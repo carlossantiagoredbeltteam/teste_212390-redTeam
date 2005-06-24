@@ -38,4 +38,28 @@ void main()
   PORTA = 0;
   PORTB = 0;
 
+  RCREG = BIN(01010100);
+  uartNotifyReceive();
+
+  RCREG = BIN(01010001);  //hdb2
+  uartNotifyReceive();
+
+  RCREG = BIN(00110001);  //hdb1
+  uartNotifyReceive();
+
+  RCREG = 1;  //dest
+  uartNotifyReceive();
+
+  RCREG = 0;  //src
+  uartNotifyReceive();
+
+  RCREG = 0x10;  //data
+  uartNotifyReceive();
+
+  RCREG = 0x00;  //crc
+  uartNotifyReceive();
+
+  for(;;) {
+  }
+
 }

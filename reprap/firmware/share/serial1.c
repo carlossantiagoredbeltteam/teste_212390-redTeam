@@ -91,7 +91,37 @@
  * In order for the routines to work the ISR must call the interrupt
  * handler serialInterruptHandler()
  *
+ * When we get a packet not destined for us or with headers we don't
+ * understand, we just pass them on.  In theory, a corrupt packet
+ * could therefore just be passed on by everybody, forever.  To get
+ * around this we could buffer the packet and check the CRC, then only
+ * send it on if all is well.  However in doing so we greatly increase
+ * the latency.  To prevent the possible long-term buildup of rogue
+ * packets it is assumed that there is a node in the ring (such as a
+ * more powerful PC) that will check things more thoroughly and mop up
+ * any problem packets that are cycling the network.  By only having
+ * one such node in the network, the latency effects are minimised.
+ *
+ *
+ * Problems with SNAP:
+ *
+ * Error correction is optional.  That means the flag itself could be
+ * corrupted and no error correction will take place.  It should
+ * be mandatory and cover the header.
+ *
+ * The destination address should occur sooner so packets can be
+ * passed on in the network as soon as possible to decrease latency (only
+ * relevant in a token ring situation).
+ *
+ * The lengths are not continuous up to the sizes we want.
+ *
+ * A lot of the other stuff is superfluous.
+ *
+ * An ARP protocol like SMBus has might be nice.
+ *
  */
+
+#include "serial-inc.h"
 
 #define MAX_TRANSMIT_BUFFER 8  //< Transmit buffer size. Must be power of 2.
 #define MAX_PAYLOAD 16        ///< Size of largest possible message.
@@ -115,9 +145,12 @@ enum SNAP_states {
   SNAP_readingDataPass
 };
 
-const byte SNAP_SYNC = BIN(01010100);
+#define SNAP_SYNC BIN(01010100)
 
 static byte uartState = SNAP_idle; ///< Current SNAP state machine state
+static byte in_hdb2,  ///< Temporary buffers needed to
+  in_hdb1,            ///  pass packets on from various
+  in_dest;            ///  states.
 static byte packetLength;          ///< Length of packet being received
 static byte sourceAddress;         ///< Source of packet being received
 static byte receivedSourceAddress; ///< Source of packet previously received
@@ -138,8 +171,9 @@ static byte transmitBufferTail; ///< End of circular transmit buffer
 /// This buffer stores the last complete packet body (not the headers
 /// as they can be reconstructed).  This is to allow automatic re-sending
 /// if a NAK is received.
-static byte lastPacket[MAX_PAYLOAD];
-static byte lastPacketLength;
+static byte sendPacketDestination;
+static byte sendPacket[MAX_PAYLOAD];
+static byte sendPacketLength;
 /// When sending a packet this is set to 0 and incremented for
 /// every NAK.  After too many have occurred, the packet is just
 /// dropped.
@@ -147,6 +181,7 @@ static byte nakCount;
 
 /// General flags:
 static sbit processingLock = 0;
+static sbit ackRequested;
 
 //===========================================================================//
 static void uartNotifyReceive()
@@ -180,16 +215,18 @@ static void uartNotifyReceive()
     // address, and no protocol specific bytes.  The ACK/NAK bits may
     // be anything.
     if ((c & BIN(11111100)) != BIN(01010000)) {
-      // We can't deal with such packets, but we also can't skip to
-      // the end at the moment, so for now we'll bail out and see if
-      // we can find the next packet start.
-
-      /// @todo This should cleanly skip over the packet and just
-      /// forward it on to the next node in the ring.
-      uartState = SNAP_idle;
+      // Unsupported header.  Just pass it on to the next node.
+      // We assume there are 1 byte addresses still, for simplicity.
+      uartTransmit(SNAP_SYNC);
+      uartTransmit(in_hdb2 = c);
+      uartState = SNAP_haveHDB2Pass;
     } else {
       // All is well
-      uartState = SNAP_haveHDB1;
+      if ((c & BIN(00000011)) == BIN(00000001))
+	ackRequested = 1;
+      else
+	ackRequested = 0;
+      uartState = SNAP_haveHDB2;
     }
     break;
 
@@ -198,13 +235,15 @@ static void uartNotifyReceive()
     // For HDB1, we insist CMD = 0, EDM = 8-bit CRC.
     if ((c & BIN(11110000)) != BIN(00110000)) {
       // Bail out
-      /// @todo Cleanly skip and retransmit packet
-      uartState = SNAP_idle;
+      uartTransmit(SNAP_SYNC);
+      uartTransmit(in_hdb2);
+      uartTransmit(in_hdb1 = c);
+      uartState = SNAP_haveHDB1Pass;
     } else {
       packetLength = c & 0x0f;
       if (packetLength & 8)
 	packetLength = 8 << (c & 7);
-      uartState = SNAP_haveHDB2;
+      uartState = SNAP_haveHDB1;
     }
     break;
 
@@ -212,9 +251,11 @@ static void uartNotifyReceive()
   case SNAP_haveHDB1:
     // We should be reading the destination address now
     if (c != deviceAddress) {
-      /// @todo Cleanly skip and retransmit packet
-      /// @todo Should only retransmit if the source wasn't us
-      uartState = SNAP_idle;
+      uartTransmit(SNAP_SYNC);
+      uartTransmit(in_hdb2);
+      uartTransmit(in_hdb1);
+      uartTransmit(in_dest = c);
+      uartState = SNAP_haveDABPass;
     } else {
       uartState = SNAP_haveDAB;
     }
@@ -231,6 +272,7 @@ static void uartNotifyReceive()
       /// @todo Deal with this situation
     }
     sourceAddress = c;
+    bufferIndex = 0;
     uartState = SNAP_readingData;
     break;
 
@@ -248,25 +290,75 @@ static void uartNotifyReceive()
   case SNAP_dataComplete:
     // We should be receiving a CRC after data, and it
     // should match what we have already computed
-    if (c == crc) {
-      // All is good, so process the command.  Rather than calling the
-      // appropriate function directly, we just set a flag to say
-      // something is ready for processing.  Then in the main loop we
-      // detect this and process the command.  This allows further
-      // comms processing (such as passing other tokens around the
-      // ring) while we're actioning the command.
-
-      /// @todo Implement the flag
-      /// @todo Add locking so if we're receiving something
-      ///   while we're still processing (the flag is already set)
-      ///   then we should NAK the sender.
-
-      // Now ACK the packet
-    } else {
-      // CRC mismatch, so we will NAK the packet
+    {
+      byte hdb2 = BIN(01010000); // 1 byte addresses
+      if (1 || c == crc) { ///@todo Remove bypass here
+	// All is good, so process the command.  Rather than calling the
+	// appropriate function directly, we just set a flag to say
+	// something is ready for processing.  Then in the main loop we
+	// detect this and process the command.  This allows further
+	// comms processing (such as passing other tokens around the
+	// ring) while we're actioning the command.
+	
+	if (processingLock) {
+	  // If we're already processing, NAK and ignore
+	  hdb2 |= BIN(11);
+	} else {
+	  // Otherwise ACK and set the flag to allow processing to start
+	  hdb2 |= BIN(10);
+	  processingLock = 1;
+	}
+      } else {
+	// CRC mismatch, so we will NAK the packet
+	hdb2 |= BIN(11);
+      }
+      if (ackRequested) {
+	// Send ACK or NAK back to source
+	uartTransmit(SNAP_SYNC);
+	uartTransmit(hdb2);
+	uartTransmit(BIN(00110000));  // HDB1: 0 bytes, with 8 bit CRC
+	uartTransmit(sourceAddress);  // Return to sender
+	uartTransmit(deviceAddress);  // From us
+	uartTransmit(0);  // CRC
+      }
     }
+    uartState = SNAP_idle;
     break;
 
+  // ----------------------------------------------------------------------- //
+  case SNAP_haveHDB2Pass:
+    uartTransmit(c);  // We will be reading HDB1; pass it on
+    packetLength = c & 0x0f;
+    if (packetLength & 8)
+      packetLength = 8 << (c & 7);
+    uartState = SNAP_haveHDB1Pass;
+    break;
+
+  // ----------------------------------------------------------------------- //
+  case SNAP_haveHDB1Pass:
+    uartTransmit(c);  // We will be reading dest addr; pass it on
+    uartState = SNAP_haveDABPass;
+    break;
+
+  // ----------------------------------------------------------------------- //
+  case SNAP_haveDABPass:
+    uartTransmit(c);  // We will be reading source addr; pass it on
+
+    // Increment data length by 1 so that we just copy the CRC
+    // at the end as well.
+    packetLength++;
+
+    uartState = SNAP_readingDataPass;
+    break;
+
+  // ----------------------------------------------------------------------- //
+  case SNAP_readingDataPass:
+    uartTransmit(c);  // This is a data byte; pass it on
+    if (packetLength > 0)
+      packetLength--;
+    else
+      uartState = SNAP_idle;
+    break;
   }
 
 }
@@ -328,10 +420,10 @@ void sendDataByte(byte c)
   // yet as we don't have complete information.
 
   // Drop if trying to send too much
-  if (lastPacketLength >= MAX_PAYLOAD)
+  if (sendPacketLength >= MAX_PAYLOAD)
     return;
 
-  lastPacket[lastPacketLength++] = c;
+  sendPacket[sendPacketLength++] = c;
 }
 
 //===========================================================================//
@@ -342,14 +434,32 @@ void releaseLock()
   /// @todo If sending is in progress or waiting for ACK, block.
 }
 
+//===========================================================================//
 void sendMessage(byte dest)
 {
-  
+  sendPacketDestination = dest;
 }
 
+//===========================================================================//
 void sendReply()
 {
   sendMessage(receivedSourceAddress);
+}
+
+//===========================================================================//
+void awaitDelivery()
+{
+}
+
+//===========================================================================//
+byte deliveryStatus()
+{
+  return 0;
+}
+
+//===========================================================================//
+void endMessage()
+{
 }
 
 //===========================================================================//
