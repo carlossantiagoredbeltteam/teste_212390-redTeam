@@ -12,12 +12,12 @@ master.hex:	$(MASTER:.c=.o)
 
 clean:
 	rm -f *.asm *.p *.lst *.map \
-		*.adb *~ \
-		*.hex *.cod *.cof *.o *.o.gcc
+		*.adb *~ *.d \
+		*.hex *.cod *.cof *.o *.o.gcc *.dep
 
-%.d: %.c
+%.dep: %.c
 	$(SHELL) -ec 'gcc -MM -MG $< \
 		| sed '\''s/\($*\)\.o[ :]*/\1.o $@ : /g'\'' > $@; \
 		[ -s $@ ] || rm -f $@'
 
-include $(MASTER:.c=.d)
+include $(MASTER:.c=.dep)
