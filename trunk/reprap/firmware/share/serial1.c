@@ -1,0 +1,365 @@
+
+/**
+ * Implementation of interrupt driven SNAP communications routines for
+ * use in a token ring configuration.  Being completely interrupt
+ * driven improves performance and simplifies development of the core
+ * logic in each device.  This is not really a true token ring in that
+ * there is no token frame and the procedure for ring insertion etc.
+ * is trivial -- it is however a network with ring topology.
+ *
+ * Overview/notes:
+ *
+ * A receive buffer accepts payload data as it arrives.  Upon
+ * completion, a global flag is set that acts as a lock to prevent
+ * further receives occuring until the lock is removed.  If a receive
+ * does occur, but it is for somebody else, it is passed onto the next
+ * node in the loop.  If the receive is for ourself then we fail and
+ * NAK the packet so that it will be re-sent at a time we can
+ * hopefully act on it.
+ *
+ * The lock flag also indicates to the main loop that data is awaiting
+ * and the main loop is responsible for calling any processing on the
+ * data.  It is not called directly by the ISR to prevent re-entrancy
+ * problems.  The act of receiving the byte will wake the CPU and
+ * allow it to check for the present of the lock.  After processing is
+ * complete it may sleep if it wishes.  It will be woken after every
+ * byte is received but can just repeatedly sleep again if it likes.
+ *
+ * The main loop that is acting on the lock flag must process the
+ * command and send any necessary data.  It must also wait for an ACK
+ * or NAK before finally removing the lock and allowing further
+ * receives.
+ *
+ * When sending any packet (including ACK or NAK packets), a timeout
+ * is started.  If the timeout expires, the response is considered to
+ * be a NAK and the ACK/NAK is resent.  The timeout should be generous
+ * enough to allow for full ring propagation with worst-case delays.
+ * If the packets comes back to the sender, it is also treated as a
+ * NAK.  An error counter should limit the number of re-sends before
+ * dropping the packet and returning an error.
+ *
+ * When data is received, only the payload is available to the main
+ * loop.  A copy of the source address is also saved until the lock is
+ * released.  This allows replies to be sent regardless of other
+ * packets received or forwarded during processing.
+ *
+ * For the moment, data packets will not have ACK/NAK piggybacked
+ * with them and each will be sent separately.  This is because
+ * ACKs are automatically and immediately sent by the ISR routines
+ * because a response is even computed.
+ *
+ * @todo NAKing a packet while busy should ideally send a special NAK
+ * that indicates busy as opposed to failed CRC, etc.  This would allow
+ * a small pause before re-sending, rather than resending immediately
+ * and probably causing the same problem again.
+ *
+ * General API:
+ *
+ * - Main loop inspects processingLock flag.  If set, it actions the data
+ *   in buffer.
+ *
+ * - A reply is optionally constructed by calling sendReply.  This uses
+ *   the saved source address to send appropriate header bytes.  Nothing
+ *   much happens here because the header can't be constructed until
+ *   the packet is complete (length is unknown).
+ *
+ * - Packet payload is sent by repeatedly calling sendDataByte
+ *
+ * - The sending is completed by calling endMessage, which will
+ *   send the actual packet by constructing a header, length, body and
+ *   CRC for the message.
+ *
+ * - awaitDelivery is called to wait for a response. A duplicate of
+ *   the entire packet is kept in an additional buffer so that if a NAK
+ *   arrives the same data can be re-sent without bothering the client.
+ *   This method should do very little as the handling of this is
+ *   interrupt driven.  If called, it will block until the delivery is
+ *   complete and return fail/success.
+ *
+ * - deliveryStatus returns the same information as awaitDelivery
+ *   (except tristate values indicating still sending, success,
+ *   failure).  This does not block however.
+ *
+ * - When sending a new message rather than a reply, the sendMessage
+ *   function is called with the destination address.
+ *
+ * - Call releaseLock to indicate processing is complete amd allow
+ *   any necessary cleanups.  If no ACK is received yet, this
+ *   will block until it arrives.  If endMessage is not called,
+ *   the packet is dropped.
+ *
+ * In order for the routines to work the ISR must call the interrupt
+ * handler serialInterruptHandler()
+ *
+ */
+
+#define MAX_TRANSMIT_BUFFER 8  //< Transmit buffer size. Must be power of 2.
+#define MAX_PAYLOAD 16        ///< Size of largest possible message.
+
+enum SNAP_states {
+  SNAP_idle,
+  SNAP_haveSync,
+  SNAP_haveHDB2,
+  SNAP_haveHDB1,
+  SNAP_haveDAB,
+  SNAP_readingData,
+  SNAP_dataComplete,
+
+  // The *Pass states below represent states where
+  // we should just be passing the data on to the next node.
+  // This is either because we bailed out, or because the
+  // packet wasn't destined for us.
+  SNAP_haveHDB2Pass,
+  SNAP_haveHDB1Pass,
+  SNAP_haveDABPass,
+  SNAP_readingDataPass
+};
+
+const byte SNAP_SYNC = BIN(01010100);
+
+static byte uartState = SNAP_idle; ///< Current SNAP state machine state
+static byte packetLength;          ///< Length of packet being received
+static byte sourceAddress;         ///< Source of packet being received
+static byte receivedSourceAddress; ///< Source of packet previously received
+static byte bufferIndex;           ///< Current receive buffer index
+static byte buffer[MAX_PAYLOAD];   ///< Receive buffer
+static byte crc; ///< Incrementally calculated CRC value
+
+/// Circular transmit buffer.
+/// Tail has the buffer index that will next be written to.  Head is
+/// the buffer index that will next be transmitted.
+/// If head == tail, the buffer is empty.
+/// The purpose of this buffer is to allow background sending of
+/// data rather than busy looping.
+static byte transmitBuffer[MAX_TRANSMIT_BUFFER];
+static byte transmitBufferHead; ///< Start of circular transmit buffer
+static byte transmitBufferTail; ///< End of circular transmit buffer
+
+/// This buffer stores the last complete packet body (not the headers
+/// as they can be reconstructed).  This is to allow automatic re-sending
+/// if a NAK is received.
+static byte lastPacket[MAX_PAYLOAD];
+static byte lastPacketLength;
+/// When sending a packet this is set to 0 and incremented for
+/// every NAK.  After too many have occurred, the packet is just
+/// dropped.
+static byte nakCount;
+
+/// General flags:
+static sbit processingLock = 0;
+
+//===========================================================================//
+static void uartNotifyReceive()
+{
+
+  byte c = RCREG;
+
+  // If error occurred then reset by clearing CREN, but
+  // attempt to continue processing anyway.
+  /// @todo Should we do something else in this situation?
+  if (OERR)
+    CREN = 0;
+  else
+    CREN = 1;
+
+  switch(uartState) {
+
+  // ----------------------------------------------------------------------- //
+  case SNAP_idle:
+    // In the idle state, we wait for a sync byte.  If none is
+    // received, we remain in this state.
+    if (c == SNAP_SYNC)
+      uartState = SNAP_haveSync;
+    break;
+
+  // ----------------------------------------------------------------------- //
+  case SNAP_haveSync:
+    // In this state we are waiting for header definition bytes. First
+    // HDB2.  We currently insist that all packets meet our expected
+    // format which is 1 byte destination address, 1 byte source
+    // address, and no protocol specific bytes.  The ACK/NAK bits may
+    // be anything.
+    if ((c & BIN(11111100)) != BIN(01010000)) {
+      // We can't deal with such packets, but we also can't skip to
+      // the end at the moment, so for now we'll bail out and see if
+      // we can find the next packet start.
+
+      /// @todo This should cleanly skip over the packet and just
+      /// forward it on to the next node in the ring.
+      uartState = SNAP_idle;
+    } else {
+      // All is well
+      uartState = SNAP_haveHDB1;
+    }
+    break;
+
+  // ----------------------------------------------------------------------- //
+  case SNAP_haveHDB2:
+    // For HDB1, we insist CMD = 0, EDM = 8-bit CRC.
+    if ((c & BIN(11110000)) != BIN(00110000)) {
+      // Bail out
+      /// @todo Cleanly skip and retransmit packet
+      uartState = SNAP_idle;
+    } else {
+      packetLength = c & 0x0f;
+      if (packetLength & 8)
+	packetLength = 8 << (c & 7);
+      uartState = SNAP_haveHDB2;
+    }
+    break;
+
+  // ----------------------------------------------------------------------- //
+  case SNAP_haveHDB1:
+    // We should be reading the destination address now
+    if (c != deviceAddress) {
+      /// @todo Cleanly skip and retransmit packet
+      /// @todo Should only retransmit if the source wasn't us
+      uartState = SNAP_idle;
+    } else {
+      uartState = SNAP_haveDAB;
+    }
+    break;
+
+  // ----------------------------------------------------------------------- //
+  case SNAP_haveDAB:
+    // We should be reading the source address now
+    if (c == deviceAddress) {
+      // If we receive a packet from ourselves, that means it went
+      // around the ring and was never picked up, ie the device we
+      // sent to is off-line or unavailable.
+
+      /// @todo Deal with this situation
+    }
+    sourceAddress = c;
+    uartState = SNAP_readingData;
+    break;
+
+  // ----------------------------------------------------------------------- //
+  case SNAP_readingData:
+    buffer[bufferIndex++] = c;
+
+    /// @todo Compute partial CRC
+
+    if (bufferIndex == packetLength)
+      uartState = SNAP_dataComplete;
+    break;
+
+  // ----------------------------------------------------------------------- //
+  case SNAP_dataComplete:
+    // We should be receiving a CRC after data, and it
+    // should match what we have already computed
+    if (c == crc) {
+      // All is good, so process the command.  Rather than calling the
+      // appropriate function directly, we just set a flag to say
+      // something is ready for processing.  Then in the main loop we
+      // detect this and process the command.  This allows further
+      // comms processing (such as passing other tokens around the
+      // ring) while we're actioning the command.
+
+      /// @todo Implement the flag
+      /// @todo Add locking so if we're receiving something
+      ///   while we're still processing (the flag is already set)
+      ///   then we should NAK the sender.
+
+      // Now ACK the packet
+    } else {
+      // CRC mismatch, so we will NAK the packet
+    }
+    break;
+
+  }
+
+}
+
+//===========================================================================//
+void uartTransmit(byte c)
+{
+  // If idle, then transmit immediately.  Otherwise, queue the byte
+  // for later sending.
+
+  if (TRMT) {
+    TXREG = c;
+  } else {
+    // Put c at buffer tail and increment it.
+    byte newTail = (transmitBufferTail + 1) & (MAX_TRANSMIT_BUFFER - 1);
+    if (newTail == transmitBufferHead) {
+      // The buffer is full.  In theory this should never happen if
+      // we're sending things correctly and the buffer size is chosen
+      // correctly.  To try and help this exceptional situation, we'll
+      // wait until there is space in the buffer.  Note that this is
+      // not an ideal situation because if we're transmitting from an
+      // ISR then we might block other important activity.  Even
+      // worse, if that's true then we might never get a chance to
+      // transmit another character from the buffer and we'll hang
+      // until reset by WDT.  It shouldn't happen though...
+      /// @bug Perhaps we should just drop the excess data?
+      while(newTail == transmitBufferHead)
+	;
+    }
+    transmitBuffer[transmitBufferTail] = c;
+    transmitBufferTail = newTail;
+  }
+
+}
+
+//===========================================================================//
+/// Called to indicate when the transmit register is free and we can
+/// potentially send another byte from the buffer.
+void uartNotifyTransmitRegisterFree()
+{
+  // Note TRMT should always be 1 here (ready to transmit)
+
+  // If the queue is empty, there's nothing to do
+  if (transmitBufferHead == transmitBufferTail)
+    return;
+
+  // Send byte at transmitBuffer[transmitBufferHead]
+  TXREG = transmitBuffer[transmitBufferHead];
+
+  transmitBufferHead = (transmitBufferHead + 1) & (MAX_TRANSMIT_BUFFER - 1);
+  
+  TXIF = 0; // Clear transmit empty interrupt flag ready for next time
+}
+
+//===========================================================================//
+void sendDataByte(byte c)
+{
+  // Put byte into packet sending buffer.  Don't calculated CRCs
+  // yet as we don't have complete information.
+
+  // Drop if trying to send too much
+  if (lastPacketLength >= MAX_PAYLOAD)
+    return;
+
+  lastPacket[lastPacketLength++] = c;
+}
+
+//===========================================================================//
+void releaseLock()
+{
+  processingLock = 0;
+
+  /// @todo If sending is in progress or waiting for ACK, block.
+}
+
+void sendMessage(byte dest)
+{
+  
+}
+
+void sendReply()
+{
+  sendMessage(receivedSourceAddress);
+}
+
+//===========================================================================//
+void serialInterruptHandler()
+{
+  // Process serial
+  // Any data received?
+  if (RCIF)
+    uartNotifyReceive();
+  // Finished sending something?
+  if (TXIF)
+    uartNotifyTransmitRegisterFree();
+}
