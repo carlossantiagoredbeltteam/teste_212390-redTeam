@@ -127,7 +127,7 @@
 #define MAX_PAYLOAD 16        ///< Size of largest possible message.
 
 enum SNAP_states {
-  SNAP_idle,
+  SNAP_idle = 0x30,
   SNAP_haveSync,
   SNAP_haveHDB2,
   SNAP_haveHDB1,
@@ -196,6 +196,9 @@ static void uartNotifyReceive()
     CREN = 0;
   else
     CREN = 1;
+
+  uartTransmit(c);
+  uartTransmit(uartState);
 
   switch(uartState) {
 
@@ -292,7 +295,10 @@ static void uartNotifyReceive()
     // should match what we have already computed
     {
       byte hdb2 = BIN(01010000); // 1 byte addresses
-      if (1 || c == crc) { ///@todo Remove bypass here
+      
+      crc = c;
+
+      if (c == crc) { ///@todo Remove bypass here
 	// All is good, so process the command.  Rather than calling the
 	// appropriate function directly, we just set a flag to say
 	// something is ready for processing.  Then in the main loop we
@@ -368,8 +374,8 @@ void uartTransmit(byte c)
 {
   // If idle, then transmit immediately.  Otherwise, queue the byte
   // for later sending.
-
   if (TRMT) {
+    TXIE = 1;
     TXREG = c;
   } else {
     // Put c at buffer tail and increment it.
@@ -385,13 +391,20 @@ void uartTransmit(byte c)
       // transmit another character from the buffer and we'll hang
       // until reset by WDT.  It shouldn't happen though...
       /// @bug Perhaps we should just drop the excess data?
-      while(newTail == transmitBufferHead)
+      while(transmitBufferTail == transmitBufferHead)
 	;
     }
     transmitBuffer[transmitBufferTail] = c;
     transmitBufferTail = newTail;
-  }
+    // If the TSR became free during our processing (while
+    // interrupts were disabled), we won't find out about
+    // the completion, so check again and if it's free now
+    // proceed to send the next buffered byte.
 
+    if (TRMT)
+      uartNotifyTransmitRegisterFree();
+
+  }
 }
 
 //===========================================================================//
@@ -399,18 +412,29 @@ void uartTransmit(byte c)
 /// potentially send another byte from the buffer.
 void uartNotifyTransmitRegisterFree()
 {
+  PORTB = 0x30;
+
   // Note TRMT should always be 1 here (ready to transmit)
 
   // If the queue is empty, there's nothing to do
-  if (transmitBufferHead == transmitBufferTail)
+  if (transmitBufferHead == transmitBufferTail) {
+    TXIE = 0;  // Disable interrupts (this should never be reached)
     return;
+  }
+  PORTB = 0x40;
+
 
   // Send byte at transmitBuffer[transmitBufferHead]
   TXREG = transmitBuffer[transmitBufferHead];
 
   transmitBufferHead = (transmitBufferHead + 1) & (MAX_TRANSMIT_BUFFER - 1);
-  
-  TXIF = 0; // Clear transmit empty interrupt flag ready for next time
+
+  // If still there's anything left to send, re-enable interrupts
+  if (transmitBufferHead != transmitBufferTail) {
+    PORTB = 0x50;
+
+    TXIE = 1; // Enable TX complete interrupt
+  }
 }
 
 //===========================================================================//
