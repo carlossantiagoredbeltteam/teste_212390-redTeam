@@ -2,7 +2,7 @@
 MASTER=master1.c master2.c
 
 .c.o:
-	sdcc -S -V --debug -mpic14 -p16f628 --fommit-frame-pointer $<
+	sdcc -S -V --debug -mpic14 -p16f627 --fommit-frame-pointer $<
 	gpasm -c $*.asm
 
 all:	master.hex
