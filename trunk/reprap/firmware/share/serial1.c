@@ -391,6 +391,7 @@ static void uartNotifyReceive()
 #pragma restore
 
 //===========================================================================//
+/// Low level routine that queue a byte directly for the hardware
 void uartTransmit(byte c)
 {
   byte newTail;
@@ -407,6 +408,7 @@ void uartTransmit(byte c)
 }
 
 //===========================================================================//
+/// High level routine that queues a byte during construction of a packet
 void sendDataByte(byte c)
 {
   // Put byte into packet sending buffer.  Don't calculated CRCs
