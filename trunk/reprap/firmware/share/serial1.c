@@ -102,6 +102,22 @@
  * any problem packets that are cycling the network.  By only having
  * one such node in the network, the latency effects are minimised.
  *
+ * @todo An enhancement that may be needed is something to deal with
+ * too much data arriving.  eg if fully occupied with incoming data
+ * and a local transmit is occasionally needed, eventually
+ * transmitting will block while waiting for the TSR to become free
+ * (it won't be able to contain all the outgoing data).  This will
+ * mean received data is lost and the packet will become corrupted.
+ * However at least the next packet will also become corrupted.  This
+ * situation should be detected and if anything arrives during
+ * blocking transmits, they should be cleanly dropped up until the
+ * packet ending.  This improvement just decreases the number of lost
+ * packets, but is a little complex so it may or may not be worth
+ * doing.  Also in most cases for a local transmit to be needed, there
+ * would also be a command received, which would be consumed leaving
+ * more buffer space.  Also responses from slave devices are not
+ * expected to overwhelm the network so badly.
+ *
  *
  * Problems with SNAP:
  *
@@ -123,7 +139,7 @@
 
 #include "serial-inc.h"
 
-#define MAX_TRANSMIT_BUFFER 8  //< Transmit buffer size. Must be power of 2.
+#define MAX_TRANSMIT_BUFFER 8  //< Transmit buffer size.
 #define MAX_PAYLOAD 16        ///< Size of largest possible message.
 
 enum SNAP_states {
@@ -180,10 +196,13 @@ static byte sendPacketLength;
 static byte nakCount;
 
 /// General flags:
-static sbit processingLock = 0;
-static sbit ackRequested;
+/// @bug these should be "sbit" rather than "byte" but sdcc is breaking a bit
+static byte processingLock = 0;
+static byte ackRequested;
 
 //===========================================================================//
+#pragma save
+#pragma nooverlay
 static void uartNotifyReceive()
 {
 
@@ -197,8 +216,8 @@ static void uartNotifyReceive()
   else
     CREN = 1;
 
-  uartTransmit(c);
-  uartTransmit(uartState);
+  //uartTransmit(c);
+  //uartTransmit(uartState);
 
   switch(uartState) {
 
@@ -281,7 +300,10 @@ static void uartNotifyReceive()
 
   // ----------------------------------------------------------------------- //
   case SNAP_readingData:
-    buffer[bufferIndex++] = c;
+    if (!processingLock)
+      buffer[bufferIndex] = c;
+
+    bufferIndex++;
 
     /// @todo Compute partial CRC
 
@@ -297,7 +319,6 @@ static void uartNotifyReceive()
       byte hdb2 = BIN(01010000); // 1 byte addresses
       
       crc = c;
-
       if (c == crc) { ///@todo Remove bypass here
 	// All is good, so process the command.  Rather than calling the
 	// appropriate function directly, we just set a flag to say
@@ -313,6 +334,7 @@ static void uartNotifyReceive()
 	  // Otherwise ACK and set the flag to allow processing to start
 	  hdb2 |= BIN(10);
 	  processingLock = 1;
+	  receivedSourceAddress = sourceAddress;
 	}
       } else {
 	// CRC mismatch, so we will NAK the packet
@@ -366,75 +388,23 @@ static void uartNotifyReceive()
       uartState = SNAP_idle;
     break;
   }
-
 }
+#pragma restore
 
 //===========================================================================//
 void uartTransmit(byte c)
 {
-  // If idle, then transmit immediately.  Otherwise, queue the byte
-  // for later sending.
-  if (TRMT) {
-    TXIE = 1;
-    TXREG = c;
-  } else {
-    // Put c at buffer tail and increment it.
-    byte newTail = (transmitBufferTail + 1) & (MAX_TRANSMIT_BUFFER - 1);
-    if (newTail == transmitBufferHead) {
-      // The buffer is full.  In theory this should never happen if
-      // we're sending things correctly and the buffer size is chosen
-      // correctly.  To try and help this exceptional situation, we'll
-      // wait until there is space in the buffer.  Note that this is
-      // not an ideal situation because if we're transmitting from an
-      // ISR then we might block other important activity.  Even
-      // worse, if that's true then we might never get a chance to
-      // transmit another character from the buffer and we'll hang
-      // until reset by WDT.  It shouldn't happen though...
-      /// @bug Perhaps we should just drop the excess data?
-      while(transmitBufferTail == transmitBufferHead)
-	;
-    }
-    transmitBuffer[transmitBufferTail] = c;
-    transmitBufferTail = newTail;
-    // If the TSR became free during our processing (while
-    // interrupts were disabled), we won't find out about
-    // the completion, so check again and if it's free now
-    // proceed to send the next buffered byte.
+  byte newTail;
+  transmitBuffer[transmitBufferTail] = c;
 
-    if (TRMT)
-      uartNotifyTransmitRegisterFree();
+  newTail = transmitBufferTail + 1;
+  if (newTail >= MAX_TRANSMIT_BUFFER)
+    newTail = 0;
 
-  }
-}
-
-//===========================================================================//
-/// Called to indicate when the transmit register is free and we can
-/// potentially send another byte from the buffer.
-void uartNotifyTransmitRegisterFree()
-{
-  PORTB = 0x30;
-
-  // Note TRMT should always be 1 here (ready to transmit)
-
-  // If the queue is empty, there's nothing to do
-  if (transmitBufferHead == transmitBufferTail) {
-    TXIE = 0;  // Disable interrupts (this should never be reached)
-    return;
-  }
-  PORTB = 0x40;
-
-
-  // Send byte at transmitBuffer[transmitBufferHead]
-  TXREG = transmitBuffer[transmitBufferHead];
-
-  transmitBufferHead = (transmitBufferHead + 1) & (MAX_TRANSMIT_BUFFER - 1);
-
-  // If still there's anything left to send, re-enable interrupts
-  if (transmitBufferHead != transmitBufferTail) {
-    PORTB = 0x50;
-
-    TXIE = 1; // Enable TX complete interrupt
-  }
+  while(newTail == transmitBufferHead)
+    ;
+  transmitBufferTail = newTail;
+  TXIE = 1;
 }
 
 //===========================================================================//
@@ -484,16 +454,47 @@ byte deliveryStatus()
 //===========================================================================//
 void endMessage()
 {
+  byte length = sendPacketLength;
+  byte i;
+  if (length > 7) {
+    length = 8;
+    sendPacketLength = 16;
+  }
+
+  // Send the message
+  uartTransmit(SNAP_SYNC);
+  uartTransmit(BIN(01010001));   // Request ACK
+  uartTransmit(BIN(00110000) | length);
+  uartTransmit(sendPacketDestination);
+  uartTransmit(deviceAddress);
+  for(i = 0; i < sendPacketLength; i++)
+    uartTransmit(sendPacket[i]);
+  uartTransmit(0); /// @todo crc here
 }
 
 //===========================================================================//
+#pragma save
+#pragma nooverlay
 void serialInterruptHandler()
 {
   // Process serial
+  // Finished sending something?
+  if (TXIF && TXIE) {
+    if (transmitBufferHead != transmitBufferTail) {
+      byte c = transmitBuffer[transmitBufferHead];
+      transmitBufferHead++;
+      if (transmitBufferHead >= MAX_TRANSMIT_BUFFER)
+	transmitBufferHead = 0;
+      // If empty now, disable XMIT interrupts
+      if (transmitBufferHead == transmitBufferTail)
+	TXIE = 0;
+      TXREG = c;
+    }
+
+  }
+
   // Any data received?
   if (RCIF)
     uartNotifyReceive();
-  // Finished sending something?
-  if (TXIF)
-    uartNotifyTransmitRegisterFree();
 }
+#pragma restore
