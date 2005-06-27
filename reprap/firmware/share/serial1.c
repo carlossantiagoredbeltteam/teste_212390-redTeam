@@ -165,8 +165,7 @@ enum SNAP_states {
 
 static byte uartState = SNAP_idle; ///< Current SNAP state machine state
 static byte in_hdb2,  ///< Temporary buffers needed to
-  in_hdb1,            ///  pass packets on from various
-  in_dest;            ///  states.
+  in_hdb1;            ///  pass packets on from various states
 static byte packetLength;          ///< Length of packet being received
 static byte sourceAddress;         ///< Source of packet being received
 static byte receivedSourceAddress; ///< Source of packet previously received
@@ -276,7 +275,7 @@ static void uartNotifyReceive()
       uartTransmit(SNAP_SYNC);
       uartTransmit(in_hdb2);
       uartTransmit(in_hdb1);
-      uartTransmit(in_dest = c);
+      uartTransmit(c);
       uartState = SNAP_haveDABPass;
     } else {
       uartState = SNAP_haveDAB;
@@ -432,6 +431,7 @@ void releaseLock()
 void sendMessage(byte dest)
 {
   sendPacketDestination = dest;
+  sendPacketLength = 0;
 }
 
 //===========================================================================//
