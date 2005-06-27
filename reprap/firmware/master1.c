@@ -9,15 +9,14 @@ config at 0x2007 __CONFIG = _CP_OFF &
  _MCLRE_OFF &
  _LVP_OFF;
 
-byte deviceAddress = 1;
+byte deviceAddress = 1;  ///@todo #define or const?
+
+byte dbg = 0;
 
 // Support routines for bank 1
 #include "serial-inc.c"
 
 static void isr() interrupt 0 {
-  PORTB = 0x20;
-
-  TXIE = 0;
   serialInterruptHandler();
 }
 
@@ -31,30 +30,62 @@ void main()
                               // RA4 is used for clock out (debugging)
                               // RA5 can only be used as an input
   TRISB = BIN(00000110);      // Port B outputs (except 1/2 for serial)
-  PIE1 = BIN(00000000);       // All interrupts initially disabled
-  INTCON = BIN(11000000);     // Interrupts enabled
+  PIE1 = BIN(00000000);       // All peripheral interrupts initially disabled
+  INTCON = BIN(00000000);     // Interrupts disabled
   PIR1 = 0;                   // Clear peripheral interrupt flags
   SPBRG = 25;                 // 25 = 2400 baud @ 4MHz
-  TXSTA = BIN(00100010);      // 8 bit low speed 
+  TXSTA = BIN(00000000);      // 8 bit low speed 
   RCSTA = BIN(10000000);      // Enable port for 8 bit receive
 
-  RCIE = 1;  // Enable interrupts
+  TXEN = 1;  // Enable transmit
+  RCIE = 1;  // Enable receive interrupts
   CREN = 1;  // Start reception
+
+  PEIE = 1;  // Peripheral interrupts on
+  GIE = 1;   // Now turn on interrupts
 
   // Turn off outputs
   PORTB = 0;
   PORTA = 0;
 
-  PORTB = 0x10;
+  // Make sure TSR is clean for first transmit.
+  // A 0 byte should be ignored by anybody to start with (no sync)
+  uartTransmit(0);
 
-  uartTransmit('I');
-  uartTransmit('N');
-  uartTransmit('I');
-  uartTransmit('T');
-  uartTransmit('\r');
-  uartTransmit('\n');
+  sendMessage(0);
+  sendDataByte('I');
+  sendDataByte('N');
+  sendDataByte('I');
+  sendDataByte('T');
+  endMessage();
 
-   for(;;) {
+  /*  RCREG = 0x54;
+  uartNotifyReceive();
+  RCREG = 0x51;
+  uartNotifyReceive();
+  RCREG = 0x31;
+  uartNotifyReceive();
+  RCREG = 0x01;
+  uartNotifyReceive();
+  RCREG = 0x00;
+  uartNotifyReceive();
+  RCREG = 0x00;
+  uartNotifyReceive();
+  RCREG = 0x30;
+  uartNotifyReceive();*/
+
+  for(;;) {
+    if (processingLock) {
+      // Process command
+      switch(buffer[0]) {
+      case 0:
+	sendReply();
+	sendDataByte('S');
+	sendDataByte('M');
+	endMessage();
+      }
+      releaseLock();
+    }
   }
 }
 
