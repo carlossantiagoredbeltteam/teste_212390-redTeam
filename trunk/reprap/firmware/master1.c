@@ -57,23 +57,6 @@ void main()
   sendDataByte('T');
   endMessage();*/
 
-  /*RCREG = 0x54;
-  uartNotifyReceive();
-  RCREG = 0x51;
-  uartNotifyReceive();
-  RCREG = 0x32;
-  uartNotifyReceive();
-  RCREG = 0x01;
-  uartNotifyReceive();
-  RCREG = 0x00;
-  uartNotifyReceive();
-  RCREG = 0x01;
-  uartNotifyReceive();
-  RCREG = 0xff;
-  uartNotifyReceive();
-  RCREG = 0x30;
-  uartNotifyReceive();*/
-
   for(;;) {
     if (processingLock) {
       //processCommand();
