@@ -5,4 +5,6 @@
 #include <pic/pic16f627.h>
 #include "pic14.h"
 
+void processCommand();
+
 #endif
