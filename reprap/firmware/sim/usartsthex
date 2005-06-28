@@ -23,7 +23,6 @@ sub emit_string
       {
         my $hex = substr($_[0], $i, 2);
 	emit_char(hex($hex));
-	print OUTFILE "-----\n";
       }
   }
 

@@ -11,8 +11,6 @@ config at 0x2007 __CONFIG = _CP_OFF &
 
 byte deviceAddress = 1;  ///@todo #define or const?
 
-byte dbg = 0;
-
 // Support routines for bank 1
 #include "serial-inc.c"
 
@@ -44,9 +42,9 @@ void main()
   PEIE = 1;  // Peripheral interrupts on
   GIE = 1;   // Now turn on interrupts
 
-  // Turn off outputs
-  PORTB = 0;
-  PORTA = 0;
+  // Put pattern on outputs
+  PORTB = 0x55;
+  PORTA = 0x55;
 
   // Make sure TSR is clean for first transmit.
   // A 0 byte should be ignored by anybody to start with (no sync)
@@ -78,7 +76,19 @@ void main()
 
   for(;;) {
     if (processingLock) {
-      processCommand();
+      //processCommand();
+      if (buffer[0] == 0) {
+	if (buffer[1])
+	  PORTA = 0xff;
+	else
+	  PORTA = 0;
+
+	sendReply();
+	sendDataByte('S');
+	sendDataByte('D');
+	sendDataByte('M');
+	endMessage();
+      }
       releaseLock();
     }
   }
