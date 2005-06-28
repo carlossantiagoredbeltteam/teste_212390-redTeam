@@ -50,42 +50,36 @@ void main()
 
   // Make sure TSR is clean for first transmit.
   // A 0 byte should be ignored by anybody to start with (no sync)
-  uartTransmit(0);
+  //uartTransmit(0);
 
-  sendMessage(0);
+  /*sendMessage(0);
   sendDataByte('I');
   sendDataByte('N');
   sendDataByte('I');
   sendDataByte('T');
-  endMessage();
+  endMessage();*/
 
-  /*  RCREG = 0x54;
+  /*RCREG = 0x54;
   uartNotifyReceive();
   RCREG = 0x51;
   uartNotifyReceive();
-  RCREG = 0x31;
+  RCREG = 0x32;
   uartNotifyReceive();
   RCREG = 0x01;
   uartNotifyReceive();
   RCREG = 0x00;
   uartNotifyReceive();
-  RCREG = 0x00;
+  RCREG = 0x01;
+  uartNotifyReceive();
+  RCREG = 0xff;
   uartNotifyReceive();
   RCREG = 0x30;
   uartNotifyReceive();*/
 
   for(;;) {
     if (processingLock) {
-      // Process command
-      switch(buffer[0]) {
-      case 0:
-	sendReply();
-	sendDataByte('S');
-	sendDataByte('M');
-	endMessage();
-      }
+      processCommand();
       releaseLock();
     }
   }
 }
-

@@ -139,9 +139,6 @@
 
 #include "serial-inc.h"
 
-#define MAX_TRANSMIT_BUFFER 8  //< Transmit buffer size.
-#define MAX_PAYLOAD 16        ///< Size of largest possible message.
-
 enum SNAP_states {
   SNAP_idle = 0x30,
   SNAP_haveSync,
@@ -170,7 +167,7 @@ static byte packetLength;          ///< Length of packet being received
 static byte sourceAddress;         ///< Source of packet being received
 static byte receivedSourceAddress; ///< Source of packet previously received
 static byte bufferIndex;           ///< Current receive buffer index
-static byte buffer[MAX_PAYLOAD];   ///< Receive buffer
+byte buffer[MAX_PAYLOAD];   ///< Receive buffer
 static byte crc; ///< Incrementally calculated CRC value
 
 /// Circular transmit buffer.
@@ -403,6 +400,7 @@ void uartTransmit(byte c)
 
   while(newTail == transmitBufferHead)
     ;
+
   transmitBufferTail = newTail;
   TXIE = 1;
 }
