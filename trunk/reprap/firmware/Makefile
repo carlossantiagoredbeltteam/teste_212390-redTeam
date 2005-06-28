@@ -17,7 +17,8 @@ master.hex:	$(MASTER:.c=.o)
 	gplink -m -c -o master.hex $(MASTER:.c=.o) pic14.a
 
 usart.stim: Makefile
-	./usartsthex -f 0 -o usart.stim -n rx1 -r 25 500 545132010001ff30
+	./usartsthex -f 0 -o usart.stim -n rx1 -r 25 \
+	500 545132010000ff30 +1000 5451320100000030
 
 sim:	master.hex usart.stim
 	gpsim -pp16f627a master.hex -s master.cod -c master.stc

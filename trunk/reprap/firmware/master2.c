@@ -7,7 +7,7 @@ void dummy()
 {
 }
 
-void processCommand()
+/*void processCommand()
 {
   byte c;
   c = buffer[zero];
@@ -18,21 +18,10 @@ void processCommand()
     sendDataByte('M');
     endMessage();
   } else if (c == 1) {
-    uartTransmit('X');
     if (buffer[1]) {
-      uartTransmit('Y');
-      _asm
-	banksel PORTA
-	movlw 0xff
-	movwf PORTA
-     _endasm;
+      PORTA = 0xff;
     } else {
-      uartTransmit('Z');
-      _asm
-	banksel PORTA
-	movlw 0x00
-	movwf PORTA
-     _endasm;
+      PORTA = 0;
     }
     sendReply();
     sendDataByte('L');
@@ -41,3 +30,4 @@ void processCommand()
     endMessage();
   }
 }
+*/
