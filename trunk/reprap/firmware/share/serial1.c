@@ -197,8 +197,38 @@ static byte processingLock = 0;
 static byte ackRequested;
 
 //===========================================================================//
+
 byte computeCRC(byte dataval)
 {
+#ifdef SDCC_DISABLED_FOR_NOW
+_asm
+  ;derived from code by T. Scott Dattalo
+  ;w contains dataval
+     movwf	crctemp
+     xorwf	_crc,f
+     clrw
+     btfsc	_crc,0
+     xorlw	0x5e
+     btfsc	_crc,1
+     xorlw	0xbc
+     btfsc	_crc,2
+     xorlw	0x61
+     btfsc	_crc,3
+     xorlw	0xc2
+     btfsc	_crc,4
+     xorlw	0x9d
+     btfsc	_crc,5
+     xorlw	0x23
+     btfsc	_crc,6
+     xorlw	0x46
+     btfsc	_crc,7
+     xorlw	0x8c
+     movwf	_crc
+     movf	crctemp, w
+     return
+_endasm;
+#else
+  // Less efficient version in C
   byte i = dataval ^ crc;
 
   crc = 0;
@@ -220,6 +250,7 @@ byte computeCRC(byte dataval)
   if(i & 0x80)
     crc ^= 0x8c;
   return dataval;
+#endif
 }
 
 //===========================================================================//
