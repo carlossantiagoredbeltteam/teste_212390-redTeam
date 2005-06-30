@@ -8,7 +8,7 @@ CXXFLAGS=-g -pthread
 	sdcc -S -V --debug -mpic14 -p16f627 --fommit-frame-pointer $<
 	gpasm -c $*.asm
 
-all:	master.hex commtest
+all:	master.hex
 
 commtest:	$(COMMTEST:.cc=.o)
 	g++ -g -pthread -o commtest $(COMMTEST:.cc=.o) \
