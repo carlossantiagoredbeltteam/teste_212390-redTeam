@@ -2,7 +2,7 @@
 MASTER=master1.c master2.c
 COMMTEST=commtest.cc
 ALL=$(MASTER)
-CXXFLAGS=-g
+CXXFLAGS=-g -pthread
 
 .c.o:
 	sdcc -S -V --debug -mpic14 -p16f627 --fommit-frame-pointer $<
@@ -11,7 +11,9 @@ CXXFLAGS=-g
 all:	master.hex commtest
 
 commtest:	$(COMMTEST:.cc=.o)
-	g++ -g -o commtest $(COMMTEST:.cc=.o)
+	g++ -g -pthread -o commtest $(COMMTEST:.cc=.o) \
+		-lboost_unit_test_framework \
+		-lboost_thread
 
 master.hex:	$(MASTER:.c=.o)
 	gplink -m -c -o master.hex $(MASTER:.c=.o) pic14.a
@@ -26,7 +28,8 @@ sim:	master.hex usart.stim
 clean:
 	rm -f *.asm *.p *.lst *.map \
 		*.adb *~ *.d usart.stim \
-		*.hex *.cod *.cof *.o *.o.gcc *.dep commtest
+		*.hex *.cod *.cof *.o *.o.gcc *.dep commtest \
+		nodes.tar.gz
 
 %.dep: %.c
 	$(SHELL) -ec 'gcc -MM -MG $< \
@@ -34,9 +37,14 @@ clean:
 		[ -s $@ ] || rm -f $@'
 
 %.dep: %.cc
-	$(SHELL) -ec 'g++ -MM -MG $< \
+	$(SHELL) -ec 'g++ -pthread -MM -MG $< \
 		| sed '\''s/\($*\)\.o[ :]*/\1.o $@ : /g'\'' > $@; \
 		[ -s $@ ] || rm -f $@'
+
+dist:
+	tar cvfz nodes.tar.gz \
+		Makefile *.c *.h *.cc usartst usartsthex \
+		master.stc pic14.a
 
 include $(ALL:.c=.dep)
 include commtest.dep
