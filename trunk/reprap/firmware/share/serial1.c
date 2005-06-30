@@ -197,6 +197,32 @@ static byte processingLock = 0;
 static byte ackRequested;
 
 //===========================================================================//
+byte computeCRC(byte dataval)
+{
+  byte i = dataval ^ crc;
+
+  crc = 0;
+
+  if(i & 1)
+    crc ^= 0x5e;
+  if(i & 2)
+    crc ^= 0xbc;
+  if(i & 4)
+    crc ^= 0x61;
+  if(i & 8)
+    crc ^= 0xc2;
+  if(i & 0x10)
+    crc ^= 0x9d;
+  if(i & 0x20)
+    crc ^= 0x23;
+  if(i & 0x40)
+    crc ^= 0x46;
+  if(i & 0x80)
+    crc ^= 0x8c;
+  return dataval;
+}
+
+//===========================================================================//
 #pragma save
 #pragma nooverlay
 static void uartNotifyReceive()
@@ -244,6 +270,8 @@ static void uartNotifyReceive()
 	ackRequested = 1;
       else
 	ackRequested = 0;
+      crc = 0;
+      computeCRC(c);
       uartState = SNAP_haveHDB2;
     }
     break;
@@ -261,6 +289,7 @@ static void uartNotifyReceive()
       packetLength = c & 0x0f;
       if (packetLength & 8)
 	packetLength = 8 << (c & 7);
+      computeCRC(c);
       uartState = SNAP_haveHDB1;
     }
     break;
@@ -275,6 +304,7 @@ static void uartNotifyReceive()
       uartTransmit(c);
       uartState = SNAP_haveDABPass;
     } else {
+      computeCRC(c);
       uartState = SNAP_haveDAB;
     }
     break;
@@ -291,6 +321,7 @@ static void uartNotifyReceive()
     }
     sourceAddress = c;
     bufferIndex = 0;
+    computeCRC(c);
     uartState = SNAP_readingData;
     break;
 
@@ -301,7 +332,7 @@ static void uartNotifyReceive()
 
     bufferIndex++;
 
-    /// @todo Compute partial CRC
+    computeCRC(c);
 
     if (bufferIndex == packetLength)
       uartState = SNAP_dataComplete;
@@ -314,7 +345,6 @@ static void uartNotifyReceive()
     {
       byte hdb2 = BIN(01010000); // 1 byte addresses
       
-      crc = c;
       if (c == crc) { ///@todo Remove bypass here
 	// All is good, so process the command.  Rather than calling the
 	// appropriate function directly, we just set a flag to say
@@ -339,11 +369,13 @@ static void uartNotifyReceive()
       if (ackRequested) {
 	// Send ACK or NAK back to source
 	uartTransmit(SNAP_SYNC);
-	uartTransmit(hdb2);
-	uartTransmit(BIN(00110000));  // HDB1: 0 bytes, with 8 bit CRC
-	uartTransmit(sourceAddress);  // Return to sender
-	uartTransmit(deviceAddress);  // From us
-	uartTransmit(0);  // CRC
+	crc = 0;
+	uartTransmit(computeCRC(hdb2));
+	// HDB1: 0 bytes, with 8 bit CRC
+	uartTransmit(computeCRC(BIN(00110000)));
+	uartTransmit(computeCRC(sourceAddress));  // Return to sender
+	uartTransmit(computeCRC(deviceAddress));  // From us
+	uartTransmit(crc);  // CRC
       }
     }
     uartState = SNAP_idle;
@@ -463,13 +495,14 @@ void endMessage()
 
   // Send the message
   uartTransmit(SNAP_SYNC);
-  uartTransmit(BIN(01010001));   // Request ACK
-  uartTransmit(BIN(00110000) | length);
-  uartTransmit(sendPacketDestination);
-  uartTransmit(deviceAddress);
+  crc = 0;
+  uartTransmit(computeCRC(BIN(01010001)));   // Request ACK
+  uartTransmit(computeCRC(BIN(00110000) | length));
+  uartTransmit(computeCRC(sendPacketDestination));
+  uartTransmit(computeCRC(deviceAddress));
   for(i = 0; i < sendPacketLength; i++)
-    uartTransmit(sendPacket[i]);
-  uartTransmit(0); /// @todo crc here
+    uartTransmit(computeCRC(sendPacket[i]));
+  uartTransmit(crc); /// @todo crc here
 }
 
 //===========================================================================//

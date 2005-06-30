@@ -180,7 +180,7 @@ void simple_test()
 void send_test()
 {
   cout << "send_test" << endl;
-  rxbytes("54 51 31 01 00 00 30");
+  rxbytes("54 51 31 01 00 00 34");
   waitForLock();
   expectbytes("54 52 30 00 01 00"); // The ack
   sendReply();
