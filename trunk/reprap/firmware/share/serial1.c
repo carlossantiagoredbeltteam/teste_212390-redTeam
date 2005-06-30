@@ -46,7 +46,7 @@
  * For the moment, data packets will not have ACK/NAK piggybacked
  * with them and each will be sent separately.  This is because
  * ACKs are automatically and immediately sent by the ISR routines
- * because a response is even computed.
+ * before a response is even computed.
  *
  * @todo NAKing a packet while busy should ideally send a special NAK
  * that indicates busy as opposed to failed CRC, etc.  This would allow
@@ -388,7 +388,7 @@ static void uartNotifyReceive()
 #pragma restore
 
 //===========================================================================//
-/// Low level routine that queue a byte directly for the hardware
+/// Low level routine that queues a byte directly for the hardware
 void uartTransmit(byte c)
 {
   byte newTail;
