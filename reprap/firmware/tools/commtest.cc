@@ -171,9 +171,9 @@ void expectbytes(string bytes)
 void simple_test()
 {
   cout << "simple_test" << endl;
-  rxbytes("54 51 31 01 00 00 30");
+  rxbytes("54 51 31 01 00 00 34");
   waitForLock();
-  expectbytes("54 52 30 00 01 00");
+  expectbytes("54 52 30 00 01 5f");
   releaseLock();
 }
 
@@ -182,15 +182,36 @@ void send_test()
   cout << "send_test" << endl;
   rxbytes("54 51 31 01 00 00 34");
   waitForLock();
-  expectbytes("54 52 30 00 01 00"); // The ack
+  expectbytes("54 52 30 00 01 5f"); // The ack
   sendReply();
   sendDataByte('t');
   sendDataByte('e');
   sendDataByte('s');
   sendDataByte('t');
   endMessage();
-  expectbytes("54 51 34 00 01 74 65 73 74 00"); // The real reply
+  expectbytes("54 51 34 00 01 74 65 73 74 3f"); // The real reply
   releaseLock();
+}
+
+void passon_test()
+{
+  // This tests what happens when bytes are received for another
+  // node (they should be forwarded on)
+  cout << "passon_test" << endl;
+  rxbytes("54 51 31 02 00 00 30");
+  waitForLock();
+  expectbytes("54 52 30 00 01 00");
+  releaseLock();
+}
+
+void noresponse_test()
+{
+  // This tests what happens when a packet is received sent
+  // from a nodes own address.  It should be treated as a NAK
+  // and resent.
+  cout << "noresponse_test" << endl;
+  rxbytes("54 51 31 02 01 30");
+  expectbytes("54 52 30 00 01 00");
 }
 
 void txthread()
@@ -206,6 +227,8 @@ test_suite *init_unit_test_suite(int argc, char *argv[])
   
   logic->add(BOOST_TEST_CASE(&simple_test));
   logic->add(BOOST_TEST_CASE(&send_test));
+  logic->add(BOOST_TEST_CASE(&passon_test));
+  logic->add(BOOST_TEST_CASE(&noresponse_test));
 
   return logic;
   

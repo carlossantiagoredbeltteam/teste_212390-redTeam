@@ -289,11 +289,12 @@ static void uartNotifyReceive()
     // format which is 1 byte destination address, 1 byte source
     // address, and no protocol specific bytes.  The ACK/NAK bits may
     // be anything.
+    in_hdb2 = c;
     if ((c & BIN(11111100)) != BIN(01010000)) {
       // Unsupported header.  Just pass it on to the next node.
       // We assume there are 1 byte addresses still, for simplicity.
       uartTransmit(SNAP_SYNC);
-      uartTransmit(in_hdb2 = c);
+      uartTransmit(c);
       uartState = SNAP_haveHDB2Pass;
     } else {
       // All is well
@@ -310,11 +311,12 @@ static void uartNotifyReceive()
   // ----------------------------------------------------------------------- //
   case SNAP_haveHDB2:
     // For HDB1, we insist CMD = 0, EDM = 8-bit CRC.
+    in_hdb1 = c;
     if ((c & BIN(11110000)) != BIN(00110000)) {
       // Bail out
       uartTransmit(SNAP_SYNC);
       uartTransmit(in_hdb2);
-      uartTransmit(in_hdb1 = c);
+      uartTransmit(c);
       uartState = SNAP_haveHDB1Pass;
     } else {
       packetLength = c & 0x0f;

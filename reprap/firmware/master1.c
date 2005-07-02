@@ -59,19 +59,7 @@ void main()
 
   for(;;) {
     if (processingLock) {
-      //processCommand();
-      if (buffer[0] == 0) {
-	if (buffer[1])
-	  PORTA = 0xff;
-	else
-	  PORTA = 0;
-
-	sendReply();
-	sendDataByte('S');
-	sendDataByte('D');
-	sendDataByte('M');
-	endMessage();
-      }
+      processCommand();
       releaseLock();
     }
   }

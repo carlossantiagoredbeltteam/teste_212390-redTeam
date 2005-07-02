@@ -1,33 +1,20 @@
 #include "master.h"
 #include "serial-inc2.c"
 
-byte zero = 0; // sdcc bug workaround
-
-void dummy()
+void processCommand()
 {
-}
-
-/*void processCommand()
-{
-  byte c;
-  c = buffer[zero];
-  if (c == 0) {
+  switch(buffer[0]) {
+  case 0:
+    PORTA = buffer[1];
+    break;
+  case 1:
     sendReply();
-    sendDataByte('S');
-    sendDataByte('D');
-    sendDataByte('M');
+    sendDataByte('t');
+    sendDataByte('e');
+    sendDataByte('s');
+    sendDataByte('t');
     endMessage();
-  } else if (c == 1) {
-    if (buffer[1]) {
-      PORTA = 0xff;
-    } else {
-      PORTA = 0;
-    }
-    sendReply();
-    sendDataByte('L');
-    sendDataByte('E');
-    sendDataByte('D');
-    endMessage();
+    break;
   }
 }
-*/
+
