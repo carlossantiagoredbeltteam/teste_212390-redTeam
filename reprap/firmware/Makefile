@@ -1,9 +1,10 @@
 
 MASTER=master1.c master2.c
 STEPMOTOR=stepmotor1.c stepmotor2.c
+MOTOR=motor1.c motor2.c
 COMMTEST=commtest.cc
 POKE=poke.cc snap.cc snap_packet.cc
-ALLC=$(MASTER) $(STEPMOTOR)
+ALLC=$(MASTER) $(STEPMOTOR) $(MOTOR)
 ALLCXX=$(COMMTEST) $(POKE)
 CXXFLAGS=-g
 
@@ -11,7 +12,7 @@ CXXFLAGS=-g
 	sdcc -S -V --debug -mpic14 -p16f627 --fommit-frame-pointer $<
 	gpasm -c $*.asm
 
-all:	master.hex
+all:	master.hex motor.hex
 
 commtest.o:
 	$(CXX) $(CXXFLAGS) -pthread -c $<
@@ -30,7 +31,10 @@ master.hex:	$(MASTER:.c=.o)
 stepmotor.hex:	$(STEPMOTOR:.c=.o)
 	gplink -m -c -o stepmotor.hex $(STEPMOTOR:.c=.o) pic14.a
 
-usart.stim: Makefile
+motor.hex:	$(MOTOR:.c=.o)
+	gplink -m -c -o motor.hex $(MOTOR:.c=.o) pic14.a
+
+sart.stim: Makefile
 	./usartsthex -f 0 -o usart.stim -n rx1 -r 25 \
 	500 54513201000030 +1000 5451320100010030
 
