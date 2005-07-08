@@ -6,6 +6,7 @@
 #include "pic14.h"
 
 void processCommand();
+void motorTick();
 
 extern byte PWMPeriod;
 

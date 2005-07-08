@@ -16,6 +16,8 @@ byte deviceAddress = 4;  ///@todo #define or const?
 
 static void isr() interrupt 0 {
   serialInterruptHandler();
+  if (RBIF)
+    motorTick();
 }
 
 void main()
@@ -27,7 +29,8 @@ void main()
   TRISA = BIN(00110000);      // Port A outputs (except 4/5)
                               // RA4 is used for clock out (debugging)
                               // RA5 can only be used as an input
-  TRISB = BIN(00000110);      // Port B outputs (except 1/2 for serial)
+  TRISB = BIN(10000110);      // Port B outputs, except 1/2 for serial and
+                              // RB7 for optointerrupter input
   // Note port B3 will be used for PWM output (CCP1)
   PIE1 = BIN(00000000);       // All peripheral interrupts initially disabled
   INTCON = BIN(00000000);     // Interrupts disabled
@@ -39,6 +42,8 @@ void main()
   TXEN = 1;  // Enable transmit
   RCIE = 1;  // Enable receive interrupts
   CREN = 1;  // Start reception
+
+  RBIE = 1;  // Enable RB port change interrupt
 
   PEIE = 1;  // Peripheral interrupts on
   GIE = 1;   // Now turn on interrupts
