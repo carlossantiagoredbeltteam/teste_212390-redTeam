@@ -34,7 +34,7 @@ bool SNAPPacket::readPacket(SNAP &snap)
     return false;
   }
   if (crc != actualCRC) {
-    std::cerr << "CRC fail, got " << actualCRC << " expected " << crc
+    std::cerr << "CRC fail, got " << (int)actualCRC << " expected " << (int)crc
 	      << std::endl;
     crc = actualCRC;
     return false;

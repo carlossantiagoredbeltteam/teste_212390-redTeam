@@ -34,12 +34,12 @@ stepmotor.hex:	$(STEPMOTOR:.c=.o)
 motor.hex:	$(MOTOR:.c=.o)
 	gplink -m -c -o motor.hex $(MOTOR:.c=.o) pic14.a
 
-sart.stim: Makefile
+usart.stim: Makefile stim.data
 	./usartsthex -f 0 -o usart.stim -n rx1 -r 25 \
-	500 54513201000030 +1000 5451320100010030
+		`cat stim.data`
 
-sim:	master.hex usart.stim
-	gpsim -pp16f627a master.hex -s master.cod -c master.stc
+sim:	motor.hex usart.stim
+	gpsim -pp16f627a motor.hex -s motor.cod -c master.stc
 
 clean:
 	rm -f $(ALLC:.c=.asm) *.p *.lst *.map \

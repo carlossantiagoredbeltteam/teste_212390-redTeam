@@ -6,7 +6,6 @@ typedef unsigned char byte;
 //unsigned short _moduint(unsigned short, unsigned short);
 //unsigned short _divuint(unsigned short, unsigned short);
 
-
 // No binary literals in sdcc, so add our own
 #define BIN_BIT(value, bit, dec) \
   (((((unsigned long)(value##.0))/dec)&1 == 1)? (1<<bit) : 0)
