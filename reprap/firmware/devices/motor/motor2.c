@@ -2,12 +2,12 @@
 #include "serial-inc2.c"
 
 byte PWMPeriod = 255;
-static byte currentSpeed = 0;
 static byte currentDirection = 0;
 
 // Non-zero indicates seeking is in progress (and its speed)
 static byte seekSpeed = 0;
 
+static byte lastPortB = 0;
 
 // Note: when reversing motor direction, the speed should be set to 0
 // and then delayed long enough for the motor to come to rest.
@@ -21,13 +21,8 @@ union addressableInt {
   byte bytes[2];
 } currentPosition, seekPosition;
 
-byte toggle = 0;
-
 void setSpeed(byte speed, byte direction)
 {
-  // Note: this function may be called from an interrupt
-  // so it could re-enter itself
-  // @todo Deal with re-entrancy
   if (speed == 0) {
     PORTB = 0;
   } else {
@@ -42,48 +37,42 @@ void setSpeed(byte speed, byte direction)
   else
     PR2 = PWMPeriod;
     
-  currentSpeed = speed;
   currentDirection = direction;
 }
 
 void motorTick()
 {
+  char changes, current;
+
   // Clear interrupt flag
-  _asm
-    movf PORTB,w
-  _endasm;
   RBIF = 0;
 
-  if (toggle) {
-    toggle = 0;
-    _asm
-      banksel PORTB
-      bsf PORTB, 6
-      banksel _currentSpeed
-    _endasm;
-  } else {
-    toggle = 1;
-    _asm
-      banksel PORTB
-      bcf PORTB, 6
-      banksel _currentSpeed
-    _endasm;
-  }
+  current = PORTB;  // Store so it doesn't change half way through processing
+  PORTB = current;  // properly reset change ??
+  changes = lastPortB ^ current;
 
-  // Adjust counter appropriately
-  if (currentSpeed != 0) {
-    if (currentDirection)
-      currentPosition.ival--;
-    else
-      currentPosition.ival++;
-  }
-
-  if (seekSpeed != 0) {
-    if (currentPosition.ival == seekPosition.ival) {
-      seekSpeed = 0;
-      setSpeed(0, 0);
+  if (changes & 0x80) {
+    // Our opto-marker changed
+    if (current & 0x80) {
+      // If input is set, we hit the opto-marker.  If it's not set
+      // it's come off the marker, and we only want to deal with one
+      // of them or we'll double increment everything
+      
+      // Adjust counter appropriately based on last known direction
+      if (currentDirection)
+	currentPosition.ival--;
+      else
+	currentPosition.ival++;
+      
+      if (seekSpeed != 0 && currentPosition.ival == seekPosition.ival) {
+	seekSpeed = 0;
+	PORTB = 0;
+	CCPR1L = 0;
+      }
     }
   }
+
+  lastPortB = current;
 
 }
 
