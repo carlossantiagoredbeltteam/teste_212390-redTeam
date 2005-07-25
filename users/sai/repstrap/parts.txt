@@ -1,4 +1,4 @@
-
+Parts and consumables:
 2@$0.54 M8x75 Coach screws (extruder feeder)
 4@$0.17 M6x20 Bolts with nuts (bushing attachment)
 1@$1.70 P240 sandpaper
@@ -8,3 +8,11 @@
 1@$6.50 M10x1m galvanised threaded steel rod
 8@$0.16 M10 galvanised steel nuts
 2@$9.06 15mm x 1.02mm x 1m copper tubing
+?@? Brazing rod
+?@? 556 CRC or other light lubricant for lathing and polishing
+?@? thermoplastic (polymorph, PLA, PHB, etc)
+
+Tools:
+Electric drill with mounting (or drill press)
+Propane torch (or oxyacetylene set, etc) for brazing
+Assorted clamps for holding things in place
