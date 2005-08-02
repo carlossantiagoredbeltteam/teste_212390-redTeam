@@ -9,7 +9,7 @@ config at 0x2007 __CONFIG = _CP_OFF &
  _MCLRE_OFF &
  _LVP_OFF;
 
-byte deviceAddress = 1;  ///@todo #define or const?
+byte deviceAddress = 4;  ///@todo #define or const?
 
 // Support routines for bank 1
 #include "serial-inc.c"
@@ -48,7 +48,7 @@ void main()
 
   // Make sure TSR is clean for first transmit.
   // A 0 byte should be ignored by anybody to start with (no sync)
-  //uartTransmit(0);
+  uartTransmit(0);
 
   /*sendMessage(0);
   sendDataByte('I');
@@ -56,6 +56,15 @@ void main()
   sendDataByte('I');
   sendDataByte('T');
   endMessage();*/
+
+  RCREG = 0x54; uartNotifyReceive();
+  RCREG = 0x51; uartNotifyReceive();
+  RCREG = 0x32; uartNotifyReceive();
+  RCREG = 0x04; uartNotifyReceive();
+  RCREG = 0x00; uartNotifyReceive();
+  RCREG = 0x01; uartNotifyReceive();
+  RCREG = 0x0a; uartNotifyReceive();
+  RCREG = 0xaa; uartNotifyReceive();
 
   for(;;) {
     if (processingLock) {
