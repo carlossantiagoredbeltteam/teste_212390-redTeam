@@ -12,7 +12,7 @@ CXXFLAGS=-g
 	sdcc -S -V --debug -mpic14 -p16f627 --fommit-frame-pointer $<
 	gpasm -c $*.asm
 
-all:	master.hex motor.hex
+all:	master.hex motor.hex stepmotor.hex
 
 commtest.o:
 	$(CXX) $(CXXFLAGS) -pthread -c $<
