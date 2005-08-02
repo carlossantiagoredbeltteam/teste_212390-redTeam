@@ -16,6 +16,12 @@ byte deviceAddress = 2;  ///@todo #define or const?
 
 static void isr() interrupt 0 {
   serialInterruptHandler();
+
+  if (TMR1IF) {
+    timerTick();
+    TMR1IF = 0;
+  }
+
 }
 
 void main()
@@ -44,6 +50,14 @@ void main()
 
   PORTB = 0;
   PORTA = 0;
+
+  T1CON = BIN(00000000);  // Timer 1 in clock mode with 1:1 scale
+  TMR1IE = 1;  // Enable timer interrupt
+
+  init();
+
+  // Clear up any boot noise from the TSR
+  uartTransmit(0);
 
   for(;;) {
     if (processingLock) {
