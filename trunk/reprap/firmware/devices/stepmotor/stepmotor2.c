@@ -23,7 +23,7 @@ enum functions {
   func_reverse,
   func_seek
 };
-static byte function = 0;
+static byte function = func_idle;
 
 static byte speed = 0;
 
