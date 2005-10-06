@@ -1,0 +1,1 @@
+sdcc --debug -mpic14 -p16f628 vert1.c
