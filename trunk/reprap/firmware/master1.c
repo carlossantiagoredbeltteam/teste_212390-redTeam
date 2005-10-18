@@ -59,12 +59,11 @@ void main()
 
   RCREG = 0x54; uartNotifyReceive();
   RCREG = 0x51; uartNotifyReceive();
-  RCREG = 0x32; uartNotifyReceive();
+  RCREG = 0x31; uartNotifyReceive();
   RCREG = 0x04; uartNotifyReceive();
   RCREG = 0x00; uartNotifyReceive();
+  RCREG = 0x00; uartNotifyReceive();
   RCREG = 0x01; uartNotifyReceive();
-  RCREG = 0x0a; uartNotifyReceive();
-  RCREG = 0xaa; uartNotifyReceive();
 
   for(;;) {
     if (processingLock) {

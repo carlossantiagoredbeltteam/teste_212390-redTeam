@@ -39,7 +39,7 @@ usart.stim: Makefile stim.data
 		`cat stim.data`
 
 sim:	motor.hex usart.stim
-	gpsim -pp16f627a motor.hex -s motor.cod -c master.stc
+	gpsim -pp16f627a master.hex -s master.cod -c master.stc
 
 clean:
 	rm -f $(ALLC:.c=.asm) *.p *.lst *.map \
@@ -61,6 +61,11 @@ dist:
 	tar cvfz nodes.tar.gz \
 		Makefile *.c *.h *.cc usartst usartsthex \
 		master.stc pic14.a
+
+sdcc:
+	if [ ! -d sdcc ]; then mkdir sdcc; fi
+	cd sdcc && \
+	CVSROOT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/sdcc cvs co -D 20050702 sdcc
 
 include $(ALLC:.c=.dep)
 include $(ALLCXX:.cc=.dep)
