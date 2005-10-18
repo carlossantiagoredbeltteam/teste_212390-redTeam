@@ -177,8 +177,8 @@ static byte crc; ///< Incrementally calculated CRC value
 /// The purpose of this buffer is to allow background sending of
 /// data rather than busy looping.
 static byte transmitBuffer[MAX_TRANSMIT_BUFFER];
-static byte transmitBufferHead; ///< Start of circular transmit buffer
-static byte transmitBufferTail; ///< End of circular transmit buffer
+static byte transmitBufferHead = 0; ///< Start of circular transmit buffer
+static byte transmitBufferTail = 0; ///< End of circular transmit buffer
 
 /// This buffer stores the last complete packet body (not the headers
 /// as they can be reconstructed).  This is to allow automatic re-sending
@@ -378,7 +378,7 @@ static void uartNotifyReceive()
     {
       byte hdb2 = BIN(01010000); // 1 byte addresses
       
-      if (c == crc) { ///@todo Remove bypass here
+      if (c == crc) {
 	// All is good, so process the command.  Rather than calling the
 	// appropriate function directly, we just set a flag to say
 	// something is ready for processing.  Then in the main loop we
