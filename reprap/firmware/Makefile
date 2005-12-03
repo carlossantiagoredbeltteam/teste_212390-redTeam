@@ -1,4 +1,7 @@
 
+GPUTILSBASE=/usr/share/gputils
+
+SDCCBASE=sdcc
 MASTER=master1.c master2.c
 STEPMOTOR=stepmotor1.c stepmotor2.c
 MOTOR=motor1.c motor2.c
@@ -8,8 +11,10 @@ ALLC=$(MASTER) $(STEPMOTOR) $(MOTOR)
 ALLCXX=$(COMMTEST) $(POKE)
 CXXFLAGS=-g
 
+SDCC=$(SDCCBASE)/bin/sdcc
+
 .c.o:
-	sdcc -S -V --debug -mpic14 -p16f627 --fommit-frame-pointer $<
+	$(SDCC) -S -mpic14 -p16f627 $<
 	gpasm -c $*.asm
 
 all:	master.hex motor.hex stepmotor.hex
@@ -62,10 +67,20 @@ dist:
 		Makefile *.c *.h *.cc usartst usartsthex \
 		master.stc pic14.a
 
-sdcc:
-	if [ ! -d sdcc ]; then mkdir sdcc; fi
-	cd sdcc && \
-	CVSROOT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/sdcc cvs co -D 20050702 sdcc
+$(SDCC):
+	if [ ! -d sdcc-build ]; then mkdir sdcc-build; fi
+	cd sdcc-build && \
+		echo CVSROOT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/sdcc cvs co -D 20051204 sdcc && \
+		cd sdcc && \
+		./configure --prefix=$(CURDIR)/sdcc && \
+		make clean && \
+		make && \
+		make install && \
+		mkdir $(CURDIR)/sdcc/share/sdcc/pic && \
+		support/scripts/inc2h.pl 16f627 /usr/share/gputils > \
+			$(CURDIR)/sdcc/share/sdcc/pic/pic16f627.h && \
+		support/scripts/inc2h.pl 16f628 /usr/share/gputils > \
+			$(CURDIR)/sdcc/share/sdcc/pic/pic16f628.h
 
 include $(ALLC:.c=.dep)
 include $(ALLCXX:.cc=.dep)

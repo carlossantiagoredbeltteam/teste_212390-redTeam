@@ -17,7 +17,8 @@ byte deviceAddress = 2;  ///@todo #define or const?
 static void isr() interrupt 0 {
   serialInterruptHandler();
 
-  if (TMR1IF) {
+  /// @todo sdcc workaround, should read: if (TMR1IF) {
+  if (PIR1 & 1) {
     timerTick();
     TMR1IF = 0;
   }

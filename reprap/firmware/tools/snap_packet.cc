@@ -66,18 +66,20 @@ bool SNAPPacket::send(SNAP &snap)
 
     SNAPPacket p;
     if (!p.readPacket(snap)) {
-      std::cerr << "Read fail" << std::endl;
+      std::cerr << "Read fail 1" << std::endl;
       continue;
     }
       
-    if (p.isAck())
+    if (p.isAck()) {
+      std::cout << "[ACK Received]" << std::endl;
       return true;
+    }
 
     if (p.isNak()) {
       std::cerr << "Got NAK" << std::endl;
       continue;
     }
-    std::cerr << "Read fail" << std::endl;
+    std::cerr << "Read fail 2" << std::endl;
   }
   return false;
 }

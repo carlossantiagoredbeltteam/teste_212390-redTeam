@@ -179,3 +179,9 @@ void processCommand()
     break;
   }
 }
+
+// To work around sdcc issue
+void dummy()
+{
+  T1CON = 0;
+}
