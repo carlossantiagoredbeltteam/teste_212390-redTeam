@@ -16,7 +16,9 @@ byte deviceAddress = 4;  ///@todo #define or const?
 
 static void isr() interrupt 0 {
   serialInterruptHandler();
-  if (RBIF)
+
+  /// @todo sdcc workaround, should read: if (RBIF)
+  if (INTCON & 1)
     motorTick();
 }
 

@@ -264,7 +264,7 @@ static void uartNotifyReceive()
   // If error occurred then reset by clearing CREN, but
   // attempt to continue processing anyway.
   /// @todo Should we do something else in this situation?
-  if (OERR)
+  if (RCSTA & 2)  //@todo Should read if (OERR) but causes sdcc error
     CREN = 0;
   else
     CREN = 1;
@@ -545,7 +545,9 @@ void serialInterruptHandler()
 {
   // Process serial
   // Finished sending something?
-  if (TXIF && TXIE) {
+  
+  /// @todo sdcc workaround, following should read: if (TXIF && TXIE) {
+  if ((PIR1 & 8) && (PIE1 & 8)) {
     if (transmitBufferHead != transmitBufferTail) {
       byte c = transmitBuffer[transmitBufferHead];
       transmitBufferHead++;
@@ -560,7 +562,8 @@ void serialInterruptHandler()
   }
 
   // Any data received?
-  if (RCIF)
+  /// @todo sdcc workaround, should read: if (RCIF)
+  if (PIR1 & 16)
     uartNotifyReceive();
 }
 #pragma restore

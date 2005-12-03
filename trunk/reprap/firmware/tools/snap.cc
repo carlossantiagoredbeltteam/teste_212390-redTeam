@@ -47,7 +47,7 @@ byte SNAP::readbyte()
 {
   byte buf;
   struct timeval tout;
-  tout.tv_sec = 2;
+  tout.tv_sec = 86400;
   tout.tv_usec = 0;
 
   fd_set r;
@@ -65,8 +65,8 @@ byte SNAP::readbyte()
     perror("Read failed");
     exit(1);
   }
-  //printf("[%02x]", (unsigned char)buf);
-  //fflush(stdout);
+  printf("[%02x]", (unsigned char)buf);
+  fflush(stdout);
   return buf;
 }
 
@@ -79,8 +79,8 @@ void SNAP::sendbyte(byte c)
   if (sw == -1)
     perror("Waiting in sendbyte");
 
-  //printf("<%02x>", (unsigned char)c);
-  //fflush(stdout);
+  printf("<%02x>", (unsigned char)c);
+  fflush(stdout);
 
   if (write(fd, &c, 1) < 0) {
     perror("Write failed");

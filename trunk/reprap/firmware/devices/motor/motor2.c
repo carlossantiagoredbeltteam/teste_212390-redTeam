@@ -147,3 +147,9 @@ void processCommand()
     break;
   }
 }
+
+// To work around sdcc issue
+void dummy()
+{
+  INTCON = 0;
+}
