@@ -23,6 +23,7 @@ SNAP::SNAP(const char *device, int sourceAddress)
   cfsetspeed(&terminfo, B2400);
   terminfo.c_cflag &= ~CRTSCTS;
   terminfo.c_cflag |= CLOCAL;
+  terminfo.c_lflag &= ~ICANON;
   if (tcsetattr(fd, TCSANOW, &terminfo) == -1) {
     perror("Set attr");
     exit(1);
