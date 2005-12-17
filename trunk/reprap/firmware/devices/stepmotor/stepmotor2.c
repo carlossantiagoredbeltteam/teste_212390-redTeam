@@ -1,5 +1,5 @@
 #include "stepmotor.h"
-#include "serial-inc2.c"
+#include "serial-inc.h"
 
 // Simple stepper controller.
 //
@@ -117,18 +117,6 @@ void timerTick()
   setTimer(speed);
 }
 
-void getpos1()
-{
-  sendReply();
-  sendDataByte(currentPosition.bytes[0]);
-}
-
-void getpos2()
-{
-  sendDataByte(currentPosition.bytes[1]);
-  endMessage();
-}
-
 void processCommand()
 {
   switch(buffer[0]) {
@@ -159,8 +147,10 @@ void processCommand()
 
   case 4:
     // Get position counter
-    getpos1();
-    getpos2();
+    sendReply();
+    sendDataByte(currentPosition.bytes[0]);
+    sendDataByte(currentPosition.bytes[1]);
+    endMessage();
     break;
 
   case 5:
@@ -178,10 +168,4 @@ void processCommand()
     function = func_idle;
     break;
   }
-}
-
-// To work around sdcc issue
-void dummy()
-{
-  T1CON = 0;
 }
