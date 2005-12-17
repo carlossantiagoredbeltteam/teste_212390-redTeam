@@ -1,4 +1,5 @@
 #include "stepmotor.h"
+#include "serial-inc.h"
 
 typedef unsigned int config;
 config at 0x2007 __CONFIG = _CP_OFF &
@@ -9,25 +10,19 @@ config at 0x2007 __CONFIG = _CP_OFF &
  _MCLRE_OFF &
  _LVP_OFF;
 
-byte deviceAddress = 2;  ///@todo #define or const?
-
-// Support routines for bank 1
-#include "serial-inc.c"
+byte deviceAddress = 2;
 
 static void isr() interrupt 0 {
   serialInterruptHandler();
-
-  /// @todo sdcc workaround, should read: if (TMR1IF) {
-  if (PIR1 & 1) {
-    timerTick();
+  
+  if (TMR1IF) {
+    //timerTick();
     TMR1IF = 0;
   }
-
 }
 
 void main()
 {
-  byte v = 0;
 
   OPTION_REG = BIN(11011111); // Disable TMR0 on RA4, 1:128 WDT
   CMCON = 0xff;               // Comparator module defaults
@@ -42,26 +37,52 @@ void main()
   TXSTA = BIN(00000000);      // 8 bit low speed 
   RCSTA = BIN(10000000);      // Enable port for 8 bit receive
 
-  TXEN = 1;  // Enable transmit
+  PORTB = 0;
+
+PORTB=0x10;
+
   RCIE = 1;  // Enable receive interrupts
   CREN = 1;  // Start reception
 
+  TXEN = 1;  // Enable transmit
   PEIE = 1;  // Peripheral interrupts on
   GIE = 1;   // Now turn on interrupts
 
   PORTB = 0;
   PORTA = 0;
+PORTB=0x20;
+
+  TMR1IE = 0;
 
   T1CON = BIN(00000000);  // Timer 1 in clock mode with 1:1 scale
-  TMR1IE = 1;  // Enable timer interrupt
+  //TMR1IE = 1;  // Enable timer interrupt
+PORTB=0x30;
 
   init();
 
   // Clear up any boot noise from the TSR
-  uartTransmit(0);
+PORTB=0x50;
+
+  uartTransmit('t');
+  uartTransmit('e');
+  uartTransmit('s');
+  uartTransmit('t');
+
+  /*uartTransmit(0);
+
+  sendMessage(0);
+  sendDataByte('I');
+  sendDataByte('N');
+  sendDataByte('I');
+  sendDataByte('T');
+  endMessage();*/
+
+  RCREG = 0x54;
+  uartNotifyReceive();
+  
 
   for(;;) {
-    if (processingLock) {
+    if (packetReady()) {
       processCommand();
       releaseLock();
     }

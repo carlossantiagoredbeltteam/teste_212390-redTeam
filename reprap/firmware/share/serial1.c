@@ -167,7 +167,6 @@ static byte packetLength;          ///< Length of packet being received
 static byte sourceAddress;         ///< Source of packet being received
 static byte receivedSourceAddress; ///< Source of packet previously received
 static byte bufferIndex;           ///< Current receive buffer index
-byte buffer[MAX_PAYLOAD];   ///< Receive buffer
 static byte crc; ///< Incrementally calculated CRC value
 
 /// Circular transmit buffer.
@@ -176,7 +175,7 @@ static byte crc; ///< Incrementally calculated CRC value
 /// If head == tail, the buffer is empty.
 /// The purpose of this buffer is to allow background sending of
 /// data rather than busy looping.
-static byte transmitBuffer[MAX_TRANSMIT_BUFFER];
+extern byte transmitBuffer[];
 static byte transmitBufferHead = 0; ///< Start of circular transmit buffer
 static byte transmitBufferTail = 0; ///< End of circular transmit buffer
 
@@ -184,7 +183,7 @@ static byte transmitBufferTail = 0; ///< End of circular transmit buffer
 /// as they can be reconstructed).  This is to allow automatic re-sending
 /// if a NAK is received.
 static byte sendPacketDestination;
-static byte sendPacket[MAX_PAYLOAD];
+extern byte sendPacket[];
 static byte sendPacketLength;
 /// When sending a packet this is set to 0 and incremented for
 /// every NAK.  After too many have occurred, the packet is just
@@ -195,6 +194,8 @@ static byte nakCount;
 /// @bug these should be "sbit" rather than "byte" but sdcc is breaking a bit
 static byte processingLock = 0;
 static byte ackRequested;
+
+extern byte deviceAddress;
 
 //===========================================================================//
 
@@ -256,7 +257,7 @@ _endasm;
 //===========================================================================//
 #pragma save
 #pragma nooverlay
-static void uartNotifyReceive()
+ void uartNotifyReceive()
 {
 
   byte c = RCREG;
@@ -264,13 +265,14 @@ static void uartNotifyReceive()
   // If error occurred then reset by clearing CREN, but
   // attempt to continue processing anyway.
   /// @todo Should we do something else in this situation?
-  if (RCSTA & 2)  //@todo Should read if (OERR) but causes sdcc error
+  if (OERR)
     CREN = 0;
   else
     CREN = 1;
 
-  //uartTransmit(c);
-  //uartTransmit(uartState);
+  uartTransmit(0x55);
+  uartTransmit(c);
+  uartTransmit(uartState);
 
   switch(uartState) {
 
@@ -456,19 +458,27 @@ static void uartNotifyReceive()
 /// Low level routine that queues a byte directly for the hardware
 void uartTransmit(byte c)
 {
-  byte newTail;
-  transmitBuffer[transmitBufferTail] = c;
+  PORTB = 0x80;
+  // Wait for idle
+  while(!TRMT) ;
+  PORTB = 0x90;
+  TXREG = c;
+  PORTB = 0xA0;
+}
 
+/*  byte newTail;
+  transmitBuffer[transmitBufferTail] = c;
+  
   newTail = transmitBufferTail + 1;
   if (newTail >= MAX_TRANSMIT_BUFFER)
     newTail = 0;
-
+  
   while(newTail == transmitBufferHead)
     ;
-
+  
   transmitBufferTail = newTail;
   TXIE = 1;
-}
+  }*/
 
 //===========================================================================//
 /// High level routine that queues a byte during construction of a packet
@@ -517,6 +527,12 @@ byte deliveryStatus()
 }
 
 //===========================================================================//
+byte packetReady()
+{
+  return processingLock;
+}
+
+//===========================================================================//
 void endMessage()
 {
   byte length = sendPacketLength;
@@ -546,8 +562,7 @@ void serialInterruptHandler()
   // Process serial
   // Finished sending something?
   
-  /// @todo sdcc workaround, following should read: if (TXIF && TXIE) {
-  if ((PIR1 & 8) && (PIE1 & 8)) {
+  /*  if (TXIF && TXIE) {
     if (transmitBufferHead != transmitBufferTail) {
       byte c = transmitBuffer[transmitBufferHead];
       transmitBufferHead++;
@@ -558,12 +573,9 @@ void serialInterruptHandler()
 	TXIE = 0;
       TXREG = c;
     }
-
-  }
-
+    }*/
   // Any data received?
-  /// @todo sdcc workaround, should read: if (RCIF)
-  if (PIR1 & 16)
+  if (RCIF)
     uartNotifyReceive();
 }
 #pragma restore
