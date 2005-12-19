@@ -34,6 +34,11 @@ union addressableInt {
 
 void init()
 {
+  /// @todo Remove some of these when intialisers fixed
+  speed = 0;
+  function = func_idle;
+  coilPosition = 0;
+
   currentPosition.bytes[0] = 0;
   currentPosition.bytes[1] = 0;
   seekPosition.bytes[0] = 0;
