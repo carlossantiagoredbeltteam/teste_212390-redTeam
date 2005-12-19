@@ -26,6 +26,7 @@ SNAP::SNAP(const char *device, int sourceAddress, bool verbose)
   terminfo.c_cflag |= CLOCAL;
   terminfo.c_lflag &= ~ICANON;
   terminfo.c_oflag &= ~(ONLRET | OCRNL | ONLCR);
+  terminfo.c_iflag &= ~(ICRNL | INLCR);
   if (tcsetattr(fd, TCSANOW, &terminfo) == -1) {
     perror("Set attr");
     exit(1);
