@@ -25,9 +25,11 @@ int main(int argc, char **argv)
   bool wait = false;
   int dest = 1;
   const char *tty = "/dev/ttyS1";
+  bool verbose = false;
+
 
   int opt;
-  while((opt = getopt(argc, argv, "wd:t:")) != -1) {
+  while((opt = getopt(argc, argv, "wd:t:v")) != -1) {
     switch(opt) {
     case 'w':
       wait = true;
@@ -35,12 +37,15 @@ int main(int argc, char **argv)
     case 'd':
       dest = atoi(optarg);
       break;
+    case 'v':
+      verbose = true;
+      break;
     case 't':
       tty = optarg;
     }
   }
 
-  SNAP snap(tty, 0);
+  SNAP snap(tty, 0, verbose);
     
   string cmd;
   int dataidx = 0;
