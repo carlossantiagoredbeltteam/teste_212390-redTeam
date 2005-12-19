@@ -16,7 +16,7 @@ static void isr() interrupt 0 {
   serialInterruptHandler();
   
   if (TMR1IF) {
-    //timerTick();
+    timerTick();
     TMR1IF = 0;
   }
 }
@@ -39,8 +39,6 @@ void main()
 
   PORTB = 0;
 
-PORTB=0x10;
-
   RCIE = 1;  // Enable receive interrupts
   CREN = 1;  // Start reception
 
@@ -50,28 +48,18 @@ PORTB=0x10;
 
   PORTB = 0;
   PORTA = 0;
-PORTB=0x20;
 
   TMR1IE = 0;
 
   T1CON = BIN(00000000);  // Timer 1 in clock mode with 1:1 scale
-  //TMR1IE = 1;  // Enable timer interrupt
-PORTB=0x30;
+  TMR1IE = 1;  // Enable timer interrupt
 
   init();
+  serial_init();
 
   // Clear up any boot noise from the TSR
-PORTB=0x50;
-serial_init();
 
   uartTransmit(0);
-
-  sendMessage(0);
-  sendDataByte('I');
-  sendDataByte('N');
-  sendDataByte('I');
-  sendDataByte('T');
-  endMessage();
 
   for(;;) {
     if (packetReady()) {
