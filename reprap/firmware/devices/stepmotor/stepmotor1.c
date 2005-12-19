@@ -62,24 +62,16 @@ PORTB=0x30;
 
   // Clear up any boot noise from the TSR
 PORTB=0x50;
+serial_init();
 
-  uartTransmit('t');
-  uartTransmit('e');
-  uartTransmit('s');
-  uartTransmit('t');
-
-  /*uartTransmit(0);
+  uartTransmit(0);
 
   sendMessage(0);
   sendDataByte('I');
   sendDataByte('N');
   sendDataByte('I');
   sendDataByte('T');
-  endMessage();*/
-
-  RCREG = 0x54;
-  uartNotifyReceive();
-  
+  endMessage();
 
   for(;;) {
     if (packetReady()) {

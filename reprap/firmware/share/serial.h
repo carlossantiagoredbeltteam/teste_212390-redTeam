@@ -24,6 +24,6 @@ extern byte buffer[];
 
 // REMOVE
 void uartNotifyReceive();
-
+void serial_init();
 
 #endif

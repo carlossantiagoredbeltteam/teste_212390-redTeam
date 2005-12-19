@@ -197,6 +197,14 @@ static byte ackRequested;
 
 extern byte deviceAddress;
 
+/// @todo Remove when sdcc initialisers fixed
+void serial_init()
+{
+  uartState = SNAP_idle;
+  transmitBufferHead = transmitBufferTail = 0;
+  processingLock = 0;
+}
+
 //===========================================================================//
 
 byte computeCRC(byte dataval)
@@ -270,9 +278,9 @@ _endasm;
   else
     CREN = 1;
 
-  uartTransmit(0x55);
-  uartTransmit(c);
-  uartTransmit(uartState);
+  //uartTransmit(0x55);
+  //uartTransmit(c);
+  //uartTransmit(uartState);
 
   switch(uartState) {
 
@@ -464,21 +472,25 @@ void uartTransmit(byte c)
   PORTB = 0x90;
   TXREG = c;
   PORTB = 0xA0;
-}
 
-/*  byte newTail;
+  /*  byte newTail;
   transmitBuffer[transmitBufferTail] = c;
   
   newTail = transmitBufferTail + 1;
   if (newTail >= MAX_TRANSMIT_BUFFER)
     newTail = 0;
   
+  // If full, wait for buffer to empty sufficiently
   while(newTail == transmitBufferHead)
     ;
   
   transmitBufferTail = newTail;
-  TXIE = 1;
-  }*/
+  TXIE = 1;*/
+
+_asm  /// @todo Remove when sdcc bug fixed
+  BANKSEL _uartState;
+_endasm;
+}
 
 //===========================================================================//
 /// High level routine that queues a byte during construction of a packet
@@ -562,7 +574,7 @@ void serialInterruptHandler()
   // Process serial
   // Finished sending something?
   
-  /*  if (TXIF && TXIE) {
+  if (TXIF && TXIE) {
     if (transmitBufferHead != transmitBufferTail) {
       byte c = transmitBuffer[transmitBufferHead];
       transmitBufferHead++;
@@ -573,9 +585,12 @@ void serialInterruptHandler()
 	TXIE = 0;
       TXREG = c;
     }
-    }*/
+  }
   // Any data received?
   if (RCIF)
     uartNotifyReceive();
+_asm  /// @todo Remove when sdcc bug fixed
+  BANKSEL _uartState;
+_endasm;
 }
 #pragma restore
