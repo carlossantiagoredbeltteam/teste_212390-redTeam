@@ -453,7 +453,7 @@ _endasm;
   // ----------------------------------------------------------------------- //
   case SNAP_readingDataPass:
     uartTransmit(c);  // This is a data byte; pass it on
-    if (packetLength > 0)
+    if (packetLength > 1)
       packetLength--;
     else
       uartState = SNAP_idle;
@@ -466,14 +466,11 @@ _endasm;
 /// Low level routine that queues a byte directly for the hardware
 void uartTransmit(byte c)
 {
-  PORTB = 0x80;
-  // Wait for idle
-  while(!TRMT) ;
-  PORTB = 0x90;
-  TXREG = c;
-  PORTB = 0xA0;
+  //// Wait for idle
+  //while(!TRMT) ;
+  //TXREG = c;
 
-  /*  byte newTail;
+  byte newTail;
   transmitBuffer[transmitBufferTail] = c;
   
   newTail = transmitBufferTail + 1;
@@ -485,7 +482,7 @@ void uartTransmit(byte c)
     ;
   
   transmitBufferTail = newTail;
-  TXIE = 1;*/
+  TXIE = 1;
 
 _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _uartState;

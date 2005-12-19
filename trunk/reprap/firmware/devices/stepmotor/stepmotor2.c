@@ -72,7 +72,10 @@ void forward1()
 {
   currentPosition.ival++;
   coilPosition = (coilPosition + 1) & (stepCount - 1);
-   PORTB = stepValue();
+  PORTB = stepValue();
+_asm  /// @todo Remove when sdcc bug fixed
+  BANKSEL _coilPosition;
+_endasm;
 }
 
 void reverse1()
@@ -80,6 +83,9 @@ void reverse1()
   currentPosition.ival--;
   coilPosition = (coilPosition + stepCount - 1) & (stepCount - 1);
   PORTB = stepValue();
+_asm  /// @todo Remove when sdcc bug fixed
+  BANKSEL _coilPosition;
+_endasm;
 }
 
 void setTimer(byte newspeed)
@@ -92,6 +98,9 @@ void setTimer(byte newspeed)
   } else {
     TMR1ON = 0;
   }
+_asm  /// @todo Remove when sdcc bug fixed
+  BANKSEL _coilPosition;
+_endasm;
 }
 
 void timerTick()
@@ -120,6 +129,9 @@ void timerTick()
     break;
   }
   setTimer(speed);
+_asm  /// @todo Remove when sdcc bug fixed
+  BANKSEL _coilPosition;
+_endasm;
 }
 
 void processCommand()
@@ -173,4 +185,7 @@ void processCommand()
     function = func_idle;
     break;
   }
+_asm  /// @todo Remove when sdcc bug fixed
+  BANKSEL _coilPosition;
+_endasm;
 }
