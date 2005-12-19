@@ -5,9 +5,10 @@
 #include <termios.h>
 #include "snap.h"
 
-SNAP::SNAP(const char *device, int sourceAddress)
+SNAP::SNAP(const char *device, int sourceAddress, bool verbose)
 {
   localAddress = sourceAddress; 
+  this->verbose = verbose;
 
   struct termios terminfo;
   fd = open(device, O_RDWR | O_NONBLOCK);
@@ -67,8 +68,10 @@ byte SNAP::readbyte()
     perror("Read failed");
     exit(1);
   }
-  printf("[%02x]", (unsigned char)buf);
-  fflush(stdout);
+  if (verbose) {
+    printf("[%02x]", (unsigned char)buf);
+    fflush(stdout);
+  }
   return buf;
 }
 
@@ -81,8 +84,10 @@ void SNAP::sendbyte(byte c)
   if (sw == -1)
     perror("Waiting in sendbyte");
 
-  printf("<%02x>", (unsigned char)c);
-  fflush(stdout);
+  if (verbose) {
+    printf("<%02x>", (unsigned char)c);
+    fflush(stdout);
+  }
 
   if (write(fd, &c, 1) < 0) {
     perror("Write failed");

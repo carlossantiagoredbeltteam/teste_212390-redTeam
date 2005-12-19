@@ -11,7 +11,7 @@
 class SNAP
 {
 public:
-  SNAP(const char *device, int sourceAddress);
+  SNAP(const char *device, int sourceAddress, bool verbose);
   ~SNAP();
 
   byte readbyte();
@@ -21,6 +21,7 @@ public:
 private:
   int fd;
   int localAddress;
+  bool verbose;
 };
 
 #endif
