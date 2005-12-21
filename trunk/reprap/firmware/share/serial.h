@@ -19,7 +19,7 @@ byte packetReady();
 void sendMessage(byte dest);
 void sendDataByte(byte c);
 
-extern byte buffer[];
+extern volatile byte buffer[];
 
 
 // REMOVE

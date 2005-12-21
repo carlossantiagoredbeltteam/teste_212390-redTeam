@@ -160,14 +160,14 @@ enum SNAP_states {
 
 #define SNAP_SYNC BIN(01010100)
 
-static byte uartState = SNAP_idle; ///< Current SNAP state machine state
-static byte in_hdb2,  ///< Temporary buffers needed to
-  in_hdb1;            ///  pass packets on from various states
-static byte packetLength;          ///< Length of packet being received
-static byte sourceAddress;         ///< Source of packet being received
-static byte receivedSourceAddress; ///< Source of packet previously received
-static byte bufferIndex;           ///< Current receive buffer index
-static byte crc; ///< Incrementally calculated CRC value
+static volatile byte uartState = SNAP_idle; ///< Current SNAP state machine state
+static volatile byte in_hdb1;  ///< Temporary buffers needed to
+static volatile byte in_hdb2;  ///  pass packets on from various states
+static volatile byte packetLength; ///< Length of packet being received
+static volatile byte sourceAddress;///< Source of packet being received
+static volatile byte receivedSourceAddress; ///< Source of packet previously received
+static volatile byte bufferIndex;  ///< Current receive buffer index
+static volatile byte crc; ///< Incrementally calculated CRC value
 
 /// Circular transmit buffer.
 /// Tail has the buffer index that will next be written to.  Head is
@@ -175,9 +175,9 @@ static byte crc; ///< Incrementally calculated CRC value
 /// If head == tail, the buffer is empty.
 /// The purpose of this buffer is to allow background sending of
 /// data rather than busy looping.
-extern byte transmitBuffer[];
-static byte transmitBufferHead = 0; ///< Start of circular transmit buffer
-static byte transmitBufferTail = 0; ///< End of circular transmit buffer
+extern volatile byte transmitBuffer[];
+static volatile byte transmitBufferHead = 0; ///< Start of circular transmit buffer
+static volatile byte transmitBufferTail = 0; ///< End of circular transmit buffer
 
 /// This buffer stores the last complete packet body (not the headers
 /// as they can be reconstructed).  This is to allow automatic re-sending
@@ -192,8 +192,8 @@ static byte nakCount;
 
 /// General flags:
 /// @bug these should be "sbit" rather than "byte" but sdcc is breaking a bit
-static byte processingLock = 0;
-static byte ackRequested;
+static volatile byte processingLock = 0;
+static volatile byte ackRequested;
 
 extern byte deviceAddress;
 
@@ -207,6 +207,8 @@ void serial_init()
 
 //===========================================================================//
 
+#pragma save
+#pragma nooverlay
 byte computeCRC(byte dataval)
 {
 #ifdef SDCC_DISABLED_FOR_NOW
@@ -261,6 +263,7 @@ _endasm;
   return dataval;
 #endif
 }
+#pragma restore
 
 //===========================================================================//
 #pragma save
@@ -464,6 +467,8 @@ _endasm;
 
 //===========================================================================//
 /// Low level routine that queues a byte directly for the hardware
+#pragma save
+#pragma nooverlay
 void uartTransmit(byte c)
 {
   //// Wait for idle
@@ -488,6 +493,7 @@ _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _uartState;
 _endasm;
 }
+#pragma restore
 
 //===========================================================================//
 /// High level routine that queues a byte during construction of a packet
