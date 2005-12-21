@@ -137,6 +137,10 @@
  *
  */
 
+/// @bug There are problems with addresses 3,9,17,19,26 and 28 for
+/// some currently unknown reason.  If you send a message to one of
+/// these addresses, it will not be chained on correctly.
+
 #include "serial-inc.h"
 
 enum SNAP_states {
