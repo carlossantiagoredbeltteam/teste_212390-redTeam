@@ -17,7 +17,7 @@ SDCC=$(SDCCBASE)/bin/sdcc
 	$(SDCC) -S -mpic14 -p16f627 $<
 	gpasm -c $*.asm
 
-all:	master.hex motor.hex stepmotor.hex
+all:	sdcc/bin/sdcc master.hex motor.hex stepmotor.hex
 
 commtest.o:
 	$(CXX) $(CXXFLAGS) -pthread -c $<
