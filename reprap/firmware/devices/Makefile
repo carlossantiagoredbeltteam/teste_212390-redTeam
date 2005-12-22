@@ -1,6 +1,10 @@
 
 SUBDIRS=stepmotor stepmotorb
 
+ifdef DEVICES
+SUBDIRS=$(DEVICES)
+endif
+
 export
 .PHONY: $(SUBDIRS)
 
