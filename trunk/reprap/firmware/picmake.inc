@@ -14,7 +14,7 @@ $(BUILDDIR)/%.o: %.c
 
 OBJS=$(SOURCES:%.c=$(BUILDDIR)/%.o)
 CC=$(SDCC)
-CFLAGS=-I$(BASEDIR)/share -D__$(PROCESSOR)
+CFLAGS += -I$(BASEDIR)/share -D__$(PROCESSOR)
 CXXFLAGS=$(CFLAGS)
 PWD=$(CURDIR)
 LDFLAGS=$(BASEDIR)/share/pic14.a $(BASEBUILDDIR)/serial.lib
