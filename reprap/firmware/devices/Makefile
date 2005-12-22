@@ -1,5 +1,5 @@
 
-SUBDIRS=stepmotor stepmotor2
+SUBDIRS=stepmotor stepmotorb
 
 export
 .PHONY: $(SUBDIRS)

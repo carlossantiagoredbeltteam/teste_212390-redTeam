@@ -10,7 +10,7 @@ TARGET=stepmotorb
 SOURCES=stepmotor1.c stepmotor2.c
 include ../../picmake.inc
 
-CFLAGS += -I../stepmotor
+CFLAGS += -I$(CURDIR)/../stepmotor
 
 $(BUILDDIR)/$(TARGET).hex:	$(SOURCES) $(OBJS)
 	cd $(BUILDDIR) && gplink -m -c -o $(TARGET).hex $(OBJS) $(LDFLAGS)
