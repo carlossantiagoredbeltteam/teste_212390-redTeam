@@ -1,89 +1,61 @@
 
+# These might need configuring:
 GPUTILSBASE=/usr/share/gputils
 
-SDCCBASE=sdcc
-MASTER=master1.c master2.c
-STEPMOTOR=stepmotor1.c stepmotor2.c serial-inc.c serial-inc2.c
-MOTOR=motor1.c motor2.c
-COMMTEST=commtest.cc
-POKE=poke.cc snap.cc snap_packet.cc
-ALLC=$(MASTER) $(STEPMOTOR) $(MOTOR)
-ALLCXX=$(COMMTEST) $(POKE)
-CXXFLAGS=-g
+ifndef PROCESSOR
+PROCESSOR=16f628
+endif
+
+PWD=$(CURDIR)
+BASEDIR=$(PWD)
+SDCCBASE=$(PWD)/sdcc
+BUILDDIR=$(PWD)/build/$(PROCESSOR)
+SUBDIRS=share devices
+
+export
+.PHONY: $(SUBDIRS)
 
 SDCC=$(SDCCBASE)/bin/sdcc
 
-.c.o:
-	$(SDCC) -S -mpic14 -p16f627 $<
-	gpasm -c $*.asm
+all:	buildarea procheader $(SUBDIRS)
 
-all:	sdcc/bin/sdcc master.hex motor.hex stepmotor.hex
+buildarea: $(BUILDDIR)
 
-commtest.o:
-	$(CXX) $(CXXFLAGS) -pthread -c $<
+$(BUILDDIR):
+	if [ ! -d $(BUILDDIR) ]; then mkdir -p $(BUILDDIR); fi
 
-commtest:	$(COMMTEST:.cc=.o)
-	g++ -g -pthread -o commtest $(COMMTEST:.cc=.o) \
-		-lboost_unit_test_framework \
-		-lboost_thread
-
-poke:	$(POKE:.cc=.o)
-	g++ -g -o poke $(POKE:.cc=.o)
-
-master.hex:	$(MASTER:.c=.o)
-	gplink -m -c -o master.hex $(MASTER:.c=.o) pic14.a
-	perl checkmap master.map
-
-stepmotor.hex:	$(STEPMOTOR:.c=.o)
-	gplink -m -c -o stepmotor.hex $(STEPMOTOR:.c=.o) pic14.a
-	perl checkmap stepmotor.map
-
-motor.hex:	$(MOTOR:.c=.o)
-	gplink -m -c -o motor.hex $(MOTOR:.c=.o) pic14.a
-	perl checkmap motor.map
-
-usart.stim: Makefile stim.data
-	perl usartsthex -f 0 -o usart.stim -n rx1 -r 25 \
-		`cat stim.data`
-
-sim:	stepmotor.hex usart.stim
-	gpsim -pp16f627a stepmotor.hex -s stepmotor.cod -c stepmotor.stc
+$(SUBDIRS):
+	$(MAKE) -C $@
 
 clean:
-	rm -f $(ALLC:.c=.asm) *.p *.lst *.map \
-		*.adb *~ *.d usart.stim \
-		*.hex *.cod *.cof *.o *.o.gcc *.dep commtest poke \
-		nodes.tar.gz
+	rm -rf build *~
+	$(MAKE) -C share clean
+	$(MAKE) -C devices clean
 
-%.dep: %.c
-	$(SHELL) -ec 'gcc -MM -MG $< \
-		| sed '\''s/\($*\)\.o[ :]*/\1.o $@ : /g'\'' > $@; \
-		[ -s $@ ] || rm -f $@'
+distclean:	clean
+	rm -rf sdcc sdcc-build
 
-%.dep: %.cc
-	$(SHELL) -ec 'g++ -pthread -MM -MG $< \
-		| sed '\''s/\($*\)\.o[ :]*/\1.o $@ : /g'\'' > $@; \
-		[ -s $@ ] || rm -f $@'
+sdcc: $(SDCCBASE)/share/sdcc/include/pic $(SDCCBASE)/inc2h.pl
 
-dist:
-	tar cvfz nodes.tar.gz \
-		Makefile *.c *.h *.cc usartst usartsthex \
-		master.stc pic14.a
+# Build header files for required processor if necessary
+procheader:	sdcc $(SDCCBASE)/share/sdcc/include/pic/pic$(PROCESSOR).h
 
-$(SDCC):
+$(SDCCBASE)/share/sdcc/include/pic/pic$(PROCESSOR).h:
+	$(SDCCBASE)/inc2h.pl 16f627 $(GPUTILSBASE) > \
+		$(SDCCBASE)/share/sdcc/include/pic/pic16f627.h
+
+# Build sdcc (and extra pic include directory)
+$(SDCCBASE)/share/sdcc/include/pic:
 	if [ ! -d sdcc-build ]; then mkdir sdcc-build; fi
 	cd sdcc-build && \
 		CVSROOT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/sdcc cvs co -D 20051210 sdcc && \
 		cd sdcc && \
-		./configure --prefix=$(CURDIR)/sdcc && \
+		./configure --prefix=$(SDCCBASE) && \
 		make clean && \
 		make && \
 		make install && \
-		mkdir $(CURDIR)/sdcc/share/sdcc/include/pic && \
-		support/scripts/inc2h.pl 16f627 /usr/share/gputils > \
-			$(CURDIR)/sdcc/share/sdcc/include/pic/pic16f627.h && \
-		support/scripts/inc2h.pl 16f628 /usr/share/gputils > \
-			$(CURDIR)/sdcc/share/sdcc/include/pic/pic16f628.h
+		mkdir $(SDCCBASE)/share/sdcc/include/pic
 
-include $(ALLC:.c=.dep)
-include $(ALLCXX:.cc=.dep)
+# Install tool for creating header files
+$(SDCCBASE)/inc2h.pl:
+	cp sdcc-build/sdcc/support/scripts/inc2h.pl $(SDCCBASE)
