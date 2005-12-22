@@ -33,8 +33,8 @@ void main()
   PIE1 = BIN(00000000);       // All peripheral interrupts initially disabled
   INTCON = BIN(00000000);     // Interrupts disabled
   PIR1 = 0;                   // Clear peripheral interrupt flags
-  SPBRG = 25;                 // 25 = 2400 baud @ 4MHz
-  TXSTA = BIN(00000000);      // 8 bit low speed 
+  SPBRG = 12;                 // 12 = 19200 (actually 19230) baud @ 4MHz
+  TXSTA = BIN(00000100);      // 8 bit high speed 
   RCSTA = BIN(10000000);      // Enable port for 8 bit receive
 
   PORTB = 0;
@@ -58,13 +58,11 @@ void main()
   serial_init();
 
   // Clear up any boot noise from the TSR
-
   uartTransmit(0);
 
   for(;;) {
-    if (packetReady()) {
-      processCommand();
-      releaseLock();
-    }
+    waitForPacket();
+    processCommand();
+    releaseLock();
   }
 }

@@ -552,6 +552,14 @@ byte packetReady()
 }
 
 //===========================================================================//
+void waitForPacket()
+{
+  /// @todo It would be nice if this slept or something sensible
+  while(!processingLock)
+    ;
+}
+
+//===========================================================================//
 void endMessage()
 {
   byte length = sendPacketLength;
