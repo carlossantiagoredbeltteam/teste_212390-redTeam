@@ -10,6 +10,7 @@ PWD=$(CURDIR)
 BASEDIR=$(PWD)
 SDCCBASE=$(PWD)/sdcc
 BUILDDIR=$(PWD)/build/$(PROCESSOR)
+BASEBUILDDIR=$(BUILDDIR)
 SUBDIRS=share devices tools
 
 export
@@ -17,21 +18,14 @@ export
 
 SDCC=$(SDCCBASE)/bin/sdcc
 
-all:	buildarea procheader $(SUBDIRS)
-
-buildarea: $(BUILDDIR)
-
-$(BUILDDIR):
-	if [ ! -d $(BUILDDIR) ]; then mkdir -p $(BUILDDIR); fi
+all:	procheader $(SUBDIRS)
 
 $(SUBDIRS):
 	$(MAKE) -C $@
 
 clean:
 	rm -rf build *~
-	$(MAKE) -C share clean
-	$(MAKE) -C devices clean
-	$(MAKE) -C tools clean
+	for dir in $(SUBDIRS); do $(MAKE) -C $$dir clean; done
 
 distclean:	clean
 	rm -rf sdcc sdcc-build
