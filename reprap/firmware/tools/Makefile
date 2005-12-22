@@ -7,4 +7,11 @@ poke:	$(POKE:.cc=.o)
 	g++ -g -o poke $(POKE:.cc=.o)
 
 clean:
-	rm -f poke $(ALLCXX:.cc=.o) *~
+	rm -f poke $(ALLCXX:.cc=.o) *~ $(ALLCXX:.cc=.dep)
+
+%.dep: %.cc
+	$(SHELL) -ec 'g++ -pthread -MM -MG $< \
+		| sed '\''s/\($*\)\.o[ :]*/\1.o $@ : /g'\'' > $@; \
+		[ -s $@ ] || rm -f $@'
+
+include $(ALLCXX:.cc=.dep)
