@@ -21,7 +21,7 @@ SNAP::SNAP(const char *device, int sourceAddress, bool verbose)
     perror("Get attr");
     exit(1);
   }
-  cfsetspeed(&terminfo, B2400);
+  cfsetspeed(&terminfo, B19200);
   terminfo.c_cflag &= ~CRTSCTS;
   terminfo.c_cflag |= CLOCAL;
   terminfo.c_lflag &= ~ICANON;

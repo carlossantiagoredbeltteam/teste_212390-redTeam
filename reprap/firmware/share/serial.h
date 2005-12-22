@@ -14,6 +14,7 @@ void endMessage();
 void releaseLock();
 void serialInterruptHandler();
 byte packetReady();
+void waitForPacket();
 void sendMessage(byte dest);
 void sendDataByte(byte c);
 
