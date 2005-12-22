@@ -5,7 +5,7 @@ clean:
 
 
 %.dep: %.c
-	$(SHELL) -ec 'gcc -MM -I$(BASEDIR)/share $< \
+	$(SHELL) -ec 'gcc -MM $(CFLAGS) $< \
 		| sed '\''s#\($*\)\.o[ :]*#$(BUILDDIR)/\1.o $@ : #g'\'' > $@; \
 		[ -s $@ ] || rm -f $@'
 
