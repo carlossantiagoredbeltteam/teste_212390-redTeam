@@ -14,7 +14,7 @@
 
 #define stepCount 8
 
-static byte coilPosition = 0;
+volatile static byte coilPosition = 0;
 
 // Non-zero indicates seeking is in progress (and its speed)
 enum functions {
@@ -23,11 +23,11 @@ enum functions {
   func_reverse,
   func_seek
 };
-static byte function = func_idle;
+volatile static byte function = func_idle;
 
-static byte speed = 0;
+volatile static byte speed = 0;
 
-union addressableInt {
+volatile static union addressableInt {
   int ival;
   byte bytes[2];
 } currentPosition, seekPosition;
@@ -68,6 +68,8 @@ byte stepValue()
   return 0;
 }
 
+#pragma save
+#pragma nooverlay
 void forward1()
 {
   currentPosition.ival++;
@@ -77,7 +79,10 @@ _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _coilPosition;
 _endasm;
 }
+#pragma restore
 
+#pragma save
+#pragma nooverlay
 void reverse1()
 {
   currentPosition.ival--;
@@ -87,7 +92,10 @@ _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _coilPosition;
 _endasm;
 }
+#pragma restore
 
+#pragma save
+#pragma nooverlay
 void setTimer(byte newspeed)
 {
   speed = newspeed;
@@ -102,7 +110,10 @@ _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _coilPosition;
 _endasm;
 }
+#pragma restore
 
+#pragma save
+#pragma nooverlay
 void timerTick()
 {
   switch(function) {
@@ -133,14 +144,16 @@ _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _coilPosition;
 _endasm;
 }
+#pragma restore
 
 void processCommand()
 {
   switch(buffer[0]) {
   case 0:
     sendReply();
-    sendDataByte(0);  // These don't really mean much right now
-    sendDataByte(1);
+    sendDataByte(0);  // Response type 0
+    sendDataByte(0);  // Minor
+    sendDataByte(1);  // Major
     endMessage();
     break;
 
@@ -165,6 +178,7 @@ void processCommand()
   case 4:
     // Get position counter
     sendReply();
+    sendDataByte(4);
     sendDataByte(currentPosition.bytes[0]);
     sendDataByte(currentPosition.bytes[1]);
     endMessage();
