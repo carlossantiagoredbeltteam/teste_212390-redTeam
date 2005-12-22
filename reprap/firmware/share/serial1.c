@@ -141,7 +141,7 @@
 /// some currently unknown reason.  If you send a message to one of
 /// these addresses, it will not be chained on correctly.
 
-#include "serial-inc.h"
+#include "serial.h"
 
 enum SNAP_states {
   SNAP_idle = 0x30,

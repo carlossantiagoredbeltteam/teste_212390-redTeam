@@ -1,5 +1,5 @@
-#ifndef _serial_inc_h
-#define _serial_inc_h
+#ifndef _serial_h
+#define _serial_h
 
 #define __16f627
 #include <pic/pic16f627.h>
@@ -20,7 +20,6 @@ void sendMessage(byte dest);
 void sendDataByte(byte c);
 
 extern volatile byte buffer[];
-
 
 // REMOVE
 void uartNotifyReceive();

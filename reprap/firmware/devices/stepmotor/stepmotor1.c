@@ -1,5 +1,5 @@
 #include "stepmotor.h"
-#include "serial-inc.h"
+#include "serial.h"
 
 typedef unsigned int config;
 config at 0x2007 __CONFIG = _CP_OFF &

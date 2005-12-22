@@ -1,5 +1,5 @@
 #include "stepmotor.h"
-#include "serial-inc.h"
+#include "serial.h"
 
 // Simple stepper controller.
 //
