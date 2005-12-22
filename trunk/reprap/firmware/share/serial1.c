@@ -569,6 +569,7 @@ void endMessage()
     sendPacketLength = 16;
   }
 
+  GIE = 0;
   // Send the message
   uartTransmit(SNAP_SYNC);
   crc = 0;
@@ -579,6 +580,19 @@ void endMessage()
   for(i = 0; i < sendPacketLength; i++)
     uartTransmit(computeCRC(sendPacket[i]));
   uartTransmit(crc); /// @todo crc here
+  GIE = 1;
+
+  /// @bug Because interrupts are now disabled during sending
+  /// the buffer cannot empty, so if too much is sent, it
+  /// will probably cause a lock-up (I've not actually seen
+  /// this happen yet, but it probably will).  It should
+  /// be a bit smarter to prevent this or else enable
+  /// interrupts briefly during uartTransmit if it is full and
+  /// then restore interrupts to their start state.
+
+_asm  /// @todo Remove when sdcc bug fixed
+  BANKSEL _uartState;
+_endasm;
 }
 
 //===========================================================================//
