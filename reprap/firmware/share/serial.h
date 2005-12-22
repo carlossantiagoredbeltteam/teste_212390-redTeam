@@ -1,8 +1,6 @@
 #ifndef _serial_h
 #define _serial_h
 
-#define __16f627
-#include <pic/pic16f627.h>
 #include "pic14.h"
 
 #define MAX_TRANSMIT_BUFFER 16  ///< Transmit buffer size.

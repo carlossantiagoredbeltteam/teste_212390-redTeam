@@ -10,7 +10,7 @@ PWD=$(CURDIR)
 BASEDIR=$(PWD)
 SDCCBASE=$(PWD)/sdcc
 BUILDDIR=$(PWD)/build/$(PROCESSOR)
-SUBDIRS=share devices
+SUBDIRS=share devices tools
 
 export
 .PHONY: $(SUBDIRS)
@@ -31,6 +31,7 @@ clean:
 	rm -rf build *~
 	$(MAKE) -C share clean
 	$(MAKE) -C devices clean
+	$(MAKE) -C tools clean
 
 distclean:	clean
 	rm -rf sdcc sdcc-build

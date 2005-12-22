@@ -1,6 +1,6 @@
 
 $(BUILDDIR)/%.o: %.c
-	cd $(BUILDDIR) && $(SDCC) -I$(BASEDIR)/share -S -mpic14 -p$(PROCESSOR) $(PWD)/$< && \
+	cd $(BUILDDIR) && $(SDCC) -S -mpic14 -p$(PROCESSOR) $(CFLAGS) $(PWD)/$< && \
 		gpasm -c $*.asm
 
 %.o: %.c
@@ -8,7 +8,7 @@ $(BUILDDIR)/%.o: %.c
 
 OBJS=$(SOURCES:%.c=$(BUILDDIR)/%.o)
 CC=$(SDCC)
-CFLAGS=-I$(BASEDIR)/share
+CFLAGS=-I$(BASEDIR)/share -D__$(PROCESSOR)
 CXXFLAGS=$(CFLAGS)
 PWD=$(CURDIR)
 LDFLAGS=$(BASEDIR)/share/pic14.a serial.lib

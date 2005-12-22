@@ -10,7 +10,7 @@ config at 0x2007 __CONFIG = _CP_OFF &
  _MCLRE_OFF &
  _LVP_OFF;
 
-byte deviceAddress = 2;
+byte deviceAddress = PORT;
 
 static void isr() interrupt 0 {
   serialInterruptHandler();
