@@ -13,6 +13,10 @@ BUILDDIR=$(PWD)/build/$(PROCESSOR)
 BASEBUILDDIR=$(BUILDDIR)
 SUBDIRS=share devices tools
 
+ifdef DEVICES
+SUBDIRS=share devices
+endif
+
 export
 .PHONY: $(SUBDIRS)
 
