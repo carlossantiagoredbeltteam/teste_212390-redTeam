@@ -36,8 +36,8 @@ sdcc: $(SDCCBASE)/share/sdcc/include/pic $(SDCCBASE)/inc2h.pl
 procheader:	sdcc $(SDCCBASE)/share/sdcc/include/pic/pic$(PROCESSOR).h
 
 $(SDCCBASE)/share/sdcc/include/pic/pic$(PROCESSOR).h:
-	$(SDCCBASE)/inc2h.pl 16f627 $(GPUTILSBASE) > \
-		$(SDCCBASE)/share/sdcc/include/pic/pic16f627.h
+	$(SDCCBASE)/inc2h.pl $(PROCESSOR) $(GPUTILSBASE) > \
+		$(SDCCBASE)/share/sdcc/include/pic/pic$(PROCESSOR).h
 
 # Build sdcc (and extra pic include directory)
 $(SDCCBASE)/share/sdcc/include/pic:
