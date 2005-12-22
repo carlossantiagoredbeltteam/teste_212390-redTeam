@@ -1,6 +1,16 @@
 #ifndef _pic14_h
 #define _pic14_h
 
+#if defined __16f627
+#include <pic/pic16f627.h>
+#elif defined __16f628
+#include <pic/pic16f628.h>
+#elif defined __GNUC__
+// Ignore when calculating dependencies
+#else
+#error No processor or unknown processor specified
+#endif
+
 typedef unsigned char byte;
 
 //unsigned short _moduint(unsigned short, unsigned short);
