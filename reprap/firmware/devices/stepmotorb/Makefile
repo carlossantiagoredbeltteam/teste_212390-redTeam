@@ -12,7 +12,7 @@ include ../../picmake.inc
 
 CFLAGS += -I$(CURDIR)/../stepmotor
 
-$(BUILDDIR)/$(TARGET).hex:	$(SOURCES) $(OBJS)
+$(BUILDDIR)/$(TARGET).hex:	$(SOURCES) $(OBJS) $(PICDEPS)
 	cd $(BUILDDIR) && gplink -m -c -o $(TARGET).hex $(OBJS) $(LDFLAGS)
 	perl $(BASEDIR)/tools/checkmap $(BUILDDIR)/$(TARGET).map
 

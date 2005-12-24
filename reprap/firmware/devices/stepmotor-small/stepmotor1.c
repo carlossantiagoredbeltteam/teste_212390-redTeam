@@ -26,7 +26,7 @@ void main()
 
   OPTION_REG = BIN(11011111); // Disable TMR0 on RA4, 1:128 WDT
   CMCON = 0xff;               // Comparator module defaults
-  TRISA = BIN(00110011);      // Port A outputs (except 0,1,4,5)
+  TRISA = BIN(00110000);      // Port A outputs (except 4/5)
                               // RA4 is used for clock out (debugging)
                               // RA5 can only be used as an input
   TRISB = BIN(00000110);      // Port B outputs (except 1/2 for serial)
