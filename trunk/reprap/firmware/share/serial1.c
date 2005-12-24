@@ -501,6 +501,8 @@ _endasm;
 
 //===========================================================================//
 /// High level routine that queues a byte during construction of a packet
+#pragma save
+#pragma nooverlay
 void sendDataByte(byte c)
 {
   // Put byte into packet sending buffer.  Don't calculated CRCs
@@ -512,6 +514,7 @@ void sendDataByte(byte c)
 
   sendPacket[sendPacketLength++] = c;
 }
+#pragma restore
 
 //===========================================================================//
 void releaseLock()
@@ -522,11 +525,14 @@ void releaseLock()
 }
 
 //===========================================================================//
+#pragma save
+#pragma nooverlay
 void sendMessage(byte dest)
 {
   sendPacketDestination = dest;
   sendPacketLength = 0;
 }
+#pragma restore
 
 //===========================================================================//
 void sendReply()
@@ -560,8 +566,11 @@ void waitForPacket()
 }
 
 //===========================================================================//
+#pragma save
+#pragma nooverlay
 void endMessage()
 {
+  byte interruptEnabledState;
   byte length = sendPacketLength;
   byte i;
   if (length > 7) {
@@ -569,7 +578,9 @@ void endMessage()
     sendPacketLength = 16;
   }
 
-  GIE = 0;
+  interruptEnabledState = GIE;
+  if (!interruptEnabledState) // note side effect
+    GIE = 0;
   // Send the message
   uartTransmit(SNAP_SYNC);
   crc = 0;
@@ -580,7 +591,9 @@ void endMessage()
   for(i = 0; i < sendPacketLength; i++)
     uartTransmit(computeCRC(sendPacket[i]));
   uartTransmit(crc); /// @todo crc here
-  GIE = 1;
+  
+  if (!interruptEnabledState)
+    GIE = 1;
 
   /// @bug Because interrupts are now disabled during sending
   /// the buffer cannot empty, so if too much is sent, it
@@ -594,6 +607,7 @@ _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _uartState;
 _endasm;
 }
+#pragma restore
 
 //===========================================================================//
 #pragma save

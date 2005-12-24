@@ -12,45 +12,25 @@
 // stepCount value and the stepValue function.  Currently
 // stepCount must be a power of 2.
 
-// I/O ports:
-//   B0-B1 - Unused: Output low
-//   B2 - UART Receive
-//   B3 - UART Transmit
-//   B4-B7 - Stepper motor connections
-//   A0 - Min optointerrupter (optional)
-//   A1 - Max optointerrupter (optional)
-//   A2 - Sync input/output (optional)
-
 #define stepCount 8
 
 volatile static byte coilPosition = 0;
 
+// Non-zero indicates seeking is in progress (and its speed)
 enum functions {
   func_idle,
   func_forward,
   func_reverse,
-  func_syncwait,   // Waiting for sync prior to seeking
-  func_seek,
-  func_findmin,    // Calibration, finding minimum
-  func_findmax     // Calibration, finding maximum
+  func_seek
 };
 volatile static byte function = func_idle;
 
 volatile static byte speed = 0;
 
-volatile static byte seekNotify = 255;
-
 volatile static union addressableInt {
   int ival;
   byte bytes[2];
-} currentPosition, seekPosition, maxPosition;
-
-enum sync_modes {
-  sync_none,    // no sync (default)
-  sync_slave,   // sync slave (monitors sync line)
-  sync_master   // sync master (send sync pulse when seek starts)
-};
-static byte sync_mode = sync_none;
+} currentPosition, seekPosition;
 
 void init()
 {
@@ -58,14 +38,11 @@ void init()
   speed = 0;
   function = func_idle;
   coilPosition = 0;
-  sync_mode = sync_none;
 
   currentPosition.bytes[0] = 0;
   currentPosition.bytes[1] = 0;
   seekPosition.bytes[0] = 0;
   seekPosition.bytes[1] = 0;
-  maxPosition.bytes[0] = 0;
-  maxPosition.bytes[1] = 0;
 }
 
 byte stepValue()
@@ -159,38 +136,6 @@ void timerTick()
       speed = 0;
       // Uncomment next line to remove torque on arrival
       //PORTB = 0;
-      if (seekNotify != 255) {
-	sendMessage(seekNotify);
-	sendDataByte(7);
-	sendDataByte(currentPosition.bytes[0]);
-	sendDataByte(currentPosition.bytes[1]);
-	endMessage();
-      }
-    }
-    break;
-  case func_findmin:
-    if (!PORTA0) {
-      currentPosition.bytes[0] = 0;
-      currentPosition.bytes[1] = 0;
-      function = func_findmax;
-    } else {
-      reverse1();
-    }
-    break;
-  case func_findmax:
-    if (!PORTA1) {
-      maxPosition.bytes[0] = currentPosition.bytes[0];
-      maxPosition.bytes[1] = currentPosition.bytes[1];
-      function = func_idle;
-      if (seekNotify != 255) {
-	sendMessage(seekNotify);
-	sendDataByte(9);
-	sendDataByte(currentPosition.bytes[0]);
-	sendDataByte(currentPosition.bytes[1]);
-	endMessage();
-      }
-    } else {
-      forward1();
     }
     break;
   }
@@ -208,7 +153,7 @@ void processCommand()
     sendReply();
     sendDataByte(0);  // Response type 0
     sendDataByte(0);  // Minor
-    sendDataByte(2);  // Major
+    sendDataByte(1);  // Major
     endMessage();
     break;
 
@@ -253,33 +198,6 @@ void processCommand()
     PORTB = 0;
     function = func_idle;
     break;
-
-  case 7:
-    // Set seek completion (and calibration) notification
-    seekNotify = buffer[1];
-    break;
-
-  case 8:
-    // Set sync mode
-    sync_mode = buffer[1];
-    // Not complete yet
-    break;
-
-  case 9:
-    // Request calibration (search at given speed)
-    function = func_findmin;
-    setTimer(buffer[1]);
-    break;
-
-  case 10:
-    // Request range
-    sendReply();
-    sendDataByte(10);
-    sendDataByte(maxPosition.bytes[0]);
-    sendDataByte(maxPosition.bytes[1]);
-    endMessage();
-    break;
-
   }
 _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _coilPosition;
