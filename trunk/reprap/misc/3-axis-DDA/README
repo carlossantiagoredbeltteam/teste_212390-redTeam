@@ -1,0 +1,22 @@
+RepRap
+------
+
+The Replicating Rapid Prototyper Project
+
+These are the files for the PIC that controls the 
+RepRap polymer extruder head.
+
+Version 1.  1 September 2005
+
+http://reprap.org
+
+
+This software uses SDCC (http://sdcc.sourceforge.net/)
+
+Type "make" to make the file extruder.hex, then download that to the PIC using, 
+for example, gpicp (http://home.pacbell.net/theposts/picmicro/).
+
+"make clean" will erase derived files.
+
+If make fails and you need a quick copy of extruder.hex, the original one is
+in the directory Saved-hex-file.
