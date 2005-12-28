@@ -46,9 +46,12 @@ volatile static union addressableInt {
 } currentPosition, seekPosition, maxPosition;
 
 enum sync_modes {
-  sync_none,    // no sync (default)
-  sync_slave,   // sync slave (monitors sync line)
-  sync_master   // sync master (send sync pulse when seek starts)
+  sync_none,     // no sync (default)
+  sync_slave,    // sync slave (monitors sync line)
+  sync_master,   // sync master (send sync pulse when seek starts)
+  sync_inc,      // inc motor on each pulse
+  sync_dec       // dec motor on each pulse
+  sync_ddamaster // master for DDA sync
 };
 static byte sync_mode = sync_none;
 
@@ -59,6 +62,7 @@ void init()
   function = func_idle;
   coilPosition = 0;
   sync_mode = sync_none;
+  seekNotify = 255;
 
   currentPosition.bytes[0] = 0;
   currentPosition.bytes[1] = 0;
@@ -262,7 +266,6 @@ void processCommand()
   case 8:
     // Set sync mode
     sync_mode = buffer[1];
-    // Not complete yet
     break;
 
   case 9:
