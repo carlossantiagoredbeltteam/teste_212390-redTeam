@@ -3,20 +3,32 @@ RepRap
 
 The Replicating Rapid Prototyper Project
 
-These are the files for the PIC that controls the 
-RepRap polymer extruder head.
+This is the C program for the PIC that controls the cartesian X, Y, Z
+movement.
 
-Version 1.  1 September 2005
+It uses a DDA to drive three steppers together to make a line in space
+in exactly the same way that Bressenham's algorithm draws a straight
+line in pixels on a graphics screen, except that it works in 3D rather
+than 2.
+
+The line is swapped about so it is always in the first octant (x > 0,
+y > 0, z > 0) and so that the X movement is bigger than the Y and the
+Z.  This is recorded in the bits in negswap, which is then used to
+unravel this and to plot the line in the right place in space.
+
+Version 1.  16 December 2005
+
 
 http://reprap.org
 
 
 This software uses SDCC (http://sdcc.sourceforge.net/)
 
-Type "make" to make the file extruder.hex, then download that to the PIC using, 
-for example, gpicp (http://home.pacbell.net/theposts/picmicro/).
+Type "make" to make the file cartesian.hex, then download that to the
+PIC using, for example, gpicp
+(http://home.pacbell.net/theposts/picmicro/).
 
 "make clean" will erase derived files.
 
-If make fails and you need a quick copy of extruder.hex, the original one is
+If make fails and you need a quick copy of cartesian.hex, the original one is
 in the directory Saved-hex-file.
