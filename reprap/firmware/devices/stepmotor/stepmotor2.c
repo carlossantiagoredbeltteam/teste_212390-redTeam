@@ -183,7 +183,7 @@ static void dda_step()
   if ((dda_error + dda_error) > dda_deltax) {
     // Y needs to be stepped, so signal
     strobe_sync();
-    dda_error -= dda_deltay.ival;
+    dda_error -= dda_deltax;
   }
 }
 #pragma restore
@@ -267,8 +267,10 @@ void syncStrobe() {
   case sync_none:
     break;
   case sync_seek:
-    if (function = func_syncwait)
+    if (function = func_syncwait) {
+      sync_mode = sync_none;
       function = func_seek;
+    }
     break;
   case sync_inc:
     forward1();
