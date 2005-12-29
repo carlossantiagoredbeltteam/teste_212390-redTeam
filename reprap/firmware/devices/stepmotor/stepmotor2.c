@@ -23,6 +23,11 @@
 
 #define stepCount 8
 
+typedef union {
+  int ival;
+  byte bytes[2];
+} addressableInt;
+
 volatile static byte coilPosition = 0;
 
 enum functions {
@@ -32,7 +37,8 @@ enum functions {
   func_syncwait,   // Waiting for sync prior to seeking
   func_seek,
   func_findmin,    // Calibration, finding minimum
-  func_findmax     // Calibration, finding maximum
+  func_findmax,    // Calibration, finding maximum
+  func_ddamaster
 };
 volatile static byte function = func_idle;
 
@@ -40,22 +46,21 @@ volatile static byte speed = 0;
 
 volatile static byte seekNotify = 255;
 
-volatile static union addressableInt {
-  int ival;
-  byte bytes[2];
-} currentPosition, seekPosition, maxPosition;
+volatile static addressableInt currentPosition, seekPosition, maxPosition;
+
+volatile static addressableInt dda_deltay;
+volatile static int dda_error;
+static int dda_deltax;
 
 enum sync_modes {
   sync_none,     // no sync (default)
-  sync_slave,    // sync slave (monitors sync line)
-  sync_master,   // sync master (send sync pulse when seek starts)
+  sync_seek,     // synchronised seeking
   sync_inc,      // inc motor on each pulse
   sync_dec       // dec motor on each pulse
-  sync_ddamaster // master for DDA sync
 };
 static byte sync_mode = sync_none;
 
-void init()
+void init2()
 {
   /// @todo Remove some of these when intialisers fixed
   speed = 0;
@@ -103,7 +108,7 @@ void forward1()
   coilPosition = (coilPosition + 1) & (stepCount - 1);
   PORTB = stepValue();
 _asm  /// @todo Remove when sdcc bug fixed
-  BANKSEL _coilPosition;
+  BANKSEL _coilPosition
 _endasm;
 }
 #pragma restore
@@ -134,8 +139,52 @@ void setTimer(byte newspeed)
     TMR1ON = 0;
   }
 _asm  /// @todo Remove when sdcc bug fixed
-  BANKSEL _coilPosition;
+  BANKSEL _coilPosition
 _endasm;
+}
+#pragma restore
+
+#pragma save
+#pragma nooverlay
+void strobe_sync() {
+  byte delay;
+  
+  PORTA2 = 0; // Pull low
+  TRISA2 = 0; // Set to output during stobe
+
+  // Spin for a few cycles
+  for(delay = 0; delay <= 255; delay++)
+    ;
+
+  TRISA2 = 1; // Back to input so we don't drive the sync line
+_asm  /// @todo Remove when sdcc bug fixed
+  BANKSEL _coilPosition
+_endasm;
+}
+#pragma restore
+
+
+#pragma save
+#pragma nooverlay
+// Perform a single DDA step
+static void dda_step()
+{
+  if (currentPosition.ival == seekPosition.ival) {
+    function = func_idle;
+    speed = 0;
+    return; 
+  } else if (currentPosition.ival < seekPosition.ival) {
+    forward1();
+  } else {
+    reverse1();
+  }
+
+  dda_error += dda_deltay.ival;
+  if ((dda_error + dda_error) > dda_deltax) {
+    // Y needs to be stepped, so signal
+    strobe_sync();
+    dda_error -= dda_deltay.ival;
+  }
 }
 #pragma restore
 
@@ -146,6 +195,7 @@ void timerTick()
   switch(function) {
   case func_idle:
     TMR1ON = 0;
+    speed = 0;
     break;
   case func_forward:
     forward1();
@@ -197,13 +247,37 @@ void timerTick()
       forward1();
     }
     break;
+  case func_syncwait:
+    // Do nothing, we're still waiting
+    break;
+  case func_ddamaster:
+    dda_step();
+    break;
   }
   setTimer(speed);
 _asm  /// @todo Remove when sdcc bug fixed
-  BANKSEL _coilPosition;
+  BANKSEL _coilPosition
 _endasm;
 }
 #pragma restore
+
+/// Called when the sync line is strobed (pulled briefly low)
+void syncStrobe() {
+  switch(sync_mode) {
+  case sync_none:
+    break;
+  case sync_seek:
+    if (function = func_syncwait)
+      function = func_seek;
+    break;
+  case sync_inc:
+    forward1();
+    break;
+  case sync_dec:
+    reverse1();
+    break;
+  }
+}
 
 void processCommand()
 {
@@ -248,7 +322,10 @@ void processCommand()
     seekPosition.bytes[0] = buffer[2];
     seekPosition.bytes[1] = buffer[3];
 
-    function = func_seek;
+    if (sync_mode == sync_seek)
+      function = func_syncwait;
+    else
+      function = func_seek;
     setTimer(buffer[1]);
     break;
 
@@ -283,8 +360,26 @@ void processCommand()
     endMessage();
     break;
 
+  case 11:
+    // Master a DDA
+    // Assumes head is already positioned correctly at x0 and extrusion
+    // is starting
+
+    seekPosition.bytes[0] = buffer[2];
+    seekPosition.bytes[1] = buffer[3];
+    dda_deltay.bytes[0] = buffer[4];
+    dda_deltay.bytes[1] = buffer[5];
+    dda_error = 0;
+
+    dda_deltax = seekPosition.ival - currentPosition.ival;
+    if (dda_deltax < 0) dda_deltax = -dda_deltax;
+
+    function = func_ddamaster;
+    setTimer(buffer[1]);
+    break;
+
   }
 _asm  /// @todo Remove when sdcc bug fixed
-  BANKSEL _coilPosition;
+  BANKSEL _coilPosition
 _endasm;
 }
