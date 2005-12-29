@@ -3,8 +3,9 @@
 
 #include "pic14.h"
 
-void init();
+void init2();
 void timerTick();
 void processCommand();
+void syncStrobe();
 
 #endif
