@@ -30,6 +30,19 @@ typedef union {
 
 volatile static byte coilPosition = 0;
 
+#define CMD_VERSION   0
+#define CMD_FORWARD   1
+#define CMD_REVERSE   2
+#define CMD_SETPOS    3
+#define CMD_GETPOS    4
+#define CMD_SEEK      5
+#define CMD_FREE      6
+#define CMD_NOTIFY    7
+#define CMD_SYNC      8
+#define CMD_CALIBRATE 9
+#define CMD_GETRANGE  10
+#define CMD_DDA       11
+
 enum functions {
   func_idle,
   func_forward,
@@ -172,6 +185,13 @@ static void dda_step()
   if (currentPosition.ival == seekPosition.ival) {
     function = func_idle;
     speed = 0;
+    if (seekNotify != 255) {
+      sendMessage(seekNotify);
+      sendDataByte(CMD_DDA);
+      sendDataByte(currentPosition.bytes[0]);
+      sendDataByte(currentPosition.bytes[1]);
+      endMessage();
+    }
     return; 
   } else if (currentPosition.ival < seekPosition.ival) {
     forward1();
@@ -215,7 +235,7 @@ void timerTick()
       //PORTB = 0;
       if (seekNotify != 255) {
 	sendMessage(seekNotify);
-	sendDataByte(7);
+	sendDataByte(CMD_SEEK);
 	sendDataByte(currentPosition.bytes[0]);
 	sendDataByte(currentPosition.bytes[1]);
 	endMessage();
@@ -238,7 +258,7 @@ void timerTick()
       function = func_idle;
       if (seekNotify != 255) {
 	sendMessage(seekNotify);
-	sendDataByte(9);
+	sendDataByte(CMD_CALIBRATE);
 	sendDataByte(currentPosition.bytes[0]);
 	sendDataByte(currentPosition.bytes[1]);
 	endMessage();
@@ -284,42 +304,42 @@ void syncStrobe() {
 void processCommand()
 {
   switch(buffer[0]) {
-  case 0:
+  case CMD_VERSION:
     sendReply();
-    sendDataByte(0);  // Response type 0
+    sendDataByte(CMD_VERSION);  // Response type 0
     sendDataByte(0);  // Minor
     sendDataByte(2);  // Major
     endMessage();
     break;
 
-  case 1:
+  case CMD_FORWARD:
     // Forward speed
     function = func_forward;
     setTimer(buffer[1]);
     break;
 
-  case 2:
+  case CMD_REVERSE:
     // Reverse speed
     function = func_reverse;
     setTimer(buffer[1]);    
     break;
 
-  case 3:
+  case CMD_SETPOS:
     // Set (reset) position counter
     currentPosition.bytes[0] = buffer[1];
     currentPosition.bytes[1] = buffer[2];
     break;
 
-  case 4:
+  case CMD_GETPOS:
     // Get position counter
     sendReply();
-    sendDataByte(4);
+    sendDataByte(CMD_GETPOS);
     sendDataByte(currentPosition.bytes[0]);
     sendDataByte(currentPosition.bytes[1]);
     endMessage();
     break;
 
-  case 5:
+  case CMD_SEEK:
     // Goto position
     seekPosition.bytes[0] = buffer[2];
     seekPosition.bytes[1] = buffer[3];
@@ -331,38 +351,38 @@ void processCommand()
     setTimer(buffer[1]);
     break;
 
-  case 6:
+  case CMD_FREE:
     // Free motor (release torque)
     PORTB = 0;
     function = func_idle;
     break;
 
-  case 7:
+  case CMD_NOTIFY:
     // Set seek completion (and calibration) notification
     seekNotify = buffer[1];
     break;
 
-  case 8:
+  case CMD_SYNC:
     // Set sync mode
     sync_mode = buffer[1];
     break;
 
-  case 9:
+  case CMD_CALIBRATE:
     // Request calibration (search at given speed)
     function = func_findmin;
     setTimer(buffer[1]);
     break;
 
-  case 10:
+  case CMD_GETRANGE:
     // Request range
     sendReply();
-    sendDataByte(10);
+    sendDataByte(CMD_GETRANGE);
     sendDataByte(maxPosition.bytes[0]);
     sendDataByte(maxPosition.bytes[1]);
     endMessage();
     break;
 
-  case 11:
+  case CMD_DDA:
     // Master a DDA
     // Assumes head is already positioned correctly at x0 and extrusion
     // is starting
