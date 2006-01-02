@@ -6,7 +6,7 @@ config at 0x2007 __CONFIG = _CP_OFF &
  _WDT_OFF &
  _BODEN_OFF &
  _PWRTE_ON &
- _INTRC_OSC_CLKOUT &
+ _INTRC_OSC_NOCLKOUT &
  _MCLRE_OFF &
  _LVP_OFF;
 
@@ -24,12 +24,11 @@ static void isr() interrupt 0 {
 void init1()
 {
 
-  OPTION_REG = BIN(11011111); // Disable TMR0 on RA4, 1:128 WDT
+  OPTION_REG = BIN(01011111); // Disable TMR0 on RA4, 1:128 WDT, pullups on
   CMCON = 0xff;               // Comparator module defaults
-  TRISA = BIN(00110111);      // Port A outputs except 0,1,2,4,5
-                              // RA4 is used for clock out (debugging)
+  TRISA = BIN(00101100);      // Port A outputs except 2,3 (sync)
                               // RA5 can only be used as an input
-  TRISB = BIN(00000110);      // Port B outputs (except 1/2 for serial)
+  TRISB = BIN(00001111);      // Port B 0-3 input, 4-7 outputs
   PIE1 = BIN(00000000);       // All peripheral interrupts initially disabled
   INTCON = BIN(00000000);     // Interrupts disabled
   PIR1 = 0;                   // Clear peripheral interrupt flags
@@ -37,7 +36,7 @@ void init1()
   TXSTA = BIN(00000100);      // 8 bit high speed 
   RCSTA = BIN(10000000);      // Enable port for 8 bit receive
 
-  PORTB = 0;
+  PORTB = BIN(00001001);      // Turn on pullups for B0,3
 
   RCIE = 1;  // Enable receive interrupts
   CREN = 1;  // Start reception
@@ -65,7 +64,7 @@ void main() {
   // Clear up any boot noise from the TSR
   uartTransmit(0);
  
-  if (PORTA2) // Only enable if PORTA2 is by default high
+  if (SYNCA) // Only enable if SYNCA is by default high
     syncEnabled = 1;
 
   for(;;) {
@@ -73,10 +72,10 @@ void main() {
       processCommand();
       releaseLock();
     }
-    if (syncEnabled && !PORTA2) {
+    if (syncEnabled && !SYNCA) {
       // Sync line has dropped
       // Spin until it goes high again (we trigger on the rising edge)
-      while(!PORTA2)
+      while(!SYNCA)
 	;
       syncStrobe();
     }

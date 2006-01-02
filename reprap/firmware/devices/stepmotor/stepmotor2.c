@@ -13,13 +13,13 @@
 // stepCount must be a power of 2.
 
 // I/O ports:
-//   B0-B1 - Unused: Output low
-//   B2 - UART Receive
-//   B3 - UART Transmit
+//   B0 - Min optointerrupter (optional)
+//   B1 - UART Receive
+//   B2 - UART Transmit
+//   B3 - Max optointerrupter (optional)
 //   B4-B7 - Stepper motor connections
-//   A0 - Min optointerrupter (optional)
-//   A1 - Max optointerrupter (optional)
-//   A2 - Sync input/output (optional)
+//   A2 - Sync A input/output (optional)
+//   A3 - Sync B input/output (optional)
 
 #define stepCount 8
 
@@ -92,17 +92,18 @@ void init2()
 
 byte stepValue()
 {
+  // The low bits are always 1001 to ensure pullups are enabled for those ports
   switch(coilPosition) {
   case 0:
-    return BIN(00010000);
+    return BIN(00011001);
   case 1:
-    return BIN(00110000);
+    return BIN(00111001);
   case 2:
-    return BIN(00100000);
+    return BIN(00101001);
   case 3:
-    return BIN(01100000);
+    return BIN(01101001);
   case 4:
-    return BIN(01000000);
+    return BIN(01001001);
   case 5:
     return BIN(11000000);
   case 6:
@@ -162,14 +163,14 @@ _endasm;
 void strobe_sync() {
   byte delay;
   
-  PORTA2 = 0; // Pull low
-  TRISA2 = 0; // Set to output during stobe
+  SYNCA = 0; // Pull low
+  SYNCA_TRIS = 0; // Set to output during stobe
 
   // Spin for a few cycles
   for(delay = 0; delay <= 255; delay++)
     ;
 
-  TRISA2 = 1; // Back to input so we don't drive the sync line
+  SYNCA_TRIS = 1; // Back to input so we don't drive the sync line
 _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _coilPosition
 _endasm;
@@ -243,7 +244,7 @@ void timerTick()
     }
     break;
   case func_findmin:
-    if (!PORTA0) {
+    if (MINSENSOR) {
       currentPosition.bytes[0] = 0;
       currentPosition.bytes[1] = 0;
       function = func_findmax;
@@ -252,7 +253,7 @@ void timerTick()
     }
     break;
   case func_findmax:
-    if (!PORTA1) {
+    if (MAXSENSOR) {
       maxPosition.bytes[0] = currentPosition.bytes[0];
       maxPosition.bytes[1] = currentPosition.bytes[1];
       function = func_idle;
