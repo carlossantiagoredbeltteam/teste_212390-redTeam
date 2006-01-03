@@ -6,5 +6,6 @@ AUTHOR = "sai"
 DESC = "RepRap GEDA project"
 
 [FILES]
+FILE = "Design Notes.txt", ""
 FILE = "xaxis.sch", ""
 
