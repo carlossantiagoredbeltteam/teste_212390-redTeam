@@ -2,7 +2,7 @@
 # This is a special target that just rebuilds another copy
 # of stepmotor, but with a different address
 
-CFLAGS += -DPORT=4
+CFLAGS += -DPORT=3
 TARGET=stepmotorb
 
 
