@@ -81,7 +81,8 @@ byte echo;         // True - echo input; false - don't
 int flash_d;       // Number of times round the control loop to flash the LED
 byte fl;           // LED flash state
 int delay;         // Number of times round the control loop for one motor step
-int del;           // Count for the above   
+int del;           // Count for the above
+byte byte_to_send; // Byte to send is need be  
 
 byte x_idle;       // Count for how long since X last changed...
 byte y_idle;       // ...and Y...
@@ -510,6 +511,7 @@ void lineFinished()
       old_y = new_y;
       old_z = new_z;
       line_done = 1;
+      byte_to_send = 'f';
 }
 
 
@@ -779,6 +781,7 @@ void init()
   portA_byte = 0;
   echo = 1;
   idle = 10;
+  byte_to_send = 0;
   lineFinished();
   power(0);
  }
@@ -801,6 +804,11 @@ void main()
     {
       b = rcvByte();    // Incomming from serial port...
       if(b) menu(b);    // ...?  If yes use menu() to find what was said
+      if(byte_to_send)  // Anything to transmit?
+	{
+	  sendByte(byte_to_send);
+	  byte_to_send = 0;
+	}
       doLine();         // Line steps with delay
       doFlash();        // Flash the LED, or not
     }
