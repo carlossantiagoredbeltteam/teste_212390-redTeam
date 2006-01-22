@@ -1,0 +1,21 @@
+RepRap
+------
+
+The Replicating Rapid Prototyper Project
+
+These are the files for the mechanical design of the RepRap polymer
+extruder head.
+
+Version 2.  2 November 2005
+
+http://reprap.org
+
+Files with the extension .aoi are for the Art of Illusion design system
+(http://www.artofillusion.org).
+
+Files with the extension .stl are the rapid prototyper files for the
+extruder components, from which they can be made directly.
+
+Files with the extension .dxf are engineering drawings for the
+open-source version of QCad (http://www.ribbonsoft.com/qcad.html).
+
