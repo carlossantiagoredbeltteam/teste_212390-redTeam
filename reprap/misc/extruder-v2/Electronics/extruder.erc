@@ -1,0 +1,33 @@
+EAGLE Version 4.15 Copyright (c) 1988-2005 CadSoft
+
+Electrical Rule Check for /home/ensab/eagle/reprap-extruder/extruder.sch at  7/14/2005 11:21:44 
+
+WARNING: Sheet 1/1: unconnected Pin: JP1 1
+WARNING: Sheet 1/1: unconnected Pin: JP1 2
+WARNING: Sheet 1/1: POWER Pin IC1 VSS connected to GND
+ERROR: Sheet 1/1: unconnected INPUT Pin: IC1 RA4/T0CKIN/CMP2
+WARNING: Sheet 1/1: POWER Pin IC1 VDD connected to +5V
+WARNING: Only 1 Pin on net N$17
+WARNING: Sheet 1/1, Net GND: missing Junction at (-0.5 2.4)
+WARNING: Sheet 1/1, Net GND: missing Junction at (-0.3 2.4)
+WARNING: Sheet 1/1, Net GND: missing Junction at (1.7 1)
+WARNING: Sheet 1/1, Net GND: missing Junction at (1.8 1.4)
+WARNING: Sheet 1/1, Net +12V: missing Junction at (-0.8 3.1)
+WARNING: Sheet 1/1, Net +12V: missing Junction at (1.7 0.7)
+WARNING: Sheet 1/1, Net +12V: missing Junction at (2.3 1.2)
+WARNING: Sheet 1/1, Net +5V: missing Junction at (0 3.1)
+WARNING: Sheet 1/1, Net N$1: missing Junction at (2.8 2.6)
+WARNING: Sheet 1/1, Net N$3: missing Junction at (3.4 3.6)
+WARNING: Sheet 1/1, Net N$3: missing Junction at (3.7 3.6)
+WARNING: Sheet 1/1: Nets N$12 and GND too close at (2 1.3)
+WARNING: Sheet 1/1, Net N$13: wire overlaps pin at (4.2 1.8)
+WARNING: Sheet 1/1, Net N$17: wire overlaps pin at (6.7 -0.3)
+WARNING: Sheet 1/1, Net GND: wire overlaps pin at (6.7 -0.4)
+WARNING: Sheet 1/1, Net N$17: wire overlaps pin at (6.7 1.6)
+WARNING: Sheet 1/1, Net +12V: wire overlaps pin at (2 1.2)
+WARNING: Sheet 1/1, Net N$12: wire overlaps pin at (2 1.3)
+
+No board loaded - consistency has not been checked
+
+    1 errors
+   23 warnings

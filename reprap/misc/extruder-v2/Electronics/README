@@ -1,0 +1,20 @@
+RepRap
+------
+
+The Replicating Rapid Prototyper Project
+
+These are the files for the electronics for the RepRap polymer extruder head.
+
+Version 2.  2 November 2005
+
+http://reprap.org
+
+Files called extruder.* and eagle.* are for the Eagle PCB program
+(http://www.cadsoft.de/).  Start by loading extruder.sch into Eagle.
+
+Files called thermistor-charactristics.* are the spreadsheet for
+working out the characteristics of different thermistors for the
+design, .xsc for OpenOffice (http://www.openoffice.org/) and .xls for
+Excel (http://office.microsoft.com/en-us/default.aspx).
+
+
