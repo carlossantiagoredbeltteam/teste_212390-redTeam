@@ -1,35 +1,31 @@
 #include "motor.h"
+#include "serial.h"
 
 typedef unsigned int config;
 config at 0x2007 __CONFIG = _CP_OFF &
  _WDT_OFF &
  _BODEN_OFF &
  _PWRTE_ON &
- _INTRC_OSC_CLKOUT &
+ _INTRC_OSC_NOCLKOUT &
  _MCLRE_OFF &
  _LVP_OFF;
 
-byte deviceAddress = 4;  ///@todo #define or const?
-
-// Support routines for bank 1
-#include "serial-inc.c"
+byte deviceAddress = PORT;
 
 static void isr() interrupt 0 {
   serialInterruptHandler();
 
-  /// @todo sdcc workaround, should read: if (RBIF)
-  if (INTCON & 1)
+  if (RBIF)
     motorTick();
 }
 
-void main()
+void init1()
 {
   byte v = 0;
 
   OPTION_REG = BIN(11011111); // Disable TMR0 on RA4, 1:128 WDT
   CMCON = 0xff;               // Comparator module defaults
-  TRISA = BIN(00110000);      // Port A outputs (except 4/5)
-                              // RA4 is used for clock out (debugging)
+  TRISA = BIN(00100000);      // Port A outputs (except 5)
                               // RA5 can only be used as an input
   TRISB = BIN(10000110);      // Port B outputs, except 1/2 for serial and
                               // RB7 for optointerrupter input
@@ -37,14 +33,14 @@ void main()
   PIE1 = BIN(00000000);       // All peripheral interrupts initially disabled
   INTCON = BIN(00000000);     // Interrupts disabled
   PIR1 = 0;                   // Clear peripheral interrupt flags
-  SPBRG = 25;                 // 25 = 2400 baud @ 4MHz
-  TXSTA = BIN(00000000);      // 8 bit low speed 
+  SPBRG = 12;                 // 12 = ~19200 baud @ 4MHz
+  TXSTA = BIN(00000100);      // 8 bit high speed 
   RCSTA = BIN(10000000);      // Enable port for 8 bit receive
 
-  TXEN = 1;  // Enable transmit
   RCIE = 1;  // Enable receive interrupts
   CREN = 1;  // Start reception
 
+  TXEN = 1;  // Enable transmit
   RBIE = 1;  // Enable RB port change interrupt
 
   PEIE = 1;  // Peripheral interrupts on
@@ -58,14 +54,19 @@ void main()
   CCPR1L = 0;               // Start turned off
   
   T2CON = BIN(00000100);    // Enable timer 2 and set prescale to 1
+}
+
+void main() {
+  init1();
+  init2();
+  serial_init();
 
   // Clear up any boot noise from the TSR
   uartTransmit(0);
 
   for(;;) {
-    if (processingLock) {
-      processCommand();
-      releaseLock();
-    }
+    waitForPacket();
+    processCommand();
+    releaseLock();
   }
 }

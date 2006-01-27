@@ -1,5 +1,5 @@
 #include "motor.h"
-#include "serial-inc2.c"
+#include "serial.h"
 
 byte PWMPeriod = 255;
 static byte currentDirection = 0;
@@ -16,10 +16,40 @@ static byte lastPortB = 0;
 // actual direction (and the motor may take a little while to actually
 // reverse direction).
 
-union addressableInt {
+typedef union {
   int ival;
   byte bytes[2];
-} currentPosition, seekPosition;
+} addressableInt;
+
+addressableInt currentPosition, seekPosition;
+
+#define CMD_VERSION   0
+#define CMD_FORWARD   1
+#define CMD_REVERSE   2
+#define CMD_SETPOS    3
+#define CMD_GETPOS    4
+#define CMD_SEEK      5
+#define CMD_FREE      6
+#define CMD_NOTIFY    7
+#define CMD_SYNC      8
+#define CMD_CALIBRATE 9
+#define CMD_GETRANGE  10
+#define CMD_DDA       11
+#define CMD_PWMPERIOD 50
+#define CMD_PRESCALER 51
+
+
+void init2()
+{
+  PWMPeriod = 255;
+  currentDirection = 0;
+  seekSpeed = 0;
+  lastPortB = 0;
+  currentPosition.bytes[0] = 0;
+  currentPosition.bytes[1] = 0;
+  seekPosition.bytes[0] = 0;
+  seekPosition.bytes[1] = 0;
+}
 
 void setSpeed(byte speed, byte direction)
 {
@@ -76,50 +106,41 @@ void motorTick()
 
 }
 
-void getpos1()
-{
-  sendReply();
-  sendDataByte(currentPosition.bytes[0]);
-}
-
-void getpos2()
-{
-  sendDataByte(currentPosition.bytes[1]);
-  endMessage();
-}
-
 void processCommand()
 {
   switch(buffer[0]) {
-  case 0:
+  case CMD_VERSION:
     sendReply();
     sendDataByte(0);  // These don't really mean much right now
     sendDataByte(1);
     endMessage();
     break;
-  case 1:
+
+  case CMD_FORWARD:
     // Forward speed
     setSpeed(buffer[1], 0);
     break;
 
-  case 2:
+  case CMD_REVERSE:
     // Reverse speed
     setSpeed(buffer[1], 1);
     break;
 
-  case 3:
+  case CMD_SETPOS:
     // Set (reset) position counter
     currentPosition.bytes[0] = buffer[1];
     currentPosition.bytes[1] = buffer[2];
     break;
 
-  case 4:
+  case CMD_GETPOS:
     // Get position counter
-    getpos1();
-    getpos2();
+    sendReply();
+    sendDataByte(currentPosition.bytes[0]);
+    sendDataByte(currentPosition.bytes[1]);
+    endMessage();
     break;
 
-  case 5:
+  case CMD_SEEK:
     // Goto position
     seekPosition.bytes[0] = buffer[2];
     seekPosition.bytes[1] = buffer[3];
@@ -134,14 +155,40 @@ void processCommand()
 
     break;
 
+  case CMD_FREE:
+    // Free motor.  There is no torque hold for a DC motor,
+    // so all we do is switch off
+    setSpeed(0, 0);
+    break;
+
+  case CMD_NOTIFY:
+    // To be implemented
+    break;
+
+  case CMD_SYNC:
+    // To be implemented
+    break;
+
+  case CMD_CALIBRATE:
+    // To be implemented
+    break;
+
+  case CMD_GETRANGE:
+    // To be implemented
+    break;
+
+  case CMD_DDA:
+    // To be implemented
+    break;
+
 // "Hidden" low level commands
-  case 6:
+  case CMD_PWMPERIOD:
     // Set PWM period
     PWMPeriod = buffer[1];
     PR2 = PWMPeriod;
     break;
 
-  case 7:
+  case CMD_PRESCALER:
     // Set timer prescaler
     T2CON = BIN(00000100) | (buffer[1] & 3);
     break;
