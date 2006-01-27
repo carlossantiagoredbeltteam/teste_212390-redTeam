@@ -5,6 +5,7 @@
 #include <pic/pic16f627.h>
 #include "pic14.h"
 
+void init2();
 void processCommand();
 void motorTick();
 
