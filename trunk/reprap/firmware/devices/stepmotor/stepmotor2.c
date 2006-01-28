@@ -118,12 +118,18 @@ byte stepValue()
 #pragma nooverlay
 void forward1()
 {
-  currentPosition.ival++;
-  coilPosition = (coilPosition + 1) & (stepCount - 1);
-  PORTB = stepValue();
-_asm  /// @todo Remove when sdcc bug fixed
+  if (MAXSENSOR) {
+    // We hit the end so go idle
+    PORTB = 0;
+    function = func_idle;
+  } else {
+    currentPosition.ival++;
+    coilPosition = (coilPosition + 1) & (stepCount - 1);
+    PORTB = stepValue();
+  }
+ _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _coilPosition
-_endasm;
+ _endasm;
 }
 #pragma restore
 
@@ -131,9 +137,15 @@ _endasm;
 #pragma nooverlay
 void reverse1()
 {
-  currentPosition.ival--;
-  coilPosition = (coilPosition + stepCount - 1) & (stepCount - 1);
-  PORTB = stepValue();
+  if (MINSENSOR) {
+    // We hit the end so go idle
+    PORTB = 0;
+    function = func_idle;
+  } else {
+    currentPosition.ival--;
+    coilPosition = (coilPosition + stepCount - 1) & (stepCount - 1);
+    PORTB = stepValue();
+  }
 _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _coilPosition;
 _endasm;
