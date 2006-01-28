@@ -23,7 +23,7 @@ void init1()
 {
   byte v = 0;
 
-  OPTION_REG = BIN(11011111); // Disable TMR0 on RA4, 1:128 WDT
+  OPTION_REG = BIN(01011111); // Disable TMR0 on RA4, 1:128 WDT, pullups on
   CMCON = 0xff;               // Comparator module defaults
   TRISA = BIN(00100000);      // Port A outputs (except 5)
                               // RA5 can only be used as an input
@@ -46,11 +46,11 @@ void init1()
   PEIE = 1;  // Peripheral interrupts on
   GIE = 1;   // Now turn on interrupts
 
-  PORTB = 0;
+  PORTB = 0x80;  // Pullup on RB7 for opto-input
   PORTA = 0;
 
   PR2 = PWMPeriod;          // Initial PWM period
-  CCP1CON = BIN(00111100);  // Enable PWM mode (low two bits set)
+  CCP1CON = BIN(00111100);  // Enable PWM mode
   CCPR1L = 0;               // Start turned off
   
   T2CON = BIN(00000100);    // Enable timer 2 and set prescale to 1
