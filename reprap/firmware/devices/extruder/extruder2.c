@@ -2,12 +2,12 @@
 #include "serial.h"
 
 byte PWMPeriod = 255;
-static byte currentDirection = 0;
+volatile static byte currentDirection = 0;
 
 // Non-zero indicates seeking is in progress (and its speed)
-static byte seekSpeed = 0;
+volatile static byte seekSpeed = 0;
 
-static byte lastPortB = 0;
+volatile static byte lastPortB = 0;
 
 // Note: when reversing motor direction, the speed should be set to 0
 // and then delayed long enough for the motor to come to rest.
@@ -21,7 +21,7 @@ typedef union {
   byte bytes[2];
 } addressableInt;
 
-addressableInt currentPosition, seekPosition;
+volatile static addressableInt currentPosition, seekPosition;
 
 #define CMD_VERSION   0
 #define CMD_FORWARD   1
@@ -48,15 +48,23 @@ void init2()
   seekPosition.bytes[1] = 0;
 }
 
+#pragma save
+#pragma nooverlay
 void setSpeed(byte speed, byte direction)
 {
   if (speed == 0) {
     PORTB = 0;
+    // Also turn off PWM completely
+    CCP1M2 = 0;
+    CCP1M3 = 0;
   } else {
     if (direction == 0)
       PORTB = BIN(00010000);  // Set forward output enable
     else
       PORTB = BIN(00100000);  // Set reverse output enable
+    // Turn on PWM if it wasn't already
+    CCP1M2 = 1;
+    CCP1M3 = 1;
   }
   CCPR1L = speed;
   if (speed == 255)
@@ -65,8 +73,14 @@ void setSpeed(byte speed, byte direction)
     PR2 = PWMPeriod;
     
   currentDirection = direction;
+ _asm  /// @todo Remove when sdcc bug fixed
+  BANKSEL _currentPosition
+ _endasm;
 }
+#pragma restore
 
+#pragma save
+#pragma nooverlay
 void motorTick()
 {
   char changes, current;
@@ -100,16 +114,20 @@ void motorTick()
   }
 
   lastPortB = current;
-
+ _asm  /// @todo Remove when sdcc bug fixed
+  BANKSEL _currentPosition
+ _endasm;
 }
+#pragma restore
 
 void processCommand()
 {
   switch(buffer[0]) {
   case CMD_VERSION:
     sendReply();
+    sendDataByte(CMD_VERSION);  // Response type 0
     sendDataByte(0);  // These don't really mean much right now
-    sendDataByte(1);
+    sendDataByte(2);
     endMessage();
     break;
 
@@ -132,6 +150,7 @@ void processCommand()
   case CMD_GETPOS:
     // Get position counter
     sendReply();
+    sendDataByte(CMD_GETPOS);
     sendDataByte(currentPosition.bytes[0]);
     sendDataByte(currentPosition.bytes[1]);
     endMessage();
