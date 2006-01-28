@@ -1,5 +1,5 @@
 
-SUBDIRS=stepmotor stepmotorb stepmotorc stepmotor-small motor
+SUBDIRS=stepmotor stepmotorb stepmotorc stepmotor-small motor extruder
 
 ifdef DEVICES
 SUBDIRS=$(DEVICES)
