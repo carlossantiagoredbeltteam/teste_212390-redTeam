@@ -7,6 +7,8 @@ volatile static byte currentDirection = 0;
 // Non-zero indicates seeking is in progress (and its speed)
 volatile static byte seekSpeed = 0;
 
+volatile static byte seekNotify = 255;
+
 volatile static byte lastPortB = 0;
 
 // Note: when reversing motor direction, the speed should be set to 0
@@ -41,6 +43,7 @@ void init2()
   PWMPeriod = 255;
   currentDirection = 0;
   seekSpeed = 0;
+  seekNotify = 255;
   lastPortB = 0;
   currentPosition.bytes[0] = 0;
   currentPosition.bytes[1] = 0;
@@ -112,6 +115,15 @@ void motorTick()
       }
     }
   }
+  if (changes & 0x40) {
+    // Material detector changed
+    if (!PORTB6 && seekNotify != 255) {
+      sendMessage(seekNotify);
+      sendDataByte(CMD_ISEMPTY);
+      sendDataByte(1);
+      endMessage();
+    }
+  }
 
   lastPortB = current;
  _asm  /// @todo Remove when sdcc bug fixed
@@ -178,7 +190,15 @@ void processCommand()
     break;
 
   case CMD_NOTIFY:
-    // To be implemented
+    // Set seek completion (and calibration) notification
+    seekNotify = buffer[1];
+    break;
+
+  case CMD_ISEMPTY:
+    sendMessage(seekNotify);
+    sendDataByte(CMD_ISEMPTY);
+    sendDataByte(!PORTB6);
+    endMessage();
     break;
 
 // "Hidden" low level commands
