@@ -46,7 +46,7 @@ void init1()
   PEIE = 1;  // Peripheral interrupts on
   GIE = 1;   // Now turn on interrupts
 
-  PORTB = 0x80;  // Pullup on RB7 for opto-input
+  PORTB = BIN(11000000);  // Pullup on RB6,RB7 for opto-inputs
   PORTA = 0;
 
   PR2 = PWMPeriod;          // Initial PWM period
@@ -57,8 +57,10 @@ void init1()
 }
 
 void main() {
+  init2();  // Order is important here, otherwise interrupts will occur
+            // before initialisation.  Once sdcc bugs are fixed, this
+            // will not matter.
   init1();
-  init2();
   serial_init();
 
   // Clear up any boot noise from the TSR
