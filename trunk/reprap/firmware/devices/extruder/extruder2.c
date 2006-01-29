@@ -11,6 +11,13 @@ volatile static byte seekNotify = 255;
 
 volatile static byte lastPortB = 0;
 
+static byte requestedHeat = 0;
+volatile static byte heatCounter = 0;
+static byte temperatureLimit = 0;
+
+volatile static byte delay_counter;
+static byte lastTemperature = 0;
+
 // Note: when reversing motor direction, the speed should be set to 0
 // and then delayed long enough for the motor to come to rest.
 // Failing to do this could result in miscalculated motor position
@@ -34,9 +41,12 @@ volatile static addressableInt currentPosition, seekPosition;
 #define CMD_FREE      6
 #define CMD_NOTIFY    7
 #define CMD_ISEMPTY   8
+#define CMD_SETHEAT   9
+#define CMD_GETTEMP   10
 #define CMD_PWMPERIOD 50
 #define CMD_PRESCALER 51
 
+#define HEATER_PWM_PERIOD 255
 
 void init2()
 {
@@ -49,6 +59,11 @@ void init2()
   currentPosition.bytes[1] = 0;
   seekPosition.bytes[0] = 0;
   seekPosition.bytes[1] = 0;
+  requestedHeat = 0;
+  heatCounter = 0;
+  lastTemperature = 0;
+  TMR1H = HEATER_PWM_PERIOD;
+  TMR1L = 0;
 }
 
 #pragma save
@@ -81,6 +96,32 @@ void setSpeed(byte speed, byte direction)
  _endasm;
 }
 #pragma restore
+
+#pragma save
+#pragma nooverlay
+void timerTick()
+{
+
+  if (lastTemperature >= temperatureLimit) {
+    // Reached critical limit, so power off
+    PORTB = 0;
+  } else if (heatCounter >= requestedHeat && requestedHeat != 255) {
+    // Heater off
+    PORTB0 = 0;
+  } else {
+    // Heater on
+    PORTB0 = 1;
+  }
+  heatCounter++;
+  TMR1H = HEATER_PWM_PERIOD;
+  TMR1L = 0;
+
+_asm  /// @todo Remove when sdcc bug fixed
+  BANKSEL _currentPosition
+_endasm;
+}
+#pragma restore
+
 
 #pragma save
 #pragma nooverlay
@@ -131,6 +172,47 @@ void motorTick()
  _endasm;
 }
 #pragma restore
+
+void delay_10us()
+{
+_asm
+  BANKSEL _delay_counter
+DELAY_10US_1:
+  CLRWDT
+  NOP
+  NOP
+  NOP
+  NOP
+  NOP
+  NOP
+  DECFSZ _delay_counter, F
+  GOTO DELAY_10US_1
+_endasm;
+}
+
+byte getTemperature()
+{
+  byte b;
+
+  // Could use a binary search which would be on average 4 iterations
+  // but we're in no hurry because this is used in the main loop.
+  // Everything else is interrupt driven so it won't bother anything.
+  for(b = 0; b < 16; b++) {
+    VRCON = BIN(11100000) | b;
+    delay_10us();
+    if (C1OUT)
+      break;
+  }
+  return b;
+ _asm  /// @todo Remove when sdcc bug fixed
+  BANKSEL _currentPosition
+ _endasm;
+}
+
+void checkTemperature()
+{
+  lastTemperature = getTemperature();  
+}
 
 void processCommand()
 {
@@ -198,6 +280,18 @@ void processCommand()
     sendMessage(seekNotify);
     sendDataByte(CMD_ISEMPTY);
     sendDataByte(!PORTB6);
+    endMessage();
+    break;
+
+  case CMD_SETHEAT:
+    requestedHeat = buffer[1];
+    temperatureLimit = buffer[2];
+    break;
+
+  case CMD_GETTEMP:
+    sendMessage(seekNotify);
+    sendDataByte(CMD_GETTEMP);
+    sendDataByte(lastTemperature);
     endMessage();
     break;
 

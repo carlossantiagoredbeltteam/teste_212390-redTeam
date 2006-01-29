@@ -8,6 +8,8 @@
 void init2();
 void processCommand();
 void motorTick();
+void timerTick();
+void checkTemperature();
 
 extern byte PWMPeriod;
 
