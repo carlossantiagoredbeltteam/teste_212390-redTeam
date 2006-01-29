@@ -17,6 +17,12 @@ static void isr() interrupt 0 {
 
   if (RBIF)
     motorTick();
+
+  if (TMR1IF) {
+    timerTick();
+    TMR1IF = 0;
+  }
+
 }
 
 void init1()
@@ -24,11 +30,15 @@ void init1()
   byte v = 0;
 
   OPTION_REG = BIN(01011111); // Disable TMR0 on RA4, 1:128 WDT, pullups on
-  CMCON = 0xff;               // Comparator module defaults
-  TRISA = BIN(00100000);      // Port A outputs (except 5)
+  CMCON = BIN(00000010);      // Comparator: compare RA0 to int. ref.
+  TRISA = BIN(00101111);      // Port A outputs (except 5, 0)
                               // RA5 can only be used as an input
-  TRISB = BIN(10000110);      // Port B outputs, except 1/2 for serial and
+                              // RA0 is thermistor input
+                              // RA2 is vref output (conf as input)
+  TRISB = BIN(11000110);      // Port B outputs, except 1/2 for serial and
                               // RB7 for optointerrupter input
+                              // RB6 for material out detector
+                              // RB0 for heater controller output
   // Note port B3 will be used for PWM output (CCP1)
   PIE1 = BIN(00000000);       // All peripheral interrupts initially disabled
   INTCON = BIN(00000000);     // Interrupts disabled
@@ -49,6 +59,11 @@ void init1()
   PORTB = BIN(11000000);  // Pullup on RB6,RB7 for opto-inputs
   PORTA = 0;
 
+  TMR1IE = 0;
+  T1CON = BIN(00000000);  // Timer 1 in clock mode with 1:1 scale
+  TMR1IE = 1;  // Enable timer interrupt
+  TMR1ON = 1;
+
   PR2 = PWMPeriod;          // Initial PWM period
   CCP1CON = BIN(00111100);  // Enable PWM mode
   CCPR1L = 0;               // Start turned off
@@ -67,8 +82,11 @@ void main() {
   uartTransmit(0);
 
   for(;;) {
-    waitForPacket();
-    processCommand();
-    releaseLock();
+    if (packetReady()) {
+      processCommand();
+      releaseLock();
+    }
+    checkTemperature();
+    clearwdt();
   }
 }
