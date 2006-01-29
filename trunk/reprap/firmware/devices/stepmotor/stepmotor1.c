@@ -79,5 +79,6 @@ void main() {
 	;
       syncStrobe();
     }
+    clearwdt();
   }
 }
