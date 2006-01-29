@@ -561,8 +561,9 @@ byte packetReady()
 void waitForPacket()
 {
   /// @todo It would be nice if this slept or something sensible
-  while(!processingLock)
-    ;
+  while(!processingLock) {
+    clearwdt();
+  }
 }
 
 //===========================================================================//

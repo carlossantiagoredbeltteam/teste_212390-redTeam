@@ -24,4 +24,6 @@ extern volatile byte buffer[];
 void uartNotifyReceive();
 void serial_init();
 
+void clearwdt();
+
 #endif
