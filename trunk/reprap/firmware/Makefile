@@ -18,7 +18,7 @@ SUBDIRS=share devices
 endif
 
 export
-.PHONY: $(SUBDIRS)
+.PHONY: $(SUBDIRS) sim
 
 SDCC=$(SDCCBASE)/bin/sdcc
 
@@ -58,3 +58,7 @@ $(SDCCBASE)/share/sdcc/include/pic:
 # Install tool for creating header files
 $(SDCCBASE)/inc2h.pl:
 	cp sdcc-build/sdcc/support/scripts/inc2h.pl $(SDCCBASE)
+
+sim:
+	cd build/16f628/stepmotor && gpsim -p16f628 stepmotor.hex \
+		-s stepmotor.cod
