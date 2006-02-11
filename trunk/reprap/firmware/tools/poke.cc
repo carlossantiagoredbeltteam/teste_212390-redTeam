@@ -59,7 +59,7 @@ int main(int argc, char **argv)
 
     if (cmd == ".") {
       toSend.setLength(dataidx);
-      toSend.send(snap);
+      toSend.send(snap, verbose);
       dataidx = 0;
     } else if (cmd == "w") {
       SNAPPacket response(snap);
@@ -72,7 +72,7 @@ int main(int argc, char **argv)
   }
   if (dataidx > 0) {
     toSend.setLength(dataidx);
-    toSend.send(snap);
+    toSend.send(snap, verbose);
   }
 
   if (wait) {

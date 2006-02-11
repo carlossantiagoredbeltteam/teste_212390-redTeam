@@ -27,7 +27,7 @@ public:
   SNAPPacket reply();
 
   /// Send our content
-  bool send(SNAP &snap);
+  bool send(SNAP &snap, bool verbose);
 
   /// Length helper functions
   int getLength() const {
