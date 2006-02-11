@@ -50,7 +50,7 @@ SNAPPacket SNAPPacket::reply()
   return p;
 }
 
-bool SNAPPacket::send(SNAP &snap)
+bool SNAPPacket::send(SNAP &snap, bool verbose)
 {
   for(int retries = 0; retries < 5; retries++) {
     crc = 0;
@@ -71,7 +71,8 @@ bool SNAPPacket::send(SNAP &snap)
     }
       
     if (p.isAck()) {
-      std::cout << "[ACK Received]" << std::endl;
+      if (verbose)
+	std::cout << "[ACK Received]" << std::endl;
       return true;
     }
 
