@@ -51,6 +51,9 @@ static byte temperatureLimit = 0;
 
 volatile static byte delay_counter;
 static byte lastTemperature = 0;
+static byte lastTemperatureRef = 0;
+
+static byte temperatureVRef = 3;
 
 // Note: when reversing motor direction, the speed should be set to 0
 // and then delayed long enough for the motor to come to rest.
@@ -79,6 +82,7 @@ volatile static addressableInt currentPosition, seekPosition;
 #define CMD_GETTEMP   10
 #define CMD_PWMPERIOD 50
 #define CMD_PRESCALER 51
+#define CMD_SETVREF   52
 
 #define HEATER_PWM_PERIOD 255
 
@@ -96,6 +100,8 @@ void init2()
   requestedHeat = 0;
   heatCounter = 0;
   lastTemperature = 0;
+  lastTemperatureRef = 0;
+  temperatureVRef = 3;
   TMR1H = HEATER_PWM_PERIOD;
   TMR1L = 0;
 }
@@ -244,7 +250,7 @@ _endasm;
 }*/
 
 
-byte getTemperature()
+void checkTemperature()
 {
   // Assumes:
   // A6 is a reference resistor
@@ -260,17 +266,23 @@ byte getTemperature()
   PSA = 0;
 
   // Set vref to test level and give it time to stabilise
-  VRCON = BIN(11000011); // should be 1000xxxx to not output value
+  VRCON = BIN(11000000) | temperatureVRef;
   CMCON = BIN(00000101);
   delay_10us();
 
+  T0IF = 0;
   // Set A6 to high, float others
   PORTA = BIN(01000000);
   TRISA = BIN(10111111);
 
   // Wait for cap to reach vref
+  TMR0 = 0;
   while (C2OUT)
     ;
+  if (T0IF)
+    lastTemperatureRef = 255;
+  else
+    lastTemperatureRef = TMR0;
 
   // Discharge cap
   // Set A1 to low, float others
@@ -287,7 +299,7 @@ byte getTemperature()
   delay_10us();
 
   // Set vref to test level and give it time to stabilise
-  VRCON = BIN(11000011); // should be 1000xxxx to not output value
+  VRCON = BIN(11000000) | temperatureVRef;
   delay_10us();
 
   T0IF = 0;
@@ -301,9 +313,9 @@ byte getTemperature()
   while (C2OUT)
     ;
   if (T0IF)
-    val = 255;
+    lastTemperature = 255;
   else
-    val = TMR0;
+    lastTemperature = TMR0;
 
   // Discharge cap
   // Set A1 to low, float others
@@ -323,16 +335,9 @@ byte getTemperature()
   PORTA = 0;
   VRCON = 0;  // Turn of vref
 
-  return val;
-
 _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _currentPosition
- _endasm;
-}
-
-void checkTemperature()
-{
-  lastTemperature = getTemperature();  
+_endasm;
 }
 
 void processCommand()
@@ -413,6 +418,7 @@ void processCommand()
     sendMessage(seekNotify);
     sendDataByte(CMD_GETTEMP);
     sendDataByte(lastTemperature);
+    sendDataByte(lastTemperatureRef);
     endMessage();
     break;
 
@@ -427,7 +433,12 @@ void processCommand()
     // Set timer prescaler
     T2CON = BIN(00000100) | (buffer[1] & 3);
     break;
+
+  case CMD_SETVREF:
+    temperatureVRef = buffer[1];
+    break;
   }
+
 }
 
 // To work around sdcc issue
