@@ -64,10 +64,7 @@ void init1()
 
   OPTION_REG = BIN(01011111); // Disable TMR0 on RA4, 1:128 WDT, pullups on
   CMCON = BIN(00000010);      // Comparator: compare RA0 to int. ref.
-  TRISA = BIN(00101111);      // Port A outputs (except 5, 0)
-                              // RA5 can only be used as an input
-                              // RA0 is thermistor input
-                              // RA2 is vref output (conf as input)
+  TRISA = BIN(11111111);      // Port A all inputs for now
   TRISB = BIN(11000110);      // Port B outputs, except 1/2 for serial and
                               // RB7 for optointerrupter input
                               // RB6 for material out detector

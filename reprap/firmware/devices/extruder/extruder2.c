@@ -224,7 +224,7 @@ DELAY_10US_1:
 _endasm;
 }
 
-byte getTemperature()
+/*byte getTemperature()
 {
   byte b;
 
@@ -239,6 +239,93 @@ byte getTemperature()
   }
   return b;
  _asm  /// @todo Remove when sdcc bug fixed
+  BANKSEL _currentPosition
+ _endasm;
+}*/
+
+
+byte getTemperature()
+{
+  // Assumes:
+  // A6 is a reference resistor
+  // A7 is thermistor
+  // A1 is comparator
+
+  byte val = 0;
+
+  // Assume capacitor is discharged from previous round or powerup
+
+  // Set Timer0 to timer mode and use watchdog prescaler
+  T0CS = 0;
+  PSA = 0;
+
+  // Set vref to test level and give it time to stabilise
+  VRCON = BIN(11000011); // should be 1000xxxx to not output value
+  CMCON = BIN(00000101);
+  delay_10us();
+
+  // Set A6 to high, float others
+  PORTA = BIN(01000000);
+  TRISA = BIN(10111111);
+
+  // Wait for cap to reach vref
+  while (C2OUT)
+    ;
+
+  // Discharge cap
+  // Set A1 to low, float others
+  PORTA = BIN(00000000);
+  TRISA = BIN(11111101);
+
+  // Set vref to low
+  VRCON = BIN(11100001); // should be 1010xxxx to not output value
+  delay_10us();
+  // Wait for voltage to go low
+  while (!C2OUT)
+    ;
+  // Extra delay for full discharge
+  delay_10us();
+
+  // Set vref to test level and give it time to stabilise
+  VRCON = BIN(11000011); // should be 1000xxxx to not output value
+  delay_10us();
+
+  T0IF = 0;
+  // Set A7 to high, float others
+  PORTA = BIN(10000000);
+  TRISA = BIN(01111111);
+
+  // Use 8 bit Timer0 to measure time
+  // Wait for cap to reach vref
+  TMR0 = 0;
+  while (C2OUT)
+    ;
+  if (T0IF)
+    val = 255;
+  else
+    val = TMR0;
+
+  // Discharge cap
+  // Set A1 to low, float others
+  PORTA = BIN(00000000);
+  TRISA = BIN(11111101);
+
+  // Set vref to low
+  VRCON = BIN(11100001); // should be 1010xxxx to not output value
+  delay_10us();
+  // Wait for voltage to reach 0
+  while (!C2OUT)
+    ;
+  // Extra delay for full discharge
+  delay_10us();
+
+  TRISA = BIN(11111111);
+  PORTA = 0;
+  VRCON = 0;  // Turn of vref
+
+  return val;
+
+_asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _currentPosition
  _endasm;
 }
