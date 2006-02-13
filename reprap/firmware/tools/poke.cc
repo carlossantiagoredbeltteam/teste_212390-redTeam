@@ -29,9 +29,17 @@ int main(int argc, char **argv)
 
 
   int opt;
-  while((opt = getopt(argc, argv, "wd:t:v")) != -1) {
+  while((opt = getopt(argc, argv, "hwd:t:v")) != -1) {
     switch(opt) {
-    case 'w':
+    case 'h':
+      printf("poke - a test tool for Simon's SNAP RepRap protocol\n"
+	"\tw\tWait.\n"
+	"\td n\tSend to device n\n"
+	"\tv\tVerbose mode - show serial data\n"
+	"\tt xxx\tUse serial port xxx\n\n");
+      exit(-1);
+
+     case 'w':
       wait = true;
       break;
     case 'd':
