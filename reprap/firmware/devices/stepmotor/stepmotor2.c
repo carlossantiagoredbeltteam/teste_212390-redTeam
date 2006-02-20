@@ -138,11 +138,11 @@ byte stepValue()
   case 4:
     return BIN(01001001);
   case 5:
-    return BIN(11000000);
+    return BIN(11001001);
   case 6:
-    return BIN(10000000);
+    return BIN(10001001);
   case 7:
-    return BIN(10010000);
+    return BIN(10011001);
   }
   return 0;
 }
@@ -153,16 +153,16 @@ void forward1()
 {
   if (MAXSENSOR) {
     // We hit the end so go idle
-    PORTB = 0;
+    PORTB = BIN(00001001);
     function = func_idle;
   } else {
     currentPosition.ival++;
     coilPosition = (coilPosition + 1) & (stepCount - 1);
     PORTB = stepValue();
   }
- _asm  /// @todo Remove when sdcc bug fixed
+_asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _coilPosition
- _endasm;
+_endasm;
 }
 #pragma restore
 
@@ -172,7 +172,7 @@ void reverse1()
 {
   if (MINSENSOR) {
     // We hit the end so go idle
-    PORTB = 0;
+    PORTB = BIN(00001001);
     function = func_idle;
   } else {
     currentPosition.ival--;
@@ -278,7 +278,7 @@ void timerTick()
       // Reached, switch to 0 speed
       speed = 0;
       // Uncomment next line to remove torque on arrival
-      //PORTB = 0;
+      //PORTB = BIN(00001001);
       if (seekNotify != 255) {
 	sendMessage(seekNotify);
 	sendDataByte(CMD_SEEK);
@@ -399,7 +399,7 @@ void processCommand()
 
   case CMD_FREE:
     // Free motor (release torque)
-    PORTB = 0;
+    PORTB = BIN(00001001);
     function = func_idle;
     break;
 
