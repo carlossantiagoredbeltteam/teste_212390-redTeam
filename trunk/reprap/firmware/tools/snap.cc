@@ -24,7 +24,7 @@ SNAP::SNAP(const char *device, int sourceAddress, bool verbose)
   cfsetspeed(&terminfo, B19200);
   terminfo.c_cflag &= ~CRTSCTS;
   terminfo.c_cflag |= CLOCAL;
-  terminfo.c_lflag &= ~ICANON;
+  terminfo.c_lflag &= ~(ICANON | ECHO);
   terminfo.c_oflag &= ~(ONLRET | OCRNL | ONLCR);
   terminfo.c_iflag &= ~(ICRNL | INLCR);
   if (tcsetattr(fd, TCSANOW, &terminfo) == -1) {
