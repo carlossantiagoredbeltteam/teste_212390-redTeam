@@ -75,6 +75,8 @@ volatile static byte coilPosition = 0;
 #define CMD_CALIBRATE 9
 #define CMD_GETRANGE  10
 #define CMD_DDA       11
+#define CMD_FORWARD1  12
+#define CMD_BACKWARD1 13
 
 enum functions {
   func_idle,
@@ -446,6 +448,13 @@ void processCommand()
     setTimer(buffer[1]);
     break;
 
+  case CMD_FORWARD1:
+    forward1();
+    break;
+
+  case CMD_BACKWARD1:
+    reverse1();
+    break;
   }
 _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _coilPosition
