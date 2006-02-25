@@ -60,8 +60,10 @@ void init1()
   OPTION_REG = BIN(01011111); // Disable TMR0 on RA4, 1:128 WDT, pullups on
   CMCON = 0xff;               // Comparator module defaults
   TRISA = BIN(00101100);      // Port A outputs except 2,3 (sync)
+                              // RA3 is input for max limit sensor
                               // RA5 can only be used as an input
-  TRISB = BIN(00001111);      // Port B 0-3 input, 4-7 outputs
+  TRISB = BIN(00000111);      // Port B 0-2 input, 3-7 outputs
+                              // Port B3 is PWM output
   PIE1 = BIN(00000000);       // All peripheral interrupts initially disabled
   INTCON = BIN(00000000);     // Interrupts disabled
   PIR1 = 0;                   // Clear peripheral interrupt flags
@@ -69,7 +71,7 @@ void init1()
   TXSTA = BIN(00000100);      // 8 bit high speed 
   RCSTA = BIN(10000000);      // Enable port for 8 bit receive
 
-  PORTB = BIN(00001001);      // Turn on pullups for B0,3
+  PORTB = PULLUPS;      // Turn on pullups for B0,3
 
   RCIE = 1;  // Enable receive interrupts
   CREN = 1;  // Start reception
@@ -83,8 +85,15 @@ void init1()
 
   TMR1IE = 0;
 
+  TMR2 = 0;
+  CCP1CON = BIN(00110000);   // PWM mode
+  T2CON = BIN(00000100);     // Start timer 1:1 prescale, 1:1 postscale
+  CCPR1L = 193;
+  PR2 = 192;
+
   T1CON = BIN(00000000);  // Timer 1 in clock mode with 1:1 scale
   TMR1IE = 1;  // Enable timer interrupt
+
 }
 
 void main() {

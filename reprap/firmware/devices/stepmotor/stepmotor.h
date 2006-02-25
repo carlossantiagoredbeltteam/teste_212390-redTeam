@@ -45,6 +45,11 @@ void syncStrobe();
 #define SYNCA_TRIS  TRISA2
 
 #define MINSENSOR   PORTB0
-#define MAXSENSOR   PORTB3
+#define MAXSENSOR   PORTA5
+
+#define PULLUPS     BIN(00000001)
+
+#define PWM         PORTB3
+#define PWM_TRIS    TRISB3
 
 #endif
