@@ -77,6 +77,7 @@ volatile static byte coilPosition = 0;
 #define CMD_DDA       11
 #define CMD_FORWARD1  12
 #define CMD_BACKWARD1 13
+#define CMD_SETPOWER  14
 
 enum functions {
   func_idle,
@@ -127,24 +128,24 @@ void init2()
 
 byte stepValue()
 {
-  // The low bits are always 1001 to ensure pullups are enabled for those ports
+  // The low bits are set to ensure pullups are enabled for those ports
   switch(coilPosition) {
   case 0:
-    return BIN(00011001);
+    return BIN(00010000) | PULLUPS;
   case 1:
-    return BIN(00111001);
+    return BIN(00110000) | PULLUPS;
   case 2:
-    return BIN(00101001);
+    return BIN(00100000) | PULLUPS;
   case 3:
-    return BIN(01101001);
+    return BIN(01100000) | PULLUPS;
   case 4:
-    return BIN(01001001);
+    return BIN(01000000) | PULLUPS;
   case 5:
-    return BIN(11001001);
+    return BIN(11000000) | PULLUPS;
   case 6:
-    return BIN(10001001);
+    return BIN(10000000) | PULLUPS;
   case 7:
-    return BIN(10011001);
+    return BIN(10010000) | PULLUPS;
   }
   return 0;
 }
@@ -155,7 +156,7 @@ void forward1()
 {
   if (MAXSENSOR) {
     // We hit the end so go idle
-    PORTB = BIN(00001001);
+    PORTB = PULLUPS;
     function = func_idle;
   } else {
     currentPosition.ival++;
@@ -174,7 +175,7 @@ void reverse1()
 {
   if (MINSENSOR) {
     // We hit the end so go idle
-    PORTB = BIN(00001001);
+    PORTB = PULLUPS;
     function = func_idle;
   } else {
     currentPosition.ival--;
@@ -280,7 +281,7 @@ void timerTick()
       // Reached, switch to 0 speed
       speed = 0;
       // Uncomment next line to remove torque on arrival
-      //PORTB = BIN(00001001);
+      //PORTB = PULLUPS;
       if (seekNotify != 255) {
 	sendMessage(seekNotify);
 	sendDataByte(CMD_SEEK);
@@ -401,7 +402,7 @@ void processCommand()
 
   case CMD_FREE:
     // Free motor (release torque)
-    PORTB = BIN(00001001);
+    PORTB = PULLUPS;
     function = func_idle;
     break;
 
@@ -455,6 +456,14 @@ void processCommand()
   case CMD_BACKWARD1:
     reverse1();
     break;
+
+  case CMD_SETPOWER:
+    CCPR1L = buffer[2];
+    PR2 = buffer[3];
+    // Store low 2 bits and turn on PWM
+    CCP1CON = buffer[1];
+    break;
+
   }
 _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _coilPosition
