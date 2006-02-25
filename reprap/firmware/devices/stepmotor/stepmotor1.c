@@ -86,7 +86,7 @@ void init1()
   TMR1IE = 0;
 
   TMR2 = 0;
-  CCP1CON = BIN(00110000);   // PWM mode
+  CCP1CON = BIN(00111100);   // PWM mode
   T2CON = BIN(00000100);     // Start timer 1:1 prescale, 1:1 postscale
   CCPR1L = 193;
   PR2 = 192;
