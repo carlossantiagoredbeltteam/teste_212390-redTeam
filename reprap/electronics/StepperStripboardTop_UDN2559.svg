@@ -695,6 +695,7 @@
 
 
 
+
 		</switch><switch
    id="switch931"
    i:objectType="pointText"
@@ -733,6 +734,7 @@
      font-size="8"
      y="0"
      x="0">Bottom edge</tspan></text>
+
 
 
 
@@ -787,6 +789,7 @@
 
 
 
+
 		</switch><switch
    id="switch945"
    i:objectType="pointText"
@@ -825,6 +828,7 @@
      font-size="8"
      y="0"
      x="0">Right edge</tspan></text>
+
 
 
 
@@ -960,6 +964,7 @@
 
 
 
+
 		</switch><switch
      id="switch838"
      i:objectType="pointText"
@@ -1006,6 +1011,7 @@
 
 
 
+
 		</switch><switch
      id="switch845"
      i:objectType="pointText"
@@ -1044,6 +1050,7 @@
      font-size="6"
      y="0"
      x="0">= link/jumper</tspan></text>
+
 
 
 
@@ -1103,6 +1110,7 @@
      font-size="6"
      y="0"
      x="0">= connector</tspan></text>
+
 
 
 
@@ -3618,7 +3626,7 @@
      id="path7792"
      d="M 88.334220,93.422109 C 88.334220,94.665109 87.327220,95.672109 86.084220,95.672109 C 84.841220,95.672109 83.834220,94.665109 83.834220,93.422109 C 83.834220,92.179109 84.841220,91.172109 86.084220,91.172109 C 87.327220,91.172109 88.334220,92.180109 88.334220,93.422109 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;stroke:#000000;stroke-width:0.25000000;display:inline"
+     style="fill:#000000;fill-opacity:1.0000000;stroke:#000000;stroke-width:0.25000000;display:inline"
      id="path7794"
      d="M 97.334220,93.422109 C 97.334220,94.665109 96.327220,95.672109 95.084220,95.672109 C 93.841220,95.672109 92.834220,94.665109 92.834220,93.422109 C 92.834220,92.179109 93.841220,91.172109 95.084220,91.172109 C 96.327220,91.172109 97.334220,92.180109 97.334220,93.422109 z "
      i:knockout="Off" /><path
@@ -3894,7 +3902,7 @@
      id="path7930"
      d="M 88.334220,66.422108 C 88.334220,67.665108 87.327220,68.672108 86.084220,68.672108 C 84.841220,68.672108 83.834220,67.665108 83.834220,66.422108 C 83.834220,65.179108 84.841220,64.172108 86.084220,64.172108 C 87.327220,64.172108 88.334220,65.180108 88.334220,66.422108 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;fill-opacity:1.0000000;stroke:#000000;stroke-width:0.25000000;display:inline"
+     style="fill:#000000;fill-opacity:1.0000000;stroke:#000000;stroke-width:0.25000000;display:inline"
      id="path7932"
      d="M 97.334220,66.422108 C 97.334220,67.665108 96.327220,68.672108 95.084220,68.672108 C 93.841220,68.672108 92.834220,67.665108 92.834220,66.422108 C 92.834220,65.179108 93.841220,64.172108 95.084220,64.172108 C 96.327220,64.172108 97.334220,65.180108 97.334220,66.422108 z "
      i:knockout="Off" /><path
@@ -4630,6 +4638,7 @@
 
 
 
+
 			</switch>
 			<switch
    id="switch962"
@@ -4669,6 +4678,7 @@
      font-size="5"
      y="0"
      x="0">B</tspan></text>
+
 
 
 
@@ -4724,6 +4734,7 @@
 
 
 
+
 			</switch>
 			<switch
    id="switch976"
@@ -4763,6 +4774,7 @@
      font-size="5"
      y="0"
      x="0">D</tspan></text>
+
 
 
 
@@ -4818,6 +4830,7 @@
 
 
 
+
 			</switch>
 			<switch
    id="switch990"
@@ -4857,6 +4870,7 @@
      font-size="5"
      y="0"
      x="0">F</tspan></text>
+
 
 
 
@@ -4912,6 +4926,7 @@
 
 
 
+
 			</switch>
 			<switch
    id="switch1004"
@@ -4951,6 +4966,7 @@
      font-size="5"
      y="0"
      x="0">H</tspan></text>
+
 
 
 
@@ -5006,6 +5022,7 @@
 
 
 
+
 			</switch>
 			<switch
    id="switch1018"
@@ -5045,6 +5062,7 @@
      font-size="5"
      y="0"
      x="0">J</tspan></text>
+
 
 
 
@@ -5100,6 +5118,7 @@
 
 
 
+
 			</switch>
 			<switch
    id="switch1032"
@@ -5139,6 +5158,7 @@
      font-size="5"
      y="0"
      x="0">L</tspan></text>
+
 
 
 
@@ -5195,6 +5215,7 @@
 
 
 
+
 		</switch><switch
      id="switch1046"
      i:objectType="pointText"
@@ -5234,6 +5255,7 @@
      font-size="5"
      y="0"
      x="0">2</tspan></text>
+
 
 
 
@@ -5289,6 +5311,7 @@
 
 
 
+
 		</switch><switch
      id="switch1060"
      i:objectType="pointText"
@@ -5328,6 +5351,7 @@
      font-size="5"
      y="0"
      x="0">4</tspan></text>
+
 
 
 
@@ -5383,6 +5407,7 @@
 
 
 
+
 		</switch><switch
      id="switch1074"
      i:objectType="pointText"
@@ -5422,6 +5447,7 @@
      font-size="5"
      y="0"
      x="0">6</tspan></text>
+
 
 
 
@@ -5477,6 +5503,7 @@
 
 
 
+
 		</switch><switch
      id="switch1088"
      i:objectType="pointText"
@@ -5516,6 +5543,7 @@
      font-size="5"
      y="0"
      x="0">8</tspan></text>
+
 
 
 
@@ -5571,6 +5599,7 @@
 
 
 
+
 		</switch><switch
      id="switch1102"
      i:objectType="pointText"
@@ -5610,6 +5639,7 @@
      font-size="5"
      y="0"
      x="0">10</tspan></text>
+
 
 
 
@@ -5665,6 +5695,7 @@
 
 
 
+
 		</switch><switch
      id="switch1116"
      i:objectType="pointText"
@@ -5704,6 +5735,7 @@
      font-size="5"
      y="0"
      x="0">12</tspan></text>
+
 
 
 
@@ -5759,6 +5791,7 @@
 
 
 
+
 		</switch><switch
      id="switch1130"
      i:objectType="pointText"
@@ -5798,6 +5831,7 @@
      font-size="5"
      y="0"
      x="0">14</tspan></text>
+
 
 
 
@@ -5853,6 +5887,7 @@
 
 
 
+
 		</switch><switch
      id="switch1144"
      i:objectType="pointText"
@@ -5892,6 +5927,7 @@
      font-size="5"
      y="0"
      x="0">16</tspan></text>
+
 
 
 
@@ -5947,6 +5983,7 @@
 
 
 
+
 		</switch><switch
      id="switch1158"
      i:objectType="pointText"
@@ -5986,6 +6023,7 @@
      font-size="5"
      y="0"
      x="0">18</tspan></text>
+
 
 
 
@@ -6041,6 +6079,7 @@
 
 
 
+
 		</switch><switch
      id="switch1172"
      i:objectType="pointText"
@@ -6080,6 +6119,7 @@
      font-size="5"
      y="0"
      x="0">20</tspan></text>
+
 
 
 
@@ -6135,6 +6175,7 @@
 
 
 
+
 		</switch><switch
      id="switch1186"
      i:objectType="pointText"
@@ -6174,6 +6215,7 @@
      font-size="5"
      y="0"
      x="0">22</tspan></text>
+
 
 
 
@@ -6229,6 +6271,7 @@
 
 
 
+
 		</switch><switch
      id="switch1200"
      i:objectType="pointText"
@@ -6268,6 +6311,7 @@
      font-size="5"
      y="0"
      x="0">24</tspan></text>
+
 
 
 
@@ -6323,6 +6367,7 @@
 
 
 
+
 		</switch><switch
      id="switch1214"
      i:objectType="pointText"
@@ -6362,6 +6407,7 @@
      font-size="5"
      y="0"
      x="0">26</tspan></text>
+
 
 
 
@@ -6417,6 +6463,7 @@
 
 
 
+
 		</switch><switch
      id="switch1228"
      i:objectType="pointText"
@@ -6456,6 +6503,7 @@
      font-size="5"
      y="0"
      x="0">M</tspan></text>
+
 
 
 
@@ -6511,6 +6559,7 @@
 
 
 
+
 		</switch><switch
      id="switch1242"
      i:objectType="pointText"
@@ -6550,6 +6599,7 @@
      font-size="5"
      y="0"
      x="0">O</tspan></text>
+
 
 
 
@@ -6611,6 +6661,7 @@
 
 
 
+
 			</switch><switch
      i:knockout="Off"
      i:objectNS="http://ns.adobe.com/Flows/1.0/"
@@ -6657,6 +6708,7 @@
 
 
 
+
 			</switch><switch
      i:knockout="Off"
      i:objectNS="http://ns.adobe.com/Flows/1.0/"
@@ -6695,6 +6747,7 @@
      font-size="5"
      id="tspan8639"
      style="font-size:5.0000000px;fill:#2289bd;font-family:Myriad-Roman">D</tspan></text>
+
 
 
 
@@ -6760,6 +6813,7 @@
 
 
 
+
 			</switch><switch
      i:knockout="Off"
      i:objectNS="http://ns.adobe.com/Flows/1.0/"
@@ -6799,6 +6853,7 @@
      font-size="5"
      id="tspan8743"
      style="font-size:5.0000000px;fill:#2289bd;font-family:Myriad-Roman">Q</tspan></text>
+
 
 
 
@@ -6854,6 +6909,7 @@
 
 
 
+
 			</switch><switch
      i:knockout="Off"
      i:objectNS="http://ns.adobe.com/Flows/1.0/"
@@ -6893,6 +6949,7 @@
      font-size="5"
      id="tspan8759"
      style="font-size:5.0000000px;fill:#2289bd;font-family:Myriad-Roman">S</tspan></text>
+
 
 
 
@@ -6948,6 +7005,7 @@
 
 
 
+
 			</switch><switch
      i:knockout="Off"
      i:objectNS="http://ns.adobe.com/Flows/1.0/"
@@ -6987,6 +7045,7 @@
      font-size="5"
      id="tspan8775"
      style="font-size:5.0000000px;fill:#2289bd;font-family:Myriad-Roman">U</tspan></text>
+
 
 
 
@@ -7042,6 +7101,7 @@
 
 
 
+
 			</switch><switch
      i:knockout="Off"
      i:objectNS="http://ns.adobe.com/Flows/1.0/"
@@ -7081,6 +7141,7 @@
      font-size="5"
      id="tspan8791"
      style="font-size:5.0000000px;fill:#2289bd;font-family:Myriad-Roman">W</tspan></text>
+
 
 
 
@@ -7136,6 +7197,7 @@
 
 
 
+
 			</switch><switch
      i:knockout="Off"
      i:objectNS="http://ns.adobe.com/Flows/1.0/"
@@ -7175,6 +7237,7 @@
      font-size="5"
      id="tspan8807"
      style="font-size:5.0000000px;fill:#2289bd;font-family:Myriad-Roman">Y</tspan></text>
+
 
 
 
@@ -7230,6 +7293,7 @@
 
 
 
+
 			</switch><switch
      i:knockout="Off"
      i:objectNS="http://ns.adobe.com/Flows/1.0/"
@@ -7269,6 +7333,7 @@
      font-size="5"
      id="tspan8823"
      style="font-size:5.0000000px;fill:#2289bd;font-family:Myriad-Roman">A</tspan></text>
+
 
 
 
@@ -7516,6 +7581,7 @@
 
 
 
+
 		</switch><path
      style="fill:#c52890"
      id="path1352"
@@ -7630,6 +7696,7 @@
 
 
 
+
 		</switch><switch
      id="switch1418"
      i:objectType="pointText"
@@ -7668,6 +7735,7 @@
      font-size="6"
      y="0"
      x="0">J2</tspan></text>
+
 
 
 
@@ -7722,6 +7790,7 @@
 
 
 
+
 		</switch><switch
      id="switch1432"
      i:objectType="pointText"
@@ -7760,6 +7829,7 @@
      font-size="6"
      y="0"
      x="0">J3</tspan></text>
+
 
 
 
@@ -7814,6 +7884,7 @@
 
 
 
+
 		</switch><switch
      id="switch1446"
      i:objectType="pointText"
@@ -7852,6 +7923,7 @@
      font-size="6"
      y="0"
      x="0">J5</tspan></text>
+
 
 
 
@@ -7914,6 +7986,7 @@
 
 
 
+
 		</switch><switch
      id="switch1471"
      i:objectType="pointText"
@@ -7960,6 +8033,7 @@
 
 
 
+
 		</switch><switch
      id="switch1478"
      i:objectType="pointText"
@@ -7998,6 +8072,7 @@
      font-size="6"
      y="0"
      x="0">R3</tspan></text>
+
 
 
 
@@ -8147,6 +8222,7 @@
 
 
 
+
 		</switch><path
      style="fill:#c52890;display:inline"
      id="path10520"
@@ -8154,7 +8230,7 @@
      i:knockout="Off" /><path
      style="fill:#c52890;display:inline"
      id="path10524"
-     d="M 86.936777,75.428196 L 84.717526,75.428196 L 84.717526,111.13157 L 86.936777,111.13157 L 86.936777,75.428196 z "
+     d="M 87.215310,75.149664 L 84.996059,75.149664 L 84.996059,110.85304 L 87.215310,110.85304 L 87.215310,75.149664 z "
      i:knockout="Off" /><path
      style="fill:#c52890;display:inline"
      id="path10526"
@@ -8242,6 +8318,7 @@
 
 
 
+
 		</switch><path
      style="fill:#c52890;display:inline"
      id="path2616"
@@ -8314,6 +8391,7 @@
 
 
 
+
 		</switch><path
      style="fill:#c52890;display:inline"
      id="path3340"
@@ -8322,4 +8400,8 @@
      style="fill:#c52890;display:inline"
      id="path4068"
      d="M 51.245451,-50.156654 L 49.026200,-50.156654 L 49.026200,-5.0755733 L 51.245451,-5.0755733 L 51.245451,-50.156654 z "
+     i:knockout="Off" /><path
+     style="fill:#c52890;display:inline"
+     id="path2615"
+     d="M 95.929038,93.500590 L 94.030038,93.500590 L 94.030038,66.015641 L 95.929038,66.015641 L 95.929038,93.500590 z "
      i:knockout="Off" /></g></svg>
