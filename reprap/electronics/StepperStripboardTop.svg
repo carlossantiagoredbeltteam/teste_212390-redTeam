@@ -548,12 +548,12 @@
    bordercolor="#666666"
    pagecolor="#ffffff"
    id="base"
-   inkscape:zoom="3.2379762"
-   inkscape:cx="147.15565"
-   inkscape:cy="94.616156"
-   inkscape:window-x="146"
+   inkscape:zoom="3.4509815"
+   inkscape:cx="149.22582"
+   inkscape:cy="98.513189"
+   inkscape:window-x="78"
    inkscape:window-y="0"
-   inkscape:current-layer="layer3" />
+   inkscape:current-layer="layer1" />
 	<metadata
    id="metadata4">
 		<ns:variableSets>
@@ -624,6 +624,7 @@
 
 
 
+
 		</switch>
 		<switch
    i:knockout="Off"
@@ -662,6 +663,7 @@
      font-size="8"
      id="tspan936"
      style="font-size:8.0000000px;font-family:Myriad-Roman">Bottom edge</tspan></text>
+
 
 
 
@@ -706,6 +708,7 @@
 
 
 
+
 		</switch>
 		<switch
    i:knockout="Off"
@@ -745,6 +748,7 @@
      font-size="8"
      id="tspan950"
      style="font-size:8.0000000px;font-family:Myriad-Roman">Right edge</tspan></text>
+
 
 
 
@@ -848,6 +852,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -887,6 +892,7 @@
      font-size="5"
      id="tspan967"
      style="font-size:5.0000000px;fill:#2289bd;font-family:Myriad-Roman">B</tspan></text>
+
 
 
 
@@ -932,6 +938,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -971,6 +978,7 @@
      font-size="5"
      id="tspan981"
      style="font-size:5.0000000px;fill:#2289bd;font-family:Myriad-Roman">D</tspan></text>
+
 
 
 
@@ -1016,6 +1024,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -1055,6 +1064,7 @@
      font-size="5"
      id="tspan995"
      style="font-size:5.0000000px;fill:#2289bd;font-family:Myriad-Roman">F</tspan></text>
+
 
 
 
@@ -1100,6 +1110,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -1139,6 +1150,7 @@
      font-size="5"
      id="tspan1009"
      style="font-size:5.0000000px;fill:#2289bd;font-family:Myriad-Roman">H</tspan></text>
+
 
 
 
@@ -1184,6 +1196,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -1223,6 +1236,7 @@
      font-size="5"
      id="tspan1023"
      style="font-size:5.0000000px;fill:#2289bd;font-family:Myriad-Roman">J</tspan></text>
+
 
 
 
@@ -1268,6 +1282,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -1307,6 +1322,7 @@
      font-size="5"
      id="tspan1037"
      style="font-size:5.0000000px;fill:#2289bd;font-family:Myriad-Roman">L</tspan></text>
+
 
 
 
@@ -1353,6 +1369,7 @@
 
 
 
+
 		</switch>
 		<switch
    i:knockout="Off"
@@ -1392,6 +1409,7 @@
      font-size="5"
      id="tspan1051"
      style="font-size:5.0000000px;fill:#2589ba;font-family:Myriad-Roman">2</tspan></text>
+
 
 
 
@@ -1437,6 +1455,7 @@
 
 
 
+
 		</switch>
 		<switch
    i:knockout="Off"
@@ -1476,6 +1495,7 @@
      font-size="5"
      id="tspan1065"
      style="font-size:5.0000000px;fill:#2589ba;font-family:Myriad-Roman">4</tspan></text>
+
 
 
 
@@ -1521,6 +1541,7 @@
 
 
 
+
 		</switch>
 		<switch
    i:knockout="Off"
@@ -1560,6 +1581,7 @@
      font-size="5"
      id="tspan1079"
      style="font-size:5.0000000px;fill:#2589ba;font-family:Myriad-Roman">6</tspan></text>
+
 
 
 
@@ -1605,6 +1627,7 @@
 
 
 
+
 		</switch>
 		<switch
    i:knockout="Off"
@@ -1644,6 +1667,7 @@
      font-size="5"
      id="tspan1093"
      style="font-size:5.0000000px;fill:#2589ba;font-family:Myriad-Roman">8</tspan></text>
+
 
 
 
@@ -1689,6 +1713,7 @@
 
 
 
+
 		</switch>
 		<switch
    i:knockout="Off"
@@ -1728,6 +1753,7 @@
      font-size="5"
      id="tspan1107"
      style="font-size:5.0000000px;fill:#2589ba;font-family:Myriad-Roman">10</tspan></text>
+
 
 
 
@@ -1773,6 +1799,7 @@
 
 
 
+
 		</switch>
 		<switch
    i:knockout="Off"
@@ -1812,6 +1839,7 @@
      font-size="5"
      id="tspan1121"
      style="font-size:5.0000000px;fill:#2589ba;font-family:Myriad-Roman">12</tspan></text>
+
 
 
 
@@ -1857,6 +1885,7 @@
 
 
 
+
 		</switch>
 		<switch
    i:knockout="Off"
@@ -1896,6 +1925,7 @@
      font-size="5"
      id="tspan1135"
      style="font-size:5.0000000px;fill:#2589ba;font-family:Myriad-Roman">14</tspan></text>
+
 
 
 
@@ -1941,6 +1971,7 @@
 
 
 
+
 		</switch>
 		<switch
    i:knockout="Off"
@@ -1980,6 +2011,7 @@
      font-size="5"
      id="tspan1149"
      style="font-size:5.0000000px;fill:#2589ba;font-family:Myriad-Roman">16</tspan></text>
+
 
 
 
@@ -2025,6 +2057,7 @@
 
 
 
+
 		</switch>
 		<switch
    i:knockout="Off"
@@ -2064,6 +2097,7 @@
      font-size="5"
      id="tspan1163"
      style="font-size:5.0000000px;fill:#2589ba;font-family:Myriad-Roman">18</tspan></text>
+
 
 
 
@@ -2109,6 +2143,7 @@
 
 
 
+
 		</switch>
 		<switch
    i:knockout="Off"
@@ -2148,6 +2183,7 @@
      font-size="5"
      id="tspan1177"
      style="font-size:5.0000000px;fill:#2589ba;font-family:Myriad-Roman">20</tspan></text>
+
 
 
 
@@ -2193,6 +2229,7 @@
 
 
 
+
 		</switch>
 		<switch
    i:knockout="Off"
@@ -2232,6 +2269,7 @@
      font-size="5"
      id="tspan1191"
      style="font-size:5.0000000px;fill:#2589ba;font-family:Myriad-Roman">22</tspan></text>
+
 
 
 
@@ -2277,6 +2315,7 @@
 
 
 
+
 		</switch>
 		<switch
    i:knockout="Off"
@@ -2316,6 +2355,7 @@
      font-size="5"
      id="tspan1205"
      style="font-size:5.0000000px;fill:#2589ba;font-family:Myriad-Roman">24</tspan></text>
+
 
 
 
@@ -2361,6 +2401,7 @@
 
 
 
+
 		</switch>
 		<switch
    i:knockout="Off"
@@ -2400,6 +2441,7 @@
      font-size="5"
      id="tspan1219"
      style="font-size:5.0000000px;fill:#2589ba;font-family:Myriad-Roman">26</tspan></text>
+
 
 
 
@@ -2445,6 +2487,7 @@
 
 
 
+
 		</switch>
 		<switch
    i:knockout="Off"
@@ -2484,6 +2527,7 @@
      font-size="5"
      id="tspan1233"
      style="font-size:5.0000000px;fill:#2589ba;font-family:Myriad-Roman">M</tspan></text>
+
 
 
 
@@ -2529,6 +2573,7 @@
 
 
 
+
 		</switch>
 		<switch
    i:knockout="Off"
@@ -2568,6 +2613,7 @@
      font-size="5"
      id="tspan1247"
      style="font-size:5.0000000px;fill:#2589ba;font-family:Myriad-Roman">O</tspan></text>
+
 
 
 
@@ -2950,11 +2996,11 @@
      id="path193"
      d="M 34.334220,84.384806 C 34.334220,85.627806 33.327220,86.634806 32.084220,86.634806 C 30.841220,86.634806 29.834220,85.627806 29.834220,84.384806 C 29.834220,83.141806 30.841220,82.134806 32.084220,82.134806 C 33.327220,82.134806 34.334220,83.142806 34.334220,84.384806 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;stroke:#000000;stroke-width:0.25000000"
+     style="fill:#000000;fill-opacity:1.0000000;stroke:#000000;stroke-width:0.25000000"
      id="path195"
      d="M 43.334220,84.384806 C 43.334220,85.627806 42.327220,86.634806 41.084220,86.634806 C 39.841220,86.634806 38.834220,85.627806 38.834220,84.384806 C 38.834220,83.141806 39.841220,82.134806 41.084220,82.134806 C 42.327220,82.134806 43.334220,83.142806 43.334220,84.384806 z "
      i:knockout="Off" /><path
-     style="stroke:#000000;stroke-width:0.25000000"
+     style="fill:#ffffff;fill-opacity:1.0000000;stroke:#000000;stroke-width:0.25000000"
      id="path197"
      d="M 52.334220,84.384806 C 52.334220,85.627806 51.327220,86.634806 50.084220,86.634806 C 48.841220,86.634806 47.834220,85.627806 47.834220,84.384806 C 47.834220,83.141806 48.841220,82.134806 50.084220,82.134806 C 51.327220,82.134806 52.334220,83.142806 52.334220,84.384806 z "
      i:knockout="Off" /><path
@@ -3318,7 +3364,7 @@
      id="path377"
      d="M 34.334220,48.384806 C 34.334220,49.627806 33.327220,50.634806 32.084220,50.634806 C 30.841220,50.634806 29.834220,49.627806 29.834220,48.384806 C 29.834220,47.141806 30.841220,46.134806 32.084220,46.134806 C 33.327220,46.134806 34.334220,47.142806 34.334220,48.384806 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;stroke:#000000;stroke-width:0.25000000"
+     style="fill:#000000;fill-opacity:1.0000000;stroke:#000000;stroke-width:0.25000000"
      id="path379"
      d="M 43.334220,48.384806 C 43.334220,49.627806 42.327220,50.634806 41.084220,50.634806 C 39.841220,50.634806 38.834220,49.627806 38.834220,48.384806 C 38.834220,47.141806 39.841220,46.134806 41.084220,46.134806 C 42.327220,46.134806 43.334220,47.142806 43.334220,48.384806 z "
      i:knockout="Off" /><path
@@ -3330,7 +3376,7 @@
      id="path383"
      d="M 61.334220,48.384806 C 61.334220,49.627806 60.327220,50.634806 59.084220,50.634806 C 57.841220,50.634806 56.834220,49.627806 56.834220,48.384806 C 56.834220,47.141806 57.841220,46.134806 59.084220,46.134806 C 60.327220,46.134806 61.334220,47.142806 61.334220,48.384806 z "
      i:knockout="Off" /><path
-     style="fill:#000000;fill-opacity:1.0000000;stroke:#000000;stroke-width:0.25000000"
+     style="fill:#ffffff;fill-opacity:1.0000000;stroke:#000000;stroke-width:0.25000000"
      id="path385"
      d="M 70.334220,48.384806 C 70.334220,49.627806 69.327220,50.634806 68.084220,50.634806 C 66.841220,50.634806 65.834220,49.627806 65.834220,48.384806 C 65.834220,47.141806 66.841220,46.134806 68.084220,46.134806 C 69.327220,46.134806 70.334220,47.142806 70.334220,48.384806 z "
      i:knockout="Off" /><path
@@ -4284,6 +4330,7 @@
 
 
 
+
 		</switch><switch
      id="switch838"
      i:objectType="pointText"
@@ -4324,6 +4371,7 @@
 
 
 
+
 		</switch><switch
      id="switch845"
      i:objectType="pointText"
@@ -4361,6 +4409,7 @@
      font-size="6"
      y="0"
      x="0">= link/jumper</tspan></text>
+
 
 
 
@@ -4413,6 +4462,7 @@
      font-size="6"
      y="0"
      x="0">= connector</tspan></text>
+
 
 
 
@@ -4669,6 +4719,7 @@
 
 
 
+
 		</switch><g
      id="g1299"
      transform="translate(0.493674,-0.186531)">
@@ -4818,6 +4869,7 @@
 
 
 
+
 		</switch><path
      style="fill:#c52890"
      id="path1350"
@@ -4849,7 +4901,7 @@
      i:knockout="Off" /><path
      style="opacity:0.49999997;fill:#3ca537"
      id="path1366"
-     d="M 54.493700,71.157471 L 45.493700,71.157471 L 45.493700,17.657471 L 54.493700,17.657471 L 54.493700,71.157471 z "
+     d="M 54.783473,70.867698 L 45.783473,70.867698 L 45.783473,17.367698 L 54.783473,17.367698 L 54.783473,70.867698 z "
      i:knockout="Off" /><path
      style="opacity:0.49999997;fill:#3ca537"
      id="path1368"
@@ -4860,10 +4912,6 @@
      d="M 77.160700,22.101471 C 77.160700,22.101471 82.092370,27.652798 81.523021,75.630985 C 81.325131,92.306889 86.160700,111.76847 86.160700,111.76847"
      i:knockout="Off"
      sodipodi:nodetypes="csc" /><path
-     style="fill:#c52890;stroke:#c5288b;stroke-width:1.8052142"
-     id="path1379"
-     d="M 68.200307,47.600490 L 50.478258,85.939992"
-     i:knockout="Off" /><path
      style="fill:none;stroke:#c52890;stroke-width:2.0000000"
      id="path1381"
      d="M 212.49370,147.10147 C 212.49370,147.10147 213.16070,125.10147 209.82670,102.10147 C 208.09970,90.187469 208.15970,85.768469 204.15970,68.101471 C 200.54970,52.158471 194.49270,31.101471 194.49270,31.101471"
@@ -4951,6 +4999,7 @@
 
 
 
+
 		</switch><switch
      id="switch1418"
      i:objectType="pointText"
@@ -4989,6 +5038,7 @@
      font-size="6"
      y="0"
      x="0">J2</tspan></text>
+
 
 
 
@@ -5033,6 +5083,7 @@
 
 
 
+
 		</switch><switch
      id="switch1432"
      i:objectType="pointText"
@@ -5071,6 +5122,7 @@
      font-size="6"
      y="0"
      x="0">J3</tspan></text>
+
 
 
 
@@ -5115,6 +5167,7 @@
 
 
 
+
 		</switch><switch
      id="switch1446"
      i:objectType="pointText"
@@ -5153,6 +5206,7 @@
      font-size="6"
      y="0"
      x="0">J5</tspan></text>
+
 
 
 
@@ -5205,6 +5259,7 @@
 
 
 
+
 		</switch><switch
      id="switch1478"
      i:objectType="pointText"
@@ -5246,6 +5301,7 @@
 
 
 
+
 		</switch><switch
      id="switch1485"
      i:objectType="pointText"
@@ -5284,6 +5340,7 @@
      font-size="6"
      y="0"
      x="0">Z1</tspan></text>
+
 
 
 
@@ -5341,6 +5398,7 @@
 
 
 
+
 		</switch><switch
      id="switch1457"
      i:objectType="pointText"
@@ -5382,9 +5440,14 @@
 
 
 
+
 		</switch><path
      style="fill:none;stroke:#c62989;stroke-width:2.0000002;stroke-miterlimit:4.0000000;stroke-dasharray:none;display:inline"
      id="path6682"
      d="M 94.917507,83.952843 C 94.917507,83.952843 99.441671,89.896135 99.275671,102.59013 C 99.109671,115.28413 99.467854,100.29623 99.031020,123.23674 C 98.683360,141.80306 86.021130,128.52258 86.021130,128.52258"
      i:knockout="Off"
-     sodipodi:nodetypes="cssc" /></g></svg>
+     sodipodi:nodetypes="cssc" /><path
+     style="fill:#c52890;display:inline"
+     id="path2091"
+     d="M 42.049816,84.942511 L 40.150816,84.942511 L 40.150816,48.363611 L 42.049816,48.363611 L 42.049816,84.942511 z "
+     i:knockout="Off" /></g></svg>
