@@ -269,7 +269,8 @@ class rr_polygon
     public rr_p_list no_cross()
     {
 	rr_p_list result = new rr_p_list();
-	result.append(this);
+        result.polygons.add(new rr_polygon(this));
+	result.box.expand(box);
 	return result;
 	// Need some code in here...
     }
