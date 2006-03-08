@@ -71,6 +71,8 @@ class rr_p_list
 	box = new rr_box();
     }
 
+    // Deep copy
+
     public rr_p_list(rr_p_list lst)
     {
 	polygons = new ArrayList();
@@ -80,15 +82,6 @@ class rr_p_list
 	    polygons.add(new rr_polygon((rr_polygon)lst.polygons.get(i)));
     }
 
-    // Add a new polygon to the list
-
-    public void append(rr_polygon p)
-    {
-	if(p.points.size() == 0)
-	    return;
-	polygons.add(new rr_polygon(p));
-	box.expand(p.box);
-    }
 
     // Put a new list on the end
 
@@ -100,6 +93,13 @@ class rr_p_list
 	for(int i = 0; i < leng; i++)
 		polygons.add(new rr_polygon((rr_polygon)lst.polygons.get(i)));
 	box.expand(lst.box);
+    }
+
+    // Add one new polygon to the list
+
+    public void append(rr_polygon p)
+    {
+	append(p.no_cross());
     }
 
     /*
@@ -115,9 +115,15 @@ class rr_p_list
 
     }
 
-    public rr_p_list difference(rr_p_list a,  rr_p_list b)
+    public rr_p_list negate(rr_p_list a)
     {
 
+    }
+
+
+    public rr_p_list difference(rr_p_list a,  rr_p_list b)
+    {
+       return intersection(a, negate(b));
     }
     */
 
