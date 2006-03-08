@@ -216,24 +216,24 @@ class rr_interval
 	    {
                 if (high <= 0)
 		    {
-			result = rr_interval(-high, -low);
+			result = new rr_interval(-high, -low);
 		    } else
 		    {
-                        result = rr_interval(0, result.high);
+                        result = new rr_interval(0, result.high);
 			p = -low;
-                        if ( p > high ) result = rr_interval(result.low, p);
+                        if ( p > high ) result = new rr_interval(result.low, p);
 		    }
 	    }
         return(result);
     }
 
     // Sign of an interval
-
+/*
     public rr_interval sign()
     {
         return( new rr_interval(sign(low), sign(high)) );
     }
-
+*/
     // Max and min
 
     public rr_interval max(rr_interval a, rr_interval b)
