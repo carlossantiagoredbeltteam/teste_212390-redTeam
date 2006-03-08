@@ -1,6 +1,6 @@
 class graphics_test
 {
-    public void main() 
+    public static void main(String[] args)
     {
 	rr_2point p = new rr_2point(0, 0);
 	rr_2point q = new rr_2point(0.9, 0.1);
