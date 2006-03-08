@@ -264,6 +264,16 @@ class rr_polygon
 	return new self_x(false, 0, 0);
     }
 
+    // Remove self-intersections
+
+    public rr_p_list no_cross()
+    {
+	rr_p_list result = new rr_p_list();
+	result.append(p);
+	return result;
+	// Need some code in here...
+    }
+
 
     // Offset a polygon to the right by d
 
