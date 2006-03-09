@@ -118,17 +118,26 @@ class rr_p_list
 
     }
 
-    public rr_p_list negate(rr_p_list a)
-    {
-
-    }
-
 
     public rr_p_list difference(rr_p_list a,  rr_p_list b)
     {
        return intersection(a, negate(b));
     }
     */
+    
+    // Negate all the polygons
+    
+    public rr_p_list negate()
+    {
+        rr_p_list result = new rr_p_list();
+  	int leng = polygons.size();
+	for(int i = 0; i < leng; i++)
+        {
+            result.polygons.add(((rr_polygon)polygons.get(i)).negate());
+        }
+        result.box = new rr_box(box);
+        return result;
+    }
 
     // Write as an SVG xml to file opf
 
