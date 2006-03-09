@@ -274,6 +274,20 @@ class rr_polygon
 	return result;
 	// Need some code in here...
     }
+    
+    // Negate (i.e. reverse cyclic order)
+    
+    public rr_polygon negate()
+    {
+        rr_polygon result = new rr_polygon();
+       	int leng = points.size();
+	for(int i = 1; i <= leng; i++)
+	    {
+                result.append((rr_2point)points.get(leng - i), 
+                        ((Integer)flags.get(leng - i)).intValue());
+	    } 
+        return result;
+    }
 
 
     // Offset a polygon to the right by d
