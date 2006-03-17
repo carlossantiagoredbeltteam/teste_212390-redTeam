@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Generator: Adobe Illustrator 10.0, SVG Export Plug-In . SVG Version: 3.0.0 Build 76)  -->
 <svg
+   xmlns:ns1="http://ns.adobe.com/Flows/1.0/"
    xmlns:ns0="http://ns.adobe.com/SaveForWeb/1.0/"
    xmlns:ns="http://ns.adobe.com/Variables/1.0/"
-   xmlns:ns1="http://ns.adobe.com/Flows/1.0/"
    xmlns:i="http://ns.adobe.com/AdobeIllustrator/10.0/"
    xmlns:x="http://ns.adobe.com/Extensibility/1.0/"
    xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -31,7 +31,7 @@
    version="1.0"
    x="0.0000000"
    y="0.0000000"
-   inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440b.png"
+   inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
    inkscape:export-xdpi="209.37"
    inkscape:export-ydpi="209.37"><defs
    id="defs1495">
@@ -653,14 +653,16 @@
    pagecolor="#ffffff"
    id="base"
    inkscape:zoom="2.592"
-   inkscape:cx="146.0625"
-   inkscape:cy="161.17005"
+   inkscape:cx="142.92283"
+   inkscape:cy="143.94988"
    inkscape:window-x="1"
    inkscape:window-y="0"
-   inkscape:current-layer="layer3"
+   inkscape:current-layer="layer1"
    showgrid="false"
    inkscape:showpageshadow="true"
-   showborder="true" />
+   showborder="true"
+   showguides="true"
+   inkscape:guide-bbox="true" />
 	<metadata
    id="metadata4">
 		<ns:variableSets>
@@ -690,7 +692,10 @@
    i:objectType="pointText"
    i:objectNS="http://ns.adobe.com/Flows/1.0/"
    i:knockout="Off"
-   transform="translate(36.02355,-8.64922)">
+   transform="translate(36.02355,-8.64922)"
+   inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+   inkscape:export-xdpi="209.37"
+   inkscape:export-ydpi="209.37">
 			<foreignObject
    id="foreignObject926"
    overflow="visible"
@@ -731,12 +736,17 @@
 
 
 
+
+
 		</switch><switch
    id="switch931"
    i:objectType="pointText"
    i:objectNS="http://ns.adobe.com/Flows/1.0/"
    i:knockout="Off"
-   transform="translate(-19.23738,40.22748)">
+   transform="translate(-19.23738,40.22748)"
+   inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+   inkscape:export-xdpi="209.37"
+   inkscape:export-ydpi="209.37">
 			<foreignObject
    id="foreignObject933"
    overflow="visible"
@@ -776,12 +786,17 @@
 
 
 
+
+
 		</switch><switch
    id="switch938"
    i:objectType="pointText"
    i:objectNS="http://ns.adobe.com/Flows/1.0/"
    i:knockout="Off"
-   transform="translate(-6.768572,-37.30399)">
+   transform="translate(-6.768572,-37.30399)"
+   inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+   inkscape:export-xdpi="209.37"
+   inkscape:export-ydpi="209.37">
 			<foreignObject
    id="foreignObject940"
    overflow="visible"
@@ -821,12 +836,17 @@
 
 
 
+
+
 		</switch><switch
    id="switch945"
    i:objectType="pointText"
    i:objectNS="http://ns.adobe.com/Flows/1.0/"
    i:knockout="Off"
-   transform="translate(-80.16874,-3.082551)">
+   transform="translate(-80.16874,-3.082551)"
+   inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+   inkscape:export-xdpi="209.37"
+   inkscape:export-ydpi="209.37">
 			<foreignObject
    id="foreignObject947"
    overflow="visible"
@@ -867,13 +887,18 @@
 
 
 
+
+
 		</switch>
 	
 	<path
    style="fill:#c52890"
    id="path1358"
    d="M 80.725847,235.04965 L 72.975847,235.04965 L 72.975847,232.79965 L 80.725847,232.79965 L 80.725847,235.04965 z "
-   i:knockout="Off" /><switch
+   i:knockout="Off"
+   inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+   inkscape:export-xdpi="209.37"
+   inkscape:export-ydpi="209.37" /><switch
    id="switch1370"
    i:objectType="pointText"
    i:objectNS="http://ns.adobe.com/Flows/1.0/"
@@ -913,7 +938,8 @@
    inkscape:groupmode="layer"
    id="layer2"
    inkscape:label="Board"
-   style="display:inline"><path
+   style="display:inline"
+   sodipodi:insensitive="true"><path
      style="fill:#f8e285"
      id="path7"
      d="M 200.0307,198.85197 L 53.194607,198.85197 L 53.194607,-26.125946 L 200.0307,-26.125946 L 200.0307,198.85197 z "
@@ -956,6 +982,8 @@
      font-size="5"
      y="0"
      x="0">1</tspan></text>
+
+
 
 
 
@@ -1009,6 +1037,8 @@
 
 
 
+
+
 		</switch><switch
      id="switch1053"
      i:objectType="pointText"
@@ -1048,6 +1078,8 @@
      font-size="5"
      y="0"
      x="0">3</tspan></text>
+
+
 
 
 
@@ -1101,6 +1133,8 @@
 
 
 
+
+
 		</switch><switch
      id="switch1067"
      i:objectType="pointText"
@@ -1140,6 +1174,8 @@
      font-size="5"
      y="0"
      x="0">5</tspan></text>
+
+
 
 
 
@@ -1193,6 +1229,8 @@
 
 
 
+
+
 		</switch><switch
      id="switch1081"
      i:objectType="pointText"
@@ -1232,6 +1270,8 @@
      font-size="5"
      y="0"
      x="0">7</tspan></text>
+
+
 
 
 
@@ -1285,6 +1325,8 @@
 
 
 
+
+
 		</switch><switch
      id="switch1095"
      i:objectType="pointText"
@@ -1324,6 +1366,8 @@
      font-size="5"
      y="0"
      x="0">9</tspan></text>
+
+
 
 
 
@@ -1377,6 +1421,8 @@
 
 
 
+
+
 		</switch><switch
      id="switch1109"
      i:objectType="pointText"
@@ -1416,6 +1462,8 @@
      font-size="5"
      y="0"
      x="0">11</tspan></text>
+
+
 
 
 
@@ -1469,6 +1517,8 @@
 
 
 
+
+
 		</switch><switch
      id="switch1123"
      i:objectType="pointText"
@@ -1508,6 +1558,8 @@
      font-size="5"
      y="0"
      x="0">13</tspan></text>
+
+
 
 
 
@@ -1561,6 +1613,8 @@
 
 
 
+
+
 		</switch><switch
      id="switch1137"
      i:objectType="pointText"
@@ -1600,6 +1654,8 @@
      font-size="5"
      y="0"
      x="0">15</tspan></text>
+
+
 
 
 
@@ -1654,6 +1710,8 @@
 
 
 
+
+
 			</switch><switch
    id="switch962"
    i:objectType="pointText"
@@ -1692,6 +1750,8 @@
      font-size="5"
      y="0"
      x="0">B</tspan></text>
+
+
 
 
 
@@ -1744,6 +1804,8 @@
 
 
 
+
+
 			</switch><switch
    id="switch976"
    i:objectType="pointText"
@@ -1782,6 +1844,8 @@
      font-size="5"
      y="0"
      x="0">D</tspan></text>
+
+
 
 
 
@@ -1834,6 +1898,8 @@
 
 
 
+
+
 			</switch><switch
    id="switch990"
    i:objectType="pointText"
@@ -1872,6 +1938,8 @@
      font-size="5"
      y="0"
      x="0">F</tspan></text>
+
+
 
 
 
@@ -1924,6 +1992,8 @@
 
 
 
+
+
 			</switch><switch
    id="switch1004"
    i:objectType="pointText"
@@ -1962,6 +2032,8 @@
      font-size="5"
      y="0"
      x="0">H</tspan></text>
+
+
 
 
 
@@ -2014,6 +2086,8 @@
 
 
 
+
+
 			</switch><switch
    id="switch1018"
    i:objectType="pointText"
@@ -2052,6 +2126,8 @@
      font-size="5"
      y="0"
      x="0">J</tspan></text>
+
+
 
 
 
@@ -2104,6 +2180,8 @@
 
 
 
+
+
 			</switch><switch
    id="switch1032"
    i:objectType="pointText"
@@ -2142,6 +2220,8 @@
      font-size="5"
      y="0"
      x="0">L</tspan></text>
+
+
 
 
 
@@ -2194,6 +2274,8 @@
 
 
 
+
+
 		</switch><switch
    i:knockout="Off"
    i:objectNS="http://ns.adobe.com/Flows/1.0/"
@@ -2232,6 +2314,8 @@
      font-size="5"
      id="tspan1240"
      style="font-size:5px;fill:#2589ba;font-family:Myriad-Roman">N</tspan></text>
+
+
 
 
 
@@ -2284,6 +2368,8 @@
 
 
 
+
+
 		</switch><text
    y="131.51711"
    x="18.935499"
@@ -2293,6 +2379,8 @@
      font-size="5"
      id="tspan25408"
      style="font-size:5px;fill:#2589ba;font-family:Myriad-Roman">M</tspan></text>
+
+
 
 
 <switch
@@ -2340,6 +2428,8 @@
 
 
 
+
+
 		</switch><switch
    id="switch25418"
    i:objectType="pointText"
@@ -2378,6 +2468,8 @@
      font-size="5"
      y="0"
      x="0">O</tspan></text>
+
+
 
 
 
@@ -2431,6 +2523,8 @@
 
 
 
+
+
 			</switch><switch
      id="switch25839"
      i:objectType="pointText"
@@ -2470,6 +2564,8 @@
      font-size="5"
      y="0"
      x="0">Q</tspan></text>
+
+
 
 
 
@@ -2523,6 +2619,8 @@
 
 
 
+
+
 			</switch><switch
      id="switch25855"
      i:objectType="pointText"
@@ -2562,6 +2660,8 @@
      font-size="5"
      y="0"
      x="0">S</tspan></text>
+
+
 
 
 
@@ -2615,6 +2715,8 @@
 
 
 
+
+
 			</switch><switch
      id="switch25871"
      i:objectType="pointText"
@@ -2654,6 +2756,8 @@
      font-size="5"
      y="0"
      x="0">U</tspan></text>
+
+
 
 
 
@@ -2707,6 +2811,8 @@
 
 
 
+
+
 			</switch><switch
      id="switch25887"
      i:objectType="pointText"
@@ -2753,11 +2859,14 @@
 
 
 
+
+
 			</switch></g><g
    inkscape:groupmode="layer"
    id="layer3"
    inkscape:label="Stripboard holes"
-   style="display:inline"><path
+   style="display:inline"
+   sodipodi:insensitive="true"><path
      style="fill:#ffffff;stroke:#000000;stroke-width:0.25"
      id="path9"
      d="M 70.334836,85.384211 C 70.334836,86.627211 69.327836,87.634211 68.084836,87.634211 C 66.841836,87.634211 65.834836,86.627211 65.834836,85.384211 C 65.834836,84.141211 66.841836,83.134211 68.084836,83.134211 C 69.327836,83.134211 70.334836,84.142211 70.334836,85.384211 z "
@@ -2766,15 +2875,15 @@
      id="path11"
      d="M 79.334836,85.384211 C 79.334836,86.627211 78.327836,87.634211 77.084836,87.634211 C 75.841836,87.634211 74.834836,86.627211 74.834836,85.384211 C 74.834836,84.141211 75.841836,83.134211 77.084836,83.134211 C 78.327836,83.134211 79.334836,84.142211 79.334836,85.384211 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path13"
      d="M 88.334836,85.384211 C 88.334836,86.627211 87.327836,87.634211 86.084836,87.634211 C 84.841836,87.634211 83.834836,86.627211 83.834836,85.384211 C 83.834836,84.141211 84.841836,83.134211 86.084836,83.134211 C 87.327836,83.134211 88.334836,84.142211 88.334836,85.384211 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path15"
      d="M 97.334836,85.384211 C 97.334836,86.627211 96.327836,87.634211 95.084836,87.634211 C 93.841836,87.634211 92.834836,86.627211 92.834836,85.384211 C 92.834836,84.141211 93.841836,83.134211 95.084836,83.134211 C 96.327836,83.134211 97.334836,84.142211 97.334836,85.384211 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path17"
      d="M 106.33484,85.384211 C 106.33484,86.627211 105.32784,87.634211 104.08484,87.634211 C 102.84184,87.634211 101.83484,86.627211 101.83484,85.384211 C 101.83484,84.141211 102.84184,83.134211 104.08484,83.134211 C 105.32784,83.134211 106.33484,84.142211 106.33484,85.384211 z "
      i:knockout="Off" /><path
@@ -2814,7 +2923,7 @@
      id="path35"
      d="M 187.33484,85.384211 C 187.33484,86.627211 186.32784,87.634211 185.08484,87.634211 C 183.84184,87.634211 182.83484,86.627211 182.83484,85.384211 C 182.83484,84.141211 183.84184,83.134211 185.08484,83.134211 C 186.32784,83.134211 187.33484,84.142211 187.33484,85.384211 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path37"
      d="M 196.33484,85.384211 C 196.33484,86.627211 195.32784,87.634211 194.08484,87.634211 C 192.84184,87.634211 191.83484,86.627211 191.83484,85.384211 C 191.83484,84.141211 192.84184,83.134211 194.08484,83.134211 C 195.32784,83.134211 196.33484,84.142211 196.33484,85.384211 z "
      i:knockout="Off" /><path
@@ -2834,7 +2943,7 @@
      id="path61"
      d="M 97.334836,76.384211 C 97.334836,77.627211 96.327836,78.634211 95.084836,78.634211 C 93.841836,78.634211 92.834836,77.627211 92.834836,76.384211 C 92.834836,75.141211 93.841836,74.134211 95.084836,74.134211 C 96.327836,74.134211 97.334836,75.142211 97.334836,76.384211 z "
      i:knockout="Off" /><path
-     style="fill:#000000;stroke:#000000;stroke-width:0.25;fill-opacity:1"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path63"
      d="M 106.33484,76.384211 C 106.33484,77.627211 105.32784,78.634211 104.08484,78.634211 C 102.84184,78.634211 101.83484,77.627211 101.83484,76.384211 C 101.83484,75.141211 102.84184,74.134211 104.08484,74.134211 C 105.32784,74.134211 106.33484,75.142211 106.33484,76.384211 z "
      i:knockout="Off" /><path
@@ -2874,7 +2983,7 @@
      id="path81"
      d="M 187.33484,76.384211 C 187.33484,77.627211 186.32784,78.634211 185.08484,78.634211 C 183.84184,78.634211 182.83484,77.627211 182.83484,76.384211 C 182.83484,75.141211 183.84184,74.134211 185.08484,74.134211 C 186.32784,74.134211 187.33484,75.142211 187.33484,76.384211 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path83"
      d="M 196.33484,76.384211 C 196.33484,77.627211 195.32784,78.634211 194.08484,78.634211 C 192.84184,78.634211 191.83484,77.627211 191.83484,76.384211 C 191.83484,75.141211 192.84184,74.134211 194.08484,74.134211 C 195.32784,74.134211 196.33484,75.142211 196.33484,76.384211 z "
      i:knockout="Off" /><path
@@ -2894,7 +3003,7 @@
      id="path107"
      d="M 97.334836,67.384211 C 97.334836,68.627211 96.327836,69.634211 95.084836,69.634211 C 93.841836,69.634211 92.834836,68.627211 92.834836,67.384211 C 92.834836,66.141211 93.841836,65.134211 95.084836,65.134211 C 96.327836,65.134211 97.334836,66.142211 97.334836,67.384211 z "
      i:knockout="Off" /><path
-     style="fill:#000000;stroke:#000000;stroke-width:0.25;fill-opacity:1"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path109"
      d="M 106.33484,67.384211 C 106.33484,68.627211 105.32784,69.634211 104.08484,69.634211 C 102.84184,69.634211 101.83484,68.627211 101.83484,67.384211 C 101.83484,66.141211 102.84184,65.134211 104.08484,65.134211 C 105.32784,65.134211 106.33484,66.142211 106.33484,67.384211 z "
      i:knockout="Off" /><path
@@ -2934,7 +3043,7 @@
      id="path127"
      d="M 187.33484,67.384211 C 187.33484,68.627211 186.32784,69.634211 185.08484,69.634211 C 183.84184,69.634211 182.83484,68.627211 182.83484,67.384211 C 182.83484,66.141211 183.84184,65.134211 185.08484,65.134211 C 186.32784,65.134211 187.33484,66.142211 187.33484,67.384211 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path129"
      d="M 196.33484,67.384211 C 196.33484,68.627211 195.32784,69.634211 194.08484,69.634211 C 192.84184,69.634211 191.83484,68.627211 191.83484,67.384211 C 191.83484,66.141211 192.84184,65.134211 194.08484,65.134211 C 195.32784,65.134211 196.33484,66.142211 196.33484,67.384211 z "
      i:knockout="Off" /><path
@@ -2946,7 +3055,7 @@
      id="path149"
      d="M 79.334836,58.384207 C 79.334836,59.627207 78.327836,60.634207 77.084836,60.634207 C 75.841836,60.634207 74.834836,59.627207 74.834836,58.384207 C 74.834836,57.141207 75.841836,56.134207 77.084836,56.134207 C 78.327836,56.134207 79.334836,57.142207 79.334836,58.384207 z "
      i:knockout="Off" /><path
-     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
+     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path151"
      d="M 88.334836,58.384207 C 88.334836,59.627207 87.327836,60.634207 86.084836,60.634207 C 84.841836,60.634207 83.834836,59.627207 83.834836,58.384207 C 83.834836,57.141207 84.841836,56.134207 86.084836,56.134207 C 87.327836,56.134207 88.334836,57.142207 88.334836,58.384207 z "
      i:knockout="Off" /><path
@@ -2954,7 +3063,7 @@
      id="path153"
      d="M 97.334836,58.384207 C 97.334836,59.627207 96.327836,60.634207 95.084836,60.634207 C 93.841836,60.634207 92.834836,59.627207 92.834836,58.384207 C 92.834836,57.141207 93.841836,56.134207 95.084836,56.134207 C 96.327836,56.134207 97.334836,57.142207 97.334836,58.384207 z "
      i:knockout="Off" /><path
-     style="fill:#000000;stroke:#000000;stroke-width:0.25;fill-opacity:1"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path155"
      d="M 106.33484,58.384207 C 106.33484,59.627207 105.32784,60.634207 104.08484,60.634207 C 102.84184,60.634207 101.83484,59.627207 101.83484,58.384207 C 101.83484,57.141207 102.84184,56.134207 104.08484,56.134207 C 105.32784,56.134207 106.33484,57.142207 106.33484,58.384207 z "
      i:knockout="Off" /><path
@@ -2994,7 +3103,7 @@
      id="path173"
      d="M 187.33484,58.384207 C 187.33484,59.627207 186.32784,60.634207 185.08484,60.634207 C 183.84184,60.634207 182.83484,59.627207 182.83484,58.384207 C 182.83484,57.141207 183.84184,56.134207 185.08484,56.134207 C 186.32784,56.134207 187.33484,57.142207 187.33484,58.384207 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path175"
      d="M 196.33484,58.384207 C 196.33484,59.627207 195.32784,60.634207 194.08484,60.634207 C 192.84184,60.634207 191.83484,59.627207 191.83484,58.384207 C 191.83484,57.141207 192.84184,56.134207 194.08484,56.134207 C 195.32784,56.134207 196.33484,57.142207 196.33484,58.384207 z "
      i:knockout="Off" /><path
@@ -3010,7 +3119,7 @@
      id="path197"
      d="M 88.334836,49.384207 C 88.334836,50.627207 87.327836,51.634207 86.084836,51.634207 C 84.841836,51.634207 83.834836,50.627207 83.834836,49.384207 C 83.834836,48.141207 84.841836,47.134207 86.084836,47.134207 C 87.327836,47.134207 88.334836,48.142207 88.334836,49.384207 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path199"
      d="M 97.334836,49.384207 C 97.334836,50.627207 96.327836,51.634207 95.084836,51.634207 C 93.841836,51.634207 92.834836,50.627207 92.834836,49.384207 C 92.834836,48.141207 93.841836,47.134207 95.084836,47.134207 C 96.327836,47.134207 97.334836,48.142207 97.334836,49.384207 z "
      i:knockout="Off" /><path
@@ -3050,11 +3159,11 @@
      id="path217"
      d="M 178.33484,49.384207 C 178.33484,50.627207 177.32784,51.634207 176.08484,51.634207 C 174.84184,51.634207 173.83484,50.627207 173.83484,49.384207 C 173.83484,48.141207 174.84184,47.134207 176.08484,47.134207 C 177.32784,47.134207 178.33484,48.142207 178.33484,49.384207 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path219"
      d="M 187.33484,49.384207 C 187.33484,50.627207 186.32784,51.634207 185.08484,51.634207 C 183.84184,51.634207 182.83484,50.627207 182.83484,49.384207 C 182.83484,48.141207 183.84184,47.134207 185.08484,47.134207 C 186.32784,47.134207 187.33484,48.142207 187.33484,49.384207 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path221"
      d="M 196.33484,49.384207 C 196.33484,50.627207 195.32784,51.634207 194.08484,51.634207 C 192.84184,51.634207 191.83484,50.627207 191.83484,49.384207 C 191.83484,48.141207 192.84184,47.134207 194.08484,47.134207 C 195.32784,47.134207 196.33484,48.142207 196.33484,49.384207 z "
      i:knockout="Off" /><path
@@ -3066,11 +3175,11 @@
      id="path241"
      d="M 79.334836,40.384207 C 79.334836,41.627207 78.327836,42.634207 77.084836,42.634207 C 75.841836,42.634207 74.834836,41.627207 74.834836,40.384207 C 74.834836,39.141207 75.841836,38.134207 77.084836,38.134207 C 78.327836,38.134207 79.334836,39.142207 79.334836,40.384207 z "
      i:knockout="Off" /><path
-     style="fill:#000000;stroke:#000000;stroke-width:0.25;fill-opacity:1"
+     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path243"
      d="M 88.334836,40.384207 C 88.334836,41.627207 87.327836,42.634207 86.084836,42.634207 C 84.841836,42.634207 83.834836,41.627207 83.834836,40.384207 C 83.834836,39.141207 84.841836,38.134207 86.084836,38.134207 C 87.327836,38.134207 88.334836,39.142207 88.334836,40.384207 z "
      i:knockout="Off" /><path
-     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
+     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path245"
      d="M 97.334836,40.384207 C 97.334836,41.627207 96.327836,42.634207 95.084836,42.634207 C 93.841836,42.634207 92.834836,41.627207 92.834836,40.384207 C 92.834836,39.141207 93.841836,38.134207 95.084836,38.134207 C 96.327836,38.134207 97.334836,39.142207 97.334836,40.384207 z "
      i:knockout="Off" /><path
@@ -3110,11 +3219,11 @@
      id="path263"
      d="M 178.33484,40.384207 C 178.33484,41.627207 177.32784,42.634207 176.08484,42.634207 C 174.84184,42.634207 173.83484,41.627207 173.83484,40.384207 C 173.83484,39.141207 174.84184,38.134207 176.08484,38.134207 C 177.32784,38.134207 178.33484,39.142207 178.33484,40.384207 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path265"
      d="M 187.33484,40.384207 C 187.33484,41.627207 186.32784,42.634207 185.08484,42.634207 C 183.84184,42.634207 182.83484,41.627207 182.83484,40.384207 C 182.83484,39.141207 183.84184,38.134207 185.08484,38.134207 C 186.32784,38.134207 187.33484,39.142207 187.33484,40.384207 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path267"
      d="M 196.33484,40.384207 C 196.33484,41.627207 195.32784,42.634207 194.08484,42.634207 C 192.84184,42.634207 191.83484,41.627207 191.83484,40.384207 C 191.83484,39.141207 192.84184,38.134207 194.08484,38.134207 C 195.32784,38.134207 196.33484,39.142207 196.33484,40.384207 z "
      i:knockout="Off" /><path
@@ -3238,7 +3347,7 @@
      id="path359"
      d="M 196.33484,22.384207 C 196.33484,23.627207 195.32784,24.634207 194.08484,24.634207 C 192.84184,24.634207 191.83484,23.627207 191.83484,22.384207 C 191.83484,21.141207 192.84184,20.134207 194.08484,20.134207 C 195.32784,20.134207 196.33484,21.142207 196.33484,22.384207 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path377"
      d="M 70.334836,13.384207 C 70.334836,14.627207 69.327836,15.634207 68.084836,15.634207 C 66.841836,15.634207 65.834836,14.627207 65.834836,13.384207 C 65.834836,12.141207 66.841836,11.134207 68.084836,11.134207 C 69.327836,11.134207 70.334836,12.142207 70.334836,13.384207 z "
      i:knockout="Off" /><path
@@ -3354,7 +3463,7 @@
      id="path449"
      d="M 187.33484,4.3842069 C 187.33484,5.6272069 186.32784,6.6342069 185.08484,6.6342069 C 183.84184,6.6342069 182.83484,5.6272069 182.83484,4.3842069 C 182.83484,3.1412069 183.84184,2.1342069 185.08484,2.1342069 C 186.32784,2.1342069 187.33484,3.1422069 187.33484,4.3842069 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path451"
      d="M 196.33484,4.3842069 C 196.33484,5.6272069 195.32784,6.6342069 194.08484,6.6342069 C 192.84184,6.6342069 191.83484,5.6272069 191.83484,4.3842069 C 191.83484,3.1412069 192.84184,2.1342069 194.08484,2.1342069 C 195.32784,2.1342069 196.33484,3.1422069 196.33484,4.3842069 z "
      i:knockout="Off" /><path
@@ -3374,7 +3483,7 @@
      id="path475"
      d="M 97.334836,-4.6157931 C 97.334836,-3.3727931 96.327836,-2.3657931 95.084836,-2.3657931 C 93.841836,-2.3657931 92.834836,-3.3727931 92.834836,-4.6157931 C 92.834836,-5.8587931 93.841836,-6.8657931 95.084836,-6.8657931 C 96.327836,-6.8657931 97.334836,-5.8577931 97.334836,-4.6157931 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path477"
      d="M 106.33484,-4.6157931 C 106.33484,-3.3727931 105.32784,-2.3657931 104.08484,-2.3657931 C 102.84184,-2.3657931 101.83484,-3.3727931 101.83484,-4.6157931 C 101.83484,-5.8587931 102.84184,-6.8657931 104.08484,-6.8657931 C 105.32784,-6.8657931 106.33484,-5.8577931 106.33484,-4.6157931 z "
      i:knockout="Off" /><path
@@ -3410,7 +3519,7 @@
      id="path493"
      d="M 178.33484,-4.6157931 C 178.33484,-3.3727931 177.32784,-2.3657931 176.08484,-2.3657931 C 174.84184,-2.3657931 173.83484,-3.3727931 173.83484,-4.6157931 C 173.83484,-5.8587931 174.84184,-6.8657931 176.08484,-6.8657931 C 177.32784,-6.8657931 178.33484,-5.8577931 178.33484,-4.6157931 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path495"
      d="M 187.33484,-4.6157931 C 187.33484,-3.3727931 186.32784,-2.3657931 185.08484,-2.3657931 C 183.84184,-2.3657931 182.83484,-3.3727931 182.83484,-4.6157931 C 182.83484,-5.8587931 183.84184,-6.8657931 185.08484,-6.8657931 C 186.32784,-6.8657931 187.33484,-5.8577931 187.33484,-4.6157931 z "
      i:knockout="Off" /><path
@@ -3538,7 +3647,7 @@
      id="path589"
      d="M 196.22084,111.88421 C 196.22084,113.12721 195.21384,114.13421 193.97084,114.13421 C 192.72784,114.13421 191.72084,113.12721 191.72084,111.88421 C 191.72084,110.64121 192.72784,109.63421 193.97084,109.63421 C 195.21384,109.63421 196.22084,110.64221 196.22084,111.88421 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path607"
      d="M 70.220836,102.88421 C 70.220836,104.12721 69.213836,105.13421 67.970836,105.13421 C 66.727836,105.13421 65.720836,104.12721 65.720836,102.88421 C 65.720836,101.64121 66.727836,100.63421 67.970836,100.63421 C 69.213836,100.63421 70.220836,101.64221 70.220836,102.88421 z "
      i:knockout="Off" /><path
@@ -3546,7 +3655,7 @@
      id="path609"
      d="M 79.220836,102.88421 C 79.220836,104.12721 78.213836,105.13421 76.970836,105.13421 C 75.727836,105.13421 74.720836,104.12721 74.720836,102.88421 C 74.720836,101.64121 75.727836,100.63421 76.970836,100.63421 C 78.213836,100.63421 79.220836,101.64221 79.220836,102.88421 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path611"
      d="M 88.220836,102.88421 C 88.220836,104.12721 87.213836,105.13421 85.970836,105.13421 C 84.727836,105.13421 83.720836,104.12721 83.720836,102.88421 C 83.720836,101.64121 84.727836,100.63421 85.970836,100.63421 C 87.213836,100.63421 88.220836,101.64221 88.220836,102.88421 z "
      i:knockout="Off" /><path
@@ -3562,7 +3671,7 @@
      id="path617"
      d="M 115.22084,102.88421 C 115.22084,104.12721 114.21384,105.13421 112.97084,105.13421 C 111.72784,105.13421 110.72084,104.12721 110.72084,102.88421 C 110.72084,101.64121 111.72784,100.63421 112.97084,100.63421 C 114.21384,100.63421 115.22084,101.64221 115.22084,102.88421 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path619"
      d="M 124.22084,102.88421 C 124.22084,104.12721 123.21384,105.13421 121.97084,105.13421 C 120.72784,105.13421 119.72084,104.12721 119.72084,102.88421 C 119.72084,101.64121 120.72784,100.63421 121.97084,100.63421 C 123.21384,100.63421 124.22084,101.64221 124.22084,102.88421 z "
      i:knockout="Off" /><path
@@ -3594,7 +3703,7 @@
      id="path633"
      d="M 187.22084,102.88421 C 187.22084,104.12721 186.21384,105.13421 184.97084,105.13421 C 183.72784,105.13421 182.72084,104.12721 182.72084,102.88421 C 182.72084,101.64121 183.72784,100.63421 184.97084,100.63421 C 186.21384,100.63421 187.22084,101.64221 187.22084,102.88421 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path635"
      d="M 196.22084,102.88421 C 196.22084,104.12721 195.21384,105.13421 193.97084,105.13421 C 192.72784,105.13421 191.72084,104.12721 191.72084,102.88421 C 191.72084,101.64121 192.72784,100.63421 193.97084,100.63421 C 195.21384,100.63421 196.22084,101.64221 196.22084,102.88421 z "
      i:knockout="Off" /><path
@@ -3602,11 +3711,11 @@
      id="path653"
      d="M 70.220836,93.884211 C 70.220836,95.127211 69.213836,96.134211 67.970836,96.134211 C 66.727836,96.134211 65.720836,95.127211 65.720836,93.884211 C 65.720836,92.641211 66.727836,91.634211 67.970836,91.634211 C 69.213836,91.634211 70.220836,92.642211 70.220836,93.884211 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path655"
      d="M 79.220836,93.884211 C 79.220836,95.127211 78.213836,96.134211 76.970836,96.134211 C 75.727836,96.134211 74.720836,95.127211 74.720836,93.884211 C 74.720836,92.641211 75.727836,91.634211 76.970836,91.634211 C 78.213836,91.634211 79.220836,92.642211 79.220836,93.884211 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path657"
      d="M 88.220836,93.884211 C 88.220836,95.127211 87.213836,96.134211 85.970836,96.134211 C 84.727836,96.134211 83.720836,95.127211 83.720836,93.884211 C 83.720836,92.641211 84.727836,91.634211 85.970836,91.634211 C 87.213836,91.634211 88.220836,92.642211 88.220836,93.884211 z "
      i:knockout="Off" /><path
@@ -3622,7 +3731,7 @@
      id="path663"
      d="M 115.22084,93.884211 C 115.22084,95.127211 114.21384,96.134211 112.97084,96.134211 C 111.72784,96.134211 110.72084,95.127211 110.72084,93.884211 C 110.72084,92.641211 111.72784,91.634211 112.97084,91.634211 C 114.21384,91.634211 115.22084,92.642211 115.22084,93.884211 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path665"
      d="M 124.22084,93.884211 C 124.22084,95.127211 123.21384,96.134211 121.97084,96.134211 C 120.72784,96.134211 119.72084,95.127211 119.72084,93.884211 C 119.72084,92.641211 120.72784,91.634211 121.97084,91.634211 C 123.21384,91.634211 124.22084,92.642211 124.22084,93.884211 z "
      i:knockout="Off" /><path
@@ -3654,7 +3763,7 @@
      id="path679"
      d="M 187.22084,93.884211 C 187.22084,95.127211 186.21384,96.134211 184.97084,96.134211 C 183.72784,96.134211 182.72084,95.127211 182.72084,93.884211 C 182.72084,92.641211 183.72784,91.634211 184.97084,91.634211 C 186.21384,91.634211 187.22084,92.642211 187.22084,93.884211 z "
      i:knockout="Off" /><path
-     style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.25"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.25"
      id="path681"
      d="M 196.22084,93.884211 C 196.22084,95.127211 195.21384,96.134211 193.97084,96.134211 C 192.72784,96.134211 191.72084,95.127211 191.72084,93.884211 C 191.72084,92.641211 192.72784,91.634211 193.97084,91.634211 C 195.21384,91.634211 196.22084,92.642211 196.22084,93.884211 z "
      i:knockout="Off" /><path
@@ -4243,12 +4352,18 @@
      style="fill:#e96060"
      id="path829"
      d="M 82.850847,216.06465 C 82.850847,214.33865 81.451847,212.93965 79.725847,212.93965 C 77.999847,212.93965 76.600847,214.33865 76.600847,216.06465 C 76.600847,217.79065 77.999847,219.18965 79.725847,219.18965 C 81.451847,219.18965 82.850847,217.79065 82.850847,216.06465 z "
-     i:knockout="Off" /><switch
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><switch
      id="switch831"
      i:objectType="pointText"
      i:objectNS="http://ns.adobe.com/Flows/1.0/"
      i:knockout="Off"
-     transform="translate(37.30885,39.95665)">
+     transform="translate(37.30885,39.95665)"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37">
 			<foreignObject
    id="foreignObject833"
    overflow="visible"
@@ -4288,12 +4403,17 @@
 
 
 
+
+
 		</switch><switch
      id="switch838"
      i:objectType="pointText"
      i:objectNS="http://ns.adobe.com/Flows/1.0/"
      i:knockout="Off"
-     transform="translate(37.30885,39.95665)">
+     transform="translate(37.30885,39.95665)"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37">
 			<foreignObject
    id="foreignObject840"
    overflow="visible"
@@ -4333,12 +4453,17 @@
 
 
 
+
+
 		</switch><switch
      id="switch845"
      i:objectType="pointText"
      i:objectNS="http://ns.adobe.com/Flows/1.0/"
      i:knockout="Off"
-     transform="translate(37.30885,39.95665)">
+     transform="translate(37.30885,39.95665)"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37">
 			<foreignObject
    id="foreignObject847"
    overflow="visible"
@@ -4378,9 +4503,14 @@
 
 
 
+
+
 		</switch><g
      id="g852"
-     transform="translate(-86.53591,65.03424)">
+     transform="translate(-86.53591,65.03424)"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37">
 			<path
    style="opacity:0.5;fill:#f3e285"
    id="path854"
@@ -4396,7 +4526,10 @@
      i:objectType="pointText"
      i:objectNS="http://ns.adobe.com/Flows/1.0/"
      i:knockout="Off"
-     transform="translate(-86.53591,65.03424)">
+     transform="translate(-86.53591,65.03424)"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37">
 			<foreignObject
    id="foreignObject860"
    overflow="visible"
@@ -4436,94 +4569,186 @@
 
 
 
+
+
 		</switch><path
      style="fill:#e86060"
      id="path865"
      d="M 151.87562,85.926401 C 151.87562,84.200401 150.47662,82.801401 148.75062,82.801401 C 147.02462,82.801401 145.62562,84.200401 145.62562,85.926401 C 145.62562,87.652401 147.02462,89.051401 148.75062,89.051401 C 150.47662,89.051401 151.87562,87.652401 151.87562,85.926401 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#e86060"
      id="path867"
      d="M 151.87562,94.593401 C 151.87562,92.867401 150.47662,91.468401 148.75062,91.468401 C 147.02462,91.468401 145.62562,92.867401 145.62562,94.593401 C 145.62562,96.319401 147.02462,97.718401 148.75062,97.718401 C 150.47662,97.718401 151.87562,96.319401 151.87562,94.593401 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#e86060"
      id="path873"
      d="M 151.87562,76.926401 C 151.87562,75.200401 150.47662,73.801401 148.75062,73.801401 C 147.02462,73.801401 145.62562,75.200401 145.62562,76.926401 C 145.62562,78.652401 147.02462,80.051401 148.75062,80.051401 C 150.47662,80.051401 151.87562,78.652401 151.87562,76.926401 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#e86060"
      id="path875"
      d="M 151.87562,67.926401 C 151.87562,66.200401 150.47662,64.801401 148.75062,64.801401 C 147.02462,64.801401 145.62562,66.200401 145.62562,67.926401 C 145.62562,69.652401 147.02462,71.051401 148.75062,71.051401 C 150.47662,71.051401 151.87562,69.652401 151.87562,67.926401 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#e86060"
      id="path877"
      d="M 151.87562,58.926401 C 151.87562,57.200401 150.47662,55.801401 148.75062,55.801401 C 147.02462,55.801401 145.62562,57.200401 145.62562,58.926401 C 145.62562,60.652401 147.02462,62.051401 148.75062,62.051401 C 150.47662,62.051401 151.87562,60.652401 151.87562,58.926401 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#e86060"
      id="path879"
      d="M 151.87562,49.926401 C 151.87562,48.200401 150.47662,46.801401 148.75062,46.801401 C 147.02462,46.801401 145.62562,48.200401 145.62562,49.926401 C 145.62562,51.652401 147.02462,53.051401 148.75062,53.051401 C 150.47662,53.051401 151.87562,51.652401 151.87562,49.926401 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#e86060"
      id="path881"
      d="M 151.87562,40.926401 C 151.87562,39.200401 150.47662,37.801401 148.75062,37.801401 C 147.02462,37.801401 145.62562,39.200401 145.62562,40.926401 C 145.62562,42.652401 147.02462,44.051401 148.75062,44.051401 C 150.47662,44.051401 151.87562,42.652401 151.87562,40.926401 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#e86060"
      id="path885"
      d="M 124.87562,-13.073599 C 124.87562,-14.799599 123.47662,-16.198599 121.75062,-16.198599 C 120.02462,-16.198599 118.62562,-14.799599 118.62562,-13.073599 C 118.62562,-11.347599 120.02462,-9.9485991 121.75062,-9.9485991 C 123.47662,-9.9485991 124.87562,-11.347599 124.87562,-13.073599 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#e86060"
      id="path895"
      d="M 151.87562,31.926401 C 151.87562,30.200401 150.47662,28.801401 148.75062,28.801401 C 147.02462,28.801401 145.62562,30.200401 145.62562,31.926401 C 145.62562,33.652401 147.02462,35.051401 148.75062,35.051401 C 150.47662,35.051401 151.87562,33.652401 151.87562,31.926401 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#e86060"
      id="path897"
      d="M 151.87562,22.926401 C 151.87562,21.200401 150.47662,19.801401 148.75062,19.801401 C 147.02462,19.801401 145.62562,21.200401 145.62562,22.926401 C 145.62562,24.652401 147.02462,26.051401 148.75062,26.051401 C 150.47662,26.051401 151.87562,24.652401 151.87562,22.926401 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#e86060"
      id="path899"
      d="M 152.37364,174.68732 C 152.37364,172.96132 150.97464,171.56232 149.24864,171.56232 C 147.52264,171.56232 146.12364,172.96132 146.12364,174.68732 C 146.12364,176.41332 147.52264,177.81232 149.24864,177.81232 C 150.97464,177.81232 152.37364,176.41332 152.37364,174.68732 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#e86060"
      id="path901"
      d="M 152.37364,165.68732 C 152.37364,163.96132 150.97464,162.56232 149.24864,162.56232 C 147.52264,162.56232 146.12364,163.96132 146.12364,165.68732 C 146.12364,167.41332 147.52264,168.81232 149.24864,168.81232 C 150.97464,168.81232 152.37364,167.41332 152.37364,165.68732 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#e86060"
      id="path903"
      d="M 152.37364,156.68732 C 152.37364,154.96132 150.97464,153.56232 149.24864,153.56232 C 147.52264,153.56232 146.12364,154.96132 146.12364,156.68732 C 146.12364,158.41332 147.52264,159.81232 149.24864,159.81232 C 150.97464,159.81232 152.37364,158.41332 152.37364,156.68732 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#e86060"
      id="path909"
      d="M 152.37364,129.68732 C 152.37364,127.96132 150.97464,126.56232 149.24864,126.56232 C 147.52264,126.56232 146.12364,127.96132 146.12364,129.68732 C 146.12364,131.41332 147.52264,132.81232 149.24864,132.81232 C 150.97464,132.81232 152.37364,131.41332 152.37364,129.68732 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#e86060"
      id="path911"
      d="M 152.37364,120.68732 C 152.37364,118.96132 150.97464,117.56232 149.24864,117.56232 C 147.52264,117.56232 146.12364,118.96132 146.12364,120.68732 C 146.12364,122.41332 147.52264,123.81232 149.24864,123.81232 C 150.97464,123.81232 152.37364,122.41332 152.37364,120.68732 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#e86060"
      id="path913"
      d="M 152.37364,111.68732 C 152.37364,109.96132 150.97464,108.56232 149.24864,108.56232 C 147.52264,108.56232 146.12364,109.96132 146.12364,111.68732 C 146.12364,113.41332 147.52264,114.81232 149.24864,114.81232 C 150.97464,114.81232 152.37364,113.41332 152.37364,111.68732 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      i:knockout="Off"
      d="M 116.45312,76.639531 C 116.45312,74.913531 115.05412,73.514531 113.32812,73.514531 C 111.60212,73.514531 110.20312,74.913531 110.20312,76.639531 C 110.20312,78.365531 111.60212,79.764531 113.32812,79.764531 C 115.05412,79.764531 116.45312,78.365531 116.45312,76.639531 z "
      id="path18097"
-     style="fill:#e86060" /><path
      style="fill:#e86060"
-     id="path18101"
-     d="M 116.2105,40.246556 C 116.2105,38.520556 114.8115,37.121556 113.0855,37.121556 C 111.3595,37.121556 109.9605,38.520556 109.9605,40.246556 C 109.9605,41.972556 111.3595,43.371556 113.0855,43.371556 C 114.8115,43.371556 116.2105,41.972556 116.2105,40.246556 z "
-     i:knockout="Off" /><path
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      i:knockout="Off"
      d="M 125.32752,165.8545 C 125.32752,164.1285 123.92852,162.7295 122.20252,162.7295 C 120.47652,162.7295 119.07752,164.1285 119.07752,165.8545 C 119.07752,167.5805 120.47652,168.9795 122.20252,168.9795 C 123.92852,168.9795 125.32752,167.5805 125.32752,165.8545 z "
      id="path24996"
-     style="fill:#e86060" /><path
+     style="fill:#e86060"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#e86060"
      id="path24998"
      d="M 125.32752,174.30059 C 125.32752,172.57459 123.92852,171.17559 122.20252,171.17559 C 120.47652,171.17559 119.07752,172.57459 119.07752,174.30059 C 119.07752,176.02659 120.47652,177.42559 122.20252,177.42559 C 123.92852,177.42559 125.32752,176.02659 125.32752,174.30059 z "
-     i:knockout="Off" /></g><g
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
+     i:knockout="Off"
+     d="M 98.254794,102.66912 C 98.254794,100.94312 96.855794,99.544123 95.129794,99.544123 C 93.403794,99.544123 92.004794,100.94312 92.004794,102.66912 C 92.004794,104.39512 93.403794,105.79412 95.129794,105.79412 C 96.855794,105.79412 98.254794,104.39512 98.254794,102.66912 z "
+     id="path2011"
+     style="fill:#e86060"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
+     i:knockout="Off"
+     d="M 116.00201,85.307714 C 116.00201,83.581714 114.60301,82.182714 112.87701,82.182714 C 111.15101,82.182714 109.75201,83.581714 109.75201,85.307714 C 109.75201,87.033714 111.15101,88.432714 112.87701,88.432714 C 114.60301,88.432714 116.00201,87.033714 116.00201,85.307714 z "
+     id="path2019"
+     style="fill:#e86060"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
+     style="fill:#e86060"
+     id="path2021"
+     d="M 98.254794,93.795511 C 98.254794,92.069511 96.855794,90.670514 95.129794,90.670514 C 93.403794,90.670514 92.004794,92.069511 92.004794,93.795511 C 92.004794,95.521511 93.403794,96.920511 95.129794,96.920511 C 96.855794,96.920511 98.254794,95.521511 98.254794,93.795511 z "
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
+     i:knockout="Off"
+     d="M 178.88889,49.041662 C 178.88889,47.315662 177.48989,45.916662 175.76389,45.916662 C 174.03789,45.916662 172.63889,47.315662 172.63889,49.041662 C 172.63889,50.767662 174.03789,52.166662 175.76389,52.166662 C 177.48989,52.166662 178.88889,50.767662 178.88889,49.041662 z "
+     id="path2023"
+     style="fill:#e86060"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
+     style="fill:#e86060"
+     id="path2031"
+     d="M 178.50308,40.168053 C 178.50308,38.442053 177.19044,37.043053 175.57099,37.043053 C 173.95153,37.043053 172.63889,38.442053 172.63889,40.168053 C 172.63889,41.894053 173.95153,43.293053 175.57099,43.293053 C 177.19044,43.293053 178.50308,41.894053 178.50308,40.168053 z "
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /></g><g
    inkscape:groupmode="layer"
    id="layer1"
    inkscape:label="Components"
-   style="display:inline"
-   sodipodi:insensitive="true"><g
+   style="display:inline"><g
      id="g1250"
-     transform="translate(36.49429,-35.18713)">
+     transform="translate(36.49429,-35.18713)"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37">
 			<path
    style="opacity:0.5"
    id="path1252"
@@ -4538,80 +4763,137 @@
      style="fill:#b2add2"
      id="path1256"
      d="M 139.82732,59.84387 L 143.67732,59.84387 L 143.67732,57.55787 L 139.82732,57.55787 L 139.82732,59.84387 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#b2add2"
      id="path1258"
      d="M 139.82732,68.843871 L 143.67732,68.843871 L 143.67732,66.557871 L 139.82732,66.557871 L 139.82732,68.843871 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#b2add2"
      id="path1260"
      d="M 139.82732,77.843871 L 143.67732,77.843871 L 143.67732,75.557871 L 139.82732,75.557871 L 139.82732,77.843871 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#b2add2"
      id="path1262"
      d="M 139.82732,86.843871 L 143.67732,86.843871 L 143.67732,84.557871 L 139.82732,84.557871 L 139.82732,86.843871 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#b2add2"
      id="path1264"
      d="M 139.82732,23.843872 L 143.67732,23.843872 L 143.67732,21.557872 L 139.82732,21.557872 L 139.82732,23.843872 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#b2add2"
      id="path1266"
      d="M 139.82732,32.843872 L 143.67732,32.843872 L 143.67732,30.557872 L 139.82732,30.557872 L 139.82732,32.843872 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#b2add2"
      id="path1268"
      d="M 139.82732,41.843872 L 143.67732,41.843872 L 143.67732,39.557872 L 139.82732,39.557872 L 139.82732,41.843872 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#b2add2"
      id="path1270"
      d="M 139.82732,50.84387 L 143.67732,50.84387 L 143.67732,48.55787 L 139.82732,48.55787 L 139.82732,50.84387 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#b2add2"
      id="path1272"
      d="M 163.07732,59.92687 L 166.92732,59.92687 L 166.92732,57.64087 L 163.07732,57.64087 L 163.07732,59.92687 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#b2add2"
      id="path1274"
      d="M 163.07732,68.926871 L 166.92732,68.926871 L 166.92732,66.640871 L 163.07732,66.640871 L 163.07732,68.926871 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#b2add2"
      id="path1276"
      d="M 163.07732,77.926871 L 166.92732,77.926871 L 166.92732,75.640871 L 163.07732,75.640871 L 163.07732,77.926871 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#b2add2"
      id="path1278"
      d="M 163.07732,86.926871 L 166.92732,86.926871 L 166.92732,84.640871 L 163.07732,84.640871 L 163.07732,86.926871 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#b2add2"
      id="path1280"
      d="M 139.82732,95.370871 L 143.67732,95.370871 L 143.67732,93.084871 L 139.82732,93.084871 L 139.82732,95.370871 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#b2add2"
      id="path1282"
      d="M 163.07732,95.453871 L 166.92732,95.453871 L 166.92732,93.167871 L 163.07732,93.167871 L 163.07732,95.453871 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#b2add2"
      id="path1284"
      d="M 163.07732,23.926872 L 166.92732,23.926872 L 166.92732,21.640872 L 163.07732,21.640872 L 163.07732,23.926872 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#b2add2"
      id="path1286"
      d="M 163.07732,32.926872 L 166.92732,32.926872 L 166.92732,30.640872 L 163.07732,30.640872 L 163.07732,32.926872 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#b2add2"
      id="path1288"
      d="M 163.07732,41.926872 L 166.92732,41.926872 L 166.92732,39.640872 L 163.07732,39.640872 L 163.07732,41.926872 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#b2add2"
      id="path1290"
      d="M 163.07732,50.92687 L 166.92732,50.92687 L 166.92732,48.64087 L 163.07732,48.64087 L 163.07732,50.92687 z "
-     i:knockout="Off" /><switch
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><switch
      id="switch1292"
      i:objectType="pointText"
      i:objectNS="http://ns.adobe.com/Flows/1.0/"
      i:knockout="Off"
-     transform="translate(36.49429,-35.18713)">
+     transform="translate(36.49429,-35.18713)"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37">
 			<foreignObject
    id="foreignObject1294"
    overflow="visible"
@@ -4653,9 +4935,14 @@
 
 
 
+
+
 		</switch><g
      id="g4110"
-     transform="translate(-44.78738,8.794613)"><g
+     transform="translate(-44.78738,8.794613)"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37"><g
        transform="matrix(1,0,0,0.879576,18.54043,43.3471)"
        id="g1301">
 				<path
@@ -4779,45 +5066,53 @@
 
 
 
+
+
 		</switch></g><path
      style="fill:#c52890"
      id="path1352"
      d="M 114.01805,59.412687 L 112.11905,59.412687 L 112.11905,3.3296489 L 114.01805,3.3296489 L 114.01805,59.412687 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="opacity:0.5;fill:#3ca537"
      id="path1360"
-     d="M 90.736935,62.489907 L 81.736935,62.489907 L 81.736935,36.460386 L 90.736935,36.460386 L 90.736935,62.489907 z "
-     i:knockout="Off" /><path
+     d="M 91.122744,106.85795 L 82.122744,106.85795 L 82.122744,80.828429 L 91.122744,80.828429 L 91.122744,106.85795 z "
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="opacity:0.5;fill:#3ca537"
      id="path1366"
      d="M 90.784089,16.742105 L 81.784089,16.742105 L 81.784089,-17.632901 L 90.784089,-17.632901 L 90.784089,16.742105 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="opacity:0.5;fill:#3ca537"
      id="path1368"
      d="M 180.30145,16.868726 L 171.30145,16.868726 L 171.30145,-19.131274 L 180.30145,-19.131274 L 180.30145,16.868726 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:none;stroke:#c5288b;stroke-width:2"
      id="path1377"
      d="M 113.16132,-12.899128 C 113.16132,-12.899128 118.09299,-7.3478011 117.52364,40.630386 C 117.32575,57.30629 122.16132,76.767871 122.16132,76.767871"
      i:knockout="Off"
-     sodipodi:nodetypes="csc" /><path
-     style="fill:#b2add2"
-     id="path1387"
-     d="M 96.403931,40.928138 L 94.268931,40.928138 L 94.268931,36.437518 L 96.403931,36.437518 L 96.403931,40.928138 z "
-     i:knockout="Off" /><path
-     style="fill:#b2add2"
-     id="path1393"
-     d="M 96.403931,16.652518 L 94.268931,16.652518 L 94.268931,13.344378 L 96.403931,13.344378 L 96.403931,16.652518 z "
-     i:knockout="Off" /><path
-     style="opacity:0.5;fill:#95561d"
-     id="path1401"
-     d="M 98.403931,36.618518 L 92.403931,36.618518 L 92.403931,16.618518 L 98.403931,16.618518 L 98.403931,36.618518 z "
-     i:knockout="Off" /><switch
+     sodipodi:nodetypes="csc"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><switch
      id="switch1411"
      i:objectType="pointText"
      i:objectNS="http://ns.adobe.com/Flows/1.0/"
      i:knockout="Off"
-     transform="translate(36.49429,-35.18713)">
+     transform="translate(36.49429,-35.18713)"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37">
 			<foreignObject
    id="foreignObject1413"
    overflow="visible"
@@ -4857,12 +5152,17 @@
 
 
 
+
+
 		</switch><switch
      id="switch1418"
      i:objectType="pointText"
      i:objectNS="http://ns.adobe.com/Flows/1.0/"
      i:knockout="Off"
-     transform="translate(-8.372857,-36.97528)">
+     transform="translate(-8.372857,-36.97528)"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37">
 			<foreignObject
    id="foreignObject1420"
    overflow="visible"
@@ -4902,12 +5202,17 @@
 
 
 
+
+
 		</switch><switch
      id="switch1425"
      i:objectType="pointText"
      i:objectNS="http://ns.adobe.com/Flows/1.0/"
      i:knockout="Off"
-     transform="translate(36.49429,-35.18713)">
+     transform="translate(36.49429,-35.18713)"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37">
 			<foreignObject
    id="foreignObject1427"
    overflow="visible"
@@ -4947,33 +5252,53 @@
 
 
 
+
+
 		</switch><path
      style="opacity:0.5;fill:#95561d"
      id="path1453"
      d="M 134.74432,22.766872 C 134.74432,24.699872 133.17732,26.266872 131.24432,26.266872 C 129.31132,26.266872 127.74432,24.699872 127.74432,22.766872 C 127.74432,20.833872 129.31132,19.266872 131.24432,19.266872 C 133.17732,19.266872 134.74432,20.833872 134.74432,22.766872 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#b2add2"
      id="path1455"
      d="M 132.16132,23.714872 L 130.02632,23.714872 L 130.02632,13.319249 L 132.16132,13.319249 L 132.16132,23.714872 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:none;stroke:#c62989;stroke-width:2.20000029;stroke-miterlimit:4;stroke-dasharray:none"
      id="path1492"
      d="M 131.49432,-12.566128 C 131.49432,-12.566128 127.3711,3.2598809 127.2051,15.953881 C 127.0391,28.647881 126.37708,25.391565 126.34278,48.33621 C 126.30396,74.314561 131.24532,85.740871 131.24532,85.740871"
      i:knockout="Off"
-     sodipodi:nodetypes="cssc" /><path
+     sodipodi:nodetypes="cssc"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="opacity:0.5;fill:#95561d;display:inline"
      id="path6568"
      d="M 125.66554,31.28287 C 125.66554,33.21587 124.09854,34.78287 122.16554,34.78287 C 120.23254,34.78287 118.66554,33.21587 118.66554,31.28287 C 118.66554,29.34987 120.23254,27.78287 122.16554,27.78287 C 124.09854,27.78287 125.66554,29.34987 125.66554,31.28287 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#b2add2;display:inline"
      id="path6570"
      d="M 123.08254,31.304365 L 120.94754,31.304365 L 120.94754,12.879035 L 123.08254,12.879035 L 123.08254,31.304365 z "
-     i:knockout="Off" /><switch
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><switch
      id="switch1464"
      i:objectType="pointText"
      i:objectNS="http://ns.adobe.com/Flows/1.0/"
      i:knockout="Off"
-     transform="translate(36.49429,-35.18713)">
+     transform="translate(36.49429,-35.18713)"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37">
 			<foreignObject
    id="foreignObject1466"
    overflow="visible"
@@ -5013,12 +5338,17 @@
 
 
 
+
+
 		</switch><switch
      id="switch1457"
      i:objectType="pointText"
      i:objectNS="http://ns.adobe.com/Flows/1.0/"
      i:knockout="Off"
-     transform="translate(36.49429,-35.18713)">
+     transform="translate(36.49429,-35.18713)"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37">
 			<foreignObject
    id="foreignObject1459"
    overflow="visible"
@@ -5058,114 +5388,780 @@
 
 
 
+
+
 		</switch><path
      i:knockout="Off"
      d="M 90.784089,35.240401 L 81.784089,35.240401 L 81.784089,17.961981 L 90.784089,17.961981 L 90.784089,35.240401 z "
      id="path3852"
-     style="opacity:0.5;fill:#3ca537" /><path
+     style="opacity:0.5;fill:#3ca537"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      i:knockout="Off"
      d="M 108.44818,80.443771 L 99.448183,80.443771 L 99.448183,54.414253 L 108.44818,54.414253 L 108.44818,80.443771 z "
      id="path18089"
-     style="opacity:0.5;fill:#3ca537" /><path
+     style="opacity:0.5;fill:#3ca537"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      i:knockout="Off"
      d="M 78.207443,76.835871 L 76.072443,76.835871 L 76.072443,54.148766 L 78.207443,54.148766 L 78.207443,76.835871 z "
      id="path18091"
-     style="fill:#b2add2" /><path
+     style="fill:#b2add2"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      i:knockout="Off"
      d="M 78.207443,34.363766 L 76.072443,34.363766 L 76.072443,13.101758 L 78.207443,13.101758 L 78.207443,34.363766 z "
      id="path18093"
-     style="fill:#b2add2" /><path
+     style="fill:#b2add2"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      i:knockout="Off"
      d="M 80.207443,54.329766 L 74.207443,54.329766 L 74.207443,34.329766 L 80.207443,34.329766 L 80.207443,54.329766 z "
      id="path18095"
-     style="opacity:0.5;fill:#95561d" /><path
+     style="opacity:0.5;fill:#95561d"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#c52890"
      id="path18103"
      d="M 131.97192,111.87887 L 130.07292,111.87887 L 130.07292,93.341611 L 131.97192,93.341611 L 131.97192,111.87887 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      sodipodi:nodetypes="csc"
      i:knockout="Off"
      d="M 175.67413,94.140409 C 171.43969,107.82091 133.33535,93.247805 134.76047,108.25703 C 135.38391,114.82308 130.82336,120.6768 130.82336,120.6768"
      id="path18107"
-     style="fill:none;stroke:#c5288b;stroke-width:2" /><path
+     style="fill:none;stroke:#c5288b;stroke-width:2"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:none;stroke:#c5288b;stroke-width:2"
      id="path18111"
      d="M 175.75198,67.331634 C 175.75041,67.331634 187.00927,85.672323 186.15029,97.329735 C 185.5929,104.89414 172.88719,106.06953 171.65917,111.86005 C 170.87231,115.57034 179.67977,117.08137 178.80669,121.70649 C 177.53706,128.43228 171.15547,124.20392 171.06485,137.32957 C 170.89967,161.57969 176.19997,165.94607 176.19997,165.94607"
      i:knockout="Off"
-     sodipodi:nodetypes="cssssc" /><path
+     sodipodi:nodetypes="cssssc"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      sodipodi:nodetypes="cssssc"
      i:knockout="Off"
      d="M 175.85118,75.673215 C 175.85118,75.673215 170.89853,81.161379 171.797,86.609958 C 172.60396,91.503532 183.42497,91.290343 175.64581,99.993572 C 168.95459,107.47963 138.36595,98.659513 137.87578,107.39774 C 137.20748,119.31138 134.83953,143.52249 133.14025,155.62806 C 131.75538,165.49379 130.92401,165.44998 130.92401,165.44998"
      id="path18113"
-     style="fill:none;stroke:#c5288b;stroke-width:2" /><path
+     style="fill:none;stroke:#c5288b;stroke-width:2"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:none;stroke:#c5288b;stroke-width:2"
      id="path18115"
      d="M 175.99458,85.4664 C 175.99458,85.4664 187.91154,96.953424 178.88778,101.22363 C 167.37707,106.67069 162.92829,112.09115 176.28307,121.21149"
      i:knockout="Off"
-     sodipodi:nodetypes="csc" /><path
+     sodipodi:nodetypes="csc"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      sodipodi:nodetypes="csssc"
      i:knockout="Off"
      d="M 121.90982,110.9804 C 124.51563,135.40988 120.45309,165.74855 130.34707,169.71483 C 137.89564,172.74089 134.04423,177.68382 140.82835,180.10971 C 145.80469,181.88916 155.59071,181.01511 161.44464,181.42913 C 172.6698,182.22304 175.55187,174.68708 175.55187,174.68708"
      id="path18117"
-     style="fill:none;stroke:#c5288b;stroke-width:2" /><path
+     style="fill:none;stroke:#c5288b;stroke-width:2"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:none;stroke:#c5288b;stroke-width:2"
      id="path18123"
      d="M 175.77142,156.83554 C 175.77142,156.83554 179.26996,161.47323 179.16327,172.27375 C 179.09721,178.8107 172.82242,186.78524 149.82632,184.68102 C 130.1155,182.87741 112.92929,174.9525 112.92929,174.9525"
      i:knockout="Off"
-     sodipodi:nodetypes="cssc" /><path
+     sodipodi:nodetypes="cssc"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      sodipodi:nodetypes="cssc"
      i:knockout="Off"
      d="M 176.01404,129.66212 C 176.01404,129.66212 177.66953,138.46162 179.25026,148.44464 C 180.72053,157.7301 182.45185,165.43366 182.40044,170.63842 C 182.29473,181.09888 175.954,183.76323 175.954,183.76323"
      id="path18125"
-     style="fill:none;stroke:#c5288b;stroke-width:2" /><path
+     style="fill:none;stroke:#c5288b;stroke-width:2"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      i:knockout="Off"
      d="M 81.211114,186.54839 L 72.211114,186.54839 L 72.211114,152.99766 L 81.211114,152.99766 L 81.211114,186.54839 z "
      id="path18127"
-     style="opacity:0.5;fill:#3ca537" /><path
+     style="opacity:0.5;fill:#3ca537"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      i:knockout="Off"
      d="M 131.82851,148.31077 L 129.92951,148.31077 L 129.92951,138.08288 L 131.82851,138.08288 L 131.82851,148.31077 z "
      id="path18129"
-     style="fill:#c52890" /><path
+     style="fill:#c52890"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#c52890"
      id="path18131"
      d="M 105.26236,166.08901 L 103.36336,166.08901 L 103.36336,129.22654 L 105.26236,129.22654 L 105.26236,166.08901 z "
-     i:knockout="Off" /><path
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="opacity:0.5;fill:#39b3c2;fill-opacity:1"
      d="M 89.35189,153.10474 C 90.742799,151.83617 98.556049,151.72855 99.784531,153.10474 C 100.93274,154.39099 101.18428,168.79849 99.784531,170.08813 C 98.355179,171.40263 90.44434,171.24432 89.35189,170.08813 C 88.20278,168.87199 87.9171,154.41331 89.35189,153.10474 z "
      id="rect19363"
-     sodipodi:nodetypes="ccccc" /><path
+     sodipodi:nodetypes="ccccc"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      sodipodi:nodetypes="ccccc"
      id="path24986"
      d="M 99.019197,170.73959 C 100.41011,169.47102 108.22336,169.3634 109.45185,170.73959 C 110.60007,172.02584 110.85161,186.43334 109.45185,187.72298 C 108.0225,189.03748 100.11165,188.87917 99.019197,187.72298 C 97.870087,186.50684 97.584407,172.04816 99.019197,170.73959 z "
-     style="opacity:0.5;fill:#39b3c2;fill-opacity:1" /><path
+     style="opacity:0.5;fill:#39b3c2;fill-opacity:1"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      sodipodi:nodetypes="ccccc"
      id="path24988"
      d="M 109.18683,117.26066 C 110.08639,115.99209 115.13951,115.88447 115.93402,117.26066 C 116.67662,118.54691 116.8393,132.95441 115.93402,134.24405 C 115.00961,135.55855 109.89336,135.40024 109.18683,134.24405 C 108.44366,133.02791 108.2589,118.56923 109.18683,117.26066 z "
-     style="opacity:0.5;fill:#39b3c2;fill-opacity:1" /><path
+     style="opacity:0.5;fill:#39b3c2;fill-opacity:1"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      i:knockout="Off"
      d="M 113.70634,116.12418 L 111.57134,116.12418 L 111.57134,111.63356 L 113.70634,111.63356 L 113.70634,116.12418 z "
      id="path24990"
-     style="fill:#b2add2" /><path
+     style="fill:#b2add2"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:#b2add2"
      id="path24992"
      d="M 113.70634,139.41568 L 111.57134,139.41568 L 111.57134,134.92506 L 113.70634,134.92506 L 113.70634,139.41568 z "
-     i:knockout="Off" /><path
      i:knockout="Off"
-     d="M 96.064182,139.37802 L 94.165182,139.37802 L 94.165182,57.676492 L 96.064182,57.676492 L 96.064182,139.37802 z "
-     id="path24994"
-     style="fill:#c52890" /><path
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      sodipodi:nodetypes="cssc"
      i:knockout="Off"
      d="M 104.34533,-4.5669437 C 109.74607,3.8942951 108.04754,23.98123 109.09732,48.116632 C 110.2861,75.448023 111.30448,90.204228 116.58538,111.35064 C 121.19523,129.80995 114.50484,166.21818 130.46544,174.03561"
      id="path25011"
-     style="fill:none;stroke:#c5288b;stroke-width:2" /><path
+     style="fill:none;stroke:#c5288b;stroke-width:2"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      sodipodi:nodetypes="csc"
      i:knockout="Off"
      d="M 167.19997,13.480865 C 167.19997,13.480865 171.42997,14.632818 173.02471,26.632279 C 175.16348,42.725314 176.28307,58.346294 176.28307,58.346294"
      id="path4135"
-     style="fill:none;stroke:#c5288b;stroke-width:2" /><path
+     style="fill:none;stroke:#c5288b;stroke-width:2"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
      style="fill:none;stroke:#c5288b;stroke-width:2"
      id="path4137"
      d="M 185.11493,58.105382 C 187.06929,65.597089 187.39057,79.778098 188.98531,91.777559 C 191.12408,107.87059 178.56316,106.5538 175.95735,112.09115"
      i:knockout="Off"
-     sodipodi:nodetypes="csc" /></g></svg>
+     sodipodi:nodetypes="csc"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
+     style="fill:#b2add2"
+     id="path2005"
+     d="M 68.948025,103.4567 L 66.813025,103.4567 L 66.813025,68.037892 L 68.948025,68.037892 L 68.948025,103.4567 z "
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
+     style="fill:#b2add2"
+     id="path2007"
+     d="M 68.948025,48.252892 L 66.813025,48.252892 L 66.813025,13.487566 L 68.948025,13.487566 L 68.948025,48.252892 z "
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
+     style="opacity:0.5;fill:#95561d"
+     id="path2009"
+     d="M 70.948025,68.218892 L 64.948025,68.218892 L 64.948025,48.218892 L 70.948025,48.218892 L 70.948025,68.218892 z "
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
+     style="fill:none;stroke:#c5288b;stroke-width:2"
+     id="path2013"
+     d="M 104.6989,85.627161 C 104.6989,85.627161 102.34917,100.70595 100.49261,112.6677 C 98.773288,123.74522 95.263169,138.59459 95.263169,138.59459"
+     i:knockout="Off"
+     sodipodi:nodetypes="csc"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
+     sodipodi:nodetypes="csc"
+     i:knockout="Off"
+     d="M 95.439485,57.848908 C 95.509585,61.706999 95.666526,66.349186 95.477097,69.842895 C 94.809244,82.16035 94.87736,85.738745 94.87736,85.738745"
+     id="path2015"
+     style="fill:none;stroke:#c5288b;stroke-width:2"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
+     i:knockout="Off"
+     d="M 198.43448,107.91967 L 189.43448,107.91967 L 189.43448,35.653614 L 198.43448,35.653614 L 198.43448,107.91967 z "
+     id="path2025"
+     style="opacity:0.5;fill:#3ca537"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
+     i:knockout="Off"
+     d="M 122.7125,103.39107 L 120.8135,103.39107 L 120.8135,93.72742 L 122.7125,93.72742 L 122.7125,103.39107 z "
+     id="path2027"
+     style="fill:#c52890"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
+     style="fill:none;stroke:#c5288b;stroke-width:2"
+     id="path2029"
+     d="M 86.180064,48.975299 C 86.180064,48.975299 87.052695,64.805949 81.587965,76.401648 C 76.329279,87.560136 77.130143,94.226544 77.130143,94.226544"
+     i:knockout="Off"
+     sodipodi:nodetypes="csc"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
+     sodipodi:nodetypes="csc"
+     i:knockout="Off"
+     d="M 193.82079,4.6072556 C 193.82079,4.6072556 192.93053,12.284947 192.31517,25.089042 C 191.68619,38.176575 185.15668,50.24431 185.15668,50.24431"
+     id="path2033"
+     style="fill:none;stroke:#c5288b;stroke-width:2"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
+     sodipodi:nodetypes="csc"
+     i:knockout="Off"
+     d="M 185.33299,-4.2663526 C 185.33299,-4.2663526 186.06973,7.7259635 185.3706,20.459332 C 184.75603,31.652625 185.15668,41.370704 185.15668,41.370704"
+     id="path2035"
+     style="fill:none;stroke:#c5288b;stroke-width:2"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><switch
+     transform="translate(-114.4704,135.0956)"
+     i:knockout="Off"
+     i:objectNS="http://ns.adobe.com/Flows/1.0/"
+     i:objectType="pointText"
+     id="switch26040"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37">
+			<foreignObject
+   requiredExtensions="http://ns.adobe.com/Flows/1.0/"
+   x="0"
+   y="0"
+   width="1"
+   height="1"
+   overflow="visible"
+   id="foreignObject26042">
+				<ns1:flowDef>
+					<ns1:region>
+						<ns1:path
+   d="M180.333,36.954" />
+					</ns1:region>
+					<ns1:flow
+   font-family="'Myriad-Roman'"
+   font-size="6"
+   text-align="center"
+   text-align-last="center">
+						<ns1:p><ns1:span>J2</ns1:span></ns1:p>
+					</ns1:flow>
+				</ns1:flowDef>
+				<x:targetRef
+   xlink:href="#XMLID_56_" />
+			</foreignObject>
+			<text
+   id="text26044"
+   transform="translate(177.6846,36.9541)"><tspan
+     x="0"
+     y="0"
+     font-size="6"
+     id="tspan26046"
+     style="font-size:6px;font-family:Myriad-Roman">J5</tspan></text>
+
+
+
+
+
+
+
+
+
+		</switch><switch
+     id="switch26048"
+     i:objectType="pointText"
+     i:objectNS="http://ns.adobe.com/Flows/1.0/"
+     i:knockout="Off"
+     transform="translate(-100.9671,72.20872)"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37">
+			<foreignObject
+   id="foreignObject26050"
+   overflow="visible"
+   height="1"
+   width="1"
+   y="0"
+   x="0"
+   requiredExtensions="http://ns.adobe.com/Flows/1.0/">
+				<ns1:flowDef>
+					<ns1:region>
+						<ns1:path
+   d="M180.333,36.954" />
+					</ns1:region>
+					<ns1:flow
+   text-align-last="center"
+   text-align="center"
+   font-size="6"
+   font-family="'Myriad-Roman'">
+						<ns1:p><ns1:span>J2</ns1:span></ns1:p>
+					</ns1:flow>
+				</ns1:flowDef>
+				<x:targetRef
+   xlink:href="#XMLID_56_" />
+			</foreignObject>
+			<text
+   transform="translate(177.6846,36.9541)"
+   id="text26052"><tspan
+     style="font-size:6px;font-family:Myriad-Roman"
+     id="tspan26054"
+     font-size="6"
+     y="0"
+     x="0">J3</tspan></text>
+
+
+
+
+
+
+
+
+
+		</switch><switch
+     transform="translate(-80.13341,15.49479)"
+     i:knockout="Off"
+     i:objectNS="http://ns.adobe.com/Flows/1.0/"
+     i:objectType="pointText"
+     id="switch26056"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37">
+			<foreignObject
+   requiredExtensions="http://ns.adobe.com/Flows/1.0/"
+   x="0"
+   y="0"
+   width="1"
+   height="1"
+   overflow="visible"
+   id="foreignObject26058">
+				<ns1:flowDef>
+					<ns1:region>
+						<ns1:path
+   d="M180.333,36.954" />
+					</ns1:region>
+					<ns1:flow
+   font-family="'Myriad-Roman'"
+   font-size="6"
+   text-align="center"
+   text-align-last="center">
+						<ns1:p><ns1:span>J2</ns1:span></ns1:p>
+					</ns1:flow>
+				</ns1:flowDef>
+				<x:targetRef
+   xlink:href="#XMLID_56_" />
+			</foreignObject>
+			<text
+   id="text26060"
+   transform="translate(177.6846,36.9541)"><tspan
+     x="0"
+     y="0"
+     font-size="6"
+     id="tspan26062"
+     style="font-size:6px;font-family:Myriad-Roman">J4</tspan></text>
+
+
+
+
+
+
+
+
+
+		</switch><switch
+     id="switch26064"
+     i:objectType="pointText"
+     i:objectNS="http://ns.adobe.com/Flows/1.0/"
+     i:knockout="Off"
+     transform="translate(22.49182,13.56575)"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37">
+			<foreignObject
+   id="foreignObject26066"
+   overflow="visible"
+   height="1"
+   width="1"
+   y="0"
+   x="0"
+   requiredExtensions="http://ns.adobe.com/Flows/1.0/">
+				<ns1:flowDef>
+					<ns1:region>
+						<ns1:path
+   d="M180.333,36.954" />
+					</ns1:region>
+					<ns1:flow
+   text-align-last="center"
+   text-align="center"
+   font-size="6"
+   font-family="'Myriad-Roman'">
+						<ns1:p><ns1:span>J2</ns1:span></ns1:p>
+					</ns1:flow>
+				</ns1:flowDef>
+				<x:targetRef
+   xlink:href="#XMLID_56_" />
+			</foreignObject>
+			<text
+   transform="translate(177.6846,36.9541)"
+   id="text26068"><tspan
+     style="font-size:6px;font-family:Myriad-Roman"
+     id="tspan26070"
+     font-size="6"
+     y="0"
+     x="0">J7</tspan></text>
+
+
+
+
+
+
+
+
+
+		</switch><switch
+     id="switch26072"
+     i:objectType="pointText"
+     i:objectNS="http://ns.adobe.com/Flows/1.0/"
+     i:knockout="Off"
+     transform="translate(-118.7143,27.84068)"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37">
+			<foreignObject
+   id="foreignObject26074"
+   overflow="visible"
+   height="1"
+   width="1"
+   y="0"
+   x="0"
+   requiredExtensions="http://ns.adobe.com/Flows/1.0/">
+				<ns1:flowDef>
+					<ns1:region>
+						<ns1:path
+   d="M180.333,36.954" />
+					</ns1:region>
+					<ns1:flow
+   text-align-last="center"
+   text-align="center"
+   font-size="6"
+   font-family="'Myriad-Roman'">
+						<ns1:p><ns1:span>J2</ns1:span></ns1:p>
+					</ns1:flow>
+				</ns1:flowDef>
+				<x:targetRef
+   xlink:href="#XMLID_56_" />
+			</foreignObject>
+			<text
+   transform="translate(177.6846,36.9541)"
+   id="text26076"><tspan
+     style="font-size:6px;font-family:Myriad-Roman"
+     id="tspan26078"
+     font-size="6"
+     y="0"
+     x="0">R3</tspan></text>
+
+
+
+
+
+
+
+
+
+		</switch><switch
+     transform="translate(-100.1955,9.707657)"
+     i:knockout="Off"
+     i:objectNS="http://ns.adobe.com/Flows/1.0/"
+     i:objectType="pointText"
+     id="switch26080"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37">
+			<foreignObject
+   requiredExtensions="http://ns.adobe.com/Flows/1.0/"
+   x="0"
+   y="0"
+   width="1"
+   height="1"
+   overflow="visible"
+   id="foreignObject26082">
+				<ns1:flowDef>
+					<ns1:region>
+						<ns1:path
+   d="M180.333,36.954" />
+					</ns1:region>
+					<ns1:flow
+   font-family="'Myriad-Roman'"
+   font-size="6"
+   text-align="center"
+   text-align-last="center">
+						<ns1:p><ns1:span>J2</ns1:span></ns1:p>
+					</ns1:flow>
+				</ns1:flowDef>
+				<x:targetRef
+   xlink:href="#XMLID_56_" />
+			</foreignObject>
+			<text
+   id="text26084"
+   transform="translate(177.6846,36.9541)"><tspan
+     x="0"
+     y="0"
+     font-size="6"
+     id="tspan26086"
+     style="font-size:6px;font-family:Myriad-Roman">R2</tspan></text>
+
+
+
+
+
+
+
+
+
+		</switch><switch
+     transform="translate(-72.0314,90.34175)"
+     i:knockout="Off"
+     i:objectNS="http://ns.adobe.com/Flows/1.0/"
+     i:objectType="pointText"
+     id="switch26088"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37">
+			<foreignObject
+   requiredExtensions="http://ns.adobe.com/Flows/1.0/"
+   x="0"
+   y="0"
+   width="1"
+   height="1"
+   overflow="visible"
+   id="foreignObject26090">
+				<ns1:flowDef>
+					<ns1:region>
+						<ns1:path
+   d="M180.333,36.954" />
+					</ns1:region>
+					<ns1:flow
+   font-family="'Myriad-Roman'"
+   font-size="6"
+   text-align="center"
+   text-align-last="center">
+						<ns1:p><ns1:span>J2</ns1:span></ns1:p>
+					</ns1:flow>
+				</ns1:flowDef>
+				<x:targetRef
+   xlink:href="#XMLID_56_" />
+			</foreignObject>
+			<text
+   id="text26092"
+   transform="translate(177.6846,36.9541)"><tspan
+     x="0"
+     y="0"
+     font-size="6"
+     id="tspan26094"
+     style="font-size:6px;font-family:Myriad-Roman">C3</tspan></text>
+
+
+
+
+
+
+
+
+
+		</switch><switch
+     id="switch26096"
+     i:objectType="pointText"
+     i:objectNS="http://ns.adobe.com/Flows/1.0/"
+     i:knockout="Off"
+     transform="translate(-91.32185,126.222)"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37">
+			<foreignObject
+   id="foreignObject26098"
+   overflow="visible"
+   height="1"
+   width="1"
+   y="0"
+   x="0"
+   requiredExtensions="http://ns.adobe.com/Flows/1.0/">
+				<ns1:flowDef>
+					<ns1:region>
+						<ns1:path
+   d="M180.333,36.954" />
+					</ns1:region>
+					<ns1:flow
+   text-align-last="center"
+   text-align="center"
+   font-size="6"
+   font-family="'Myriad-Roman'">
+						<ns1:p><ns1:span>J2</ns1:span></ns1:p>
+					</ns1:flow>
+				</ns1:flowDef>
+				<x:targetRef
+   xlink:href="#XMLID_56_" />
+			</foreignObject>
+			<text
+   transform="translate(177.6846,36.9541)"
+   id="text26100"><tspan
+     style="font-size:6px;font-family:Myriad-Roman"
+     id="tspan26102"
+     font-size="6"
+     y="0"
+     x="0">C1</tspan></text>
+
+
+
+
+
+
+
+
+
+		</switch><switch
+     transform="translate(-83.21986,144.355)"
+     i:knockout="Off"
+     i:objectNS="http://ns.adobe.com/Flows/1.0/"
+     i:objectType="pointText"
+     id="switch26104"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37">
+			<foreignObject
+   requiredExtensions="http://ns.adobe.com/Flows/1.0/"
+   x="0"
+   y="0"
+   width="1"
+   height="1"
+   overflow="visible"
+   id="foreignObject26106">
+				<ns1:flowDef>
+					<ns1:region>
+						<ns1:path
+   d="M180.333,36.954" />
+					</ns1:region>
+					<ns1:flow
+   font-family="'Myriad-Roman'"
+   font-size="6"
+   text-align="center"
+   text-align-last="center">
+						<ns1:p><ns1:span>J2</ns1:span></ns1:p>
+					</ns1:flow>
+				</ns1:flowDef>
+				<x:targetRef
+   xlink:href="#XMLID_56_" />
+			</foreignObject>
+			<text
+   id="text26108"
+   transform="translate(177.6846,36.9541)"><tspan
+     x="0"
+     y="0"
+     font-size="6"
+     id="tspan26110"
+     style="font-size:6px;font-family:Myriad-Roman">C2</tspan></text>
+
+
+
+
+
+
+
+
+
+		</switch><path
+     style="fill:#b2add2"
+     id="path26112"
+     d="M 95.95466,49.829236 L 93.81966,49.829236 L 93.81966,40.645448 L 95.95466,40.645448 L 95.95466,49.829236 z "
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
+     style="fill:#b2add2"
+     id="path26114"
+     d="M 95.95466,20.860448 L 93.81966,20.860448 L 93.81966,13.101757 L 95.95466,13.101757 L 95.95466,20.860448 z "
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><path
+     style="opacity:0.5;fill:#95561d"
+     id="path26116"
+     d="M 97.95466,40.826448 L 91.95466,40.826448 L 91.95466,20.826448 L 97.95466,20.826448 L 97.95466,40.826448 z "
+     i:knockout="Off"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37" /><switch
+     transform="translate(-82.83406,-7.653755)"
+     i:knockout="Off"
+     i:objectNS="http://ns.adobe.com/Flows/1.0/"
+     i:objectType="pointText"
+     id="switch26118"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/StepperStripboardTop_75440.png"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-ydpi="209.37">
+			<foreignObject
+   requiredExtensions="http://ns.adobe.com/Flows/1.0/"
+   x="0"
+   y="0"
+   width="1"
+   height="1"
+   overflow="visible"
+   id="foreignObject26120">
+				<ns1:flowDef>
+					<ns1:region>
+						<ns1:path
+   d="M180.333,36.954" />
+					</ns1:region>
+					<ns1:flow
+   font-family="'Myriad-Roman'"
+   font-size="6"
+   text-align="center"
+   text-align-last="center">
+						<ns1:p><ns1:span>J2</ns1:span></ns1:p>
+					</ns1:flow>
+				</ns1:flowDef>
+				<x:targetRef
+   xlink:href="#XMLID_56_" />
+			</foreignObject>
+			<text
+   id="text26122"
+   transform="translate(177.6846,36.9541)"><tspan
+     x="0"
+     y="0"
+     font-size="6"
+     id="tspan26124"
+     style="font-size:6px;font-family:Myriad-Roman">R5</tspan></text>
+
+
+
+
+
+
+
+
+
+		</switch></g></svg>
