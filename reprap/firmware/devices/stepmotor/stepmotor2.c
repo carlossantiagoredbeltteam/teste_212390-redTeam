@@ -49,12 +49,19 @@
 //   B0 - Min optointerrupter (optional)
 //   B1 - UART Receive
 //   B2 - UART Transmit
-//   B3 - Max optointerrupter (optional)
+//   B3 - PWM output for motor current control
 //   B4-B7 - Stepper motor connections
 //   A2 - Sync A input/output (optional)
 //   A3 - Sync B input/output (optional)
+//   A5 - Max optointerrupter (optional)
 
+#define HALFSTEP
+
+#ifdef HALFSTEP
 #define stepCount 8
+#else
+#define stepCount 4
+#endif
 
 typedef union {
   int ival;
@@ -78,6 +85,7 @@ volatile static byte coilPosition = 0;
 #define CMD_FORWARD1  12
 #define CMD_BACKWARD1 13
 #define CMD_SETPOWER  14
+#define CMD_GETSENSOR 15
 
 enum functions {
   func_idle,
@@ -126,6 +134,7 @@ void init2()
   maxPosition.bytes[1] = 0;
 }
 
+#ifdef HALFSTEP
 byte stepValue()
 {
   // The low bits are set to ensure pullups are enabled for those ports
@@ -149,6 +158,23 @@ byte stepValue()
   }
   return 0;
 }
+#else
+byte stepValue()
+{
+  // The low bits are set to ensure pullups are enabled for those ports
+  switch(coilPosition) {
+  case 0:
+    return BIN(00010000) | PULLUPS;
+  case 1:
+    return BIN(00100000) | PULLUPS;
+  case 2:
+    return BIN(01000000) | PULLUPS;
+  case 3:
+    return BIN(10000000) | PULLUPS;
+  }
+  return 0;
+}
+#endif
 
 #pragma save
 #pragma nooverlay
@@ -462,6 +488,14 @@ void processCommand()
     PR2 = buffer[3];
     // Store low 2 bits and turn on PWM
     CCP1CON = buffer[1];
+    break;
+
+  case CMD_GETSENSOR:
+    sendReply();
+    sendDataByte(CMD_GETSENSOR);
+    sendDataByte(PORTA);
+    sendDataByte(PORTB);
+    endMessage();
     break;
 
   }
