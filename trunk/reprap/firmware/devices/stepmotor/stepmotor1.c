@@ -86,10 +86,10 @@ void init1()
   TMR1IE = 0;
 
   TMR2 = 0;
-  CCP1CON = BIN(00111100);   // PWM mode
+  CCPR1L = 6;
+  PR2 = 16;
+  CCP1CON = BIN(00001100);   // PWM mode
   T2CON = BIN(00000100);     // Start timer 1:1 prescale, 1:1 postscale
-  CCPR1L = 193;
-  PR2 = 192;
 
   T1CON = BIN(00000000);  // Timer 1 in clock mode with 1:1 scale
   TMR1IE = 1;  // Enable timer interrupt
