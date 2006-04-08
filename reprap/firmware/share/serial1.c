@@ -513,6 +513,7 @@ void uartTransmit(byte c)
   //TXREG = c;
 
   byte newTail;
+
   transmitBuffer[transmitBufferTail] = c;
   
   newTail = transmitBufferTail + 1;
@@ -555,6 +556,9 @@ void releaseLock()
   processingLock = 0;
 
   /// @todo If sending is in progress or waiting for ACK, block.
+_asm  /// @todo Remove when sdcc bug fixed
+  BANKSEL _uartState;
+_endasm;
 }
 
 //===========================================================================//
@@ -613,7 +617,7 @@ void endMessage()
   }
 
   interruptEnabledState = GIE;
-  if (!interruptEnabledState) // note side effect
+  if (!interruptEnabledState)
     GIE = 0;
   // Send the message
   uartTransmit(SNAP_SYNC);
