@@ -86,7 +86,7 @@ void init1()
   TMR1IE = 0;
 
   TMR2 = 0;
-  CCPR1L = 6;
+  CCPR1L = 4;  // Default power-up current limiting (25%)
   PR2 = 16;
   CCP1CON = BIN(00001100);   // PWM mode
   T2CON = BIN(00000100);     // Start timer 1:1 prescale, 1:1 postscale

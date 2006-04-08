@@ -484,10 +484,13 @@ void processCommand()
     break;
 
   case CMD_SETPOWER:
-    CCPR1L = buffer[2];
-    PR2 = buffer[3];
+    // This is a value from 0 to 63 (6 bits)
+    // The low two bits are stored in CCP1CON, and the remaining
+    // four bits in CCPR1L
+    CCPR1L = buffer[1] >> 2;
+    PR2 = 16;  // The maximum range
     // Store low 2 bits and turn on PWM
-    CCP1CON = buffer[1];
+    CCP1CON = BIN(1100) | ((buffer[1] & BIN(11)) << 4);
     break;
 
   case CMD_GETSENSOR:
