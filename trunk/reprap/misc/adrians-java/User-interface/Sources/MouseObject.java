@@ -63,7 +63,6 @@ import com.sun.j3d.utils.behaviors.mouse.MouseTranslate;
 
 //************************************************************************
 
-
 public class MouseObject
 {
     private BranchGroup top = null;        // Attach this to the rest of the tree
