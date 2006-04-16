@@ -6,7 +6,7 @@ RepRap
 The Replicating Rapid Prototyper Project
  
  
-Copyright (C) 2005
+Copyright (C) 2006
 Adrian Bowyer & The University of Bath
  
 http://reprap.org
