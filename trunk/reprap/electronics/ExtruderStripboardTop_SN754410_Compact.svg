@@ -665,11 +665,11 @@
    bordercolor="#666666"
    pagecolor="#ffffff"
    id="base"
-   inkscape:zoom="1"
-   inkscape:cx="253.5834"
-   inkscape:cy="377.98656"
-   inkscape:window-x="0"
-   inkscape:window-y="9"
+   inkscape:zoom="2.802589"
+   inkscape:cx="219.5"
+   inkscape:cy="474"
+   inkscape:window-x="-3"
+   inkscape:window-y="0"
    inkscape:current-layer="layer4"
    showgrid="false" />
 	<metadata
@@ -758,6 +758,7 @@
 
 
 
+
 		</switch><switch
    id="switch931"
    i:objectType="pointText"
@@ -799,6 +800,7 @@
      font-size="8"
      y="0"
      x="0">Bottom edge</tspan></text>
+
 
 
 
@@ -880,6 +882,7 @@
 
 
 
+
 		</switch><switch
    id="switch945"
    i:objectType="pointText"
@@ -922,6 +925,7 @@
      font-size="8"
      y="0"
      x="0">Right edge</tspan></text>
+
 
 
 
@@ -1087,6 +1091,7 @@
 
 
 
+
 		</switch><switch
      id="switch838"
      i:objectType="pointText"
@@ -1128,6 +1133,7 @@
      font-size="6"
      y="0"
      x="0">= component inserted into this hole</tspan></text>
+
 
 
 
@@ -1209,6 +1215,7 @@
 
 
 
+
 		</switch><g
      id="g852"
      transform="translate(16.71194,-32.13658)"
@@ -1266,6 +1273,7 @@
      font-size="6"
      y="0"
      x="0">= connector</tspan></text>
+
 
 
 
@@ -1371,6 +1379,7 @@
      font-size="6"
      y="110.1252"
      x="67.282738">+</tspan></text>
+
 
 
 
@@ -4314,6 +4323,7 @@
 
 
 
+
 			</switch>
 			<switch
    id="switch962"
@@ -4353,6 +4363,7 @@
      font-size="5"
      y="0"
      x="0">B</tspan></text>
+
 
 
 
@@ -4432,6 +4443,7 @@
 
 
 
+
 			</switch>
 			<switch
    id="switch976"
@@ -4471,6 +4483,7 @@
      font-size="5"
      y="0"
      x="0">D</tspan></text>
+
 
 
 
@@ -4550,6 +4563,7 @@
 
 
 
+
 			</switch>
 			<switch
    id="switch990"
@@ -4589,6 +4603,7 @@
      font-size="5"
      y="0"
      x="0">F</tspan></text>
+
 
 
 
@@ -4668,6 +4683,7 @@
 
 
 
+
 			</switch>
 			<switch
    id="switch1004"
@@ -4707,6 +4723,7 @@
      font-size="5"
      y="0"
      x="0">H</tspan></text>
+
 
 
 
@@ -4786,6 +4803,7 @@
 
 
 
+
 			</switch>
 			<switch
    id="switch1018"
@@ -4825,6 +4843,7 @@
      font-size="5"
      y="0"
      x="0">J</tspan></text>
+
 
 
 
@@ -4904,6 +4923,7 @@
 
 
 
+
 			</switch>
 			<switch
    id="switch1032"
@@ -4943,6 +4963,7 @@
      font-size="5"
      y="0"
      x="0">L</tspan></text>
+
 
 
 
@@ -5026,6 +5047,7 @@
 
 
 
+
 		</switch><switch
      id="switch1046"
      i:objectType="pointText"
@@ -5068,6 +5090,7 @@
      font-size="5"
      y="0"
      x="0">2</tspan></text>
+
 
 
 
@@ -5150,6 +5173,7 @@
 
 
 
+
 		</switch><switch
      id="switch1060"
      i:objectType="pointText"
@@ -5192,6 +5216,7 @@
      font-size="5"
      y="0"
      x="0">4</tspan></text>
+
 
 
 
@@ -5274,6 +5299,7 @@
 
 
 
+
 		</switch><switch
      id="switch1074"
      i:objectType="pointText"
@@ -5316,6 +5342,7 @@
      font-size="5"
      y="0"
      x="0">6</tspan></text>
+
 
 
 
@@ -5398,6 +5425,7 @@
 
 
 
+
 		</switch><switch
      id="switch1088"
      i:objectType="pointText"
@@ -5440,6 +5468,7 @@
      font-size="5"
      y="0"
      x="0">8</tspan></text>
+
 
 
 
@@ -5522,6 +5551,7 @@
 
 
 
+
 		</switch><switch
      id="switch1102"
      i:objectType="pointText"
@@ -5564,6 +5594,7 @@
      font-size="5"
      y="0"
      x="0">10</tspan></text>
+
 
 
 
@@ -5646,6 +5677,7 @@
 
 
 
+
 		</switch><switch
      id="switch1116"
      i:objectType="pointText"
@@ -5688,6 +5720,7 @@
      font-size="5"
      y="0"
      x="0">12</tspan></text>
+
 
 
 
@@ -5770,6 +5803,7 @@
 
 
 
+
 		</switch><switch
      id="switch1130"
      i:objectType="pointText"
@@ -5812,6 +5846,7 @@
      font-size="5"
      y="0"
      x="0">14</tspan></text>
+
 
 
 
@@ -5894,6 +5929,7 @@
 
 
 
+
 		</switch><switch
      id="switch1144"
      i:objectType="pointText"
@@ -5936,6 +5972,7 @@
      font-size="5"
      y="0"
      x="0">16</tspan></text>
+
 
 
 
@@ -6018,6 +6055,7 @@
 
 
 
+
 		</switch><switch
      id="switch1228"
      i:objectType="pointText"
@@ -6060,6 +6098,7 @@
      font-size="5"
      y="0"
      x="0">M</tspan></text>
+
 
 
 
@@ -6142,6 +6181,7 @@
 
 
 
+
 		</switch><switch
      id="switch1242"
      i:objectType="pointText"
@@ -6184,6 +6224,7 @@
      font-size="5"
      y="0"
      x="0">O</tspan></text>
+
 
 
 
@@ -6266,6 +6307,7 @@
 
 
 
+
 			</switch><switch
      i:knockout="Off"
      i:objectNS="http://ns.adobe.com/Flows/1.0/"
@@ -6308,6 +6350,7 @@
      font-size="5"
      id="tspan8743"
      style="font-size:5px;fill:#2289bd;font-family:Myriad-Roman">Q</tspan></text>
+
 
 
 
@@ -6390,6 +6433,7 @@
 
 
 
+
 			</switch><switch
      i:knockout="Off"
      i:objectNS="http://ns.adobe.com/Flows/1.0/"
@@ -6432,6 +6476,7 @@
      font-size="5"
      id="tspan8759"
      style="font-size:5px;fill:#2289bd;font-family:Myriad-Roman">S</tspan></text>
+
 
 
 
@@ -6514,6 +6559,7 @@
 
 
 
+
 			</switch><switch
      i:knockout="Off"
      i:objectNS="http://ns.adobe.com/Flows/1.0/"
@@ -6576,6 +6622,7 @@
 
 
 
+
 			</switch><switch
      i:knockout="Off"
      i:objectNS="http://ns.adobe.com/Flows/1.0/"
@@ -6618,6 +6665,7 @@
      font-size="5"
      id="tspan8783"
      style="font-size:5px;fill:#2289bd;font-family:Myriad-Roman">V</tspan></text>
+
 
 
 
@@ -6757,7 +6805,7 @@
      inkscape:export-ydpi="209.37" /><path
      style="fill:#e86060;display:inline"
      id="path5454"
-     d="M 107.20181,40.228374 C 107.20181,38.502374 105.80281,37.103374 104.07681,37.103374 C 102.35081,37.103374 100.95181,38.502374 100.95181,40.228374 C 100.95181,41.954374 102.35081,43.353374 104.07681,43.353374 C 105.80281,43.353374 107.20181,41.954374 107.20181,40.228374 z "
+     d="M 107.40058,40.228374 C 107.40058,38.502374 105.91259,37.103374 104.07681,37.103374 C 102.24103,37.103374 100.75304,38.502374 100.75304,40.228374 C 100.75304,41.954374 102.24103,43.353374 104.07681,43.353374 C 105.91259,43.353374 107.40058,41.954374 107.40058,40.228374 z "
      i:knockout="Off"
      inkscape:export-filename="/home/sai/work/reprap/electronics/Extruder_compact.png"
      inkscape:export-xdpi="209.37"
@@ -6824,11 +6872,19 @@
      style="fill:#e86060;display:inline"
      inkscape:export-filename="/home/sai/work/reprap/electronics/Extruder_compact.png"
      inkscape:export-xdpi="209.37"
-     inkscape:export-ydpi="209.37" /></g><g
+     inkscape:export-ydpi="209.37" /><path
+     inkscape:export-ydpi="209.37"
+     inkscape:export-xdpi="209.37"
+     inkscape:export-filename="/home/sai/work/reprap/electronics/Extruder_compact.png"
+     i:knockout="Off"
+     d="M 107.40058,57.322414 C 107.40058,55.596414 105.91259,54.197414 104.07681,54.197414 C 102.24103,54.197414 100.75304,55.596414 100.75304,57.322414 C 100.75304,59.048414 102.24103,60.447414 104.07681,60.447414 C 105.91259,60.447414 107.40058,59.048414 107.40058,57.322414 z "
+     id="path2102"
+     style="fill:#e86060;display:inline" /></g><g
    inkscape:groupmode="layer"
    id="layer1"
    inkscape:label="Components"
-   style="display:inline"><g
+   style="display:inline"
+   sodipodi:insensitive="true"><g
    id="g1250"
    transform="translate(18.05347,-89.89206)"
    inkscape:export-filename="/home/sai/work/reprap/electronics/Extruder_compact.png"
@@ -7033,6 +7089,7 @@
 
 
 
+
 		</switch><path
    style="fill:#c52890"
    id="path1354"
@@ -7136,6 +7193,7 @@
 
 
 
+
 		</switch><switch
    id="switch1418"
    i:objectType="pointText"
@@ -7177,6 +7235,7 @@
      font-size="6"
      y="0"
      x="0">J2</tspan></text>
+
 
 
 
@@ -7258,6 +7317,7 @@
 
 
 
+
 		</switch><switch
    id="switch1439"
    i:objectType="pointText"
@@ -7319,6 +7379,7 @@
 
 
 
+
 		</switch><switch
    id="switch1446"
    i:objectType="pointText"
@@ -7360,6 +7421,7 @@
      font-size="6"
      y="0"
      x="0">J7</tspan></text>
+
 
 
 
@@ -7570,6 +7632,7 @@
 
 
 
+
 		</switch><path
    style="fill:#c52890;display:inline"
    id="path2615"
@@ -7617,6 +7680,7 @@
      font-size="6"
      id="tspan1348"
      style="font-size:6px;fill:#ffffff;font-family:Myriad-Roman">U2: SN7554410</tspan></text>
+
 
 
 
@@ -7721,6 +7785,7 @@
 
 
 
+
 		</switch><path
    style="fill:#c52890;display:inline"
    id="path4724"
@@ -7803,6 +7868,7 @@
 
 
 
+
 		</switch><g
    id="g7904"
    transform="translate(-35.72419,8.520962e-15)"
@@ -7862,6 +7928,7 @@
      font-size="6"
      y="0"
      x="0">R3</tspan></text>
+
 
 
 
@@ -7965,6 +8032,7 @@
 
 
 
+
 		</switch><g
    id="g4394"
    transform="matrix(1,0,0,-1,-26.69279,-55.12376)"
@@ -8025,6 +8093,7 @@
      y="0"
      x="0"
      id="tspan6271" /></text>
+
 
 
 
@@ -8126,6 +8195,7 @@
 
 
 
+
 		</switch></g><switch
    style="display:inline"
    id="switch4857"
@@ -8168,6 +8238,7 @@
      font-size="6"
      y="0"
      x="0">T1</tspan></text>
+
 
 
 
@@ -8249,6 +8320,7 @@
 
 
 
+
 		</switch><path
    sodipodi:nodetypes="cc"
    i:knockout="Off"
@@ -8307,6 +8379,7 @@
      font-size="6"
      y="0"
      x="0">C1</tspan></text>
+
 
 
 
