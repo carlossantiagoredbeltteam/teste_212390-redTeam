@@ -111,18 +111,22 @@ void init2()
 void setSpeed(byte speed, byte direction)
 {
   if (speed == 0) {
-    PORTB = 0;
+    PORTB4 = 0;
+    PORTB5 = 0;
     // Also turn off PWM completely
-    CCP1M2 = 0;
-    CCP1M3 = 0;
+    CCP1CON = BIN(00110000);
   } else {
-    if (direction == 0)
-      PORTB = BIN(00010000);  // Set forward output enable
-    else
-      PORTB = BIN(00100000);  // Set reverse output enable
+    if (direction == 0) {
+      // Set forward output enable
+      PORTB5 = 0;
+      PORTB4 = 1;
+    } else {
+      // Set reverse output enable
+      PORTB4 = 0;
+      PORTB5 = 1;
+    }
     // Turn on PWM if it wasn't already
-    CCP1M2 = 1;
-    CCP1M3 = 1;
+    CCP1CON = BIN(00111100);
   }
   CCPR1L = speed;
   if (speed == 255)
@@ -144,7 +148,7 @@ void timerTick()
 
   if (lastTemperature >= temperatureLimit) {
     // Reached critical limit, so power off
-    PORTB = 0;
+    PORTB0 = 0;
   } else if (heatCounter >= requestedHeat && requestedHeat != 255) {
     // Heater off
     PORTB0 = 0;
@@ -191,7 +195,8 @@ void motorTick()
       
       if (seekSpeed != 0 && currentPosition.ival == seekPosition.ival) {
 	seekSpeed = 0;
-	PORTB = 0;
+	PORTB4 = 0;
+	PORTB5 = 0;
 	CCPR1L = 0;
       }
     }
