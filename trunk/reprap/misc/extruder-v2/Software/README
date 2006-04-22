@@ -13,6 +13,9 @@ http://reprap.org
 
 This software uses SDCC (http://sdcc.sourceforge.net/)
 
+You may need to edit the Makefile to set the right path to the SDCC
+library.  The place where this may be needed is commented in the file.
+
 Type "make" to make the file extruder.hex, then download that to the PIC using, 
 for example, gpicp (http://home.pacbell.net/theposts/picmicro/).
 

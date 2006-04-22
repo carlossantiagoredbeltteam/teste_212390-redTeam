@@ -6,8 +6,14 @@
 # see http://reprap.org
 #
 
+# You may need to change this line for your system:
+
+SDCCLIB=/usr/local/share/sdcc/lib/pic/
+
+
+
 extruder.hex:	obj/extruder.o
-	gplink -m -c -o extruder.hex obj/extruder.o lib/pic14.a
+	gplink -m -c -o extruder.hex obj/extruder.o  $(SDCCLIB)/libsdcc.lib
 
 obj/extruder.o:	asm/extruder.asm
 	gpasm -c -o obj/extruder.o asm/extruder.asm
