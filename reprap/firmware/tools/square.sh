@@ -8,7 +8,9 @@ export yaxis=3
 export slp=22
 # Ensure port is raw data friendly.
 stty -F $pokeDev -echo -cooked
-echo 3 0 0 | $poke
+echo 3 0 0 | $poke $xaxis
+echo 3 0 0 | $poke $yaxis
+
 while true; do
 	echo 5 200 0 6 | $poke $xaxis
 	sleep $slp
