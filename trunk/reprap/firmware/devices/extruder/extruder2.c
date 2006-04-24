@@ -146,7 +146,7 @@ void setSpeed(byte speed, byte direction)
 void timerTick()
 {
 
-  if (lastTemperature >= temperatureLimit) {
+  if (lastTemperature <= temperatureLimit) {
     // Reached critical limit, so power off
     PORTB0 = 0;
   } else if (heatCounter >= requestedHeat && requestedHeat != 255) {
@@ -420,7 +420,7 @@ void processCommand()
     break;
 
   case CMD_GETTEMP:
-    sendMessage(seekNotify);
+    sendReply();
     sendDataByte(CMD_GETTEMP);
     sendDataByte(lastTemperature);
     sendDataByte(lastTemperatureRef);
