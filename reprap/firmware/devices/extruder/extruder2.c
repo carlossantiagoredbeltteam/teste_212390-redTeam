@@ -69,20 +69,21 @@ typedef union {
 
 volatile static addressableInt currentPosition, seekPosition;
 
-#define CMD_VERSION   0
-#define CMD_FORWARD   1
-#define CMD_REVERSE   2
-#define CMD_SETPOS    3
-#define CMD_GETPOS    4
-#define CMD_SEEK      5
-#define CMD_FREE      6
-#define CMD_NOTIFY    7
-#define CMD_ISEMPTY   8
-#define CMD_SETHEAT   9
-#define CMD_GETTEMP   10
-#define CMD_PWMPERIOD 50
-#define CMD_PRESCALER 51
-#define CMD_SETVREF   52
+#define CMD_VERSION       0
+#define CMD_FORWARD       1
+#define CMD_REVERSE       2
+#define CMD_SETPOS        3
+#define CMD_GETPOS        4
+#define CMD_SEEK          5
+#define CMD_FREE          6
+#define CMD_NOTIFY        7
+#define CMD_ISEMPTY       8
+#define CMD_SETHEAT       9
+#define CMD_GETTEMP       10
+#define CMD_PWMPERIOD     50
+#define CMD_PRESCALER     51
+#define CMD_SETVREF       52
+#define CMD_SETTEMPSCALER 53
 
 #define HEATER_PWM_PERIOD 255
 
@@ -408,7 +409,7 @@ void processCommand()
     break;
 
   case CMD_ISEMPTY:
-    sendMessage(seekNotify);
+    sendReply();
     sendDataByte(CMD_ISEMPTY);
     sendDataByte(!PORTB6);
     endMessage();
@@ -435,14 +436,21 @@ void processCommand()
     break;
 
   case CMD_PRESCALER:
-    // Set timer prescaler
+    // Set timer prescaler (for PWM)
     T2CON = BIN(00000100) | (buffer[1] & 3);
     break;
 
   case CMD_SETVREF:
     temperatureVRef = buffer[1];
     break;
+
+  case CMD_SETTEMPSCALER:
+    OPTION_REG = (OPTION_REG & BIN(11111000)) | (buffer[1] & BIN(111));
+    break;
+
   }
+
+   
 
 }
 
