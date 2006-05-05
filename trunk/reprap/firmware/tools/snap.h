@@ -14,7 +14,10 @@ public:
   SNAP(const char *device, int sourceAddress, bool verbose);
   ~SNAP();
 
+  /// Read a single byte
   byte readbyte();
+
+  /// Send a single byte
   void sendbyte(byte c);
   SNAPPacket createPacket(int destAddr, int length = 0);
 
