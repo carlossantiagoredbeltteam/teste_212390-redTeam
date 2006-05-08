@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <termios.h>
+#include <sys/time.h>
 #include "snap.h"
 
 SNAP::SNAP(const char *device, int sourceAddress, bool verbose)
@@ -21,7 +22,8 @@ SNAP::SNAP(const char *device, int sourceAddress, bool verbose)
     perror("Get attr");
     exit(1);
   }
-  cfsetspeed(&terminfo, B19200);
+  cfsetispeed(&terminfo, B19200);
+  cfsetospeed(&terminfo, B19200);
   terminfo.c_cflag &= ~CRTSCTS;
   terminfo.c_cflag |= CLOCAL;
   terminfo.c_lflag &= ~(ICANON | ECHO);
