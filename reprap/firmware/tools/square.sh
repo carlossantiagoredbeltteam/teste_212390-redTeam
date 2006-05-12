@@ -5,19 +5,20 @@ export pokeDev=/dev/ttyUSB0
 export poke="./poke -t $pokeDev -v -d "
 export xaxis=2
 export yaxis=3
-export slp=22
+export slp=4.8
+export spd=220
 # Ensure port is raw data friendly.
 stty -F $pokeDev -echo -cooked
 echo 3 0 0 | $poke $xaxis
 echo 3 0 0 | $poke $yaxis
 
 while true; do
-	echo 5 200 0 6 | $poke $xaxis
+	echo 5 $spd 0 2 | $poke $xaxis
 	sleep $slp
-	echo 5 200 0 6 | $poke $yaxis
+	echo 5 $spd 0 2 | $poke $yaxis
 	sleep $slp
-	echo 5 200 0 0 | $poke $xaxis
+	echo 5 $spd 0 0 | $poke $xaxis
 	sleep $slp
-	echo 5 200 0 0 | $poke $yaxis
+	echo 5 $spd 0 0 | $poke $yaxis
 	sleep $slp
 done
