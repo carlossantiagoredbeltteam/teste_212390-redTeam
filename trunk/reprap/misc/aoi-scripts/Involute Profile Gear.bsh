@@ -242,7 +242,7 @@ double Ylast;
 
 for (int ii = 1; ii <= N; ii++)
   {
-print ("ii = " + ii );
+//print ("ii = " + ii );
   for (int i = 2; i <= ToothProfileLimit; i++)
     {
     RTheta = RectangularToCylindrical( ToothProfileX[i], ToothProfileY[i] );
