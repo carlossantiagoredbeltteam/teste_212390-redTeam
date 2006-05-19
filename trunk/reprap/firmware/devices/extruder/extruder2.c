@@ -115,7 +115,11 @@ void setSpeed(byte speed, byte direction)
     PORTB4 = 0;
     PORTB5 = 0;
     // Also turn off PWM completely
-    CCP1CON = BIN(00110000);
+    CCP1CON = BIN(00000000);
+    PR2 = 255;
+    PORTB3 = 0;
+    CCPR1L = 0;
+    return;
   } else {
     if (direction == 0) {
       // Set forward output enable
@@ -195,9 +199,14 @@ void motorTick()
 	currentPosition.ival++;
       
       if (seekSpeed != 0 && currentPosition.ival == seekPosition.ival) {
+	// Set speed to 0 and turn off motor
 	seekSpeed = 0;
 	PORTB4 = 0;
 	PORTB5 = 0;
+	// Also turn off PWM
+	CCP1CON = BIN(00000000);
+	PR2 = 255;
+	PORTB3 = 0;
 	CCPR1L = 0;
       }
     }
