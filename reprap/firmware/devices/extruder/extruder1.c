@@ -95,7 +95,7 @@ void init1()
   TMR1ON = 1;
 
   PR2 = PWMPeriod;          // Initial PWM period
-  CCP1CON = BIN(00111100);  // Enable PWM mode
+  CCP1CON = BIN(00001100);  // Enable PWM mode
   CCPR1L = 0;               // Start turned off
   
   T2CON = BIN(00000100);    // Enable timer 2 and set prescale to 1
