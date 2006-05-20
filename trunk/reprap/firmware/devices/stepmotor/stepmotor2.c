@@ -86,6 +86,7 @@ volatile static byte coilPosition = 0;
 #define CMD_BACKWARD1 13
 #define CMD_SETPOWER  14
 #define CMD_GETSENSOR 15
+#define CMD_HOMERESET 16
 
 enum functions {
   func_idle,
@@ -95,7 +96,8 @@ enum functions {
   func_seek,
   func_findmin,    // Calibration, finding minimum
   func_findmax,    // Calibration, finding maximum
-  func_ddamaster
+  func_ddamaster,
+  func_homereset   // Move to min position and reset
 };
 volatile static byte function = func_idle;
 
@@ -348,6 +350,20 @@ void timerTick()
   case func_ddamaster:
     dda_step();
     break;
+  case func_homereset:
+    if (MINSENSOR) {
+      currentPosition.bytes[0] = 0;
+      currentPosition.bytes[1] = 0;
+      function = func_idle;
+      if (seekNotify != 255) {
+	sendMessage(seekNotify);
+	sendDataByte(CMD_HOMERESET);
+	endMessage();
+      }
+    } else {
+      reverse1();
+    }
+    break;
   }
   setTimer(speed);
 _asm  /// @todo Remove when sdcc bug fixed
@@ -499,6 +515,12 @@ void processCommand()
     sendDataByte(PORTA);
     sendDataByte(PORTB);
     endMessage();
+    break;
+
+  case CMD_HOMERESET:
+    // Seek to home position and reset (search at given speed)
+    function = func_homereset;
+    setTimer(buffer[1]);
     break;
 
   }
