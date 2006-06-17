@@ -45,9 +45,11 @@ volatile static byte seekNotify = 255;
 
 volatile static byte lastPortB = 0;
 
-static byte requestedHeat = 0;
+static byte requestedHeat0 = 0;
+static byte requestedHeat1 = 0;
 volatile static byte heatCounter = 0;
-static byte temperatureLimit = 0;
+static byte temperatureLimit0 = 0;
+static byte temperatureLimit1 = 0;
 
 volatile static byte delay_counter;
 static byte lastTemperature = 0;
@@ -98,7 +100,8 @@ void init2()
   currentPosition.bytes[1] = 0;
   seekPosition.bytes[0] = 0;
   seekPosition.bytes[1] = 0;
-  requestedHeat = 0;
+  requestedHeat0 = 0;
+  requestedHeat1 = 0;
   heatCounter = 0;
   lastTemperature = 0;
   lastTemperatureRef = 0;
@@ -150,12 +153,22 @@ void setSpeed(byte speed, byte direction)
 #pragma nooverlay
 void timerTick()
 {
-
-  if (lastTemperature <= temperatureLimit) {
+  // There are two temperatures temperatureLimit0 and temperatureLimit1.
+  // When colder than temperatureLimit0, the heater runs at
+  // the power specified by requestedHeat1.  If it is between
+  // temperatureLimit0 and temperatureLimit1 then it runs at the
+  // lower power setting requestedHeat0.  If it is hotter than
+  // temperatureLimit1, the power shuts down completely.
+  if (lastTemperature <= temperatureLimit1) {
     // Reached critical limit, so power off
     PORTB0 = 0;
-  } else if (heatCounter >= requestedHeat && requestedHeat != 255) {
-    // Heater off
+  } else if (lastTemperature <= temperatureLimit0 &&
+	     heatCounter >= requestedHeat0 && requestedHeat0 != 255) {
+    // In medium zone, heater off period (based on low heat)
+    PORTB0 = 0;
+  } else if (lastTemperature > temperatureLimit0 &&
+	     heatCounter >= requestedHeat1 && requestedHeat1 != 255) {
+    // In low zone, heater off period (based on high heat)
     PORTB0 = 0;
   } else {
     // Heater on
@@ -425,8 +438,10 @@ void processCommand()
     break;
 
   case CMD_SETHEAT:
-    requestedHeat = buffer[1];
-    temperatureLimit = buffer[2];
+    requestedHeat0 = buffer[1];
+    requestedHeat1 = buffer[2];
+    temperatureLimit0 = buffer[3];
+    temperatureLimit1 = buffer[4];
     break;
 
   case CMD_GETTEMP:
