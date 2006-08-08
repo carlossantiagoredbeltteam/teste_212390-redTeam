@@ -28,7 +28,7 @@
    sodipodi:version="0.32"
    inkscape:version="0.43"
    sodipodi:docname="CommsStripboardTop.svg"
-   sodipodi:docbase="/home/sai/work/reprap/electronics"
+   sodipodi:docbase="/home/sai/work/reprap-svn/trunk/reprap/electronics"
    inkscape:label="board"
    version="1.0"
    inkscape:export-filename="/home/sai/work/reprap/electronics/CommsStripboardTop.png"
@@ -411,12 +411,12 @@
    bordercolor="#666666"
    pagecolor="#ffffff"
    id="base"
-   inkscape:zoom="4.5823886"
-   inkscape:cx="129.40849"
-   inkscape:cy="86.348605"
+   inkscape:zoom="3.8533169"
+   inkscape:cx="129.5256"
+   inkscape:cy="105.0964"
    inkscape:window-x="0"
    inkscape:window-y="0"
-   inkscape:current-layer="layer1" />
+   inkscape:current-layer="layer2" />
 	<metadata
    id="metadata2507">
 		<ns:variableSets>
@@ -1612,6 +1612,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -1651,6 +1652,7 @@
      font-size="5"
      id="tspan3178"
      style="font-size:5px;fill:#2289bd;font-family:Myriad-Roman">B</tspan></text>
+
 
 
 
@@ -1700,6 +1702,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -1739,6 +1742,7 @@
      font-size="5"
      id="tspan3192"
      style="font-size:5px;fill:#2289bd;font-family:Myriad-Roman">D</tspan></text>
+
 
 
 
@@ -1788,6 +1792,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -1827,6 +1832,7 @@
      font-size="5"
      id="tspan3206"
      style="font-size:5px;fill:#2289bd;font-family:Myriad-Roman">F</tspan></text>
+
 
 
 
@@ -1876,6 +1882,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -1915,6 +1922,7 @@
      font-size="5"
      id="tspan3220"
      style="font-size:5px;fill:#2289bd;font-family:Myriad-Roman">H</tspan></text>
+
 
 
 
@@ -1964,6 +1972,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -2003,6 +2012,7 @@
      font-size="5"
      id="tspan3234"
      style="font-size:5px;fill:#2289bd;font-family:Myriad-Roman">J</tspan></text>
+
 
 
 
@@ -2052,6 +2062,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -2091,6 +2102,7 @@
      font-size="5"
      id="tspan3248"
      style="font-size:5px;fill:#2289bd;font-family:Myriad-Roman">L</tspan></text>
+
 
 
 
@@ -2143,6 +2155,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -2182,6 +2195,7 @@
      font-size="5"
      id="tspan3264"
      style="font-size:5px;fill:#2589ba;font-family:Myriad-Roman">2</tspan></text>
+
 
 
 
@@ -2231,6 +2245,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -2270,6 +2285,7 @@
      font-size="5"
      id="tspan3278"
      style="font-size:5px;fill:#2589ba;font-family:Myriad-Roman">4</tspan></text>
+
 
 
 
@@ -2319,6 +2335,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -2358,6 +2375,7 @@
      font-size="5"
      id="tspan3292"
      style="font-size:5px;fill:#2589ba;font-family:Myriad-Roman">6</tspan></text>
+
 
 
 
@@ -2407,6 +2425,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -2446,6 +2465,7 @@
      font-size="5"
      id="tspan3306"
      style="font-size:5px;fill:#2589ba;font-family:Myriad-Roman">8</tspan></text>
+
 
 
 
@@ -2495,6 +2515,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -2534,6 +2555,7 @@
      font-size="5"
      id="tspan3320"
      style="font-size:5px;fill:#2589ba;font-family:Myriad-Roman">10</tspan></text>
+
 
 
 
@@ -2583,6 +2605,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -2622,6 +2645,7 @@
      font-size="5"
      id="tspan3334"
      style="font-size:5px;fill:#2589ba;font-family:Myriad-Roman">12</tspan></text>
+
 
 
 
@@ -2671,6 +2695,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -2710,6 +2735,7 @@
      font-size="5"
      id="tspan3348"
      style="font-size:5px;fill:#2589ba;font-family:Myriad-Roman">14</tspan></text>
+
 
 
 
@@ -2759,6 +2785,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -2798,6 +2825,7 @@
      font-size="5"
      id="tspan3362"
      style="font-size:5px;fill:#2589ba;font-family:Myriad-Roman">16</tspan></text>
+
 
 
 
@@ -2847,6 +2875,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -2886,6 +2915,7 @@
      font-size="5"
      id="tspan3376"
      style="font-size:5px;fill:#2589ba;font-family:Myriad-Roman">18</tspan></text>
+
 
 
 
@@ -2935,6 +2965,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -2974,6 +3005,7 @@
      font-size="5"
      id="tspan3390"
      style="font-size:5px;fill:#2589ba;font-family:Myriad-Roman">20</tspan></text>
+
 
 
 
@@ -3023,6 +3055,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -3067,6 +3100,7 @@
 
 
 
+
 			</switch>
 			<switch
    i:knockout="Off"
@@ -3106,6 +3140,7 @@
      font-size="5"
      id="tspan3411"
      style="font-size:5px;fill:#2589ba;font-family:Myriad-Roman">23</tspan></text>
+
 
 
 
@@ -3275,7 +3310,7 @@
      d="M 84.829,81.065143 L 88.679,81.065143 L 88.679,78.779143 L 84.829,78.779143 L 84.829,81.065143 z "
      i:knockout="Off" /><g
      id="g3459"
-     transform="translate(0,8.857143)">
+     transform="matrix(1,0,0,-1,0,96.80814)">
 			<path
    style="opacity:0.5;fill:#39b3c2"
    id="path3461"
@@ -3530,6 +3565,7 @@
 
 
 
+
 		</switch><switch
      style="display:inline"
      id="switch3107"
@@ -3568,6 +3604,7 @@
      font-size="6"
      y="0"
      x="0">= component inserted into this hole</tspan></text>
+
 
 
 
@@ -3616,6 +3653,7 @@
 
 
 
+
 		</switch><switch
      style="display:inline"
      id="switch3127"
@@ -3654,6 +3692,7 @@
      font-size="6"
      y="0"
      x="0">= connector</tspan></text>
+
 
 
 
@@ -3703,6 +3742,7 @@
 
 
 
+
 		</switch><switch
      style="display:inline"
      id="switch3142"
@@ -3741,6 +3781,7 @@
      font-size="8"
      y="0"
      x="0">Bottom edge</tspan></text>
+
 
 
 
@@ -3789,6 +3830,7 @@
 
 
 
+
 		</switch><switch
      style="display:inline"
      id="switch3156"
@@ -3828,6 +3870,7 @@
      font-size="8"
      y="0"
      x="0">Right edge</tspan></text>
+
 
 
 
@@ -3912,6 +3955,7 @@
 
 
 
+
 		</switch><switch
      style="display:inline"
      id="switch3551"
@@ -3952,6 +3996,7 @@
      font-size="6"
      y="0"
      x="0">C1</tspan></text>
+
 
 
 
@@ -4003,6 +4048,7 @@
 
 
 
+
 		</switch><switch
      style="display:inline"
      id="switch3565"
@@ -4044,6 +4090,7 @@
      font-size="6"
      y="0"
      x="0">C3</tspan></text>
+
 
 
 
@@ -4095,6 +4142,7 @@
 
 
 
+
 		</switch><switch
      style="display:inline"
      id="switch3579"
@@ -4136,6 +4184,7 @@
      font-size="6"
      y="0"
      x="0">C5</tspan></text>
+
 
 
 
@@ -4185,6 +4234,7 @@
 
 
 
+
 		</switch><switch
      style="display:inline"
      id="switch3614"
@@ -4224,6 +4274,7 @@
      font-size="6"
      y="0"
      x="0">J2</tspan></text>
+
 
 
 
@@ -4273,6 +4324,7 @@
 
 
 
+
 		</switch><switch
      style="display:inline"
      id="switch3628"
@@ -4311,6 +4363,7 @@
      font-size="6"
      y="0"
      x="0">J4</tspan></text>
+
 
 
 
@@ -4360,6 +4413,7 @@
 
 
 
+
 		</switch><switch
      style="display:inline"
      id="switch3452"
@@ -4401,6 +4455,7 @@
      font-size="6"
      y="0"
      x="0">U1:  MAX 232</tspan></text>
+
 
 
 
