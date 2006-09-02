@@ -89,6 +89,9 @@ void init1()
   PORTB = BIN(11000000);  // Pullup on RB6,RB7 for opto-inputs
   PORTA = 0;
 
+  TRISA = BIN(11000010) | PORTATRIS;  // Turn off A/D lines,
+                                      // but set others as required
+
   TMR1IE = 0;
   T1CON = BIN(00000000);  // Timer 1 in clock mode with 1:1 scale
   TMR1IE = 1;  // Enable timer interrupt
