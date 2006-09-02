@@ -57,6 +57,8 @@ static byte lastTemperatureRef = 0;
 
 static byte temperatureVRef = 3;
 
+static byte portaval = 0;
+
 // Note: when reversing motor direction, the speed should be set to 0
 // and then delayed long enough for the motor to come to rest.
 // Failing to do this could result in miscalculated motor position
@@ -82,6 +84,7 @@ volatile static addressableInt currentPosition, seekPosition;
 #define CMD_ISEMPTY       8
 #define CMD_SETHEAT       9
 #define CMD_GETTEMP       10
+#define CMD_SETCOOLER     11
 #define CMD_PWMPERIOD     50
 #define CMD_PRESCALER     51
 #define CMD_SETVREF       52
@@ -106,6 +109,7 @@ void init2()
   lastTemperature = 0;
   lastTemperatureRef = 0;
   temperatureVRef = 3;
+  portaval = 0;
   TMR1H = HEATER_PWM_PERIOD;
   TMR1L = 0;
 }
@@ -258,26 +262,6 @@ DELAY_10US_1:
 _endasm;
 }
 
-/*byte getTemperature()
-{
-  byte b;
-
-  // Could use a binary search which would be on average 4 iterations
-  // but we're in no hurry because this is used in the main loop.
-  // Everything else is interrupt driven so it won't bother anything.
-  for(b = 0; b < 16; b++) {
-    VRCON = BIN(11100000) | b;
-    delay_10us();
-    if (C1OUT)
-      break;
-  }
-  return b;
- _asm  /// @todo Remove when sdcc bug fixed
-  BANKSEL _currentPosition
- _endasm;
-}*/
-
-
 void checkTemperature()
 {
   // Assumes:
@@ -294,14 +278,14 @@ void checkTemperature()
   PSA = 0;
 
   // Set vref to test level and give it time to stabilise
-  VRCON = BIN(11000000) | temperatureVRef;
-  CMCON = BIN(00000101);
+  VRCON = BIN(10000000) | temperatureVRef;
+  CMCON = BIN(00000010);
   delay_10us();
 
   T0IF = 0;
   // Set A6 to high, float others
-  PORTA = BIN(01000000);
-  TRISA = BIN(10111111);
+  TRISA = BIN(10000010) | PORTATRIS;
+  PORTA = portaval | BIN(01000000);
 
   // Wait for cap to reach vref
   TMR0 = 0;
@@ -314,11 +298,11 @@ void checkTemperature()
 
   // Discharge cap
   // Set A1 to low, float others
-  PORTA = BIN(00000000);
-  TRISA = BIN(11111101);
+  PORTA = portaval;
+  TRISA = BIN(11000000) | PORTATRIS;
 
   // Set vref to low
-  VRCON = BIN(11100001); // should be 1010xxxx to not output value
+  VRCON = BIN(10100001); // should be 1010xxxx to not output value
   delay_10us();
   // Wait for voltage to go low
   while (!C2OUT)
@@ -327,13 +311,13 @@ void checkTemperature()
   delay_10us();
 
   // Set vref to test level and give it time to stabilise
-  VRCON = BIN(11000000) | temperatureVRef;
+  VRCON = BIN(10000000) | temperatureVRef;
   delay_10us();
 
   T0IF = 0;
   // Set A7 to high, float others
-  PORTA = BIN(10000000);
-  TRISA = BIN(01111111);
+  PORTA = portaval | BIN(10000000);
+  TRISA = BIN(01000010) | PORTATRIS;
 
   // Use 8 bit Timer0 to measure time
   // Wait for cap to reach vref
@@ -347,11 +331,11 @@ void checkTemperature()
 
   // Discharge cap
   // Set A1 to low, float others
-  PORTA = BIN(00000000);
-  TRISA = BIN(11111101);
+  PORTA = portaval;
+  TRISA = BIN(11000000) | PORTATRIS;
 
   // Set vref to low
-  VRCON = BIN(11100001); // should be 1010xxxx to not output value
+  VRCON = BIN(10100001); // should be 1010xxxx to not output value
   delay_10us();
   // Wait for voltage to reach 0
   while (!C2OUT)
@@ -359,8 +343,7 @@ void checkTemperature()
   // Extra delay for full discharge
   delay_10us();
 
-  TRISA = BIN(11111111);
-  PORTA = 0;
+  TRISA = BIN(11000010) | PORTATRIS;
   VRCON = 0;  // Turn of vref
 
 _asm  /// @todo Remove when sdcc bug fixed
@@ -452,6 +435,14 @@ void processCommand()
     endMessage();
     break;
 
+  case CMD_SETCOOLER:
+    if (buffer[1])
+      portaval |= BIN(00000100);
+    else
+      portaval &= BIN(11111011);
+    PORTA = portaval;
+    break;
+
 // "Hidden" low level commands
   case CMD_PWMPERIOD:
     // Set PWM period
@@ -473,8 +464,6 @@ void processCommand()
     break;
 
   }
-
-   
 
 }
 
