@@ -47,7 +47,7 @@ $(SDCCBASE)/share/sdcc/include/pic/pic$(PROCESSOR).h:
 $(SDCCBASE)/share/sdcc/include/pic:
 	if [ ! -d sdcc-build ]; then mkdir sdcc-build; fi
 	cd sdcc-build && \
-		CVSROOT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/sdcc cvs co -D 20051210 sdcc && \
+		CVSROOT=:pserver:anonymous@sdcc.cvs.sourceforge.net:/cvsroot/sdcc cvs co -D 20051210 sdcc && \
 		cd sdcc && \
 		./configure --prefix=$(SDCCBASE) && \
 		make clean && \
