@@ -52,4 +52,7 @@ void syncStrobe();
 #define PWM         PORTB3
 #define PWM_TRIS    TRISB3
 
+#define LED			PORTA4
+#define FLASHRATE   50
+
 #endif

@@ -111,6 +111,9 @@ volatile static addressableInt dda_deltay;
 volatile static int dda_error;
 static int dda_deltax;
 
+volatile static byte flash_count;
+volatile static byte flash;
+
 enum sync_modes {
   sync_none,     // no sync (default)
   sync_seek,     // synchronised seeking
@@ -127,6 +130,9 @@ void init2()
   coilPosition = 0;
   sync_mode = sync_none;
   seekNotify = 255;
+  
+  flash = 0;
+  flash_count = FLASHRATE;
 
   currentPosition.bytes[0] = 0;
   currentPosition.bytes[1] = 0;
@@ -180,8 +186,24 @@ byte stepValue()
 
 #pragma save
 #pragma nooverlay
+
+void flashLED()
+{
+	flash_count--;
+	if(flash_count <= 0)
+	{
+		flash = 1 - flash;
+		if(flash)
+			LED = 0;
+		else
+			LED = 1;
+		flash_count = FLASHRATE;
+	}
+}
+
 void forward1()
 {
+  flashLED();
   if (MAXSENSOR) {
     // We hit the end so go idle
     PORTB = PULLUPS;
@@ -201,6 +223,7 @@ _endasm;
 #pragma nooverlay
 void reverse1()
 {
+  flashLED();
   if (MINSENSOR) {
     // We hit the end so go idle
     PORTB = PULLUPS;
@@ -293,6 +316,7 @@ void timerTick()
   case func_idle:
     TMR1ON = 0;
     speed = 0;
+    LED = 0;
     break;
   case func_forward:
     forward1();
@@ -308,6 +332,7 @@ void timerTick()
     } else {
       // Reached, switch to 0 speed
       speed = 0;
+      LED = 0;
       // Uncomment next line to remove torque on arrival
       //PORTB = PULLUPS;
       if (seekNotify != 255) {

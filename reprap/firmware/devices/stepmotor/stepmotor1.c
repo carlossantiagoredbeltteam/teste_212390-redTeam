@@ -61,6 +61,7 @@ void init1()
   CMCON = 0xff;               // Comparator module defaults
   TRISA = BIN(00101100);      // Port A outputs except 2,3 (sync)
                               // RA3 is input for max limit sensor
+                              // RA4 is the indicator LED
                               // RA5 can only be used as an input
   TRISB = BIN(00000111);      // Port B 0-2 input, 3-7 outputs
                               // Port B3 is PWM output
