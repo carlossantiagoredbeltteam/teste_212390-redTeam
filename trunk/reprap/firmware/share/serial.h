@@ -38,7 +38,13 @@
 
 #define MAX_TRANSMIT_BUFFER 16  ///< Transmit buffer size.
 
-#define MAX_PAYLOAD 16         ///< Size of largest possible message.
+#define MAX_PAYLOAD 16          ///< Size of largest possible message.
+
+#define LED			PORTA4      ///< Port to which the LED is attached - 0 is on
+#define FLASHRATE   50          ///< Default flashrate
+void flashLED();
+void LEDon();
+void setFlash(byte on, byte off);
 
 void uartTransmit(byte c);
 void sendReply();
