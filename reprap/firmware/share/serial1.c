@@ -234,12 +234,59 @@ static volatile byte ackRequested;
 
 extern byte deviceAddress;
 
+//===============================================================================
+
+// LED flash code added by Adrian
+
+// flashON and flashOFF set the duty cycle
+// Call flashLED in a loop, or in a repeatedly-called
+// interrupt function.
+
+volatile static byte flash_count;
+volatile static byte flash;
+volatile static byte flashON;
+volatile static byte flashOFF;
+
+void flashLED()
+{
+	flash_count--;
+	if(flash_count <= 0)
+	{
+		flash = 1 - flash;
+		if(flash)
+		{
+			LED = 0;
+			flash_count = flashOFF;
+		} else
+		{
+			LED = 1;
+			flash_count = flashON;
+		}
+	}
+}
+
+void LEDon()
+{
+	LED = 0;
+}
+
+void setFlash(byte on, byte off)
+{
+	flashON = on;
+	flashOFF = off;
+}
+
+// ======================================================================
+
 /// @todo Remove when sdcc initialisers fixed
 void serial_init()
 {
   uartState = SNAP_idle;
   transmitBufferHead = transmitBufferTail = 0;
   processingLock = 0;
+  flash = 0;
+  flashON = FLASHRATE;
+  flashOFF = FLASHRATE;
 }
 
 //===========================================================================//
