@@ -131,10 +131,18 @@ y2 = RB * Math.sin(A1 * (Math.PI / 180));
 
 XY = CylindricalToRectangular(RI, (90 - AT / 2) * (Math.PI / 180));
 
-SaveClockwiseProfileX[1] = XY.x;
-SaveClockwiseProfileY[1] = XY.y;
-SaveClockwiseProfileX[2] = x1;
-SaveClockwiseProfileY[2] = y1;
+// Finangling factor to stop the troughs between teeth distorting > 45 teeth. 
+double finanglingFactor=1;
+
+if (N>45) {
+	finanglingFactor=1-((N-45)*.00068);
+	// Works out at 0.97 for 79 teeth.	But is quite horrible.
+}
+
+SaveClockwiseProfileX[1] = XY.x*finanglingFactor;
+SaveClockwiseProfileY[1] = XY.y*finanglingFactor;
+SaveClockwiseProfileX[2] = x1*finanglingFactor;
+SaveClockwiseProfileY[2] = y1*finanglingFactor;
 SaveClockwiseProfileX[3] = x2;
 SaveClockwiseProfileY[3] = y2;
 
@@ -173,10 +181,10 @@ Theta = 90 + Theta;
 
 X2Y2 = CylindricalToRectangular(RTheta.r, Theta*(Math.PI / 180));
 
-SaveAntiClockwiseProfileX[1] = XY.x;
-SaveAntiClockwiseProfileY[1] = XY.y;
-SaveAntiClockwiseProfileX[2] = X1Y1.x;
-SaveAntiClockwiseProfileY[2] = X1Y1.y;
+SaveAntiClockwiseProfileX[1] = XY.x*finanglingFactor;
+SaveAntiClockwiseProfileY[1] = XY.y*finanglingFactor;
+SaveAntiClockwiseProfileX[2] = X1Y1.x*finanglingFactor;
+SaveAntiClockwiseProfileY[2] = X1Y1.y*finanglingFactor;
 SaveAntiClockwiseProfileX[3] = X2Y2.x;
 SaveAntiClockwiseProfileY[3] = X2Y2.y;
 
