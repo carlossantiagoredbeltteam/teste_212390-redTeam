@@ -1,0 +1,201 @@
+/*
+<?xml version='1.0' standalone='yes' ?>
+
+<script>
+	<name>Triangular Dipyramid Crystalization of a solid</name>
+	<author>Simon McAuliffe</author>
+	<version>0.1</version>
+	<date>19/11/2006</date>
+	<description>
+This script removes material from an object so that the outer shape is
+maintained but is much lighter weight.
+
+This is accomplished by removing triangular bipyramids from the solid.
+
+It was built for the RepRap project
+http://reprap.org/
+    </description>
+</script>
+*/
+
+/* Copyright (C) 2006 by Simon McAuliffe
+
+   This program is free software; you can redistribute it and/or modify it under the
+   terms of the GNU General Public License as published by the Free Software
+   Foundation; either version 2 of the License, or (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful, but WITHOUT ANY 
+   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A 
+   PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+*/
+   
+double Tolerance = 0.0;
+
+// Global base coordinate system
+CoordinateSystem cs = new CoordinateSystem();
+ObjectInfo allParts = null;
+
+scene = window.getScene();
+
+maxDim = new ValueField(32, ValueField.NONNEGATIVE);
+minDim = new ValueField(4, ValueField.NONNEGATIVE);
+maxAngle = new ValueField(30, ValueField.NONNEGATIVE);
+
+dlg = new ComponentsDialog(window, "RepRap Tetrahedral Crystalization" ,
+  new Widget [] { maxDim, minDim, maxAngle },
+  new String [] { "Maximum crystal size:", "Minimum crystal size:", "Maximum angle (degrees):" }
+);
+
+if (!dlg.clickedOk()) return;
+
+// Make a crystal.
+// It should be centered about x/y/z based on its bounding box
+ObjectInfo makeCrystal(double size, double x, double y, double z) {
+  vertices = new Vec3[4];
+  vertices[0] = new Vec3(x, y, z + size * 0.5);
+  vertices[1] = new Vec3(x + size * 3 * Math.sqrt(2)/8, y, z + size * -0.5);
+  vertices[2] = new Vec3(x + size * -3 * Math.sqrt(2)/8,
+    y + size * Math.sqrt(6)/4, z + size * -0.5);
+  vertices[3] = new Vec3(x + size * -3 * Math.sqrt(2)/8,
+    y + size * -Math.sqrt(6)/4, z + size * -0.5);
+  int[][] faces = {{0, 1, 2}, {0, 2, 3}, {0, 3, 1}, {1, 3, 2}};
+  mesh = new TriangleMesh(vertices, faces);
+  return new ObjectInfo(mesh, cs, "crystal");
+}
+
+boolean intersects(Object3D o1, Object3D o2) {
+  ObjectInfo oi1 = new ObjectInfo(o1, cs, "object");
+  ObjectInfo oi2 = new ObjectInfo(o2, cs, "object");
+  return intersects(oi1, oi2);
+}
+
+// True is there is anything common between oi1 and oi2
+boolean intersects(ObjectInfo oi1, ObjectInfo oi2) {
+  CSGObject intersect = new CSGObject(oi1, oi2, CSGObject.INTERSECTION);
+  int canConvert = intersect.canConvertToTriangleMesh();
+  if (canConvert != Object3D.EXACTLY) {
+    print("Cannot convert to mesh as expected");
+    return false;
+  }
+  TriangleMesh mesh = intersect.convertToTriangleMesh(Tolerance);
+  return mesh.getEdges().length > 0;
+}
+
+// True is oi1 is fully contained within oi2
+// Turns out this isn't quite correct.  Not sure why.  Maybe AoI tolerance.
+boolean within(ObjectInfo oi1, ObjectInfo oi2) {
+  CSGObject diff = new CSGObject(oi1, oi2, CSGObject.DIFFERENCE12);
+  int canConvert = diff.canConvertToTriangleMesh();
+  if (canConvert != Object3D.EXACTLY) {
+    print("Cannot convert to mesh as expected");
+    return false;
+  }
+  TriangleMesh mesh = diff.convertToTriangleMesh(Tolerance);
+  return mesh.getEdges().length == 0;
+}
+
+// Approximately find the smallest crystal that contains our object
+ObjectInfo findContainingCrystal(ObjectInfo obj) {
+  BoundingBox box = obj.object.getBounds();
+
+  double size = 1.0;
+
+  // First pass, get something definitely bigger
+  for(int maxiter = 0; maxiter < 10; maxiter++) {
+    ObjectInfo candidate = makeCrystal(size,
+      (box.minx + box.maxx)/2.0,
+      (box.miny + box.maxy)/2.0,
+      (box.minz + box.maxz)/2.0);
+    if (within(obj, candidate))
+      break;
+    size *= 5.0;
+  }
+
+  double lowerbound = 0;
+  double upperbound = size;  
+
+  // Search between bounds to find smallest containing crystal
+  size = (lowerbound + upperbound) / 2;
+  for(int maxiter = 0; maxiter < 20; maxiter++) {
+    ObjectInfo candidate = makeCrystal(size,
+      (box.minx + box.maxx)/2.0,
+      (box.miny + box.maxy)/2.0,
+      (box.minz + box.maxz)/2.0);
+    boolean isWithin = within(obj, candidate);
+    if (upperbound - lowerbound < 0.1 && isWithin)
+      return candidate;
+    if (!isWithin) {
+      lowerbound = size;
+      size = (size + upperbound) / 2;
+    } else {
+      upperbound = size;
+      size = (size + lowerbound) / 2;
+    }
+  }
+  return null;
+}
+
+// Given a parent crystal, subdivide into smaller crystals
+ObjectInfo [] subdivide(ObjectInfo parent) {
+  BoundingBox bounds = parent.object.getBounds();
+
+  // Use height as our base unit
+  double height = bounds.maxz - bounds.minz;
+  ObjectInfo [] subs = new ObjectInfo[4];
+  double scale = height / 2.0;
+  double x = (bounds.minx + bounds.maxx) / 2.0;
+  double y = (bounds.miny + bounds.maxy) / 2.0;
+  double z = (bounds.minz + bounds.maxz) / 2.0;
+  subs[0] = makeCrystal(scale, x - scale * 3 * Math.sqrt(2)/8,
+    y + scale * Math.sqrt(6)/4, z - scale * 0.5);
+  subs[1] = makeCrystal(scale, x - scale * 3 * Math.sqrt(2)/8,
+    y - scale * Math.sqrt(6)/4, z - scale * 0.5);
+  subs[2] = makeCrystal(scale, x + scale * 3 * Math.sqrt(2)/8, y,
+    z - scale * 0.5);
+  subs[3] = makeCrystal(scale, x, y, z + scale * 0.5);
+
+  // Special case:
+  // For tetrahedra, there is also a square bi-pyramid in the middle
+  // that we need to fill in
+  //subs[4] = null;
+
+  return subs;
+}
+
+void crystalize(ObjectInfo obj, ObjectInfo container) {
+  if (!intersects(obj, container))
+    return;
+
+  BoundingBox bounds = container.object.getBounds();
+  double height = bounds.maxz - bounds.minz;
+
+  print("Size is " + height);
+
+  // We're done if it's small enough
+  if (height < 0.1) {
+    if (within(container, obj)) {
+      if (allParts == null)
+        allParts = container;
+      else
+        allParts = new ObjectInfo(
+          new CSGObject(container, allParts, CSGObject.UNION),
+          cs, "join");
+    }
+    return;
+  }
+
+  // Otherwise subdivide further
+  ObjectInfo [] subs = subdivide(container);
+  for(int i = 0; i < subs.length; i++) {
+    crystalize(obj, subs[i]);
+  }
+}
+
+ObjectInfo obj = new ObjectInfo(new Cube(0.5, 0.5, 0.5), cs, "cube");
+
+ObjectInfo rootCrystal = findContainingCrystal(obj);
+
+window.addObject(obj, null);
+crystalize(obj, rootCrystal);
+
+window.addObject(allParts, null);
