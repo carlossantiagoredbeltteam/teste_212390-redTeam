@@ -154,8 +154,9 @@ ObjectInfo [] subdivide(ObjectInfo parent) {
     z - scale * 0.5);
   subs[3] = makeCrystal(scale, x, y, z + scale * 0.5);
 
+  /// @todo Add pyramids or dipyramid (ie with or without separating wall)
   // Special case:
-  // For tetrahedra, there is also a square bi-pyramid in the middle
+  // For tetrahedra, there is also a square dipyramid in the middle
   // that we need to fill in
   //subs[4] = null;
 
@@ -170,6 +171,13 @@ void crystalize(ObjectInfo obj, ObjectInfo container) {
   double height = bounds.maxz - bounds.minz;
 
   print("Size is " + height);
+
+/// @todo Should be:
+/// If too small, stop, done.
+/// If below some larger size limit and fully within, then done
+/// Otherwise if not fully within, subdivide further
+/// This should make smaller holes near the surface and larger
+/// holes (up to some size limit) towards the centre.
 
   // We're done if it's small enough
   if (height < 0.1) {
