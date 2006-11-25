@@ -9,6 +9,8 @@ extern int rfd, wfd;
 extern void *timer(void *);
 extern void *comms(void *);
 
+extern int exitAfter;
+
 void packetNotifyReceive(byte *data, byte length)
 {
   int i;
@@ -37,6 +39,20 @@ int main()
   pthread_t timer_thread;
   pthread_t comms_thread;
   pthread_attr_t pthread_custom_attr;
+
+  switch(fork()) {
+  case -1:
+    perror("Fork failed");
+    exit(1);
+  case 0:
+    system("./slave &");
+    //execl("slave", "slave");
+    exit(1);
+  }
+
+  exitAfter = 50;
+
+  printf("Starting master\n");
 
   address = 0;
 
