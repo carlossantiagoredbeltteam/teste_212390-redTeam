@@ -100,6 +100,36 @@ void timer_ping()
 {
 }
 
+static void sendCurrentOutBuffer()
+{
+  byte i;
+
+  if (!xmitBufferReady) {
+     printf("Transmit buffer not ready!!\n");
+     return;
+  }
+
+  uartTransmit(RAP_SYNC);
+  crc = 0;
+  uartTransmit(computeCRC(out_hdb1));
+  uartTransmit(computeCRC(address));
+  uartTransmit(computeCRC(out_dest));
+  uartTransmit(computeCRC(out_hdb2));
+  uartTransmit(crc);
+  if (out_length > 0) {
+    for(i = 0; i < out_length; i++)
+      uartTransmit(computeCRC(out_buffer[i]));
+    uartTransmit(crc);
+  }
+}
+
+static void sendTokenImmediate()
+{
+  uartTransmit(RAP_SYNC);
+  uartTransmit(0xff);
+  uartState = RAP_idle;
+}
+
 void uartNotifyReceive()
 {
   byte c = RCREG;
@@ -123,27 +153,15 @@ void uartNotifyReceive()
       // We have received a token, so if we have any data to send we
       // can send it now.
       if (xmitBufferReady) {
-	byte i;
-	uartTransmit(RAP_SYNC);
-	crc = 0;
-	uartTransmit(computeCRC(out_hdb1));
-	uartTransmit(computeCRC(address));
-	uartTransmit(computeCRC(out_dest));
-	uartTransmit(computeCRC(out_hdb2));
-	uartTransmit(crc);
-	if (out_length > 0) {
-	  for(i = 0; i < out_length; i++)
-	    uartTransmit(computeCRC(out_buffer[i]));
-	  uartTransmit(crc);
-	}
+	sendCurrentOutBuffer();
+	uartState = RAP_idle;
+	
+	/// TODO the buffer should only be marked free after an ACK!!
 	xmitBufferReady = 0;
 	out_bufferBusy = 0;
-	uartState = RAP_idle;
       } else {
 	// Nothing to send, so pass the token on
-	uartTransmit(RAP_SYNC);
-	uartTransmit(0xff);
-	uartState = RAP_idle;
+	sendTokenImmediate();
       }
     } else {
       // Header of a normal packet
@@ -235,7 +253,14 @@ void uartNotifyReceive()
 	}
       }
 
-      // Deal with incoming receive sequence (responde to outgoing data)
+      if (ok && (in_hdb1 & RAP_HDB1_NAK)) {
+	// TODO: check sequence of NAK
+	printf("Received NAK, resend last packet\n");
+	sendCurrentOutBuffer();
+	ok = 0;
+      }
+
+      // Deal with incoming receive sequence (responded to outgoing data)
       if (ok && (in_hdb1 & RAP_HDB1_ACK)) {
 	byte rseq;
 	rseq = RAP_RSEQ(in_hdb2);
@@ -250,17 +275,13 @@ void uartNotifyReceive()
 	if ((in_hdb2 & RAP_HDB2_LENMASK) == 0) {
 	  // We don't bother with the second CRC if there is
 	  // no data payload.
-	  uartTransmit(RAP_SYNC);
-	  uartTransmit(0xff);
-	  uartState = RAP_idle;
+	  sendTokenImmediate();
 	} else
 	  uartState = RAP_readingData;
       } else {
 	printf("Failure, will drop packet\n");
       }
     } else {
-      // We want to NAK the packet but we need to wait
-      // until it is all received first
       printf("Header CRC failure (got %02x, expected %02x), drop packet\n",
 	     c, crc);
       in_dropAction = Drop_None;
@@ -281,15 +302,27 @@ void uartNotifyReceive()
   case RAP_expectDCRC:
     if (c == crc) {
       packetNotifyReceive((byte *)in_buffer, (in_hdb2 & RAP_HDB2_LENMASK));
-      uartTransmit(RAP_SYNC);
-      uartTransmit(0xff);
-      uartState = RAP_idle;
+      sendTokenImmediate();
     } else {
-      // We want to NAK the packet but we need to wait
-      // until it is all received first
+      // Failure, so NAK the packet.  Possible optimisation: rather
+      // than putting a token out, just NAK immediately.
       printf("Data CRC failure (got %02x, expected %02x), NAK packet\n",
 	     c, crc);
-      uartState = RAP_idle;
+      if (out_bufferBusy) {
+	// Already waiting to send a packet, so just drop it.
+	printf("Outward buffer already busy, drop\n");
+      } else {
+	out_bufferBusy = 1;
+	out_hdb1 = RAP_HDB1_NAK;
+	out_hdb2 = 0;
+	out_length = 0;
+	out_dest = in_src;
+	xmitBufferReady = 1;
+	in_bufferBusy = 0;
+
+	// Put out a new token
+	sendTokenImmediate();
+      }
     }
     break;
 
@@ -328,9 +361,7 @@ void uartNotifyReceive()
     case Drop_None:
       // Drop and do nothing.  Except of course, we still
       // need to put a token back into circulation
-      uartTransmit(RAP_SYNC);
-      uartTransmit(0xff);
-      uartState = RAP_idle;
+      sendTokenImmediate();
       break;
     case Drop_NAK:
     case Drop_ResendLast:

@@ -30,6 +30,8 @@ int main()
   pthread_t comms_thread;
   pthread_attr_t pthread_custom_attr;
 
+  printf("Started slave\n");
+
   address = 1;
 
   rfd = open("1", O_RDONLY);
