@@ -38,19 +38,24 @@ ObjectInfo allParts = null;
 scene = window.getScene();
 
 maxDim = new ValueField(32, ValueField.NONNEGATIVE);
-minDim = new ValueField(4, ValueField.NONNEGATIVE);
-maxAngle = new ValueField(30, ValueField.NONNEGATIVE);
+minDim = new ValueField(0.1, ValueField.NONNEGATIVE);
+wall = new ValueField(0.025, ValueField.NONNEGATIVE);
 
-dlg = new ComponentsDialog(window, "RepRap Tetrahedral Crystalization" ,
-  new Widget [] { maxDim, minDim, maxAngle },
-  new String [] { "Maximum crystal size:", "Minimum crystal size:", "Maximum angle (degrees):" }
+dlg = new ComponentsDialog(window, "RepRap Crystalization" ,
+  new Widget [] { maxDim, minDim, wall },
+  new String [] { "Maximum crystal size:",
+    "Minimum crystal size:",
+    "Wall thickness:" }
 );
 
 if (!dlg.clickedOk()) return;
 
+
+///////////////////// TETRAHEDRAL CRYSTALS /////////////////////
+
 // Make a crystal.
 // It should be centered about x/y/z based on its bounding box
-ObjectInfo makeCrystal(double size, double x, double y, double z) {
+ObjectInfo makeCrystalTetra(double size, double x, double y, double z) {
   vertices = new Vec3[4];
   vertices[0] = new Vec3(x, y, z + size * 0.5);
   vertices[1] = new Vec3(x + size * 3 * Math.sqrt(2)/8, y, z + size * -0.5);
@@ -62,6 +67,89 @@ ObjectInfo makeCrystal(double size, double x, double y, double z) {
   mesh = new TriangleMesh(vertices, faces);
   return new ObjectInfo(mesh, cs, "crystal");
 }
+
+// Given a parent crystal, subdivide into smaller crystals
+ObjectInfo [] subdivideTetra(ObjectInfo parent) {
+  BoundingBox bounds = parent.object.getBounds();
+
+  // Use height as our base unit
+  double height = bounds.maxz - bounds.minz;
+  ObjectInfo [] subs = new ObjectInfo[4];
+  double scale = height / 2.0;
+  double x = (bounds.minx + bounds.maxx) / 2.0;
+  double y = (bounds.miny + bounds.maxy) / 2.0;
+  double z = (bounds.minz + bounds.maxz) / 2.0;
+  subs[0] = makeCrystalTetra(scale, x - scale * 3 * Math.sqrt(2)/8,
+    y + scale * Math.sqrt(6)/4, z - scale * 0.5);
+  subs[1] = makeCrystalTetra(scale, x - scale * 3 * Math.sqrt(2)/8,
+    y - scale * Math.sqrt(6)/4, z - scale * 0.5);
+  subs[2] = makeCrystalTetra(scale, x + scale * 3 * Math.sqrt(2)/8, y,
+    z - scale * 0.5);
+  subs[3] = makeCrystalTetra(scale, x, y, z + scale * 0.5);
+
+  /// @todo Add pyramids or dipyramid (ie with or without separating wall)
+  // Special case:
+  // For tetrahedra, there is also a square dipyramid in the middle
+  // that we need to fill in
+  //subs[4] = null;
+
+  return subs;
+}
+
+
+///////////////////// CUBOID CRYSTALS /////////////////////
+
+// Make a crystal.
+// It should be centered about x/y/z based on its bounding box
+// size is the height of the crystal
+ObjectInfo makeCrystal(double size, double x, double y, double z, String name) {
+  Cube cube = new Cube(size, size, size);
+  CoordinateSystem csc = new CoordinateSystem(new Vec3(x,y,z),
+    180 * Math.asin(1.0/Math.sqrt(3)) / Math.PI, 0, 45.0);
+
+  return new ObjectInfo(cube, csc, name);
+}
+
+ObjectInfo [] subdivide(ObjectInfo parent) {
+  BoundingBox bounds = parent.object.getBounds();
+
+  // Use height as our base unit
+  double height = bounds.maxz - bounds.minz;
+  ObjectInfo [] subs = new ObjectInfo[8];
+  double scale = height / 2.0;
+
+  Vec3 origin = parent.coords.getOrigin();
+
+  double x = (bounds.minx + bounds.maxx) / 2.0 + origin.x;
+  double y = (bounds.miny + bounds.maxy) / 2.0 + origin.y;
+  double z = (bounds.minz + bounds.maxz) / 2.0 + origin.z;
+
+  String name = parent.name;
+
+  subs[0] = makeCrystal(scale, x, y - scale * Math.sqrt(3) / 2, z, name + "0");
+  subs[1] = makeCrystal(scale, x, y + scale * Math.sqrt(3) / 2, z, name + "1");
+  subs[2] = makeCrystal(scale, x - scale * Math.sqrt(2)/2,
+    y - scale * Math.sqrt(3) / 6, z - scale * Math.sqrt(2.0/3.0) / 2.0,
+    name + "2");
+  subs[3] = makeCrystal(scale, x, y + scale * Math.sqrt(3) / 6,
+    z - scale * Math.sqrt(2.0/3.0), name + "3");
+  subs[4] = makeCrystal(scale, x, y - scale * Math.sqrt(3) / 6,
+    z + scale * Math.sqrt(2.0/3.0), name + "4");
+  subs[5] = makeCrystal(scale, x + scale * Math.sqrt(2)/2,
+    y + scale * Math.sqrt(3) / 6, z + scale * Math.sqrt(2.0/3.0) / 2.0,
+    name + "5");
+  subs[6] = makeCrystal(scale, x - scale * Math.sqrt(2)/2,
+    y + scale * Math.sqrt(3) / 6, z + scale * Math.sqrt(2.0/3.0) / 2.0,
+    name + "6");
+  subs[7] = makeCrystal(scale, x + scale * Math.sqrt(2)/2,
+    y - scale * Math.sqrt(3) / 6, z - scale * Math.sqrt(2.0/3.0) / 2.0,
+    name + "7");
+
+  return subs;
+}
+
+///////////////////// GENERAL GEOMETRY /////////////////////
+
 
 boolean intersects(Object3D o1, Object3D o2) {
   ObjectInfo oi1 = new ObjectInfo(o1, cs, "object");
@@ -98,14 +186,15 @@ boolean within(ObjectInfo oi1, ObjectInfo oi2) {
 ObjectInfo findContainingCrystal(ObjectInfo obj) {
   BoundingBox box = obj.object.getBounds();
 
-  double size = 1.0;
+  double size = Math.sqrt(3);
 
   // First pass, get something definitely bigger
   for(int maxiter = 0; maxiter < 10; maxiter++) {
-    ObjectInfo candidate = makeCrystal(size,
-      (box.minx + box.maxx)/2.0,
-      (box.miny + box.maxy)/2.0,
-      (box.minz + box.maxz)/2.0);
+    Vec3 origin = obj.coords.getOrigin();
+    double x = (box.minx + box.maxx) / 2.0 + origin.x;
+    double y = (box.miny + box.maxy) / 2.0 + origin.y;
+    double z = (box.minz + box.maxz) / 2.0 + origin.z;
+    ObjectInfo candidate = makeCrystal(size, x, y, z, "root");
     if (within(obj, candidate))
       break;
     size *= 5.0;
@@ -120,7 +209,7 @@ ObjectInfo findContainingCrystal(ObjectInfo obj) {
     ObjectInfo candidate = makeCrystal(size,
       (box.minx + box.maxx)/2.0,
       (box.miny + box.maxy)/2.0,
-      (box.minz + box.maxz)/2.0);
+      (box.minz + box.maxz)/2.0, "root");
     boolean isWithin = within(obj, candidate);
     if (upperbound - lowerbound < 0.1 && isWithin)
       return candidate;
@@ -132,45 +221,19 @@ ObjectInfo findContainingCrystal(ObjectInfo obj) {
       size = (size + lowerbound) / 2;
     }
   }
-  return null;
+  return makeCrystal(upperbound,
+      (box.minx + box.maxx)/2.0,
+      (box.miny + box.maxy)/2.0,
+      (box.minz + box.maxz)/2.0, "root");
 }
 
-// Given a parent crystal, subdivide into smaller crystals
-ObjectInfo [] subdivide(ObjectInfo parent) {
-  BoundingBox bounds = parent.object.getBounds();
+void crystalize(ObjectInfo obj, ObjectInfo container, double minHole, double maxHole, double wallThickness) {
 
-  // Use height as our base unit
-  double height = bounds.maxz - bounds.minz;
-  ObjectInfo [] subs = new ObjectInfo[4];
-  double scale = height / 2.0;
-  double x = (bounds.minx + bounds.maxx) / 2.0;
-  double y = (bounds.miny + bounds.maxy) / 2.0;
-  double z = (bounds.minz + bounds.maxz) / 2.0;
-  subs[0] = makeCrystal(scale, x - scale * 3 * Math.sqrt(2)/8,
-    y + scale * Math.sqrt(6)/4, z - scale * 0.5);
-  subs[1] = makeCrystal(scale, x - scale * 3 * Math.sqrt(2)/8,
-    y - scale * Math.sqrt(6)/4, z - scale * 0.5);
-  subs[2] = makeCrystal(scale, x + scale * 3 * Math.sqrt(2)/8, y,
-    z - scale * 0.5);
-  subs[3] = makeCrystal(scale, x, y, z + scale * 0.5);
-
-  /// @todo Add pyramids or dipyramid (ie with or without separating wall)
-  // Special case:
-  // For tetrahedra, there is also a square dipyramid in the middle
-  // that we need to fill in
-  //subs[4] = null;
-
-  return subs;
-}
-
-void crystalize(ObjectInfo obj, ObjectInfo container) {
   if (!intersects(obj, container))
     return;
 
   BoundingBox bounds = container.object.getBounds();
   double height = bounds.maxz - bounds.minz;
-
-  print("Size is " + height);
 
 /// @todo Should be:
 /// If too small, stop, done.
@@ -180,30 +243,43 @@ void crystalize(ObjectInfo obj, ObjectInfo container) {
 /// holes (up to some size limit) towards the centre.
 
   // We're done if it's small enough
-  if (height < 0.1) {
-    if (within(container, obj)) {
-      if (allParts == null)
-        allParts = container;
-      else
-        allParts = new ObjectInfo(
-          new CSGObject(container, allParts, CSGObject.UNION),
-          cs, "join");
-    }
+  if (height < minHole)
+    return;
+
+  if (height <= maxHole && within(container, obj)) {
+    Vec3 origin = container.coords.getOrigin();
+    double x = (bounds.minx + bounds.maxx) / 2.0 + origin.x;
+    double y = (bounds.miny + bounds.maxy) / 2.0 + origin.y;
+    double z = (bounds.minz + bounds.maxz) / 2.0 + origin.z;
+    ObjectInfo shrunk = makeCrystal(height - (wallThickness/2.0),
+      x, y, z, container.name);
+    if (allParts == null)
+      allParts = shrunk;
+    else
+      allParts = new ObjectInfo(
+        new CSGObject(shrunk, allParts, CSGObject.UNION),
+        cs, "join");
     return;
   }
 
   // Otherwise subdivide further
   ObjectInfo [] subs = subdivide(container);
   for(int i = 0; i < subs.length; i++) {
-    crystalize(obj, subs[i]);
+    crystalize(obj, subs[i], minHole, maxHole, wallThickness);
   }
 }
 
-ObjectInfo obj = new ObjectInfo(new Cube(0.5, 0.5, 0.5), cs, "cube");
+ObjectInfo obj = new ObjectInfo(new Cube(1, 1, 1), cs, "cube");
 
 ObjectInfo rootCrystal = findContainingCrystal(obj);
+//window.addObject(rootCrystal, null);
 
-window.addObject(obj, null);
-crystalize(obj, rootCrystal);
+//window.addObject(obj, null);
 
-window.addObject(allParts, null);
+crystalize(obj, rootCrystal, minDim.getValue(), maxDim.getValue(), wall.getValue());
+
+//window.addObject(allParts, null);
+
+// Finally, subtract crystals from original object
+CSGObject result = new CSGObject(obj, allParts, CSGObject.DIFFERENCE12);
+window.addObject(new ObjectInfo(result, cs, obj.name + " crystalised"), null);
