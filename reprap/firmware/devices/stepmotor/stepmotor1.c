@@ -59,12 +59,33 @@ void init1()
 
   OPTION_REG = BIN(01011111); // Disable TMR0 on RA4, 1:128 WDT, pullups on
   CMCON = 0xff;               // Comparator module defaults
+#ifdef UNIVERSAL_PCB  
+  TRISA = BIN(00101010);      // Port A outputs except 1,3 (sync) and 5 (Max)
+                              // RA0 is L298 4
+                              // RA1 is Sync
+                              // RA2 is L298 3                                                            
+                              // RA3 is Sync
+                              // RA4 is the indicator LED
+                              // RA5 is Max sensor
+                              // RA6 is not used for the stepper
+                              // RA7 is not used for the stepper                                                                                        
+  TRISB = BIN(00000011);      // Port B 0,1 input, 2-7 outputs
+                              // RB0 is Min sensor
+                              // RB1 is Rx
+                              // RB2 is Tx 
+                              // RB3 is PWM output to L298                                                                                       
+                              // RB4 is L298 2
+                              // RB5 is L298 1
+                              // RB6 is not used
+                              // RB7 is not used 
+#else
   TRISA = BIN(00101100);      // Port A outputs except 2,3 (sync)
                               // RA3 is input for max limit sensor
                               // RA4 is the indicator LED
-                              // RA5 can only be used as an input
+                              // RA5 can only be used as an input                              
   TRISB = BIN(00000111);      // Port B 0-2 input, 3-7 outputs
                               // Port B3 is PWM output
+#endif                              
   PIE1 = BIN(00000000);       // All peripheral interrupts initially disabled
   INTCON = BIN(00000000);     // Interrupts disabled
   PIR1 = 0;                   // Clear peripheral interrupt flags

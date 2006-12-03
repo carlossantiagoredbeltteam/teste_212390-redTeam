@@ -45,7 +45,8 @@
 // stepCount value and the stepValue function.  Currently
 // stepCount must be a power of 2.
 
-// I/O ports:
+// I/O ports - old design:
+
 //   B0 - Min optointerrupter (optional)
 //   B1 - UART Receive
 //   B2 - UART Transmit
@@ -55,7 +56,26 @@
 //   A3 - Sync B input/output (optional)
 //   A5 - Max optointerrupter (optional)
 
-#define HALFSTEP
+// I/O ports - Universal PCB:
+
+// RA0 is L298 4
+// RA1 is Sync
+// RA2 is L298 3                                                            
+// RA3 is Sync
+// RA4 is the indicator LED
+// RA5 is Max sensor
+// RA6 is not used for the stepper
+// RA7 is not used for the stepper  
+                              
+// RB0 is Min sensor
+// RB1 is Rx
+// RB2 is Tx 
+// RB3 is PWM output to L298                                                                                       
+// RB4 is L298 2
+// RB5 is L298 1
+// RB6 is not used
+// RB7 is not used
+
 
 #ifdef HALFSTEP
 #define stepCount 8
@@ -136,6 +156,74 @@ void init2()
   maxPosition.bytes[1] = 0;
 }
 
+#ifdef UNIVERSAL_PCB
+
+#pragma save
+#pragma nooverlay
+
+void motor_stop()
+{
+	PORTB = PORTB & BIN(11001111);
+	PORTA = PORTA & BIN(11111010);
+_asm  /// @todo Remove when sdcc bug fixed
+  BANKSEL _coilPosition
+_endasm;
+}
+#pragma restore
+
+#pragma save
+#pragma nooverlay
+
+void motor_click()
+{
+  byte cp;
+#ifdef HALFSTEP
+  cp = coilPosition;
+#else
+  cp = coilPosition << 1;
+#endif
+  switch(cp) {
+  case 0:
+    PORTB = (PORTB & BIN(11001111)) | BIN(00010000);
+	PORTA = PORTA & BIN(11111010);
+	break;
+  case 1:
+    PORTB = (PORTB & BIN(11001111)) | BIN(00110000);
+	PORTA = PORTA & BIN(11111010);
+	break;    
+  case 2:
+    PORTB = (PORTB & BIN(11001111)) | BIN(00100000);
+	PORTA = PORTA & BIN(11111010);
+	break;     
+  case 3:
+    PORTB = (PORTB & BIN(11001111)) | BIN(00100000);
+	PORTA = (PORTA & BIN(11111010)) | BIN(00000001);
+	break;     
+  case 4:
+    PORTB = PORTB & BIN(11001111);
+	PORTA = (PORTA & BIN(11111010)) | BIN(00000001);
+	break;     
+  case 5:
+    PORTB = PORTB & BIN(11001111);
+	PORTA = (PORTA & BIN(11111010)) | BIN(00000101);
+	break;    
+  case 6:
+    PORTB = PORTB & BIN(11001111);
+	PORTA = (PORTA & BIN(11111010)) | BIN(00000100);
+	break;    
+  case 7:
+    PORTB = (PORTB & BIN(11001111)) | BIN(00010000);
+	PORTA = (PORTA & BIN(11111010)) | BIN(00000100);
+	break;    
+  }
+_asm  /// @todo Remove when sdcc bug fixed
+  BANKSEL _coilPosition
+_endasm;
+}
+#pragma restore
+
+#else
+
 #ifdef HALFSTEP
 byte stepValue()
 {
@@ -180,18 +268,44 @@ byte stepValue()
 
 #pragma save
 #pragma nooverlay
+void motor_stop()
+{
+	PORTB = PULLUPS;
+_asm  /// @todo Remove when sdcc bug fixed
+  BANKSEL _coilPosition
+_endasm;
+}
+#pragma restore
+
+#pragma save
+#pragma nooverlay
+void motor_click()
+{
+    PORTB = stepValue();
+_asm  /// @todo Remove when sdcc bug fixed
+  BANKSEL _coilPosition
+_endasm;
+}
+#pragma restore
+
+#endif
+
+
+
+#pragma save
+#pragma nooverlay
 
 void forward1()
 {
   flashLED();
   if (MAXSENSOR) {
     // We hit the end so go idle
-    PORTB = PULLUPS;
+    motor_stop();
     function = func_idle;
   } else {
     currentPosition.ival++;
     coilPosition = (coilPosition + 1) & (stepCount - 1);
-    PORTB = stepValue();
+    motor_click();
   }
 _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _coilPosition
@@ -206,12 +320,12 @@ void reverse1()
   flashLED();
   if (MINSENSOR) {
     // We hit the end so go idle
-    PORTB = PULLUPS;
+    motor_stop();
     function = func_idle;
   } else {
     currentPosition.ival--;
     coilPosition = (coilPosition + stepCount - 1) & (stepCount - 1);
-    PORTB = stepValue();
+    motor_click();
   }
 _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _coilPosition;
@@ -314,7 +428,7 @@ void timerTick()
       speed = 0;
       LEDon();
       // Uncomment next line to remove torque on arrival
-      //PORTB = PULLUPS;
+      //motor_stop();
       if (seekNotify != 255) {
 	sendMessage(seekNotify);
 	sendDataByte(CMD_SEEK);
@@ -449,7 +563,7 @@ void processCommand()
 
   case CMD_FREE:
     // Free motor (release torque)
-    PORTB = PULLUPS;
+    motor_stop();
     function = func_idle;
     break;
 

@@ -55,6 +55,16 @@ $(SDCCBASE)/share/sdcc/include/pic:
 		make install && \
 		mkdir $(SDCCBASE)/share/sdcc/include/pic
 
+# Using subversion to get SDCC - Adrian		
+#	cd sdcc-build && \
+#		svn -r 2005 co https://svn.sourceforge.net/svnroot/sdcc/trunk/sdcc sdcc && \
+#		cd sdcc && \
+#		./configure --prefix=$(SDCCBASE) && \
+#		make clean && \
+#		make && \
+#		make install && \
+#		mkdir $(SDCCBASE)/share/sdcc/include/pic
+
 # Install tool for creating header files
 $(SDCCBASE)/inc2h.pl:
 	cp sdcc-build/sdcc/support/scripts/inc2h.pl $(SDCCBASE)
