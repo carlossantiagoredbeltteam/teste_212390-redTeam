@@ -36,13 +36,21 @@
 
 #include "pic14.h"
 
+#define HALFSTEP
+//#define UNIVERSAL_PCB
+
 void init2();
 void timerTick();
 void processCommand();
 void syncStrobe();
 
+#ifdef UNIVERSAL_PCB
+#define SYNCA       PORTA1
+#define SYNCA_TRIS  TRISA1
+#else
 #define SYNCA       PORTA2
 #define SYNCA_TRIS  TRISA2
+#endif
 
 #define MINSENSOR   PORTB0
 #define MAXSENSOR   PORTA5
@@ -51,5 +59,7 @@ void syncStrobe();
 
 #define PWM         PORTB3
 #define PWM_TRIS    TRISB3
+
+
 
 #endif
