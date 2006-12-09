@@ -1,0 +1,7 @@
+This is all the Java stuff on polygons that I'm writing for layered
+manufacture.  The top-level is in rr_layer.java - that actually
+attempts to build a prismatic object from a polygon stored in a file
+(see the directory Data).
+
+- Adrian Bowyer
+
