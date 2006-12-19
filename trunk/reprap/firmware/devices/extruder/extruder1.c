@@ -65,10 +65,22 @@ void init1()
   OPTION_REG = BIN(01011111); // Disable TMR0 on RA4, 1:128 WDT, pullups on
   CMCON = BIN(00000010);      // Comparator: compare RA0 to int. ref.
   TRISA = BIN(11111111);      // Port A all inputs for now
+// RB0 is Extrude speed sensor
+// RB1 is Rx
+// RB2 is Tx 
+// RB3 is PWM output to L298                                                                                       
+// RB4 is L298 2 (Extrude)
+// RB5 is L298 1 (Extrude)
+// RB6 is not used
+// RB7 is not used
+#ifdef UNIVERSAL_PCB
+  TRISB = BIN(11000111);
+#else 
   TRISB = BIN(11000110);      // Port B outputs, except 1/2 for serial and
                               // RB7 for optointerrupter input
                               // RB6 for material out detector
                               // RB0 for heater controller output
+#endif
   // Note port B3 will be used for PWM output (CCP1)
   PIE1 = BIN(00000000);       // All peripheral interrupts initially disabled
   INTCON = BIN(00000000);     // Interrupts disabled
@@ -85,12 +97,18 @@ void init1()
 
   PEIE = 1;  // Peripheral interrupts on
   GIE = 1;   // Now turn on interrupts
-
-  PORTB = BIN(11000000);  // Pullup on RB6,RB7 for opto-inputs
-  PORTA = 0;
-
+#ifdef UNIVERSAL_PCB
+  PORTB = BIN(11000001);
   TRISA = BIN(11000010) | PORTATRIS;  // Turn off A/D lines,
-                                      // but set others as required
+                                      // but set others as required  
+  PORTA = 0;
+#else
+  PORTB = BIN(11000000);  // Pullup on RB6,RB7 for opto-inputs
+  TRISA = BIN(11000010) | PORTATRIS;  // Turn off A/D lines,
+                                      // but set others as required  
+  PORTA = 0;
+#endif
+
 
   TMR1IE = 0;
   T1CON = BIN(00000000);  // Timer 1 in clock mode with 1:1 scale
