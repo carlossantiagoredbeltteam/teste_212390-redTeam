@@ -44,6 +44,9 @@ volatile static byte seekSpeed = 0;
 volatile static byte seekNotify = 255;
 
 volatile static byte lastPortB = 0;
+volatile static byte lastPortA = 0;
+volatile static byte extrude_click = 0;
+volatile static byte material_click = 0;
 
 static byte requestedHeat0 = 0;
 static byte requestedHeat1 = 0;
@@ -92,6 +95,140 @@ volatile static addressableInt currentPosition, seekPosition;
 
 #define HEATER_PWM_PERIOD 255
 
+#ifdef UNIVERSAL_PCB
+
+void extruder_stop()
+{
+    PORTB4 = 0;
+    PORTB5 = 0;
+}
+void extruder_forward()
+{
+    PORTB5 = 0;
+    PORTB4 = 1;
+}
+void extruder_reverse()
+{
+    PORTB4 = 0;
+    PORTB5 = 1;
+}
+void heater_off()
+{
+	PORTA3 = 0;
+}
+void heater_on()
+{
+	PORTA3 = 1;
+}
+
+#pragma save
+#pragma nooverlay
+void change_log()
+{
+  char changes, current;
+  extrude_click = 0;
+  material_click = 0;
+  current = PORTB;  // Store so it doesn't change half way through processing
+  PORTB = current;  // properly reset change ??
+  changes = lastPortB ^ current;
+
+  if (changes & 0x01) {
+    // Our opto-marker changed
+    if (current & 0x01) {
+    	extrude_click = 1;
+    }
+  }
+  lastPortB = current;
+  
+  current = PORTA;  // Store so it doesn't change half way through processing
+  PORTA = current;  // properly reset change ??
+  changes = lastPortA ^ current;  
+  if (changes & 0x20) {
+    // Material detector changed
+    if (!PORTA5 && seekNotify != 255) {
+		material_click = 1;
+    }
+  }
+  lastPortA = current;
+
+}
+
+void set_cooler(byte b)
+{
+    if (b)
+      portaval |= BIN(00000001);
+    else
+      portaval &= BIN(11111110);
+    PORTA = portaval;
+}
+#pragma restore
+
+
+#else
+void extruder_stop()
+{
+    PORTB4 = 0;
+    PORTB5 = 0;
+}
+void extruder_forward()
+{
+    PORTB5 = 0;
+    PORTB4 = 1;
+}
+void extruder_reverse()
+{
+    PORTB4 = 0;
+    PORTB5 = 1;
+}
+void heater_off()
+{
+	PORTB0 = 0;
+}
+void heater_on()
+{
+	PORTB0 = 1;
+}
+
+#pragma save
+#pragma nooverlay
+void change_log()
+{
+  char changes, current;
+  extrude_click = 0;
+  material_click = 0;
+  current = PORTB;  // Store so it doesn't change half way through processing
+  PORTB = current;  // properly reset change ??
+  changes = lastPortB ^ current;
+
+  if (changes & 0x80) {
+    // Our opto-marker changed
+    if (current & 0x80) {
+    	extrude_click = 1;
+    }
+  }
+  if (changes & 0x40) {
+    // Material detector changed
+    if (!PORTB6 && seekNotify != 255) {
+		material_click = 1;
+    }
+  }
+
+  lastPortB = current;
+}
+
+void set_cooler(byte b)
+{
+    if (b)
+      portaval |= BIN(00000100);
+    else
+      portaval &= BIN(11111011);
+    PORTA = portaval;
+}
+#pragma restore
+
+
+#endif
+
 void init2()
 {
   PWMPeriod = 255;
@@ -99,6 +236,7 @@ void init2()
   seekSpeed = 0;
   seekNotify = 255;
   lastPortB = 0;
+  lastPortA = 0;
   currentPosition.bytes[0] = 0;
   currentPosition.bytes[1] = 0;
   seekPosition.bytes[0] = 0;
@@ -119,8 +257,7 @@ void init2()
 void setSpeed(byte speed, byte direction)
 {
   if (speed == 0) {
-    PORTB4 = 0;
-    PORTB5 = 0;
+    extruder_stop();
     // Also turn off PWM completely
     CCP1CON = BIN(00000000);
     PR2 = 255;
@@ -130,12 +267,10 @@ void setSpeed(byte speed, byte direction)
   } else {
     if (direction == 0) {
       // Set forward output enable
-      PORTB5 = 0;
-      PORTB4 = 1;
+      extruder_forward();
     } else {
       // Set reverse output enable
-      PORTB4 = 0;
-      PORTB5 = 1;
+      extruder_reverse();
     }
     // Turn on PWM if it wasn't already
     CCP1CON = BIN(00111100);
@@ -165,18 +300,19 @@ void timerTick()
   // temperatureLimit1, the power shuts down completely.
   if (lastTemperature <= temperatureLimit1) {
     // Reached critical limit, so power off
-    PORTB0 = 0;
+    extruder_stop();
+    heater_off();
   } else if (lastTemperature <= temperatureLimit0 &&
 	     heatCounter >= requestedHeat0 && requestedHeat0 != 255) {
     // In medium zone, heater off period (based on low heat)
-    PORTB0 = 0;
+    heater_off();
   } else if (lastTemperature > temperatureLimit0 &&
 	     heatCounter >= requestedHeat1 && requestedHeat1 != 255) {
     // In low zone, heater off period (based on high heat)
-    PORTB0 = 0;
+    heater_off();
   } else {
     // Heater on
-    PORTB0 = 1;
+    heater_on();
   }
   heatCounter++;
   TMR1H = HEATER_PWM_PERIOD;
@@ -193,21 +329,12 @@ _endasm;
 #pragma nooverlay
 void motorTick()
 {
-  char changes, current;
-
   // Clear interrupt flag
   RBIF = 0;
+  
+  change_log();
 
-  current = PORTB;  // Store so it doesn't change half way through processing
-  PORTB = current;  // properly reset change ??
-  changes = lastPortB ^ current;
-
-  if (changes & 0x80) {
-    // Our opto-marker changed
-    if (current & 0x80) {
-      // If input is set, we hit the opto-marker.  If it's not set
-      // it's come off the marker, and we only want to deal with one
-      // of them or we'll double increment everything
+  if (extrude_click) {
       
       // Adjust counter appropriately based on last known direction
       if (currentDirection)
@@ -218,27 +345,21 @@ void motorTick()
       if (seekSpeed != 0 && currentPosition.ival == seekPosition.ival) {
 	// Set speed to 0 and turn off motor
 	seekSpeed = 0;
-	PORTB4 = 0;
-	PORTB5 = 0;
+	extruder_stop();
 	// Also turn off PWM
 	CCP1CON = BIN(00000000);
 	PR2 = 255;
 	PORTB3 = 0;
 	CCPR1L = 0;
-      }
     }
   }
-  if (changes & 0x40) {
-    // Material detector changed
-    if (!PORTB6 && seekNotify != 255) {
+  if (material_click) {
       sendMessage(seekNotify);
       sendDataByte(CMD_ISEMPTY);
       sendDataByte(1);
       endMessage();
-    }
   }
 
-  lastPortB = current;
  _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _currentPosition
  _endasm;
@@ -344,7 +465,7 @@ void checkTemperature()
   delay_10us();
 
   TRISA = BIN(11000010) | PORTATRIS;
-  VRCON = 0;  // Turn of vref
+  VRCON = 0;  // Turn off vref
 
 _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _currentPosition
@@ -436,11 +557,7 @@ void processCommand()
     break;
 
   case CMD_SETCOOLER:
-    if (buffer[1])
-      portaval |= BIN(00000100);
-    else
-      portaval &= BIN(11111011);
-    PORTA = portaval;
+  	set_cooler(buffer[1]);
     break;
 
 // "Hidden" low level commands
