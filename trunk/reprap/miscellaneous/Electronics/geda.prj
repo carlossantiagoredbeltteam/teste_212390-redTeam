@@ -1,0 +1,11 @@
+[GMANAGER]
+VERSION = "20050820"
+
+[PROJECT]
+AUTHOR = "sai"
+DESC = "RepRap GEDA project"
+
+[FILES]
+FILE = "Design Notes.txt", ""
+FILE = "xaxis.sch", ""
+
