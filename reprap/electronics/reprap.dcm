@@ -1,4 +1,4 @@
-EESchema-DOCLIB  Version 2.0  7/1/2007-14:32:10
+EESchema-DOCLIB  Version 2.0  Date: 18/11/2006-14:55:41
 #
 $CMP 7805
 D Linear Regulator +5V
@@ -6,8 +6,23 @@ K POWER REGUL
 F regulator/lm78*.*
 $ENDCMP
 #
+$CMP 78L05
+D Linear Regulator +5V
+K POWER REGUL
+F regulator/lm78*.*
+$ENDCMP
+#
 $CMP C
 D Condensateur non polarise
+$ENDCMP
+#
+$CMP CAPAPOL
+D Condensateur polarise
+$ENDCMP
+#
+$CMP CONN_1
+D 1 pin
+K CONN
 $ENDCMP
 #
 $CMP CONN_2
@@ -34,9 +49,34 @@ $CMP CP
 D Condensateur polarise
 $ENDCMP
 #
+$CMP DB9
+K CONN
+$ENDCMP
+#
 $CMP DIODE
 D Diode simple
 K DEV DIODE
+$ENDCMP
+#
+$CMP LM7805
+D Linear Regulator +5V
+K POWER REGUL
+F regulator/lm78*.*
+$ENDCMP
+#
+$CMP LM7812
+D Linear Regulator +12V
+K POWER REGUL
+F regulator/lm78*.*
+$ENDCMP
+#
+$CMP MAX233
+D Driver de Ligne RS232
+K RS232
+$ENDCMP
+#
+$CMP NPN
+F transistors/bipolar/*.*
 $ENDCMP
 #
 $CMP PIC16F628

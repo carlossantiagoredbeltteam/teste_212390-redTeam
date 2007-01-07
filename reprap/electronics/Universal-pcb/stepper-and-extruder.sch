@@ -5,7 +5,7 @@ EELAYER END
 $Descr A4 11700 8267
 Sheet 1 1
 Title ""
-Date "3 dec 2006"
+Date "7 jan 2007"
 Rev ""
 Comp ""
 Comment1 ""
@@ -13,6 +13,30 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
+$Comp
+L GND #PWR28
+U 1 1 45A10408
+P 1750 1950
+F 0 "#PWR28" H 1750 1950 30  0001 C C
+F 1 "GND" H 1750 1880 30  0001 C C
+	1    1750 1950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1750 1550 2000 1550
+Wire Wire Line
+	2000 1550 2000 1850
+Wire Wire Line
+	2000 1850 2150 1850
+$Comp
+L C C4
+U 1 1 45A103C4
+P 1750 1750
+F 0 "C4" H 1800 1850 50  0000 L C
+F 1 "0.1uF" H 1800 1650 50  0000 L C
+	1    1750 1750
+	1    0    0    -1  
+$EndComp
 Kmarq B 5700 5100 "Warning Pin power_in not driven (Net 14)" F=1
 Kmarq B 5000 1300 "Warning Pin power_in not driven (Net 8)" F=1
 Wire Wire Line

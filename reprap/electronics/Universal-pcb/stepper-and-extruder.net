@@ -1,8 +1,12 @@
-# EESchema Netlist Version 1.0 generee le  3/12/2006-16:21:03
+# EESchema Netlist Version 1.0 generee le  7/1/2007-14:49:58
 (
+ ( 45A103C4 $noname  C4 0.1uF {Lib=C}
+  (    1 +5V )
+  (    2 GND )
+ )
  ( 455F4065 $noname  R9 220R {Lib=R}
   (    1 N-000046 )
-  (    2 N-000001 )
+  (    2 N-000002 )
  )
  ( 455F1F7D $noname  P10 CONN_5 {Lib=CONN_5}
   (    1 N-000013 )
@@ -18,15 +22,15 @@
  )
  ( 455F1C1A $noname  R8 220R {Lib=R}
   (    1 +5V )
-  (    2 N-000005 )
+  (    2 N-000006 )
  )
  ( 455F1BED $noname  R7 220R {Lib=R}
   (    1 +5V )
-  (    2 N-000004 )
+  (    2 N-000005 )
  )
  ( 455F16DE $noname  P8 CONN_2 {Lib=CONN_2}
   (    1 GND )
-  (    2 N-000007 )
+  (    2 N-000008 )
  )
  ( 45572E0D $noname  P7 CONN_2 {Lib=CONN_2}
   (    1 +12V )
@@ -151,12 +155,12 @@
  )
  ( 455089A1 $noname  Q2 TIP110 {Lib=DARL_N}
   (    1 GND )
-  (    2 N-000001 )
+  (    2 N-000002 )
   (    3 N-000051 )
  )
  ( 45508761 $noname  K2 CONN_3 {Lib=CONN_3}
-  (    1 N-000004 )
-  (    2 N-000006 )
+  (    1 N-000005 )
+  (    2 N-000007 )
   (    3 GND )
  )
  ( 454F9B8A $noname  P5 CONN_2 {Lib=CONN_2}
@@ -165,11 +169,11 @@
  )
  ( 454F9AD1 $noname  R2 10K {Lib=R}
   (    1 +5V )
-  (    2 N-000003 )
+  (    2 N-000004 )
  )
  ( 454F99F9 $noname  K1 CONN_3 {Lib=CONN_3}
-  (    1 N-000005 )
-  (    2 N-000003 )
+  (    1 N-000006 )
+  (    2 N-000004 )
   (    3 GND )
  )
  ( 454F9848 $noname  R12 560R {Lib=R}
@@ -292,10 +296,10 @@
   (    1 N-000009 )
   (    2 N-000016 )
   (    3 N-000043 )
-  (    4 N-000003 )
+  (    4 N-000004 )
   (    5 GND )
-  (    6 N-000006 )
-  (    7 N-000007 )
+  (    6 N-000007 )
+  (    7 N-000008 )
   (    8 N-000045 )
   (    9 N-000013 )
   (   10 N-000010 )
@@ -311,47 +315,9 @@
 )
 *
 { Pin List by Nets
-Net 1 ""
- R9 2
- Q2 2
-Net 2 "+5V"
- U1 3
- #PWR15 1
- #PWR14 1
- R8 1
- R7 1
- #PWR13 1
- J8 2
- J7 2
- #PWR12 1
- R11 1
- R10 1
- R2 1
- #PWR11 1
- #PWR10 1
- #PWR9 1
- #PWR8 1
- C2 1
- D9 1
- U2 9
- U3 14
-Net 3 ""
- R2 2
- K1 2
- U3 4
-Net 4 ""
- R7 2
- K2 1
-Net 5 ""
- R8 2
- K1 1
-Net 6 ""
- K2 2
- U3 6
-Net 7 ""
- P8 2
- U3 7
-Net 8 "GND"
+Net 1 "GND"
+ #PWR28 1
+ C4 2
  U1 2
  #PWR27 1
  P8 1
@@ -388,6 +354,47 @@ Net 8 "GND"
  U2 1
  U2 8
  U3 5
+Net 2 ""
+ R9 2
+ Q2 2
+Net 3 "+5V"
+ C4 1
+ U1 3
+ #PWR15 1
+ #PWR14 1
+ R8 1
+ R7 1
+ #PWR13 1
+ J8 2
+ J7 2
+ #PWR12 1
+ R11 1
+ R10 1
+ R2 1
+ #PWR11 1
+ #PWR10 1
+ #PWR9 1
+ #PWR8 1
+ C2 1
+ D9 1
+ U2 9
+ U3 14
+Net 4 ""
+ R2 2
+ K1 2
+ U3 4
+Net 5 ""
+ R7 2
+ K2 1
+Net 6 ""
+ R8 2
+ K1 1
+Net 7 ""
+ K2 2
+ U3 6
+Net 8 ""
+ P8 2
+ U3 7
 Net 9 ""
  P10 3
  U2 10
