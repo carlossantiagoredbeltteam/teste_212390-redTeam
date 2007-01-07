@@ -1,3 +1,0 @@
-Optointerrupters:
-- Assumes pin uses internal weak pull-up.  Opto interrupter will then pull down to ground when active (that is, when interrupted the input will be high).
-
