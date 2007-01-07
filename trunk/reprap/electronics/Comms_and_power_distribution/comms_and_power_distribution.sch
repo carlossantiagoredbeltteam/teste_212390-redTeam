@@ -1,6 +1,6 @@
 EESchema Schematic File Version 1
-LIBS:power,/home/adrian/workspace/electronics/reprap,device,conn,linear,regul,74xx,cmos4000,adc-dac,memory,xilinx,special,microcontrollers,microchip,analog_switches,motorola,intel,audio,interface,digital-audio,philips,display,cypress,siliconi,contrib
-EELAYER 43  0
+LIBS:power,/home/adrian/workspace/electronics/reprap,device,conn,linear,regul,74xx,cmos4000,adc-dac,memory,xilinx,special,microcontrollers,microchip,analog_switches,motorola,intel,audio,interface,digital-audio,philips,display,cypress,siliconi,contrib,./comms_and_power_distribution.cache
+EELAYER 23  0
 EELAYER END
 $Descr A4 11700 8267
 Sheet 1 1
@@ -14,11 +14,177 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 Wire Wire Line
+	3150 2200 3150 2300
+$Comp
+L +5V #PWR?
+U 1 1 45A18644
+P 3150 2200
+F 0 "#PWR?" H 3150 2290 20  0001 C C
+F 1 "+5V" H 3150 2290 30  0000 C C
+	1    3150 2200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4350 3100 4350 3200
+Wire Wire Line
+	6500 4150 6500 4250
+Wire Wire Line
+	7150 4150 7150 4250
+Wire Wire Line
+	7150 3500 7150 3600
+Wire Wire Line
+	6500 3500 6500 3600
+Wire Wire Line
+	5800 2600 5800 2700
+Wire Wire Line
+	6500 2600 6500 2700
+Wire Wire Line
+	7200 2600 7200 2700
+Wire Wire Line
+	7200 1950 7200 2050
+Wire Wire Line
+	6500 1950 6500 2050
+Wire Wire Line
+	5800 1950 5800 2050
+Wire Wire Line
+	5250 1950 5250 2050
+$Comp
+L +12V #PWR?
+U 1 1 45A18608
+P 7150 4150
+F 0 "#PWR?" H 7150 4100 20  0001 C C
+F 1 "+12V" H 7150 4250 30  0000 C C
+	1    7150 4150
+	1    0    0    -1  
+$EndComp
+$Comp
+L +12V #PWR?
+U 1 1 45A18605
+P 6500 4150
+F 0 "#PWR?" H 6500 4100 20  0001 C C
+F 1 "+12V" H 6500 4250 30  0000 C C
+	1    6500 4150
+	1    0    0    -1  
+$EndComp
+$Comp
+L +12V #PWR?
+U 1 1 45A185FF
+P 7150 3500
+F 0 "#PWR?" H 7150 3450 20  0001 C C
+F 1 "+12V" H 7150 3600 30  0000 C C
+	1    7150 3500
+	1    0    0    -1  
+$EndComp
+$Comp
+L +12V #PWR?
+U 1 1 45A185FB
+P 6500 3500
+F 0 "#PWR?" H 6500 3450 20  0001 C C
+F 1 "+12V" H 6500 3600 30  0000 C C
+	1    6500 3500
+	1    0    0    -1  
+$EndComp
+$Comp
+L +12V #PWR?
+U 1 1 45A185F6
+P 7200 2600
+F 0 "#PWR?" H 7200 2550 20  0001 C C
+F 1 "+12V" H 7200 2700 30  0000 C C
+	1    7200 2600
+	1    0    0    -1  
+$EndComp
+$Comp
+L +12V #PWR?
+U 1 1 45A185F2
+P 6500 2600
+F 0 "#PWR?" H 6500 2550 20  0001 C C
+F 1 "+12V" H 6500 2700 30  0000 C C
+	1    6500 2600
+	1    0    0    -1  
+$EndComp
+$Comp
+L +12V #PWR?
+U 1 1 45A185ED
+P 5800 2600
+F 0 "#PWR?" H 5800 2550 20  0001 C C
+F 1 "+12V" H 5800 2700 30  0000 C C
+	1    5800 2600
+	1    0    0    -1  
+$EndComp
+$Comp
+L +5V #PWR?
+U 1 1 45A185E8
+P 4350 3100
+F 0 "#PWR?" H 4350 3190 20  0001 C C
+F 1 "+5V" H 4350 3190 30  0000 C C
+	1    4350 3100
+	1    0    0    -1  
+$EndComp
+$Comp
+L +12V #PWR?
+U 1 1 45A185DF
+P 7200 1950
+F 0 "#PWR?" H 7200 1900 20  0001 C C
+F 1 "+12V" H 7200 2050 30  0000 C C
+	1    7200 1950
+	1    0    0    -1  
+$EndComp
+$Comp
+L +12V #PWR?
+U 1 1 45A185DB
+P 6500 1950
+F 0 "#PWR?" H 6500 1900 20  0001 C C
+F 1 "+12V" H 6500 2050 30  0000 C C
+	1    6500 1950
+	1    0    0    -1  
+$EndComp
+$Comp
+L +12V #PWR?
+U 1 1 45A185D8
+P 5800 1950
+F 0 "#PWR?" H 5800 1900 20  0001 C C
+F 1 "+12V" H 5800 2050 30  0000 C C
+	1    5800 1950
+	1    0    0    -1  
+$EndComp
+$Comp
+L +12V #PWR?
+U 1 1 45A185D2
+P 5250 1950
+F 0 "#PWR?" H 5250 1900 20  0001 C C
+F 1 "+12V" H 5250 2050 30  0000 C C
+	1    5250 1950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1750 2150 1750 2300
+$Comp
+L +12V #PWR?
+U 1 1 45A185B6
+P 1750 2150
+F 0 "#PWR?" H 1750 2100 20  0001 C C
+F 1 "+12V" H 1750 2250 30  0000 C C
+	1    1750 2150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5250 4200 5100 4200
+Wire Wire Line
+	5100 4200 5100 4700
+Wire Wire Line
+	5100 4700 5250 4700
+Wire Wire Line
+	5250 4800 5250 4900
+Wire Wire Line
+	5250 4900 5100 4900
+Wire Wire Line
+	5100 4900 5100 5150
+Wire Wire Line
 	2550 2600 2550 2700
 Wire Wire Line
-	2950 2300 3150 2300
+	3150 2300 2950 2300
 Wire Wire Line
-	2150 2300 1750 2300
+	1750 2300 2150 2300
 $Comp
 L 78L05 U1
 U 1 1 45A1407A
@@ -32,8 +198,6 @@ Text Notes 4400 2650 0    60   ~
 Power-on LED
 Wire Wire Line
 	5250 3000 5250 3100
-Wire Wire Line
-	5250 1950 5250 2050
 $Comp
 L GND #PWR30
 U 1 1 45A13734
@@ -41,15 +205,6 @@ P 5250 3100
 F 0 "#PWR30" H 5250 3100 30  0001 C C
 F 1 "GND" H 5250 3030 30  0001 C C
 	1    5250 3100
-	1    0    0    -1  
-$EndComp
-$Comp
-L +12V #PWR12
-U 1 1 45A1372D
-P 5250 1950
-F 0 "#PWR12" H 5250 1900 20  0001 C C
-F 1 "+12V" H 5250 2050 30  0000 C C
-	1    5250 1950
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
@@ -90,15 +245,6 @@ Wire Wire Line
 	5150 4600 5150 4400
 Wire Wire Line
 	5150 4400 5250 4400
-Wire Wire Line
-	5250 4700 5250 4800
-Connection ~ 5100 4900
-Wire Wire Line
-	5100 5150 5100 4200
-Wire Wire Line
-	5100 4200 5250 4200
-Wire Wire Line
-	5100 4900 5250 4900
 $Comp
 L GND #PWR29
 U 1 1 45A13462
@@ -110,8 +256,6 @@ F 1 "GND" H 5100 5080 30  0001 C C
 $EndComp
 Wire Wire Line
 	7150 4450 7150 4600
-Wire Wire Line
-	7150 4150 7150 4250
 $Comp
 L GND #PWR28
 U 1 1 45A13385
@@ -119,15 +263,6 @@ P 7150 4600
 F 0 "#PWR28" H 7150 4600 30  0001 C C
 F 1 "GND" H 7150 4530 30  0001 C C
 	1    7150 4600
-	1    0    0    -1  
-$EndComp
-$Comp
-L +12V #PWR11
-U 1 1 45A13384
-P 7150 4150
-F 0 "#PWR11" H 7150 4100 20  0001 C C
-F 1 "+12V" H 7150 4250 30  0000 C C
-	1    7150 4150
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -141,8 +276,6 @@ F 1 "CONN_2" V 7550 4350 40  0000 C C
 $EndComp
 Wire Wire Line
 	5800 2900 5800 3050
-Wire Wire Line
-	5800 2600 5800 2700
 $Comp
 L GND #PWR27
 U 1 1 45A13382
@@ -150,15 +283,6 @@ P 5800 3050
 F 0 "#PWR27" H 5800 3050 30  0001 C C
 F 1 "GND" H 5800 2980 30  0001 C C
 	1    5800 3050
-	1    0    0    -1  
-$EndComp
-$Comp
-L +12V #PWR10
-U 1 1 45A13381
-P 5800 2600
-F 0 "#PWR10" H 5800 2550 20  0001 C C
-F 1 "+12V" H 5800 2700 30  0000 C C
-	1    5800 2600
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -172,8 +296,6 @@ F 1 "CONN_2" V 6200 2800 40  0000 C C
 $EndComp
 Wire Wire Line
 	6500 2900 6500 3050
-Wire Wire Line
-	6500 2600 6500 2700
 $Comp
 L GND #PWR26
 U 1 1 45A1337F
@@ -181,15 +303,6 @@ P 6500 3050
 F 0 "#PWR26" H 6500 3050 30  0001 C C
 F 1 "GND" H 6500 2980 30  0001 C C
 	1    6500 3050
-	1    0    0    -1  
-$EndComp
-$Comp
-L +12V #PWR9
-U 1 1 45A1337E
-P 6500 2600
-F 0 "#PWR9" H 6500 2550 20  0001 C C
-F 1 "+12V" H 6500 2700 30  0000 C C
-	1    6500 2600
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -203,8 +316,6 @@ F 1 "CONN_2" V 6900 2800 40  0000 C C
 $EndComp
 Wire Wire Line
 	7200 2900 7200 3050
-Wire Wire Line
-	7200 2600 7200 2700
 $Comp
 L GND #PWR25
 U 1 1 45A1337C
@@ -212,15 +323,6 @@ P 7200 3050
 F 0 "#PWR25" H 7200 3050 30  0001 C C
 F 1 "GND" H 7200 2980 30  0001 C C
 	1    7200 3050
-	1    0    0    -1  
-$EndComp
-$Comp
-L +12V #PWR8
-U 1 1 45A1337B
-P 7200 2600
-F 0 "#PWR8" H 7200 2550 20  0001 C C
-F 1 "+12V" H 7200 2700 30  0000 C C
-	1    7200 2600
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -234,8 +336,6 @@ F 1 "CONN_2" V 7600 2800 40  0000 C C
 $EndComp
 Wire Wire Line
 	6500 4450 6500 4600
-Wire Wire Line
-	6500 4150 6500 4250
 $Comp
 L GND #PWR24
 U 1 1 45A13379
@@ -243,15 +343,6 @@ P 6500 4600
 F 0 "#PWR24" H 6500 4600 30  0001 C C
 F 1 "GND" H 6500 4530 30  0001 C C
 	1    6500 4600
-	1    0    0    -1  
-$EndComp
-$Comp
-L +12V #PWR7
-U 1 1 45A13378
-P 6500 4150
-F 0 "#PWR7" H 6500 4100 20  0001 C C
-F 1 "+12V" H 6500 4250 30  0000 C C
-	1    6500 4150
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -265,8 +356,6 @@ F 1 "CONN_2" V 6900 4350 40  0000 C C
 $EndComp
 Wire Wire Line
 	7150 3800 7150 3950
-Wire Wire Line
-	7150 3500 7150 3600
 $Comp
 L GND #PWR23
 U 1 1 45A13373
@@ -274,15 +363,6 @@ P 7150 3950
 F 0 "#PWR23" H 7150 3950 30  0001 C C
 F 1 "GND" H 7150 3880 30  0001 C C
 	1    7150 3950
-	1    0    0    -1  
-$EndComp
-$Comp
-L +12V #PWR6
-U 1 1 45A13372
-P 7150 3500
-F 0 "#PWR6" H 7150 3450 20  0001 C C
-F 1 "+12V" H 7150 3600 30  0000 C C
-	1    7150 3500
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -296,8 +376,6 @@ F 1 "CONN_2" V 7550 3700 40  0000 C C
 $EndComp
 Wire Wire Line
 	5800 2250 5800 2400
-Wire Wire Line
-	5800 1950 5800 2050
 $Comp
 L GND #PWR22
 U 1 1 45A13364
@@ -305,15 +383,6 @@ P 5800 2400
 F 0 "#PWR22" H 5800 2400 30  0001 C C
 F 1 "GND" H 5800 2330 30  0001 C C
 	1    5800 2400
-	1    0    0    -1  
-$EndComp
-$Comp
-L +12V #PWR5
-U 1 1 45A13363
-P 5800 1950
-F 0 "#PWR5" H 5800 1900 20  0001 C C
-F 1 "+12V" H 5800 2050 30  0000 C C
-	1    5800 1950
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -327,8 +396,6 @@ F 1 "CONN_2" V 6200 2150 40  0000 C C
 $EndComp
 Wire Wire Line
 	6500 2250 6500 2400
-Wire Wire Line
-	6500 1950 6500 2050
 $Comp
 L GND #PWR21
 U 1 1 45A13361
@@ -336,15 +403,6 @@ P 6500 2400
 F 0 "#PWR21" H 6500 2400 30  0001 C C
 F 1 "GND" H 6500 2330 30  0001 C C
 	1    6500 2400
-	1    0    0    -1  
-$EndComp
-$Comp
-L +12V #PWR4
-U 1 1 45A13360
-P 6500 1950
-F 0 "#PWR4" H 6500 1900 20  0001 C C
-F 1 "+12V" H 6500 2050 30  0000 C C
-	1    6500 1950
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -358,8 +416,6 @@ F 1 "CONN_2" V 6900 2150 40  0000 C C
 $EndComp
 Wire Wire Line
 	7200 2250 7200 2400
-Wire Wire Line
-	7200 1950 7200 2050
 $Comp
 L GND #PWR20
 U 1 1 45A13352
@@ -367,15 +423,6 @@ P 7200 2400
 F 0 "#PWR20" H 7200 2400 30  0001 C C
 F 1 "GND" H 7200 2330 30  0001 C C
 	1    7200 2400
-	1    0    0    -1  
-$EndComp
-$Comp
-L +12V #PWR3
-U 1 1 45A13351
-P 7200 1950
-F 0 "#PWR3" H 7200 1900 20  0001 C C
-F 1 "+12V" H 7200 2050 30  0000 C C
-	1    7200 1950
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -435,17 +482,6 @@ F 1 "CONN_2" V 1450 4150 40  0000 C C
 	1    1400 4150
 	-1   0    0    1   
 $EndComp
-Wire Wire Line
-	4500 3050 4500 3200
-$Comp
-L +5V #PWR14
-U 1 1 45A12952
-P 4500 3050
-F 0 "#PWR14" H 4500 3140 20  0001 C C
-F 1 "+5V" H 4500 3140 30  0000 C C
-	1    4500 3050
-	1    0    0    -1  
-$EndComp
 Connection ~ 4800 3700
 Wire Wire Line
 	5150 3800 5150 3700
@@ -478,7 +514,7 @@ $EndComp
 Wire Wire Line
 	4500 3600 4350 3600
 Wire Wire Line
-	4500 3200 4350 3200
+	4350 3200 4500 3200
 $Comp
 L CP C5
 U 1 1 45A128D1
@@ -516,8 +552,6 @@ F 1 "1uF" H 2650 3300 50  0000 L C
 $EndComp
 Wire Wire Line
 	6500 3800 6500 3950
-Wire Wire Line
-	6500 3500 6500 3600
 $Comp
 L GND #PWR16
 U 1 1 45A12699
@@ -527,40 +561,9 @@ F 1 "GND" H 6500 3880 30  0001 C C
 	1    6500 3950
 	1    0    0    -1  
 $EndComp
-$Comp
-L +12V #PWR2
-U 1 1 45A12695
-P 6500 3500
-F 0 "#PWR2" H 6500 3450 20  0001 C C
-F 1 "+12V" H 6500 3600 30  0000 C C
-	1    6500 3500
-	1    0    0    -1  
-$EndComp
 Connection ~ 1750 2700
 Wire Wire Line
 	1750 2850 1750 2500
-Wire Wire Line
-	3150 2300 3150 2100
-Wire Wire Line
-	1750 2300 1750 2100
-$Comp
-L +5V #PWR13
-U 1 1 45A12672
-P 3150 2100
-F 0 "#PWR13" H 3150 2190 20  0001 C C
-F 1 "+5V" H 3150 2190 30  0000 C C
-	1    3150 2100
-	1    0    0    -1  
-$EndComp
-$Comp
-L +12V #PWR1
-U 1 1 45A12660
-P 1750 2100
-F 0 "#PWR1" H 1750 2050 20  0001 C C
-F 1 "+12V" H 1750 2200 30  0000 C C
-	1    1750 2100
-	1    0    0    -1  
-$EndComp
 $Comp
 L GND #PWR15
 U 1 1 45A1264D
