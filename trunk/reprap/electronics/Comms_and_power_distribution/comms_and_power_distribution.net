@@ -1,129 +1,212 @@
-( { Netlist by Cvpcb (2006-08-28), date = 9/1/2007-22:07:32 }
- ( 45A40A1C C1V5 C1 100uF
-  ( 1 +5V )
-  ( 2 GND )
+# EESchema Netlist Version 1.0 generee le  13/1/2007-14:21:04
+(
+ ( 45A40E6C $noname  P10 CONN_2 {Lib=CONN_2}
+  (    1 +12V )
+  (    2 GND )
  )
- ( 45A40B29 C1V5 C2 1uF
-  ( 1 N-000014 )
-  ( 2 N-000013 )
+ ( 45A40E69 $noname  P9 CONN_2 {Lib=CONN_2}
+  (    1 +12V )
+  (    2 GND )
  )
- ( 45A40B2E C1V5 C3 1uF
-  ( 1 N-000016 )
-  ( 2 +5V )
+ ( 45A40E66 $noname  P8 CONN_2 {Lib=CONN_2}
+  (    1 +12V )
+  (    2 GND )
  )
- ( 45A40B38 C1V5 C4 1uF
-  ( 1 GND )
-  ( 2 N-000015 )
+ ( 45A40E63 $noname  P7 CONN_2 {Lib=CONN_2}
+  (    1 +12V )
+  (    2 GND )
  )
- ( 45A40CF5 C1V5 C5 1uF
-  ( 1 N-000005 )
-  ( 2 N-000004 )
+ ( 45A40E57 $noname  P6 CONN_2 {Lib=CONN_2}
+  (    1 +12V )
+  (    2 GND )
  )
- ( 45A40A15 CP36V C6 4700uF
-  ( 1 +12V )
-  ( 2 GND )
+ ( 45A40E4E $noname  P5 CONN_2 {Lib=CONN_2}
+  (    1 +12V )
+  (    2 GND )
  )
- ( 45A40D97 LEDV D1 LED
-  ( 1 N-000003 )
-  ( 2 GND )
+ ( 45A40E1F $noname  P4 CONN_2 {Lib=CONN_2}
+  (    1 +12V )
+  (    2 GND )
  )
- ( 45A40B59 DB9FC J1 DB9
-  ( 1 ? )
-  ( 2 N-000011 )
-  ( 3 N-000010 )
-  ( 4 N-000009 )
-  ( 5 GND )
-  ( 6 N-000009 )
-  ( 7 N-000008 )
-  ( 8 N-000008 )
-  ( 9 GND )
+ ( 45A40D97 $noname  D1 LED {Lib=LED}
+  (    1 N-000003 )
+  (    2 GND )
  )
- ( 45A409FB bornier2 P1 CONN_2
-  ( 1 GND )
-  ( 2 +12V )
+ ( 45A40D8A $noname  R1 560R {Lib=R}
+  (    1 +12V )
+  (    2 N-000003 )
  )
- ( 45A40B73 SIL-2 P2 CONN_2
-  ( 1 GND )
-  ( 2 N-000012 )
+ ( 45A40CF5 $noname  C5 1uF {Lib=CP}
+  (    1 N-000005 )
+  (    2 N-000004 )
  )
- ( 45A40B82 SIL-2 P3 CONN_2
-  ( 1 GND )
-  ( 2 N-000007 )
+ ( 45A40B82 $noname  P3 CONN_2 {Lib=CONN_2}
+  (    1 GND )
+  (    2 N-000007 )
  )
- ( 45A40E1F SIL-2 P4 CONN_2
-  ( 1 +12V )
-  ( 2 GND )
+ ( 45A40B73 $noname  P2 CONN_2 {Lib=CONN_2}
+  (    1 GND )
+  (    2 N-000012 )
  )
- ( 45A40E4E SIL-2 P5 CONN_2
-  ( 1 +12V )
-  ( 2 GND )
+ ( 45A40B59 $noname  J1 DB9 {Lib=DB9}
+  (    1  ? )
+  (    2 N-000011 )
+  (    3 N-000010 )
+  (    4 N-000009 )
+  (    5 GND )
+  (    6 N-000009 )
+  (    7 N-000008 )
+  (    8 N-000008 )
+  (    9 GND )
  )
- ( 45A40E57 SIL-2 P6 CONN_2
-  ( 1 +12V )
-  ( 2 GND )
+ ( 45A40B38 $noname  C4 1uF {Lib=CP}
+  (    1 GND )
+  (    2 N-000015 )
  )
- ( 45A40E63 SIL-2 P7 CONN_2
-  ( 1 +12V )
-  ( 2 GND )
+ ( 45A40B2E $noname  C3 1uF {Lib=CP}
+  (    1 N-000016 )
+  (    2 +5V )
  )
- ( 45A40E66 SIL-2 P8 CONN_2
-  ( 1 +12V )
-  ( 2 GND )
+ ( 45A40B29 $noname  C2 1uF {Lib=CP}
+  (    1 N-000014 )
+  (    2 N-000013 )
  )
- ( 45A40E69 SIL-2 P9 CONN_2
-  ( 1 +12V )
-  ( 2 GND )
+ ( 45A40B1C $noname  U2 MAX232 {Lib=MAX232}
+  (    1 N-000005 )
+  (    2 N-000016 )
+  (    3 N-000004 )
+  (    4 N-000014 )
+  (    5 N-000013 )
+  (    6 N-000015 )
+  (    7  ? )
+  (    8  ? )
+  (    9  ? )
+  (   10  ? )
+  (   11 N-000007 )
+  (   12 N-000012 )
+  (   13 N-000010 )
+  (   14 N-000011 )
+  (   15 GND )
+  (   16 +5V )
  )
- ( 45A40E6C SIL-2 P10 CONN_2
-  ( 1 +12V )
-  ( 2 GND )
+ ( 45A40A1C $noname  C1 100uF {Lib=CP}
+  (    1 +5V )
+  (    2 GND )
  )
- ( 45A40E6F SIL-2 P11 CONN_2
-  ( 1 +12V )
-  ( 2 GND )
+ ( 45A40A15 $noname  C6 4700uF {Lib=CP}
+  (    1 +12V )
+  (    2 GND )
  )
- ( 45A40E72 SIL-2 P12 CONN_2
-  ( 1 +12V )
-  ( 2 GND )
+ ( 45A409FB $noname  P1 CONN_2 {Lib=CONN_2}
+  (    1 GND )
+  (    2 +12V )
  )
- ( 45A40E75 SIL-2 P13 CONN_2
-  ( 1 +12V )
-  ( 2 GND )
- )
- ( 45A40E78 SIL-2 P14 CONN_2
-  ( 1 +12V )
-  ( 2 GND )
- )
- ( 45A40E7B SIL-2 P15 CONN_2
-  ( 1 +12V )
-  ( 2 GND )
- )
- ( 45A40D8A R3 R1 560R
-  ( 1 +12V )
-  ( 2 N-000003 )
- )
- ( 45A409E1 TO92 U1 78L05
-  ( 1 +12V )
-  ( 2 GND )
-  ( 3 +5V )
- )
- ( 45A40B1C 16dip300 U2 MAX232
-  ( 1 N-000005 )
-  ( 2 N-000016 )
-  ( 3 N-000004 )
-  ( 4 N-000014 )
-  ( 5 N-000013 )
-  ( 6 N-000015 )
-  ( 7 ? )
-  ( 8 ? )
-  ( 9 ? )
-  ( 10 ? )
-  ( 11 N-000007 )
-  ( 12 N-000012 )
-  ( 13 N-000010 )
-  ( 14 N-000011 )
-  ( 15 GND )
-  ( 16 +5V )
+ ( 45A409E1 $noname  U1 78L05 {Lib=78L05}
+  (    1 +12V )
+  (    2 GND )
+  (    3 +5V )
  )
 )
 *
+{ Pin List by Nets
+Net 1 "GND"
+ #PWR29 1
+ P10 2
+ #PWR28 1
+ P9 2
+ #PWR27 1
+ P8 2
+ #PWR26 1
+ P7 2
+ #PWR25 1
+ P6 2
+ #PWR24 1
+ P5 2
+ #PWR23 1
+ P4 2
+ #PWR22 1
+ D1 2
+ #PWR21 1
+ #PWR20 1
+ #PWR19 1
+ #PWR18 1
+ P3 1
+ P2 1
+ J1 9
+ J1 5
+ C4 1
+ U2 15
+ #PWR17 1
+ C1 2
+ C6 2
+ P1 1
+ U1 2
+Net 2 "+12V"
+ #PWR9 1
+ P10 1
+ #PWR8 1
+ P9 1
+ #PWR7 1
+ P8 1
+ #PWR6 1
+ P7 1
+ #PWR5 1
+ P6 1
+ #PWR4 1
+ P5 1
+ #PWR3 1
+ P4 1
+ #PWR2 1
+ R1 1
+ #PWR1 1
+ C6 1
+ P1 2
+ U1 1
+Net 3 ""
+ D1 1
+ R1 2
+Net 4 ""
+ C5 2
+ U2 3
+Net 5 ""
+ C5 1
+ U2 1
+Net 6 "+5V"
+ #PWR16 1
+ C3 2
+ U2 16
+ #PWR15 1
+ C1 1
+ U1 3
+Net 7 ""
+ P3 2
+ U2 11
+Net 8 ""
+ J1 7
+ J1 8
+Net 9 ""
+ J1 6
+ J1 4
+Net 10 ""
+ J1 3
+ U2 13
+Net 11 ""
+ J1 2
+ U2 14
+Net 12 ""
+ P2 2
+ U2 12
+Net 13 ""
+ C2 2
+ U2 5
+Net 14 ""
+ C2 1
+ U2 4
+Net 15 ""
+ C4 2
+ U2 6
+Net 16 ""
+ C3 1
+ U2 2
+}
+#End
