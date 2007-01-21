@@ -2,6 +2,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
 #include "shared.h"
 
 extern byte address;
@@ -14,19 +16,26 @@ extern int exitAfter;
 void packetNotifyReceive(byte *data, byte length)
 {
   int i;
+  printTime();
   printf("master %d received packet:", address);
   for(i = 0; i < length; i++)
     printf(" %02x", data[i]);
   printf("\n");
+  fflush(stdout);
 
-  releaseReceiveBuffer();
+  if (!strncmp(data, "A", length)) {
+    reply();
+    sendDataByte('B');
+    endMessage();
+  } else 
+    releaseReceiveBuffer();
 }
 
 void comms_main()
 {
   sendMessage(1);
-  sendDataByte(65);
-  sendDataByte(66);
+  sendDataByte('G');
+  sendDataByte('O');
   endMessage();
 
   uartTransmit(0x54);
@@ -34,25 +43,50 @@ void comms_main()
 }
 
 
-int main()
+int main(int argc, char **argv)
 {
   pthread_t timer_thread;
   pthread_t comms_thread;
   pthread_attr_t pthread_custom_attr;
+  char buf[1024];
+  FILE *f;
+  int c;
+
+  extern byte action;
+  extern byte action_value;
+  extern int act_after;
+
+  if (argc == 1) {
+    action = ACT_NONE;
+    exitAfter = 10;
+  } else if (argc == 5) {
+    act_after = atoi(argv[1]);
+    action = atoi(argv[2]);
+    action_value = atoi(argv[3]);
+    exitAfter = atoi(argv[4]);
+  } else {
+    fprintf(stderr, "Usage: ./master action_after action action_val exit\n");
+    exit(1);
+  }
 
   switch(fork()) {
   case -1:
     perror("Fork failed");
     exit(1);
   case 0:
-    system("./slave &");
-    //execl("slave", "slave");
+    f = popen("./slave", "r");
+    while(fgets(buf, 1024, f)) {
+      printf(buf);
+      fflush(stdout);
+    }
+    pclose(f);
     exit(1);
   }
 
-  exitAfter = 50;
-
   printf("Starting master\n");
+  fflush(stdout);
+
+  alarm(10);
 
   address = 0;
 

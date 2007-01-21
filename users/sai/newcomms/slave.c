@@ -16,12 +16,18 @@ void packetNotifyReceive(byte *data, byte length)
   for(i = 0; i < length; i++)
     printf(" %02x", data[i]);
   printf("\n");
+  fflush(stdout);
 
-  reply();
-  sendDataByte(0x51);
-  endMessage();
-
-  //releaseReceiveBuffer();
+  if (!strncmp(data, "GO", length)) {
+    reply();
+    sendDataByte('A');
+    endMessage();
+  } else if (!strncmp(data, "B", length)) {
+    reply();
+    sendDataByte('C');
+    endMessage();
+  } else 
+    releaseReceiveBuffer();
 }
 
 int main()
@@ -31,6 +37,7 @@ int main()
   pthread_attr_t pthread_custom_attr;
 
   printf("Started slave\n");
+  fflush(stdout);
 
   address = 1;
 

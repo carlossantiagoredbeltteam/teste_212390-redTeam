@@ -1,7 +1,20 @@
 #ifndef _SHARED_H
 #define _SHARED_H
 
+#include <sys/time.h>
+#include <stdio.h>
+
+#define ACT_NONE   0
+#define ACT_FLIP   1
+#define ACT_DROP   2
+#define ACT_INSERT 3
+
 typedef unsigned char byte;
+
+extern byte action;
+extern byte action_value;
+extern int act_after;
+extern int exitAfter;
 
 extern void timer_ping();
 extern void uartNotifyReceive();
@@ -12,6 +25,7 @@ extern void endMessage();
 
 extern void packetNotifyReceive(byte *data, byte length);
 
+extern void printTime();
 
 extern byte RCREG;
 
