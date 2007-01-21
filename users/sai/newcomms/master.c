@@ -91,7 +91,7 @@ int main(int argc, char **argv)
   address = 0;
 
   rfd = open("0", O_RDONLY);
-  wfd = open("1", O_WRONLY);
+  wfd = open("1", O_WRONLY | O_NONBLOCK);
 
   pthread_attr_init(&pthread_custom_attr);
   

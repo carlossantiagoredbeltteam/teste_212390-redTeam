@@ -21,16 +21,13 @@ enum RAP_states {
   RAP_expectDCRC,    // 7
 
   RAP_expectHDB2Pass,   // 8
-  RAP_expectHCRCPass,   // 9
-  RAP_readingDataPass,  // 10
-  RAP_expectDCRCPass,   // 11
+  RAP_readingDataPass,  // 9
+  RAP_expectDCRCPass,   // 10
 
-  RAP_expectDSTDrop,    // 12
-  RAP_expectSRCDrop,    // 13
-  RAP_expectHDB2Drop,   // 14
-  RAP_expectHCRCDrop,   // 15
-  RAP_readingDataDrop,  // 16
-  RAP_expectDCRCDrop    // 17
+  RAP_expectDSTDrop,    // 11
+  RAP_expectSRCDrop,    // 12
+  RAP_readingDataDrop,  // 13
+  RAP_expectDCRCDrop    // 14
 };
 
 enum Drop_Actions {
@@ -58,21 +55,23 @@ static volatile byte uartState = RAP_idle; ///< Current RAP state machine state
 static volatile byte crc; ///< Incrementally calculated CRC value
 
 // Single bit flags
-static volatile byte xmitBufferReady = 0; ///< We have data ready to send
-static volatile byte xmitBufferSent = 0;  ///< Data has been sent
-static volatile byte in_bufferBusy = 0;
-static volatile byte out_bufferBusy = 0;
-static volatile byte out_timedout = 0;
+static volatile struct flags1_s {
+  unsigned xmitBufferReady : 1; ///< We have data ready to send
+  unsigned xmitBufferSent : 1;  ///< Data has been sent
+  unsigned in_bufferBusy : 1;
+  unsigned out_bufferBusy : 1;
+  unsigned out_timedout : 1;
+
+  /// When dropping data, this determines the action we'll take after
+  /// all of the packet is received.
+  unsigned in_dropAction : 2;
+} flags1 = {0,0,0,0,0,0};
 
 // Receive buffer information
 static volatile byte in_hdb1;
 static volatile byte in_src;
 static volatile byte in_dest;
 static volatile byte in_hdb2;
-
-/// When dropping data, this determines the action we'll take after
-/// all of the packet is received.
-static volatile byte in_dropAction;
 
 static volatile byte in_bufferIndex;
 static volatile byte in_buffer[MAX_PAYLOAD];
@@ -117,19 +116,19 @@ static void sendCurrentOutBuffer()
 {
   byte i;
 
-  if (xmitBufferSent) {
+  if (flags1.xmitBufferSent) {
      printf("Sending already sent packet!\n");
      fflush(stdout);
      return;
   }
 
-  if (!xmitBufferReady) {
+  if (!flags1.xmitBufferReady) {
      printf("Transmit buffer not ready!!\n");
      fflush(stdout);
      return;
   }
 
-  xmitBufferSent = 1;
+  flags1.xmitBufferSent = 1;
   uartTransmit(RAP_SYNC);
   crc = 0;
   uartTransmit(computeCRC(out_hdb1));
@@ -160,7 +159,7 @@ void timer_ping()
       in_packetTimer = -1;
       printf("  packet receive timed out at %d\n", address);
       fflush(stdout);
-      in_bufferBusy = 0;
+      flags1.in_bufferBusy = 0;
       uartState = RAP_idle;
     }
   }
@@ -168,7 +167,7 @@ void timer_ping()
     out_resendTimer--;
     if (out_resendTimer == 0) {
       out_resendTimer = -1;
-      out_timedout = 1;
+      flags1.out_timedout = 1;
       printf("  send timed out at %d\n", address);
       fflush(stdout);
     }
@@ -210,34 +209,34 @@ void uartNotifyReceive()
       // We have received a token, so if we have any data to send we
       // can send it now.
       in_tokenTimer = 0;
-      if (xmitBufferReady && !xmitBufferSent) {
+      if (flags1.xmitBufferReady && !flags1.xmitBufferSent) {
 	sendCurrentOutBuffer();
 	uartState = RAP_idle;
 	in_packetTimer = -1;
-	out_bufferBusy = 0;
-      } else if (out_timedout) {
+	flags1.out_bufferBusy = 0;
+      } else if (flags1.out_timedout) {
 	// If our last send timed out, send it again
 	out_resendTimer = PKT_SEND_TIMEOUT;
-	out_timedout = 0;
-	xmitBufferSent = 0;
+	flags1.out_timedout = 0;
+	flags1.xmitBufferSent = 0;
 	sendCurrentOutBuffer();
 	uartState = RAP_idle;
 	in_packetTimer = -1;
-	in_bufferBusy = 0;      
+	flags1.in_bufferBusy = 0;      
       } else {
 	// Nothing to send, so pass the token on
 	sendTokenImmediate();
       }
     } else {
       // Header of a normal packet
-      if (in_bufferBusy) {
+      if (flags1.in_bufferBusy) {
 	// Inward buffer still busy, so have to drop packet.
 	printf("%d Buffer busy, drop %02x\n", address, c);
 	fflush(stdout);
 	uartState = RAP_expectSRCDrop;
-	in_dropAction = Drop_None;
+	flags1.in_dropAction = Drop_None;
       } else {
-	in_bufferBusy = 1;
+	flags1.in_bufferBusy = 1;
 	in_hdb1 = c;
 	crc = 0;
 	computeCRC(c);
@@ -273,10 +272,13 @@ void uartNotifyReceive()
     if (c == crc) {
       byte tseq;
       byte ok = 1;
-      in_dropAction = Drop_None;
+      flags1.in_dropAction = Drop_None;
 
       printf("Valid header CRC\n");
       fflush(stdout);
+
+      // Restart timer
+      in_packetTimer = PKT_RECEIVE_TIMEOUT;
 
       // We now have a valid header, so we can process it
       if (in_src == address) {
@@ -284,7 +286,7 @@ void uartNotifyReceive()
 	fflush(stdout);
 
 	uartState = RAP_readingDataDrop;
-	in_dropAction = Drop_None;
+	flags1.in_dropAction = Drop_None;
 	ok = 0;
       } else if (in_dest != address) {
 	printf("Not for me (%d), forward it on\n", in_dest);
@@ -295,7 +297,7 @@ void uartNotifyReceive()
 	uartTransmit(in_dest);
 	uartTransmit(in_hdb2);
 	uartTransmit(c);
-	in_bufferBusy = 0;
+	flags1.in_bufferBusy = 0;
 	uartState = RAP_readingDataPass;
 	ok = 0;
       }
@@ -325,7 +327,7 @@ void uartNotifyReceive()
 	  printf("Lost previous packet, retransmit\n");
 	  fflush(stdout);
 	  uartState = RAP_readingDataDrop;
-	  in_dropAction = Drop_ResendLast;
+	  flags1.in_dropAction = Drop_ResendLast;
 	  ok = 0;
 	} else if (tseq == nextrs) {
 	  printf("Valid sequence\n");
@@ -334,7 +336,7 @@ void uartNotifyReceive()
 	  printf("Invalid tsequence %d (lastReceive=%d), drop and reset\n",
 		 tseq, lastReceive);
 	  fflush(stdout);
-	  in_dropAction = Drop_Reset;
+	  flags1.in_dropAction = Drop_Reset;
 	  uartState = RAP_readingDataDrop;
 	  ok = 0;
 	}
@@ -344,13 +346,13 @@ void uartNotifyReceive()
 	// TODO: check sequence of NAK
 	printf("Received NAK, resend last packet\n");
 	fflush(stdout);
-	xmitBufferSent = 0;
+	flags1.xmitBufferSent = 0;
 	sendCurrentOutBuffer();
 	uartState = RAP_idle;
 	in_packetTimer = -1;
-	in_bufferBusy = 0;
+	flags1.in_bufferBusy = 0;
 	out_resendTimer = PKT_SEND_TIMEOUT;
-	out_timedout = 0;
+	flags1.out_timedout = 0;
 	break;
       }
 
@@ -360,10 +362,10 @@ void uartNotifyReceive()
 	rseq = RAP_RSEQ(in_hdb2);
 	if (rseq == (lastTransmit & 3)) {
 	  printf("Previous data acknowledged\n");
-	  xmitBufferReady = 0;
+	  flags1.xmitBufferReady = 0;
 	  fflush(stdout);
 	  out_resendTimer = 255;
-	  out_timedout = 0;
+	  flags1.out_timedout = 0;
 	} else {
 	  printf("Invalid rsequence, dropping packet\n");
 	  fflush(stdout);
@@ -382,7 +384,7 @@ void uartNotifyReceive()
       printf("Header CRC failure (got %02x, expected %02x), drop packet\n",
 	     c, crc);
       fflush(stdout);
-      in_dropAction = Drop_None;
+      flags1.in_dropAction = Drop_None;
       uartState = RAP_readingDataDrop;
     }
     break;
@@ -391,6 +393,8 @@ void uartNotifyReceive()
   case RAP_readingData:
     in_buffer[in_bufferIndex] = c;
     in_bufferIndex++;
+    // Restart timer
+    in_packetTimer = PKT_RECEIVE_TIMEOUT;
     computeCRC(c);
     if (in_bufferIndex == (in_hdb2 & RAP_HDB2_LENMASK))
       uartState = RAP_expectDCRC;
@@ -409,19 +413,19 @@ void uartNotifyReceive()
       printf("Data CRC failure (got %02x, expected %02x), NAK packet\n",
 	     c, crc);
       fflush(stdout);
-      if (out_bufferBusy) {
+      if (flags1.out_bufferBusy) {
 	// Already waiting to send a packet, so just drop it.
 	printf("Outward buffer already busy, drop\n");
 	fflush(stdout);
       } else {
-	out_bufferBusy = 1;
+	flags1.out_bufferBusy = 1;
 	out_hdb1 = RAP_HDB1_NAK;
 	out_hdb2 = 0;
 	out_length = 0;
 	out_dest = in_src;
-	xmitBufferReady = 1;
-	xmitBufferSent = 0;
-	in_bufferBusy = 0;
+	flags1.xmitBufferReady = 1;
+	flags1.xmitBufferSent = 0;
+	flags1.in_bufferBusy = 0;
 
 	// Put out a new token
 	sendTokenImmediate();
@@ -460,26 +464,26 @@ void uartNotifyReceive()
 
   // ----------------------------------------------------------------------- //
   case RAP_expectDCRCDrop:
-    in_bufferBusy = 0;
-    switch(in_dropAction) {
+    flags1.in_bufferBusy = 0;
+    switch(flags1.in_dropAction) {
     case Drop_None:
       // Drop and do nothing.  Except of course, we still
       // need to put a token back into circulation
       sendTokenImmediate();
       break;
-    case Drop_NAK:
     case Drop_ResendLast:
-      xmitBufferSent = 0;
+      flags1.xmitBufferSent = 0;
       sendCurrentOutBuffer();
       uartState = RAP_idle;
       in_packetTimer = -1;
-      in_bufferBusy = 0;
+      flags1.in_bufferBusy = 0;
       out_resendTimer = PKT_SEND_TIMEOUT;
-      out_timedout = 0;
+      flags1.out_timedout = 0;
       break;
+    case Drop_NAK:
     case Drop_Reset:
     default:
-      printf("Unknown drop action %d\n", in_dropAction);
+      printf("Unknown drop action %d\n", flags1.in_dropAction);
       fflush(stdout);
     }
     break;
@@ -496,17 +500,17 @@ void uartNotifyReceive()
 void releaseReceiveBuffer()
 {
   // Send an ACK and free buffer for other data
-  if (in_bufferBusy) {
+  if (flags1.in_bufferBusy) {
     printf("Sending bare ACK\n");
     fflush(stdout);
-    out_bufferBusy = 1;
+    flags1.out_bufferBusy = 1;
     out_hdb1 = RAP_HDB1_ACK;
     out_hdb2 = ((lastTransmit & 3) << 6) | ((lastReceive & 3) << 4);
     out_length = 0;
     out_dest = in_src;
-    in_bufferBusy = 0;
-    xmitBufferReady = 1;
-    xmitBufferSent = 0;
+    flags1.in_bufferBusy = 0;
+    flags1.xmitBufferReady = 1;
+    flags1.xmitBufferSent = 0;
   } else {
     printf("Release called, probably should have called endMessage\n");
     fflush(stdout);
@@ -515,7 +519,7 @@ void releaseReceiveBuffer()
 
 void reply()
 {
-  if (in_bufferBusy) {
+  if (flags1.in_bufferBusy) {
     sendMessage(in_src);
   } else {
     printf("Sending reply when no data received\n");
@@ -525,7 +529,7 @@ void reply()
 
 void sendMessage(byte dest)
 {
-  out_bufferBusy = 1;
+  flags1.out_bufferBusy = 1;
   out_dest = dest;
   out_length = 0;
   out_hdb1 = 0;
@@ -548,7 +552,7 @@ void endMessage()
 {
   byte i;
 
-  if (in_bufferBusy)  // piggyback ACK
+  if (flags1.in_bufferBusy)  // piggyback ACK
     out_hdb1 |= RAP_HDB1_ACK;
   out_hdb2 |= out_length & 15;  // packet length
 
@@ -556,13 +560,13 @@ void endMessage()
   out_hdb2 |= (lastTransmit & 3) << 6;
   out_hdb2 |= (lastReceive & 3) << 4;
 
-  xmitBufferReady = 1;
-  xmitBufferSent = 0;
+  flags1.xmitBufferReady = 1;
+  flags1.xmitBufferSent = 0;
 
   // If there was a receive buffer we were locking free it now
-  in_bufferBusy = 0;
+  flags1.in_bufferBusy = 0;
   out_resendTimer = PKT_SEND_TIMEOUT;
-  out_timedout = 0;
+  flags1.out_timedout = 0;
 }
 
 void printTime()
