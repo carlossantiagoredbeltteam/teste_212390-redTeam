@@ -42,7 +42,7 @@ int main()
   address = 1;
 
   rfd = open("1", O_RDONLY);
-  wfd = open("0", O_WRONLY);
+  wfd = open("0", O_WRONLY | O_NONBLOCK);
 
   pthread_attr_init(&pthread_custom_attr);
   

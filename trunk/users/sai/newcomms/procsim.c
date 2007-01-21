@@ -52,6 +52,11 @@ void uartTransmit(byte c)
 {
   //if (address) printf("                  ");
   //printf("--> %d tx %02x\n", address, c);
+  //fflush(stdout);
   usleep(10000);
-  write(wfd, &c, 1);
+
+  if (write(wfd, &c, 1) == -1) {
+    printf("WRITE FAILURE!!\n");
+    fflush(stdout);
+  }
 }
