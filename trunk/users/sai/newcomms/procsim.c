@@ -12,10 +12,14 @@ int rfd, wfd;
 
 byte RCREG;
 
+byte action = ACT_NONE;
+byte action_value = 0;
+int act_after = 0;
+
 void *timer(void *arg)
 {
   for(;;) {
-    sleep(1);
+    usleep(20000);
     timer_ping();
   }
   return NULL;
@@ -24,17 +28,21 @@ void *timer(void *arg)
 void *comms(void *arg)
 {  
   ssize_t len;
+
   for(;;) {
     len = read(rfd, &RCREG, 1);
-    if (exitAfter != -1) {
-      receiveCount++;
-      if (receiveCount >= exitAfter)
+    receiveCount++;
+    if (exitAfter != -1 && receiveCount >= exitAfter)
 	break;
-      if (receiveCount == 11)
-	RCREG ^= 1;
-    }
+    if (receiveCount == act_after && action == ACT_FLIP)
+      RCREG ^= action_value;
     if (len == 0) break;
-    uartNotifyReceive();
+    if (receiveCount != act_after || action != ACT_DROP)
+      uartNotifyReceive();
+    if (receiveCount == act_after && action == ACT_INSERT) {
+      RCREG = action_value;
+      uartNotifyReceive();
+    }
   }
   exit(0);
   return NULL;
@@ -44,6 +52,6 @@ void uartTransmit(byte c)
 {
   //if (address) printf("                  ");
   //printf("--> %d tx %02x\n", address, c);
-  usleep(100000);
+  usleep(10000);
   write(wfd, &c, 1);
 }
