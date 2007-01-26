@@ -300,7 +300,6 @@ void timerTick()
   // temperatureLimit1, the power shuts down completely.
   if (lastTemperature <= temperatureLimit1) {
     // Reached critical limit, so power off
-    extruder_stop();
     heater_off();
   } else if (lastTemperature <= temperatureLimit0 &&
 	     heatCounter >= requestedHeat0 && requestedHeat0 != 255) {
