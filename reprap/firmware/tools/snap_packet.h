@@ -56,7 +56,7 @@ public:
   byte crc;
 
 private:
-  byte SNAPPacket::computeCRC(byte dataval);
+  byte computeCRC(byte dataval);
 };
 
 
