@@ -41,6 +41,13 @@ maxDim = new ValueField(32, ValueField.NONNEGATIVE);
 minDim = new ValueField(0.1, ValueField.NONNEGATIVE);
 wall = new ValueField(0.025, ValueField.NONNEGATIVE);
 
+sel = scene.getSelection();
+if (sel.length != 1)
+{
+  new MessageDialog(window, "Please select a single object to crystalize.");
+  return;
+}
+
 dlg = new ComponentsDialog(window, "RepRap Crystalization" ,
   new Widget [] { maxDim, minDim, wall },
   new String [] { "Maximum crystal size:",
@@ -269,7 +276,8 @@ void crystalize(ObjectInfo obj, ObjectInfo container, double minHole, double max
   }
 }
 
-ObjectInfo obj = new ObjectInfo(new Cube(1, 1, 1), cs, "cube");
+//ObjectInfo obj = new ObjectInfo(new Cube(1, 1, 1), cs, "cube");
+ObjectInfo obj = scene.getObject(sel[0]);
 
 ObjectInfo rootCrystal = findContainingCrystal(obj);
 //window.addObject(rootCrystal, null);
