@@ -37,7 +37,7 @@
 #include "pic14.h"
 
 #define HALFSTEP
-//#define UNIVERSAL_PCB
+#define UNIVERSAL_PCB
 
 void init2();
 void timerTick();

@@ -3,7 +3,7 @@
 
 #include "pic14.h"
 
-//#define UNIVERSAL_PCB
+#define UNIVERSAL_PCB
 
 void init2();
 void processCommand();
