@@ -1,5 +1,13 @@
-# EESchema Netlist Version 1.0 generee le  7/1/2007-14:49:58
+# EESchema Netlist Version 1.0 generee le  15/2/2007-00:00:28
 (
+ ( 45D3A006 $noname  C6 0.1uF {Lib=C}
+  (    1 N-000047 )
+  (    2 N-000048 )
+ )
+ ( 45D39FFB $noname  C5 0.1uF {Lib=C}
+  (    1 N-000050 )
+  (    2 N-000049 )
+ )
  ( 45A103C4 $noname  C4 0.1uF {Lib=C}
   (    1 +5V )
   (    2 GND )
@@ -567,21 +575,25 @@ Net 46 ""
  U2 12
  U3 17
 Net 47 ""
+ C6 1
  D7 1
  D3 2
  P9 3
  U2 13
 Net 48 ""
+ C6 2
  D8 1
  D4 2
  P9 4
  U2 14
 Net 49 ""
+ C5 2
  D6 1
  D2 2
  P9 2
  U2 3
 Net 50 ""
+ C5 1
  D5 1
  D1 2
  P9 1

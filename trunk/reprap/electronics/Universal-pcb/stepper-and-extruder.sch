@@ -1,11 +1,11 @@
 EESchema Schematic File Version 1
-LIBS:power,reprap,device,conn,linear,regul,74xx,cmos4000,adc-dac,memory,xilinx,special,microcontrollers,microchip,analog_switches,motorola,intel,audio,interface,digital-audio,philips,display,cypress,siliconi,contrib,./stepper-and-extruder.cache
+LIBS:power,/home/adrian/workspace/electronics/RepRap_kicad_library/reprap,reprap,device,conn,linear,regul,74xx,cmos4000,adc-dac,memory,xilinx,special,microcontrollers,microchip,analog_switches,motorola,intel,audio,interface,digital-audio,philips,display,cypress,siliconi,contrib,./stepper-and-extruder.cache
 EELAYER 23  0
 EELAYER END
 $Descr A4 11700 8267
 Sheet 1 1
 Title ""
-Date "7 jan 2007"
+Date "15 feb 2007"
 Rev ""
 Comp ""
 Comment1 ""
@@ -13,6 +13,54 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
+Kmarq B 5700 5100 "Warning Pin power_in not driven (Net 14)" F=1
+Kmarq B 1750 1950 "Warning Pin power_in not driven (Net 1)" F=1
+Wire Wire Line
+	8600 4500 10350 4500
+Connection ~ 9850 4500
+Wire Wire Line
+	8600 4400 10350 4400
+Connection ~ 9850 4400
+Connection ~ 9850 4000
+Wire Wire Line
+	10350 4300 10100 4300
+Wire Wire Line
+	10100 4300 10100 4000
+Wire Wire Line
+	10100 4000 9700 4000
+Wire Wire Line
+	9700 4000 9700 4300
+Wire Wire Line
+	9700 4300 8600 4300
+Connection ~ 9850 4900
+Wire Wire Line
+	10350 4600 10150 4600
+Wire Wire Line
+	10150 4600 10150 4900
+Wire Wire Line
+	10150 4900 9700 4900
+Wire Wire Line
+	9700 4900 9700 4600
+Wire Wire Line
+	9700 4600 8600 4600
+$Comp
+L C C6
+U 1 1 45D3A006
+P 9850 4700
+F 0 "C6" H 9900 4800 50  0000 L C
+F 1 "0.1uF" H 9900 4600 50  0000 L C
+	1    9850 4700
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C5
+U 1 1 45D39FFB
+P 9850 4200
+F 0 "C5" H 9900 4300 50  0000 L C
+F 1 "0.1uF" H 9900 4100 50  0000 L C
+	1    9850 4200
+	1    0    0    -1  
+$EndComp
 $Comp
 L GND #PWR28
 U 1 1 45A10408
@@ -37,8 +85,6 @@ F 1 "0.1uF" H 1800 1650 50  0000 L C
 	1    1750 1750
 	1    0    0    -1  
 $EndComp
-Kmarq B 5700 5100 "Warning Pin power_in not driven (Net 14)" F=1
-Kmarq B 5000 1300 "Warning Pin power_in not driven (Net 8)" F=1
 Wire Wire Line
 	3900 4250 3900 3700
 Wire Wire Line
@@ -598,14 +644,6 @@ Wire Wire Line
 	8750 4200 8750 4800
 Connection ~ 8750 4300
 Wire Wire Line
-	8600 4600 9600 4600
-Wire Wire Line
-	8600 4500 9600 4500
-Wire Wire Line
-	8600 4400 9600 4400
-Wire Wire Line
-	8600 4300 9600 4300
-Wire Wire Line
 	4550 4450 4550 4350
 $Comp
 L +12V #PWR5
@@ -866,9 +904,9 @@ F 1 "10K" V 1550 2350 50  0000 C C
 	1    1550 2350
 	0    1    1    0   
 $EndComp
-Text Notes 10150 4600 0    60   ~
+Text Notes 10250 4800 0    60   ~
 Step B / Fan
-Text Notes 10150 4400 0    60   ~
+Text Notes 10150 4200 0    60   ~
 Step A / Extrude
 Connection ~ 9100 5200
 Wire Wire Line
@@ -1019,10 +1057,10 @@ $EndComp
 $Comp
 L CONN_4 P9
 U 1 1 454F6CD4
-P 9950 4450
-F 0 "P9" V 9900 4450 50  0000 C C
-F 1 "CONN_4" V 10000 4450 50  0000 C C
-	1    9950 4450
+P 10700 4450
+F 0 "P9" V 10650 4450 50  0000 C C
+F 1 "CONN_4" V 10750 4450 50  0000 C C
+	1    10700 4450
 	1    0    0    -1  
 $EndComp
 Connection ~ 8600 4900
