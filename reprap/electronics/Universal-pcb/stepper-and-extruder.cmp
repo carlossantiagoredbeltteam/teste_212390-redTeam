@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by Cvpcb (2006-08-28) date = 7/1/2007-14:49:44
+Cmp-Mod V01 Created by Cvpcb (2006-08-28) date = 14/2/2007-23:52:08
 
 BeginCmp
 TimeStamp = 454E2D14;
@@ -24,6 +24,20 @@ EndCmp
 BeginCmp
 TimeStamp = 45A103C4;
 Reference = C4;
+ValeurCmp = 0.1uF;
+IdModule  = C2;
+EndCmp
+
+BeginCmp
+TimeStamp = 45D39FFB;
+Reference = C5;
+ValeurCmp = 0.1uF;
+IdModule  = C2;
+EndCmp
+
+BeginCmp
+TimeStamp = 45D3A006;
+Reference = C6;
 ValeurCmp = 0.1uF;
 IdModule  = C2;
 EndCmp

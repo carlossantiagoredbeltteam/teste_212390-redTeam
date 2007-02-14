@@ -1,4 +1,4 @@
-update=7/1/2007-14:38:19
+update=23/1/2007-20:50:19
 last_client=eeschema
 [general]
 version=1
@@ -59,8 +59,8 @@ PenMin=20
 SimCmd=
 UseNetN=0
 [eeschema/libraries]
-LibName1=/home/adrian/workspace/electronics/reprap
-LibName2=power
+LibName1=power
+LibName2=/home/adrian/workspace/electronics/RepRap_kicad_library/reprap
 LibName3=reprap
 LibName4=device
 LibName5=conn
