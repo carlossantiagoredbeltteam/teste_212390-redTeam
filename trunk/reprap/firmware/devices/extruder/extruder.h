@@ -16,17 +16,17 @@ extern byte PWMPeriod;
 #ifdef UNIVERSAL_PCB
 // RA0 is L298 4 (Fan)
 // RA1 is Thermistor
-// RA2 is L298 3 (Fan)                                                            
+// RA2 is L298 3 (Fan)   
 // RA3 is Heater
 // RA4 is the indicator LED
 // RA5 is Material sensor
 // RA6 is Thermistor
-// RA7 is Thermistor                                                                                        
+// RA7 is Thermistor       
 
 // RB0 is Extrude speed sensor
 // RB1 is Rx
 // RB2 is Tx 
-// RB3 is PWM output to L298                                                                                       
+// RB3 is PWM output to L298      
 // RB4 is L298 2 (Extrude)
 // RB5 is L298 1 (Extrude)
 // RB6 is not used
