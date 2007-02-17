@@ -536,7 +536,11 @@ void processCommand()
   case CMD_ISEMPTY:
     sendReply();
     sendDataByte(CMD_ISEMPTY);
-    sendDataByte(!PORTB6);
+#ifdef UNIVERSAL_PCB
+     sendDataByte(!PORTA5);   
+#else
+     sendDataByte(!PORTB6);
+#endif
     endMessage();
     break;
 
