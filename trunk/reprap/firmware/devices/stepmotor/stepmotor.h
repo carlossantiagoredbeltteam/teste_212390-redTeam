@@ -36,7 +36,8 @@
 
 #include "pic14.h"
 
-#define HALFSTEP
+// Half-stepping not needed for 400-step-per-rev motors
+//#define HALFSTEP
 #define UNIVERSAL_PCB
 
 void init2();
