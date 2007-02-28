@@ -184,36 +184,52 @@ void motor_click()
 #endif
   switch(cp) {
   case 0:
-    PORTB = (PORTB & BIN(11001111)) | BIN(00010000);
-	PORTA = PORTA & BIN(11111010);
+    PORTB5 = 1;
+    PORTB4 = 0;
+	PORTA2 = 0;
+	PORTA0 = 0;
 	break;
   case 1:
-    PORTB = (PORTB & BIN(11001111)) | BIN(00110000);
-	PORTA = PORTA & BIN(11111010);
+    PORTB5 = 1;
+    PORTB4 = 0;
+	PORTA2 = 1;
+	PORTA0 = 0;
 	break;    
   case 2:
-    PORTB = (PORTB & BIN(11001111)) | BIN(00100000);
-	PORTA = PORTA & BIN(11111010);
+    PORTB5 = 0;
+    PORTB4 = 0;
+	PORTA2 = 1;
+	PORTA0 = 0;
 	break;     
   case 3:
-    PORTB = (PORTB & BIN(11001111)) | BIN(00100000);
-	PORTA = (PORTA & BIN(11111010)) | BIN(00000001);
+    PORTB5 = 0;
+    PORTB4 = 1;
+	PORTA2 = 1;
+	PORTA0 = 0;
 	break;     
   case 4:
-    PORTB = PORTB & BIN(11001111);
-	PORTA = (PORTA & BIN(11111010)) | BIN(00000001);
+    PORTB5 = 0;
+    PORTB4 = 1;
+	PORTA2 = 0;
+	PORTA0 = 0;
 	break;     
   case 5:
-    PORTB = PORTB & BIN(11001111);
-	PORTA = (PORTA & BIN(11111010)) | BIN(00000101);
+    PORTB5 = 0;
+    PORTB4 = 1;
+	PORTA2 = 0;
+	PORTA0 = 1;
 	break;    
   case 6:
-    PORTB = PORTB & BIN(11001111);
-	PORTA = (PORTA & BIN(11111010)) | BIN(00000100);
+    PORTB5 = 0;
+    PORTB4 = 0;
+	PORTA2 = 0;
+	PORTA0 = 1;
 	break;    
   case 7:
-    PORTB = (PORTB & BIN(11001111)) | BIN(00010000);
-	PORTA = (PORTA & BIN(11111010)) | BIN(00000100);
+    PORTB5 = 1;
+    PORTB4 = 0;
+	PORTA2 = 0;
+	PORTA0 = 1;
 	break;    
   }
 _asm  /// @todo Remove when sdcc bug fixed
