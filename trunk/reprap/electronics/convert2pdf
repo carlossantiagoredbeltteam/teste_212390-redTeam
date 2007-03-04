@@ -1,0 +1,4 @@
+#!/bin/bash
+
+ps2pdf Comms_and_power_distribution/comms_and_power_distribution-Copper.ps Comms_and_power_distribution/comms_and_power_distribution-Copper.pdf
+ps2pdf Comms_and_power_distribution/comms_and_power_distribution-SilkSCmp.ps Comms_and_power_distribution/comms_and_power_distribution-SilkSCmp.pdf
