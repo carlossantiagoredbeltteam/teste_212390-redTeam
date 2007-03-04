@@ -1,4 +1,4 @@
-PCBNEW-BOARD Version 1 date 4/3/2007-16:05:31
+PCBNEW-BOARD Version 1 date 4/3/2007-16:58:01
 
 $GENERAL
 LayerCount 1
@@ -32,6 +32,7 @@ UserGridSize 1.000000 1.000000 mm
 ZoneGridSize 500
 Layers 1
 TrackWidth 800
+TrackWidthHistory 170
 TrackWidthHistory 400
 TrackWidthHistory 800
 TrackWidthHistory 1300
@@ -42,6 +43,7 @@ DrawSegmWidth 197
 EdgeSegmWidth 150
 ViaSize 800
 ViaDrill 250
+ViaSizeHistory 450
 ViaSizeHistory 800
 TextPcbWidth 120
 TextPcbSize 600 800
@@ -990,12 +992,12 @@ $EndDRAWSEGMENT
 $TEXTPCB
 Te "RepRap"
 Po 61100 34900 900 1200 300 900
-De 0 0 0 0
+De 0 1 0 0
 $EndTEXTPCB
 $TEXTPCB
 Te "http://reprap.org"
 Po 66400 20800 600 800 200 0
-De 0 0 0 0
+De 0 1 0 0
 $EndTEXTPCB
 $COTATION
 Ge 0 25 0
@@ -1045,9 +1047,9 @@ De 0 0 1 0 400
 Po 0 58100 21700 58000 21600 800 -1
 De 0 0 1 0 0
 Po 0 53000 21600 53000 30800 1600 -1
-De 0 0 1 0 C00
+De 0 0 1 0 800
 Po 0 53000 30800 53100 30900 1600 -1
-De 0 0 1 0 C00
+De 0 0 1 0 400
 Po 0 53100 30900 53100 38400 1600 -1
 De 0 0 1 0 800
 Po 0 53100 38400 53000 38500 1600 -1
