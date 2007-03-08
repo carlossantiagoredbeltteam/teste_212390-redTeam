@@ -1,0 +1,9 @@
+#!/bin/bash
+
+#convert our universal controller to pdf
+echo "Converting Universal Controller board to pdf."
+ps2pdf Universal-pcb/stepper-and-extruder-Component.ps  Universal-pcb/stepper-and-extruder-Component.pdf
+ps2pdf Universal-pcb/stepper-and-extruder-Copper.ps  Universal-pcb/stepper-and-extruder-Copper.pdf
+ps2pdf Universal-pcb/stepper-and-extruder-SilkSCmp.ps  Universal-pcb/stepper-and-extruder-SilkSCmp.pdf
+
+echo "Done."
