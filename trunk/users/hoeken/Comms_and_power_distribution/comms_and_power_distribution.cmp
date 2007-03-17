@@ -1,0 +1,150 @@
+Cmp-Mod V01 Created by Cvpcb (2007-01-15) date = 3/3/2007-16:19:20
+
+BeginCmp
+TimeStamp = 45A40A1C;
+Reference = C1;
+ValeurCmp = 100uF;
+IdModule  = C1V5;
+EndCmp
+
+BeginCmp
+TimeStamp = 45A40B29;
+Reference = C2;
+ValeurCmp = 1uF;
+IdModule  = C1V5;
+EndCmp
+
+BeginCmp
+TimeStamp = 45A40B2E;
+Reference = C3;
+ValeurCmp = 1uF;
+IdModule  = C1V5;
+EndCmp
+
+BeginCmp
+TimeStamp = 45A40B38;
+Reference = C4;
+ValeurCmp = 1uF;
+IdModule  = C1V5;
+EndCmp
+
+BeginCmp
+TimeStamp = 45A40CF5;
+Reference = C5;
+ValeurCmp = 1uF;
+IdModule  = C1V5;
+EndCmp
+
+BeginCmp
+TimeStamp = 45A40A15;
+Reference = C6;
+ValeurCmp = 4700uF;
+IdModule  = CP36V;
+EndCmp
+
+BeginCmp
+TimeStamp = 45A40D97;
+Reference = D1;
+ValeurCmp = LED;
+IdModule  = LEDV;
+EndCmp
+
+BeginCmp
+TimeStamp = 45A40B59;
+Reference = J1;
+ValeurCmp = DB9;
+IdModule  = DB9FC;
+EndCmp
+
+BeginCmp
+TimeStamp = 45A409FB;
+Reference = P1;
+ValeurCmp = CONN_2;
+IdModule  = bornier2;
+EndCmp
+
+BeginCmp
+TimeStamp = 45A40B73;
+Reference = P2;
+ValeurCmp = CONN_2;
+IdModule  = SIL-2;
+EndCmp
+
+BeginCmp
+TimeStamp = 45A40B82;
+Reference = P3;
+ValeurCmp = CONN_2;
+IdModule  = SIL-2;
+EndCmp
+
+BeginCmp
+TimeStamp = 45A40E1F;
+Reference = P4;
+ValeurCmp = CONN_2;
+IdModule  = SIL-2;
+EndCmp
+
+BeginCmp
+TimeStamp = 45A40E4E;
+Reference = P5;
+ValeurCmp = CONN_2;
+IdModule  = SIL-2;
+EndCmp
+
+BeginCmp
+TimeStamp = 45A40E57;
+Reference = P6;
+ValeurCmp = CONN_2;
+IdModule  = SIL-2;
+EndCmp
+
+BeginCmp
+TimeStamp = 45A40E63;
+Reference = P7;
+ValeurCmp = CONN_2;
+IdModule  = SIL-2;
+EndCmp
+
+BeginCmp
+TimeStamp = 45A40E66;
+Reference = P8;
+ValeurCmp = CONN_2;
+IdModule  = SIL-2;
+EndCmp
+
+BeginCmp
+TimeStamp = 45A40E69;
+Reference = P9;
+ValeurCmp = CONN_2;
+IdModule  = SIL-2;
+EndCmp
+
+BeginCmp
+TimeStamp = 45A40E6C;
+Reference = P10;
+ValeurCmp = CONN_2;
+IdModule  = SIL-2;
+EndCmp
+
+BeginCmp
+TimeStamp = 45A40D8A;
+Reference = R1;
+ValeurCmp = 560R;
+IdModule  = R3;
+EndCmp
+
+BeginCmp
+TimeStamp = 45A409E1;
+Reference = U1;
+ValeurCmp = 78L05;
+IdModule  = TO92;
+EndCmp
+
+BeginCmp
+TimeStamp = 45A40B1C;
+Reference = U2;
+ValeurCmp = MAX232;
+IdModule  = 16dip300;
+EndCmp
+
+EndListe
