@@ -1,4 +1,4 @@
-PCBNEW-BOARD Version 1 date 17/3/2007-19:21:38
+PCBNEW-BOARD Version 1 date 17/3/2007-20:11:01
 
 $GENERAL
 LayerCount 2
@@ -2208,7 +2208,7 @@ $EndCOTATION
 $TEXTPCB
 Te "RepRap.org - Universal v1.1"
 Po 43900 34800 600 800 120 900
-De 15 1 0 0
+De 21 1 0 0
 $EndTEXTPCB
 $COTATION
 Ge 0 24 0
