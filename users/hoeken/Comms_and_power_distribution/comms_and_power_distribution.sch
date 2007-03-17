@@ -1,0 +1,540 @@
+EESchema Schematic File Version 1
+LIBS:power,/home/adrian/workspace/electronics/RepRap_kicad_library/reprap,/home/adrian/workspace/electronics/RepRap_kicad_library/contrib,device,conn,linear,regul,74xx,cmos4000,adc-dac,memory,xilinx,special,microcontrollers,microchip,analog_switches,motorola,intel,audio,interface,digital-audio,philips,display,cypress,siliconi,contrib,./comms_and_power_distribution.cache
+EELAYER 23  0
+EELAYER END
+$Descr A4 11700 8267
+Sheet 1 1
+Title ""
+Date "13 jan 2007"
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+Wire Wire Line
+	5550 4550 5550 4700
+Wire Wire Line
+	5550 4200 5550 4350
+$Comp
+L +12V #PWR9
+U 1 1 45A40E6E
+P 5550 4200
+F 0 "#PWR9" H 5550 4150 20  0001 C C
+F 1 "+12V" H 5550 4300 30  0000 C C
+	1    5550 4200
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR29
+U 1 1 45A40E6D
+P 5550 4700
+F 0 "#PWR29" H 5550 4700 30  0001 C C
+F 1 "GND" H 5550 4630 30  0001 C C
+	1    5550 4700
+	1    0    0    -1  
+$EndComp
+$Comp
+L CONN_2 P10
+U 1 1 45A40E6C
+P 5900 4450
+F 0 "P10" V 5850 4450 40  0000 C C
+F 1 "CONN_2" V 5950 4450 40  0000 C C
+	1    5900 4450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5550 3800 5550 3950
+Wire Wire Line
+	5550 3450 5550 3600
+$Comp
+L +12V #PWR8
+U 1 1 45A40E6B
+P 5550 3450
+F 0 "#PWR8" H 5550 3400 20  0001 C C
+F 1 "+12V" H 5550 3550 30  0000 C C
+	1    5550 3450
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR28
+U 1 1 45A40E6A
+P 5550 3950
+F 0 "#PWR28" H 5550 3950 30  0001 C C
+F 1 "GND" H 5550 3880 30  0001 C C
+	1    5550 3950
+	1    0    0    -1  
+$EndComp
+$Comp
+L CONN_2 P9
+U 1 1 45A40E69
+P 5900 3700
+F 0 "P9" V 5850 3700 40  0000 C C
+F 1 "CONN_2" V 5950 3700 40  0000 C C
+	1    5900 3700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6150 3800 6150 3950
+Wire Wire Line
+	6150 3450 6150 3600
+$Comp
+L +12V #PWR7
+U 1 1 45A40E68
+P 6150 3450
+F 0 "#PWR7" H 6150 3400 20  0001 C C
+F 1 "+12V" H 6150 3550 30  0000 C C
+	1    6150 3450
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR27
+U 1 1 45A40E67
+P 6150 3950
+F 0 "#PWR27" H 6150 3950 30  0001 C C
+F 1 "GND" H 6150 3880 30  0001 C C
+	1    6150 3950
+	1    0    0    -1  
+$EndComp
+$Comp
+L CONN_2 P8
+U 1 1 45A40E66
+P 6500 3700
+F 0 "P8" V 6450 3700 40  0000 C C
+F 1 "CONN_2" V 6550 3700 40  0000 C C
+	1    6500 3700
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6150 3100 6150 3250
+Wire Wire Line
+	6150 2750 6150 2900
+$Comp
+L +12V #PWR6
+U 1 1 45A40E65
+P 6150 2750
+F 0 "#PWR6" H 6150 2700 20  0001 C C
+F 1 "+12V" H 6150 2850 30  0000 C C
+	1    6150 2750
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR26
+U 1 1 45A40E64
+P 6150 3250
+F 0 "#PWR26" H 6150 3250 30  0001 C C
+F 1 "GND" H 6150 3180 30  0001 C C
+	1    6150 3250
+	1    0    0    -1  
+$EndComp
+$Comp
+L CONN_2 P7
+U 1 1 45A40E63
+P 6500 3000
+F 0 "P7" V 6450 3000 40  0000 C C
+F 1 "CONN_2" V 6550 3000 40  0000 C C
+	1    6500 3000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5550 3100 5550 3250
+Wire Wire Line
+	5550 2750 5550 2900
+$Comp
+L +12V #PWR5
+U 1 1 45A40E59
+P 5550 2750
+F 0 "#PWR5" H 5550 2700 20  0001 C C
+F 1 "+12V" H 5550 2850 30  0000 C C
+	1    5550 2750
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR25
+U 1 1 45A40E58
+P 5550 3250
+F 0 "#PWR25" H 5550 3250 30  0001 C C
+F 1 "GND" H 5550 3180 30  0001 C C
+	1    5550 3250
+	1    0    0    -1  
+$EndComp
+$Comp
+L CONN_2 P6
+U 1 1 45A40E57
+P 5900 3000
+F 0 "P6" V 5850 3000 40  0000 C C
+F 1 "CONN_2" V 5950 3000 40  0000 C C
+	1    5900 3000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5550 2350 5550 2500
+Wire Wire Line
+	5550 2000 5550 2150
+$Comp
+L +12V #PWR4
+U 1 1 45A40E50
+P 5550 2000
+F 0 "#PWR4" H 5550 1950 20  0001 C C
+F 1 "+12V" H 5550 2100 30  0000 C C
+	1    5550 2000
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR24
+U 1 1 45A40E4F
+P 5550 2500
+F 0 "#PWR24" H 5550 2500 30  0001 C C
+F 1 "GND" H 5550 2430 30  0001 C C
+	1    5550 2500
+	1    0    0    -1  
+$EndComp
+$Comp
+L CONN_2 P5
+U 1 1 45A40E4E
+P 5900 2250
+F 0 "P5" V 5850 2250 40  0000 C C
+F 1 "CONN_2" V 5950 2250 40  0000 C C
+	1    5900 2250
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6150 2350 6150 2500
+Wire Wire Line
+	6150 2000 6150 2150
+$Comp
+L +12V #PWR3
+U 1 1 45A40E2B
+P 6150 2000
+F 0 "#PWR3" H 6150 1950 20  0001 C C
+F 1 "+12V" H 6150 2100 30  0000 C C
+	1    6150 2000
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR23
+U 1 1 45A40E27
+P 6150 2500
+F 0 "#PWR23" H 6150 2500 30  0001 C C
+F 1 "GND" H 6150 2430 30  0001 C C
+	1    6150 2500
+	1    0    0    -1  
+$EndComp
+$Comp
+L CONN_2 P4
+U 1 1 45A40E1F
+P 6500 2250
+F 0 "P4" V 6450 2250 40  0000 C C
+F 1 "CONN_2" V 6550 2250 40  0000 C C
+	1    6500 2250
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5000 3050 5000 3200
+Wire Wire Line
+	5000 2600 5000 2650
+Wire Wire Line
+	5000 2000 5000 2100
+$Comp
+L +12V #PWR2
+U 1 1 45A40DAB
+P 5000 2000
+F 0 "#PWR2" H 5000 1950 20  0001 C C
+F 1 "+12V" H 5000 2100 30  0000 C C
+	1    5000 2000
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR22
+U 1 1 45A40DA1
+P 5000 3200
+F 0 "#PWR22" H 5000 3200 30  0001 C C
+F 1 "GND" H 5000 3130 30  0001 C C
+	1    5000 3200
+	1    0    0    -1  
+$EndComp
+$Comp
+L LED D1
+U 1 1 45A40D97
+P 5000 2850
+F 0 "D1" H 5000 2950 50  0000 C C
+F 1 "LED" H 5000 2750 50  0000 C C
+	1    5000 2850
+	0    1    1    0   
+$EndComp
+$Comp
+L R R1
+U 1 1 45A40D8A
+P 5000 2350
+F 0 "R1" V 5080 2350 50  0000 C C
+F 1 "560R" V 5000 2350 50  0000 C C
+	1    5000 2350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	2150 3450 2050 3450
+Wire Wire Line
+	2150 3050 2050 3050
+$Comp
+L CP C5
+U 1 1 45A40CF5
+P 2050 3250
+F 0 "C5" H 2100 3350 50  0000 L C
+F 1 "1uF" H 2100 3150 50  0000 L C
+	1    2050 3250
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3900 3050 3750 3050
+Wire Wire Line
+	3750 3050 3750 2950
+Wire Wire Line
+	1650 3850 1850 3850
+Wire Wire Line
+	1850 3850 1850 4150
+Wire Wire Line
+	1850 4150 2150 4150
+Connection ~ 4500 4750
+Wire Wire Line
+	4500 4950 4500 4650
+Wire Wire Line
+	1650 4550 1650 4700
+Wire Wire Line
+	1650 4050 1650 4200
+Connection ~ 4050 3550
+Wire Wire Line
+	4400 3550 3900 3550
+Wire Wire Line
+	4400 3550 4400 3700
+$Comp
+L GND #PWR21
+U 1 1 45A40C07
+P 4400 3700
+F 0 "#PWR21" H 4400 3700 30  0001 C C
+F 1 "GND" H 4400 3630 30  0001 C C
+	1    4400 3700
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR20
+U 1 1 45A40C01
+P 1650 4700
+F 0 "#PWR20" H 1650 4700 30  0001 C C
+F 1 "GND" H 1650 4630 30  0001 C C
+	1    1650 4700
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR19
+U 1 1 45A40BFC
+P 1650 4200
+F 0 "#PWR19" H 1650 4200 30  0001 C C
+F 1 "GND" H 1650 4130 30  0001 C C
+	1    1650 4200
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR18
+U 1 1 45A40BF0
+P 4500 4950
+F 0 "#PWR18" H 4500 4950 30  0001 C C
+F 1 "GND" H 4500 4880 30  0001 C C
+	1    4500 4950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4500 4450 4400 4450
+Wire Wire Line
+	4400 4450 4400 4250
+Wire Wire Line
+	4400 4250 4500 4250
+Wire Wire Line
+	4500 4550 4350 4550
+Wire Wire Line
+	4350 4550 4350 4050
+Wire Wire Line
+	4350 4050 4500 4050
+Wire Wire Line
+	4500 4350 3750 4350
+Wire Wire Line
+	4500 4150 3750 4150
+Wire Wire Line
+	1650 4350 2150 4350
+Wire Wire Line
+	2050 3950 2150 3950
+Wire Wire Line
+	2050 3550 2150 3550
+Wire Wire Line
+	3900 3550 3900 3650
+Wire Wire Line
+	3900 3650 3750 3650
+Wire Wire Line
+	3750 3950 4050 3950
+Wire Wire Line
+	3900 3450 3750 3450
+$Comp
+L CONN_2 P3
+U 1 1 45A40B82
+P 1300 3950
+F 0 "P3" V 1250 3950 40  0000 C C
+F 1 "CONN_2" V 1350 3950 40  0000 C C
+	1    1300 3950
+	-1   0    0    1   
+$EndComp
+$Comp
+L CONN_2 P2
+U 1 1 45A40B73
+P 1300 4450
+F 0 "P2" V 1250 4450 40  0000 C C
+F 1 "CONN_2" V 1350 4450 40  0000 C C
+	1    1300 4450
+	-1   0    0    1   
+$EndComp
+$Comp
+L DB9 J1
+U 1 1 45A40B59
+P 4950 4350
+F 0 "J1" H 4950 4900 70  0000 C C
+F 1 "DB9" H 4950 3800 70  0000 C C
+	1    4950 4350
+	1    0    0    1   
+$EndComp
+$Comp
+L +5V #PWR16
+U 1 1 45A40B48
+P 3750 2950
+F 0 "#PWR16" H 3750 3040 20  0001 C C
+F 1 "+5V" H 3750 3040 30  0000 C C
+	1    3750 2950
+	1    0    0    -1  
+$EndComp
+$Comp
+L CP C4
+U 1 1 45A40B38
+P 4050 3750
+F 0 "C4" H 4100 3850 50  0000 L C
+F 1 "1uF" H 4100 3650 50  0000 L C
+	1    4050 3750
+	1    0    0    -1  
+$EndComp
+$Comp
+L CP C3
+U 1 1 45A40B2E
+P 3900 3250
+F 0 "C3" H 3950 3350 50  0000 L C
+F 1 "1uF" H 3950 3150 50  0000 L C
+	1    3900 3250
+	-1   0    0    1   
+$EndComp
+$Comp
+L CP C2
+U 1 1 45A40B29
+P 2050 3750
+F 0 "C2" H 2100 3850 50  0000 L C
+F 1 "1uF" H 2100 3650 50  0000 L C
+	1    2050 3750
+	1    0    0    -1  
+$EndComp
+$Comp
+L MAX232 U2
+U 1 1 45A40B1C
+P 2950 3750
+F 0 "U2" H 2950 4600 70  0000 C C
+F 1 "MAX232" H 2950 2900 70  0000 C C
+	1    2950 3750
+	1    0    0    -1  
+$EndComp
+Connection ~ 1700 2650
+Wire Wire Line
+	1700 2800 1700 2450
+$Comp
+L GND #PWR17
+U 1 1 45A40A81
+P 1700 2800
+F 0 "#PWR17" H 1700 2800 30  0001 C C
+F 1 "GND" H 1700 2730 30  0001 C C
+	1    1700 2800
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3050 2100 3050 2250
+$Comp
+L +5V #PWR15
+U 1 1 45A40A6C
+P 3050 2100
+F 0 "#PWR15" H 3050 2190 20  0001 C C
+F 1 "+5V" H 3050 2190 30  0000 C C
+	1    3050 2100
+	1    0    0    -1  
+$EndComp
+Connection ~ 1800 2250
+Wire Wire Line
+	1800 2100 1800 2250
+$Comp
+L +12V #PWR1
+U 1 1 45A40A48
+P 1800 2100
+F 0 "#PWR1" H 1800 2050 20  0001 C C
+F 1 "+12V" H 1800 2200 30  0000 C C
+	1    1800 2100
+	1    0    0    -1  
+$EndComp
+Connection ~ 2450 2650
+Wire Wire Line
+	2450 2550 2450 2650
+Connection ~ 1900 2650
+Wire Wire Line
+	1700 2650 3050 2650
+Wire Wire Line
+	3050 2250 2850 2250
+Connection ~ 1900 2250
+Wire Wire Line
+	2050 2250 1700 2250
+$Comp
+L CP C1
+U 1 1 45A40A1C
+P 3050 2450
+F 0 "C1" H 3100 2550 50  0000 L C
+F 1 "100uF" H 3100 2350 50  0000 L C
+	1    3050 2450
+	1    0    0    -1  
+$EndComp
+$Comp
+L CP C6
+U 1 1 45A40A15
+P 1900 2450
+F 0 "C6" H 1950 2550 50  0000 L C
+F 1 "4700uF" H 1950 2350 50  0000 L C
+	1    1900 2450
+	1    0    0    -1  
+$EndComp
+$Comp
+L CONN_2 P1
+U 1 1 45A409FB
+P 1350 2350
+F 0 "P1" V 1300 2350 40  0000 C C
+F 1 "CONN_2" V 1400 2350 40  0000 C C
+	1    1350 2350
+	-1   0    0    1   
+$EndComp
+$Comp
+L 78L05 U1
+U 1 1 45A409E1
+P 2450 2300
+F 0 "U1" H 2600 2104 60  0000 C C
+F 1 "78L05" H 2450 2500 60  0000 C C
+	1    2450 2300
+	1    0    0    -1  
+$EndComp
+Text Notes 4100 2650 0    60   ~
+Power-on LED
+Text Notes 1750 4850 0    60   ~
+RS232 to TTL converter
+Text Notes 1300 1950 0    60   ~
+Power in and voltage regulator
+Text Notes 5400 4900 0    60   ~
+Power output connectors
+Text Notes 4500 5150 0    60   ~
+RS232 socket
+$EndSCHEMATC
