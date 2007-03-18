@@ -2,8 +2,8 @@ update=19/2/2007-01:57:22
 last_client=eeschema
 [general]
 version=1
-RootSch=stepper-and-extruder.sch
-BoardNm=stepper-and-extruder.brd
+RootSch=universal.sch
+BoardNm=universal.brd
 [cvpcb]
 version=1
 NetITyp=0
