@@ -10,5 +10,6 @@ echo "Converting Universal Controller board to pdf."
 ps2pdf UniversalController/universal-Component.ps  UniversalController/universal-Component.pdf
 ps2pdf UniversalController/universal-Copper.ps  UniversalController/universal-Copper.pdf
 ps2pdf UniversalController/universal-SilkSCmp.ps  UniversalController/universal-SilkSCmp.pdf
+ps2pdf UniversalController/universal-SilkSCop.ps  UniversalController/universal-SilkSCop.pdf
 
 echo "Done."
