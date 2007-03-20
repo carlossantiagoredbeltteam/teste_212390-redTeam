@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by Cvpcb (2006-08-28) date = 14/2/2007-23:52:08
+Cmp-Mod V01 Created by Cvpcb (2006-08-28) date = 17/3/2007-13:33:50
 
 BeginCmp
 TimeStamp = 454E2D14;
@@ -113,62 +113,6 @@ IdModule  = LEDV;
 EndCmp
 
 BeginCmp
-TimeStamp = 4550EDAC;
-Reference = J1;
-ValeurCmp = SIL10;
-IdModule  = SIL-10;
-EndCmp
-
-BeginCmp
-TimeStamp = 4550EDBF;
-Reference = J2;
-ValeurCmp = SIL10;
-IdModule  = SIL-10;
-EndCmp
-
-BeginCmp
-TimeStamp = 4550EDC5;
-Reference = J3;
-ValeurCmp = SIL10;
-IdModule  = SIL-10;
-EndCmp
-
-BeginCmp
-TimeStamp = 4550EE67;
-Reference = J4;
-ValeurCmp = SIL10;
-IdModule  = SIL-10;
-EndCmp
-
-BeginCmp
-TimeStamp = 4550EE68;
-Reference = J5;
-ValeurCmp = SIL10;
-IdModule  = SIL-10;
-EndCmp
-
-BeginCmp
-TimeStamp = 4550EE69;
-Reference = J6;
-ValeurCmp = SIL10;
-IdModule  = SIL-10;
-EndCmp
-
-BeginCmp
-TimeStamp = 4550EE9D;
-Reference = J7;
-ValeurCmp = SIL10;
-IdModule  = SIL-10;
-EndCmp
-
-BeginCmp
-TimeStamp = 4550EE9E;
-Reference = J8;
-ValeurCmp = SIL10;
-IdModule  = SIL-10;
-EndCmp
-
-BeginCmp
 TimeStamp = 454F99F9;
 Reference = K1;
 ValeurCmp = CONN_3;
@@ -250,6 +194,13 @@ TimeStamp = 455F1F7D;
 Reference = P10;
 ValeurCmp = CONN_5;
 IdModule  = SIL-5;
+EndCmp
+
+BeginCmp
+TimeStamp = 45FBEC8B;
+Reference = P11;
+ValeurCmp = CONN_7;
+IdModule  = SIL-7;
 EndCmp
 
 BeginCmp

@@ -1,4 +1,4 @@
-EESchema-DOCLIB  Version 2.0  Date: 9/1/2007-21:29:28
+EESchema-DOCLIB  Version 2.0  Date: 9/1/2007-21:31:49
 #
 $CMP 7805
 D Linear Regulator +5V
@@ -68,6 +68,16 @@ $CMP LM7812
 D Linear Regulator +12V
 K POWER REGUL
 F regulator/lm78*.*
+$ENDCMP
+#
+$CMP MAX202
+F maxim/max200-max213.pdf
+$ENDCMP
+#
+$CMP MAX232
+D Driver de Ligne RS232
+K RS232
+F maxim/MAX220-MAX249.pdf
 $ENDCMP
 #
 $CMP MAX233
