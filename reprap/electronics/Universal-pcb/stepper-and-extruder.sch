@@ -5,7 +5,7 @@ EELAYER END
 $Descr A4 11700 8267
 Sheet 1 1
 Title ""
-Date "15 feb 2007"
+Date "18 mar 2007"
 Rev ""
 Comp ""
 Comment1 ""
@@ -13,8 +13,63 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
-Kmarq B 5700 5100 "Warning Pin power_in not driven (Net 14)" F=1
-Kmarq B 1750 1950 "Warning Pin power_in not driven (Net 1)" F=1
+Wire Wire Line
+	6700 2300 6350 2300
+Wire Wire Line
+	6350 2300 6350 2000
+Wire Wire Line
+	6700 2200 6550 2200
+Wire Wire Line
+	6550 2200 6550 2000
+Wire Wire Line
+	6700 2400 6000 2400
+Wire Wire Line
+	6000 2400 6000 1850
+Wire Wire Line
+	6700 2500 5900 2500
+Wire Wire Line
+	5900 2500 5900 1950
+Wire Wire Line
+	6700 2700 6400 2700
+Wire Wire Line
+	6400 2700 6400 4000
+Wire Wire Line
+	6250 2600 6250 3850
+Wire Wire Line
+	6250 2600 6700 2600
+Connection ~ 5900 2300
+Connection ~ 6000 2200
+Connection ~ 6250 2700
+Wire Wire Line
+	1750 1900 1750 2000
+$Comp
+L GND #PWR28
+U 1 1 45FBED88
+P 1750 2000
+F 0 "#PWR28" H 1750 2000 30  0001 C C
+F 1 "GND" H 1750 1930 30  0001 C C
+	1    1750 2000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1750 1500 2000 1500
+Wire Wire Line
+	2000 1500 2000 1850
+Text Notes 6950 3050 0    60   ~
+User
+Wire Wire Line
+	6700 2800 6550 2800
+Wire Wire Line
+	6550 2800 6550 3250
+$Comp
+L CONN_7 P11
+U 1 1 45FBEC8B
+P 7050 2500
+F 0 "P11" V 7020 2500 60  0000 C C
+F 1 "CONN_7" V 7120 2500 60  0000 C C
+	1    7050 2500
+	1    0    0    -1  
+$EndComp
 Wire Wire Line
 	8600 4500 10350 4500
 Connection ~ 9850 4500
@@ -61,28 +116,15 @@ F 1 "0.1uF" H 9900 4100 50  0000 L C
 	1    9850 4200
 	1    0    0    -1  
 $EndComp
-$Comp
-L GND #PWR28
-U 1 1 45A10408
-P 1750 1950
-F 0 "#PWR28" H 1750 1950 30  0001 C C
-F 1 "GND" H 1750 1880 30  0001 C C
-	1    1750 1950
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	1750 1550 2000 1550
-Wire Wire Line
-	2000 1550 2000 1850
 Wire Wire Line
 	2000 1850 2150 1850
 $Comp
 L C C4
 U 1 1 45A103C4
-P 1750 1750
-F 0 "C4" H 1800 1850 50  0000 L C
-F 1 "0.1uF" H 1800 1650 50  0000 L C
-	1    1750 1750
+P 1750 1700
+F 0 "C4" H 1800 1800 50  0000 L C
+F 1 "0.1uF" H 1800 1600 50  0000 L C
+	1    1750 1700
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
@@ -312,28 +354,12 @@ Wire Wire Line
 Wire Wire Line
 	7000 4300 5800 4300
 Wire Wire Line
-	6400 4000 6400 2700
-Wire Wire Line
 	6400 4000 1800 4000
 Wire Wire Line
-	6250 3850 6250 2600
-Wire Wire Line
 	6250 3850 1950 3850
-Wire Wire Line
-	6550 2000 6550 2200
-Wire Wire Line
-	7250 2400 6000 2400
-Text Notes 7200 1900 0    60   ~
-Breadboard
-Connection ~ 6550 2600
-Wire Wire Line
-	6250 2600 7250 2600
 Connection ~ 1950 2150
 Wire Wire Line
 	1950 3850 1950 2150
-Connection ~ 6550 2700
-Wire Wire Line
-	6400 2700 7250 2700
 Wire Wire Line
 	1800 4000 1800 2350
 Wire Wire Line
@@ -347,20 +373,9 @@ Wire Wire Line
 Wire Wire Line
 	2600 5000 2600 3600
 Wire Wire Line
-	6000 2400 6000 1850
-Wire Wire Line
 	6000 1850 4500 1850
-Connection ~ 6550 2500
-Wire Wire Line
-	7250 2500 5900 2500
-Wire Wire Line
-	5900 2500 5900 1950
 Wire Wire Line
 	5900 1950 4500 1950
-Connection ~ 6550 2400
-Connection ~ 6550 3100
-Wire Wire Line
-	6550 3250 6550 3000
 $Comp
 L GND #PWR25
 U 1 1 4550EF1A
@@ -370,11 +385,6 @@ F 1 "GND" H 6550 3180 30  0001 C C
 	1    6550 3250
 	1    0    0    -1  
 $EndComp
-Connection ~ 6550 2300
-Wire Wire Line
-	7250 2300 6350 2300
-Wire Wire Line
-	6350 2300 6350 2000
 $Comp
 L +5V #PWR13
 U 1 1 4550EEF6
@@ -391,158 +401,6 @@ P 6550 2000
 F 0 "#PWR6" H 6550 1950 20  0001 C C
 F 1 "+12V" H 6550 2100 30  0000 C C
 	1    6550 2000
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	6550 3100 7250 3100
-Wire Wire Line
-	6550 3000 7250 3000
-Wire Wire Line
-	6550 2900 7250 2900
-Wire Wire Line
-	7250 2800 6550 2800
-Wire Wire Line
-	6550 2200 7250 2200
-Connection ~ 7250 3100
-Connection ~ 7250 3000
-Connection ~ 7250 2900
-Connection ~ 7250 2800
-Connection ~ 7250 2700
-Connection ~ 7250 2600
-Connection ~ 7250 2500
-Connection ~ 7250 2400
-Connection ~ 7250 2300
-Connection ~ 7250 2200
-$Comp
-L SIL10 J8
-U 1 1 4550EE9E
-P 7600 2650
-F 0 "J8" H 7600 3250 70  0000 C C
-F 1 "SIL10" V 7620 2650 70  0000 C C
-	1    7600 2650
-	1    0    0    -1  
-$EndComp
-$Comp
-L SIL10 J7
-U 1 1 4550EE9D
-P 6900 2650
-F 0 "J7" H 6900 3250 70  0000 C C
-F 1 "SIL10" V 6920 2650 70  0000 C C
-	1    6900 2650
-	1    0    0    -1  
-$EndComp
-Connection ~ 8700 3100
-Wire Wire Line
-	8000 3100 9400 3100
-Connection ~ 8700 3000
-Wire Wire Line
-	8000 3000 9400 3000
-Connection ~ 8700 2900
-Wire Wire Line
-	8000 2900 9400 2900
-Connection ~ 8700 2800
-Wire Wire Line
-	8000 2800 9400 2800
-Connection ~ 8700 2700
-Wire Wire Line
-	8000 2700 9400 2700
-Connection ~ 8700 2600
-Wire Wire Line
-	8000 2600 9400 2600
-Connection ~ 8700 2500
-Wire Wire Line
-	8000 2500 9400 2500
-Connection ~ 8700 2400
-Wire Wire Line
-	8000 2400 9400 2400
-Connection ~ 8700 2300
-Wire Wire Line
-	8000 2300 9400 2300
-Connection ~ 8700 2200
-Wire Wire Line
-	8000 2200 9400 2200
-$Comp
-L SIL10 J6
-U 1 1 4550EE69
-P 9750 2650
-F 0 "J6" H 9750 3250 70  0000 C C
-F 1 "SIL10" V 9770 2650 70  0000 C C
-	1    9750 2650
-	1    0    0    -1  
-$EndComp
-$Comp
-L SIL10 J5
-U 1 1 4550EE68
-P 9050 2650
-F 0 "J5" H 9050 3250 70  0000 C C
-F 1 "SIL10" V 9070 2650 70  0000 C C
-	1    9050 2650
-	1    0    0    -1  
-$EndComp
-$Comp
-L SIL10 J4
-U 1 1 4550EE67
-P 8350 2650
-F 0 "J4" H 8350 3250 70  0000 C C
-F 1 "SIL10" V 8370 2650 70  0000 C C
-	1    8350 2650
-	1    0    0    -1  
-$EndComp
-Connection ~ 8700 1950
-Wire Wire Line
-	8000 1950 9400 1950
-Connection ~ 8700 1850
-Wire Wire Line
-	8000 1850 9400 1850
-Connection ~ 8700 1750
-Wire Wire Line
-	8000 1750 9400 1750
-Connection ~ 8700 1650
-Wire Wire Line
-	8000 1650 9400 1650
-Connection ~ 8700 1550
-Wire Wire Line
-	8000 1550 9400 1550
-Connection ~ 8700 1450
-Wire Wire Line
-	8000 1450 9400 1450
-Connection ~ 8700 1350
-Wire Wire Line
-	8000 1350 9400 1350
-Connection ~ 8700 1250
-Wire Wire Line
-	8000 1250 9400 1250
-Connection ~ 8700 1150
-Wire Wire Line
-	8000 1150 9400 1150
-Connection ~ 8700 1050
-Wire Wire Line
-	8000 1050 9400 1050
-$Comp
-L SIL10 J3
-U 1 1 4550EDC5
-P 9750 1500
-F 0 "J3" H 9750 2100 70  0000 C C
-F 1 "SIL10" V 9770 1500 70  0000 C C
-	1    9750 1500
-	1    0    0    -1  
-$EndComp
-$Comp
-L SIL10 J2
-U 1 1 4550EDBF
-P 9050 1500
-F 0 "J2" H 9050 2100 70  0000 C C
-F 1 "SIL10" V 9070 1500 70  0000 C C
-	1    9050 1500
-	1    0    0    -1  
-$EndComp
-$Comp
-L SIL10 J1
-U 1 1 4550EDAC
-P 8350 1500
-F 0 "J1" H 8350 2100 70  0000 C C
-F 1 "SIL10" V 8370 1500 70  0000 C C
-	1    8350 1500
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
