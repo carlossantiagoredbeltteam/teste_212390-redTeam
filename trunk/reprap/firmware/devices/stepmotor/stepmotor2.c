@@ -376,7 +376,7 @@ void strobe_sync() {
   SYNCA_TRIS = 0; // Set to output during stobe
 
   // Spin for a few cycles
-  for(delay = 0; delay <= 255; delay++)
+  for(delay = 0; delay <= 254; delay++)
     ;
 
   SYNCA_TRIS = 1; // Back to input so we don't drive the sync line
