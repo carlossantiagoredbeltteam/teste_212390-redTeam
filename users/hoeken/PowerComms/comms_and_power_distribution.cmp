@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by Cvpcb (2007-01-15) date = 3/3/2007-16:19:20
+Cmp-Mod V01 Genere par PcbNew le 16/4/2007-00:56:02
 
 BeginCmp
 TimeStamp = 45A40A1C;
@@ -81,35 +81,35 @@ BeginCmp
 TimeStamp = 45A40E1F;
 Reference = P4;
 ValeurCmp = CONN_2;
-IdModule  = SIL-2;
+IdModule  = EZPower;
 EndCmp
 
 BeginCmp
 TimeStamp = 45A40E4E;
 Reference = P5;
 ValeurCmp = CONN_2;
-IdModule  = SIL-2;
+IdModule  = EZPower;
 EndCmp
 
 BeginCmp
 TimeStamp = 45A40E57;
 Reference = P6;
 ValeurCmp = CONN_2;
-IdModule  = SIL-2;
+IdModule  = EZPower;
 EndCmp
 
 BeginCmp
 TimeStamp = 45A40E63;
 Reference = P7;
 ValeurCmp = CONN_2;
-IdModule  = SIL-2;
+IdModule  = EZPower;
 EndCmp
 
 BeginCmp
 TimeStamp = 45A40E66;
 Reference = P8;
 ValeurCmp = CONN_2;
-IdModule  = SIL-2;
+IdModule  = EZPower;
 EndCmp
 
 BeginCmp
@@ -123,7 +123,7 @@ BeginCmp
 TimeStamp = 45A40E6C;
 Reference = P10;
 ValeurCmp = CONN_2;
-IdModule  = SIL-2;
+IdModule  = EZPower;
 EndCmp
 
 BeginCmp
