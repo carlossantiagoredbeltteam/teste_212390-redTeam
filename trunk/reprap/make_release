@@ -1,0 +1,33 @@
+#!/bin/bash
+
+#init up
+VERSION=$1
+TO_DIR="reprap-$VERSION"
+
+#directory structure
+mkdir -p "$TO_DIR"
+mkdir -p "$TO_DIR/firmware"
+mkdir -p "$TO_DIR/host"
+mkdir -p "$TO_DIR/mechanics"
+
+#make the firmware nice
+cp firmware/build/16f628/extruder/extruder.hex "$TO_DIR/firmware/" 2>/dev/null
+cp firmware/build/16f628/iobox/iobox.hex "$TO_DIR/firmware/" 2>/dev/null
+cp firmware/build/16f628/stepmotor/stepmotor.hex "$TO_DIR/firmware/" 2>/dev/null
+cp firmware/build/16f628/stepmotorb/stepmotorb.hex "$TO_DIR/firmware/" 2>/dev/null
+cp firmware/build/16f628/stepmotorc/stepmotorc.hex "$TO_DIR/firmware/" 2>/dev/null
+cp firmware/build/16f628/stepmotor-small/stepmotor-small.hex "$TO_DIR/firmware/" 2>/dev/null
+
+#now get our object files in there.
+mkdir -p "$TO_DIR/mechanics/polymer-extruder"
+mkdir -p "$TO_DIR/mechanics/cartesian-robot"
+cp -f mechanics/polymer-extruder/STLs/*.stl "$TO_DIR/mechanics/polymer-extruder" 2>/dev/null
+cp -f mechanics/cartesian-robot/STLs/*.stl "$TO_DIR/mechanics/cartesian-robot" 2>/dev/null
+
+#create our archive
+zip -qr "reprap-$VERSION.zip" "reprap-$VERSION"
+
+#cleanup
+rm -rf "$TO_DIR"
+
+echo "RepRap Release v$VERSION created."
