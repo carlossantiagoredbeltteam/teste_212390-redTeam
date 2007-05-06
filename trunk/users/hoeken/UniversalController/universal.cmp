@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by Cvpcb (2006-08-28) date = 14/2/2007-23:52:08
+Cmp-Mod V01 Genere par PcbNew le 6/5/2007-01:14:37
 
 BeginCmp
 TimeStamp = 454E2D14;
@@ -186,7 +186,7 @@ BeginCmp
 TimeStamp = 454F6D76;
 Reference = P1;
 ValeurCmp = CONN_2;
-IdModule  = SIL-2;
+IdModule  = BORNIER2;
 EndCmp
 
 BeginCmp
