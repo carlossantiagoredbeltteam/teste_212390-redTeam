@@ -1,91 +1,83 @@
-# EESchema Netlist Version 1.1 created  3/3/2007-16:19:50
+# EESchema Netlist Version 1.1 created  5/5/2007-14:54:44
 (
- ( 45A40E6C $noname  P10 CONN_2 {Lib=CONN_2}
+ ( 463A9D69 $noname  M02 MOLEX_4PIN {Lib=MOLEX_4PIN}
   (    1 +12V )
   (    2 GND )
+  (    3 GND )
+  (    4  ? )
  )
- ( 45A40E69 $noname  P9 CONN_2 {Lib=CONN_2}
-  (    1 +12V )
+ ( 463198A7 $noname  P05 AMP {Lib=AMP}
+  (    1 GND )
   (    2 GND )
- )
- ( 45A40E66 $noname  P8 CONN_2 {Lib=CONN_2}
-  (    1 +12V )
-  (    2 GND )
- )
- ( 45A40E63 $noname  P7 CONN_2 {Lib=CONN_2}
-  (    1 +12V )
-  (    2 GND )
- )
- ( 45A40E57 $noname  P6 CONN_2 {Lib=CONN_2}
-  (    1 +12V )
-  (    2 GND )
- )
- ( 45A40E4E $noname  P5 CONN_2 {Lib=CONN_2}
-  (    1 +12V )
-  (    2 GND )
- )
- ( 45A40E1F $noname  P4 CONN_2 {Lib=CONN_2}
-  (    1 +12V )
-  (    2 GND )
+  (    3 GND )
+  (    4 GND )
+  (    5 GND )
+  (    6 GND )
+  (    7 +12V )
+  (    8 +12V )
+  (    9 +12V )
+  (   10 +12V )
+  (   11 +12V )
+  (   12 +12V )
  )
  ( 45A40D97 $noname  D1 LED {Lib=LED}
-  (    1 N-000003 )
+  (    1 N-000014 )
   (    2 GND )
  )
  ( 45A40D8A $noname  R1 560R {Lib=R}
   (    1 +12V )
-  (    2 N-000003 )
+  (    2 N-000014 )
  )
  ( 45A40CF5 $noname  C5 1uF {Lib=CP}
-  (    1 N-000005 )
-  (    2 N-000004 )
+  (    1 N-000012 )
+  (    2 N-000013 )
  )
  ( 45A40B82 $noname  P3 CONN_2 {Lib=CONN_2}
   (    1 GND )
-  (    2 N-000007 )
+  (    2 N-000010 )
  )
  ( 45A40B73 $noname  P2 CONN_2 {Lib=CONN_2}
   (    1 GND )
-  (    2 N-000012 )
+  (    2 N-000005 )
  )
  ( 45A40B59 $noname  J1 DB9 {Lib=DB9}
   (    1  ? )
-  (    2 N-000011 )
-  (    3 N-000010 )
-  (    4 N-000009 )
+  (    2 N-000006 )
+  (    3 N-000007 )
+  (    4 N-000008 )
   (    5 GND )
-  (    6 N-000009 )
-  (    7 N-000008 )
-  (    8 N-000008 )
+  (    6 N-000008 )
+  (    7 N-000009 )
+  (    8 N-000009 )
   (    9 GND )
  )
  ( 45A40B38 $noname  C4 1uF {Lib=CP}
   (    1 GND )
-  (    2 N-000015 )
+  (    2 N-000002 )
  )
  ( 45A40B2E $noname  C3 1uF {Lib=CP}
-  (    1 N-000016 )
+  (    1 N-000001 )
   (    2 +5V )
  )
  ( 45A40B29 $noname  C2 1uF {Lib=CP}
-  (    1 N-000014 )
-  (    2 N-000013 )
+  (    1 N-000003 )
+  (    2 N-000004 )
  )
  ( 45A40B1C $noname  U2 MAX232 {Lib=MAX232}
-  (    1 N-000005 )
-  (    2 N-000016 )
-  (    3 N-000004 )
-  (    4 N-000014 )
-  (    5 N-000013 )
-  (    6 N-000015 )
+  (    1 N-000012 )
+  (    2 N-000001 )
+  (    3 N-000013 )
+  (    4 N-000003 )
+  (    5 N-000004 )
+  (    6 N-000002 )
   (    7  ? )
   (    8  ? )
   (    9  ? )
   (   10  ? )
-  (   11 N-000007 )
-  (   12 N-000012 )
-  (   13 N-000010 )
-  (   14 N-000011 )
+  (   11 N-000010 )
+  (   12 N-000005 )
+  (   13 N-000007 )
+  (   14 N-000006 )
   (   15 GND )
   (   16 +5V )
  )
@@ -97,127 +89,87 @@
   (    1 +12V )
   (    2 GND )
  )
- ( 45A409FB $noname  P1 CONN_2 {Lib=CONN_2}
-  (    1 GND )
-  (    2 +12V )
- )
  ( 45A409E1 $noname  U1 78L05 {Lib=78L05}
-  (   1 +5V )
-  (   2 +12V )
-  (   3 GND )
+  (    1 +12V )
+  (    2 GND )
+  (    3 +5V )
  )
 )
 *
-{ Allowed footprints by component:
-$component R1
- R?
- SM0603
- SM0805
-$endlist
-$component C5
- CP*
- SM*
-$endlist
-$component J1
- DB9*
-$endlist
-$component C4
- CP*
- SM*
-$endlist
-$component C3
- CP*
- SM*
-$endlist
-$component C2
- CP*
- SM*
-$endlist
-$component C1
- CP*
- SM*
-$endlist
-$component C6
- CP*
- SM*
-$endlist
-$endfootprintlist
-}
 { Pin List by Nets
-Net 1 "GND"
- P10 2
- P9 2
- P8 2
- P7 2
- P6 2
- P5 2
- P4 2
+Net 1 ""
+ C3 1
+ U2 2
+Net 2 ""
+ U2 6
+ C4 2
+Net 3 ""
+ C2 1
+ U2 4
+Net 4 ""
+ U2 5
+ C2 2
+Net 5 ""
+ P2 2
+ U2 12
+Net 6 ""
+ U2 14
+ J1 2
+Net 7 ""
+ J1 3
+ U2 13
+Net 8 ""
+ J1 6
+ J1 4
+Net 9 ""
+ J1 7
+ J1 8
+Net 10 ""
+ U2 11
+ P3 2
+Net 11 "+5V"
+ C3 2
+ U1 3
+ U2 16
+ C1 1
+Net 12 ""
+ C5 1
+ U2 1
+Net 13 ""
+ C5 2
+ U2 3
+Net 14 ""
+ R1 2
+ D1 1
+Net 15 "+12V"
+ C6 1
+ R1 1
+ U1 1
+ P05 8
+ P05 12
+ M02 1
+ P05 11
+ P05 10
+ P05 9
+ P05 7
+Net 17 "GND"
+ P05 4
+ P05 5
+ P05 6
+ P05 3
+ P05 2
+ P05 1
+ M02 2
+ M02 3
  D1 2
  P3 1
  P2 1
  J1 9
  J1 5
  C4 1
+ C6 2
  U2 15
  C1 2
- C6 2
- P1 1
- U1 3
-Net 2 "+12V"
- P10 1
- P9 1
- P8 1
- P7 1
- P6 1
- P5 1
- P4 1
- R1 1
- C6 1
- P1 2
  U1 2
-Net 3 ""
- D1 1
- R1 2
-Net 4 ""
- C5 2
- U2 3
-Net 5 ""
- C5 1
- U2 1
-Net 6 "+5V"
- C3 2
- U2 16
- C1 1
- U1 1
-Net 7 ""
- P3 2
- U2 11
-Net 8 ""
- J1 7
- J1 8
-Net 9 ""
- J1 6
- J1 4
-Net 10 ""
- J1 3
- U2 13
-Net 11 ""
- J1 2
- U2 14
-Net 12 ""
- P2 2
- U2 12
-Net 13 ""
- C2 2
- U2 5
-Net 14 ""
- C2 1
- U2 4
-Net 15 ""
- C4 2
- U2 6
-Net 16 ""
- C3 1
- U2 2
 }
 #End

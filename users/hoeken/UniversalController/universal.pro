@@ -1,9 +1,5 @@
-update=19/2/2007-01:57:22
-last_client=eeschema
-[general]
-version=1
-RootSch=universal.sch
-BoardNm=universal.brd
+update=16/4/2007-03:41:19
+last_client=kicad
 [cvpcb]
 version=1
 NetITyp=0
@@ -84,3 +80,7 @@ LibName22=display
 LibName23=cypress
 LibName24=siliconi
 LibName25=contrib
+[general]
+version=1
+RootSch=universal.sch
+BoardNm=universal.brd
