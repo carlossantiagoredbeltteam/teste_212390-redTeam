@@ -2,7 +2,7 @@
 
 #init up
 VERSION=$1
-TO_DIR="reprap-$VERSION"
+TO_DIR="reprap-firmware-$VERSION"
 
 #directory structure
 mkdir -p "$TO_DIR"
@@ -16,9 +16,9 @@ cp build/16f628/stepmotorc/stepmotorc.hex "$TO_DIR/" 2>/dev/null
 cp build/16f628/stepmotor-small/stepmotor-small.hex "$TO_DIR/" 2>/dev/null
 
 #create our archive
-zip -qr "reprap-$VERSION.zip" "reprap-$VERSION"
+zip -qr "$TO_DIR.zip" "$TO_DIR"
 
 #cleanup
 rm -rf "$TO_DIR"
 
-echo "RepRap Release v$VERSION created."
+echo "RepRap Firmware Release v$VERSION created."
