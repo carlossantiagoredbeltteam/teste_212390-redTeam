@@ -48,6 +48,7 @@ $(SDCCBASE)/share/sdcc/include/pic:
 	if [ ! -d sdcc-build ]; then mkdir sdcc-build; fi
 	cd sdcc-build && \
 		CVSROOT=:pserver:anonymous@sdcc.cvs.sourceforge.net:/cvsroot/sdcc cvs co -D 20051210 sdcc && \
+		perl -pi.bak -e 's/cl_console:://' sdcc/sim/ucsim/cmd.src/newcmdcl.h && \
 		cd sdcc && \
 		./configure --prefix=$(SDCCBASE) && \
 		make clean && \
