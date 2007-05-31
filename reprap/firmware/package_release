@@ -1,19 +1,18 @@
 #!/bin/bash
 
 #init up
-VERSION=$1
+VERSION=${1:-`date +%Y%m%d`}
 TO_DIR="reprap-firmware-$VERSION"
+FILELIST="extruder iobox stepmotor stepmotorb stepmotorc stepmotor-small"
 
 #directory structure
 mkdir -p "$TO_DIR"
 
 #make the firmware nice
-cp build/16f628/extruder/extruder.hex "$TO_DIR/" 2>/dev/null
-cp build/16f628/iobox/iobox.hex "$TO_DIR/" 2>/dev/null
-cp build/16f628/stepmotor/stepmotor.hex "$TO_DIR/" 2>/dev/null
-cp build/16f628/stepmotorb/stepmotorb.hex "$TO_DIR/" 2>/dev/null
-cp build/16f628/stepmotorc/stepmotorc.hex "$TO_DIR/" 2>/dev/null
-cp build/16f628/stepmotor-small/stepmotor-small.hex "$TO_DIR/" 2>/dev/null
+for F in $FILELIST
+do
+  cp -p build/16f628/$F/$F.hex $TO_DIR
+done
 
 #create our archive
 zip -qr "$TO_DIR.zip" "$TO_DIR"
@@ -21,4 +20,4 @@ zip -qr "$TO_DIR.zip" "$TO_DIR"
 #cleanup
 rm -rf "$TO_DIR"
 
-echo "RepRap Firmware Release v$VERSION created."
+echo "RepRap Firmware Release v$VERSION created as ${TO_DIR}.zip"
