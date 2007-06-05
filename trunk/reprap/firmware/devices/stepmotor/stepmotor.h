@@ -38,7 +38,7 @@
 
 // Half-stepping not needed for 400-step-per-rev motors
 //#define HALFSTEP
-#define UNIVERSAL_PCB
+//#define UNIVERSAL_PCB
 
 void init2();
 void timerTick();
