@@ -1,23 +1,39 @@
 #!/bin/bash
 
 #init up
-VERSION=${1:-`date +%Y%m%d`}
-TO_DIR="reprap-powercomms-$VERSION"
+BOARD=`basename $1`
+VERSION=${2:-`date +%Y%m%d`}
+TO_DIR="reprap-$BOARD-$VERSION"
 FILELIST=""
 
 #directory structure
+echo "Making Files..."
 mkdir -p "$TO_DIR"
 mkdir -p "$TO_DIR/gerber"
 mkdir -p "$TO_DIR/pdf"
 
 #copy our files...
-cp *.pho "$TO_DIR/gerber"
-cp *.drl "$TO_DIR/gerber"
+echo "Copying Files..."
+cp $BOARD/*.pho "$TO_DIR/gerber"
+cp $BOARD/*.ps "$TO_DIR/pdf"
+cp $BOARD/*.drl "$TO_DIR/gerber"
+
+#convert to pdf...
+echo "Converting to PDF..."
+for PS in $TO_DIR/pdf/*.ps
+do
+	TO_FILE=`basename $PS .ps`.pdf
+	ps2pdf $PS $TO_DIR/pdf/$TO_FILE
+done
+rm $TO_DIR/pdf/*.ps
 
 #create our archive
+echo "Archiving..."
 zip -qr "$TO_DIR.zip" "$TO_DIR"
 
 #cleanup
+echo "Cleanup..."
 rm -rf "$TO_DIR"
 
-echo "RepRap PowerComms Release v$VERSION created as ${TO_DIR}.zip"
+#done!
+echo "Release v$VERSION created as ${TO_DIR}.zip"
