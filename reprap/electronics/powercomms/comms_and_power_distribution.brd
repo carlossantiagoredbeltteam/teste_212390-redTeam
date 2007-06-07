@@ -1,4 +1,4 @@
-PCBNEW-BOARD Version 1 date 4/6/2007-05:26:23
+PCBNEW-BOARD Version 1 date 7/6/2007-03:07:28
 
 $GENERAL
 LayerCount 2
@@ -16,7 +16,7 @@ $EndGENERAL
 $SHEETDESCR
 Sheet A3 16535 11700
 Title ""
-Date "4 jun 2007"
+Date "7 jun 2007"
 Rev ""
 Comp ""
 Comment1 ""
@@ -1036,7 +1036,7 @@ Po 0 121800 99300 150200 99300 150
 De 28 0 900 0 0
 $EndDRAWSEGMENT
 $TEXTPCB
-Te "PowerComms v1.3.1"
+Te "PowerComms v1.2.1"
 Po 136650 84100 700 800 150 0
 De 21 1 0 0
 $EndTEXTPCB
