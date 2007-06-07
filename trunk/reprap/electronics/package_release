@@ -18,6 +18,13 @@ cp $BOARD/*.pho "$TO_DIR/gerber"
 cp $BOARD/*.ps "$TO_DIR/pdf"
 cp $BOARD/*.drl "$TO_DIR/gerber"
 
+#create our source dir
+cp -a $BOARD "$TO_DIR/src";
+rm -rf $TO_DIR/src/*.ps
+rm -rf $TO_DIR/src/*.pdf
+rm -rf $TO_DIR/src/*.pho
+rm -rf $TO_DIR/src/.svn
+
 #convert to pdf...
 echo "Converting to PDF..."
 for PS in $TO_DIR/pdf/*.ps
