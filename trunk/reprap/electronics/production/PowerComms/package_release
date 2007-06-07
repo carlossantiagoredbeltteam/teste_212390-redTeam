@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#init up
+VERSION=${1:-`date +%Y%m%d`}
+TO_DIR="reprap-powercomms-$VERSION"
+FILELIST=""
+
+#directory structure
+mkdir -p "$TO_DIR"
+mkdir -p "$TO_DIR/gerber"
+mkdir -p "$TO_DIR/pdf"
+
+#copy our files...
+cp *.pho "$TO_DIR/gerber"
+cp *.drl "$TO_DIR/gerber"
+
+#create our archive
+zip -qr "$TO_DIR.zip" "$TO_DIR"
+
+#cleanup
+rm -rf "$TO_DIR"
+
+echo "RepRap PowerComms Release v$VERSION created as ${TO_DIR}.zip"
