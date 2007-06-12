@@ -14,8 +14,16 @@ mkdir -p "$TO_DIR/pdf"
 
 #copy our files...
 echo "Copying Files..."
-cp $BOARD/*.pho "$TO_DIR/gerber"
-cp $BOARD/*.ps "$TO_DIR/pdf"
+cp $BOARD/*-Component.pho "$TO_DIR/gerber/ComponentTraces.pho"
+cp $BOARD/*-Copper.pho "$TO_DIR/gerber/CopperTraces.pho"
+cp $BOARD/*-MaskCmp.pho "$TO_DIR/gerber/SolderMaskComponent.pho"
+cp $BOARD/*-MaskCopp.pho "$TO_DIR/gerber/SolderMaskCopper.pho"
+cp $BOARD/*-SilkSCmp.pho "$TO_DIR/gerber/SilkScreen.pho"
+cp $BOARD/*-Component.ps "$TO_DIR/pdf/ComponentTraces.ps"
+cp $BOARD/*-Copper.ps "$TO_DIR/pdf/CopperTraces.ps"
+cp $BOARD/*-MaskCmp.ps "$TO_DIR/pdf/SolderMaskComponent.ps"
+cp $BOARD/*-MaskCopp.ps "$TO_DIR/pdf/SolderMaskCopper.ps"
+cp $BOARD/*-SilkSCmp.ps "$TO_DIR/pdf/SilkScreen.ps"
 cp $BOARD/*.drl "$TO_DIR/gerber"
 
 #create our source dir
