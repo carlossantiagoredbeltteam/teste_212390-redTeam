@@ -1,0 +1,45 @@
+PCBNEW-LibDoc----V1  16/6/2007-23:29:04
+#
+$MODULE P05
+Li P05
+Cd Connecteur 12 pins
+Kw CONN DEV
+$EndMODULE
+#
+$MODULE MOLEX Disk Drive Power
+Li MOLEX Disk Drive Power
+Cd Connecteur 4 pibs
+Kw CONN DEV
+$EndMODULE
+#
+$MODULE AMP Economy Power 12pin
+Li AMP Economy Power 12pin
+Cd AMP Economy Power 12P
+Kw CONN DEV
+$EndMODULE
+#
+$MODULE AMP Economy Power 12pin
+Li AMP Economy Power 12pin
+Cd AMP Economy Power 12P
+Kw CONN DEV
+$EndMODULE
+#
+$MODULE 4PIN_KEYED
+Li 4PIN_KEYED
+Cd 4 Pin Connector
+Kw Connector
+$EndMODULE
+#
+$MODULE POWER
+Li POWER
+Cd Bornier d'alimentation 2 pins
+Kw DEV
+$EndMODULE
+#
+$MODULE 2PIN_KEYED
+Li 2PIN_KEYED
+Cd 2 Pin Connector
+Kw CONN DEV
+$EndMODULE
+#
+$EndLIBDOC
