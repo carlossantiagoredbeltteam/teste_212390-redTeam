@@ -35,6 +35,9 @@
 #include "extruder.h"
 #include "serial.h"
 
+#define PC1 100
+#define PC2 20
+
 byte PWMPeriod = 255;
 volatile static byte currentDirection = 0;
 
@@ -51,6 +54,8 @@ volatile static byte material_click = 0;
 static byte requestedHeat0 = 0;
 static byte requestedHeat1 = 0;
 volatile static byte heatCounter = 0;
+volatile static byte pulseCounter1 = PC1;
+volatile static byte pulseCounter2 = PC2;
 static byte temperatureLimit0 = 0;
 static byte temperatureLimit1 = 0;
 
@@ -94,6 +99,8 @@ volatile static addressableInt currentPosition, seekPosition;
 #define CMD_SETTEMPSCALER 53
 
 #define HEATER_PWM_PERIOD 255
+
+
 
 #ifdef UNIVERSAL_PCB
 
@@ -258,11 +265,12 @@ void init2()
 void pwmSet()
 {
     CCP1CON = BIN(00111100);
-    CCPR1L = seekSpeed;
-  	if (seekSpeed == 255)
+//    CCPR1L = seekSpeed;
+    CCPR1L = 255;
+//  	if (seekSpeed == 255)
     	PR2 = 0;
-  	else
-    	PR2 = PWMPeriod;
+//  	else
+//   	PR2 = PWMPeriod;
 }
 #pragma restore
 
@@ -283,16 +291,19 @@ void setSpeed(byte direction)
 {
   if (seekSpeed == 0) 
   {
-    extruder_stop();
-    return;
+  	extruder_reverse();
+    //extruder_stop();
+    //return;
   } else 
   {
-    if (direction == 0) 
+//    if (direction == 0) 
       extruder_forward();
-    else 
-      extruder_reverse();
+//    else 
+//      extruder_reverse();
   }
-  pwmSet();    
+  pwmSet();
+  pulseCounter1 = PC1;
+  pulseCounter2 = PC2;    
   currentDirection = direction;
  _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _currentPosition
@@ -304,6 +315,7 @@ void setSpeed(byte direction)
 #pragma nooverlay
 void timerTick()
 {
+/*
   // There are two temperatures temperatureLimit0 and temperatureLimit1.
   // When colder than temperatureLimit0, the heater runs at
   // the power specified by requestedHeat1.  If it is between
@@ -325,6 +337,21 @@ void timerTick()
     // Heater on
     heater_on();
   }
+  */
+
+  if(pulseCounter2 == 0)
+  {
+    if(pulseCounter1 == 0)
+  	{
+  		extruder_stop();
+  	} else
+  	{
+  	  pulseCounter1--;
+  	  pulseCounter2 = PC2;
+  	}
+  } else
+  	  pulseCounter2--;
+  	  
   heatCounter++;
   TMR1H = HEATER_PWM_PERIOD;
   TMR1L = 0;
@@ -390,6 +417,7 @@ _endasm;
 
 void checkTemperature()
 {
+/*
   // Assumes:
   // A6 is a reference resistor
   // A7 is thermistor
@@ -487,7 +515,7 @@ void checkTemperature()
 
   TRISA = BIN(11000010) | PORTATRIS;
   VRCON = 0;  // Turn off vref
-
+*/
 _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _currentPosition
 _endasm;
@@ -511,8 +539,8 @@ void processCommand()
     break;
 
   case CMD_REVERSE:
-    seekSpeed = buffer[1];
-    setSpeed(1);
+//    seekSpeed = buffer[1];
+//    setSpeed(1);
     break;
 
   case CMD_SETPOS:

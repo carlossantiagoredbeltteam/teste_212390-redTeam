@@ -4,7 +4,7 @@ SOURCES=extruder1.c extruder2.c
 
 include ../../picmake.inc
 
-CFLAGS += -DPORT=8
+CFLAGS += -DPORT=9
 
 $(BUILDDIR)/$(TARGET).hex:	$(OBJS) $(PICDEPS)
 	cd $(BUILDDIR) && gplink -m -c -o $(TARGET).hex $(SOURCES:.c=.o) $(LDFLAGS)
