@@ -27,7 +27,7 @@ cp $BOARD/*-SilkSCmp.ps "$TO_DIR/pdf/SilkScreen.ps"
 cp $BOARD/*.drl "$TO_DIR/gerber"
 
 #create our source dir
-cp -a $BOARD "$TO_DIR/src";
+cp -R $BOARD "$TO_DIR/src";
 rm -rf $TO_DIR/src/*.ps
 rm -rf $TO_DIR/src/*.pdf
 rm -rf $TO_DIR/src/*.pho

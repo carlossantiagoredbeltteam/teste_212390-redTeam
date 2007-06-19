@@ -1,4 +1,4 @@
-Cmp-Mod V01 Genere par PcbNew le 6/5/2007-01:14:37
+Cmp-Mod V01 Genere par PcbNew le 19/6/2007-02:03:13
 
 BeginCmp
 TimeStamp = 454E2D14;
@@ -11,7 +11,7 @@ BeginCmp
 TimeStamp = 454E2D1F;
 Reference = C2;
 ValeurCmp = 100uF_12v;
-IdModule  = C2V10;
+IdModule  = C1V5;
 EndCmp
 
 BeginCmp
@@ -172,14 +172,14 @@ BeginCmp
 TimeStamp = 454F99F9;
 Reference = K1;
 ValeurCmp = CONN_3;
-IdModule  = SIL-3;
+IdModule  = 3PIN_KEYED_180;
 EndCmp
 
 BeginCmp
 TimeStamp = 45508761;
 Reference = K2;
 ValeurCmp = CONN_3;
-IdModule  = SIL-3;
+IdModule  = 3PIN_KEYED;
 EndCmp
 
 BeginCmp
@@ -193,56 +193,56 @@ BeginCmp
 TimeStamp = 454F782D;
 Reference = P2;
 ValeurCmp = CONN_2;
-IdModule  = SIL-2;
+IdModule  = 2PIN_KEYED;
 EndCmp
 
 BeginCmp
 TimeStamp = 454F79B4;
 Reference = P3;
 ValeurCmp = CONN_2;
-IdModule  = SIL-2;
+IdModule  = 2PIN_KEYED;
 EndCmp
 
 BeginCmp
 TimeStamp = 454F7BC7;
 Reference = P4;
 ValeurCmp = CONN_2;
-IdModule  = SIL-2;
+IdModule  = 2PIN_KEYED;
 EndCmp
 
 BeginCmp
 TimeStamp = 454F9B8A;
 Reference = P5;
 ValeurCmp = CONN_2;
-IdModule  = SIL-2;
+IdModule  = 2PIN_KEYED;
 EndCmp
 
 BeginCmp
 TimeStamp = 455089A4;
 Reference = P6;
 ValeurCmp = CONN_2;
-IdModule  = SIL-2;
+IdModule  = 2PIN_KEYED;
 EndCmp
 
 BeginCmp
 TimeStamp = 45572E0D;
 Reference = P7;
 ValeurCmp = CONN_2;
-IdModule  = SIL-2;
+IdModule  = 2PIN_KEYED;
 EndCmp
 
 BeginCmp
 TimeStamp = 455F16DE;
 Reference = P8;
 ValeurCmp = CONN_2;
-IdModule  = SIL-2;
+IdModule  = 2PIN_KEYED;
 EndCmp
 
 BeginCmp
 TimeStamp = 454F6CD4;
 Reference = P9;
 ValeurCmp = CONN_4;
-IdModule  = SIL-4;
+IdModule  = 4PIN_KEYED;
 EndCmp
 
 BeginCmp
