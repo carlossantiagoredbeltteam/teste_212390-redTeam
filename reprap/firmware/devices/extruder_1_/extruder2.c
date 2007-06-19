@@ -56,10 +56,11 @@ static byte requestedHeat1 = 0;
 volatile static byte heatCounter = 0;
 volatile static byte pulseCounter1 = PC1;
 volatile static byte pulseCounter2 = PC2;
+volatile static byte solenoid_on = 0;
 static byte temperatureLimit0 = 0;
 static byte temperatureLimit1 = 0;
 
-//volatile static byte delay_counter;
+volatile static byte delay_counter;
 static byte lastTemperature = 0;
 static byte lastTemperatureRef = 0;
 
@@ -255,6 +256,7 @@ void init2()
   lastTemperatureRef = 0;
   temperatureVRef = 3;
   portaval = 0;
+  solenoid_on = 0;
   PORTA = portaval;
   TMR1H = HEATER_PWM_PERIOD;
   TMR1L = 0;
@@ -287,7 +289,30 @@ void pwmSet()
 
 #pragma save
 #pragma nooverlay
-void setSpeed(byte direction)
+
+void solenoid_delay()
+{
+  pwmSet();
+  pulseCounter1 = PC1;
+  pulseCounter2 = PC2; 
+  solenoid_on = 1;
+}
+
+#pragma restore
+
+#pragma save
+#pragma nooverlay
+
+void solenoid(byte on)
+{
+	if(on)
+		extruder_forward();
+	else
+		extruder_reverse();
+	solenoid_delay();
+}
+
+/*void setSpeed(byte direction)
 {
   if (seekSpeed == 0) 
   {
@@ -308,7 +333,7 @@ void setSpeed(byte direction)
  _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _currentPosition
  _endasm;
-}
+}*/
 #pragma restore
 
 #pragma save
@@ -338,20 +363,24 @@ void timerTick()
     heater_on();
   }
   */
-
-  if(pulseCounter2 == 0)
+  
+  if(solenoid_on)
   {
-    if(pulseCounter1 == 0)
+  	if(pulseCounter2 == 0)
   	{
-  		extruder_stop();
+    	if(pulseCounter1 == 0)
+  		{
+  			extruder_stop();
+  			solenoid_on = 0;
+  		} else
+  		{
+  	  		pulseCounter1--;
+  	  		pulseCounter2 = PC2;
+  		}
   	} else
-  	{
-  	  pulseCounter1--;
-  	  pulseCounter2 = PC2;
-  	}
-  } else
   	  pulseCounter2--;
-  	  
+  }
+  
   heatCounter++;
   TMR1H = HEATER_PWM_PERIOD;
   TMR1L = 0;
@@ -534,13 +563,15 @@ void processCommand()
 
 // Extrude speed takes precedence over fan speed
   case CMD_FORWARD:
-    seekSpeed = buffer[1];
-    setSpeed(0);
+  	solenoid(buffer[1]);
+ //   seekSpeed = buffer[1];
+ //   setSpeed(0);
     break;
 
   case CMD_REVERSE:
 //    seekSpeed = buffer[1];
 //    setSpeed(1);
+  	solenoid(0);
     break;
 
   case CMD_SETPOS:
@@ -563,20 +594,21 @@ void processCommand()
     seekPosition.bytes[0] = buffer[2];
     seekPosition.bytes[1] = buffer[3];
 
-    if (seekPosition.ival != currentPosition.ival) {
-      seekSpeed = buffer[1];
-      if (currentPosition.ival > seekPosition.ival)
-	setSpeed(1);
-      else
-	setSpeed(0);
-    }
+//  if (seekPosition.ival != currentPosition.ival) {
+//      seekSpeed = buffer[1];
+//      if (currentPosition.ival > seekPosition.ival)
+//	setSpeed(1);
+//      else
+//	setSpeed(0);
+//    }
 
     break;
 
   case CMD_FREE:
     // Free motor.  There is no torque hold for a DC motor,
     // so all we do is switch off
-    extruder_stop();
+//    extruder_stop();
+	solenoid(0);
     break;
 
   case CMD_NOTIFY:
