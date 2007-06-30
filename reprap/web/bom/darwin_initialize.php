@@ -1,7 +1,8 @@
 <?php
 
 // cretae db
-queries("
+// db must be defined before this file is included.
+$db->queries("
 DROP DATABASE if exists bom;
 CREATE DATABASE bom;
 USE bom;
@@ -14,8 +15,10 @@ CREATE TABLE IF NOT EXISTS model (
 CREATE TABLE IF NOT EXISTS part (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT UNIQUE,
   name VARCHAR(128),
-  type_id INT,
   description VARCHAR(256),
+  url VARCHAR(256),
+  photo MEDIUMBLOB,
+  stl MEDIUMBLOB,
   notes VARCHAR(2048)
 );
 
@@ -35,11 +38,30 @@ CREATE TABLE IF NOT EXISTS module ( /* also used for assemblies */
   notes VARCHAR(2048)
 );
 
-CREATE TABLE IF NOT EXISTS type (
+CREATE TABLE IF NOT EXISTS tag ( /*just like flickr tags */
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT UNIQUE,
   name VARCHAR(32),
   description VARCHAR(256)
 );
+
+CREATE TABLE IF NOT EXISTS model_tag ( /*just like flickr tags */
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT UNIQUE,
+  model_id INT,
+  tag_id INT
+);
+
+CREATE TABLE IF NOT EXISTS module_tag ( /*just like flickr tags */
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT UNIQUE,
+  module_id INT,
+  tag_id INT
+);
+
+CREATE TABLE IF NOT EXISTS part_tag ( /*just like flickr tags */
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT UNIQUE,
+  part_id INT,
+  tag_id INT
+);
+
 
 CREATE TABLE IF NOT EXISTS source_part (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT UNIQUE,
@@ -53,26 +75,31 @@ CREATE TABLE IF NOT EXISTS source_part (
   notes VARCHAR(2048)  /* notes about getting this particular part from this vendor */
 );
 
+
 CREATE TABLE IF NOT EXISTS module_part (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT UNIQUE,
   module_id INT,
   part_id INT,
   quantity INT,
   schematic VARCHAR(16),   /* this is the code used to identify this part on a drawing */
-  description VARCHAR(256) /* If part has a colloquial name when used in this context, put it here */
+  description VARCHAR(256), /* If part has a colloquial name when used in this context, put it here */
+  notes VARCHAR(2048)  /* notes about how this part is used in this module*/
 );
+
 
 CREATE TABLE IF NOT EXISTS module_module (
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT UNIQUE,
   supermodule_id INT,
   submodule_id INT,
   quantity INT,        /*how many submodules in the supermodule? */
+  schematic VARCHAR(16),   /* this is the code used to identify the submodule on a drawing */
   notes VARCHAR(2048) /* notes about how this assembly or submodule fits with the supermodule */
 );
 
+
 INSERT INTO model (module_id) VALUES (1); /* identify master module */
 
-INSERT INTO type (name, description) VALUES ('', 'N/A');
+INSERT INTO tag (name, description) VALUES ('', 'N/A');
 
 INSERT INTO source (name, url, description) VALUES ('RepRap', 'http://reprap.org', 'These are parts that will be fabricated on an already-working RepRap.');
 INSERT INTO source (name, url, description) VALUES ('RepRap Research Foundation', 'http://rrrf.org', 'The Reprap Research Foundation\'s online store');
