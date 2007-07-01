@@ -6,6 +6,7 @@
 	{
 		//send it out!
 		$parts = importBOMData($_POST['assembly_ids'], $_POST['assembly_qty']);
+		$corps = loadSupplierData();
 	
 		if ($output == 'json')
 			renderUniqueJSON($parts);
@@ -79,19 +80,24 @@
 ?>
 	<h3><?=$name?></h3>
 	<? if (count($parts)): ?>
-		<table>
+		<table width="85%">
 			<tr>
-				<th>Part</th>
-				<th>Quantity</th>
-				<th>Suppliers</th>
+				<th width="50%">Part</th>
+				<th width="10%">Quantity</th>
+				<th width="40%">Suppliers</th>
 			</tr>
 			<? foreach ($parts AS $part): ?>
+				<?$total += $part->quantity;?>
 				<tr>
 					<td><?=$part->name?></td>
-					<td><?=$part->quantity?></td>
+					<td align="center"><?=$part->quantity?></td>
 					<td><? renderPartSuppliers($part) ?></td>
 				</tr>
 			<? endforeach ?>
+			<tr>
+				<td align="right">Total:</td>
+				<td align="center"><?=$total?></td>
+			</tr>
 		</table>
 	<? else: ?>
 		<b>No parts found.</b>
@@ -101,6 +107,8 @@
 
 	function renderPartSuppliers($part)
 	{
+		global $corps;
+		
 		echo '<input type="hidden" name="parts[]" value="' . $part->getSafeName() . '"/>';
 		echo '<input type="hidden" name="quantities[]" value="' . $part->quantity .  '"/>';
 
@@ -108,7 +116,7 @@
 		{
 			echo '<select name="suppliers[]">';
 			foreach ($part->suppliers AS $supplier)
-				echo '<option value="' . $supplier->name . '">' . $supplier->key . ' (' . $supplier->part_id . ')</option>';
+				echo '<option value="' . $supplier->name . '">' . $corps[$supplier->key]->name . '</option>';
 			echo '</select>';
 		}
 		else
