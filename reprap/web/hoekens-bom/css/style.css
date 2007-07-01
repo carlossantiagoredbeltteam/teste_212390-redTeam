@@ -1,0 +1,601 @@
+body
+{
+	background-color: #202020;
+	background-image: url(images/bg.gif);
+	font-family: Verdana, Helvetica, sans-serif;
+	font-size: 13px;
+	margin: 0px;
+	padding: 0px;
+	border-right: 12px solid #666666;
+}
+
+th
+{
+	text-align: left;
+	vertical-align: top;
+	padding: 3px 10px;
+}
+
+td
+{
+	padding: 1px 10px 1px 0px;
+}
+
+table.BaseForm
+{
+	width: 95%;
+}
+
+div.PageNavigation
+{
+	background: #ddf;
+	border: 1px solid #aaf;
+	
+	padding: 10px;
+	margin: 10px 0px;
+	font-weight: bold;
+}
+
+div.BaseError
+{
+	background: #fdd;
+	border: 1px solid #faa;
+	
+	padding: 10px;
+	margin: 10px 0px;
+	font-weight: bold;
+}
+
+div.BaseStatus
+{
+	border: 1px solid #afa;
+	background: #dfd;
+	
+	padding: 10px;
+	margin: 10px 0px;
+	font-weight: bold;
+}
+
+span.FormError
+{
+	color: red;
+}
+
+div.ObjectSearch
+{
+	padding: 10px 0px;
+}
+
+div.profileNav
+{
+	font-size: 15px;
+	padding: 5px 0px;
+}
+
+div#pagination
+{
+	margin: 5px 0px;
+	font-size: 14px;
+}
+
+#nav
+{
+	width: 1000px;
+	height: 25px;
+	border-bottom: 1px solid white;
+	color: white;
+	background-color: #202020;
+	opacity: 0.8;
+	-moz-opacity: 0.8;
+	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=80);
+	
+	position: fixed;
+	top: 0px;
+	margin-left: 0px;
+	left: 16px;
+	margin-top: 0px;
+	padding: 0px;
+	z-index: 99;
+
+	_position: absolute;
+	_top: expression((dummy = document.documentElement.scrollTop) + "px");
+}
+
+#nav li
+{
+	display: block;
+	float: left;
+	height: 25px;
+	width: auto;
+	text-align: center;
+	line-height: 25px;
+}
+
+#nav li a
+{
+	display: block;
+	padding-left: 15px;
+	padding-right: 15px;
+	line-height: 25px;
+	color: white;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+#nav li a:hover
+{
+	background-color: #666666;
+}
+
+li#searchBox
+{
+	float: right;	
+}
+
+#main
+{
+	width: 1000px;
+	margin-left: 15px;
+	border-right: 1px solid #666666;
+	border-left: 1px solid #666666;
+	margin-bottom: 15px;
+}
+
+div#featuredWidgets
+{
+	position: absolute;
+	margin-left: 10px;
+	padding-left: 55px;
+	bottom: 15px;
+	height: 140px;
+	background: #FDC91D url(images/featured-widgets.gif) left no-repeat;
+}
+
+div#featuredWidgets img
+{
+	border: 1px solid #333;
+	padding: 10px;
+	background: #bbb;
+	margin-left: 10px;
+}
+
+div#featuredWidgets img:hover
+{
+	border: 1px solid #000;
+	background: #fff;
+}
+
+#header
+{
+	background: #fdc91d url(images/header_bg.gif) bottom repeat-x;
+	height: 110px;
+	padding-top: 1px;
+	position: relative;
+}
+
+.gear
+{
+	position: absolute;
+	top: 37px;
+	left: 12px;
+	width: 57px;
+	height: 56px;
+	background-image: url(images/gear.png);
+	_background-image: none;
+	filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='style/images/gear.png');
+}
+
+#header h1
+{
+	position: absolute;
+	left: 82px;
+	top: 33px;
+	color: white;
+	font-size: 48px;
+	font-weight: bold;
+	margin: 0px;
+}
+
+#header h1.shad
+{
+	left: 84px;
+	top: 34px;
+	color: black;
+	opacity: 0.7;
+	-moz-opacity: 0.7;
+	filter:progid:DXImageTransform.Microsoft.Alpha(opacity=70);
+}
+
+#header em
+{
+	font-style: normal;
+	text-decoration: underline;
+}
+
+div#body
+{
+	padding-top: 1px;
+	background-color: white;
+	position: relative;
+	border-right: 200px solid #eeeeee;
+}
+
+#sidebar
+{
+	
+	width: 180px;
+	
+	position: absolute;
+	right: -200px;
+	_right: 0px;
+	top: 0px;
+	padding: 10px;
+}
+
+#sidebar h3
+{
+	font-size: 13px;
+	border-bottom: 1px solid black;
+	margin-bottom: 4px;
+	margin-top: 16px;
+	clear: both;
+}
+
+#sidebar ul
+{
+	margin-left: 1em;
+	padding-left: 0px;
+}
+
+#sidebar p
+{
+	margin-bottom: 8px;
+}
+
+#content
+{
+	padding: 20px;
+	border-right: 1px solid #b0b0b0;
+	border-left: 1px solid #b0b0b0;
+	color: #333333;
+	min-height: 400px;
+	line-height: 1.3em;
+}
+
+#content h2
+{
+	font-size: 18px;
+	/* 18px is the default minimum font size for which anti-aliasing will occur. */
+	margin: 0px;
+	margin-bottom: 10px;
+	border-bottom: 1px solid black;	
+}
+
+#content h3
+{
+	margin: 0px;
+	padding: 5px 0px;
+}
+
+#content .date
+{
+	float: right;
+}
+
+#content .postedBy
+{
+	float: left;
+}
+
+#content .meta
+{
+	height: 1em;
+}
+
+#content p
+{
+	text-align: justify;
+}
+
+.comments
+{
+	border-top: 1px dotted #666666;
+	border-bottom: 1px dotted #666666;
+	padding: 4px;
+	text-align: right;
+	margin-bottom: 2em;
+	background-image: url(images/comment_edit.gif);
+	background-repeat: no-repeat;
+	background-position: center left;
+}
+
+a
+{
+	color: #666666;
+}
+
+.pullout
+{
+	background-color: #eeeeee;
+	padding: 5px;
+	float: right;
+	margin: 8px;
+}
+
+
+
+.flickr-thumbnail, .flickr-pullout {
+	float: left;
+		background: url('images/flickr_shadow.gif') no-repeat bottom right;
+	margin: 5px 0px 0px 6px;
+ 	padding: 0px 0px 0px 0px;
+	display: block;
+	width: auto;
+	_position: relative;
+	}
+
+.flickr-thumbnail img, .flickr-pullout img {
+		 background-color: #fff;
+	 border: 1px solid #a9a9a9;
+	 display: block;
+	 margin: -5px 5px 5px -5px;
+	 padding: 4px;
+	 position: relative;
+	}
+
+.flickr-thumbnail img:hover, .flickr-thumbnail:hover img, .flickr-pullout:hover img {
+	background-color: #ccd;
+}
+
+.flickr-pullout
+{
+	margin: 13px 3px 3px 14px;
+	background-image: url(images/flickr_shadow_white.gif);
+	
+}
+
+img
+{
+	display: block;
+	padding: 0px;
+	margin: 0px;
+}
+
+#footer
+{
+	width: 998px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	border: 1px solid #b0b0b0;
+	background-color: #eeeeee;
+	color: #666;
+
+}
+
+
+
+.csskeyword
+{
+	color: blue;
+}
+
+.cssvalue
+{
+	color: red;
+}
+
+p.caption
+{
+	text-align: center;
+}
+
+small.super
+{
+	vertical-align: top;
+	font-size: 0.75em;
+	line-height: 1.3em;
+}
+
+.nodisplay
+{
+	display: none;
+}
+
+div#widgetTabs
+{
+	margin-top: 15px;
+}
+
+div#widgetTabs div.tab
+{
+	font-size: 15px;
+	border: 1px solid #666;
+	margin-right: 5px;
+	padding: 5px 10px;
+	display: inline;
+	float: left;
+	margin-bottom: -1px;
+}
+
+div#widgetTabs div.tab:hover, div#widgetTabs div.activeTab
+{
+	border-bottom: 1px solid #eee;
+	background: #eee;
+}
+
+div#widgetContent
+{
+	clear: both;
+	border: 1px solid #666;
+	padding: 5px;
+	background: #eee;
+}
+
+ol.stepOrder
+{
+	margin: 0px;
+}
+
+ol.stepOrder li
+{
+	padding: 10px;
+	margin: 10px 0px;
+	border: 1px solid;
+}
+
+div.autocomplete {
+      position:absolute;
+      width:250px;
+      background-color:white;
+      border:1px solid #888;
+      margin:0px;
+      padding:0px;
+    }
+    div.autocomplete ul {
+      list-style-type:none;
+      margin:0px;
+      padding:0px;
+    }
+    div.autocomplete ul li.selected { background-color: #ddd;}
+    div.autocomplete ul li {
+      list-style-type:none;
+      display:block;
+      margin:0;
+      padding:10px 5px;
+      cursor:pointer;
+    }
+
+div#stepDetailImage
+{
+	position: relative;	
+}
+
+div#stepDetailImage img
+{
+	padding: 10px;
+	border: 1px solid #666;
+	background: #ddd;
+}
+
+ul.stepImages
+{
+	margin: 0px;
+	padding: 0px;
+	list-style-type: none;
+}
+
+li.stepImage
+{
+	list-style-type: none;
+	display: inline;
+	float: left;
+	padding: 8px;
+	margin: 8px 8px 0px 0px;
+	border: 1px solid #666;
+	background: #ddd;
+}
+
+li.stepImage:hover
+{
+	background: #aaa;
+	border: 1px solid #333;
+}
+
+div.clear
+{
+clear: both;
+}
+
+div.imageAnnotation, div.newAnnotation
+{
+	position: absolute;
+	z-index: 500;
+}
+
+div.imageAnnotation:hover, div.newAnnotation:hover
+{
+	z-index: 600;
+}
+
+div.imageAnnotationBox
+{
+	border: 1px solid #ccc;
+	margin-bottom: 5px;
+}
+
+div.annotationTransparency
+{
+	background: #fff;
+	opacity: .10;
+	width: 100%;
+	height: 100%;
+}
+
+div.annotationTransparency:hover
+{
+	opacity: .0;
+}
+
+div.imageAnnotationBox:hover
+{
+	border: 1px solid #fff;
+}
+
+div.imageAnnotationText
+{
+	display: none;
+	background: #ccc;
+	border: 1px solid white;
+	color: black;
+	padding: 5px;
+	font-size: 11px;
+
+	position: relative;
+}
+
+div.imageAnnotation:hover div.imageAnnotationText
+{
+	display: block;
+}
+
+div.annotationActions
+{
+	margin-top: 5px;
+	text-align: right;
+}
+
+span.annotationActions
+{
+	border: 1px solid #333;
+	padding: 2px;
+	margin: 5px 0px 0px 5px;
+	background: #aaa;
+}
+
+span.annotationActions:hover
+{
+	background: #eee;
+}
+
+div.imageAnnotationText textarea
+{
+	width: 100%;
+	height: 75px;
+	font-size: 12px;
+}
+
+div.imageAnnotationText textarea.inactive
+{
+	border: 1px solid #999;
+	color: #666;
+}
+
+div.imageAnnotationText textarea.active
+{
+	border: 1px solid #333;
+	color: #000;
+}
+
