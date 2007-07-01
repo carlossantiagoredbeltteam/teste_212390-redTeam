@@ -1,9 +1,10 @@
 <?
-	require_once("include.php");
+	require_once("include/global.php");
 
 	$modules = loadModulesData();
+	
+	drawHeader("Generate Bill of Materials");
 ?>
-<h1>Generate RepRap Bill of Materials</h1>
 <ul>
 	<li><b>Step 1: Choose which assemblies and the quantities of each.</b></li>
 	<li>Step 2: Choose which suppliers you'd like to use.</li>
@@ -15,13 +16,13 @@
 			<th>Module</th>
 			<th>Quantity</th>
 		</tr>
-		<? foreach ($modules AS $module): ?>
+		<? foreach ($modules AS $key => $module): ?>
 			<? if($modules[3]): ?>
 				<tr>
 					<td><label><input type="checkbox" name="assembly_ids[]" value="<?=$module[3]?>"/> <b><?=$module[0]?></b></label></td>
 					<td><input type="text" size="5" name="assembly_qty[<?=$module[3]?>]" value="<?=$module[1]?>"/></td>
 				</tr>
-				<tr>
+				<tr id="module_<?=$key?>" style="display: none">
 					<td colspan="2"><?=$module[2]?></td>
 				</tr>
 			<? endif ?>
@@ -41,3 +42,4 @@
 		</tr>
 	</table>
 </form>
+<? drawFooter() ?>

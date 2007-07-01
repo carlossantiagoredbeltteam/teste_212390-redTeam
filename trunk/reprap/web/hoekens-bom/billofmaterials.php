@@ -1,5 +1,7 @@
 <?
-	require_once("include.php");
+	require_once("include/global.php");
+
+	drawHeader("RepRap Bill of Materials - " . date("F d, Y"));
 
 	if (isset($_POST['submit']))
 	{
@@ -18,7 +20,6 @@
 		
 		$corps = $list->getSuppliers();
 ?>
-		<h1>RepRap Bill of Materials - <?=date("F d, Y")?></h1>
 		<ul>
 			<li>Step 1: Choose which assemblies and the quantities of each.</li>
 			<li>Step 2: Choose which suppliers you'd like to use.</li>
@@ -53,6 +54,11 @@
 	}
 	else
 		echo "Oops, you gotta POST here bro.";
+		
+	drawFooter();
+	
+	
+	//VIEW FUNCTIONS BELOW.
 
 	function renderParts($parts, $corp)
 	{
