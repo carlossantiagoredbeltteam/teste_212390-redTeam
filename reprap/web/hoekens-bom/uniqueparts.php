@@ -1,5 +1,5 @@
 <?
-	require_once("include.php");
+	require_once("include/global.php");
 
 	$output = $_POST['output'];
 	if ($output != '')
@@ -37,8 +37,8 @@
 
 	function renderUniqueHTML($bom)
 	{
+		drawHeader("Choose Suppliers");
 ?>
-	<h1>Choose Suppliers</h1>
 	<ul>
 		<li>Step 1: Choose which assemblies and the quantities of each.</li>
 		<li><b>Step 2: Choose which suppliers you'd like to use.</b></li>
@@ -58,6 +58,7 @@
 		<input type="submit" name="submit" value="Generate Bill of Materials"/>
 	</form>
 <?
+		drawFooter();
 	}
 
 	function renderGenericPartsCSV($parts, $name)
