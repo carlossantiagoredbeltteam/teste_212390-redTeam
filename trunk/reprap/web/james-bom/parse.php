@@ -224,8 +224,13 @@ function parse_spreadsheet($module_name, $lines, $field_str) {
 
 $modules = get_bom_data();
 $db = new mydb();
-include("darwin_initialize.php");
 
+// drop and recreate database to start clean
+$db->queries("DROP DATABASE if exists bom;".
+             "CREATE DATABASE ".$db->name.";".
+             "USE ".$db->name.";");
+include ("tables.mysql");          // create tables
+include("darwin_initialize.php");  // load the darwin data into the fresh db
 
 
 // Parse the spreadsheets

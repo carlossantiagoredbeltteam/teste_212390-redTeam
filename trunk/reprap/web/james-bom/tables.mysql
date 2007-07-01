@@ -1,0 +1,96 @@
+<?php
+
+// create db
+// db must be defined before this file is included.
+$db->queries("
+CREATE TABLE IF NOT EXISTS model (
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT UNIQUE,
+  module_id INT
+);
+
+CREATE TABLE IF NOT EXISTS part (
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT UNIQUE,
+  name VARCHAR(128),
+  description VARCHAR(256),
+  url VARCHAR(256),
+  photo MEDIUMBLOB,
+  stl MEDIUMBLOB,
+  notes VARCHAR(2048)
+);
+
+CREATE TABLE IF NOT EXISTS source (
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT UNIQUE,
+  name VARCHAR(128),
+  description VARCHAR(256),
+  url VARCHAR(256),
+  notes VARCHAR(2048)
+);
+
+CREATE TABLE IF NOT EXISTS module ( /* also used for assemblies */
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT UNIQUE,
+  name VARCHAR(128) UNIQUE,
+  description VARCHAR(256),
+  url VARCHAR(256),
+  notes VARCHAR(2048)
+);
+
+CREATE TABLE IF NOT EXISTS tag ( /*just like flickr tags */
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT UNIQUE,
+  name VARCHAR(32),
+  description VARCHAR(256)
+);
+
+CREATE TABLE IF NOT EXISTS model_tag ( /*just like flickr tags */
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT UNIQUE,
+  model_id INT,
+  tag_id INT
+);
+
+CREATE TABLE IF NOT EXISTS module_tag ( /*just like flickr tags */
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT UNIQUE,
+  module_id INT,
+  tag_id INT
+);
+
+CREATE TABLE IF NOT EXISTS part_tag ( /*just like flickr tags */
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT UNIQUE,
+  part_id INT,
+  tag_id INT
+);
+
+
+CREATE TABLE IF NOT EXISTS source_part (
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT UNIQUE,
+  source_id INT,
+  part_id INT,
+  vendor_part_id VARCHAR(64),  /* Vendor's part number */
+  vendor_part_name VARCHAR(256),  /* Vendor's name for part, if different from ours */
+  url VARCHAR(256),
+  price FLOAT(2),
+  price_date DATE,
+  notes VARCHAR(2048)  /* notes about getting this particular part from this vendor */
+);
+
+
+CREATE TABLE IF NOT EXISTS module_part (
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT UNIQUE,
+  module_id INT,
+  part_id INT,
+  quantity INT,
+  schematic VARCHAR(16),   /* this is the code used to identify this part on a drawing */
+  description VARCHAR(256), /* If part has a colloquial name when used in this context, put it here */
+  notes VARCHAR(2048)  /* notes about how this part is used in this module*/
+);
+
+
+CREATE TABLE IF NOT EXISTS module_module (
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT UNIQUE,
+  supermodule_id INT,
+  submodule_id INT,
+  quantity INT,        /*how many submodules in the supermodule? */
+  schematic VARCHAR(16),   /* this is the code used to identify the submodule on a drawing */
+  notes VARCHAR(2048) /* notes about how this assembly or submodule fits with the supermodule */
+);
+");
+
+?>

@@ -58,6 +58,7 @@ if (strcmp($str,'Array')) {
 }
 
 function html_out($str) {
+  global $model;
   if (!$str['title']) { $str['title']='RepRap Bill of Materials Viewer'; }
 
 ?>
@@ -133,9 +134,10 @@ function dump_part($part_id) {
     }
 
     $tag = get_part_tags($p[0][0]);
+    $supplier = $db->get_source_for_part($part_id);
 
     $str .= '<tr><td>'.
-      join('</td><td class="bomBorderLeft">', array($part_id, make_part_href($part_id,$p[0][1]), $quantity, $module, $p[0][5], $p[0][6], $tag, '')).
+      join('</td><td class="bomBorderLeft">', array($part_id, make_part_href($part_id,$p[0][1]), $quantity, $module, $p[0][5], $p[0][6], $tag, $supplier)).
       "</td></tr>\n";
   }
 
@@ -209,13 +211,12 @@ function dump_module($module_id) {
     while ($row = $q->fetchRow()) {
       $id = array_shift($row);
       $row[count($row)] = get_part_tags($id);
-      $row[count($row)] = ' ';
       $row[0] = make_part_href($id, $row[0]);
+      $row[count($row)] = $db->get_source_for_part($id);
       $str .= html_row($row, array('Name', 'Qty', 'Descrip', 'Schematic ID', 'Tag', 'Notes'), $level, 0, $master_row++);
     }
-    
 
-    // get all modules
+     // get all modules
     $q = $db->query("SELECT m.id, m.name, mm.quantity, m.description, mm.schematic, mm.notes ".
                     "FROM module m, module_module mm WHERE m.id=mm.submodule_id AND mm.supermodule_id=$module_id;");
     while ($row = $q->fetchRow()) {
@@ -250,6 +251,7 @@ function get_part_rows($q) {
   }
 
   foreach ($part as $p) {
+    $part_id = $p[0][0];
     $quantity = 0;
     $module = '';
     foreach ($p as $m) {
@@ -258,8 +260,9 @@ function get_part_rows($q) {
     }
 
     $tag = get_part_tags($p[0][0]);
+    $suppliers = $db->get_source_for_part($part_id)."@";
 
-    $str .= '<tr><td>'.join('</td><td class="bomBorderLeft">', array($p[0][0], make_part_href($p[0][0],$p[0][1]), $quantity, $module, $p[0][5], $p[0][6], $tag, '')). "</td></tr>\n";
+    $str .= '<tr><td>'.join('</td><td class="bomBorderLeft">', array($part_id, make_part_href($part_id,$p[0][1]), $quantity, $module, $p[0][5], $p[0][6], $tag, $suppliers)). "</td></tr>\n";
   }
   return $str;
 }
