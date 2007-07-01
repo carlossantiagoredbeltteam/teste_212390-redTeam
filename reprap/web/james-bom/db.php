@@ -6,15 +6,30 @@ class mydb {
 
   function mydb() {
     require_once('DB.php');
+    require_once('JSON.php');
 
-    $auth = `cat db_auth`;
-    $auth = split("\n", $auth); // put dbname on line 0, username on line 1 and password on line 2
-    $this->db_name = $auth[0];
+    if (!$auth = file('db_auth.php')) {
+      die ("Couldn't read db_auth.php!");
+    }
+
+    $json = new Services_JSON();
+    $auth =  $json->decode(join('', array_slice($auth, 1)));
+
+    if (is_readable($auth->alternate_path)) {
+      // if an alternate db_auth file is specified, read it.  If you
+      // can't find it, try to use the auth credentials in the
+      // original file
+      $auth = file($auth->alternate_path);
+      $auth =  $json->decode(join('', array_slice($auth, 1)));
+    }
+
+    $this->db_name = $auth->db_name;
+
     $dsn = array(
                  'phptype'  => "mysql",
-                 'hostspec' => "localhost",
-                 'username' => $auth[1],
-                 'password' => $auth[2],
+                 'hostspec' => $auth->host,
+                 'username' => $auth->db_user,
+                 'password' => $auth->db_pass,
                  );
     $this->db = DB::connect($dsn);
     if (DB::iserror($this->db)) { die($this->db->getMessage()); }
@@ -36,6 +51,22 @@ class mydb {
     foreach ($queries as $query) {    
       $this->query($query.";");
     }
+  }
+
+  function get_source_for_part($part_id) {
+    $q = $this->query("SELECT s.id, s.name, sp.url, s.url FROM source_part sp, part p, source s WHERE sp.part_id=p.id and sp.source_id=s.id and p.id=$part_id;");
+    while ($row = $q->fetchRow()) {
+      if ($row[0] == 3) {                                    // if no source, display suggest-it link
+        $str .= $row[1].' <a href="">(suggest one)</a><br />';
+      } elseif ($row[2]) {
+        $str .= "<a href=\"$row[2]\">$row[1]</a><br />";     // if there's a url for this particular part, display it
+      } elseif ($row[3]) {
+        $str .= "<a href=\"$row[3]\">$row[1]</a><br />";     // failing that, link to supplier
+      } else {
+        $str .= $row[1].'<br />';                            // failing that, just display name of supplier
+      }
+    }
+    return $str;
   }
 
   function get_model_name_by_id ($id) {
