@@ -113,6 +113,31 @@
 			sort($keys); 
 			return $keys;
 		}
+		
+		public function getUniqueSuppliers()
+		{
+			$suppliers = array();
+			$parts = $this->getParts();
+						
+			//mega loop.  stupid if statements.
+			if (count($parts))
+				foreach ($parts AS $type => $type_parts)
+					if (count($type_parts))
+						foreach ($type_parts AS $part)
+							if (count($part->suppliers))
+								foreach ($part->suppliers AS $supplier)
+									$suppliers[] = $supplier->key;
+
+			//make it special
+			$unique = array_unique($suppliers);
+			
+			//get our objects...
+			$corps = loadSupplierData();
+			foreach ($unique AS $key)
+				$unique_corps[] = $corps[$key];
+				
+			return $unique_corps;
+		}
 	
 		public function importSheetData($id, $main_qty)
 		{
