@@ -4,9 +4,9 @@ Bill Of Materials Viewer and Editor
 
 An outgrowth of the RepRap Project.  See reprap.org for details.
 
-Copyright 2007 James Vasile
-Released under the latest version of the Affero GPL
-See <http://www.affero.org/oagpl.html> for details
+Copyright 2007 James Vasile 
+Released under Version 1 of the Affero GPL
+See LICENSE and <http://www.affero.org/oagpl.html> for details.
 */
 ?>
 
@@ -58,7 +58,6 @@ if (strcmp($str,'Array')) {
 }
 
 function html_out($str) {
-  global $model;
   if (!$str['title']) { $str['title']='RepRap Bill of Materials Viewer'; }
 
 ?>
@@ -119,7 +118,7 @@ function dump_part($part_id) {
                   "FROM part p, module m, module_part mp WHERE p.id=mp.part_id AND m.id=mp.module_id AND p.id=$part_id");
 
   $part=array();
-  while ($row = $q->fetchRow()) {
+  while ($row = $q->fetchRow(MDB2_FETCHMODE_ORDERED)) {
     $part[$row[0]][ count($part[$row[0]]) ] = $row;
   }
 
@@ -129,11 +128,11 @@ function dump_part($part_id) {
     $part_id = $p[0][0];
     $photo = $p[0][7];
     foreach ($p as $m) {
-      $module .= make_module_href($m[3],$m[2])." ($m[4])<br />";
+      $module .= $db->make_module_href($m[3],$m[2])." ($m[4])<br />";
       $quantity = $quantity + $m[4];
     }
 
-    $tag = get_part_tags($p[0][0]);
+    $tag = $db->get_part_tags($p[0][0]);
     $supplier = $db->get_source_for_part($part_id);
 
     $str .= '<tr><td>'.
@@ -208,22 +207,23 @@ function dump_module($module_id) {
     // get all parts
     $q = $db->query("SELECT p.id, p.name, mp.quantity, mp.description, mp.schematic, mp.notes ".
                     "FROM part p, module_part mp WHERE mp.module_id=$module_id AND p.id=mp.part_id;");
-    while ($row = $q->fetchRow()) {
+    while ($row = $q->fetchRow(MDB2_FETCHMODE_ORDERED)) {
       $id = array_shift($row);
-      $row[count($row)] = get_part_tags($id);
-      $row[0] = make_part_href($id, $row[0]);
+      $row[count($row)] = $db->get_part_tags($id);
+      $row[0] = $db->make_part_href($id, $row[0]);
       $row[count($row)] = $db->get_source_for_part($id);
       $str .= html_row($row, array('Name', 'Qty', 'Descrip', 'Schematic ID', 'Tag', 'Notes'), $level, 0, $master_row++);
     }
+    
 
-     // get all modules
+    // get all modules
     $q = $db->query("SELECT m.id, m.name, mm.quantity, m.description, mm.schematic, mm.notes ".
                     "FROM module m, module_module mm WHERE m.id=mm.submodule_id AND mm.supermodule_id=$module_id;");
-    while ($row = $q->fetchRow()) {
+    while ($row = $q->fetchRow(MDB2_FETCHMODE_ORDERED)) {
       $id = array_shift($row);
-      $row[count($row)] = get_module_tags($id);
+      $row[count($row)] = $db->get_module_tags($id);
       $row[count($row)] = ' ';
-      $row[0] = make_module_href($id, $row[0]);
+      $row[0] = $db->make_module_href($id, $row[0]);
       $str .= html_row($row, array('Name', 'Qty', 'Descrip', 'Schematic', 'Notes', 'Tags'), $level, 1, $master_row++);
       $str .= recursive_dump_module($id, $level+1, &$master_row);
     }
@@ -245,24 +245,24 @@ function dump_module($module_id) {
 
 
 function get_part_rows($q) {
+  global $db;
+
   $part=array();
-  while ($row = $q->fetchRow()) {
+  while ($row = $q->fetchRow(MDB2_FETCHMODE_ORDERED)) {
     $part[$row[0]][ count($part[$row[0]]) ] = $row;
   }
 
   foreach ($part as $p) {
-    $part_id = $p[0][0];
     $quantity = 0;
     $module = '';
     foreach ($p as $m) {
-      $module .= make_module_href($m[3],$m[2])." ($m[4])<br />";
+      $module .= $db->make_module_href($m[3],$m[2])." ($m[4])<br />";
       $quantity = $quantity + $m[4];
     }
 
-    $tag = get_part_tags($p[0][0]);
-    $suppliers = $db->get_source_for_part($part_id)."@";
+    $tag = $db->get_part_tags($p[0][0]);
 
-    $str .= '<tr><td>'.join('</td><td class="bomBorderLeft">', array($part_id, make_part_href($part_id,$p[0][1]), $quantity, $module, $p[0][5], $p[0][6], $tag, $suppliers)). "</td></tr>\n";
+    $str .= '<tr><td>'.join('</td><td class="bomBorderLeft">', array($p[0][0], $db->make_part_href($p[0][0],$p[0][1]), $quantity, $module, $p[0][5], $p[0][6], $tag, '')). "</td></tr>\n";
   }
   return $str;
 }
@@ -293,11 +293,11 @@ function dump_tag($tag_id) {
 
   // Modules
   $r = $db->query("SELECT m.id, m.name from tag t, module_tag mt, module m WHERE m.id=mt.module_id AND t.id=mt.tag_id AND t.id=$tag_id");
-  if ($row = $r->fetchRow()) {
+  if ($row = $r->fetchRow(MDB2_FETCHMODE_ORDERED)) {
     $str .= '<tr><td colspan="20" class="topModule">Modules tagged "'.$tag_name.'"</td></tr>'.$field_header;
     do {
-      $str .= '<tr><td>'.make_module_href($row[0],$row[1]).'</td></tr>';
-    } while ($row = $r->fetchRow());
+      $str .= '<tr><td>'.$db->make_module_href($row[0],$row[1]).'</td></tr>';
+    } while ($row = $r->fetchRow(MDB2_FETCHMODE_ORDERED));
   }
 
   // Parts
@@ -312,38 +312,5 @@ function dump_tag($tag_id) {
 
 
 
-function make_tag_href($id, $text) {
-  global $model;
-  return '<a href="?model='.$model.'&tag='.$id.'">'.$text.'</a>';
-}
-
-function make_module_href($id, $text) {
-  global $model;
-  //  return $text;
-  return '<a href="?model='.$model.'&module='.$id.'">'.$text.'</a>';
-}
-
-function make_part_href($id, $text) {
-  global $model;
-  return '<a href="?model='.$model.'&part='.$id.'">'.$text.'</a>';
-}
-
-function get_tags($q) {
- $tag='';
-  while ($row = $q->fetchRow()) {
-    $tag .= make_tag_href($row[1], $row[0])."<br />";
-  }
-  return $tag;
-}
-
-function get_module_tags($id) {
-  global $db;
-  return get_tags($db->query("SELECT t.name, t.id from tag t, module m, module_tag tm WHERE tm.module_id=m.id AND t.id=tm.tag_id and m.id=$id"));
-}
-
-function get_part_tags($id) {
-  global $db;
-  return get_tags( $db->query("SELECT t.name, t.id FROM tag t, part_tag pt WHERE pt.part_id=".$id." AND t.id=pt.tag_id;") );
-}
 
 ?></body></html>

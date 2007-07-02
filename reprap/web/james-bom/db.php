@@ -1,11 +1,24 @@
 <?php
+/*
+Bill Of Materials Viewer and Editor
+
+An outgrowth of the RepRap Project.  See reprap.org for details.
+
+Copyright 2007 James Vasile 
+Released under Version 1 of the Affero GPL
+See LICENSE and <http://www.affero.org/oagpl.html> for details.
+*/
 
 class mydb {
   var $db; // database_object;
   var $db_name;
 
   function mydb() {
-    require_once('DB.php');
+    // Needed to switch from DB.php to mdb2.php for licensing reasons.
+    // Thanks to http://www.phpied.com/db-2-mdb2/ for making it easy
+    require_once('MDB2.php');
+
+    // included with this distribution in case you don't have it.
     require_once('JSON.php');
 
     if (!$auth = file('db_auth.php')) {
@@ -25,25 +38,28 @@ class mydb {
 
     $this->db_name = $auth->db_name;
 
-    $dsn = array(
-                 'phptype'  => "mysql",
-                 'hostspec' => $auth->host,
-                 'username' => $auth->db_user,
-                 'password' => $auth->db_pass,
-                 );
-    $this->db = DB::connect($dsn);
-    if (DB::iserror($this->db)) { die($this->db->getMessage()); }
+    $this->db =& MDB2::factory('mysql://'.$auth->db_user.':'.$auth->db_pass.'@'.$auth->host.'/'.$auth->db_name);
+    if (PEAR::isError($this->db)) {
+      echo ($this->db->getMessage().' - '.$this->db->getUserinfo());
+    }
+
+    //$this->db->setFetchMode(MDB2_FETCHMODE_ORDERED);
+    $this->db->setFetchMode(MDB2_FETCHMODE_ASSOC);
   }
 
   function query($sql) {
 
-
     if (!preg_match("/[a-z]/i", $sql)) return; // make sure the query isn't blank
 
-    $q = $this->db->query($sql);
-    if (DB::iserror($q)) {  die("$sql: ".$q->getMessage()); }  
+    // run the query and get a result handler
+    $result = $this->db->query($sql);
 
-    return $q;
+    // check if the query was executed properly
+    if (PEAR::isError($result)) {
+      die ($result->getMessage().' - '.$result->getUserinfo());
+    }
+
+    return $result;
   }
 
   function queries($sql) {
@@ -53,9 +69,27 @@ class mydb {
     }
   }
 
+  function get_tags($q) {
+    $tag='';
+    while ($row = $q->fetchRow(MDB2_FETCHMODE_ORDERED)) {
+      $tag .= $this->make_tag_href($row[1], $row[0])."<br />";
+    }
+    return $tag;
+  }
+  
+  function get_module_tags($id) {
+    global $db;
+    return $this->get_tags($db->query("SELECT t.name, t.id from tag t, module m, module_tag tm WHERE tm.module_id=m.id AND t.id=tm.tag_id and m.id=$id"));
+  }
+  
+  function get_part_tags($id) {
+    global $db;
+    return $this->get_tags( $db->query("SELECT t.name, t.id FROM tag t, part_tag pt WHERE pt.part_id=".$id." AND t.id=pt.tag_id;") );
+  }
+
   function get_source_for_part($part_id) {
     $q = $this->query("SELECT s.id, s.name, sp.url, s.url FROM source_part sp, part p, source s WHERE sp.part_id=p.id and sp.source_id=s.id and p.id=$part_id;");
-    while ($row = $q->fetchRow()) {
+    while ($row = $q->fetchRow(MDB2_FETCHMODE_ORDERED)) {
       if ($row[0] == 3) {                                    // if no source, display suggest-it link
         $str .= $row[1].' <a href="">(suggest one)</a><br />';
       } elseif ($row[2]) {
@@ -72,30 +106,30 @@ class mydb {
   function get_model_name_by_id ($id) {
     $q = $this->query("SELECT module.name from model, module WHERE module.id=model.id AND model.id=$id;");
     $row = $q->fetchRow();
-    if ($row[0] == NULL) { return -1; }
-    return $row[0];
+    if ($row['name'] == NULL) { return -1; }
+    return $row['name'];
   }
 
   function is_model($module_id) {
     // if module is a model, return 1, else 0
     $q = $this->query("SELECT * from model WHERE module_id=$module_id;");
     $row = $q->fetchRow();
-    if ($row[0] == NULL) { return 0; }
+    if ($row['id'] == NULL) { return 0; }
     return 1;
   }
 
   function get_module_name_by_id ($id) {
     $q = $this->query("SELECT name from module WHERE id=$id;");
     $row = $q->fetchRow();
-    if ($row[0] == NULL) { return -1; }
-    return $row[0];
+    if ($row['name'] == NULL) { return -1; }
+    return $row['name'];
   }
 
   function get_part_id_by_name ($name) {
     $q = $this->query("SELECT id from part WHERE name=\"$name\";");
     $row = $q->fetchRow();
-    if ($row[0] == NULL) { return -1; }
-    return $row[0];
+    if ($row['id'] == NULL) { return -1; }
+    return $row['id'];
   }
 
   function get_module_id_by_name ($name) {
@@ -106,8 +140,8 @@ class mydb {
     if ($name == NULL) { return 0;}
     $q = $this->query("SELECT id from module WHERE name=\"$name\";");
     $row = $q->fetchRow();
-    if ($row[0] == NULL) { return -1; }
-    return $row[0];
+    if ($row['id'] == NULL) { return -1; }
+    return $row['id'];
   }
 
   function get_top_modules_for_model ($model_id) {
@@ -120,7 +154,7 @@ class mydb {
     $l=0;
     while ($r[$l] = $q->fetchRow()) {
       
-      echo $r[$l][0];
+      echo $r[$l]['name'];
     }
     return $r;
   }
@@ -132,8 +166,8 @@ class mydb {
     if (!$id) { return 0; }
     $q = $this->query("SELECT name from tag WHERE id=$id;");
     $row = $q->fetchRow();
-    if (!$row[0]) { return 0; }
-    return $row[0];
+    if (!$row['name']) { return 0; }
+    return $row['name'];
   }
 
   function get_tag_id_by_name ($name) {
@@ -144,8 +178,8 @@ class mydb {
     if (!$name) { return 0; }
     $q = $this->query("SELECT id from tag WHERE name=\"$name\";");
     $row = $q->fetchRow();
-    if (!$row[0]) { return -1; }
-    return $row[0];
+    if (!$row['id']) { return -1; }
+    return $row['id'];
   }
 
 
@@ -204,8 +238,23 @@ class mydb {
     }
     $this->query("INSERT into part_tag (part_id, tag_id) VALUE ($part_id, $tag_id);");
   }
+
+  function make_tag_href($id, $text) {
+    global $model;
+    return '<a href="?model='.$model.'&tag='.$id.'">'.$text.'</a>';
+  }
+
+  function make_module_href($id, $text) {
+    global $model;
+    //  return $text;
+    return '<a href="?model='.$model.'&module='.$id.'">'.$text.'</a>';
+  }
+
+  function make_part_href($id, $text) {
+    global $model;
+    return '<a href="?model='.$model.'&part='.$id.'">'.$text.'</a>';
+  }
+
 }
-
-
 
 ?>
