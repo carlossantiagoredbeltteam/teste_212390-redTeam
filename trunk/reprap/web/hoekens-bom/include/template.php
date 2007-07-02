@@ -8,22 +8,17 @@
 		<title><?=$title?> - RepRap Bill of Materials</title>
 		<link rel="stylesheet" type="text/css" href="/css/style.css" />
 		<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
-		<script>
-			if (parent.frames.length > 0)
-			{
-			    parent.location.href = self.document.location;
-			}
-		</script>
+		<script src="/js/prototype.js"></script>
 	</head>
 	<body>
 		<ul id="nav">
 			<li><a href="/">Home</a></li>
+			<li><a href="http://www.reprap.org/">RepRap.org</a></li>
 			<li><a href="http://forums.reprap.org/">Forums</a></li>
 			<li><a href="http://blog.reprap.org/">Blog</a></li>
-			<li><a href="http://builders.reprap.org/">Builders</a></li>
-			<li><a href="http://www.reprap.org/">RepRap.org</a></li>
+			<li><a href="http://builders.reprap.org/">Builders Blog</a></li>
 			<li><a href="http://parts.rrrf.org/">Store</a></li>
-			<li><a href="http://reprap.org/bin/view/Main/RepRapOneDarwin">HOWTO Build It</a></li>
+			<li><a href="http://reprap.org/bin/view/Main/RepRapOneDarwin">HowTo Build It</a></li>
 		</ul>
 		<div id="main">
 			<a name="top" class="nodisplay"></a>
