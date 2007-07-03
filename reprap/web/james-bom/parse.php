@@ -48,31 +48,18 @@ function get_bom_data() {
 
   $pages = get_csv(8); // retrieve master BOM
 
-  //  $pages[count($pages)] = array(array("Universal Controller","3",'Universal controller board on which the stepper and extruder controller boards are based',"1"));
   array_splice($pages, 8,0,array(array("Universal Controller","3",'Universal controller board on which the stepper and extruder controller boards are based',"1")));
 
-  // Which field contains the id of the spreadsheet page we need?
-  //  $fields = parse_csv( $pages[1] );
-  $fields = $pages[1];
-  $bom_field=-1;
-  for ($i=0; $i < sizeof($fields); $i++) {
-    if (!strcasecmp($fields[$i], "BOM Id")){$bom_field=$i;}
-    if (!strcasecmp($fields[$i], "Module")){$module_field=$i;}
-  }
-  if ($bom_field==-1) { die("Couldn't find BOM_Id field in master bom spreadsheet."); }
+  unset($pages[1]);
+  unset($pages[0]);
 
-  // Get list of modules and their BOM Ids
-  for ($p=2; $p < sizeof($pages);$p++) {
-    $data = $pages[$p];
-    $modules[ $data[$module_field] ] = $data[$bom_field];
+  for ($p=0; $p < count($pages); $p++) {
+    $out[$p]['name'] = $pages[$p][0];
+    $out[$p]['quantity'] = $pages[$p][1];
+    $out[$p]['description'] = $pages[$p][2];
+    $out[$p]['id'] = $pages[$p][3];
   }
-  
-  // Get all the spreadsheet pages
-  while (list($mod, $id) = each($modules)) {
-    $csv[$mod] = get_csv($id);
-  }
-
-  return $csv;
+  return $out;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -247,96 +234,92 @@ $darwin_module_id = $darwin_module_id['module_id'];
 
 include("darwin_initialize.php");  // load the darwin data into the fresh db
 
-// Parse the spreadsheets
+parse($modules);
 
-while (list($mod, $lines) = each($modules)) {
-  switch ($mod) {
-  case "Cartesian Robot v1.0":  // parse Cartesian Robot
-    echo "Parsing Cartesion Robot\n";
 
-    $module_id = $db->create_module("Cartesian Robot v1.0", $darwin_module_id);
-    
-    // Change jig module to a bunch of parts tagged "jig".  Jigs are not really a separate module
-    for ($l=2; $l < count($lines); $l++) {
-      if (preg_match('/jig/i', $lines[$l][1])) {
-        $jig_line=$l;
-        break;
+function parse($modules) {
+  global $darwin_module_id;
+  global $db;
+  // Parse the spreadsheets
+
+  // Fetch all the spreadsheet pages
+  foreach ($modules as $row) {
+    if (!$row['name'] || !strcmp('Incomplete', $row['name'])) { continue; }
+
+    $lines = get_csv($row['id']);
+    echo "Parsing ".$row['name']."\n";
+
+    $row['parent_id'] = $darwin_module_id;
+
+    $mod = $row['name'];
+
+    if (strcmp($mod, "Universal Controller")) {
+      $module_id = $db->create_module($mod, $darwin_module_id, $row['quantity']);
+    }
+
+    //    parse_module($row);
+    switch ($mod) {
+
+    case "Cartesian Robot v1.0":  // parse Cartesian Robot
+      // Change jig module to a bunch of parts tagged "jig".  Jigs are not really a separate module
+      for ($l=2; $l < count($lines); $l++) {
+        if (preg_match('/jig/i', $lines[$l][1])) {
+          $jig_line=$l;
+          break;
+        }
       }
+      unset($lines[$jig_line]);
+      for ($l=$jig_line; !preg_match('/assembly/i', $lines[$l][3]) && $l < count($lines); $l++) {
+        $lines[$l][3] .= "\njig";
+        if (!$lines[$l][4]) { $lines[$l][4] = "This jig is used for lining up and measuring other pieces during assembly."; }
+      }
+      
+      parse_spreadsheet($mod, $lines, 'Part Id|Name|Quantity|Type|Description|Suppliers', $module_id);
+      break;
+      
+    case  "PowerComms Board v1.2":
+    case "Thermoplast Extruder v1.0":  
+    case "Support Material Extruder v1.0":
+    case "Opto Endstop Board v1.0":
+      parse_spreadsheet($mod, $lines, 'Part Id|Name|Quantity|Type|Description|Suppliers', $module_id);
+      break;
+      
+    case "Thermoplast Extruder Controller Board v1.2":
+    case "Support Extruder Controller Board v1.2":
+    case "Stepper Controller Board v1.2":
+      $universal_parent[count($universal_parent)] = $module_id;
+      parse_spreadsheet($mod, $lines, 'Part Id|Name|Quantity|Type|Description|Suppliers', $module_id);
+      break;
+      
+    case "Universal Controller":
+      $module_id = $db->create_module($mod,  $universal_parent[0]);
+      parse_spreadsheet($mod, $lines, 'Part Id|Name|Quantity|Type|Description|Suppliers', $module_id);
+      
+      for ($l=1; $l < count($universal_parent); $l++) {
+        $db->query ("INSERT into module_module (supermodule_id, submodule_id, quantity) VALUES (".$universal_parent[$l].", $module_id, 1);");
+      }
+      break;
+      
+      
+    case  "Stepper Tester Board v1.0":
+      parse_spreadsheet($mod, $lines, 'Item|Name / Value|Quantity|Type|Description|Suppliers', $module_id);
+      break;
+      
+    case "Miscellaneous Kit":
+    case "Pulley Mold Kit":
+      parse_spreadsheet($mod, $lines, 'Id|Name|Quantity|Type|Description|Suppliers', $module_id);
+      break;
+      
+    default:
+      echo ("Couldn't find a parser for $mod\n");
     }
-    unset($lines[$jig_line]);
-    for ($l=$jig_line; !preg_match('/assembly/i', $lines[$l][3]) && $l < count($lines); $l++) {
-      $lines[$l][3] .= "\njig";
-      if (!$lines[$l][4]) { $lines[$l][4] = "This jig is used for lining up and measuring other pieces during assembly."; }
-    }
-    
-    parse_spreadsheet($mod, $lines, 'Part Id|Name|Quantity|Type|Description|Suppliers', $module_id);
-    break;
-  
-  case "Thermoplast Extruder v1.0":      // parse extruder
-    echo "Parsing extruder.\n";
-    $module_id = $db->create_module("Thermoplast Extruder v1.0", $darwin_module_id);
-    parse_spreadsheet($mod, $lines, 'Part Id|Name|Quantity|Type|Description|Suppliers', $module_id);
-    break;
-
-  case "Support Extruder Controller Board v1.2":
-    echo "Parsing Support Extruder Controller Board\n";
-    $module_id = $db->create_module("Support Extruder Controller Board v1.2", $darwin_module_id);
-    parse_spreadsheet($mod, $lines, 'Part Id|Name|Quantity|Type|Description|Suppliers', $module_id);
-    break;
-
-  case "Support Material Extruder v1.0":
-    echo "Parsing Support Material Extruder v1.0\n";
-    $module_id = $db->create_module("Support Material Extruder", $darwin_module_id);
-    parse_spreadsheet($mod, $lines, 'Part Id|Name|Quantity|Type|Description|Suppliers', $module_id);
-    break;
-
-  case "Universal Controller":
-    echo "Parsing Universal Controller\n";
-    $module_id = $db->create_module("Universal Controller",  $thermoplast_controller_id);
-    parse_spreadsheet($mod, $lines, 'Part Id|Name|Quantity|Type|Description|Suppliers', $module_id);
-    
-    $db->query ("INSERT into module_module (supermodule_id, submodule_id, quantity) ".
-                "VALUES ($stepper_controller_id, $module_id, 1);");
-    break;
-
-  case  "Stepper Controller Board v1.2":
-    echo "Parsing Stepper Controller\n";
-    $stepper_controller_id = $db->create_module("Stepper Controller Board v1.2", $darwin_module_id, 3);
-    parse_spreadsheet($mod, $lines, 'Part Id|Name|Quantity|Type|Description|Suppliers', $stepper_controller_id);
-    break;
-
-  case "Thermoplast Extruder Controller Board v1.2":
-    echo "Parsing extruder\n";
-    $thermoplast_controller_id = $db->create_module("Thermoplast Extruder Controller Board v1.2", $darwin_module_id);
-    parse_spreadsheet($mod, $lines, 'Part Id|Name|Quantity|Type|Description|Suppliers',  $thermoplast_controller_id);
-    break;
-
-  case  "PowerComms Board v1.2":
-    echo "Parsing PowerComms board\n";
-    $module_id = $db->create_module("PowerComms Board v1.2", $darwin_module_id);
-    parse_spreadsheet($mod, $lines, 'Part Id|Name|Quantity|Type|Description|Suppliers', $module_id);
-    break;
-
-  case "Opto Endstop Board v1.0":
-    echo "Parsing Opto Endstop Board\n";
-    $module_id = $db->create_module("Opto Endstop Board v1.0", $darwin_module_id, 3);
-    parse_spreadsheet($mod, $lines, 'Part Id|Name|Quantity|Type|Description|Suppliers', $module_id);
-    break;
-
-  case  "Stepper Tester Board v1.0";
-    echo "Parsing Stepper Tester Board\n";
-    $module_id = $db->create_module("Stepper Tester Board v1.0", $darwin_module_id);
-    parse_spreadsheet($mod, $lines, 'Item|Name / Value|Quantity|Type|Description|Suppliers', $module_id);
-    break;
-
-  case "Miscellaneous Kit":
-    echo "Parsing miscellaneous kit\n";
-    parse_spreadsheet($mod, $lines, 'Id|Name|Quantity|Type|Description|Suppliers', $module_id);
-    break;
-
-  default:
-    echo ("Couldn't find a parser for $mod\n");
   }
+}
+
+function parse_module($args) {
+
+
+  return $module_id;
 }
 
 $db->query("UPDATE tag SET name='fastener' WHERE name='fast'");

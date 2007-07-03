@@ -1,0 +1,43 @@
+<h2>List Parts and Modules</h2>
+
+<p>The BOM viewer is ugly and not yet complete, but it is starting to 
+be useful.  Be aware that the code is not stable, and inbound links might not survive future revisions.  Enjoy.</p>
+
+<p> From here, you can:</p>
+<ul><li><a class="twikiLink" href="?model=<?= $model ?>&list=module">list all the modules and the parts they comprise</a></li>
+<li><a href="?model=<?= $model ?>&list=part">list all parts</a> (probably what you want if you're going to be ordering parts)</li>
+<li><a href="?show=vendors">See sources of parts</a></li>
+</ul>
+
+<h2>Search for a specific part</h2>
+<p>Enter as much or as little information as you want: <form method="get">
+
+<table>
+
+<tr>
+  <td>Project</td>
+  <td>
+    <SELECT NAME="model">
+    <OPTION VALUE="."> --
+    <OPTION VALUE="Darwin">Darwin
+<!--    <OPTION VALUE="Tommelise">Tommelise -->
+    </SELECT>
+  </td></tr>
+
+<tr>
+  <td>Module</td>
+  <td>
+    <SELECT NAME="module">
+    <OPTION VALUE=""> --
+    <OPTION VALUE="Catesian">Cartesian
+    <OPTION VALUE="SCB">Support Controller Board
+    </SELECT>
+  </td></tr>
+
+<tr><td>Part</td><td><input name="part" type="text" /></td></tr>
+</table>
+
+
+<INPUT TYPE=SUBMIT VALUE="Go">
+</form></p>
+
