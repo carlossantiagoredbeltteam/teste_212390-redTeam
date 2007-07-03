@@ -9,77 +9,37 @@ Released under Version 1 of the Affero GPL
 See LICENSE and <http://www.affero.org/oagpl.html> for details.
 */
 ?>
-
 <?php main(); ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>BOM Viewer (<?= $model_name ?>)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" type="text/css" href="bom.css" />
+  <script type="text/javascript" src="hide_show.js"></script>
+</head>
 
-<html><head><title>BOM Viewer (<?= $model_name ?>)</title>
-
-<link rel="stylesheet" type="text/css" href="bom.css" />
-
-<script type="text/javascript">
-function toggleModule( image, startrow, endrow) {
-  var thisImg =  document.getElementById( 'toggle' + image );
-  var thisRow =  document.getElementById( 'bomRow' + image );
-  
-  var RegularExpression = /plus\.png/;
-
-  for (row = startrow; row <= endrow; row++) {
-    var currRow = document.getElementById( 'bomRow' + row );
-    if ( thisImg.src.search(RegularExpression) != -1) {
-      currRow.style.display = "block";
-      currRow.style.display = "table-row";
-    } else {
-      currRow.style.display = "none";
-    }
-  }
-
-  if ( thisImg.src.search(RegularExpression) != -1) {
-    thisImg.src = "images/minus.png";
-  } else {
-    thisImg.src = "images/plus.png";
-  }
-}
-</script>
-
-</head><body>
-
+<body>
 <div id="wrap">
    <div id="header"><h1><?= $str['title'] ?></h1></div>
-<!--    <div id="nav">
+    <div id="nav">
         <ul>
             <li><a href="?">Home</a></li>
-            <li><a href="http://reprap.org/bin/view/Main/WebHome">RepRap Wiki</a></li>
-            <li><a href="http://forums.reprap.org">Forums</a></li>
-        </ul>
-    </div>-->
-   <div id="sidebar">
-        <ul> 
-            <li><a href="?"><strong>BOM Home</strong></a></li>
-            <li><a href="?model=<?=$model?>&list=module">List all modules</a></li>
-            <li><a href="?model=<?=$model?>&list=part">List all parts</a></li>
-            <li><a href="?show=vendors">Show part sources</a></li>
+            <li><a href="?show=models">Projects</a></li>
+            <li><a href="?model=<?=$model?>&list=module">Modules</a></li>
+            <li><a href="?model=<?=$model?>&list=part">Parts</a></li>
+            <li><a href="?show=vendors">Sources</a></li>
             <li><a href="#"><strike>Search</strike></a></li>
         </ul>
-        <ul>
-            <li><strong><a href="http://reprap.org">RepRap Core</a></strong></li>
-            <li><a href="http://www.reprap.org/bin/view/Main/ShowCase">RepRap Intro</a></li>
-            <li><a href="http://www.reprap.org/bin/view/Main/FuturePlans">Future Plans</a></li>
-            <li><a href="http://blog.reprap.org/">Main Blog</a></li>
-            <li><a href="https://sourceforge.net/projects/reprap/">Sourceforge Project</a></li>
-        </ul>
-        <ul>
-            <li><strong><a href="http://reprap.org/bin/view/Main/Community">RepRap Community</a></strong></li>
-            <li><a href="http://forums.reprap.org">Forums</a></li>
-            <li><a href="http://reprap.org/bin/view/Main/PeopleMain">People</a></li>
-            <li><a href="http://objects.reprap.org/mediawiki/index.php/Main_Page">Object Library</a></li>
-        </ul>
     </div>
+    <?php // include ('sidebar.html') ?>
     <div id="main">
-      <?= $str['body'] ?>
+      <?php if ($str['file']) { include($str['file']); } else {echo $str['body'];} ?>
     </div>
     <div id="footer">
         <p>BOM Viewer is an outgrowth of the <a href="reprap.org">RepRap</a> project.<br />
-           <a href="bom_0.1.1.tar.gz">Code</a> is copyright 2007 <a href="">James Vasile</a> and released under the <a href="http://www.affero.org/oagpl.html">Affero GPL</a>.
+        <a href="bom_0.1.1.tar.gz">Code</a> is copyright 2007 <a href="">James Vasile</a> 
+        and released under the <a href="http://www.affero.org/oagpl.html">Affero GPL</a>.
         </p>
     </div>
 </div>
@@ -122,8 +82,9 @@ function main() {
   } elseif ($_GET['tag']) { 
     $str = dump_tag ( $_GET['tag'] ); 
 
-  } else {$str = display_main();}
-
+  } else {
+    $str['file'] = 'home.html';
+  }
 
   if (strcmp($str,'Array')) {
     $str = array('body' => $str);
@@ -152,7 +113,7 @@ function dump_sources() {
     join("</td><td class=\"field\">", array('Name', 'Prefix', 'Description', 'Region')).
     '</td></tr>';
   
-  $q = $db->query("SELECT * FROM source");
+  $q = $db->query("SELECT * FROM source ORDER BY REGION");
 
   while ($row = $q->fetchRow()) {
     if ($row['id'] == 1) { continue; }
@@ -167,24 +128,6 @@ function dump_sources() {
   }
 
   return array('title' => 'Sources for Parts', 'body' => ($str.'</table>'));
-}
-
-
-function display_main() {
-  global $model;
-  return '<h2>List Parts and Modules</h2>'.
-
-    '<p>The BOM viewer is ugly and not yet complete, but it is starting to '.
-    'be useful.  Be aware that the code is not stable, and inbound links might not survive future revisions.  Enjoy.</p>'.
-
-    '<p> From here, you can <a class="twikiLink" href="?model='. $model .'&list=module">list all the modules and the parts they
-     comprise</a> or <a href="?model='. $model .'&list=part">list all parts</a> (probably what you want if
-     you\'re going to be ordering parts).</p>
-
-    <h2>Search for a specific part</h2>'.
-    '<p><form>
-[TODO: Search function] 
-</form></p>';
 }
 
 
