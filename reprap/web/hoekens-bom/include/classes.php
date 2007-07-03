@@ -229,7 +229,7 @@
 		public $description;
 		public $website;
 		public $buy_url;
-		public $countries;
+		public $countries = array();
 	}
 
 	class SupplierList
