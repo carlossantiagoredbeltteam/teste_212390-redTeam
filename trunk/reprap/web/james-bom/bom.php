@@ -10,57 +10,38 @@ See LICENSE and <http://www.affero.org/oagpl.html> for details.
 */
 ?>
 
-<?php
-require_once("db.php");
-$db  = new mydb();
-$db->query("use ".$db->db_name);
-
-$model = $_GET["model"] ? $_GET["model"] : 1;
-$model_name = $db->get_model_name_by_id($model);
-?>
+<?php main(); ?>
 
 <html><head><title>BOM Viewer (<?= $model_name ?>)</title>
 
 <link rel="stylesheet" type="text/css" href="bom.css" />
 
 <script type="text/javascript">
-function toggleModule( _toggleID, _levelId) {
-  var thisImg =  document.getElementById( _toggleID );
-  var thisLevel = document.getElementById( _levelId );
-  alert('these buttons are not yet functional');
-  return;
-  if ( thisLevel.style.display == "none") {
-    thisLevel.style.display = "block";
-    thisLevel.style.display = "table-row";
-    thisImg.src = "images/minus.png";
+function toggleModule( image, startrow, endrow) {
+  var thisImg =  document.getElementById( 'toggle' + image );
+  var thisRow =  document.getElementById( 'bomRow' + image );
+  
+  var RegularExpression = /plus\.png/;
+
+  for (row = startrow; row <= endrow; row++) {
+    var currRow = document.getElementById( 'bomRow' + row );
+    if ( thisImg.src.search(RegularExpression) != -1) {
+      currRow.style.display = "block";
+      currRow.style.display = "table-row";
+    } else {
+      currRow.style.display = "none";
+    }
   }
-  else {
+
+  if ( thisImg.src.search(RegularExpression) != -1) {
+    thisImg.src = "images/minus.png";
+  } else {
     thisImg.src = "images/plus.png";
-    thisLevel.style.display = "none";
   }
 }
 </script>
 
 </head><body>
-
-<?php
-if (!strcmp($_GET['list'], 'part')) { $str = dump_parts_for_model ( $model ); }
-elseif (!strcmp($_GET['list'], 'module')) { $str = dump_module ( $model ); }
-elseif ($_GET['part']) { $str = dump_part ( $_GET['part'] ); }
-elseif ($_GET['module']) { $str = dump_module ( $_GET['module'] ); }
-elseif ($_GET['tag']) { $str = dump_tag ( $_GET['tag'] ); }
-else {$str = display_main();}
-
-if (strcmp($str,'Array')) {
-  html_out(array('body' => $str));
-} else {
-  html_out($str);
-}
-
-function html_out($str) {
-  if (!$str['title']) { $str['title']='RepRap Bill of Materials Viewer'; }
-
-?>
 
 <div id="wrap">
    <div id="header"><h1><?= $str['title'] ?></h1></div>
@@ -76,6 +57,7 @@ function html_out($str) {
             <li><a href="?"><strong>BOM Home</strong></a></li>
             <li><a href="?model=<?=$model?>&list=module">List all modules</a></li>
             <li><a href="?model=<?=$model?>&list=part">List all parts</a></li>
+            <li><a href="?show=vendors">Show part sources</a></li>
             <li><a href="#"><strike>Search</strike></a></li>
         </ul>
         <ul>
@@ -93,7 +75,7 @@ function html_out($str) {
         </ul>
     </div>
     <div id="main">
-<?= $str['body'] ?>
+      <?= $str['body'] ?>
     </div>
     <div id="footer">
         <p>BOM Viewer is an outgrowth of the <a href="reprap.org">RepRap</a> project.<br />
@@ -101,51 +83,92 @@ function html_out($str) {
         </p>
     </div>
 </div>
+</body></html>
 
 <?php
-   }
 
-function dump_part($part_id) {
-
-  // TODO: make it model-specific
+function main() {
   global $db;
+  global $model;
   global $model_name;
+  global $str;
 
-  $str .= '<table summary="Darwin Bill of Materials organized by part" class="bomT" cellspacing="0">'.
-    '<tr><td class="field">'.join("</td><td class=\"field\">", array('Part ID', 'Name', 'Qty', 'Modules', 'Description', 'Notes', 'Tags', 'Suppliers')).'</td></tr>';
+  require_once("db.php");
+  $db  = new mydb();
+  $db->query("use ".$db->db_name);
 
-  $q = $db->query("SELECT p.id, p.name, m.name, m.id, mp.quantity, p.description, p.notes, p.photo ".
-                  "FROM part p, module m, module_part mp WHERE p.id=mp.part_id AND m.id=mp.module_id AND p.id=$part_id");
+  $model = $_GET["model"] ? $_GET["model"] : 1;
+  $model_name = $db->get_model_name_by_id($model);
 
-  $part=array();
-  while ($row = $q->fetchRow(MDB2_FETCHMODE_ORDERED)) {
-    $part[$row[0]][ count($part[$row[0]]) ] = $row;
+  if (!strcmp($_GET['list'], 'part')) {
+    require_once("part.php");
+    $str = dump_parts_for_model ( $model );
+  
+  } elseif (!strcmp($_GET['show'], 'vendors')) {
+    $str = dump_sources(); 
+
+  } elseif (!strcmp($_GET['list'], 'module')) {
+    require_once ("module.php");
+    $str = dump_module ( $model ); 
+
+  } elseif ($_GET['part']) { 
+    require_once("part.php");
+    $str = dump_part ( $_GET['part'] ); 
+
+  } elseif ($_GET['module']) { 
+    require_once ("module.php");
+    $str = dump_module ( $_GET['module'] );
+
+  } elseif ($_GET['tag']) { 
+    $str = dump_tag ( $_GET['tag'] ); 
+
+  } else {$str = display_main();}
+
+
+  if (strcmp($str,'Array')) {
+    $str = array('body' => $str);
   }
-
-  foreach ($part as $p) {
-    $quantity = 0;
-    $module = '';
-    $part_id = $p[0][0];
-    $photo = $p[0][7];
-    foreach ($p as $m) {
-      $module .= $db->make_module_href($m[3],$m[2])." ($m[4])<br />";
-      $quantity = $quantity + $m[4];
-    }
-
-    $tag = $db->get_part_tags($p[0][0]);
-    $supplier = $db->get_source_for_part($part_id);
-
-    $str .= '<tr><td>'.
-      join('</td><td class="bomBorderLeft">', array($part_id, make_part_href($part_id,$p[0][1]), $quantity, $module, $p[0][5], $p[0][6], $tag, $supplier)).
-      "</td></tr>\n";
-  }
-
-  $str .= '</table>';
-
-  if ($photo) { $str .= '<p><img src="pic.php?part='.$part_id.'"/></p>'; }
-
-  return array('title' => 'Part Detail for '.$p[0][1], 'body' => $str);
+  
+  if (!$str['title']) { $str['title'] ='RepRap Bill of Materials Viewer'; }
 }
+
+function combine_description_notes($description='', $notes='') {
+  // combine description and note fields
+  if ($notes) {
+    if ($description) {
+      $description .= '<br />';
+    }
+    $description .=  'Note: '.$notes;
+  }
+  return $description;
+}
+
+
+function dump_sources() {
+  global $db;
+
+  $str = '<table summary="Darwin Bill of Materials organized by part" class="bomT" cellspacing="0">'.
+    '<tr><td class="field">'.
+    join("</td><td class=\"field\">", array('Name', 'Prefix', 'Description', 'Region')).
+    '</td></tr>';
+  
+  $q = $db->query("SELECT * FROM source");
+
+  while ($row = $q->fetchRow()) {
+    if ($row['id'] == 1) { continue; }
+    $str .= '<tr><td class="bomBorderLeft">'.
+      join('</td><td class="bomBorderLeft">', array(
+                              ($row['url'] ? '<a href="'.$row['url'].'">'.$row['name'].'</a>' : $row['name']), 
+                              $row['abbreviation'], 
+                              $row['description'],
+                              $row['region']
+                              )).
+      '</td></tr>';
+  }
+
+  return array('title' => 'Sources for Parts', 'body' => ($str.'</table>'));
+}
+
 
 function display_main() {
   global $model;
@@ -164,130 +187,13 @@ function display_main() {
 </form></p>';
 }
 
-function dump_module($module_id) {
-  global $db;
-  global $model_name;
-
-  function html_row($row, $fields, $indent, $module=0, $master_row=0) {
-    if (!count($row)) {return;}
-
-    $str .= '<tr id="bomRow'.$master_row.'">';
-    for ($l=0; $l < count($row); $l++) {
-      $padding='';
-      if ($l==0) {
-        if ($indent > 0) {$padding = ' style="padding-left:'.($indent * 15).'px"';}
-        $img='';
-        if ($module) {
-          $img = '<img id="toggle'.$master_row.'" src="images/minus.png" onclick="toggleModule(\'toggle0\', \'bomRow'.($master_row+1).'\');"/> ';          
-
-          if ($indent==0) {
-            $class = ' class="topmodule"';
-          } else {
-            $class = ' class="submodule"';
-          }
-        }
-        $str .= '<td'.$padding.$class.'>'.$img.$row[$l].'</td>';
-      } else {
-        if ($indent==0 && $module) {
-          $str .= "<td class=\"topmodule\">$row[$l]</td>";
-        } else {
-          $str .= "<td class=\"bomBorderLeft\">$row[$l]</td>";
-        }
-
-      }
-    }
-    $str .= "</tr></div>\n";
-    return $str;
-  }
-
-  function recursive_dump_module($module_id, $level=0, $master_row=0) {
-    global $db;
-    global $model_name;
-    
-    // get all parts
-    $q = $db->query("SELECT p.id, p.name, mp.quantity, mp.description, mp.schematic, mp.notes ".
-                    "FROM part p, module_part mp WHERE mp.module_id=$module_id AND p.id=mp.part_id;");
-    while ($row = $q->fetchRow(MDB2_FETCHMODE_ORDERED)) {
-      $id = array_shift($row);
-      $row[count($row)] = $db->get_part_tags($id);
-      $row[0] = $db->make_part_href($id, $row[0]);
-      $row[count($row)] = $db->get_source_for_part($id);
-      $str .= html_row($row, array('Name', 'Qty', 'Descrip', 'Schematic ID', 'Tag', 'Notes'), $level, 0, $master_row++);
-    }
-    
-
-    // get all modules
-    $q = $db->query("SELECT m.id, m.name, mm.quantity, m.description, mm.schematic, mm.notes ".
-                    "FROM module m, module_module mm WHERE m.id=mm.submodule_id AND mm.supermodule_id=$module_id;");
-    while ($row = $q->fetchRow(MDB2_FETCHMODE_ORDERED)) {
-      $id = array_shift($row);
-      $row[count($row)] = $db->get_module_tags($id);
-      $row[count($row)] = ' ';
-      $row[0] = $db->make_module_href($id, $row[0]);
-      $str .= html_row($row, array('Name', 'Qty', 'Descrip', 'Schematic', 'Notes', 'Tags'), $level, 1, $master_row++);
-      $str .= recursive_dump_module($id, $level+1, &$master_row);
-    }
-    
-    return $str;
-  }
-
-  $str .= '<table summary="Darwin Bill of Materials" class="bomT" cellspacing="0">';
-
-  if (!$db->is_model($module_id)) {
-    $str .=  '<tr><td colspan="20" class="bomHeader">'.$db->get_module_name_by_id($module_id).'</td></tr>'."\n";
-  }
-
-  $str .= '<tr><td class="field">'.join("</td><td class=\"field\">", array('Name', 'Qty', 'Descrip', 'Schematic', 'Notes', 'Tags', 'Suppliers')).'</td></tr>'."\n".
-    recursive_dump_module($module_id);
-
-  return array('title' => 'Bill of Materials for '.$model_name, 'body' => $str.'</table>');
-}
-
-
-function get_part_rows($q) {
-  global $db;
-
-  $part=array();
-  while ($row = $q->fetchRow(MDB2_FETCHMODE_ORDERED)) {
-    $part[$row[0]][ count($part[$row[0]]) ] = $row;
-  }
-
-  foreach ($part as $p) {
-    $quantity = 0;
-    $module = '';
-    foreach ($p as $m) {
-      $module .= $db->make_module_href($m[3],$m[2])." ($m[4])<br />";
-      $quantity = $quantity + $m[4];
-    }
-
-    $tag = $db->get_part_tags($p[0][0]);
-
-    $str .= '<tr><td>'.join('</td><td class="bomBorderLeft">', array($p[0][0], $db->make_part_href($p[0][0],$p[0][1]), $quantity, $module, $p[0][5], $p[0][6], $tag, '')). "</td></tr>\n";
-  }
-  return $str;
-}
-
-
-function dump_parts_for_model ($model=0) {
-  // TODO: make it model-specific
-  global $db;
-  global $model_name;
-
-  $str .= '<table summary="Darwin Bill of Materials organized by part" class="bomT" cellspacing="0">'.
-    '<tr><td class="field">'.join("</td><td class=\"field\">", array('Part ID', 'Name', 'Qty', 'Modules', 'Description', 'Notes', 'Tags', 'Suppliers')).'</td></tr>';
-
-  $q = $db->query("SELECT p.id, p.name, m.name, m.id, mp.quantity, p.description, p.notes ".
-                  "FROM part p, module m, module_part mp WHERE p.id=mp.part_id AND m.id=mp.module_id");
-  $str .=get_part_rows($q);
-  return array('title' => $model_name.' Bill of Materials Organized by Part', 'body' => $str.'</table>');
-}
 
 function dump_tag($tag_id) {
   global $db;
 
   $tag_name = $db->get_tag_name_by_id($tag_id);
 
-  $field_header = '<tr><td class="field">'.join("</td><td class=\"field\">", array('Part ID', 'Name', 'Qty', 'Modules', 'Description', 'Notes', 'Tags', 'Suppliers')).'</td></tr>';
+  $field_header = '<tr><td class="field">'.join("</td><td class=\"field\">", array('Name', 'Modules', 'Description and Notes', 'Tags', 'Suppliers')).'</td></tr>';
 
   $str .= '<table summary="Bill of Materials tag viewer" class="bomT" cellspacing="0">';
 
@@ -303,14 +209,10 @@ function dump_tag($tag_id) {
   // Parts
   $rows = get_part_rows($db->query("SELECT p.id, p.name, m.name, m.id, mp.quantity, p.description, p.notes ".
                                    "FROM part p, module m, module_part mp, part_tag pt ".
-                                   "WHERE p.id=mp.part_id AND m.id=mp.module_id AND pt.part_id=p.id and pt.tag_id=$tag_id"));
+                                   "WHERE p.id=mp.part_id AND m.id=mp.module_id AND pt.part_id=p.id and pt.tag_id=$tag_id ORDER BY p.name"));
   if ($rows) {
     $str .= '<tr><td colspan="20" class="topModule">Parts tagged "'.$tag_name.'"</td></tr>'.$field_header.$rows;
   }
   return (array('title' => 'Parts and Modules Tagged "'.$tag_name.'"', 'body' => $str.'</table>'));
 }
 
-
-
-
-?></body></html>

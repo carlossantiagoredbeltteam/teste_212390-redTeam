@@ -12,8 +12,11 @@ See LICENSE and <http://www.affero.org/oagpl.html> for details.
 class mydb {
   var $db; // database_object;
   var $db_name;
+  var $source_id_abbreviation='';
 
-  function mydb() {
+  function mydb($args=array()) {
+    // note: set $args['no_use_db'] if you just want to connect to mysql without selecting the bom db
+
     // Needed to switch from DB.php to mdb2.php for licensing reasons.
     // Thanks to http://www.phpied.com/db-2-mdb2/ for making it easy
     require_once('MDB2.php');
@@ -38,7 +41,7 @@ class mydb {
 
     $this->db_name = $auth->db_name;
 
-    $this->db =& MDB2::factory('mysql://'.$auth->db_user.':'.$auth->db_pass.'@'.$auth->host.'/'.$auth->db_name);
+    $this->db =& MDB2::factory('mysql://'.$auth->db_user.':'.$auth->db_pass.'@'.$auth->host.($args['no_use_db'] ? '' : '/'.$auth->db_name));
     if (PEAR::isError($this->db)) {
       echo ($this->db->getMessage().' - '.$this->db->getUserinfo());
     }
@@ -69,6 +72,20 @@ class mydb {
     }
   }
 
+  function get_source_abbreviation_id_hash() {
+    // get hash of source abbreviations and id
+
+    if ($this->source_id_abbreviation) { return $this->source_id_abbreviation; }
+
+    $q = $this->query("SELECT abbreviation, id FROM source");
+    while ($row = $q->fetchRow()) {
+      $sid[$row['abbreviation']] = $row['id'];
+    }
+    $this->source_id_abbreviation = $sid;
+
+    return $sid;
+  }
+
   function get_tags($q) {
     $tag='';
     while ($row = $q->fetchRow(MDB2_FETCHMODE_ORDERED)) {
@@ -87,15 +104,24 @@ class mydb {
     return $this->get_tags( $db->query("SELECT t.name, t.id FROM tag t, part_tag pt WHERE pt.part_id=".$id." AND t.id=pt.tag_id;") );
   }
 
+  function get_source_id_by_name ($name) {
+    $name = preg_replace('/"/', '\\"', $name);
+    $q = $this->query("SELECT id from source WHERE name=\"$name\";");
+    $row = $q->fetchRow();
+    if ($row['id'] == NULL) { return -1; }
+    return $row['id'];
+  }
+
   function get_source_for_part($part_id) {
-    $q = $this->query("SELECT s.id, s.name, sp.url, s.url FROM source_part sp, part p, source s WHERE sp.part_id=p.id and sp.source_id=s.id and p.id=$part_id;");
+    $q = $this->query("SELECT s.id, s.name, sp.url, s.url, s.abbreviation, sp.vendor_part_id FROM ".
+                      "source_part sp, part p, source s WHERE sp.part_id=p.id and sp.source_id=s.id and p.id=$part_id;");
     while ($row = $q->fetchRow(MDB2_FETCHMODE_ORDERED)) {
-      if ($row[0] == 3) {                                    // if no source, display suggest-it link
+      if ($row[0] == 1) {                                    // if no source, display suggest-it link
         $str .= $row[1].' <a href="">(suggest one)</a><br />';
       } elseif ($row[2]) {
-        $str .= "<a href=\"$row[2]\">$row[1]</a><br />";     // if there's a url for this particular part, display it
+        $str .= "<a href=\"$row[2]\">$row[4]:$row[5]</a><br />";     // if there's a url for this particular part, display it
       } elseif ($row[3]) {
-        $str .= "<a href=\"$row[3]\">$row[1]</a><br />";     // failing that, link to supplier
+        $str .= "<a href=\"$row[3]\">$row[4]:$row[5]</a><br />";     // failing that, link to supplier
       } else {
         $str .= $row[1].'<br />';                            // failing that, just display name of supplier
       }
@@ -126,6 +152,7 @@ class mydb {
   }
 
   function get_part_id_by_name ($name) {
+    $name = preg_replace('/"/', '\\"', $name);
     $q = $this->query("SELECT id from part WHERE name=\"$name\";");
     $row = $q->fetchRow();
     if ($row['id'] == NULL) { return -1; }
@@ -182,11 +209,17 @@ class mydb {
     return $row['id'];
   }
 
+  function create_model ($model) {
+    // returns module id and model id
+    $module_id = $this->create_module($model);
+    $this->query("INSERT INTO model (module_id) VALUES ($module_id);");
+    return array('model_id' => $this->db->lastInsertID(),
+                 'module_id' => $module_id);
+  }
 
   function create_tag ($name, $description='') {
     $this->query("INSERT into tag (name, description) VALUES (\"$name\", \"$description\")");
-    $type_id = $this->get_tag_id_by_name($name);
-    return $type_id;
+    return $this->db->lastInsertID();
   }
 
 
@@ -200,11 +233,11 @@ class mydb {
     $description = $this->escape_quotes($description);
     $notes = $this->escape_quotes($notes);
     $this->query("INSERT into part (name, description, notes) VALUES (\"$name\", \"$description\", \"$notes\")");
-    return $this->get_part_id_by_name($name);    
+    return $this->db->lastInsertID();
   }
   
-  function create_module ($name, $parent_module_id, $quantity=1, $notes='') {
-    $this->query ("INSERT into module (name) VALUES (\"".$name."\");");
+  function create_module ($name, $parent_module_id=-1, $quantity=1, $notes='') {
+    $q = $this->query ("INSERT into module (name) VALUES (\"".$name."\");");
     $module_id = $this->get_module_id_by_name($name);
     if ($parent_module_id != -1) {
       $this->query ("INSERT into module_module (supermodule_id, submodule_id, quantity, notes) VALUES ($parent_module_id, $module_id, $quantity, \"$notes\");");

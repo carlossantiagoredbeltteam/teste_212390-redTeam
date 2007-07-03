@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS part (
   name VARCHAR(128),
   description VARCHAR(256),
   url VARCHAR(256),
+  units INT,
   photo MEDIUMBLOB,
   stl MEDIUMBLOB,
   notes VARCHAR(2048)
@@ -23,6 +24,8 @@ CREATE TABLE IF NOT EXISTS source (
   name VARCHAR(128),
   description VARCHAR(256),
   url VARCHAR(256),
+  region VARCHAR(64),
+  abbreviation VARCHAR(6) UNIQUE,
   notes VARCHAR(2048)
 );
 
@@ -66,6 +69,7 @@ CREATE TABLE IF NOT EXISTS source_part (
   vendor_part_id VARCHAR(64),  /* Vendor's part number */
   vendor_part_name VARCHAR(256),  /* Vendor's name for part, if different from ours */
   url VARCHAR(256),
+  lot_size INT,
   price FLOAT(2),
   price_date DATE,
   notes VARCHAR(2048)  /* notes about getting this particular part from this vendor */
@@ -91,6 +95,10 @@ CREATE TABLE IF NOT EXISTS module_module (
   schematic VARCHAR(16),   /* this is the code used to identify the submodule on a drawing */
   notes VARCHAR(2048) /* notes about how this assembly or submodule fits with the supermodule */
 );
+
+INSERT INTO tag (name, description) VALUES ('', 'N/A');
+INSERT INTO source (name, abbreviation, description) VALUES ('No Source', 'NS', 'Some parts you\'ll just have to find on your own.');
+
 ");
 
 ?>
