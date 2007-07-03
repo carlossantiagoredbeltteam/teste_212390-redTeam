@@ -77,7 +77,9 @@
 	<select name="global_supplier" onchange="selectGlobalSupplier(this)">
 		<option value="">Choose Supplier</option>
 		<? foreach ($suppliers AS $corp): ?>
-			<option value="<?=$corp->name?>"><?=$corp->name?> (<?=implode(", ", $corp->countries)?>)</option>
+			<? if ($corp instanceof Corporation): ?>
+				<option value="<?=$corp->name?>"><?=$corp->name?> (<?= implode(", ", $corp->countries); ?>)</option>
+			<? endif ?>
 		<? endforeach ?>
 	</select>
 	<form action="billofmaterials.php" method="post" id="bom_form">

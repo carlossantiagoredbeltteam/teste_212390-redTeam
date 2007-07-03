@@ -76,7 +76,8 @@
 	<table>
 		<tr>
 			<th>Part #</th>
-			<th>Quantity</th>
+			<th>Quantity</th
+			<th>Name</th>
 		</tr>
 <?
 			foreach ($parts AS $part)
@@ -94,7 +95,9 @@
 				else
 					echo $part->part_id;
 					
-				echo "</td><td>$part->quantity</td></tr>";
+				echo "</td><td>$part->quantity</td>";
+				echo "<td>$part->name</td>";
+				echo "</tr>";
 			}
 			
  			echo "</table>";
