@@ -38,11 +38,19 @@
 			$this->name = trim($name);
 			$this->type = $type;
 			$this->quantity = $quantity;
-			$this->addSuppliers($suppliers);
+			
+			if (count($suppliers))
+				$this->addSuppliers($suppliers);
 		}
 	
 		public function addSuppliers($suppliers)
 		{
+			/*
+			echo "adding suppliers for $this->name\n";
+			print_r($suppliers);
+			echo "\n";
+			*/
+			
 			if (count($suppliers))
 			{
 				foreach ($suppliers AS $name)
@@ -59,7 +67,8 @@
 		public function getSafeName()
 		{
 			$name = str_replace(" ", "_", $this->name);
-			preg_replace("/[^a-zA-Z0-9_]/", "", $name);
+			$name = str_replace('"', '', $name);
+			$name = preg_replace("/[^a-zA-Z0-9_.']/", "", $name);
 		
 			return $name;
 		}
@@ -102,7 +111,11 @@
 		public function getParts($type = null)
 		{
 			if ($type !== null)
+			{
+				if (is_array($this->parts[$type]))
+					sort($this->parts[$type]);
 				return $this->parts[$type];
+			}
 			else
 				return $this->parts;
 		}
@@ -169,14 +182,9 @@
 							break;
 
 						case 'belt':
-					
-							if (!$beltSuppliers)
-								$beltSuppliers = $part->suppliers;
-							else
-								$part->suppliers = $beltSuppliers;
-							
-							preg_match("/\d+/", $part->name, $matches); // match the length
-							$part->name = "{$matches[0]}mm belt (Length 950 pitch 2.5 width 6 thick ~1.3)";
+
+							preg_match("/\((.+)\) x (\d+)/", $part->name, $matches); // match the belt type
+							$part->name = "{$matches[1]} belt x $matches[2]mm";
 							$part->quantity *= $subqty;
 							break;
 						
@@ -187,16 +195,6 @@
 							{
 								$length = $matches[2];
 								$part->name = "M{$matches[1]} x $length $part->type";
-							}
-							else
-							{
-								preg_match("/(\d+)/", $part->name, $matches); // match the length
-								$length = $matches[1];
-							
-								if ($part->type == 'rod')
-									$part->name = "M8 x $length $part->type";
-								else if ($part->type == 'stud')
-									$part->name = "M5 x $length $part->type";
 							}
 					
 							$part->quantity *= $subqty;
@@ -236,25 +234,25 @@
 	{
 		private $suppliers;
 	
-		public function addSupplier($part)
+		public function hasSupplier($part)
 		{
 			if ($part->key && $part->part_id)
-			{
 				if (count($this->suppliers[$part->key]))
-				{
-					foreach ($this->suppliers[$part->key] AS $dongle)
-					{
+					foreach ($this->suppliers[$part->key] AS $key => $dongle)
 						if ($dongle->part_id == $part->part_id)
-						{
-							$found = true;
-							$dongle->quantity += $part->quantity;	
-						}
-					}
-				}
-
-			}
-			if (!$found)
-				$this->suppliers[$part->key][] = $part;
+							return $key;
+		
+			return false;
+		}
+		
+		public function addSupplier($part)
+		{
+			/*
+				$key = $this->hasSupplier($part);
+				if ($key !== false)
+					$this->suppliers[$part->key][$]
+			*/
+			$this->suppliers[$part->key][] = $part;
 		}
 	
 		public function getParts($key = null)
