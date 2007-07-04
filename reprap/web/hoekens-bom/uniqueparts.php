@@ -88,7 +88,8 @@
 		{
 			$parts = $bom->getParts($type);
 			
-			renderGenericPartsHTML($parts, ucfirst(strtolower($type)));
+			if ($type != 'assembly')
+				renderGenericPartsHTML($parts, ucfirst(strtolower($type)));
 		}
 ?>
 		<input type="submit" name="submit" value="Generate Bill of Materials"/>
@@ -117,7 +118,7 @@
 ?>
 	<h3><?=$name?></h3>
 	<? if (count($parts)): ?>
-		<table width="85%">
+		<table width="100%">
 			<tr>
 				<th width="50%">Part</th>
 				<th width="10%">Quantity</th>
@@ -161,5 +162,6 @@
 			echo '<input type="hidden" name="suppliers[]" value=""/>';
 			echo '<b>no suppliers</b> - <a href="http://forums.reprap.org">suggest one!</a>';
 		}
+		echo "\n";
 	}
 ?>

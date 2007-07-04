@@ -96,7 +96,7 @@
 					echo $part->part_id;
 					
 				echo "</td><td>$part->quantity</td>";
-				echo "<td>$part->name</td>";
+				echo "<td>" . stripslashes($part->name) . "</td>";
 				echo "</tr>";
 			}
 			
@@ -159,7 +159,7 @@
 	</tr>
 <?
 		foreach ($parts AS $part)
-			echo "<tr><td>$part->name</td><td>$part->quantity</td></tr/>";
+			echo "<tr><td>" . stripslashes($part->name) . "</td><td>$part->quantity</td></tr/>";
 	
 		echo "</table>";
 	}
