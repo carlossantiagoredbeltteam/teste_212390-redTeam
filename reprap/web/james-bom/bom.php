@@ -32,7 +32,7 @@ See LICENSE and <http://www.affero.org/oagpl.html> for details.
           <li><a href="?show=model">Projects</a></li>
           <li><a href="?model=<?=$model?>&list=module">Modules</a></li>
           <li><a href="?model=<?=$model?>&list=part">Parts</a></li>	
-          <li><a href="?show=vendors" rel="dropmenuSource">Sources</a></li>	
+          <li><a href="?show=vendor" rel="dropmenuSource">Sources</a></li>	
           <li><a href="#" rel="dropmenuHelp">Help</a></li>	
         </ul>
       </div>
@@ -45,7 +45,7 @@ See LICENSE and <http://www.affero.org/oagpl.html> for details.
     </div>
       <!--Source drop down menu -->                                                   
       <div id="dropmenuSource" class="dropmenudiv">
-        <a href="?show=vendors" rel="dropmenuSource">Show vendors</a></li>	
+        <a href="?show=vendor" rel="dropmenuSource">Show vendors</a></li>	
         <a href="?show=orphans">Orphans</a>
       </div>
 
@@ -117,9 +117,9 @@ function main() {
 
     switch ($_GET['show']) {
 
-      case "vendors":
+      case "vendor":
       require_once("view.php");
-      $str = dump_sources(); 
+      $str = dump_source($_GET['id']); 
       break;
 
       case "orphans":
