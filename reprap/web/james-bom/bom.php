@@ -17,27 +17,56 @@ See LICENSE and <http://www.affero.org/oagpl.html> for details.
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <link rel="stylesheet" type="text/css" href="bom.css" />
   <script type="text/javascript" src="hide_show.js"></script>
+  <link rel="stylesheet" type="text/css" href="chrometheme/chromestyle.css" />
+  <script type="text/javascript" src="chromejs/chrome.js"></script>
 </head>
 
 <body>
 <div id="wrap">
    <div id="header"><h1><?= $str['title'] ?></h1></div>
-    <div id="nav">
+
+    <div class="chromestyle" id="chromemenu">
+      <div class="chromestyleLeft" id="chromemenu">
         <ul>
-            <li><a href="?">Home</a></li>
-            <li><a href="?show=models">Projects</a></li>
-            <li><a href="?model=<?=$model?>&list=module">Modules</a></li>
-            <li><a href="?model=<?=$model?>&list=part">Parts</a></li>
-            <li><a href="?show=vendors">Sources</a></li>
-            <li><a href="#"><strike>Search</strike></a></li>
+          <li><a href="?">Home</a></li>
+          <li><a href="?show=model">Projects</a></li>
+          <li><a href="?model=<?=$model?>&list=module">Modules</a></li>
+          <li><a href="?model=<?=$model?>&list=part">Parts</a></li>	
+          <li><a href="?show=vendors" rel="dropmenuSource">Sources</a></li>	
+          <li><a href="#" rel="dropmenuHelp">Help</a></li>	
         </ul>
+      </div>
+
+     <!-- <div class="chromestyleRight" >
+        <ul>
+          <li><form><input type="text" name="search" size="15"/></form></li>	
+        </ul>
+      </div> -->
     </div>
+      <!--Source drop down menu -->                                                   
+      <div id="dropmenuSource" class="dropmenudiv">
+        <a href="?show=vendors" rel="dropmenuSource">Show vendors</a></li>	
+        <a href="?show=orphans">Orphans</a>
+      </div>
+
+      <!--Help drop down menu -->                                                
+      <div id="dropmenuHelp" class="dropmenudiv" style="width: 150px;">
+        <a href="?show=builders">Builders</a>
+        <a href="?show=developers">Developers</a>
+        <a href="?show=faq">FAQ</a>
+        <a href="?show=about">About</a>
+      </div>
+
+      <script type="text/javascript">cssdropdown.startchrome("chromemenu")</script>
+   <!-- END MENU -->
+
+
     <?php // include ('sidebar.html') ?>
     <div id="main">
       <?php if ($str['file']) { include($str['file']); } else {echo $str['body'];} ?>
     </div>
     <div id="footer">
-        <p>BOM Viewer is an outgrowth of the <a href="reprap.org">RepRap</a> project.<br />
+        <p>BOM Viewer is an outgrowth of the <a href="http://reprap.org">RepRap</a> project.<br />
         <a href="bom_0.1.1.tar.gz">Code</a> is copyright 2007 <a href="">James Vasile</a> 
         and released under the <a href="http://www.affero.org/oagpl.html">Affero GPL</a>.
         </p>
@@ -61,26 +90,49 @@ function main() {
   $model_name = $db->get_model_name_by_id($model);
 
   if (!strcmp($_GET['list'], 'part')) {
+    require_once("view.php");
     require_once("part.php");
     $str = dump_parts_for_model ( $model );
   
-  } elseif (!strcmp($_GET['show'], 'vendors')) {
-    $str = dump_sources(); 
-
   } elseif (!strcmp($_GET['list'], 'module')) {
+    require_once("view.php");
     require_once ("module.php");
     $str = dump_module ( $model ); 
 
   } elseif ($_GET['part']) { 
+    require_once("view.php");
     require_once("part.php");
     $str = dump_part ( $_GET['part'] ); 
 
   } elseif ($_GET['module']) { 
+    require_once("view.php");
     require_once ("module.php");
     $str = dump_module ( $_GET['module'] );
 
   } elseif ($_GET['tag']) { 
+    require_once("view.php");
     $str = dump_tag ( $_GET['tag'] ); 
+
+  } elseif ($_GET['show']) {
+
+    switch ($_GET['show']) {
+
+      case "vendors":
+      require_once("view.php");
+      $str = dump_sources(); 
+      break;
+
+      case "orphans":
+      $str = html_parts_sans_source();
+      break;
+
+      case "search":
+      $str = search();
+      break;
+
+      default:
+      $str = '<h2>Page Not Found</h2><p>Couldn\'t find any pages marked "'.$_GET['show'].'".  Perhaps you have selected a link that doesn\'t go anywhere yet.</p>';
+    }
 
   } else {
     $str['file'] = 'home.html';
@@ -93,69 +145,46 @@ function main() {
   if (!$str['title']) { $str['title'] ='RepRap Bill of Materials Viewer'; }
 }
 
-function combine_description_notes($description='', $notes='') {
-  // combine description and note fields
-  if ($notes) {
-    if ($description) {
-      $description .= '<br />';
-    }
-    $description .=  'Note: '.$notes;
-  }
-  return $description;
-}
+function search() {
 
-
-function dump_sources() {
   global $db;
 
-  $str = '<table summary="Darwin Bill of Materials organized by part" class="bomT" cellspacing="0">'.
-    '<tr><td class="field">'.
-    join("</td><td class=\"field\">", array('Name', 'Prefix', 'Description', 'Region')).
-    '</td></tr>';
-  
-  $q = $db->query("SELECT * FROM source ORDER BY REGION");
+  $str .= "<h2>Preferences</h2>".
 
+    '<p>If you tell us what region you\'re in, we can generate order forms
+     for the various online stores from which you can order your
+     parts.  This will help cut down on shipping costs.</p>';
+
+
+  $q = $db->query("SELECT sp.part_id, p.name, sp.source_id  from part p, source_part sp WHERE sp.part_id=p.id ORDER BY p.name");
   while ($row = $q->fetchRow()) {
-    if ($row['id'] == 1) { continue; }
-    $str .= '<tr><td class="bomBorderLeft">'.
-      join('</td><td class="bomBorderLeft">', array(
-                              ($row['url'] ? '<a href="'.$row['url'].'">'.$row['name'].'</a>' : $row['name']), 
-                              $row['abbreviation'], 
-                              $row['description'],
-                              $row['region']
-                              )).
-      '</td></tr>';
+    //$str .= join(' ', array($row['part_id'], $row['source_id'], $row['name'])).'<br />';
   }
 
-  return array('title' => 'Sources for Parts', 'body' => ($str.'</table>'));
+
+  $str .= "<h2>Orphaned Parts</h2>";
+  $orphans = html_parts_sans_source();
+  $str .= $orphans['body'];
+
+
+
+  return array('title'=>'Search', 'body'=>$str);
 }
 
-
-function dump_tag($tag_id) {
+function html_parts_sans_source() {
+  require_once ("view.php");
   global $db;
 
-  $tag_name = $db->get_tag_name_by_id($tag_id);
+  $str .= '<table summary="Darwin Bill of Materials organized by part" class="bomT" cellspacing="0">'.
+    '<tr><td class="bomHeader" colspan="20">Parts With No Sources</td></tr>'.
+    '<tr><td class="field">'.join("</td><td class=\"field\">", array('Name', 'Modules', 'Description and Notes', 'Tags')).'</td></tr>';
 
-  $field_header = '<tr><td class="field">'.join("</td><td class=\"field\">", array('Name', 'Modules', 'Description and Notes', 'Tags', 'Suppliers')).'</td></tr>';
+  // return all the parts that have no source
+  $q = $db->query("SELECT p.id, p.name, m.name, m.id, mp.quantity, p.description, p.notes FROM part p, module_part mp, module m ".
+                  "WHERE m.id=mp.module_id AND mp.part_id = p.id AND p.id NOT IN (SELECT part_id FROM source_part) ORDER BY p.name;");
 
-  $str .= '<table summary="Bill of Materials tag viewer" class="bomT" cellspacing="0">';
+  $str .= html_part_rows(array('query'=>$q, 'orphans'=>1)).'</table>';
 
-  // Modules
-  $r = $db->query("SELECT m.id, m.name from tag t, module_tag mt, module m WHERE m.id=mt.module_id AND t.id=mt.tag_id AND t.id=$tag_id");
-  if ($row = $r->fetchRow(MDB2_FETCHMODE_ORDERED)) {
-    $str .= '<tr><td colspan="20" class="topModule">Modules tagged "'.$tag_name.'"</td></tr>'.$field_header;
-    do {
-      $str .= '<tr><td>'.$db->make_module_href($row[0],$row[1]).'</td></tr>';
-    } while ($row = $r->fetchRow(MDB2_FETCHMODE_ORDERED));
-  }
-
-  // Parts
-  $rows = get_part_rows($db->query("SELECT p.id, p.name, m.name, m.id, mp.quantity, p.description, p.notes ".
-                                   "FROM part p, module m, module_part mp, part_tag pt ".
-                                   "WHERE p.id=mp.part_id AND m.id=mp.module_id AND pt.part_id=p.id and pt.tag_id=$tag_id ORDER BY p.name"));
-  if ($rows) {
-    $str .= '<tr><td colspan="20" class="topModule">Parts tagged "'.$tag_name.'"</td></tr>'.$field_header.$rows;
-  }
-  return (array('title' => 'Parts and Modules Tagged "'.$tag_name.'"', 'body' => $str.'</table>'));
+  return array('title'=>'Orphaned Parts', 'body'=>$str);
 }
 

@@ -16,6 +16,8 @@ INSERT INTO source (name, url, abbreviation) VALUES ('Radio Shack', 'http://radi
 INSERT INTO source (name, url, abbreviation) VALUES ('Greenweld', 'http://www.greenweld.co.uk/', 'GH');
 INSERT INTO source (name, url, abbreviation) VALUES ('Sculpt.com', ' http://www.sculpt.com/', 'Sculpt');
 INSERT INTO source (name, abbreviation) VALUES ('Hardware Store', 'H');
+INSERT INTO source (name, abbreviation) VALUES ('Amazon', 'A');
+
 
 
 ");

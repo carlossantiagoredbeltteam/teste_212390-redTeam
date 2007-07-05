@@ -15,6 +15,7 @@ See LICENSE and <http://www.affero.org/oagpl.html> for details.
 function dump_module($module_id) {
   global $db;
   global $model_name;
+  global $model;
 
   function html_row($row, $indent, $module=0, $master_row=0, $start_hide_row=0, $end_hide_row=0) {
     if (!count($row)) {return;}
@@ -51,6 +52,20 @@ function dump_module($module_id) {
     return $str;
   }
 
+  function html_parent_modules($module_id) {
+    global $db;
+
+    $q = $db->query("SELECT m.name, m.id FROM module_module mm, module m WHERE mm.submodule_id = $module_id AND mm.supermodule_id=m.id AND m.id NOT IN (SELECT module_id FROM model);");
+  
+    while ($row = $q->fetchRow()) {
+      $str .= $db->make_module_href($row['id'], $row['name']).' ';
+    }
+
+    if (!$str) { return; }
+
+    return "This module is part of the following modules: \n".$str;
+  }
+
   function recursive_dump_module($module_id, $level=0, $master_row=0) {
     global $db;
     global $model_name;
@@ -60,7 +75,7 @@ function dump_module($module_id) {
                     "FROM part p, module_part mp WHERE mp.module_id=$module_id AND p.id=mp.part_id ORDER BY p.name;");
     while ($row = $q->fetchRow(MDB2_FETCHMODE_ORDERED)) {
       $id = $row[0];
-      $out[0] =  $db->make_part_href($id, $row[1])." ($row[2])";
+      $out[0] =  $db->make_part_href($id, $row[1]).($row[2] != 1 ? " ($row[2])" : '');
       $out[1] =  combine_description_notes($row[3], $row[5]);
       $out[2] = $row[4];
       $out[3] =  $db->get_part_tags($id);
@@ -71,13 +86,19 @@ function dump_module($module_id) {
     
 
     // get all modules
+    /*    $sort = 'm.name';
+    if (!strcmp($_GET['sort'], 'supplier')) {
+      $sort = 'm.source???
+    }
+    */
+
     $q = $db->query("SELECT m.id, m.name, mm.quantity, m.description, mm.schematic, mm.notes ".
                     "FROM module m, module_module mm WHERE m.id=mm.submodule_id AND mm.supermodule_id=$module_id ORDER BY m.name;");
     while ($row = $q->fetchRow(MDB2_FETCHMODE_ORDERED)) {
-      $id = array_shift($row);
-      $out[0] = $db->make_module_href($id, $row[0])." ($row[1])";
-      $out[1] = combine_description_notes($row[2], $row[4]);
-      $out[2] = $row[3];
+      $id = $row[0];
+      $out[0] = $db->make_module_href($id, $row[1]).($row[2] != 1 ? " ($row[2])" : '');
+      $out[1] = combine_description_notes($row[3], $row[5]);
+      $out[2] = $row[4];
       $out[3] = $db->get_module_tags($id);
       $out[4] = '';
 
@@ -106,9 +127,16 @@ function dump_module($module_id) {
     $str .=  '<tr><td colspan="20" class="bomHeader">'.$db->get_module_name_by_id($module_id).'</td></tr>'."\n";
   }
 
-  $str .= '<tr><td class="field">'.join("</td><td class=\"field\">", array('Name', 'Description and Notes', 'Schematic', 'Tags', 'Suppliers')).'</td></tr>'."\n".
-    recursive_dump_module($module_id);
+  $str .= '<tr><td class="field">'.
+    //join("</td><td class=\"field\">", array('Name', 'Description and Notes', 'Schematic', 'Tags', '<a href="?model='.$model.'&module='.$module_id.'&sort=supplier">Suppliers</a>')).    
+    join("</td><td class=\"field\">", array('Name', 'Description and Notes', 'Schematic', 'Tags', 'Suppliers')).
+    '</td></tr>'."\n";
 
-  return array('title' => 'Bill of Materials for '.$model_name, 'body' => $str.'</table>');
+  $str .=  recursive_dump_module($module_id).'</table>';
+
+  $str .= html_parent_modules($module_id);
+
+
+  return array('title' => 'Bill of Materials for '.$model_name, 'body' => $str);
 }
 
