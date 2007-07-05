@@ -124,6 +124,19 @@ function parse_supplier_columns($vals, $f, $part_id) {
         if ($row['id']) {
           $q = $db->query("SELECT source_id, part_id FROM source_part where source_id=".$row['id']." AND part_id=$part_id");
           if (!$q->fetchRow()) { $db->query("INSERT into source_part (part_id, source_id, vendor_part_id) VALUES ($part_id, ".$row['id'].", \"$id\")"); }
+
+          /*
+          if ($row['id']==15) {
+            $url = "http://amazon.com/s/field-keywords=$id";
+          }
+
+          if ($url) {
+            if (!$q->fetchRow()) { $db->query("INSERT into source_part (part_id, source_id, vendor_part_id, url) ".
+                                              "VALUES ($part_id, ".$row['id'].", \"$id\", \"$url\"   );"); }
+          } else {
+            if (!$q->fetchRow()) { $db->query("INSERT into source_part (part_id, source_id, vendor_part_id) VALUES ($part_id, ".$row['id'].", \"$id\")"); }
+          }*/
+
           $success = 1;
         } else {
           echo "Unknown source abbreviation: $code in $vals[$s]\n";
