@@ -236,6 +236,8 @@ include("darwin_initialize.php");  // load the darwin data into the fresh db
 
 parse($modules);
 
+$db->query("UPDATE tag SET name='fastener' WHERE name='fast'");
+$db->query("UPDATE module SET url='http://reprap.org/bin/view/Main/WebHome' WHERE name=\"Darwin\"");
 
 function parse($modules) {
   global $darwin_module_id;
@@ -254,7 +256,7 @@ function parse($modules) {
     $mod = $row['name'];
 
     if (strcmp($mod, "Universal Controller")) {
-      $module_id = $db->create_module($mod, $darwin_module_id, $row['quantity']);
+      $module_id = $db->create_module($mod, $darwin_module_id, $row['quantity'], $row['description']);
     }
 
     //    parse_module($row);
@@ -316,14 +318,6 @@ function parse($modules) {
   }
 }
 
-function parse_module($args) {
-
-
-  return $module_id;
-}
-
-$db->query("UPDATE tag SET name='fastener' WHERE name='fast'");
-$db->query("UPDATE module SET url='http://reprap.org/bin/view/Main/WebHome' WHERE name=\"Darwin\"");
 
 function set_vendor_part_id_by_part_name($part_name, $vendor_part_id) {
   // adjusts source_part, creates if needed
@@ -345,11 +339,12 @@ function set_vendor_part_id_by_part_name($part_name, $vendor_part_id) {
   }
 }
 
-set_vendor_part_id_by_part_name('M3 nut', '90591A121');
+/*set_vendor_part_id_by_part_name('M3 nut', '90591A121');
 set_vendor_part_id_by_part_name('M3 washer', '91166A210');
 set_vendor_part_id_by_part_name('M3 x 15 cap', '91290A120');
 set_vendor_part_id_by_part_name('M3 x 25 cap', '91290A125');
 set_vendor_part_id_by_part_name('M3 x 30 cap', '91290A130');
+*/
 set_vendor_part_id_by_part_name('M3 x 35 cap', '91292A033 ');
 
-echo "\n\ndone.\n";
+echo "\ndone.\n";
