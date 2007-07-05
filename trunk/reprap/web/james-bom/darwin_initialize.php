@@ -4,7 +4,7 @@
 // db must be defined before this file is included.
 $db->queries("
 INSERT INTO source (name, url, abbreviation, description) VALUES ('RepRap', 'http://reprap.org', 'RR', 'These are parts that will be fabricated on an already-working RepRap.');
-INSERT INTO source (name, url, abbreviation, description) VALUES ('RepRap Research Foundation', 'http://rrrf.org', 'RRRF', 'The Reprap Research Foundation\'s online store');
+INSERT INTO source (name, url, abbreviation, description, part_url_prefix) VALUES ('RepRap Research Foundation', 'http://rrrf.org', 'RRRF', 'The Reprap Research Foundation\'s online store', 'http://parts.rrrf.org/product_info.php?products_id=');
 INSERT INTO source (name, abbreviation, description, notes) VALUES ('Module', 'Module', 'This part is a module or assembly.', 'See documentation for building details.');
 INSERT INTO source (name, abbreviation, description) VALUES ('Mold', 'Mold', 'You can make this part yourself from Friendly Plastic.  See URL for details');
 INSERT INTO source (name, url, abbreviation, notes) VALUES ('RS Electronics', 'http://rselectronics', 'RS', 'This is not Radio Shack.  It\'s a completely different company.');
