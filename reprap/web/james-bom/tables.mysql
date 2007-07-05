@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS source (
   name VARCHAR(128),
   description VARCHAR(256),
   url VARCHAR(256),
+  part_url_prefix VARCHAR(256), /* this plus a part number should be the url for the page about that part */
   region VARCHAR(64),
   abbreviation VARCHAR(6) UNIQUE,
   notes VARCHAR(2048)

@@ -67,7 +67,7 @@ See LICENSE and <http://www.affero.org/oagpl.html> for details.
     </div>
     <div id="footer">
         <p>BOM Viewer is an outgrowth of the <a href="http://reprap.org">RepRap</a> project.<br />
-        <a href="bom_0.1.1.tar.gz">Code</a> is copyright 2007 <a href="">James Vasile</a> 
+        <!--<a href="bom_0.1.1.tar.gz">Code</a>--> Code is copyright 2007 <a href="">James Vasile</a> 
         and released under the <a href="http://www.affero.org/oagpl.html">Affero GPL</a>.
         </p>
     </div>

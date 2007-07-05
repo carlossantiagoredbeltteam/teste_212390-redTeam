@@ -113,13 +113,15 @@ class mydb {
   }
 
   function get_source_for_part($part_id) {
-    $q = $this->query("SELECT s.id, s.name, sp.url, s.url, s.abbreviation, sp.vendor_part_id FROM ".
+    $q = $this->query("SELECT s.id, s.name, sp.url, s.url, s.abbreviation, sp.vendor_part_id, s.part_url_prefix FROM ".
                       "source_part sp, part p, source s WHERE sp.part_id=p.id and sp.source_id=s.id and p.id=$part_id;");
     while ($row = $q->fetchRow(MDB2_FETCHMODE_ORDERED)) {
-      if ($row[0] == 1) {                                    // if no source, display suggest-it link
+      if ($row[0] == 1) {                                    // if tagged no source, display suggest-it link
         $str .= $row[1].' <a href="">(suggest one)</a><br />';
       } elseif ($row[2]) {
         $str .= "<a href=\"$row[2]\">$row[4]:$row[5]</a><br />";     // if there's a url for this particular part, display it
+      } elseif ($row[6] && $row[5]) {
+        $str .= '<a href="'. $row[6]. $row[5]. "\">$row[4]:$row[5]</a><br />"; // construct the url from the prefix+part number
       } elseif ($row[3]) {
         $str .= "<a href=\"$row[3]\">$row[4]:$row[5]</a><br />";     // failing that, link to supplier
       } else {
