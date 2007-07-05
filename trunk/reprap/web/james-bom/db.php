@@ -118,15 +118,30 @@ class mydb {
     while ($row = $q->fetchRow(MDB2_FETCHMODE_ORDERED)) {
       if ($row[0] == 1) {                                    // if tagged no source, display suggest-it link
         $str .= $row[1].' <a href="">(suggest one)</a><br />';
-      } elseif ($row[2]) {
-        $str .= "<a href=\"$row[2]\">$row[4]:$row[5]</a><br />";     // if there's a url for this particular part, display it
-      } elseif ($row[6] && $row[5]) {
-        $str .= '<a href="'. $row[6]. $row[5]. "\">$row[4]:$row[5]</a><br />"; // construct the url from the prefix+part number
-      } elseif ($row[3]) {
-        $str .= "<a href=\"$row[3]\">$row[4]:$row[5]</a><br />";     // failing that, link to supplier
-      } else {
-        $str .= $row[1].'<br />';                            // failing that, just display name of supplier
+        continue;
       }
+
+      if ($row[4]) {
+        $supplier = $row[4];
+      } elseif ($row[1]) {
+        $supplier = $row[1];
+      } else {
+        $str .= 'N/A<br />';
+        continue;
+      }
+
+      $supplier = '<a href="?show=vendor&id='.$row[0].'">'.$supplier.'</a>'; // link to list of parts by this vendor
+      
+      $part='';
+      if ($row[2]) {
+        $part = "<a href=\"$row[2]\">$row[5]</a>";     // if there's a specified url for this particular part, display it
+      } elseif ($row[6] && $row[5]) {
+        $part = '<a href="'. $row[6]. $row[5]. "\">$row[5]</a>"; // construct the url from the prefix+part number
+      } elseif ($row[5]) {
+        $part = $row[5];                            // failing that, just display part number
+      }
+
+      $str .= $supplier.($part ? ':'.$part : '').'<br />';
     }
     return $str;
   }
