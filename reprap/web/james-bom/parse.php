@@ -128,18 +128,6 @@ function parse_supplier_columns($vals, $f, $part_id) {
           $q = $db->query("SELECT source_id, part_id FROM source_part where source_id=".$row['id']." AND part_id=$part_id");
           if (!$q->fetchRow()) { $db->query("INSERT into source_part (part_id, source_id, vendor_part_id) VALUES ($part_id, ".$row['id'].", \"$id\")"); }
 
-          /*
-          if ($row['id']==15) {
-            $url = "http://amazon.com/s/field-keywords=$id";
-          }
-
-          if ($url) {
-            if (!$q->fetchRow()) { $db->query("INSERT into source_part (part_id, source_id, vendor_part_id, url) ".
-                                              "VALUES ($part_id, ".$row['id'].", \"$id\", \"$url\"   );"); }
-          } else {
-            if (!$q->fetchRow()) { $db->query("INSERT into source_part (part_id, source_id, vendor_part_id) VALUES ($part_id, ".$row['id'].", \"$id\")"); }
-          }*/
-
           $success = 1;
         } else {
           echo "Unknown source abbreviation: $code in $vals[$s]\n";
@@ -169,8 +157,8 @@ function parse_name_quantity_type_description ($vals, $f, $parent_module_id=0, $
 
   if (preg_match("/assembly/i", $vals[$f["type"]])) {
     $module_id = $db->create_module($vals[$f["name"]], $parent_module_id, $vals[$f["quantity"]], $vals[$f["note"]]);
+    //   echo "New module ($module_id): ".$vals[$f["name"]]."\n";
     $db->tag_module($module_id, $vals[$f["type"]]);
-    // echo "New module ($module_id): ".$vals[$f["name"]]."\n";
     return $module_id;
   }
 
@@ -185,6 +173,7 @@ function parse_name_quantity_type_description ($vals, $f, $parent_module_id=0, $
       }
     }
   }
+
 
   // Module_Part
   set_module_part($vals[$f["quantity"]], $part_id, $module_id, $vals[$f["description"]], $vals[$f["schematic"]], $vals[$f["note"]]);

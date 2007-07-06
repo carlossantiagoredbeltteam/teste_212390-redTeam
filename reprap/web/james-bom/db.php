@@ -19,7 +19,7 @@ class mydb {
 
     // Needed to switch from DB.php to mdb2.php for licensing reasons.
     // Thanks to http://www.phpied.com/db-2-mdb2/ for making it easy
-    require_once('lib/MDB2.php');
+    require_once('MDB2.php');
 
     // included with this distribution in case you don't have it.
     require_once('lib/JSON.php');
@@ -42,7 +42,7 @@ class mydb {
     $this->db_name = $auth->db_name;
 
     $this->db =& MDB2::factory('mysql://'.$auth->db_user.':'.$auth->db_pass.'@'.$auth->host.($args['no_use_db'] ? '' : '/'.$auth->db_name));
-    if (PEAR::isError($this->db)) {
+    if (MDB2::isError($this->db)) {
       echo ($this->db->getMessage().' - '.$this->db->getUserinfo());
     }
 
@@ -58,7 +58,7 @@ class mydb {
     $result = $this->db->query($sql);
 
     // check if the query was executed properly
-    if (PEAR::isError($result)) {
+    if (MDB2::isError($result)) {
       die ($result->getMessage().' - '.$result->getUserinfo());
     }
 
@@ -127,13 +127,12 @@ class mydb {
     return 1;
   }
 
-  function get_modules_by_model($model) {
-    // returns module object
-    //    $q = $this->query("SELECT ule.id, ule.name, mm.quantity FROM module ule, model el, module module mm "
-    //                      "WHERE el.module_id=ule.id AND mm.submodule_id=ule.id AND el.id=$model");
-    //    $row = $q->fetchRow();
-    
-
+  function get_top_modules_by_model($model) {
+    // returns top-level module id, name and quantities
+    $q = $this->query("SELECT module.id, module.name, mm.quantity FROM module, model, module_module mm ".
+                      "WHERE mm.supermodule_id=model.id AND mm.submodule_id=module.id AND model.id=$model;");
+    $row = $q->fetchAll();
+    return $row;
   }
 
   function get_module_name_by_id ($id) {
@@ -163,20 +162,6 @@ class mydb {
     return $row['id'];
   }
 
-  function get_top_modules_for_model ($model_id) {
-    // returns the largest modules in a model, the ones that are assemblies / submodules of the model itself
-
-    $q = $this->db->query("SELECT md.name, mm.submodule_id, mm.quantity, mm.notes ".
-                          "FROM model m, module_module mm, module md ".
-                          "WHERE m.module_id=mm.supermodule_id and m.id=1 and md.id=mm.submodule_id;");
-
-    $l=0;
-    while ($r[$l] = $q->fetchRow()) {
-      
-      echo $r[$l]['name'];
-    }
-    return $r;
-  }
 
   function get_tag_name_by_id ($id) {
     // returns 0 if $id is 0 or not found
@@ -238,7 +223,7 @@ class mydb {
     $description = $this->escape_quotes($description);
     $notes = $this->escape_quotes($notes);
     $this->query("INSERT into part (name, description, notes) VALUES (\"$name\", \"$description\", \"$notes\")");
-    return $this->db->lastInsertID();
+    return $this->db->lastInsertID('part', 'id');
   }
   
   function create_module ($name, $parent_module_id=-1, $quantity=1, $notes='') {
