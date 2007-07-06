@@ -61,11 +61,11 @@ h6 { font-size:95%; color: black;}
   margin-left: 1em;
 }
 
-#main h2, #main h3, #main p {
+#main h2, #main h3, #main p, #main form {
   padding:0 10px;
   }
 
-#main p {
+#main p, #main form {
   margin-left: 2em;
   margin-right: 5em;
 }
