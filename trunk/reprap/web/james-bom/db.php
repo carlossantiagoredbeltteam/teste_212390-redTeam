@@ -19,10 +19,10 @@ class mydb {
 
     // Needed to switch from DB.php to mdb2.php for licensing reasons.
     // Thanks to http://www.phpied.com/db-2-mdb2/ for making it easy
-    require_once('MDB2.php');
+    require_once('lib/MDB2.php');
 
     // included with this distribution in case you don't have it.
-    require_once('JSON.php');
+    require_once('lib/JSON.php');
 
     if (!$auth = file('db_auth.php')) {
       die ("Couldn't read db_auth.php!");
