@@ -165,15 +165,16 @@ function search() {
           <option>Oceania</option>
         </select>';
 
-  $modules = $db->get_modules_by_model($model);
+  $str.= '<br /><br />For which modules do you need parts?<br /><ul>';
+  $modules = $db->get_top_modules_by_model($model);
+  $str.= '<input type="checkbox" name="" value="" />All<br />'."\n";
+  foreach ($modules as $module) {
+    $str .= '<input type="checkbox" name="modules" value="'. $module['id'].'" />'. $module['name']."<br />\n";
+  }
+  $str .= "</ul>\n";
+  
 
-  $str.= '<br /><br />For which modules do you need parts?<br />
-     <ul>
-     <input type="checkbox" name="modules" value="mod1" />Mod 1<br />
-     <input type="checkbox" name="modules" value="mod2" />Mod 2<br />
-     <input type="checkbox" name="modules" value="mod3" />Mod 3<br />
-     </ul>
-     </form>';
+  $str .= '</form>';
 
 
   $q = $db->query("SELECT sp.part_id, p.name, sp.source_id  from part p, source_part sp WHERE sp.part_id=p.id ORDER BY p.name");
