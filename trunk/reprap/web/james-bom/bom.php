@@ -15,10 +15,10 @@ See LICENSE and <http://www.affero.org/oagpl.html> for details.
 <head>
   <title>BOM Viewer (<?= $model_name ?>)</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-  <link rel="stylesheet" type="text/css" href="bom.css" />
-  <script type="text/javascript" src="hide_show.js"></script>
-  <link rel="stylesheet" type="text/css" href="chrometheme/chromestyle.css" />
-  <script type="text/javascript" src="chromejs/chrome.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/bom.css" />
+  <script type="text/javascript" src="js/hide_show.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/chrometheme/chromestyle.css" />
+  <script type="text/javascript" src="js/chromejs/chrome.js"></script>
 </head>
 
 <body>

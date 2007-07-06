@@ -127,9 +127,12 @@ class mydb {
     return 1;
   }
 
-  function get_module_by_model($model) {
-    $q = $this->query("SELECT ule.id, ule.name, mm.quantity FROM module ule, model el, module module mm "
-                      "WHERE el.module_id=ule.id AND mm.submodule_id=ule.id AND el.id=$model");
+  function get_modules_by_model($model) {
+    // returns module object
+    //    $q = $this->query("SELECT ule.id, ule.name, mm.quantity FROM module ule, model el, module module mm "
+    //                      "WHERE el.module_id=ule.id AND mm.submodule_id=ule.id AND el.id=$model");
+    //    $row = $q->fetchRow();
+    
 
   }
 
