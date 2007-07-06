@@ -28,7 +28,7 @@ function dump_module($module_id) {
         $img='';
         if ($module) {
           if ($start_hide_row) {
-            $img = '<img id="toggle'.$master_row.'" src="'."images/minus.png".'" '.
+            $img = '<img id="toggle'.$master_row.'" src="'."css/images/minus.png".'" '.
                    'onclick="toggleModule('."$master_row, $start_hide_row, $end_hide_row)\" />";
           }
 
@@ -67,6 +67,8 @@ function dump_module($module_id) {
   }
 
   function recursive_dump_module($module_id, $level=0, $master_row=0) {
+    require_once("view.php");
+
     global $db;
     global $model_name;
     
@@ -79,7 +81,7 @@ function dump_module($module_id) {
       $out[1] =  combine_description_notes($row[3], $row[5]);
       $out[2] = $row[4];
       $out[3] =  $db->get_part_tags($id);
-      $out[4] = $db->get_source_for_part($id);
+      $out[4] = html_source_for_part($id);
 
       $str .= html_row($out,  $level, 0, $master_row++);
     }

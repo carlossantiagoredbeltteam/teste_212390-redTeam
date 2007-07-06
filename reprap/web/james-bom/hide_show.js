@@ -17,9 +17,9 @@ function toggleModule( image, startrow, endrow) {
   }
 
   if ( thisImg.src.search(RegularExpression) != -1) {
-    thisImg.src = "images/minus.png";
+    thisImg.src = "css/images/minus.png";
   } else {
-    thisImg.src = "images/plus.png";
+    thisImg.src = "css/images/plus.png";
   }
 }
 

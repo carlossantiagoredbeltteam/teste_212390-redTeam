@@ -44,6 +44,18 @@ CREATE TABLE IF NOT EXISTS tag ( /*just like flickr tags */
   description VARCHAR(256)
 );
 
+CREATE TABLE IF NOT EXISTS region (
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT UNIQUE,
+  name VARCHAR(64),
+  description VARCHAR(256)
+);
+
+CREATE TABLE IF NOT EXISTS region_source (
+  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT UNIQUE,
+  region_id INT,
+  source_id INT
+);
+
 CREATE TABLE IF NOT EXISTS model_tag ( /*just like flickr tags */
   id INT NOT NULL PRIMARY KEY AUTO_INCREMENT UNIQUE,
   model_id INT,
@@ -99,6 +111,14 @@ CREATE TABLE IF NOT EXISTS module_module (
 
 INSERT INTO tag (name, description) VALUES ('', 'N/A');
 INSERT INTO source (name, abbreviation, description) VALUES ('No Source', 'NS', 'Some parts you\'ll just have to find on your own.');
+
+/* Put those regions in */
+INSERT INTO region (name) VALUES ('Worldwide');
+INSERT INTO region (name) VALUES ('Americas (North)');
+INSERT INTO region (name) VALUES ('Americas (South)');
+INSERT INTO region (name) VALUES ('Asia');
+INSERT INTO region (name) VALUES ('Europe');
+INSERT INTO region (name) VALUES ('Oceania');
 
 ");
 

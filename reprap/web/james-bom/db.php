@@ -112,40 +112,6 @@ class mydb {
     return $row['id'];
   }
 
-  function get_source_for_part($part_id) {
-    $q = $this->query("SELECT s.id, s.name, sp.url, s.url, s.abbreviation, sp.vendor_part_id, s.part_url_prefix FROM ".
-                      "source_part sp, part p, source s WHERE sp.part_id=p.id and sp.source_id=s.id and p.id=$part_id;");
-    while ($row = $q->fetchRow(MDB2_FETCHMODE_ORDERED)) {
-      if ($row[0] == 1) {                                    // if tagged no source, display suggest-it link
-        $str .= $row[1].' <a href="">(suggest one)</a><br />';
-        continue;
-      }
-
-      if ($row[4]) {
-        $supplier = $row[4];
-      } elseif ($row[1]) {
-        $supplier = $row[1];
-      } else {
-        $str .= 'N/A<br />';
-        continue;
-      }
-
-      $supplier = '<a href="?show=vendor&id='.$row[0].'">'.$supplier.'</a>'; // link to list of parts by this vendor
-      
-      $part='';
-      if ($row[2]) {
-        $part = "<a href=\"$row[2]\">$row[5]</a>";     // if there's a specified url for this particular part, display it
-      } elseif ($row[6] && $row[5]) {
-        $part = '<a href="'. $row[6]. $row[5]. "\">$row[5]</a>"; // construct the url from the prefix+part number
-      } elseif ($row[5]) {
-        $part = $row[5];                            // failing that, just display part number
-      }
-
-      $str .= $supplier.($part ? ':'.$part : '').'<br />';
-    }
-    return $str;
-  }
-
   function get_model_name_by_id ($id) {
     $q = $this->query("SELECT module.name from model, module WHERE module.id=model.id AND model.id=$id;");
     $row = $q->fetchRow();
@@ -159,6 +125,12 @@ class mydb {
     $row = $q->fetchRow();
     if ($row['id'] == NULL) { return 0; }
     return 1;
+  }
+
+  function get_module_by_model($model) {
+    $q = $this->query("SELECT ule.id, ule.name, mm.quantity FROM module ule, model el, module module mm "
+                      "WHERE el.module_id=ule.id AND mm.submodule_id=ule.id AND el.id=$model");
+
   }
 
   function get_module_name_by_id ($id) {
@@ -224,6 +196,19 @@ class mydb {
     $row = $q->fetchRow();
     if (!$row['id']) { return -1; }
     return $row['id'];
+  }
+
+  function create_source($args) {
+    // assume only one region.  TODO multiple regions
+    $this->query("INSERT INTO source (name, description, url, part_url_prefix, region, abbreviation)".
+                 'VALUES ("'. $args['name'] .'", '.
+                          '"'.$args['description'].'", '.
+                          '"'.$args['url'].'", '.
+                          '"'.$args['part_url_prefix'].'", '.
+                          '"'.$args['region'].'", '.
+                          '"'.$args['abbreviation'].'" '.
+                 ');');
+    return $this->db->lastInsertID();
   }
 
   function create_model ($model) {
