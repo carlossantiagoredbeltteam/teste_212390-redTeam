@@ -115,6 +115,9 @@ function parse_supplier_columns($vals, $f, $part_id) {
         if (preg_match("/sculpt\.com/", $vals[$s])) {
           $db->query("INSERT into source_part (part_id, source_id, url) VALUES ($part_id, ".$sid['Sculpt'].", \"$vals[$s]\")"); // Farnell
           $success = 1;
+        } elseif (preg_match("/greenweld.co.uk/", $vals[$s])) {
+          $db->query("INSERT into source_part (part_id, source_id, url) VALUES ($part_id, ".$sid['GH'].", \"$vals[$s]\")"); // Farnell
+          $success = 1;
         } else {
           echo "Don't know how to parse url source: $vals[$s].\n";
         }
@@ -229,9 +232,44 @@ function dump_spreadsheets($sheets) {
   }
 }
 
-////////////////////////////////////////////////////////////////////////
+function parse_suppliers_csv($csv) {
+  global $db;
+  //Name,Prefix,Website,Description,Countries,Buy Link
 
-$suppliers = get_csv(12); //TODO parse suppliers
+  array_shift($csv);
+  array_shift($csv);
+
+  foreach ($csv as $row) {
+    $part_url=preg_replace('/%%PARTID%%\/*$/','',$row[5]);
+    $region = $row[4];
+
+    switch ($region) {
+    case 'all':
+      $region=0;
+      break;
+    case 'usa':
+      $region=1;
+      break;
+    case 'europe':
+      $region=4;
+      break;
+    case 'oceania':
+      $region=5;
+      break;
+    }
+
+    $db->create_source(array('name' => $row[0], 
+                        'abbreviation' => $row[1],
+                        'url' => $row[2],
+                        'description' => $row[3],
+                        'region' => $region,
+                        'part_url_prefix' => $part_url
+                        ));
+  }
+
+
+}
+////////////////////////////////////////////////////////////////////////
 
 $modules = get_bom_data(); // get the modules as an array of arrays of rows of cells
 //dump_spreadsheets(&$modules);
@@ -246,6 +284,9 @@ $darwin_module_id = $db->create_model("Darwin");
 $darwin_module_id = $darwin_module_id['module_id'];
 
 include("darwin_initialize.php");  // load the darwin data into the fresh db
+
+$suppliers = get_csv(12); //TODO parse suppliers
+parse_suppliers_csv($suppliers);
 
 parse($modules);
 

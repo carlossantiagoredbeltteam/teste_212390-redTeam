@@ -13,7 +13,7 @@ See LICENSE and <http://www.affero.org/oagpl.html> for details.
 <?php
 
 function dump_part($part_id) {
-
+  require_once("view.php");
   // TODO: make it model-specific
   global $db;
   global $model_name;
@@ -42,7 +42,7 @@ function dump_part($part_id) {
     }
 
     $tag = $db->get_part_tags($p[0][0]);
-    $supplier = $db->get_source_for_part($part_id);
+    $supplier = html_source_for_part($part_id);
     $descrip = combine_description_notes($p[0][5], $p[0][6]);
 
     $str .= '<tr><td>'.

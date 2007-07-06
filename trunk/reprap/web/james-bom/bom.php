@@ -148,12 +148,32 @@ function main() {
 function search() {
 
   global $db;
+  global $model;
 
   $str .= "<h2>Preferences</h2>".
 
     '<p>If you tell us what region you\'re in, we can generate order forms
-     for the various online stores from which you can order your
-     parts.  This will help cut down on shipping costs.</p>';
+     for the various online stores that best serve your part of the
+     world.  This will help cut down on shipping costs.</p>'.
+
+    '<form method="post" action="?find_source">
+        <select>
+          <option>Americas (North)</option>
+          <option>Americas (South)</option>
+          <option>Asia</option>
+          <option>Europe</option>
+          <option>Oceania</option>
+        </select>';
+
+  $modules = $db->get_modules_by_model($model);
+
+  $str.= '<br /><br />For which modules do you need parts?<br />
+     <ul>
+     <input type="checkbox" name="modules" value="mod1" />Mod 1<br />
+     <input type="checkbox" name="modules" value="mod2" />Mod 2<br />
+     <input type="checkbox" name="modules" value="mod3" />Mod 3<br />
+     </ul>
+     </form>';
 
 
   $q = $db->query("SELECT sp.part_id, p.name, sp.source_id  from part p, source_part sp WHERE sp.part_id=p.id ORDER BY p.name");
