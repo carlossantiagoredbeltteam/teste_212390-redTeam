@@ -154,7 +154,14 @@
 		{
 			echo '<select class="supplier_select" name="suppliers[]">';
 			foreach ($part->unique_part->suppliers AS $supplier)
-				echo '<option value="' . $supplier->name . '">' . $corps[$supplier->key]->name . '</option>';
+			{
+				if ($corps[$supplier->key])
+					$name = $corps[$supplier->key]->name;
+				else
+					$name = $supplier->key;
+			
+				echo '<option value="' . $supplier->name . '">' . $name . '</option>';
+			}
 			echo '</select>';
 		}
 		else
