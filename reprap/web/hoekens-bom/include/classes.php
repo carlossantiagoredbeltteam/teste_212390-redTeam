@@ -245,7 +245,7 @@
 							if (preg_match("/M(\d+)\D*(\d+)/", $part->name, $matches))
 							{
 								$length = $matches[2];
-								$part->name = "M{$matches[1]} x $length $part->type";
+								$part->name = "M{$matches[1]} x {$length}mm $part->type";
 							}
 					
 							$part->lookupUnique("M{$matches[1]}");
