@@ -234,6 +234,10 @@
 							$part->quantity *= $subqty;
 							$part->lookupUnique("{$matches[1]}");
 							break;
+							
+						case 'rp':
+							$part->lookupUnique("Printing Service");
+							break;
 						
 						case 'rod':
 						case 'stud':
