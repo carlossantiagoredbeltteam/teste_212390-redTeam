@@ -23,34 +23,24 @@
 			}
 		}
 	}
-
-	class Part
+	
+	class UniquePart
 	{
-		public $id;
 		public $name;
-		public $description;
 		public $type;
-		public $quantity;
-		public $suppliers = array();
-	
-		public function __construct($name, $type, $quantity = 1, $suppliers = array())
+		public $description;
+		public $suppliers;
+		
+		public function __construct($data)
 		{
-			$this->name = trim($name);
-			$this->type = $type;
-			$this->quantity = $quantity;
-			
-			if (count($suppliers))
-				$this->addSuppliers($suppliers);
+			$this->name = $data[0];
+			$this->type = $data[1];
+			$this->description = $data[2];
+			$this->addSuppliers(array_slice($data, 3));
 		}
-	
+		
 		public function addSuppliers($suppliers)
 		{
-			/*
-			echo "adding suppliers for $this->name\n";
-			print_r($suppliers);
-			echo "\n";
-			*/
-			
 			if (count($suppliers))
 			{
 				foreach ($suppliers AS $name)
@@ -63,6 +53,27 @@
 				}
 			}
 		}
+	}
+
+	class Part
+	{
+		public $id;
+		public $name;
+		public $type;
+		public $quantity;
+		public $unique_part;
+		public static $unique_parts = null;
+	
+		public function __construct($name, $type, $quantity = 1)
+		{
+			$this->name = trim($name);
+			$this->type = $type;
+			$this->quantity = $quantity;
+			
+			if (count($suppliers))
+				$this->addSuppliers($suppliers);
+		}
+
 	
 		public function getSafeName()
 		{
@@ -71,6 +82,40 @@
 			$name = preg_replace("/[^a-zA-Z0-9_.']/", "", $name);
 		
 			return $name;
+		}
+		
+		public function lookupUnique($name = null)
+		{
+			if ($name === null)
+				$name = $this->name;
+				
+			if (self::$unique_parts === null)
+				self::loadUniqueParts();
+				
+			foreach (self::$unique_parts AS $part)
+			{
+				if ($part->type == $this->type && strtolower($part->name) == strtolower($name))
+				{
+					$this->unique_part = $part;
+					return true;
+				}
+			}
+			
+			#echo "Failed looking up $name<br/>\n";
+			return false;
+		}
+		
+		public static function loadUniqueParts()
+		{
+			$data = getRawSheetData(15);
+
+			//junk.
+			array_shift($data);
+			array_shift($data);
+			
+			foreach ($data AS $row)
+				if ($row[1])
+					self::$unique_parts[] = new UniquePart($row);
 		}
 	}
 
@@ -137,9 +182,10 @@
 				foreach ($parts AS $type => $type_parts)
 					if (count($type_parts))
 						foreach ($type_parts AS $part)
-							if (count($part->suppliers))
-								foreach ($part->suppliers AS $supplier)
-									$suppliers[] = $supplier->key;
+							if ($part->unique_part instanceof UniquePart)
+								if (count($part->unique_part->suppliers))
+									foreach ($part->unique_part->suppliers AS $supplier)
+										$suppliers[] = $supplier->key;
 
 			//make it special
 			$unique = array_unique($suppliers);
@@ -170,8 +216,8 @@
 				$part = new Part($row[1], $row[3]);
 				$part->quantity = $row[2];
 				$part->id = $row[0];
-				$part->addSuppliers(array_slice($row, 5));
 				$part->description = $row[4];
+				$part->lookupUnique();
 
 				if ($part->name && $part->quantity)
 				{
@@ -186,6 +232,7 @@
 							preg_match("/\((.+)\) x (\d+)/", $part->name, $matches); // match the belt type
 							$part->name = "{$matches[1]} belt x $matches[2]mm";
 							$part->quantity *= $subqty;
+							$part->lookupUnique("{$matches[1]}");
 							break;
 						
 						case 'rod':
@@ -197,6 +244,7 @@
 								$part->name = "M{$matches[1]} x $length $part->type";
 							}
 					
+							$part->lookupUnique("M{$matches[1]}");
 							$part->quantity *= $subqty;
 							break;
 

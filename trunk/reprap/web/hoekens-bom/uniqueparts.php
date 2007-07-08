@@ -150,10 +150,10 @@
 		echo '<input type="hidden" name="parts[]" value="' . $part->getSafeName() . '"/>';
 		echo '<input type="hidden" name="quantities[]" value="' . $part->quantity .  '"/>';
 
-		if (count($part->suppliers))
+		if (!empty($part->unique_part->suppliers))
 		{
 			echo '<select class="supplier_select" name="suppliers[]">';
-			foreach ($part->suppliers AS $supplier)
+			foreach ($part->unique_part->suppliers AS $supplier)
 				echo '<option value="' . $supplier->name . '">' . $corps[$supplier->key]->name . '</option>';
 			echo '</select>';
 		}
