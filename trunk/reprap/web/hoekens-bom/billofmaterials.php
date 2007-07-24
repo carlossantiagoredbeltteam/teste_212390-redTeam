@@ -151,16 +151,22 @@
 	function renderUnknownParts($parts)
 	{
 ?>
-<h2>Parts with No Suppliers</h2>
-<table>
-	<tr>
-		<th>Part</th>
-		<th>Quantity</th>
-	</tr>
+	<h2>Parts with No Suppliers</h2>
+	<table>
+		<tr>
+			<th>Part</th>
+			<th>Quantity</th>
+		</tr>
+		<? foreach ($parts AS $part): ?>
+			<tr>
+				<td><?=stripslashes($part->name)?></td><td><?=$part->quantity?>
+					<? if ($part->unique_part->units): ?>
+						<?=$part->unique_part->units?>
+					<? endif ?>
+				</td>
+			</tr/>
+		<? endforeach ?>
+	</table>
 <?
-		foreach ($parts AS $part)
-			echo "<tr><td>" . stripslashes($part->name) . "</td><td>$part->quantity</td></tr/>";
-	
-		echo "</table>";
 	}
 ?>
