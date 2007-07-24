@@ -29,6 +29,8 @@
 		public $name;
 		public $type;
 		public $description;
+		public $url;
+		public $units;
 		public $suppliers;
 		
 		public function __construct($data)
@@ -36,7 +38,9 @@
 			$this->name = $data[0];
 			$this->type = $data[1];
 			$this->description = $data[2];
-			$this->addSuppliers(array_slice($data, 3));
+			$this->url = $data[3];
+			$this->units = $data[4];
+			$this->addSuppliers(array_slice($data, 5));
 		}
 		
 		public function addSuppliers($suppliers)
