@@ -21,6 +21,14 @@ td
 	padding: 1px 10px 1px 0px;
 }
 
+td.part_description
+{
+	padding: 5px 15px;
+	font-size: 80%;
+	color: #000;
+	background: url("/img/right-arrow.jpg") no-repeat center left;
+}
+
 table.BaseForm
 {
 	width: 95%;
@@ -356,7 +364,6 @@ a
 
 img
 {
-	display: block;
 	padding: 0px;
 	margin: 0px;
 }

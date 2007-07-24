@@ -127,9 +127,22 @@
 			<? foreach ($parts AS $part): ?>
 				<?$total += $part->quantity;?>
 				<tr>
-					<td><?=$part->name?></td>
+					<td valign="top">
+						<? if ($part->unique_part->url): ?>
+							<a href="<?=$part->unique_part->url?>"><?=$part->name?></a>
+						<? else: ?>
+						 	<?=$part->name?>
+						<? endif ?>
+						<? if ($part->unique_part->description): ?>
+							<img src="/img/help-icon.gif" onclick="Element.toggle('<?=$part->name?>');" style="margin-left: 5px" />
+						<? endif ?>
+					</td>
+							
 					<td align="center"><?=$part->quantity?></td>
 					<td><? renderPartSuppliers($part) ?></td>
+				</tr>
+				<tr id="<?=$part->name?>" style="display: none">
+					<td colspan="3" class="part_description"><?=$part->unique_part->description?></td>
 				</tr>
 			<? endforeach ?>
 			<tr>
