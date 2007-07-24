@@ -234,8 +234,8 @@
 						case 'belt':
 
 							preg_match("/\((.+)\) x (\d+)/", $part->name, $matches); // match the belt type
-							$part->name = "{$matches[1]} belt x $matches[2]mm";
-							$part->quantity *= $subqty;
+							$part->name = "{$matches[1]} belt";
+							$part->quantity *= $subqty * $matches[2];
 							$part->lookupUnique("{$matches[1]}");
 							break;
 							
@@ -249,20 +249,24 @@
 							if (preg_match("/M(\d+)\D*(\d+)/", $part->name, $matches))
 							{
 								$length = $matches[2];
-								$part->name = "M{$matches[1]} x {$length}mm $part->type";
+								$part->name = "M{$matches[1]} $part->type";
 							}
 					
 							$part->lookupUnique("M{$matches[1]}");
-							$part->quantity *= $subqty;
+							$part->quantity *= $subqty * $length;
 							break;
 
 						case 'wire':
-							if (preg_match("/(\d+)\D*(\d+)AWG/", $part->name, $matches))
-								$part->name = "{$matches[1]}mm x {$matches[2]}AWG wire";
-							else if (preg_match("/(\d+)/", $part->name, $matches))
-								$part->name = "{$matches[1]}mm wire";
-				
-							$part->quantity *= $subqty;
+							if (preg_match("/(\d+)\D*(\d+) AWG/", $part->name, $matches)){
+									$part->name = "{$matches[2]} AWG wire";
+									$part->lookupUnique("$matches[1] AWG");
+							}
+							else if (preg_match("/(\d+)/", $part->name, $matches)){
+									$part->name = "22 AWG wire";
+									$part->lookupUnique('22 AWG');
+							}
+							
+							$part->quantity *= $subqty * $matches[1];
 							break;
 
 						default:

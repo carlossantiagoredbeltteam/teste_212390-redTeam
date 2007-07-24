@@ -138,7 +138,11 @@
 						<? endif ?>
 					</td>
 							
-					<td align="center"><?=$part->quantity?></td>
+					<td align="center"><?=$part->quantity?>
+						<? if ($part->unique_part->units): ?>
+							<?=$part->unique_part->units?>
+						<? endif ?>
+					</td>
 					<td><? renderPartSuppliers($part) ?></td>
 				</tr>
 				<tr id="<?=$part->name?>" style="display: none">
