@@ -263,14 +263,18 @@
 							break;
 
 						case 'wire':
-							if (preg_match("/(\d+)\D*(\d+) AWG/", $part->name, $matches)){
-									$part->name = "{$matches[2]} AWG wire";
-									$part->lookupUnique("$matches[1] AWG");
+							if (!preg_match("/^Nichrome/i", $part->name))
+							{
+								if (preg_match("/(\d+) AWG/", $part->name, $matches)){
+										$part->name = "{$matches[1]} AWG wire";
+										$part->lookupUnique("$matches[1] AWG");
+								}
+								else if (preg_match("/(\d+)/", $part->name, $matches)){
+										$part->name = "22 AWG wire";
+										$part->lookupUnique('22 AWG');
+								}							
 							}
-							else if (preg_match("/(\d+)/", $part->name, $matches)){
-									$part->name = "22 AWG wire";
-									$part->lookupUnique('22 AWG');
-							}
+
 							
 							$part->quantity *= $subqty * $matches[1];
 							break;
