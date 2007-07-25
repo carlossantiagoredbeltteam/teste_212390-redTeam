@@ -225,6 +225,8 @@
 
 				if ($part->name && $part->quantity)
 				{
+					$doAdd = true;
+					
 					switch ($part->type)
 					{
 						case 'assembly':
@@ -239,6 +241,10 @@
 							$part->lookupUnique("{$matches[1]}");
 							break;
 							
+						case 'module':
+							$doAdd = false;
+							break;
+							
 						case 'rp':
 							$part->lookupUnique("Printing Service");
 							break;
@@ -249,11 +255,11 @@
 							if (preg_match("/M(\d+)\D*(\d+)/", $part->name, $matches))
 							{
 								$length = $matches[2];
-								$part->name = "M{$matches[1]} $part->type";
+								$part->name = "M{$matches[1]} x $length $part->type";
 							}
 					
 							$part->lookupUnique("M{$matches[1]}");
-							$part->quantity *= $subqty * $length;
+							$part->quantity *= $subqty;
 							break;
 
 						case 'wire':
@@ -274,7 +280,8 @@
 							break;
 					}
 
-					$this->addPart($part, $type);
+					if ($doAdd)
+						$this->addPart($part, $type);
 				}
 			}
 		}

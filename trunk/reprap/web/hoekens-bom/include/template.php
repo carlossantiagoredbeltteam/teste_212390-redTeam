@@ -38,6 +38,7 @@
 	{
 ?>
 				<div id="sidebar">
+					sidebar
 					<div style="clear: both;"> </div>
 				</div>
 <?
@@ -49,9 +50,7 @@
 				</div>
 				<?//drawSideBar();?>
 			</div>
-			<div id="footer">
-				Copyright &copy; 2006-<?=date('Y')?> <a href="http://www.reprap.org">RepRap.org</a>.
-			</div>
+
 		</div>
 
 		<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
