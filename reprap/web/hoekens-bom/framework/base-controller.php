@@ -1,14 +1,19 @@
 <?
-	abstract class Controller
+	class Controller
 	{
 		private $view_name;
 		private $controller_name;
-		private $mode = 'html';
+		private $mode;
 		private $args;
 		
 		public function __construct($name)
 		{
 			$this->controller_name = $name;
+		}
+
+		public static function makeControllerViewKey($controller_name, $view_name, $params) 
+		{		
+			return sha1("{$controller_name}.{$view_name}." . serialize($params));
 		}
 	
 		public static function byName($name)
@@ -25,17 +30,13 @@
 			return new $class_name($name);
 		}
 	
-		public function viewFactory()
+		public static function viewFactory($mode = null)
 		{
 			$class = ucfirst($mode) . "View";
 			if (class_exists($class))
-				return new $class
+				return new $class;
 		}
-	
-		public final static function makeControllerViewKey($controller_name, $view_name, $params) 
-		{		
-			return sha1("{$controller_name}.{$view_name}." . serialize($params));
-		}
+
 	
 		public function renderView($view_name, $args = null, $cache_time = CacheBot::TIME_NEVER, $key = null)
 		{
@@ -59,7 +60,7 @@
 	
 			//no cache, get down to business
 			$this->view_name = $view_name;
-			$view = $this->viewFactory();
+			$view = $this->viewFactory($this->mode);
 			
 			//do our dirty work.
 			$view->preRender();
@@ -73,18 +74,18 @@
 			return $output;
 		}
 
-		protected final function setView($view_name) 
+		protected function setView($view_name) 
 		{
 			$this->view_name = $view_name;
 		}
 
-		protected final function forwardToURL($url)
+		protected function forwardToURL($url)
 		{
 			header("Location: {$url}");
 			exit();
 		}
 	
-		private final function getArgs()
+		private function getArgs()
 		{
 			$args = array();
 		
