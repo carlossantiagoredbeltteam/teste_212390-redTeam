@@ -1,0 +1,13 @@
+<FilesMatch "^\.ht*">
+	Order allow,deny
+	Deny from all
+</FilesMatch>
+
+Options -Indexes
+DirectoryIndex index.php
+RewriteEngine on
+
+# take me home...
+RewriteRule ^/?$				vimeo.index.php?controller=main&view=home [NC,L]
+RewriteRule ^/uniqueparts?$		vimeo.index.php?controller=main&view=uniqueparts [NC,L]
+RewriteRule ^/partlist?$		vimeo.index.php?controller=main&view=partlist [NC,L]
