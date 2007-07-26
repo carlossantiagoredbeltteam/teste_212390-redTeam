@@ -3,14 +3,9 @@
 require_once("lib/db.inc.php");
 
 /**
-* @ingroup BaseObjects
-* @brief BaseObject is a class for dealing with simple objects.
-* 
-* A class that simplifies loading, editing, deleting, and saving of an object
-* linked to a mysql database. Also provides hooks for API data, and easy rss
-* creation. Plus, easy integration with comments and tags.
+* @TODO: give me a description
 */
-abstract class BaseObject extends MyModule
+class Model
 {
 	/**
 	 * @b Private.  The name of the database table its linked to.
