@@ -1,0 +1,110 @@
+<?
+	abstract class Controller
+	{
+		private $view_name;
+		private $controller_name;
+		private $mode = 'html';
+		private $args;
+		
+		public function __construct($name)
+		{
+			$this->controller_name = $name;
+		}
+	
+		public static function byName($name)
+		{
+			// Get the name of the class to load
+			$class_name = "{$name}Controller";
+			$class_file = CONTROLLERS_DIR . "/{$name}.php";
+		
+			if (file_exists($class_file))
+				require_once($class_file);
+			else
+				throw new ViewException("$name controller does not exist.");
+		
+			return new $class_name($name);
+		}
+	
+		public function viewFactory()
+		{
+			$class = ucfirst($mode) . "View";
+			if (class_exists($class))
+				return new $class
+		}
+	
+		public final static function makeControllerViewKey($controller_name, $view_name, $params) 
+		{		
+			return sha1("{$controller_name}.{$view_name}." . serialize($params));
+		}
+	
+		public function renderView($view_name, $args = null, $cache_time = CacheBot::TIME_NEVER, $key = null)
+		{
+			// Check the cache
+			if ($cache_time > Cache::TIME_NEVER)
+			{
+				if ($key === null)
+					$key = Controller::makeControllerViewKey($this->controller_name, $view_name, $args);
+
+				$data = CacheBot::get($key);
+				
+				if ($data !== false)
+					return $data;
+			}
+		
+			//save our params, prep for drawing the view.
+			$this->args = $args;
+			$this->args = $this->getArgs();
+			if (method_exists($this, $view_name))
+				$this->$view_name();
+	
+			//no cache, get down to business
+			$this->view_name = $view_name;
+			$view = $this->viewFactory();
+			
+			//do our dirty work.
+			$view->preRender();
+			$output = $view->render($this->args);
+			$view->postRender();
+		
+			//do we save it to cache?
+			if ($cache_time > Cache::TIME_NEVER)
+				CacheBot::set($output, $key, $cache_time);
+
+			return $output;
+		}
+
+		protected final function setView($view_name) 
+		{
+			$this->view_name = $view_name;
+		}
+
+		protected final function forwardToURL($url)
+		{
+			header("Location: {$url}");
+			exit();
+		}
+	
+		private final function getArgs()
+		{
+			$args = array();
+		
+			// GET is the first level of args.
+			if (count($_GET)) $args = array_merge($args, $_GET);
+			
+			// POST overrides GET.
+			if (count($_POST)) $args = array_merge($args, $_POST);
+			
+			// JSON data overrides GET and POST
+			if (!empty($args['jdata'])) {
+			    $json_data = json_decode(stripslashes($args['jdata']), true);
+			    unset($args['jdata']);
+			    $args = array_merge($args, $json_data);
+			}
+			
+			// user-defined args rule all!
+			if (count($this->args)) $args = array_merge($args, $this->args);
+			
+			return $args;
+		}
+	}
+?>
