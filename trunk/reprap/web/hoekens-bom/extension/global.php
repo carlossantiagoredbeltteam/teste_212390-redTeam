@@ -1,7 +1,7 @@
 <?
 	include("../framework/global.php");
-	include("config.php");
-	include("functions.php");
-	include("classes.php");
-	include("template.php");
+	include(EXTENSIONS_DIR . "config.php");
+	include(EXTENSIONS_DIR . "functions.php");
+	include(EXTENSIONS_DIR . "classes.php");
+	include(EXTENSIONS_DIR . "template.php");
 ?>
