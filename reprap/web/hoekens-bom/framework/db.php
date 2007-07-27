@@ -39,6 +39,25 @@ class DatabaseSocket
 		return mysql_query($sql, $this->link);
 	}
 	
+	public function insert($sql)
+	{
+		$this->query($sql);
+		
+		return mysql_insert_id($this->link);
+	}
+	
+	public function execute($sql)
+	{
+		$this->query($sql);
+		
+		return mysql_affected_rows($this->link);
+	}
+	
+	public function ping()
+	{
+		mysql_ping($this->link);
+	}
+	
 	public function getArray($sql)
 	{
 		$rs = $this->query($sql);
@@ -51,7 +70,7 @@ class DatabaseSocket
 	public function getRow($sql)
 	{
 		$rs = $this->query($sql);
-		return mysql_fetch_assoc($rs);
+		return mysql_fetch_array($rs);
 	}
 	
 	public function getValue($sql)

@@ -24,14 +24,14 @@ INDEX ( `supplier_id` , `country_id` )
 ) ENGINE = MYISAM ;
 
 CREATE TABLE `countries` (
-`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`id` INT (11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 `short` VARCHAR( 10 ) NOT NULL ,
 `long` VARCHAR( 255 ) NOT NULL ,
 INDEX ( `short` )
 ) ENGINE = MYISAM ;
 
 CREATE TABLE `unique_parts` (
-`id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`id` INT (11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 `type` VARCHAR( 32 ) NOT NULL ,
 `name` VARCHAR( 255 ) NOT NULL ,
 `description` TEXT NOT NULL ,
@@ -42,7 +42,7 @@ INDEX ( `type` , `name` )
 ) ENGINE = MYISAM ;
 
 CREATE TABLE `raw_parts` (
-`id` INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`id` INT (11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 `part_id` INT( 11 ) NOT NULL ,
 `type` VARCHAR( 32 ) NOT NULL ,
 `raw_text` VARCHAR( 255 ) NOT NULL ,
@@ -53,12 +53,11 @@ INDEX ( `parent_id`)
 ) ENGINE = MYISAM ;
 
 CREATE TABLE `supplier_parts` (
-`id` INT( 11 ) UNSIGNED NOT NULL ,
+`id` INT (11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 `supplier_id` INT( 11 ) NOT NULL ,
 `part_id` INT( 11 ) NOT NULL ,
-`url` INT( 11 ) NOT NULL ,
-`part_num` INT( 11 ) NOT NULL ,
+`url` VARCHAR( 255 ) NOT NULL ,
+`part_num` VARCHAR( 255 ) NOT NULL ,
 `quantity` INT( 11 ) NOT NULL DEFAULT '1',
-PRIMARY KEY ( `id` ) ,
 INDEX ( `supplier_id` , `part_id` )
 ) ENGINE = MYISAM ;

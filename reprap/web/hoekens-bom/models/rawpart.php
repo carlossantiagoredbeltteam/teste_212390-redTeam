@@ -1,5 +1,5 @@
 <?
-	class RawPart extends BaseObject
+	class RawPart extends Model
 	{
 		public function __construct($id = null)
 		{

@@ -1,5 +1,5 @@
 <?
-	class SupplierPart extends BaseObject
+	class SupplierPart extends Model
 	{
 		public function __construct($id = null)
 		{

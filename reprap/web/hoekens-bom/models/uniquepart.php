@@ -1,5 +1,5 @@
 <?
-	class UniquePart extends BaseObject
+	class UniquePart extends Model
 	{
 		public function __construct($id = null)
 		{
