@@ -23,7 +23,7 @@ class Model
 	/**
 	 * The id that references the table.
 	 */
-	private $internalId = 0;
+	public $id = 0;
 
 	/**
 	 * @b Private. Array of fields that are dirty.
@@ -47,9 +47,6 @@ class Model
 	{
 		//set our table name...
 		$this->tableName = $tableName;
-
-		//check our fields.
-		$this->checkTable();
 
 		//omg noob... dont forget to load!
 		$this->load($data);
@@ -81,6 +78,7 @@ class Model
 	 */
 	public function set($name, $value)
 	{
+		$this->dirtyFields[$name] = 1;
 		$this->data[$name] = $value;
 	}
 
@@ -115,7 +113,7 @@ class Model
 		if ($id > 0)
 		{
 			//set our id first.
-			$this->internalId = $id;
+			$this->id = $id;
 			
 			//try our cache.. if it works, then we're good.
 			if (!$this->loadCacheData())
@@ -270,8 +268,8 @@ class Model
 
 				//make sure this key exists for us....
 				if ($key === 'id')
-					$this->internalId = (int)$val;
-				else if ($this->hasField($key))
+					$this->id = (int)$val;
+				else
 					$this->data[$key] = $val;
 			}
 			
@@ -302,11 +300,11 @@ class Model
 		//make sure we have an id....
 		if ($this->id)
 		{
-			$result = dbFetchAssoc(dbQuery("
+			$result = db()->getRow("
 				SELECT *
 				FROM $this->tableName
 				WHERE id = '$this->id'
-			"));
+			");
 
 			if (is_array($result))
 				return $result;
@@ -325,13 +323,12 @@ class Model
 	{
 		//format our sql statements w/ the valid fields
 		$fields = array();
-		$columns = $this->getDbFields();
 		
 		//loop thru all our dirty fields.
-		foreach ($this->dirtyFields AS $key)
+		foreach ($this->dirtyFields AS $key => $foo)
 		{
 			//get our value.
-			if ($columns[$key] && isset($this->data[$key]) && $key != 'id')
+			if (isset($this->data[$key]) && $key != 'id')
 			{
 				$val = $this->data[$key];
 
@@ -359,7 +356,7 @@ class Model
 				$sql .= "WHERE id = '$this->id'\n";
 				$sql .= "LIMIT 1";
 
-				dbExecute($sql);
+				db()->execute($sql);
 			}
 			//otherwise insert it...
 			else
@@ -367,7 +364,7 @@ class Model
 				$sql  = "INSERT INTO $this->tableName SET\n";
 				$sql .= $sqlFields;
 
-				$this->id = dbExecute($sql, true);
+				$this->id = db()->insert($sql);
 			}
 		}
 	}
@@ -382,7 +379,7 @@ class Model
 		//do we have an id?
 		if ($this->id)
 		{
-			dbExecute("
+			db()->execute("
 				DELETE FROM $this->tableName
 				WHERE id = '$this->id'
 			");
@@ -390,17 +387,6 @@ class Model
 			return true;
 		}
 		return false;
-	}
-
-	/**
-	* @TODO: re-implement this.
-	* load some 'dirty' data... that is data that is potentially not the same
-	* data and should thusly be saved eventually.
-	*
-	* @param $data a keyed array of data.
-	*/
-	public function loadDirtyData($data)
-	{
 	}
 
 	/**

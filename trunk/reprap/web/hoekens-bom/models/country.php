@@ -1,5 +1,5 @@
 <?
-	class Country extends BaseObject
+	class Country extends Model
 	{
 		public function __construct($id = null)
 		{

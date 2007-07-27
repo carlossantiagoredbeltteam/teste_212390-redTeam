@@ -1,5 +1,5 @@
 <?
-	class SupplierCountry extends BaseObject
+	class SupplierCountry extends Model
 	{
 		public function __construct($id = null)
 		{
