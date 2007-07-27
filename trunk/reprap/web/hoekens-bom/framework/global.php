@@ -38,5 +38,26 @@
 	include(BASE_DIR . "collection.php");
 	include(BASE_DIR . "db.php");
 	include(BASE_DIR . "exceptions.php");
+	
+	function __autoload($class)
+	{
+		$class = strtolower($class);
+		
+		$file = MODELS_DIR . "$class.php";
+		if (is_file($file))
+		{
+			include($file);
+			return true;
+		}
+		
+		$file = CLASSES_DIR . "$class.php";
+		if (is_file($file))
+		{
+			include($file);
+			return true;
+		}
+		
+		return false;
+	}
 
 ?>
