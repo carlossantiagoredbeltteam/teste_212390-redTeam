@@ -1,12 +1,20 @@
 <?
-	class ImportController extends BaseController
+	class ImportController extends Controller
 	{
 		function home()
 		{
 			//create our structure.
-			$sql = file_get_contents("sql/structure.sql");
-			DB::execute($sql);
-
+			$sql = explode(";", file_get_contents(HOME_DIR . "/sql/structure.sql"));
+			
+			foreach ($sql AS $line)
+			{
+				$line = trim($line);
+				if ($line){
+					db()->query($line);
+					echo db()->error();					
+				}
+			}
+			
 			//import our data!  order is important here.
 			$legend = loadLegend();
 			loadSuppliers($legend);
@@ -135,7 +143,7 @@
 				//get the normal data.
 				$raw = new RawPart();
 				$raw->set('raw_text', $row[1]);
-				$raw->set('type', $row[2])''
+				$raw->set('type', $row[2]);
 				$raw->set('quantity', $row[3]);
 				
 				//who owns us?

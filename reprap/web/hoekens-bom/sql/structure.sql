@@ -1,6 +1,3 @@
-/**
-*  This script creates the table structure required for the BOM generator.
-**/
 
 DROP TABLE IF EXISTS suppliers;
 DROP TABLE IF EXISTS suppliers_to_countries;
