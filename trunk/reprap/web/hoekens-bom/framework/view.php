@@ -4,7 +4,6 @@
 		//hold our private data.
 		private $controller;
 		private $view;
-		private $data;
 		
 		//init and save our controller/view info.
 		public function __construct($controller, $view)
@@ -17,18 +16,19 @@
 		public function preRender() {}
 		public function postRender() {}
 	
-		public function render($data = array())
+		public function render($view, $data = array())
 		{
 			//get our data variables into the local scope
 			if (!empty($data))
 	        	extract((array)$data, EXTR_OVERWRITE);
 	
 			ob_start();
-		
-			if (file_exists(Config::get('VIEW_DIR') . "/{$this->controller}.{$this->view}.php"))
-				include(Config::get('VIEW_DIR') . "/{$this->controller}.{$this->view}.php");
+
+			$view_file = VIEWS_DIR . "{$this->controller}.{$this->view}.php";
+			if (file_exists($view_file))
+				include($view_file);
 			else
-				throw new ViewException('This page does not exist!');
+				throw new ViewException("The {$this->controller}.{$this->view} page does not exist!");
 		
 			return ob_get_clean();
 		}

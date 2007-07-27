@@ -2,16 +2,14 @@
 	class Collection
 	{
 		private $query;
-		private $map;
 		private $obj_types;
-		private $key;
 		private $expiration;
+		private $key;
+		private $map;
 	
 		public function __construct($query, $obj_types, $expiration = Cache::TIME_NEVER, $key = null)
 		{
 			$this->query = $query;
-			$this->map = array();
-			$this->reverse_map = array();
 			$this->obj_types = $obj_types;
 			$this->expiration = $expiration;
 		
@@ -28,7 +26,7 @@
 		*/
 		public function implodeMap($type)
 		{		 
-			if (is_array($this->map)) {
+			if (is_array($this->map))
 				return implode(', ', $this->getMap($type));
 
 			return '';
