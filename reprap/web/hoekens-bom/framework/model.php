@@ -23,7 +23,7 @@ class Model
 	/**
 	 * The id that references the table.
 	 */
-	private $internalId;
+	private $internalId = 0;
 
 	/**
 	 * @b Private. Array of fields that are dirty.
@@ -45,9 +45,6 @@ class Model
 	 */
 	public function __construct($data, $tableName)
 	{
-		//do our parent...
-		parent::__construct();
-		
 		//set our table name...
 		$this->tableName = $tableName;
 
