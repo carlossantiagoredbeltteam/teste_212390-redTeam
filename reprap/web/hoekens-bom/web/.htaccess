@@ -1,13 +1,10 @@
-<FilesMatch "^\.ht*">
-	Order allow,deny
-	Deny from all
-</FilesMatch>
-
 Options -Indexes
-DirectoryIndex index.php
+DirectoryIndex plister.php
 RewriteEngine on
 
 # take me home...
-RewriteRule ^/?$				vimeo.index.php?controller=main&view=home [NC,L]
-RewriteRule ^/uniqueparts?$		vimeo.index.php?controller=main&view=uniqueparts [NC,L]
-RewriteRule ^/partlist?$		vimeo.index.php?controller=main&view=partlist [NC,L]
+RewriteRule ^uniqueparts?$	plister.php?controller=main&view=uniqueparts [NC,L]
+RewriteRule ^partlist?$		plister.php?controller=main&view=partlist [NC,L]
+RewriteRule ^import$		plister.php?controller=import&view=home [NC,L]
+
+#RewriteRule ^plister.php	plister.php?controller=main&view=home [NC,L]

@@ -30,17 +30,18 @@
 			return new $class_name($name);
 		}
 	
-		public static function viewFactory($mode = null)
+		public function viewFactory()
 		{
 			$class = ucfirst($mode) . "View";
 			if (class_exists($class))
-				return new $class;
+				return new $class($this->controller_name, $this->view_name);
 		}
 
 	
 		public function renderView($view_name, $args = null, $cache_time = CacheBot::TIME_NEVER, $key = null)
 		{
 			// Check the cache
+			/*
 			if ($cache_time > Cache::TIME_NEVER)
 			{
 				if ($key === null)
@@ -51,6 +52,7 @@
 				if ($data !== false)
 					return $data;
 			}
+			*/
 		
 			//save our params, prep for drawing the view.
 			$this->args = $args;
@@ -60,7 +62,7 @@
 	
 			//no cache, get down to business
 			$this->view_name = $view_name;
-			$view = $this->viewFactory($this->mode);
+			$view = $this->viewFactory();
 			
 			//do our dirty work.
 			$view->preRender();
@@ -68,9 +70,11 @@
 			$view->postRender();
 		
 			//do we save it to cache?
+			/*
 			if ($cache_time > Cache::TIME_NEVER)
 				CacheBot::set($output, $key, $cache_time);
-
+			*/
+			
 			return $output;
 		}
 
