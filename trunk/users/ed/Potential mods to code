@@ -1,0 +1,16 @@
+Add to org.reprap.Main above "JMenuItem toolsExerciser":
+
+
+        JMenuItem toolsWorkingVolume = new JMenuItem("Working volume probe", KeyEvent.VK_W);
+        toolsWorkingVolume.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					new org.reprap.gui.steppertest.WorkingVolumeFrame();
+				}
+              	catch (Exception ex) {
+             		JOptionPane.showMessageDialog(null, "Working volume probe exception: " + ex);
+         			ex.printStackTrace();
+             	}
+			}});
+        toolsMenu.add(toolsWorkingVolume);
+        
