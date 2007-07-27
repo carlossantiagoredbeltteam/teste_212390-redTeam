@@ -1,5 +1,5 @@
 <?
-	include("../extension/global.php");
+	include("../extensions/global.php");
 
 	$controller = $_GET['controller'];
 	$view = $_GET['view'];
