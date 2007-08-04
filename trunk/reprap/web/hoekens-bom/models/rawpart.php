@@ -15,25 +15,71 @@
 			return $name;
 		}
 		
-		public function lookupUnique($name = null)
+		public function lookupUnique($name = null, $type = null)
 		{
 			if ($name === null)
-				$name = $this->name;
+				$name = $this->getLookupName();
+			if ($type === null)
+				$type = $this->get('type');
+
+			$sql = "
+				SELECT id
+				FROM unique_parts
+				WHERE name = '$name'
+					AND type = '$type'
+			";
+			$partId = db()->getValue($sql);
+			
+			if ($partId)
+				return new UniquePart($partId);
 				
-			if (self::$unique_parts === null)
-				self::loadUniqueParts();
-				
-			foreach (self::$unique_parts AS $part)
+			if ($type != 'assembly')
+				echo "<b>Couldn't find unique part for $name ($type)</b><br/>";
+			
+			return false;
+		}
+		
+		public function getLookupName()
+		{
+			switch ($this->get('type'))
 			{
-				if ($part->type == $this->type && strtolower($part->name) == strtolower($name))
-				{
-					$this->unique_part = $part;
-					return true;
-				}
+				case 'belt':
+					if (preg_match("/\((.+)\) x (\d+)/", $this->get('raw_text'), $matches))
+						return $matches[1];
+					break;
+					
+				case 'rp':
+					return "Printing Service";
+					break;
+
+				case 'rod':
+				case 'stud':
+					if (preg_match("/M(\d+)\D+(\d+)/", $this->get('raw_text'), $matches))
+						return "M{$matches[1]}";
+					break;
+
+				case 'wire':
+					if (!preg_match("/^Nichrome/i", $this->get('raw_text')))
+					{
+						if (preg_match("/(\d+) AWG/", $this->get('raw_text'), $matches))
+								return "$matches[1] AWG";
+						if (preg_match("/(\d+)/", $this->get('raw_text'), $matches))
+								return '22 AWG';
+					}
+					break;
 			}
 			
-			#echo "Failed looking up $name<br/>\n";
-			return false;
+			return $this->get('raw_text');
+		}
+		
+		public function getDisplayName()
+		{
+			
+		}
+		
+		public function getRealQuantity()
+		{
+			
 		}
 	}
 ?>

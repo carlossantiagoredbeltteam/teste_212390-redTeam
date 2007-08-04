@@ -30,7 +30,23 @@
 		$legend = array();
 		$legend['suppliers'] = 12;
 		$legend['unique_parts'] = 15;
+		
+		//add in all our modules.
+		$data = getRawSheetData(8);
+		foreach ($data AS $row)
+		{
+			if ((int)$row[3])
+			{
+				//the first one is our 'main sheet'
+				if (!$legend['main_sheet'])
+					$legend['main_sheet'] = $row[3];
 				
+				//load up our keyed array.	
+				$karr = array();
+				$legend['raw_keys'][$row[0]] = $row[3];
+			}
+		}
+	
 		return $legend;
 	}
 	
@@ -72,7 +88,7 @@
 			
 			echo "Added supplier " . $supplier->get('name') . "<br/>\n";
 		}
-		echo "<b>Added " . count($data) . " total suppliers.</b><br/><br/>\n";
+		//echo "<b>Added " . count($data) . " total suppliers.</b><br/><br/>\n";
 	}
 	
 	function loadUniqueParts($legend)
@@ -95,13 +111,13 @@
 				$part->set('units', $row[4]);
 				$part->save();
 				
-				echo "Added unique part '" . $part->get('name') . "'<br/>\n";
+				//echo "Added unique part '" . $part->get('name') . "'<br/>\n";
 				
 				loadSuppliedParts($part, array_slice($row, 5));
 			}
 		}
 
-		echo "<b>Added " . count($data) . " total unique parts.<br/><br/>\n";
+		echo "<b>Added " . count($data) . " total unique parts.</b><br/><br/>\n";
 	}
 	
 	function loadSuppliedParts($part, $data)
@@ -134,62 +150,78 @@
 					
 					echo db()->error();
 					
-					echo "Added supplier " . $supplier->get('name') . "<br/>";
+					//echo "Added supplier " . $supplier->get('name') . "<br/>";
 				}
 				else
 					echo "Couldn't find supplier for " . $part->get('name') . "!<br/>\n";
 			}
 		}
-		echo "<br/>\n";
+		//echo "<br/>\n";
 	}
 	
 	function loadRawSheets($legend)
 	{
-		if (count($legend['raw_sheets']))
+		if (!empty($legend['raw_keys']))
 		{
-			foreach ($legend['raw_sheets'] AS $sheet_info)
+			foreach ($legend['raw_keys'] AS $name => $id)
 			{
 				//get our initial data.
-				$data = getRawSheetData($sheet_info['id']);
-				$module = RawPart::lookupUnique($sheet_info['name'], 'module');
+				$data = getRawSheetData($id);
 
 				//create our root node.
 				$root = new RawPart();
-				$root->set('part_id', $root->id);
-				$root->set('raw_text', $sheet_info['name']);
-				$root->set('quantity', 1);
-				$root->set('parent_id',0);
-				$root->save();
-
-				//get rid of human junk
-				array_shift($data);
-				array_shift($data);
-
-				//load them all.
-				foreach ($data AS $row)
+				$root->set('raw_text', $name);
+				$root->set('type', 'module');
+				$unique = $root->lookupUnique();
+				
+				if ($unique instanceOf UniquePart)
 				{
-					//get the normal data.
-					$raw = new RawPart();
-					$raw->set('raw_text', $row[1]);
-					$raw->set('type', $row[2]);
-					$raw->set('quantity', $row[3]);
+					$root->set('quantity', 1);
+					$root->set('parent_id',0);
+					$root->set('part_id', $unique->id);
+					$root->save();
+					
+					echo "<b>Added root module " . $root->get('raw_text') . "</b><br>";
+					
+					//get rid of human junk
+					array_shift($data);
+					array_shift($data);
 
-					//who owns us?
-					if (is_object($assembly))
-						$raw->set('parent_id', $assembly->id);
-					else
-						$raw->set('parent_id', $root->id);
+					//load them all.
+					foreach ($data AS $row)
+					{
+						//get the normal data.
+						$raw = new RawPart();
+						$raw->set('raw_text', $row[1]);
+						$raw->set('quantity', $row[2]);
+						$raw->set('type', $row[3]);
+						
+						//make sure we actually have a real row.
+						if ($raw->get('raw_text') && $raw->get('type'))
+						{
+							//if we have an assembly set, and we're not an assembly ourselves, use the assembly as parent
+							if (is_object($assembly) && $raw->get('type') != 'assembly')
+								$raw->set('parent_id', $assembly->id);
+							//otherwise, its the module.
+							else
+								$raw->set('parent_id', $root->id);
 
-					//what is our unique part?
-					$unique = RawPart::lookupUnique($raw->get('raw_text'), $raw->get('type'));
-					$raw->set('part_id', $unique->id);
+							//lookup our unique part
+							$unique = $raw->lookupUnique();
+							if ($unique instanceOf UniquePart)
+								$raw->set('part_id', $unique->id);
+							
+							//dont forget to save our model!	
+							$raw->save();
 
-					//dont forget to save our model!	
-					$raw->save();
+							echo "Added raw part " . $raw->get('raw_text') . "<br>";
 
-					//if we're an assembly, then save it here.
-					if ($raw->get('type') == 'assembly')
-						$assembly = $raw;
+							//if we're an assembly, then save it here.
+							if ($raw->get('type') == 'assembly')
+								$assembly = $raw;
+						}
+					}
+					echo "<br/>\n";
 				}
 			}			
 		}
