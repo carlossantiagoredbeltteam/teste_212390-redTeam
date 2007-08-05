@@ -5,6 +5,7 @@
 		private $controller_name;
 		private $mode;
 		private $args;
+		private $data;
 		
 		public function __construct($name)
 		{
@@ -38,7 +39,7 @@
 		}
 
 	
-		public function renderView($view_name, $args = null, $cache_time = CacheBot::TIME_NEVER, $key = null)
+		public function renderView($view_name, $args = array(), $cache_time = CacheBot::TIME_NEVER, $key = null)
 		{
 			// Check the cache
 			/*
@@ -66,7 +67,7 @@
 			
 			//do our dirty work.
 			$view->preRender();
-			$output = $view->render($this->args);
+			$output = $view->render($this->data);
 			$view->postRender();
 		
 			//do we save it to cache?
@@ -76,6 +77,21 @@
 			*/
 			
 			return $output;
+		}
+		
+		protected function get($key)
+		{
+			return $this->data[$key];
+		}
+		
+		protected function set($key, $data)
+		{
+			$this->data[$key] = $data;
+		}
+		
+		protected function setArg($key)
+		{
+			$this->set($key, $this->args[$key]);
 		}
 
 		protected function setView($view_name) 
@@ -91,7 +107,8 @@
 	
 		private function getArgs()
 		{
-			$args = array();
+			//use our already set args.
+			$args = $this->args;
 		
 			// GET is the first level of args.
 			if (count($_GET)) $args = array_merge($args, $_GET);

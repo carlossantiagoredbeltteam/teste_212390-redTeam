@@ -35,7 +35,7 @@
 		$data = getRawSheetData(8);
 		foreach ($data AS $row)
 		{
-			if ((int)$row[3])
+			if ((int)$row[3] || (int)$row[4])
 			{
 				//the first one is our 'main sheet'
 				if (!$legend['main_sheet'])
