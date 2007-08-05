@@ -1,20 +1,25 @@
 <?
 	class MainController extends Controller
 	{
+		public function progressbar()
+		{
+			$this->setArg('step');
+		}
+		
 		public function home()
 		{
-			$modules = loadModulesData();
+			$this->set('modules', UniquePart::getModules()->getAll());
 		}
 		
 		public function uniqueparts()
 		{
-			$output = $_POST['output'];
-			if ($output != '')
-			{
-				//send it out!
-				$parts = importBOMData($_POST['assembly_ids'], $_POST['assembly_qty']);
-				$corps = loadSupplierData();				
-			}
+			$this->set('title', 'Module Components');
+			
+			$module = new UniquePart($this->args('module_id'));
+			if ($module->id)
+				$components = $module->getUniqueComponents();
+			
+			$this->set('components', $components);
 		}
 		
 		function render_unique_csv($bom)

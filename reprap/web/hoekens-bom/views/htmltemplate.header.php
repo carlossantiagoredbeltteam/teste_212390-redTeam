@@ -1,7 +1,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 	<head>
-		<title><?=$title?> - RepRap Bill of Materials</title>
+		<? if ($title): ?>
+			<title><?=$title?> - RepRap Parts Lister</title>
+		<? else: ?>
+			<title>RepRap Parts Lister</title>
+		<? endif ?>
 		<link rel="stylesheet" type="text/css" href="/css/style.css" />
 		<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
 		<script src="/js/prototype.js"></script>
@@ -19,11 +23,13 @@
 		<div id="main">
 			<a name="top" class="nodisplay"></a>
 			<div id="header">
-				<h1 class="shad"><em>RepRap BOM Generator</em></h1>
-				<h1><em>RepRap BOM Generator</em></h1>
+				<h1 class="shad"><em>RepRap Parts Lister</em></h1>
+				<h1><em>RepRap Parts Lister</em></h1>
 				<div class="gear"> </div>
 			</div>
 
 			<div id="body">
 				<div id="content">
-					<h2><?=$title?></h2>
+					<? if ($title): ?>
+						<h2><?=$title?></h2>
+					<? endif ?>

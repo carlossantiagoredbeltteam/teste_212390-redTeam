@@ -18,7 +18,7 @@
 			else
 				$this->key = $key;
 	
-			$this->map = DB::getCachedArray($this->query, "{$key}.collection", $expiration);
+			$this->map = db()->getArray($this->query, "{$key}.collection", $expiration);
 		}
 	
 		/**
@@ -71,10 +71,12 @@
 
 			//very simple load...  should be made more advanced.
 			$data = array();
-			foreach ($map AS $key => $row)
-				foreach ($this->obj_types AS $type => $id)
-					$data[$key][$type] = new $type($row[$type]);
-		
+			foreach ($map AS $key => $row){
+				foreach ($this->obj_types AS $type => $id){
+					$data[$key][$type] = new $type($row[$id]);
+				}
+			}	
+
 			return $data;
 		}
 	}
