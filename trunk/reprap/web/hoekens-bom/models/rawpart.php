@@ -81,5 +81,62 @@
 		{
 			
 		}
+		
+		public function getChildren()
+		{
+			$sql = "
+				SELECT id
+				FROM raw_parts
+				WHERE parent_id = $this->id
+			";
+			
+			echo $sql;
+			
+			return new Collection($sql, array('RawPart' => 'id'));
+		}
+		
+		public function getComponents($deep = false)
+		{
+			$data = array();
+			
+			//get our kids.
+			$kids = $this->getChildren()->getAll();
+			foreach ($kids AS $row)
+			{
+				$part = $row['RawPart'];
+				$data[] = $part;
+				
+				echo "Got component: " . $part->get('raw_text') . "\n";
+
+				//assemblies are easy... raw -> raw.
+				if ($part->get('type') == 'assembly')
+				{
+					echo 'Getting kids for assembly.';
+					$kids = $part->getComponents($deep);
+					foreach ($kids AS $kid)
+					{
+						$kid->set('quantity', $kid->get('quantity') * $part->get('quantity'));
+						$data[] = $kid;
+					}
+					echo 'Done with assembly kids.';
+				}
+				
+				//modules are based on the unique part... raw -> unique -> raw
+				if ($part->get('type') == 'module' && $deep)
+				{ 
+					echo 'Getting kids for module';
+					$module = new UniquePart($part->get('part_id'));
+					$kids = $module->getRawComponents(true);
+					foreach ($kids AS $kid)
+					{
+						$kid->set('quantity', $kid->get('quantity') * $part->get('quantity'));
+						$data[] = $kid;
+					}
+					echo 'Done with module kids.';
+				}
+			}
+			
+			return $data;
+		}
 	}
 ?>

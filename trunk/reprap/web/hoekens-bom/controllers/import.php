@@ -3,6 +3,12 @@
 	{
 		function home()
 		{
+			//run for as long as it takes.
+			set_time_limit(0);
+			
+			//to keep the output for the view.
+			ob_start();
+			
 			//create our structure.
 			$sql = explode(";", file_get_contents(HOME_DIR . "/sql/structure.sql"));
 			
@@ -21,7 +27,9 @@
 			$legend = loadLegend();
 			loadSuppliers($legend);
 			loadUniqueParts($legend);
-			loadRawSheets($legend);			
+			loadRawSheets($legend);
+			
+			$this->set('content', ob_get_clean());
 		}
 	}
 	
@@ -222,6 +230,9 @@
 						}
 					}
 					echo "<br/>\n";
+					
+					//forget past assemblies.
+					unset($assembly);
 				}
 			}			
 		}

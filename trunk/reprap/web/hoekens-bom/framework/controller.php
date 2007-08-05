@@ -21,7 +21,7 @@
 		{
 			// Get the name of the class to load
 			$class_name = "{$name}Controller";
-			$class_file = CONTROLLERS_DIR . "/{$name}.php";
+			$class_file = CONTROLLERS_DIR . "/" . strtolower($name) . ".php";
 		
 			if (file_exists($class_file))
 				require_once($class_file);
@@ -58,9 +58,11 @@
 			//save our params, prep for drawing the view.
 			$this->args = $args;
 			$this->args = $this->getArgs();
+
+			//call our controller's view method
 			if (method_exists($this, $view_name))
-				$this->$view_name();
-	
+				$this->$view_name();	
+			
 			//no cache, get down to business
 			$this->view_name = $view_name;
 			$view = $this->viewFactory();
@@ -79,14 +81,19 @@
 			return $output;
 		}
 		
-		protected function get($key)
+		public function get($key)
 		{
 			return $this->data[$key];
 		}
 		
-		protected function set($key, $data)
+		public function set($key, $data)
 		{
 			$this->data[$key] = $data;
+		}
+		
+		public function args($key)
+		{
+			return $this->args[$key];
 		}
 		
 		protected function setArg($key)
@@ -107,24 +114,42 @@
 	
 		private function getArgs()
 		{
+			//for ease of debug.
+			ob_start();
+			
 			//use our already set args.
-			$args = $this->args;
+			$args = array();
 		
 			// GET is the first level of args.
-			if (count($_GET)) $args = array_merge($args, $_GET);
+			if (count($_GET))
+				$args = array_merge($args, $_GET);
+			echo "After GET:\n";
+			print_r($args);
 			
 			// POST overrides GET.
-			if (count($_POST)) $args = array_merge($args, $_POST);
-			
+			if (count($_POST))
+				$args = array_merge($args, $_POST);
+			echo "After POST:\n";
+			print_r($args);
+
 			// JSON data overrides GET and POST
-			if (!empty($args['jdata'])) {
+			if (!empty($args['jdata']))
+			{
 			    $json_data = json_decode(stripslashes($args['jdata']), true);
 			    unset($args['jdata']);
 			    $args = array_merge($args, $json_data);
 			}
+			echo "After jdata:\n";
+			print_r($args);
 			
 			// user-defined args rule all!
-			if (count($this->args)) $args = array_merge($args, $this->args);
+			if (count($this->args))
+				$args = array_merge($args, $this->args);
+			echo "Finally:\n";
+			print_r($args);
+			
+			//for debug;
+			ob_end_clean();
 			
 			return $args;
 		}

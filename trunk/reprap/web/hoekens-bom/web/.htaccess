@@ -3,8 +3,9 @@ DirectoryIndex plister.php
 RewriteEngine on
 
 # take me home...
-RewriteRule ^uniqueparts?$	plister.php?controller=main&view=uniqueparts [NC,L]
-RewriteRule ^partlist?$		plister.php?controller=main&view=partlist [NC,L]
-RewriteRule ^import$		plister.php?controller=import&view=home [NC,L]
+RewriteRule ^uniqueparts:([0-9]+)$	plister.php?controller=main&view=uniqueparts&module_id=$1 [NC,L]
+RewriteRule ^uniqueparts/?$			plister.php?controller=main&view=uniqueparts [NC,L]
+RewriteRule ^partlist/?$			plister.php?controller=main&view=partlist [NC,L]
+RewriteRule ^import/?$				plister.php?controller=import&view=home [NC,L]
 
 #RewriteRule ^plister.php	plister.php?controller=main&view=home [NC,L]

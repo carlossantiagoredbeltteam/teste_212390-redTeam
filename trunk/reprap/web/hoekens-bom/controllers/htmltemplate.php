@@ -4,6 +4,7 @@
 		public function main()
 		{
 			$this->setArg('content');
+			$this->setArg('title');
 		}
 		
 		public function header()

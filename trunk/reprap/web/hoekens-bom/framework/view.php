@@ -16,7 +16,7 @@
 		public function preRender() {}
 		public function postRender() {}
 	
-		public function render($view, $data = array())
+		public function render($data = array())
 		{
 			//get our data variables into the local scope
 			if (!empty($data))
@@ -24,7 +24,7 @@
 	
 			ob_start();
 
-			$view_file = VIEWS_DIR . "{$this->controller}.{$this->view}.php";
+			$view_file = strtolower(VIEWS_DIR . "{$this->controller}.{$this->view}.php");
 			if (file_exists($view_file))
 				include($view_file);
 			else
