@@ -1,0 +1,175 @@
+# EESchema Netlist Version 1.1 created  5/5/2007-14:54:44
+(
+ ( 463A9D69 $noname  M02 MOLEX_4PIN {Lib=MOLEX_4PIN}
+  (    1 +12V )
+  (    2 GND )
+  (    3 GND )
+  (    4  ? )
+ )
+ ( 463198A7 $noname  P05 AMP {Lib=AMP}
+  (    1 GND )
+  (    2 GND )
+  (    3 GND )
+  (    4 GND )
+  (    5 GND )
+  (    6 GND )
+  (    7 +12V )
+  (    8 +12V )
+  (    9 +12V )
+  (   10 +12V )
+  (   11 +12V )
+  (   12 +12V )
+ )
+ ( 45A40D97 $noname  D1 LED {Lib=LED}
+  (    1 N-000014 )
+  (    2 GND )
+ )
+ ( 45A40D8A $noname  R1 560R {Lib=R}
+  (    1 +12V )
+  (    2 N-000014 )
+ )
+ ( 45A40CF5 $noname  C5 1uF {Lib=CP}
+  (    1 N-000012 )
+  (    2 N-000013 )
+ )
+ ( 45A40B82 $noname  P3 CONN_2 {Lib=CONN_2}
+  (    1 GND )
+  (    2 N-000010 )
+ )
+ ( 45A40B73 $noname  P2 CONN_2 {Lib=CONN_2}
+  (    1 GND )
+  (    2 N-000005 )
+ )
+ ( 45A40B59 $noname  J1 DB9 {Lib=DB9}
+  (    1  ? )
+  (    2 N-000006 )
+  (    3 N-000007 )
+  (    4 N-000008 )
+  (    5 GND )
+  (    6 N-000008 )
+  (    7 N-000009 )
+  (    8 N-000009 )
+  (    9 GND )
+ )
+ ( 45A40B38 $noname  C4 1uF {Lib=CP}
+  (    1 GND )
+  (    2 N-000002 )
+ )
+ ( 45A40B2E $noname  C3 1uF {Lib=CP}
+  (    1 N-000001 )
+  (    2 +5V )
+ )
+ ( 45A40B29 $noname  C2 1uF {Lib=CP}
+  (    1 N-000003 )
+  (    2 N-000004 )
+ )
+ ( 45A40B1C $noname  U2 MAX232 {Lib=MAX232}
+  (    1 N-000012 )
+  (    2 N-000001 )
+  (    3 N-000013 )
+  (    4 N-000003 )
+  (    5 N-000004 )
+  (    6 N-000002 )
+  (    7  ? )
+  (    8  ? )
+  (    9  ? )
+  (   10  ? )
+  (   11 N-000010 )
+  (   12 N-000005 )
+  (   13 N-000007 )
+  (   14 N-000006 )
+  (   15 GND )
+  (   16 +5V )
+ )
+ ( 45A40A1C $noname  C1 100uF {Lib=CP}
+  (    1 +5V )
+  (    2 GND )
+ )
+ ( 45A40A15 $noname  C6 4700uF {Lib=CP}
+  (    1 +12V )
+  (    2 GND )
+ )
+ ( 45A409E1 $noname  U1 78L05 {Lib=78L05}
+  (    1 +12V )
+  (    2 GND )
+  (    3 +5V )
+ )
+)
+*
+{ Pin List by Nets
+Net 1 ""
+ C3 1
+ U2 2
+Net 2 ""
+ U2 6
+ C4 2
+Net 3 ""
+ C2 1
+ U2 4
+Net 4 ""
+ U2 5
+ C2 2
+Net 5 ""
+ P2 2
+ U2 12
+Net 6 ""
+ U2 14
+ J1 2
+Net 7 ""
+ J1 3
+ U2 13
+Net 8 ""
+ J1 6
+ J1 4
+Net 9 ""
+ J1 7
+ J1 8
+Net 10 ""
+ U2 11
+ P3 2
+Net 11 "+5V"
+ C3 2
+ U1 3
+ U2 16
+ C1 1
+Net 12 ""
+ C5 1
+ U2 1
+Net 13 ""
+ C5 2
+ U2 3
+Net 14 ""
+ R1 2
+ D1 1
+Net 15 "+12V"
+ C6 1
+ R1 1
+ U1 1
+ P05 8
+ P05 12
+ M02 1
+ P05 11
+ P05 10
+ P05 9
+ P05 7
+Net 17 "GND"
+ P05 4
+ P05 5
+ P05 6
+ P05 3
+ P05 2
+ P05 1
+ M02 2
+ M02 3
+ D1 2
+ P3 1
+ P2 1
+ J1 9
+ J1 5
+ C4 1
+ C6 2
+ U2 15
+ C1 2
+ U1 2
+}
+#End
