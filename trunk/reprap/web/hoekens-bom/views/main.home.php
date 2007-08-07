@@ -18,7 +18,16 @@
 			<td>
 				<input type="text" name="quantity" value="1" size="4">
 			</td>
-		</tr>		
+		</tr>
+		
+		<tr>
+			<th>Deep Lookup?</th>
+			<td>
+				<label>
+					<input type="checkbox" name="deep_lookup" value="1"> Lookup all components for all sub-modules.
+				</label>
+			</td>
+		</tr>
 
 <!--
 		<tr>
