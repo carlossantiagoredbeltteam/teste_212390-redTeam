@@ -1,4 +1,4 @@
-EESchema-DOCLIB  Version 2.0  7/6/2007-03:20:48
+EESchema-DOCLIB  Version 2.0  7/8/2007-03:10:32
 #
 $CMP 7805
 D Linear Regulator +5V
@@ -37,6 +37,12 @@ $ENDCMP
 $CMP DIODE
 D Diode simple
 K DEV DIODE
+$ENDCMP
+#
+$CMP PIC16F628
+D FLASH-Based 8-Bit CMOS Microcontroller
+K 16F628
+F www.microchip.com
 $ENDCMP
 #
 $CMP R
