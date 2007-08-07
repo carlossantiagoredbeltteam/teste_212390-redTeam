@@ -17,9 +17,16 @@
 			
 			$module = new UniquePart($this->args('module_id'));
 			if ($module->id)
-				$components = $module->getUniqueComponents();
+				$components = $module->getUniqueComponents($this->args('deep_lookup'));
 			
 			$this->set('components', $components);
+		}
+		
+		public function part_suppliers()
+		{
+			$part = $this->args('part');
+			
+			$this->set('supplied_parts', $part->getSupplierParts()->getAll());
 		}
 		
 		function render_unique_csv($bom)

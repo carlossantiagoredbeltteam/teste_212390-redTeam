@@ -2,7 +2,7 @@
 	<select name="part_supplier[<?=$part->id?>]">
 		<? foreach ($supplied_parts AS $row): ?>
 			<? $supplier = $row['Supplier']; ?>
-			<? $spart = $row['SuppliedPart']; ?>
+			<? $spart = $row['SupplierPart']; ?>
 			<option value="<?=$spart->id?>"><?=$supplier->get('name')?></option>
 		<? endforeach ?>
 	</select>

@@ -104,7 +104,6 @@
 			foreach ($kids AS $row)
 			{
 				$part = $row['RawPart'];
-				$data[] = $part;
 				
 				echo "Got component: " . $part->get('raw_text') . "\n";
 
@@ -120,20 +119,29 @@
 					}
 					echo 'Done with assembly kids.';
 				}
-				
 				//modules are based on the unique part... raw -> unique -> raw
-				if ($part->get('type') == 'module' && $deep)
-				{ 
-					echo 'Getting kids for module';
-					$module = new UniquePart($part->get('part_id'));
-					$kids = $module->getRawComponents(true);
-					foreach ($kids AS $kid)
+				else if ($part->get('type') == 'module')
+				{
+					//if we're deep, load up our kids
+					if ($deep)
 					{
-						$kid->set('quantity', $kid->get('quantity') * $part->get('quantity'));
-						$data[] = $kid;
+						echo 'Getting kids for module';
+						$module = new UniquePart($part->get('part_id'));
+						$kids = $module->getRawComponents(true);
+						foreach ($kids AS $kid)
+						{
+							$kid->set('quantity', $kid->get('quantity') * $part->get('quantity'));
+							$data[] = $kid;
+						}
+						echo 'Done with module kids.';						
 					}
-					echo 'Done with module kids.';
+					//otherwise just add the part.
+					else
+						$data[] = $part;
 				}
+				//just add the part in.
+				else
+					$data[] = $part;
 			}
 			
 			return $data;

@@ -31,7 +31,7 @@
 			return new RawPart($id);
 		}
 		
-		public function getRawComponents()
+		public function getRawComponents($deep = false)
 		{
 			//find our root node.
 			$raw = $this->lookupRawPart();
@@ -39,14 +39,14 @@
 			//merge it up!
 			$components = array();
 			//$components[] = $raw;
-			$components = array_merge($components, $raw->getComponents());
+			$components = array_merge($components, $raw->getComponents($deep));
 			
 			return $components;
 		}
 		
-		public function getUniqueComponents()
+		public function getUniqueComponents($deep = false)
 		{
-			$raw_comps = $this->getRawComponents();
+			$raw_comps = $this->getRawComponents($deep);
 			$data = array();
 			
 			foreach ($raw_comps AS $raw)
@@ -57,7 +57,7 @@
 				if ($data[$raw->get('type')][$unique->id] instanceOf UniquePart)
 				{
 					//simply add the quantity in...
-					$qty = $data[$unique->id]->get('quantity') + $unique->get('quantity');
+					$qty = $data[$raw->get('type')][$unique->id]->get('quantity') + $unique->get('quantity');
 					$data[$raw->get('type')][$unique->id]->set('quantity', $qty);
 				}
 				//nope, make a new entry.
@@ -70,6 +70,20 @@
 			}
 			
 			return $data;
+		}
+		
+		public function getSupplierParts()
+		{
+			$sql = "
+				SELECT id, supplier_id
+				FROM supplier_parts
+				WHERE part_id = '$this->id'
+			";
+			
+			return new Collection($sql, array(
+				'SupplierPart' => 'id',
+				'Supplier' => 'supplier_id'
+			));
 		}
 	}
 ?>
