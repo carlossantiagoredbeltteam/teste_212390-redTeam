@@ -38,8 +38,8 @@
 
 			//merge it up!
 			$components = array();
-			//$components[] = $raw;
-			$components = array_merge($components, $raw->getComponents($deep));
+			if ($raw->id)
+				$components = array_merge($components, $raw->getComponents($deep));
 			
 			return $components;
 		}
