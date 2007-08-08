@@ -88,9 +88,10 @@
 				SELECT id
 				FROM raw_parts
 				WHERE parent_id = $this->id
+				ORDER BY type, raw_text
 			";
 			
-			echo $sql;
+			//echo $sql;
 			
 			return new Collection($sql, array('RawPart' => 'id'));
 		}
@@ -105,19 +106,19 @@
 			{
 				$part = $row['RawPart'];
 				
-				echo "Got component: " . $part->get('raw_text') . "\n";
+				//echo "Got component: " . $part->get('raw_text') . "\n";
 
 				//assemblies are easy... raw -> raw.
 				if ($part->get('type') == 'assembly')
 				{
-					echo 'Getting kids for assembly.';
+					//echo 'Getting kids for assembly.';
 					$kids = $part->getComponents($deep);
 					foreach ($kids AS $kid)
 					{
 						$kid->set('quantity', $kid->get('quantity') * $part->get('quantity'));
 						$data[] = $kid;
 					}
-					echo 'Done with assembly kids.';
+					//echo 'Done with assembly kids.';
 				}
 				//modules are based on the unique part... raw -> unique -> raw
 				else if ($part->get('type') == 'module')
@@ -125,7 +126,7 @@
 					//if we're deep, load up our kids
 					if ($deep)
 					{
-						echo 'Getting kids for module';
+						//echo 'Getting kids for module';
 						$module = new UniquePart($part->get('part_id'));
 						$kids = $module->getRawComponents(true);
 						foreach ($kids AS $kid)
@@ -133,7 +134,7 @@
 							$kid->set('quantity', $kid->get('quantity') * $part->get('quantity'));
 							$data[] = $kid;
 						}
-						echo 'Done with module kids.';						
+						//echo 'Done with module kids.';						
 					}
 					//otherwise just add the part.
 					else

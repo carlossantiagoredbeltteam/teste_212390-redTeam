@@ -20,6 +20,7 @@
 				$components = $module->getUniqueComponents($this->args('deep_lookup'));
 			
 			$this->set('components', $components);
+			$this->set('module', $module);
 		}
 		
 		public function part_suppliers()
