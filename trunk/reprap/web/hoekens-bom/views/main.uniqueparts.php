@@ -4,12 +4,11 @@
 	Link here: <a href="http://<?=$_SERVER['HTTP_HOST']?>/uniqueparts:<?=$module->id?>"><?=$_SERVER['HTTP_HOST']?>/uniqueparts:<?=$module->id?></a>
 </p>
 
-<? if (!empty($components)): ?>
+<? if (!empty($list->uniques)): ?>
 
 	<?//= Controller::byName('main')->renderView('global_suppliers', array('parts' => $components)); ?>
 
 	<form action="/partlist" method="POST" id="bom_form">
-		<h2><?=$type?></h2>
 		<table width="100%">
 			<tr>
 				<th>Part</th>
@@ -17,13 +16,36 @@
 				<th>Quantity</th>
 				<th>Suppliers</th>
 			</tr>
-			<? foreach ($components AS $type => $data): ?>
-				<? foreach ($data AS $part): ?>
+			<? foreach ($list->type_list AS $type => $data): ?>
+				<? foreach ($data AS $unique_id): ?>
+					<? $unique = $list->getUnique($unique_id); ?>
 					<tr>
-						<td><input type="checkbox" id="use_<?=$part->id?>" name="use_part[<?=$part->id?>]" value="1" checked="true"/> <?=$part->get('name')?></td>
+						<td>
+							<input type="checkbox" id="use_<?=$unique->id?>" name="use_part[<?=$unique->id?>]" value="1" checked="true"/> <?=$unique->get('name')?>
+						
+							<span onclick="Element.toggle('breakdown_<?=$unique->id?>')">(breakdown)</span>
+						</td>
 						<td><?=$type?></td>
-						<td><input type="quantity[<?=$part->id?>]" value="<?=$part->get('quantity')?>" size="3"></td>
-						<td><?= Controller::byName('main')->renderView('part_suppliers', array('part' => $part))?></td>
+						<td><input type="quantity[<?=$unique->id?>]" value="<?=$list->getUniqueQuantity($unique->id)?>" size="3"></td>
+						<td><?= Controller::byName('main')->renderView('part_suppliers', array('part' => $unique))?></td>
+					</tr>
+					<tr id="breakdown_<?=$unique->id?>" style="display: none;">
+						<td colspan="4">
+							<div style="margin-left: 20px">
+								<table>
+									<tr>
+										<td><b>Part</b></td>
+										<td><b>Quantity</b></td>
+									</tr>
+									<? foreach ($list->raw_list[$unique->id] AS $part): ?>
+										<tr>
+											<td><?=$part->get('raw_text')?></td>
+											<td><?=$part->get('quantity')?></td>
+										</tr>
+									<? endforeach ?>
+								</table>
+							</div>
+						</td>
 					</tr>
 				<? endforeach ?>
 			<? endforeach ?>

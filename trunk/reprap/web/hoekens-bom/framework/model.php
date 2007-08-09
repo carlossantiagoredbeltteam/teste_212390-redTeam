@@ -136,9 +136,9 @@ class Model
 		//nope, load it normally.
 		$data = $this->getData(true);
 		if (count($data) && is_array($data))
-			foreach ($data AS $key => $val)
-				if ($key != 'id')
-					$this->set($key, $val);
+		
+		if (!empty($data))
+			$this->hydrate($data);
 	}
 
 	/**
@@ -232,15 +232,24 @@ class Model
 	 */
 	protected function getData($useDb = true)
 	{
+		$data = array();
+		
 		if ($useDb)
-			return $this->getDbData();
+		{
+			$row = $this->getDbData();
+
+			//format it properly.
+			$data['id'] = $row['id'];
+			unset($row['id']);
+			$data['data'] = $row;
+		}
 		else
 		{
 			$data = $this->data;
 			$data['id'] = $this->id;
-
-			return $data;
 		}
+			
+		return $data;
 	}
 
 	/**

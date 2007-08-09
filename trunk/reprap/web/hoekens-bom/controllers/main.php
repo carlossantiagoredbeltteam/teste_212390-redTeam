@@ -17,9 +17,9 @@
 			
 			$module = new UniquePart($this->args('module_id'));
 			if ($module->id)
-				$components = $module->getUniqueComponents($this->args('deep_lookup'));
+				$list = $module->getUniquePartList($this->args('deep_lookup'));
 			
-			$this->set('components', $components);
+			$this->set('list', $list);
 			$this->set('module', $module);
 		}
 		

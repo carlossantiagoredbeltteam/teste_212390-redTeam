@@ -70,12 +70,14 @@ class DatabaseSocket
 	public function getRow($sql)
 	{
 		$rs = $this->query($sql);
-		return mysql_fetch_array($rs);
+		return mysql_fetch_assoc($rs);
 	}
 	
 	public function getValue($sql)
 	{
-		$row = $this->getRow($sql);
+		$rs = $this->query($sql);
+		$row = mysql_fetch_row($rs);
+		
 		return $row[0];
 	}
 	
