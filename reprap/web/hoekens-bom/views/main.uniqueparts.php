@@ -9,6 +9,7 @@
 	<?//= Controller::byName('main')->renderView('global_suppliers', array('parts' => $components)); ?>
 
 	<form action="/partlist" method="POST" id="bom_form">
+		<input type="hidden" name="module_id" value="<?=$module->id?>" />
 		<table width="100%">
 			<tr>
 				<th>Part</th>
@@ -26,7 +27,7 @@
 							<span onclick="Element.toggle('breakdown_<?=$unique->id?>')">(breakdown)</span>
 						</td>
 						<td><?=$type?></td>
-						<td><input type="quantity[<?=$unique->id?>]" value="<?=$list->getUniqueQuantity($unique->id)?>" size="3"></td>
+						<td><input type="text" name="quantity[<?=$unique->id?>]" value="<?=$list->getUniqueQuantity($unique->id)?>" size="3"></td>
 						<td><?= Controller::byName('main')->renderView('part_suppliers', array('part' => $unique))?></td>
 					</tr>
 					<tr id="breakdown_<?=$unique->id?>" style="display: none;">

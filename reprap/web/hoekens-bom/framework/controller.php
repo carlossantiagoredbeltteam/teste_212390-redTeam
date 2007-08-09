@@ -81,9 +81,12 @@
 			return $output;
 		}
 		
-		public function get($key)
+		public function get($key = null)
 		{
-			return $this->data[$key];
+			if ($key === null)
+				return $this->data;
+			else
+				return $this->data[$key];
 		}
 		
 		public function set($key, $data)
@@ -91,9 +94,12 @@
 			$this->data[$key] = $data;
 		}
 		
-		public function args($key)
+		public function args($key = null)
 		{
-			return $this->args[$key];
+			if ($key === null)
+				return $this->args;
+			else
+				return $this->args[$key];
 		}
 		
 		protected function setArg($key)

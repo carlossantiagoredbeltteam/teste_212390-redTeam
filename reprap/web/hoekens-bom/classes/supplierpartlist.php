@@ -8,7 +8,7 @@
 		{
 			//add in suppliers
 			$supplier = new Supplier($part->get('supplier_id'));
-			$this->addSupplier();
+			$this->addSupplier($supplier);
 			
 			//add in our part.
 			$this->supplier_parts[$supplier->id] = $part;
@@ -22,7 +22,7 @@
 		
 		public function getSupplier($supplier_id)
 		{
-			return $this->suppliers[$supplier_id]
+			return $this->suppliers[$supplier_id];
 		}
 	}
 ?>
