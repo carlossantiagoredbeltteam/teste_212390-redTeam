@@ -44,6 +44,17 @@
 			return $components;
 		}
 		
+		public function getUniquePartList($deep = false)
+		{
+			$components = $this->getRawComponents($deep);
+			
+			$list = new UniquePartList();
+			foreach ($components AS $part)
+				$list->addRaw($part);
+				
+			return $list;
+		}
+		
 		public function getUniqueComponents($deep = false)
 		{
 			$raw_comps = $this->getRawComponents($deep);
