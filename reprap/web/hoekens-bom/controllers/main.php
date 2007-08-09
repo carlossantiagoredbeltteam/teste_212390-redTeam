@@ -40,7 +40,7 @@
 			//add all our used parts into the list.
 			foreach ($args['use_part'] AS $key => $use)
 			{
-				$part = new SupplierPart($key);
+				$part = new SupplierPart($args['part_supplier'][$key]);
 				$part->set('quantity', $args['quantity'][$key]);
 				$list->addSupplierPart($part);
 			}
