@@ -11,7 +11,7 @@
 			$this->addSupplier($supplier);
 			
 			//add in our part.
-			$this->supplier_parts[$supplier->id] = $part;
+			$this->supplier_parts[$supplier->id][] = $part;
 		}
 		
 		public function addSupplier(Supplier $supplier)
