@@ -27,9 +27,31 @@
 		{
 			$part = $this->args('part');
 			
+			$this->setArg('part');
 			$this->set('supplied_parts', $part->getSupplierParts()->getAll());
 		}
 		
+		public function partlist()
+		{
+			$args = $this->args();
+			$list = new SupplierPartList();
+			$module = new UniquePart($args['module_id']);
+			
+			//add all our used parts into the list.
+			foreach ($args['use_part'] AS $key => $use)
+			{
+				$part = new SupplierPart($key);
+				$part->set('quantity', $args['quantity'][$key]);
+				$list->addSupplierPart($part);
+			}
+			
+			$this->set('module', $module);
+			$this->set('list', $list);
+		}
+		
+		/**
+		*  NOT USED... YET!
+		**/
 		function render_unique_csv($bom)
 		{
 			$types = $bom->getTypes();
@@ -53,11 +75,6 @@
 
 			$types = $bom->getTypes();
 			$suppliers = $bom->getUniqueSuppliers();
-		}
-			
-		public function partlist()
-		{
-			
 		}
 	}
 ?>
