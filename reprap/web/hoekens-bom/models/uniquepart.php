@@ -96,5 +96,38 @@
 				'Supplier' => 'supplier_id'
 			));
 		}
+		
+		public function getParentModules()
+		{
+			$sql = "
+				SELECT p.id, p.part_id
+				FROM raw_parts c
+				INNER JOIN raw_parts p
+					ON c.parent_id = p.id
+				LEFT OUTER JOIN unique_parts u
+					ON u.id = p.part_id
+				WHERE c.part_id = '$this->id'
+				ORDER BY u.name
+			";
+			
+			return new Collection($sql, array(
+				'UniquePart' => 'part_id',
+				'RawPart' => 'id'
+			));
+		}
+		
+		public static function byType($type)
+		{
+			$sql = "
+				SELECT id
+				FROM unique_parts
+				WHERE type = '$type'
+				ORDER BY name
+			";
+			
+			return new Collection($sql, array(
+				'UniquePart' => 'id',
+			));
+		}
 	}
 ?>
