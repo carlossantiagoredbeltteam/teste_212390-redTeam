@@ -1,7 +1,6 @@
 * Add top level supplier list
 * Add top level part list
 * Add statistics page
-* Update top nav to point to new pages.
 * Double check that parts are calculating correctly (cross-reference bom v1.0)
 * Add footer with copyright / license / about links
 * get justin or someone to help with styling.
