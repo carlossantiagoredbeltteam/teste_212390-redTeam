@@ -49,32 +49,9 @@
 			$this->set('list', $list);
 		}
 		
-		/**
-		*  NOT USED... YET!
-		**/
-		function render_unique_csv($bom)
+		public function statistics()
 		{
-			$types = $bom->getTypes();
-			foreach ($types AS $type)
-			{
-				$parts = $bom->getParts($type);
-				renderGenericPartsCSV($parts, ucfirst(strtolower($type)));
-			}
-		}
-
-		function render_unique_json($bom)
-		{
-			$parts = $bom->getParts();
-			echo json_encode($parts);
-			die;
-		}
-
-		function render_unique_html($bom)
-		{
-			drawHeader("Choose Suppliers");
-
-			$types = $bom->getTypes();
-			$suppliers = $bom->getUniqueSuppliers();
+			
 		}
 	}
 ?>

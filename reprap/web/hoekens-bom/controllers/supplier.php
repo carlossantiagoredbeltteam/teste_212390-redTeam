@@ -1,6 +1,20 @@
 <?
 	class SupplierController extends Controller
 	{
+		public function all()
+		{	
+			$sql = "
+				SELECT id
+				FROM suppliers
+				ORDER BY name
+			";
+			$coll = new Collection($sql, array(
+				'Supplier' => 'id'
+			));
+			
+			$this->set('suppliers', $coll->getAll());
+		}
+		
 		public function generic_parts_list()
 		{
 			$this->setArg('supplier');

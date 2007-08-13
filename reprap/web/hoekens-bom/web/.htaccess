@@ -1,12 +1,12 @@
+#setup our site configuration
 Options -Indexes
 DirectoryIndex plister.php
 RewriteEngine on
 
-# take me home...
+#for the part list generator
 RewriteRule ^uniqueparts:([0-9]+)$	plister.php?controller=main&view=uniqueparts&module_id=$1 [NC,L]
 RewriteRule ^uniqueparts/?$			plister.php?controller=main&view=uniqueparts [NC,L]
 RewriteRule ^partlist/?$			plister.php?controller=main&view=partlist [NC,L]
-RewriteRule ^import/?$				plister.php?controller=import&view=home [NC,L]
 
 #detail type stuff
 RewriteRule ^supplier:([0-9]+)$		plister.php?controller=parts&view=bysupplier&id=$1 [NC,L]
@@ -15,5 +15,10 @@ RewriteRule ^uniquepart:([0-9]+)$	plister.php?controller=parts&view=uniquedetail
 
 #random stuff
 RewriteRule ^about$					plister.php?controller=main&view=about [NC,L]
+RewriteRule ^parts$					plister.php?controller=parts&view=all [NC,L]
+RewriteRule ^suppliers$				plister.php?controller=supplier&view=all [NC,L]
+RewriteRule ^statistics$			plister.php?controller=main&view=statistics [NC,L]
+RewriteRule ^import/?$				plister.php?controller=import&view=home [NC,L]
 
+#figure out a rule that doesnt allow plister.php as the initial request...
 #RewriteRule ^plister.php	plister.php?controller=main&view=home [NC,L]
