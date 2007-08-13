@@ -29,6 +29,9 @@
 			loadUniqueParts($legend);
 			loadRawSheets($legend);
 			
+			//dump our database to the file for others
+			dumpDatabaseToFile();
+			
 			$this->set('content', ob_get_clean());
 		}
 	}
@@ -250,5 +253,11 @@
 				}
 			}			
 		}
+	}
+	
+	function dumpDatabaseToFile()
+	{
+		$cmd = "mysqldump -u " . RR_DB_USER . " --password=" . RR_DB_PASS . " -h " . RR_DB_HOST . " -P " . RR_DB_PORT . " " . RR_DB_NAME . " > " . WEB_DIR . "reprap-bill-of-materials.sql";
+		system($cmd);
 	}
 ?>
