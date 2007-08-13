@@ -31,5 +31,19 @@
 			$this->set('part', $part);
 			$this->set('modules', $modules);
 		}
+		
+		public function all()
+		{
+			$sql = "
+				SELECT id
+				FROM unique_parts
+				ORDER BY type, name
+			";
+			$coll = new Collection($sql, array(
+				'UniquePart' => 'id'
+			));
+			
+			$this->set('parts', $coll->getAll());
+		}
 	}
 ?>
