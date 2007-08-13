@@ -13,11 +13,11 @@
 	<body>
 		<ul id="nav">
 			<li><a href="/">Home</a></li>
+			<li><a href="/about">About</a></li>
 			<li><a href="/parts">Parts</a></li>
 			<li><a href="/suppliers">Suppliers</a></li>
 			<li><a href="/statistics">Statistics</a></li>
 			<li><a href="http://parts.rrrf.org/">Store</a></li>
-			<li><a href="http://blog.reprap.org/">Blog</a></li>
 			<li><a href="http://www.reprap.org/">RepRap.org</a></li>
 		</ul>
 		<div id="main">
