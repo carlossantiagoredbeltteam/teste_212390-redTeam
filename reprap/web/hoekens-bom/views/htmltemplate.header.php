@@ -13,12 +13,12 @@
 	<body>
 		<ul id="nav">
 			<li><a href="/">Home</a></li>
-			<li><a href="http://www.reprap.org/">RepRap.org</a></li>
-			<li><a href="http://forums.reprap.org/">Forums</a></li>
-			<li><a href="http://blog.reprap.org/">Blog</a></li>
-			<li><a href="http://builders.reprap.org/">Builders Blog</a></li>
+			<li><a href="/parts">Parts</a></li>
+			<li><a href="/suppliers">Suppliers</a></li>
+			<li><a href="/statistics">Statistics</a></li>
 			<li><a href="http://parts.rrrf.org/">Store</a></li>
-			<li><a href="http://reprap.org/bin/view/Main/RepRapOneDarwin">HowTo Build It</a></li>
+			<li><a href="http://blog.reprap.org/">Blog</a></li>
+			<li><a href="http://www.reprap.org/">RepRap.org</a></li>
 		</ul>
 		<div id="main">
 			<a name="top" class="nodisplay"></a>
@@ -31,5 +31,5 @@
 			<div id="body">
 				<div id="content">
 					<? if ($title): ?>
-						<h2><?=$title?></h2>
+						<h1 id="pageTitle"><?=$title?></h1>
 					<? endif ?>
