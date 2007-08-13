@@ -1,9 +1,5 @@
 <?= Controller::byName('main')->renderView('progressbar', array('step' => 2))?>
 
-<p>
-	Link here: <a href="http://<?=$_SERVER['HTTP_HOST']?>/uniqueparts:<?=$module->id?>"><?=$_SERVER['HTTP_HOST']?>/uniqueparts:<?=$module->id?></a>
-</p>
-
 <? if (!empty($list->uniques)): ?>
 
 	<?//= Controller::byName('main')->renderView('global_suppliers', array('parts' => $components)); ?>
@@ -22,11 +18,12 @@
 					<? $unique = $list->getUnique($unique_id); ?>
 					<tr>
 						<td>
-							<input type="checkbox" id="use_<?=$unique->id?>" name="use_part[<?=$unique->id?>]" value="1" checked="true"/> <?=$unique->get('name')?>
+							<input type="checkbox" id="use_<?=$unique->id?>" name="use_part[<?=$unique->id?>]" value="1" checked="true"/>
+							<a href="/uniquepart:<?=$unique->id?>"><?=$unique->get('name')?></a>
 						
 							<span onclick="Element.toggle('breakdown_<?=$unique->id?>')">(breakdown)</span>
 						</td>
-						<td><?=$type?></td>
+						<td><a href="/type/<?=$type?>"><?=$type?></a></td>
 						<td><input type="text" name="quantity[<?=$unique->id?>]" value="<?=$list->getUniqueQuantity($unique->id)?>" size="3"></td>
 						<td><?= Controller::byName('main')->renderView('part_suppliers', array('part' => $unique))?></td>
 					</tr>

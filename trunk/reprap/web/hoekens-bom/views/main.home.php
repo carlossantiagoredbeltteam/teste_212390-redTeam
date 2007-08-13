@@ -1,3 +1,4 @@
+<h1>Quick Part List Lookup</h1>
 <?= Controller::byName('main')->renderView('progressbar', array('step' => 1))?>
 <form action="/uniqueparts" method="POST" name="bom_form">
 	<table>
@@ -59,4 +60,12 @@
 			<td>&nbsp;</td><td><input type="submit" name="submit" value="Next Step"></td>
 		</tr>
 	</table>
+	
+	<h1>Detailed Module Info</h1>
+	<? foreach ($modules AS $row): ?>
+		<? $module = $row['UniquePart']; ?>
+		<p>
+			<b><a href="/uniquepart:<?=$module->id?>"><?=$module->get('name')?></a></b> <?=$module->get('description')?>
+		</p>
+	<? endforeach ?>
 </form>

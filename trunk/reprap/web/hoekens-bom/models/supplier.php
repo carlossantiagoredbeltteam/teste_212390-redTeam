@@ -24,6 +24,13 @@
 			return false;
 		}
 		
+		public function getHost()
+		{
+			$data = parse_url($this->get('website'));
+			
+			return $data['host'];
+		}
+		
 		public static function lookupKey($key)
 		{
 			$id = db()->getValue("
@@ -37,6 +44,23 @@
 				return new Supplier($id);
 
 			return false;
+		}
+		
+		public function getSuppliedParts()
+		{
+			$sql = "
+				SELECT sp.id, sp.part_id
+				FROM supplier_parts sp
+				INNER JOIN unique_parts u
+					ON u.id = sp.part_id
+				WHERE sp.supplier_id = '$this->id'
+				ORDER BY u.name
+			";
+			
+			return new Collection($sql, array(
+				'SupplierPart' => 'id',
+				'UniquePart' => 'part_id'
+			));
 		}
 	}
 ?>
