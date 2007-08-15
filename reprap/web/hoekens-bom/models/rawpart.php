@@ -79,7 +79,21 @@
 		
 		public function getRealQuantity()
 		{
+			switch ($this->get('type'))
+			{
+				case 'belt':
+					if (preg_match("/\((.+)\) x (\d+)/", $this->get('raw_text'), $matches))
+						return $matches[2] * $this->get('quantity');
+					break;
+
+				case 'rod':
+				case 'stud':
+					if (preg_match("/M(\d+)\D+(\d+)/", $this->get('raw_text'), $matches))
+						return $matches[2] * $this->get('quantity');
+					break;
+			}
 			
+			return $this->get('quantity');
 		}
 		
 		public function getChildren()

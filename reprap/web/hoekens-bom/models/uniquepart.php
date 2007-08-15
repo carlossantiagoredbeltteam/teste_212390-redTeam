@@ -44,13 +44,16 @@
 			return $components;
 		}
 		
-		public function getUniquePartList($deep = false)
+		public function getUniquePartList($deep = false, $quantity = 1)
 		{
 			$components = $this->getRawComponents($deep);
 			
 			$list = new UniquePartList();
 			foreach ($components AS $part)
-				$list->addRaw($part);
+			{
+				$part->set('quantity', $part->get('quantity') * $quantity);
+				$list->addRaw($part, $quantity);
+			}
 				
 			return $list;
 		}
@@ -68,7 +71,7 @@
 				if ($data[$raw->get('type')][$unique->id] instanceOf UniquePart)
 				{
 					//simply add the quantity in...
-					$qty = $data[$raw->get('type')][$unique->id]->get('quantity') + $unique->get('quantity');
+					$qty = $data[$raw->get('type')][$unique->id]->get('quantity') + $raw->get('quantity');
 					$data[$raw->get('type')][$unique->id]->set('quantity', $qty);
 				}
 				//nope, make a new entry.

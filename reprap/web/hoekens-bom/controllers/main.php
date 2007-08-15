@@ -17,7 +17,7 @@
 			
 			$module = new UniquePart($this->args('module_id'));
 			if ($module->id)
-				$list = $module->getUniquePartList($this->args('deep_lookup'));
+				$list = $module->getUniquePartList($this->args('deep_lookup'), $this->args('quantity'));
 			
 			$this->set('list', $list);
 			$this->set('module', $module);
@@ -51,7 +51,20 @@
 		
 		public function statistics()
 		{
-			
+			$this->set('unique_part_count', db()->getValue("
+				SELECT count(*)
+				FROM unique_parts
+			"));
+			$this->set('supplier_count', db()->getValue("
+				SELECT count(*)
+				FROM suppliers
+			"));
+			$this->set('part_types', db()->getArray("
+				SELECT count(*) AS cnt, type
+				FROM unique_parts
+				GROUP BY type
+				ORDER BY type
+			"));
 		}
 	}
 ?>

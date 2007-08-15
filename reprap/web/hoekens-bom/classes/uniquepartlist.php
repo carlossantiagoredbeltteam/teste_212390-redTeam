@@ -12,6 +12,7 @@
 			{
 				$this->uniques[$part->id] = $part;
 				$this->type_list[$part->get('type')][] = $part->id;
+				ksort($this->type_list);
 			}
 		}
 		
@@ -34,7 +35,7 @@
 			$total = 0;
 			
 			foreach ($this->raw_list[$unique_id] AS $raw)
-				$total += $raw->get('quantity');
+				$total += $raw->getRealQuantity();
 				
 			return $total;
 		}
