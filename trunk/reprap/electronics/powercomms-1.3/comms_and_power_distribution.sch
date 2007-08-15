@@ -1,5 +1,5 @@
 EESchema Schematic File Version 1
-LIBS:power,device,conn,linear,regul,74xx,cmos4000,adc-dac,memory,xilinx,special,microcontrollers,microchip,analog_switches,motorola,intel,audio,interface,digital-audio,philips,display,cypress,siliconi,contrib,.\comms_and_power_distribution.cache
+LIBS:power,reprap,device,conn,linear,regul,74xx,cmos4000,adc-dac,memory,xilinx,special,microcontrollers,microchip,analog_switches,motorola,intel,audio,interface,digital-audio,philips,display,cypress,siliconi,contrib
 EELAYER 23  0
 EELAYER END
 $Descr A4 11700 8267
@@ -13,47 +13,68 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
-Kmarq B 4450 5050 "Warning Pin input Unconnected" F=1
-Kmarq B 4250 5050 "Warning Pin input Unconnected" F=1
-Kmarq B 4950 5050 "Warning Pin input Unconnected" F=1
-Kmarq B 4750 5050 "Warning Pin input Unconnected" F=1
-Kmarq B 4850 4950 "Warning Pin passive Unconnected" F=1
-Kmarq B 4350 4950 "Warning Pin passive Unconnected" F=1
-Kmarq B 5450 4950 "Warning Pin power_in not driven (Net 2)" F=1
-Kmarq B 2900 950  "Warning Pin power_in not driven (Net 1)" F=1
+NoConn ~ 3100 3750
+NoConn ~ 3100 3650
+NoConn ~ 2900 4500
+NoConn ~ 2800 4500
+NoConn ~ 2500 4500
+NoConn ~ 2400 4500
+NoConn ~ 2200 5700
+NoConn ~ 2300 5700
+NoConn ~ 2600 5700
+NoConn ~ 2700 5700
+NoConn ~ 2900 4950
+NoConn ~ 2900 4850
 Wire Wire Line
-	5350 1150 5350 1250
+	2400 5700 2400 5900
+Wire Wire Line
+	2400 5900 4200 5900
+Wire Wire Line
+	4200 5900 4200 5050
+Wire Wire Line
+	2700 4500 2700 4700
+Wire Wire Line
+	2700 4700 4200 4700
+Wire Wire Line
+	4200 4250 3200 4250
+Wire Wire Line
+	4200 4250 4200 4350
+Connection ~ 4500 4850
+Wire Wire Line
+	4500 4150 4500 4850
+Connection ~ 4400 4650
+Wire Wire Line
+	4400 4650 4400 4150
+Wire Wire Line
+	4400 4150 4200 4150
+Wire Wire Line
+	5650 850  5650 950 
 Connection ~ 2900 950 
 Wire Wire Line
 	2900 950  2750 950 
 Wire Wire Line
-	4600 6150 4600 6000
+	7400 6650 7400 6500
 Wire Wire Line
-	4350 5700 4350 6000
-Connection ~ 4850 4150
+	7150 6200 7150 6500
+Connection ~ 7650 4650
 Wire Wire Line
-	5450 4150 3750 4150
+	8250 4650 6550 4650
 Wire Wire Line
-	4850 4450 4850 4150
+	7650 4950 7650 4650
 Wire Wire Line
-	4350 4950 4350 5000
+	7150 5450 7150 5500
 Wire Wire Line
-	7250 1750 8050 1750
-Connection ~ 7450 1750
-Connection ~ 7350 1750
-Connection ~ 7650 1750
+	7550 1450 8350 1450
+Connection ~ 7750 1450
+Connection ~ 7650 1450
+Connection ~ 7950 1450
 Wire Wire Line
-	8050 1750 8050 1700
-Connection ~ 1550 2600
+	8350 1450 8350 1400
+Connection ~ 4350 3100
 Wire Wire Line
-	1400 2600 1700 2600
+	4200 3100 4500 3100
 Wire Wire Line
-	1700 3100 1700 3250
-Connection ~ 1700 4350
-Wire Wire Line
-	1700 3650 1700 4350
-Wire Wire Line
-	1850 3850 1400 3850
+	4500 3600 4500 3750
 Connection ~ 2700 1500
 Wire Wire Line
 	2700 1650 2700 1150
@@ -61,10 +82,10 @@ Wire Wire Line
 	2900 950  2900 1100
 Wire Wire Line
 	2700 1150 2500 1150
-Connection ~ 6950 1750
+Connection ~ 7250 1450
 Wire Wire Line
-	6650 1750 7150 1750
-Connection ~ 6750 1750
+	6950 1450 7450 1450
+Connection ~ 7050 1450
 Wire Wire Line
 	3850 1100 4050 1100
 Wire Wire Line
@@ -76,59 +97,51 @@ Connection ~ 3450 1500
 Wire Wire Line
 	4050 1100 4050 950 
 Wire Wire Line
-	3900 3450 3750 3450
+	6700 3950 6550 3950
 Wire Wire Line
-	3750 3950 4050 3950
+	6550 4450 6850 4450
 Wire Wire Line
-	3750 3650 3900 3650
+	6550 4150 6700 4150
 Wire Wire Line
-	3900 3650 3900 3550
+	6700 4150 6700 4050
 Wire Wire Line
-	2050 3550 2150 3550
+	4850 4050 4950 4050
 Wire Wire Line
-	2050 3950 2150 3950
+	4850 4450 4950 4450
 Wire Wire Line
-	5450 4050 5300 4050
+	8250 4550 8100 4550
 Wire Wire Line
-	5300 4050 5300 4550
+	8100 4550 8100 5050
 Wire Wire Line
-	5300 4550 5450 4550
+	8100 5050 8250 5050
 Wire Wire Line
-	5450 4250 5350 4250
+	8250 4750 8150 4750
 Wire Wire Line
-	5350 4250 5350 4450
+	8150 4750 8150 4950
 Wire Wire Line
-	5350 4450 5450 4450
+	8150 4950 8250 4950
 Wire Wire Line
-	4400 3700 4400 3550
+	7200 4200 7200 4050
 Wire Wire Line
-	4400 3550 3900 3550
-Connection ~ 4050 3550
+	7200 4050 6700 4050
+Connection ~ 6850 4050
 Wire Wire Line
-	1400 4050 1400 4200
+	8250 5450 8250 5150
+Connection ~ 8250 5250
 Wire Wire Line
-	1400 4550 1400 4700
+	6550 3450 6550 3550
 Wire Wire Line
-	5450 4950 5450 4650
-Connection ~ 5450 4750
+	6550 3550 6700 3550
 Wire Wire Line
-	2150 4150 1850 4150
+	4950 3550 4850 3550
 Wire Wire Line
-	1850 4150 1850 3850
+	4950 3950 4850 3950
 Wire Wire Line
-	3750 2950 3750 3050
+	5650 1450 5650 1500
+Connection ~ 7150 1450
+Connection ~ 7350 1450
 Wire Wire Line
-	3750 3050 3900 3050
-Wire Wire Line
-	2150 3050 2050 3050
-Wire Wire Line
-	2150 3450 2050 3450
-Wire Wire Line
-	5350 1750 5350 1800
-Connection ~ 6850 1750
-Connection ~ 7050 1750
-Wire Wire Line
-	5350 2200 5350 2350
+	5650 1900 5650 2050
 Wire Wire Line
 	2500 1250 2700 1250
 Connection ~ 2700 1250
@@ -139,132 +152,185 @@ Wire Wire Line
 Wire Wire Line
 	2750 1050 2750 950 
 Wire Wire Line
-	1400 4350 2150 4350
+	4200 3600 4200 3750
 Wire Wire Line
-	1400 3850 1400 3650
+	4350 3000 4350 3100
 Wire Wire Line
-	1400 3100 1400 3250
+	7200 1450 7200 1650
+Connection ~ 7200 1450
+Connection ~ 8050 1450
+Connection ~ 7850 1450
 Wire Wire Line
-	1550 2500 1550 2600
+	7150 4950 7150 4850
 Wire Wire Line
-	6900 1750 6900 1950
-Connection ~ 6900 1750
-Connection ~ 7750 1750
-Connection ~ 7550 1750
+	7650 5450 7650 5500
 Wire Wire Line
-	4350 4450 4350 4350
+	8250 4850 6550 4850
+Connection ~ 7150 4850
 Wire Wire Line
-	4850 4950 4850 5000
+	7650 6200 7650 6500
 Wire Wire Line
-	5450 4350 3750 4350
-Connection ~ 4350 4350
+	7650 6500 7150 6500
+Connection ~ 7400 6500
 Wire Wire Line
-	4850 5700 4850 6000
+	4950 4650 4300 4650
 Wire Wire Line
-	4850 6000 4350 6000
-Connection ~ 4600 6000
+	4300 4650 4300 4550
+Wire Wire Line
+	4300 4550 4200 4550
+Wire Wire Line
+	4950 4850 4400 4850
+Wire Wire Line
+	4400 4850 4400 5050
+Wire Wire Line
+	4400 5050 4200 5050
+Wire Wire Line
+	4200 4700 4200 4850
+Wire Wire Line
+	3200 4250 3200 5850
+Wire Wire Line
+	3200 5850 2500 5850
+Wire Wire Line
+	2500 5850 2500 5700
+Connection ~ 3200 4700
+Wire Wire Line
+	4200 4550 4200 4650
+Wire Wire Line
+	4200 4650 2600 4650
+Wire Wire Line
+	2600 4650 2600 4500
+$Comp
+L RJ12 J?
+U 1 1 46C26439
+P 2400 5250
+F 0 "J?" H 2600 5750 60  0000 C C
+F 1 "RJ12" H 2250 5750 60  0000 C C
+	1    2400 5250
+	1    0    0    -1  
+$EndComp
+$Comp
+L RJ12 J?
+U 1 1 46C26425
+P 2600 4050
+F 0 "J?" H 2800 4550 60  0000 C C
+F 1 "RJ12" H 2450 4550 60  0000 C C
+	1    2600 4050
+	1    0    0    -1  
+$EndComp
+Text Notes 3550 4500 0    60   ~
+Tx
+Text Notes 3550 5000 0    60   ~
+Rx
+Kmarq B 7250 5550 "Warning Pin input Unconnected" F=1
+Kmarq B 7050 5550 "Warning Pin input Unconnected" F=1
+Kmarq B 7750 5550 "Warning Pin input Unconnected" F=1
+Kmarq B 7550 5550 "Warning Pin input Unconnected" F=1
+Kmarq B 7650 5450 "Warning Pin passive Unconnected" F=1
+Kmarq B 7150 5450 "Warning Pin passive Unconnected" F=1
+Kmarq B 8250 5450 "Warning Pin power_in not driven (Net 2)" F=1
+Kmarq B 2900 950  "Warning Pin power_in not driven (Net 1)" F=1
 $Comp
 L +12V #PWR01
 U 1 1 46B87CA5
-P 5350 1150
-F 0 "#PWR01" H 5350 1100 20  0001 C C
-F 1 "+12V" H 5350 1250 30  0000 C C
-	1    5350 1150
+P 5650 850
+F 0 "#PWR01" H 5650 800 20  0001 C C
+F 1 "+12V" H 5650 950 30  0000 C C
+	1    5650 850 
 	1    0    0    -1  
 $EndComp
-NoConn ~ 5450 3950
-NoConn ~ 2150 4450
-NoConn ~ 2150 4250
-NoConn ~ 3750 4450
-NoConn ~ 3750 4250
+NoConn ~ 8250 4450
+NoConn ~ 4950 4950
+NoConn ~ 4950 4750
+NoConn ~ 6550 4950
+NoConn ~ 6550 4750
 $Comp
 L R R5
 U 1 1 46B771FB
-P 4850 4700
-F 0 "R5" V 4930 4700 50  0000 C C
-F 1 "5K6" V 4850 4700 50  0000 C C
-	1    4850 4700
+P 7650 5200
+F 0 "R5" V 7730 5200 50  0000 C C
+F 1 "5K6" V 7650 5200 50  0000 C C
+	1    7650 5200
 	1    0    0    -1  
 $EndComp
 $Comp
 L R R4
 U 1 1 46B771DA
-P 4350 4700
-F 0 "R4" V 4430 4700 50  0000 C C
-F 1 "5K6" V 4350 4700 50  0000 C C
-	1    4350 4700
+P 7150 5200
+F 0 "R4" V 7230 5200 50  0000 C C
+F 1 "5K6" V 7150 5200 50  0000 C C
+	1    7150 5200
 	1    0    0    -1  
 $EndComp
 $Comp
 L GND #PWR02
 U 1 1 46B77059
-P 4600 6150
-F 0 "#PWR02" H 4600 6150 30  0001 C C
-F 1 "GND" H 4600 6080 30  0001 C C
-	1    4600 6150
+P 7400 6650
+F 0 "#PWR02" H 7400 6650 30  0001 C C
+F 1 "GND" H 7400 6580 30  0001 C C
+	1    7400 6650
 	1    0    0    -1  
 $EndComp
 $Comp
 L BI_LED D5
 U 1 1 46B7702B
-P 4850 5350
-F 0 "D5" H 5150 5450 50  0000 C C
-F 1 "BI_LED" H 5200 5250 50  0000 C C
-	1    4850 5350
+P 7650 5850
+F 0 "D5" H 7950 5950 50  0000 C C
+F 1 "BI_LED" H 8000 5750 50  0000 C C
+	1    7650 5850
 	0    1    1    0   
 $EndComp
 $Comp
 L BI_LED D4
 U 1 1 46B77018
-P 4350 5350
-F 0 "D4" H 4650 5450 50  0000 C C
-F 1 "BI_LED" H 4700 5250 50  0000 C C
-	1    4350 5350
+P 7150 5850
+F 0 "D4" H 7450 5950 50  0000 C C
+F 1 "BI_LED" H 7500 5750 50  0000 C C
+	1    7150 5850
 	0    1    1    0   
 $EndComp
 $Comp
 L +5V #PWR03
 U 1 1 46B75D84
-P 1550 2500
-F 0 "#PWR03" H 1550 2590 20  0001 C C
-F 1 "+5V" H 1550 2590 30  0000 C C
-	1    1550 2500
+P 4350 3000
+F 0 "#PWR03" H 4350 3090 20  0001 C C
+F 1 "+5V" H 4350 3090 30  0000 C C
+	1    4350 3000
 	1    0    0    -1  
 $EndComp
 $Comp
 L R R3
 U 1 1 46B75D76
-P 1700 2850
-F 0 "R3" V 1780 2850 50  0000 C C
-F 1 "1K8" V 1700 2850 50  0000 C C
-	1    1700 2850
+P 4500 3350
+F 0 "R3" V 4580 3350 50  0000 C C
+F 1 "1K8" V 4500 3350 50  0000 C C
+	1    4500 3350
 	1    0    0    -1  
 $EndComp
 $Comp
 L R R2
 U 1 1 46B75D60
-P 1400 2850
-F 0 "R2" V 1480 2850 50  0000 C C
-F 1 "1K8" V 1400 2850 50  0000 C C
-	1    1400 2850
+P 4200 3350
+F 0 "R2" V 4280 3350 50  0000 C C
+F 1 "1K8" V 4200 3350 50  0000 C C
+	1    4200 3350
 	1    0    0    -1  
 $EndComp
 $Comp
 L LED D3
 U 1 1 46B75D1E
-P 1700 3450
-F 0 "D3" H 1700 3550 50  0000 C C
-F 1 "LED" H 1700 3350 50  0000 C C
-	1    1700 3450
+P 4500 3950
+F 0 "D3" H 4500 4050 50  0000 C C
+F 1 "LED" H 4500 3850 50  0000 C C
+	1    4500 3950
 	0    1    1    0   
 $EndComp
 $Comp
 L LED D2
 U 1 1 46B75CB9
-P 1400 3450
-F 0 "D2" H 1400 3550 50  0000 C C
-F 1 "LED" H 1400 3350 50  0000 C C
-	1    1400 3450
+P 4200 3950
+F 0 "D2" H 4200 4050 50  0000 C C
+F 1 "LED" H 4200 3850 50  0000 C C
+	1    4200 3950
 	0    1    1    0   
 $EndComp
 $Comp
@@ -288,172 +354,163 @@ $EndComp
 $Comp
 L GND #PWR05
 U 1 1 46319B6C
-P 6900 1950
-F 0 "#PWR05" H 6900 1950 30  0001 C C
-F 1 "GND" H 6900 1880 30  0001 C C
-	1    6900 1950
+P 7200 1650
+F 0 "#PWR05" H 7200 1650 30  0001 C C
+F 1 "GND" H 7200 1580 30  0001 C C
+	1    7200 1650
 	1    0    0    -1  
 $EndComp
 $Comp
 L +12V #PWR06
 U 1 1 46319B62
-P 8050 1700
-F 0 "#PWR06" H 8050 1650 20  0001 C C
-F 1 "+12V" H 8050 1800 30  0000 C C
-	1    8050 1700
+P 8350 1400
+F 0 "#PWR06" H 8350 1350 20  0001 C C
+F 1 "+12V" H 8350 1500 30  0000 C C
+	1    8350 1400
 	1    0    0    -1  
 $EndComp
 $Comp
 L AMP P05
 U 1 1 463198A7
-P 7200 1800
-F 0 "P05" H 7200 1800 60  0000 C C
-F 1 "AMP" H 7200 1800 60  0000 C C
-	1    7200 1800
+P 7500 1500
+F 0 "P05" H 7500 1500 60  0000 C C
+F 1 "AMP" H 7500 1500 60  0000 C C
+	1    7500 1500
 	1    0    0    -1  
 $EndComp
 $Comp
 L GND #PWR07
 U 1 1 45A40DA1
-P 5350 2350
-F 0 "#PWR07" H 5350 2350 30  0001 C C
-F 1 "GND" H 5350 2280 30  0001 C C
-	1    5350 2350
+P 5650 2050
+F 0 "#PWR07" H 5650 2050 30  0001 C C
+F 1 "GND" H 5650 1980 30  0001 C C
+	1    5650 2050
 	1    0    0    -1  
 $EndComp
 $Comp
 L LED D1
 U 1 1 45A40D97
-P 5350 2000
-F 0 "D1" H 5350 2100 50  0000 C C
-F 1 "LED" H 5350 1900 50  0000 C C
-	1    5350 2000
+P 5650 1700
+F 0 "D1" H 5650 1800 50  0000 C C
+F 1 "LED" H 5650 1600 50  0000 C C
+	1    5650 1700
 	0    1    1    0   
 $EndComp
 $Comp
 L R R1
 U 1 1 45A40D8A
-P 5350 1500
-F 0 "R1" V 5430 1500 50  0000 C C
-F 1 "560R" V 5350 1500 50  0000 C C
-	1    5350 1500
+P 5650 1200
+F 0 "R1" V 5730 1200 50  0000 C C
+F 1 "560R" V 5650 1200 50  0000 C C
+	1    5650 1200
 	1    0    0    -1  
 $EndComp
 $Comp
 L CP C5
 U 1 1 45A40CF5
-P 2050 3250
-F 0 "C5" H 2100 3350 50  0000 L C
-F 1 "1uF" H 2100 3150 50  0000 L C
-	1    2050 3250
+P 4850 3750
+F 0 "C5" H 4900 3850 50  0000 L C
+F 1 "1uF" H 4900 3650 50  0000 L C
+	1    4850 3750
 	1    0    0    -1  
 $EndComp
 $Comp
 L GND #PWR08
 U 1 1 45A40C07
-P 4400 3700
-F 0 "#PWR08" H 4400 3700 30  0001 C C
-F 1 "GND" H 4400 3630 30  0001 C C
-	1    4400 3700
-	1    0    0    -1  
-$EndComp
-$Comp
-L GND #PWR09
-U 1 1 45A40C01
-P 1400 4700
-F 0 "#PWR09" H 1400 4700 30  0001 C C
-F 1 "GND" H 1400 4630 30  0001 C C
-	1    1400 4700
+P 7200 4200
+F 0 "#PWR08" H 7200 4200 30  0001 C C
+F 1 "GND" H 7200 4130 30  0001 C C
+	1    7200 4200
 	1    0    0    -1  
 $EndComp
 $Comp
 L GND #PWR010
 U 1 1 45A40BFC
-P 1400 4200
-F 0 "#PWR010" H 1400 4200 30  0001 C C
-F 1 "GND" H 1400 4130 30  0001 C C
-	1    1400 4200
+P 3200 4700
+F 0 "#PWR010" H 3200 4700 30  0001 C C
+F 1 "GND" H 3200 4630 30  0001 C C
+	1    3200 4700
 	1    0    0    -1  
 $EndComp
 $Comp
 L GND #PWR011
 U 1 1 45A40BF0
-P 5450 4950
-F 0 "#PWR011" H 5450 4950 30  0001 C C
-F 1 "GND" H 5450 4880 30  0001 C C
-	1    5450 4950
+P 8250 5450
+F 0 "#PWR011" H 8250 5450 30  0001 C C
+F 1 "GND" H 8250 5380 30  0001 C C
+	1    8250 5450
 	1    0    0    -1  
 $EndComp
 $Comp
 L CONN_2 P3
 U 1 1 45A40B82
-P 1050 3950
-F 0 "P3" V 1000 3950 40  0000 C C
-F 1 "CONN_2" V 1100 3950 40  0000 C C
-	1    1050 3950
+P 3850 4450
+F 0 "P3" V 3800 4450 40  0000 C C
+F 1 "CONN_2" V 3900 4450 40  0000 C C
+	1    3850 4450
 	-1   0    0    1   
 $EndComp
 $Comp
 L CONN_2 P2
 U 1 1 45A40B73
-P 1050 4450
-F 0 "P2" V 1000 4450 40  0000 C C
-F 1 "CONN_2" V 1100 4450 40  0000 C C
-	1    1050 4450
+P 3850 4950
+F 0 "P2" V 3800 4950 40  0000 C C
+F 1 "CONN_2" V 3900 4950 40  0000 C C
+	1    3850 4950
 	-1   0    0    1   
 $EndComp
 $Comp
 L DB9 J1
 U 1 1 45A40B59
-P 5900 4350
-F 0 "J1" H 5900 4900 70  0000 C C
-F 1 "DB9" H 5900 3800 70  0000 C C
-	1    5900 4350
+P 8700 4850
+F 0 "J1" H 8700 5400 70  0000 C C
+F 1 "DB9" H 8700 4300 70  0000 C C
+	1    8700 4850
 	1    0    0    1   
 $EndComp
 $Comp
 L +5V #PWR012
 U 1 1 45A40B48
-P 3750 2950
-F 0 "#PWR012" H 3750 3040 20  0001 C C
-F 1 "+5V" H 3750 3040 30  0000 C C
-	1    3750 2950
+P 6550 3450
+F 0 "#PWR012" H 6550 3540 20  0001 C C
+F 1 "+5V" H 6550 3540 30  0000 C C
+	1    6550 3450
 	1    0    0    -1  
 $EndComp
 $Comp
 L CP C4
 U 1 1 45A40B38
-P 4050 3750
-F 0 "C4" H 4100 3850 50  0000 L C
-F 1 "1uF" H 4100 3650 50  0000 L C
-	1    4050 3750
+P 6850 4250
+F 0 "C4" H 6900 4350 50  0000 L C
+F 1 "1uF" H 6900 4150 50  0000 L C
+	1    6850 4250
 	1    0    0    -1  
 $EndComp
 $Comp
 L CP C3
 U 1 1 45A40B2E
-P 3900 3250
-F 0 "C3" H 3950 3350 50  0000 L C
-F 1 "1uF" H 3950 3150 50  0000 L C
-	1    3900 3250
+P 6700 3750
+F 0 "C3" H 6750 3850 50  0000 L C
+F 1 "1uF" H 6750 3650 50  0000 L C
+	1    6700 3750
 	-1   0    0    1   
 $EndComp
 $Comp
 L CP C2
 U 1 1 45A40B29
-P 2050 3750
-F 0 "C2" H 2100 3850 50  0000 L C
-F 1 "1uF" H 2100 3650 50  0000 L C
-	1    2050 3750
+P 4850 4250
+F 0 "C2" H 4900 4350 50  0000 L C
+F 1 "1uF" H 4900 4150 50  0000 L C
+	1    4850 4250
 	1    0    0    -1  
 $EndComp
 $Comp
 L MAX232 U2
 U 1 1 45A40B1C
-P 2950 3750
-F 0 "U2" H 2950 4600 70  0000 C C
-F 1 "MAX232" H 2950 2900 70  0000 C C
-	1    2950 3750
+P 5750 4250
+F 0 "U2" H 5750 5100 70  0000 C C
+F 1 "MAX232" H 5750 3400 70  0000 C C
+	1    5750 4250
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -501,14 +558,14 @@ F 1 "78L05" H 3450 1350 60  0000 C C
 	1    3450 1150
 	1    0    0    -1  
 $EndComp
-Text Notes 4450 1800 0    60   ~
+Text Notes 4750 1500 0    60   ~
 Power-on LED
-Text Notes 1500 4850 0    60   ~
+Text Notes 4300 5350 0    60   ~
 RS232 to TTL converter
 Text Notes 2100 650  0    60   ~
 Power in and voltage regulator
-Text Notes 6500 2200 0    60   ~
+Text Notes 6800 1900 0    60   ~
 Power output connectors
-Text Notes 5450 5150 0    60   ~
+Text Notes 8250 5650 0    60   ~
 RS232 socket
 $EndSCHEMATC
