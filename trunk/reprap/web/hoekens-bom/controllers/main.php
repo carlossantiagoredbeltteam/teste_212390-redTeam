@@ -51,19 +51,42 @@
 		
 		public function statistics()
 		{
-			$this->set('unique_part_count', db()->getValue("
-				SELECT count(*)
-				FROM unique_parts
-			"));
 			$this->set('supplier_count', db()->getValue("
 				SELECT count(*)
 				FROM suppliers
 			"));
+			
+			$this->set('supplier_part_count', db()->getValue("
+				SELECT count(*)
+				FROM supplier_parts
+			"));
+			
+			$this->set('raw_part_count', db()->getValue("
+				SELECT count(*)
+				FROM raw_parts
+			"));
+			
+			$this->set('rough_unique_count', db()->getValue("
+				SELECT count(distinct(raw_text))
+				FROM raw_parts
+			"));
+			
+			$this->set('unique_part_count', db()->getValue("
+				SELECT count(*)
+				FROM unique_parts
+				WHERE type != 'assembly'
+					AND type != 'module'
+					AND type != 'tool'
+			"));
+			
 			$this->set('part_types', db()->getArray("
 				SELECT count(*) AS cnt, type
 				FROM unique_parts
+				WHERE type != 'assembly'
+					AND type != 'module'
+					AND type != 'tool'
 				GROUP BY type
-				ORDER BY type
+				ORDER BY cnt DESC
 			"));
 		}
 	}
