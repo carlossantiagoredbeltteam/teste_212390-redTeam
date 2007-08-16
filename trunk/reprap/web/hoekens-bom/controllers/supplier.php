@@ -49,6 +49,8 @@
 		
 		public function amazon_checkout()
 		{
+			die('Under construction...');
+			
 			print_r($this->args());
 			
 			$asins = $this->args('asin');

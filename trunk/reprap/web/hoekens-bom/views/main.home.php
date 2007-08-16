@@ -25,7 +25,7 @@
 			<th>Deep Lookup?</th>
 			<td>
 				<label>
-					<input type="checkbox" name="deep_lookup" value="1"> Lookup all components for all sub-modules.
+					<input type="checkbox" name="deep_lookup" value="1" checked="true"> Lookup all components for all sub-modules.
 				</label>
 			</td>
 		</tr>
