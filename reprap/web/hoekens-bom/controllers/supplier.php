@@ -20,7 +20,13 @@
 			$this->setArg('supplier');
 			$this->setArg('parts');
 		}
-		
+
+		public function no_supplier_parts_list()
+		{
+			$this->setArg('parts');
+			$this->setArg('no_suppliers');
+		}
+				
 		public function amazon_parts_list()
 		{
 			$this->generic_parts_list();

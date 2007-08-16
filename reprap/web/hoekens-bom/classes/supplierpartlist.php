@@ -16,13 +16,13 @@
 		
 		public function addSupplier(Supplier $supplier)
 		{
-			if (!$this->getSupplier($supplier->id))
-				$this->suppliers[$supplier->id] = $supplier;
+			$this->suppliers[$supplier->get('name') . $supplier->id] = $supplier;
+			ksort($this->suppliers);
 		}
 		
-		public function getSupplier($supplier_id)
+		public function getSupplierParts($id)
 		{
-			return $this->suppliers[$supplier_id];
+			return $this->supplier_parts[$id];
 		}
 	}
 ?>

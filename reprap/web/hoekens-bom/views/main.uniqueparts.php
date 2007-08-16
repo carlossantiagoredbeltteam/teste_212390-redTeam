@@ -2,30 +2,39 @@
 
 <? if (!empty($list->uniques)): ?>
 
-	<?//= Controller::byName('main')->renderView('global_suppliers', array('parts' => $components)); ?>
+	<?= Controller::byName('main')->renderView('global_suppliers', array('suppliers' => $list->getSupplierList())); ?>
 
 	<form action="/partlist" method="POST" id="bom_form">
 		<input type="hidden" name="module_id" value="<?=$module->id?>" />
 		<table width="100%">
 			<tr>
-				<th>Part</th>
-				<th>Type</th>
+				<th> </th>
 				<th>Quantity</th>
 				<th>Suppliers</th>
 			</tr>
 			<? foreach ($list->type_list AS $type => $data): ?>
-				<? foreach ($data AS $unique_id): ?>
-					<? $unique = $list->getUnique($unique_id); ?>
+				<? $data = $list->getTypeList($type)->getAll(); ?>
+				<? foreach ($data AS $row): ?>
+					<? $unique = $row['UniquePart']; ?>
 					<? $quantity = $list->getUniqueQuantity($unique->id); ?>
+					<? $type = $unique->get('type'); ?>
+					<? if ($unique->get('type') != $old_type): ?>
+						<tr>
+							<td colspan="3">
+								<br/>
+								<span style="font-size: 23px; margin: 15 0 5 0"><?=$type?></a></span>
+								<a href="/type/<?=$type?>">view all</a>
+							</td>
+						</tr>
+					<? endif ?>
+					<? $old_type = $type; ?>
 					<? if ($quantity): ?>
 						<tr>
 							<td>
 								<input type="checkbox" id="use_<?=$unique->id?>" name="use_part[<?=$unique->id?>]" value="1" checked="true"/>
 								<a href="/uniquepart:<?=$unique->id?>"><?=$unique->get('name')?></a>
-						
 								<span onclick="Element.toggle('breakdown_<?=$unique->id?>')">(breakdown)</span>
 							</td>
-							<td><a href="/type/<?=$type?>"><?=$type?></a></td>
 							<td>
 								<input type="text" name="quantity[<?=$unique->id?>]" value="<?=$quantity?>" size="3">
 								<?= $unique->get('units') ?>

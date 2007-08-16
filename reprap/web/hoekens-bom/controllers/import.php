@@ -151,18 +151,21 @@
 		{
 			if ($name)
 			{
-				if (preg_match("/^http/", $name))
+				//check for quantity first
+				if (preg_match("/^([A-Za-z]+):(.+)::([0-9]+)$/", $name, $matches))
 				{
-					$supplier = Supplier::lookupUrl($name);
-					$url = $name;
+					$supplier = Supplier::lookupKey($matches[1]);
+					$part_num = $matches[2];
+					$quantity = $matches[3];
 				}
-				else
+				//otherwise, check for a normal 
+				else if (preg_match("/^([A-Za-z]+):(.+)$/", $name, $matches))
 				{
-					$key_info = explode(":", $name);
-					$supplier = Supplier::lookupKey($key_info[0]);
-					$part_num = $key_info[1];
+					$supplier = Supplier::lookupKey($matches[1]);
+					$part_num = $matches[2];
+					$quantity = 1;
 				}
-				
+
 				if ($supplier instanceOf Supplier)
 				{
 					$sp = new SupplierPart();
@@ -170,7 +173,7 @@
 					$sp->set('part_id', $part->id);
 					$sp->set('part_num', $part_num);
 					$sp->set('url', $url);
-					$sp->set('quantity', 1);
+					$sp->set('quantity', $quantity);
 					$sp->save();
 					
 					echo db()->error();
