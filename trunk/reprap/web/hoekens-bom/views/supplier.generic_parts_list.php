@@ -3,6 +3,7 @@
 		<tr>
 			<th>Part #</th>
 			<th>Name</th>
+			<th>Math</th>
 			<th>Quantity</th>
 		</tr>
 		<? foreach ($parts AS $part): ?>
@@ -20,7 +21,13 @@
 						<?=$unique->get('name')?>
 					<? endif ?>
 				</td>
-				<td><?=$part->get('quantity')?></td>
+				<td>
+					<?=$part->get('total_quantity')?><?=$unique->get('units')?> needed / 
+					<?=$part->get('quantity')?><?=$unique->get('units')?> per unit
+				</td>
+				<td>
+					<b><?=$part->orderQuantity()?> total</b>
+				</td>
 			</tr>
 		<? endforeach ?>
 	</table>

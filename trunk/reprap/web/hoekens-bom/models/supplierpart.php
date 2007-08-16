@@ -16,5 +16,15 @@
 			
 			return false;
 		}
+		
+		public function orderQuantity($total = null)
+		{
+			if ($total === null)
+				$total = $this->get('total_quantity');
+			if (!$total)
+				$total = 1;
+			
+			return ceil($total / $this->get('quantity'));
+		}
 	}
 ?>

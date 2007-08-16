@@ -53,6 +53,12 @@
 					break;
 
 				case 'rod':
+					if (preg_match("/(\d+)mm\D+(\d+)/", $this->get('raw_text'), $matches))
+						return "{$matches[1]}mm";
+					if (preg_match("/M(\d+)\D+(\d+)/", $this->get('raw_text'), $matches))
+						return "{$matches[1]}mm";
+					break;
+					
 				case 'stud':
 					if (preg_match("/M(\d+)\D+(\d+)/", $this->get('raw_text'), $matches))
 						return "M{$matches[1]}";
