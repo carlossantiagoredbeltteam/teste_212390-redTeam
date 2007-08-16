@@ -1,5 +1,5 @@
 <? if (!empty($parts)): ?>
-	<table>
+	<table width="100%">
 		<tr>
 			<th>Part #</th>
 			<th>Name</th>
@@ -14,12 +14,7 @@
 					 <?=$part->get('part_num')?>
 				</td>
 				<td>
-					<? if ($url): ?>
-						<a href="<?=$part->getBuyUrl()?>"><?=$unique->get('name')?>
-
-					<? else: ?>
-						<?=$unique->get('name')?>
-					<? endif ?>
+					<a href="/uniquepart:<?=$unique->id?>"><?=$unique->get('name')?></a>
 				</td>
 				<td>
 					<?=$part->get('total_quantity')?><?=$unique->get('units')?> needed / 
@@ -31,7 +26,6 @@
 			</tr>
 		<? endforeach ?>
 	</table>
-	<br/><br/>
 <? else: ?>
 	<b>No parts found.</b>
 <? endif?>

@@ -1,5 +1,4 @@
-<?= Controller::byName('main')->renderView('progressbar', array('step' => 3))?>
-
+<h1>Shopping List</h1>
 <? if (!empty($list->suppliers)): ?>
 	<? foreach ($list->suppliers AS $supplier): ?>
 		<? $parts = $list->getSupplierParts($supplier->id); ?>
@@ -14,14 +13,12 @@
 				//some suppliers have a different way of showing their part lists.
 				switch(strtolower($supplier->get('name')))
 				{
-					/*
-					case: 'amazon':
+					case 'amazon':
 						echo Controller::byName('supplier')->renderView('amazon_parts_list', array(
 							'supplier' => $supplier,
 							'parts' => $parts
 						));				
 						break;
-					*/
 				
 					case '':
 						echo Controller::byName('supplier')->renderView('no_supplier_parts_list', array(

@@ -13,8 +13,6 @@
 		
 		public function uniqueparts()
 		{
-			$this->set('title', 'Module Components');
-			
 			$module = new UniquePart($this->args('module_id'));
 			if ($module->id)
 				$list = $module->getUniquePartList($this->args('deep_lookup'), $this->args('quantity'));

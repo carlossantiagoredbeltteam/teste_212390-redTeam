@@ -1,17 +1,24 @@
-<?= Controller::byName('main')->renderView('progressbar', array('step' => 2))?>
+<script type="text/javascript">
+	function generateShoppingList()
+	{
+		$('shopping_list').innerHTML = 'Loading...';
 
+		var params = Form.serialize($('bom_form'));
+		new Ajax.Updater('shopping_list', '/partlist', {
+			parameters: params,
+			method: 'post'
+		});
+	}
+</script>
+<h1><a href="/uniquepart:<?=$module->id?>"><?=$module->get('name')?></a> Components - <?=date("M j, Y")?></h1>
+<br/>
 <? if (!empty($list->uniques)): ?>
 
 	<?= Controller::byName('main')->renderView('global_suppliers', array('suppliers' => $list->getSupplierList())); ?>
 
-	<form action="/partlist" method="POST" id="bom_form">
+	<form onsubmit="return false;" method="POST" id="bom_form">
 		<input type="hidden" name="module_id" value="<?=$module->id?>" />
 		<table width="100%">
-			<tr>
-				<th> </th>
-				<th>Quantity</th>
-				<th>Suppliers</th>
-			</tr>
 			<? foreach ($list->type_list AS $type => $data): ?>
 				<? $data = $list->getTypeList($type)->getAll(); ?>
 				<? foreach ($data AS $row): ?>
@@ -63,8 +70,11 @@
 				<? endforeach ?>
 			<? endforeach ?>
 		</table>
-		<input type="submit" name="submit" value="Generate Bill of Materials"/>
+		<input type="button" style="font-size: 22px" value="Generate Shopping List" onclick="generateShoppingList()"/>
 	</form>
+	<br/>
+	
+	<div id="shopping_list"></div>
 <? else: ?>
 	<b>No components found!</b>
 <? endif?>

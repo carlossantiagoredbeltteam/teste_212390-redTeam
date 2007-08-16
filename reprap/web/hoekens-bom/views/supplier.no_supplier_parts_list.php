@@ -24,7 +24,6 @@
 			</tr>
 		<? endforeach ?>
 	</table>
-	<br/><br/>
 <? else: ?>
 	<b>No parts found.</b>
 <? endif?>

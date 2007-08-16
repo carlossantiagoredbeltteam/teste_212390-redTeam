@@ -33,4 +33,4 @@
 	<? endforeach ?>
 </select>
 <br/>
-(it will choose this supplier if available below.)
+(This will choose this supplier below, if it is an option for that part.)
