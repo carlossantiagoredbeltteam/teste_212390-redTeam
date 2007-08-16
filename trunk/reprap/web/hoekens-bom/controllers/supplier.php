@@ -46,5 +46,26 @@
 		{
 			$this->generic_parts_list();
 		}
+		
+		public function amazon_checkout()
+		{
+			print_r($this->args());
+			
+			$asins = $this->args('asin');
+			$qty = $this->args('quantities');
+			
+			$url  = "http://ecs.amazonaws.com/onca/xml?Service=AWSECommerceService&AWSAccessKeyId=" . AWSAccessKeyId;
+			$url .= "&AssociateTag=" . AmazonAssociateTag;
+			$url .= "&Operation=CartCreate";
+			
+			foreach ($asins AS $key => $asin)
+			{
+				$quantity = $qty[$key];
+				$url .= "&Item.{$key}.ASIN={$asin}&Item.{$key}.Quantity={$quantity}";
+			}
+
+			echo "\n\n$url\n\n";
+			die();
+		}
 	}
 ?>

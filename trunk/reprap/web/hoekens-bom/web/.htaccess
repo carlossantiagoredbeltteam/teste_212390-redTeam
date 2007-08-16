@@ -6,7 +6,10 @@ RewriteEngine on
 #for the part list generator
 RewriteRule ^uniqueparts:([0-9]+)$	plister.php?controller=main&view=uniqueparts&module_id=$1 [NC,L]
 RewriteRule ^uniqueparts/?$			plister.php?controller=main&view=uniqueparts [NC,L]
-RewriteRule ^partlist/?$			plister.php?controller=main&view=partlist [NC,L]
+RewriteRule ^amazon_checkout/?$		plister.php?controller=supplier&view=amazon_checkout [NC,L]
+
+#ajax stuff
+RewriteRule ^partlist/?$			plister.php?mode=ajax&controller=main&view=partlist [NC,L]
 
 #detail type stuff
 RewriteRule ^supplier:([0-9]+)$		plister.php?controller=parts&view=bysupplier&id=$1 [NC,L]
