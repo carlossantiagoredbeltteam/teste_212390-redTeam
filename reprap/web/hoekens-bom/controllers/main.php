@@ -1,4 +1,4 @@
-<?
+		<?
 	class MainController extends Controller
 	{
 		public function progressbar()
@@ -46,12 +46,13 @@
 			foreach ($args['use_part'] AS $key => $use)
 			{
 				$part = new SupplierPart($args['part_supplier'][$key]);
-				$part->set('quantity', $args['quantity'][$key]);
+				$part->set('total_quantity', $args['quantity'][$key]);
 				$list->addSupplierPart($part);
 			}
 			
 			$this->set('module', $module);
 			$this->set('list', $list);
+			$this->setArg('no_suppliers');
 		}
 		
 		public function statistics()

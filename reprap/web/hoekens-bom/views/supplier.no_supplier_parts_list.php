@@ -20,7 +20,7 @@
 						<?=$unique->get('name')?>
 					<? endif ?>
 				</td>
-				<td><?=$part->get('quantity')?></td>
+				<td><?=$part->orderQuantity()?></td>
 			</tr>
 		<? endforeach ?>
 	</table>

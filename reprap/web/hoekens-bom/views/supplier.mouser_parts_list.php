@@ -3,5 +3,5 @@
 </p>
 <textarea width="100%" rows="<?=count($parts)?>" onfocus="this.select()"><? 
 	foreach ($parts AS $part)
-		echo $part->get('part_num') . " " . $part->get('quantity') . "\n";
+		echo $part->get('part_num') . " " . $part->orderQuantity() . "\n";
 ?></textarea>
