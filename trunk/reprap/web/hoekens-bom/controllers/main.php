@@ -23,6 +23,11 @@
 			$this->set('module', $module);
 		}
 		
+		public function global_suppliers()
+		{
+			$this->set('suppliers', $this->args('suppliers')->getAll());
+		}
+		
 		public function part_suppliers()
 		{
 			$part = $this->args('part');

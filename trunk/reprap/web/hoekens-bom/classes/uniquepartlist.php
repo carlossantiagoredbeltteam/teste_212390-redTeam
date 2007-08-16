@@ -11,7 +11,7 @@
 			if (!$this->getUnique($part->id))
 			{
 				$this->uniques[$part->id] = $part;
-				$this->type_list[$part->get('type')][] = $part->id;
+				$this->type_list[$part->get('type')][$part->get('name')] = $part->id;
 				ksort($this->type_list);
 			}
 		}
@@ -38,6 +38,31 @@
 				$total += $raw->getRealQuantity();
 				
 			return $total;
+		}
+		
+		public function getTypeList($type)
+		{
+			$sql = "
+				SELECT id
+				FROM unique_parts
+				WHERE id IN (" . implode(",", $this->type_list[$type]) . ")
+				ORDER BY name
+			";
+			return new Collection($sql, array('UniquePart' => id));
+		}
+		
+		public function getSupplierList()
+		{
+			$sql = "
+				SELECT distinct(s.id)
+				FROM supplier_parts sp
+				INNER JOIN suppliers s
+					ON s.id = sp.supplier_id
+				WHERE sp.part_id IN (" . implode(",", array_keys($this->uniques)) . ")
+				ORDER BY s.name
+			";
+			
+			return new Collection ($sql, array('Supplier' => 'id'));
 		}
 	}
 ?>
