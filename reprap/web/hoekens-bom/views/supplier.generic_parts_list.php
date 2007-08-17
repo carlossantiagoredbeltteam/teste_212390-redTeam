@@ -11,7 +11,10 @@
 			<? $url = $part->getBuyUrl() ?>
 			<tr>
 				<td>
-					 <?=$part->get('part_num')?>
+					<?=$part->get('part_num')?>
+					<? if ($url): ?>
+						 <a href="<?=$url?>">(buy)</a>
+					<? endif ?>
 				</td>
 				<td>
 					<a href="/uniquepart:<?=$unique->id?>"><?=$unique->get('name')?></a>

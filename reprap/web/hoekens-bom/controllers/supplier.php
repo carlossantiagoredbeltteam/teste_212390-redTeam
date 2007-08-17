@@ -49,8 +49,6 @@
 		
 		public function amazon_checkout()
 		{
-			die('Under construction...');
-			
 			print_r($this->args());
 			
 			$asins = $this->args('asin');
@@ -63,10 +61,18 @@
 			foreach ($asins AS $key => $asin)
 			{
 				$quantity = $qty[$key];
-				$url .= "&Item.{$key}.ASIN={$asin}&Item.{$key}.Quantity={$quantity}";
+				
+				if ($quantity && $asin)
+					$url .= "&Item.{$key}.ASIN={$asin}&Item.{$key}.Quantity={$quantity}";
+					
+				break;
 			}
-
-			echo "\n\n$url\n\n";
+			
+			$xml = simplexml_load_string(file_get_contents($url));
+			
+			echo "<!-- $url -->\n";
+			print_r($xml);
+			
 			die();
 		}
 	}

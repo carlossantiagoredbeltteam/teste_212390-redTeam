@@ -7,7 +7,6 @@
 		</tr>
 		<? foreach ($parts AS $part): ?>
 			<? $unique = new UniquePart($part->get('part_id')) ?>
-			<? $url = $part->getBuyUrl() ?>
 			<tr>
 				<td>
 					 <?=$part->get('part_num')?>
