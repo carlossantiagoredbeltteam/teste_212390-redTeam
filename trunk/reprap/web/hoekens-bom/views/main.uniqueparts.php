@@ -101,6 +101,7 @@
 				<? endforeach ?>
 			<? endforeach ?>
 		</table>
+		<br/>
 		<input type="button" style="font-size: 22px" value="Generate Shopping List" onclick="generateShoppingList()"/>
 	</form>
 	<br/>

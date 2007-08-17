@@ -12,7 +12,7 @@
 				<? $url = $part->getBuyUrl() ?>
 				<tr>
 					<td>
-						<?=$part->get('part_num')?>
+						<?=$part->get('part_num')?> <a href="<?=$url?>">(buy)</a>
 						<input type="hidden" name="asin[]" value="<?=$part->get('part_num')?>" />
 					</td>
 					<td>

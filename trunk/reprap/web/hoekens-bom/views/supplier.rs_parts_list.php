@@ -5,3 +5,11 @@
 	foreach ($parts AS $part)
 		echo $part->get('part_num') . "," . $part->orderQuantity() . "\n";
 ?></textarea>
+
+<h4>Human Readable List:</h4>
+<?
+	echo Controller::byName('supplier')->renderView('generic_parts_list', array(
+		'supplier' => $supplier,
+		'parts' => $parts
+	));
+?>
