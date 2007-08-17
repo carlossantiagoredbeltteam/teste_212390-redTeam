@@ -132,5 +132,56 @@
 				'UniquePart' => 'id',
 			));
 		}
+		
+		public static function typeToEnglish($type)
+		{
+			switch ($type)
+			{
+				case 'belt':
+					return 'Toothed Belt';
+				
+				case 'component':
+					return 'Electronic Component';
+				
+				case 'fast':
+					return 'Fastener';
+					
+				case 'machined':
+					return 'Machined Part';
+					
+				case 'misc':
+					return 'Miscellaneous';
+					
+				case 'module':
+					return 'System Module';
+					
+				case 'motor':
+					return 'Electric Motor';
+					
+				case 'pcb':
+					return 'Printed Circuit Board';
+					
+				case 'pulley':
+					return 'Pulley';
+					
+				case 'rp':
+					return 'Printed Part';
+					
+				case 'rod':
+					return 'Smooth Rod';
+					
+				case 'stud':
+					return 'Threaded Rod';
+					
+				case 'tool':
+					return 'Tool';
+					
+				case 'wire':
+					return 'Wire';
+					
+				default:
+					return ucfirst($type);
+			}
+		}
 	}
 ?>

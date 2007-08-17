@@ -1,6 +1,6 @@
 <? $parts = $collection->getAll(); ?>
 
-<h2>Unique <?=ucfirst($type)?> Parts</h2>
+<h2>Unique <?=UniquePart::typeToEnglish($type)?> Parts</h2>
 <? if (!empty($parts)): ?>
 	<? foreach ($parts AS $row): ?>
 		<? $part = $row['UniquePart'] ?>

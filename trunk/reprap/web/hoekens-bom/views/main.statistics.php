@@ -15,7 +15,7 @@
 	</tr>
 	<? foreach ($part_types AS $row): ?>
 		<tr>
-			<td><a href="/type/<?=$row['type']?>"><?=$row['type']?></a></td>
+			<td><a href="/type/<?=$row['type']?>"><?=UniquePart::typeToEnglish($row['type'])?></a></td>
 			<td align="right"><?=$row['cnt']?></td>
 			<td align="right"><?=number_format(($row['cnt']/$unique_part_count) * 100, 2)?>%
 		</tr>

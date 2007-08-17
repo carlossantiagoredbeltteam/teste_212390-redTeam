@@ -17,7 +17,7 @@
 		Element.toggle('minus_' + id);
 	}
 </script>
-<h1><a href="/uniquepart:<?=$module->id?>"><?=$module->get('name')?></a> Components - <?=date("M j, Y")?></h1>
+<h1><a href="/uniquepart:<?=$module->id?>"><?=$module->get('name')?></a> - <?=date("M j, Y")?></h1>
 <br/>
 <? if (!empty($list->uniques)): ?>
 
@@ -36,7 +36,7 @@
 						<tr>
 							<td colspan="3">
 								<br/>
-								<span style="font-size: 23px; margin: 15 0 5 0"><?=$type?></a></span>
+								<span style="font-size: 23px; margin: 15 0 5 0"><?=UniquePart::typeToEnglish($type)?></a></span>
 								<a href="/type/<?=$type?>">view all</a>
 							</td>
 						</tr>
