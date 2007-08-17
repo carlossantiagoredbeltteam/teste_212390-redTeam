@@ -9,6 +9,13 @@
 			method: 'post'
 		});
 	}
+	
+	function toggleBreakdown(id)
+	{
+		Element.toggle('breakdown_' + id);
+		Element.toggle('plus_' + id);
+		Element.toggle('minus_' + id);
+	}
 </script>
 <h1><a href="/uniquepart:<?=$module->id?>"><?=$module->get('name')?></a> Components - <?=date("M j, Y")?></h1>
 <br/>
@@ -38,9 +45,12 @@
 					<? if ($quantity): ?>
 						<tr>
 							<td>
+								<img src="/img/plus-icon.gif" id="plus_<?=$unique->id?>" onclick="toggleBreakdown(<?=$unique->id?>)" style="cursor: pointer;"/>
+								<img src="/img/minus-icon.gif" id="minus_<?=$unique->id?>" onclick="toggleBreakdown(<?=$unique->id?>)" style="cursor: pointer; display: none"/>
 								<input type="checkbox" id="use_<?=$unique->id?>" name="use_part[<?=$unique->id?>]" value="1" checked="true"/>
 								<a href="/uniquepart:<?=$unique->id?>"><?=$unique->get('name')?></a>
-								<span onclick="Element.toggle('breakdown_<?=$unique->id?>')">(breakdown)</span>
+								<img src="/img/help-icon.gif" onclick="Element.toggle('tooltip_<?=$unique->id?>')" style="cursor: pointer;">
+								<div id="tooltip_<?=$unique->id?>" class="tooltip" style="display: none"><?=$unique->get('description')?></div>
 							</td>
 							<td>
 								<input type="text" name="quantity[<?=$unique->id?>]" value="<?=$quantity?>" size="3">
@@ -48,7 +58,7 @@
 							</td>
 							<td><?= Controller::byName('main')->renderView('part_suppliers', array('part' => $unique))?></td>
 						</tr>
-						<tr id="breakdown_<?=$unique->id?>" style="display: none;">
+						<tr id="breakdown_<?=$unique->id?>" class="breakdown" style="display: none;">
 							<td colspan="4">
 								<div style="margin-left: 20px">
 									<table>
@@ -56,9 +66,30 @@
 											<td><b>Part</b></td>
 											<td><b>Quantity</b></td>
 										</tr>
+										<? $raws = array(); ?>
 										<? foreach ($list->raw_list[$unique->id] AS $part): ?>
+											<?
+												$parent = new RawPart($part->get('parent_id'));
+												if ($parent->get('type') == 'assembly')
+												{
+													$assembly = $parent;
+													$parent = new RawPart($assembly->get('parent_id'));
+												}
+												else
+												{
+													$grandparent = new RawPart($parent->get('parent_id'));
+													$assembly = false;
+												}
+											?>
 											<tr>
-												<td><?=$part->get('raw_text')?></td>
+												<td><?=$part->get('raw_text')?> <span style="font-size: 90%">(from 
+													<? if ($assembly instanceOf RawPart): ?>
+														<a href="/uniquepart:<?=$parent->get('part_id')?>"><?=$parent->get('raw_text')?></a> / <?=$assembly->get('raw_text')?>)</span>
+													<? else: ?>
+														<!-- <a href="/uniquepart:<?=$grandparent->get('part_id')?>"><?=$grandparent->get('raw_text')?></a> / -->
+														<a href="/uniquepart:<?=$parent->get('part_id')?>"><?=$parent->get('raw_text')?></a>)</span>
+													<? endif ?>
+												</td>
 												<td><?=$part->get('quantity')?></td>
 											</tr>
 										<? endforeach ?>
