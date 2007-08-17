@@ -4,7 +4,7 @@
 		<? $part = $row['UniquePart'] ?>
 		<? if ($part->get('type') != $type): ?>
 			<? $type = $part->get('type'); ?>
-			<h2><?=ucfirst($type)?> Parts (<a href="/type/<?=$type?>">see all</a>)</h2>
+			<h2><?=UniquePart::typeToEnglish($type)?> Parts (<a href="/type/<?=$type?>">see all</a>)</h2>
 		<? endif ?>
 		<p>
 			<b><a href="/uniquepart:<?=$part->id?>"><?=$part->get('name')?></a></b> <?=$part->get('description')?>

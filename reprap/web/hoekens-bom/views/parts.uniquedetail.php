@@ -1,4 +1,4 @@
-<h1><?=$part->get('name')?>, a <a href="/type/<?=$part->get('type')?>"><?=$part->get('type')?></a> type part.</h1>
+<h1><?=$part->get('name')?>, a <a href="/type/<?=$part->get('type')?>"><?=UniquePart::typeToEnglish($part->get('type'))?></a> type part.</h1>
 
 <p>
 	<?=$part->get('description')?>
@@ -28,7 +28,7 @@
 					<tr>
 						<td><a href="/uniquepart:<?=$unique->id?>"><?=$unique->get('name')?></a>
 						</td>
-						<td><a href="/type/<?=$type?>"><?=$type?></a></td>
+						<td><a href="/type/<?=$type?>"><?=UniquePart::typeToEnglish($type)?></a></td>
 						<td><?=$list->getUniqueQuantity($unique->id)?></td>
 					</tr>
 				<? endforeach ?>
