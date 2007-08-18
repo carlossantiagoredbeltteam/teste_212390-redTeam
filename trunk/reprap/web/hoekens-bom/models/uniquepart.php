@@ -5,7 +5,7 @@
 		{
 			parent::__construct($id, "unique_parts");
 		}
-		
+
 		public static function getModules()
 		{
 			$sql = "
@@ -14,7 +14,10 @@
 				WHERE type = 'module'
 				ORDER BY id
 			";
-			return new Collection($sql, array('UniquePart' => id));
+			
+			return new Collection($sql, array(
+				'UniquePart' => 'id',
+			));
 		}
 		
 		public function lookupRawPart()

@@ -13,12 +13,42 @@
 		
 		public function uniqueparts()
 		{
-			$module = new UniquePart($this->args('module_id'));
-			if ($module->id)
-				$list = $module->getUniquePartList($this->args('deep_lookup'), $this->args('quantity'));
+			$ids = $this->args('module_id');
 			
-			$this->set('list', $list);
-			$this->set('module', $module);
+			if (is_array($ids))
+			{
+				$list = new UniquePartList();
+				$use_module = $this->args('use_module');
+				$quantities = $this->args('quantities');
+
+				foreach ($use_module AS $id => $use)
+				{
+					$module = new UniquePart($id);
+					$components = $module->getRawComponents($false);
+					
+					foreach ($components AS $part)
+					{
+						$part->set('quantity', $part->get('quantity') * $quantities[$module->id]);
+						$list->addRaw($part, $quantity);
+					}
+					
+					$modules[] = $module;
+				}
+				$this->set('list', $list);
+				$this->set('modules', $modules);
+				$this->set('quantities', $quantities);
+			}
+			else if ($ids > 0)
+			{
+				$module = new UniquePart($this->args('module_id'));
+				if ($module->id)
+					$list = $module->getUniquePartList($this->args('deep_lookup'), $this->args('quantity'));
+
+				$this->set('list', $list);
+				$this->set('module', $module);
+			}
+			else
+				$this->set('error', "We couldn't figure out what you wanted.  Sorry!");
 		}
 		
 		public function global_suppliers()

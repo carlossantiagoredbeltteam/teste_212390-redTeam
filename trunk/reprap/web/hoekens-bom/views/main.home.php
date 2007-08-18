@@ -1,3 +1,12 @@
+<script>
+	function selectModule(id)
+	{
+		if ($('module_check_' + id).checked)
+			Element.addClassName('module_' + id, 'module_row_selected');
+		else
+			Element.removeClassName('module_' + id, 'module_row_selected')
+	}
+</script>
 <h1>Quick Part List Lookup</h1>
 <?= Controller::byName('main')->renderView('progressbar', array('step' => 1))?>
 <form action="/uniqueparts" method="POST" name="bom_form">
@@ -61,11 +70,39 @@
 		</tr>
 	</table>
 	
-	<h1>Detailed Module Info</h1>
-	<? foreach ($modules AS $row): ?>
-		<? $module = $row['UniquePart']; ?>
-		<p>
-			<b><a href="/uniquepart:<?=$module->id?>"><?=$module->get('name')?></a></b> <?=$module->get('description')?>
-		</p>
-	<? endforeach ?>
+	<h1>Detailed Part List Lookup</h1>
+	<form action="/uniqueparts">
+		<table width="100%">
+			<tr>
+				<th width="10%">Use?</th>
+				<th width="75%">Module</th>
+				<th width="15%">Quantity</th>
+			</tr>
+			<? foreach ($modules AS $row): ?>
+				<? $module = $row['UniquePart']; ?>
+				<tr class="module_row" id="module_<?=$module->id?>">
+					<td align="center">
+						<input type="checkbox" id="module_check_<?=$module->id?>" name="use_module[<?=$module->id?>]" value="1" onclick="selectModule(<?=$module->id?>)"/>
+					</td>
+					<td>
+						<input type="hidden" name="module_id[<?=$module->id?>]" value="<?=$module->id?>" />
+						<b><a href="/uniquepart:<?=$module->id?>"><?=$module->get('name')?></a></b>
+						<img src="/img/help-icon.gif" onclick="Element.toggle('description_<?=$module->id?>')">
+					</td>
+					<td align="center"><input type="text" name="quantities[<?=$module->id?>]" value="1" size="3"></td>
+				</tr>
+				<tr id="description_<?=$module->id?>" style="display: none">
+					<td>&nbsp;</td>
+					<td>
+						<?=$module->get('description')?>
+					</td>
+					<td>&nbsp;</td>
+				</tr>
+			<? endforeach ?>
+			<tr>
+				<td>&nbsp;</td>
+				<td><input type="submit" name="submit" value="Next Step" /></td>
+			</tr>
+		</table>
+	</form>
 </form>

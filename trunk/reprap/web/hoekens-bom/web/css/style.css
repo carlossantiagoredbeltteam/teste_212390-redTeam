@@ -605,3 +605,22 @@ div.imageAnnotationText textarea.active
 	color: #000;
 }
 
+table
+{
+	border: 0px;
+	border-spacing: 0px;
+}
+
+tr.module_row td
+{
+	padding: 3px;
+}
+tr.module_row:hover
+{
+	background: #ccc;
+}
+
+tr.module_row_selected
+{
+	background: #cfc !important;
+}

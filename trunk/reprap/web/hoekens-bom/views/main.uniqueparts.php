@@ -17,7 +17,28 @@
 		Element.toggle('minus_' + id);
 	}
 </script>
-<h1><a href="/uniquepart:<?=$module->id?>"><?=$module->get('name')?></a> - <?=date("M j, Y")?></h1>
+<? if ($module): ?>
+	<h1><a href="/uniquepart:<?=$module->id?>"><?=$module->get('name')?></a> - <?=date("M j, Y")?></h1>
+<? else: ?>
+	<h1>Custom Part List - <?=date("M j, Y")?></h1>
+	<table>
+		<tr>
+			<td colspan="2"><b>Modules used:</b></td>
+		</tr>
+		<? foreach ($modules AS $module): ?>
+			<tr>
+				<td><b><a href="/uniquepart:<?=$module->id?>"><?=$module->get('name')?></a></b></td>
+				<td>x <?=$quantities[$module->id]?></td>
+			</tr>
+		<? endforeach ?>
+	</table>
+	<br/>
+<? endif ?>
+<em>
+	<strong>Note:</strong> This list is reasonably accurate, but it is not guaranteed.  Please review it before you buy anything.<br/>
+	If you do happen to find an error, please report it in the <a href="http://forums.reprap.org">forums</a>.
+</em>
+<br/>
 <br/>
 <? if (!empty($list->uniques)): ?>
 
