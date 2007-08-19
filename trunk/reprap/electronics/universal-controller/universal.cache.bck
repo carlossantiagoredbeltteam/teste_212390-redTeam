@@ -1,53 +1,8 @@
-EESchema-DOCLIB  Version 2.0  7/8/2007-13:52:00
+EESchema-DOCLIB  Version 2.0  19/8/2007-21:57:31
 #
-$CMP 7805
-D Linear Regulator +5V
-K POWER REGUL
-F regulator/lm78*.*
-$ENDCMP
-#
-$CMP C
-D Condensateur non polarise
-$ENDCMP
-#
-$CMP CONN_2
-D Symbole general de connecteur
+$CMP CONN_6
+D ymbole general de connecteur
 K CONN
-$ENDCMP
-#
-$CMP CONN_3
-D Symbole general de connecteur
-K CONN
-$ENDCMP
-#
-$CMP CONN_4
-D Symbole general de connecteur
-K CONN
-$ENDCMP
-#
-$CMP CONN_5
-D Symbole general de connecteur
-K CONN
-$ENDCMP
-#
-$CMP CP
-D Condensateur polarise
-$ENDCMP
-#
-$CMP DIODE
-D Diode simple
-K DEV DIODE
-$ENDCMP
-#
-$CMP PIC16F628
-D FLASH-Based 8-Bit CMOS Microcontroller
-K 16F628
-F www.microchip.com
-$ENDCMP
-#
-$CMP R
-D Resistance
-K R DEV
 $ENDCMP
 #
 #End Doc Library
