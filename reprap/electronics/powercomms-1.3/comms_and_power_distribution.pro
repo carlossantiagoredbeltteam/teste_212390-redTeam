@@ -1,4 +1,4 @@
-update=15/8/2007-02:14:50
+update=19/8/2007-18:43:08
 last_client=eeschema
 [common]
 NetDir=
@@ -115,11 +115,11 @@ UseNetN=0
 LabSize=60
 [eeschema/libraries]
 LibName1=power
-LibName2=reprap
-LibName3=device
-LibName4=conn
-LibName5=linear
-LibName6=regul
+LibName2=device
+LibName3=conn
+LibName4=linear
+LibName5=regul
+LibName6=reprap
 LibName7=74xx
 LibName8=cmos4000
 LibName9=adc-dac
@@ -138,4 +138,3 @@ LibName21=philips
 LibName22=display
 LibName23=cypress
 LibName24=siliconi
-LibName25=contrib
