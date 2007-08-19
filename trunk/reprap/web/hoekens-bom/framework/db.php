@@ -29,6 +29,11 @@ class DatabaseSocket
 		$this->link = mysql_connect($host, $user, $pass);
 	}
 	
+	public function safe($text)
+	{
+		return mysql_real_escape_string($text, $this->link);
+	}
+	
 	public function error()
 	{
 		return mysql_error($this->link);

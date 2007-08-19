@@ -1,6 +1,6 @@
 <? if ($error): ?>
 	<h1>Error:</h1>
-	<h3 style="font-color: red"><?=$error?></h3>
+	<h3 style="color: red"><?=$error?></h3>
 <? else: ?>
 	<script type="text/javascript">
 		function generateShoppingList()
