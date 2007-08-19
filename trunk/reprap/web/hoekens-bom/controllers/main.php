@@ -21,22 +21,28 @@
 				$use_module = $this->args('use_module');
 				$quantities = $this->args('quantities');
 
-				foreach ($use_module AS $id => $use)
+				if (!empty($use_module))
 				{
-					$module = new UniquePart($id);
-					$components = $module->getRawComponents($this->args('deep_lookup'));
-					
-					foreach ($components AS $part)
+					foreach ($use_module AS $id => $use)
 					{
-						$part->set('quantity', $part->get('quantity') * $quantities[$module->id]);
-						$list->addRaw($part, $quantity);
+						$module = new UniquePart($id);
+						$components = $module->getRawComponents($this->args('deep_lookup'));
+
+						foreach ($components AS $part)
+						{
+							$part->set('quantity', $part->get('quantity') * $quantities[$module->id]);
+							$list->addRaw($part, $quantity);
+						}
+
+						$modules[] = $module;
 					}
+					$this->set('list', $list);
+					$this->set('modules', $modules);
+					$this->set('quantities', $quantities);
 					
-					$modules[] = $module;
 				}
-				$this->set('list', $list);
-				$this->set('modules', $modules);
-				$this->set('quantities', $quantities);
+				else
+					$this->set('error', "You must choose a module to generate a part list for.");
 			}
 			else if ($ids > 0)
 			{
