@@ -100,6 +100,14 @@
 				</tr>
 			<? endforeach ?>
 			<tr>
+				<th>Deep Lookup?</th>
+				<td>
+					<label>
+						<input type="checkbox" name="deep_lookup" value="1" checked="true"> Lookup all components for all sub-modules.
+					</label>
+				</td>
+			</tr>
+			<tr>
 				<td>&nbsp;</td>
 				<td><input type="submit" name="submit" value="Next Step" /></td>
 			</tr>
