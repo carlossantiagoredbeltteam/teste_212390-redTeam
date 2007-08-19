@@ -24,7 +24,7 @@
 				foreach ($use_module AS $id => $use)
 				{
 					$module = new UniquePart($id);
-					$components = $module->getRawComponents($false);
+					$components = $module->getRawComponents($this->args('deep_lookup'));
 					
 					foreach ($components AS $part)
 					{
