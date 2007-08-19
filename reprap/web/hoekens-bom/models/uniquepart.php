@@ -5,6 +5,19 @@
 		{
 			parent::__construct($id, "unique_parts");
 		}
+		
+		public static function byName($name)
+		{
+			$name = db()->safe($name);
+			
+			$sql = "
+				SELECT id
+				FROM unique_parts
+				WHERE name = '$name'
+			";
+			
+			return new UniquePart(db()->getValue($sql));
+		}
 
 		public static function getModules()
 		{

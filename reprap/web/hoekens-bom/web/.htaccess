@@ -15,6 +15,7 @@ RewriteRule ^partlist/?$			plister.php?mode=ajax&controller=main&view=partlist [
 RewriteRule ^supplier:([0-9]+)$		plister.php?controller=parts&view=bysupplier&id=$1 [NC,L]
 RewriteRule ^type/([a-zA-Z]+)$		plister.php?controller=parts&view=bytype&type=$1 [NC,L]
 RewriteRule ^uniquepart:([0-9]+)$	plister.php?controller=parts&view=uniquedetail&id=$1 [NC,L]
+RewriteRule ^uniquepart/(.+)$		plister.php?controller=parts&view=uniquedetail&name=$1 [NC,L]
 
 #random stuff
 RewriteRule ^about$					plister.php?controller=main&view=about [NC,L]
