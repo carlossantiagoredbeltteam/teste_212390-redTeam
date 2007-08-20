@@ -7,5 +7,11 @@
 	define("RR_DB_PORT", "3306");
 	define("RR_DB_USER", "");
 	define("RR_DB_PASS", "");
-
+	define("RR_DB_NAME", "");
+	
+	define("GOOGLE_USERNAME", "");
+	define("GOOGLE_PASSWORD", "");
+	
+	define("AWSAccessKeyId", "");
+	define("AmazonAssociateTag", "");
 ?>
