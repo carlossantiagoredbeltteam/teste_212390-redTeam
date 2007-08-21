@@ -57,5 +57,13 @@
 			
 			$this->set('parts', $coll->getAll());
 		}
+		
+		public function tree()
+		{
+			$root = $this->args('root');
+			
+			$this->set('root', $root);
+			$this->set('kids', $root->getUniqueComponents());
+		}
 	}
 ?>

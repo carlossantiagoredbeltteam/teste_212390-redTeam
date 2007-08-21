@@ -1,4 +1,4 @@
-		<?
+<?
 	class MainController extends Controller
 	{
 		public function progressbar()
@@ -9,6 +9,10 @@
 		public function home()
 		{
 			$this->set('modules', UniquePart::getModules()->getAll());
+			
+			$raw = new RawPart(1);
+			$root = new UniquePart($raw->get('part_id'));
+			$this->set('root', $root);
 		}
 		
 		public function uniqueparts()
