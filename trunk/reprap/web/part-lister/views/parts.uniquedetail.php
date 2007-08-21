@@ -53,7 +53,7 @@
 			<p>
 				<? $supplier = $row['Supplier'] ?>
 				<? $spart = $row['SupplierPart'] ?>
-				<b><a href="/supplier:<?=$supplier->id?>"><?=$supplier->get('name')?></a></b>: <?=$spart->get('part_num')?>
+				<b><a href="<?=$supplier->getViewUrl()?>"><?=$supplier->get('name')?></a></b>: <?=$spart->get('part_num')?>
 				(<a href="<?=$spart->getBuyUrl()?>">buy</a>)
 			</p>
 		<? endforeach ?>

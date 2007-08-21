@@ -3,7 +3,7 @@
 	<? foreach ($suppliers AS $row): ?>
 		<? $supplier = $row['Supplier'] ?>
 		<p>
-			<b><a href="/supplier:<?=$supplier->id?>"><?=$supplier->get('name')?></a></b> <?=$supplier->get('description')?>
+			<b><a href="<?=$supplier->getViewUrl()?>"><?=$supplier->get('name')?></a></b> <?=$supplier->get('description')?>
 		</p>
 	<? endforeach ?>
 <? else: ?>

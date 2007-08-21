@@ -6,6 +6,21 @@
 			parent::__construct($id, "suppliers");
 		}
 		
+		public static function byName($name)
+		{
+			$id = db()->getValue("
+				SELECT id
+				FROM suppliers
+				WHERE name = '$name'
+				LIMIT 1
+			");
+			
+			if ($id)
+				return new Supplier($id);
+			
+			return false;
+		}
+		
 		public static function lookupUrl($url)
 		{
 			$data = parse_url($url);
@@ -22,6 +37,11 @@
 				return new Supplier($id);
 
 			return false;
+		}
+		
+		public function getViewUrl()
+		{
+			return "/supplier/" . urlencode($this->get('name'));
 		}
 		
 		public function getHost()
