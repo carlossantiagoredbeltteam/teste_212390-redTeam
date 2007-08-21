@@ -1,11 +1,11 @@
 EESchema Schematic File Version 1
-LIBS:power,reprap,device,conn,linear,regul,74xx,cmos4000,adc-dac,memory,xilinx,special,microcontrollers,microchip,analog_switches,motorola,intel,audio,interface,digital-audio,philips,display,cypress,siliconi,contrib,.\universal.cache
+LIBS:power,reprap,device,conn,linear,regul,74xx,cmos4000,adc-dac,memory,xilinx,special,microcontrollers,microchip,analog_switches,motorola,intel,audio,interface,digital-audio,philips,display,cypress,siliconi,contrib,./universal.cache
 EELAYER 23  0
 EELAYER END
 $Descr A4 11700 8267
 Sheet 1 1
 Title ""
-Date "19 aug 2007"
+Date "21 aug 2007"
 Rev ""
 Comp ""
 Comment1 ""
@@ -13,16 +13,15 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
-Kmarq B 2300 1700 "Warning Pin power_in not driven (Net 30)" F=1
-Kmarq B 9100 5000 "Warning Pin power_in not driven (Net 5)" F=1
+Wire Wire Line
+	1550 5350 1250 5350
+Wire Wire Line
+	1800 4950 1050 4950
+Wire Wire Line
+	1800 5450 1800 5350
 Wire Wire Line
 	1750 3300 1750 3350
-Connection ~ 1650 6150
-Wire Wire Line
-	1650 5950 1650 6150
 Connection ~ 1250 4950
-Wire Wire Line
-	1650 4950 1050 4950
 Wire Wire Line
 	1250 5350 1250 5450
 Wire Wire Line
@@ -404,26 +403,38 @@ Wire Wire Line
 	1250 5950 1250 6150
 Connection ~ 1250 6150
 Wire Wire Line
-	1650 5350 1650 5450
-Wire Wire Line
 	2150 7350 2150 4850
+Wire Wire Line
+	1800 5950 1800 6150
+Connection ~ 1800 6150
+$Comp
+L DIODE D18
+U 1 1 46CA2AC3
+P 1550 5150
+F 0 "D18" H 1550 5250 40  0000 C C
+F 1 "1N4148" H 1550 5050 40  0000 C C
+	1    1550 5150
+	0    -1   -1   0   
+$EndComp
+Kmarq B 2300 1700 "Warning Pin power_in not driven (Net 30)" F=1
+Kmarq B 9100 5000 "Warning Pin power_in not driven (Net 5)" F=1
 NoConn ~ 6950 4300
 $Comp
 L R R19
 U 1 1 46C8BF02
-P 1650 5700
-F 0 "R19" V 1730 5700 50  0000 C C
-F 1 "10K" V 1650 5700 50  0000 C C
-	1    1650 5700
+P 1800 5700
+F 0 "R19" V 1880 5700 50  0000 C C
+F 1 "10K" V 1800 5700 50  0000 C C
+	1    1800 5700
 	1    0    0    -1  
 $EndComp
 $Comp
 L DIODE D17
 U 1 1 46C8BEB9
-P 1650 5150
-F 0 "D17" H 1650 5250 40  0000 C C
-F 1 "1N4148" H 1650 5050 40  0000 C C
-	1    1650 5150
+P 1800 5150
+F 0 "D17" H 1800 5250 40  0000 C C
+F 1 "1N4148" H 1800 5050 40  0000 C C
+	1    1800 5150
 	0    1    1    0   
 $EndComp
 $Comp
@@ -480,10 +491,10 @@ PIC
 Text Notes 3500 1300 0    60   ~
 Debug LEDs
 $Comp
-L +5V #PWR01
+L +5V #PWR14
 U 1 1 46B5AEBB
 P 1050 6750
-F 0 "#PWR01" H 1050 6840 20  0001 C C
+F 0 "#PWR14" H 1050 6840 20  0001 C C
 F 1 "+5V" H 1050 6840 30  0000 C C
 	1    1050 6750
 	1    0    0    -1  
@@ -525,10 +536,10 @@ F 1 "1K8" V 1250 5700 50  0000 C C
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR02
+L GND #PWR27
 U 1 1 46B597A4
 P 5000 2800
-F 0 "#PWR02" H 5000 2800 30  0001 C C
+F 0 "#PWR27" H 5000 2800 30  0001 C C
 F 1 "GND" H 5000 2730 30  0001 C C
 	1    5000 2800
 	1    0    0    -1  
@@ -588,10 +599,10 @@ F 1 "0.1uF" H 9900 5450 50  0000 L C
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR03
+L GND #PWR26
 U 1 1 45A10408
 P 1750 3350
-F 0 "#PWR03" H 1750 3350 30  0001 C C
+F 0 "#PWR26" H 1750 3350 30  0001 C C
 F 1 "GND" H 1750 3280 30  0001 C C
 	1    1750 3350
 	1    0    0    -1  
@@ -635,10 +646,10 @@ $EndComp
 Text Notes 6650 6950 0    60   ~
 Slave stepper
 $Comp
-L +5V #PWR04
+L +5V #PWR13
 U 1 1 455F1C54
 P 1050 4850
-F 0 "#PWR04" H 1050 4940 20  0001 C C
+F 0 "#PWR13" H 1050 4940 20  0001 C C
 F 1 "+5V" H 1050 4940 30  0000 C C
 	1    1050 4850
 	1    0    0    -1  
@@ -655,10 +666,10 @@ F 1 "CONN_2" V 5400 2200 40  0000 C C
 	0    -1   -1   0   
 $EndComp
 $Comp
-L +12V #PWR05
+L +12V #PWR6
 U 1 1 45572E0E
 P 6200 6700
-F 0 "#PWR05" H 6200 6650 20  0001 C C
+F 0 "#PWR6" H 6200 6650 20  0001 C C
 F 1 "+12V" H 6200 6800 30  0000 C C
 	1    6200 6700
 	1    0    0    -1  
@@ -675,10 +686,10 @@ F 1 "CONN_2" V 6300 7050 40  0000 C C
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR06
+L GND #PWR25
 U 1 1 45572E0C
 P 5700 7700
-F 0 "#PWR06" H 5700 7700 30  0001 C C
+F 0 "#PWR25" H 5700 7700 30  0001 C C
 F 1 "GND" H 5700 7630 30  0001 C C
 	1    5700 7700
 	1    0    0    -1  
@@ -704,28 +715,28 @@ $EndComp
 Text Notes 6950 3500 0    60   ~
 ICSP
 $Comp
-L GND #PWR07
+L GND #PWR24
 U 1 1 4550EF1A
 P 6800 4600
-F 0 "#PWR07" H 6800 4600 30  0001 C C
+F 0 "#PWR24" H 6800 4600 30  0001 C C
 F 1 "GND" H 6800 4530 30  0001 C C
 	1    6800 4600
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR08
+L +5V #PWR12
 U 1 1 4550EEF6
 P 6800 3450
-F 0 "#PWR08" H 6800 3540 20  0001 C C
+F 0 "#PWR12" H 6800 3540 20  0001 C C
 F 1 "+5V" H 6800 3540 30  0000 C C
 	1    6800 3450
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR09
+L +5V #PWR11
 U 1 1 4550EB36
 P 7050 2250
-F 0 "#PWR09" H 7050 2340 20  0001 C C
+F 0 "#PWR11" H 7050 2340 20  0001 C C
 F 1 "+5V" H 7050 2340 30  0000 C C
 	1    7050 2250
 	1    0    0    -1  
@@ -749,10 +760,10 @@ F 1 "4K7" V 7050 2600 50  0000 C C
 	1    0    0    -1  
 $EndComp
 $Comp
-L +12V #PWR010
+L +12V #PWR5
 U 1 1 455089C9
 P 4300 5550
-F 0 "#PWR010" H 4300 5500 20  0001 C C
+F 0 "#PWR5" H 4300 5500 20  0001 C C
 F 1 "+12V" H 4300 5650 30  0000 C C
 	1    4300 5550
 	1    0    0    -1  
@@ -769,10 +780,10 @@ F 1 "CONN_2" V 4950 6650 40  0000 C C
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR011
+L GND #PWR23
 U 1 1 455089A3
 P 4400 7300
-F 0 "#PWR011" H 4400 7300 30  0001 C C
+F 0 "#PWR23" H 4400 7300 30  0001 C C
 F 1 "GND" H 4400 7230 30  0001 C C
 	1    4400 7300
 	1    0    0    -1  
@@ -789,10 +800,10 @@ $EndComp
 Text Notes 550  7700 0    60   ~
 Min / Extrude speed
 $Comp
-L GND #PWR012
+L GND #PWR22
 U 1 1 45508762
 P 1050 7550
-F 0 "#PWR012" H 1050 7550 30  0001 C C
+F 0 "#PWR22" H 1050 7550 30  0001 C C
 F 1 "GND" H 1050 7480 30  0001 C C
 	1    1050 7550
 	1    0    0    -1  
@@ -820,10 +831,10 @@ $EndComp
 Text Notes 550  6500 0    60   ~
 Max / Mat. Out
 $Comp
-L GND #PWR013
+L GND #PWR21
 U 1 1 454F9A34
 P 1050 6350
-F 0 "#PWR013" H 1050 6350 30  0001 C C
+F 0 "#PWR21" H 1050 6350 30  0001 C C
 F 1 "GND" H 1050 6280 30  0001 C C
 	1    1050 6350
 	1    0    0    -1  
@@ -840,10 +851,10 @@ $EndComp
 Text Notes 3200 6950 0    60   ~
 Heater
 $Comp
-L +12V #PWR014
+L +12V #PWR4
 U 1 1 454F9863
 P 3000 5550
-F 0 "#PWR014" H 3000 5500 20  0001 C C
+F 0 "#PWR4" H 3000 5500 20  0001 C C
 F 1 "+12V" H 3000 5650 30  0000 C C
 	1    3000 5550
 	1    0    0    -1  
@@ -876,10 +887,10 @@ F 1 "CONN_2" V 3600 6650 40  0000 C C
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR015
+L GND #PWR20
 U 1 1 454F7BB6
 P 3100 7300
-F 0 "#PWR015" H 3100 7300 30  0001 C C
+F 0 "#PWR20" H 3100 7300 30  0001 C C
 F 1 "GND" H 3100 7230 30  0001 C C
 	1    3100 7300
 	1    0    0    -1  
@@ -923,10 +934,10 @@ F 1 "1uF" H 1100 4150 50  0000 L C
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR016
+L GND #PWR19
 U 1 1 454F78EE
 P 1050 4650
-F 0 "#PWR016" H 1050 4650 30  0001 C C
+F 0 "#PWR19" H 1050 4650 30  0001 C C
 F 1 "GND" H 1050 4580 30  0001 C C
 	1    1050 4650
 	1    0    0    -1  
@@ -965,19 +976,19 @@ Step B / Fan
 Text Notes 10150 5550 0    60   ~
 Step A / Extrude
 $Comp
-L GND #PWR017
+L GND #PWR18
 U 1 1 454F6FAC
 P 9100 6700
-F 0 "#PWR017" H 9100 6700 30  0001 C C
+F 0 "#PWR18" H 9100 6700 30  0001 C C
 F 1 "GND" H 9100 6630 30  0001 C C
 	1    9100 6700
 	1    0    0    -1  
 $EndComp
 $Comp
-L +12V #PWR018
+L +12V #PWR3
 U 1 1 454F6F95
 P 9100 5000
-F 0 "#PWR018" H 9100 4950 20  0001 C C
+F 0 "#PWR3" H 9100 4950 20  0001 C C
 F 1 "+12V" H 9100 5100 30  0000 C C
 	1    9100 5000
 	1    0    0    -1  
@@ -1055,19 +1066,19 @@ F 1 "1N4005" H 8750 6250 40  0000 C C
 	0    -1   -1   0   
 $EndComp
 $Comp
-L GND #PWR019
+L GND #PWR17
 U 1 1 454F6E69
 P 2150 4650
-F 0 "#PWR019" H 2150 4650 30  0001 C C
+F 0 "#PWR17" H 2150 4650 30  0001 C C
 F 1 "GND" H 2150 4580 30  0001 C C
 	1    2150 4650
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR020
+L +5V #PWR10
 U 1 1 454F6E57
 P 2150 3050
-F 0 "#PWR020" H 2150 3140 20  0001 C C
+F 0 "#PWR10" H 2150 3140 20  0001 C C
 F 1 "+5V" H 2150 3140 30  0000 C C
 	1    2150 3050
 	1    0    0    -1  
@@ -1093,64 +1104,64 @@ F 1 "CONN_4" V 10750 5800 50  0000 C C
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR021
+L GND #PWR16
 U 1 1 454F6B60
 P 7800 6950
-F 0 "#PWR021" H 7800 6950 30  0001 C C
+F 0 "#PWR16" H 7800 6950 30  0001 C C
 F 1 "GND" H 7800 6880 30  0001 C C
 	1    7800 6950
 	1    0    0    -1  
 $EndComp
 $Comp
-L +12V #PWR022
+L +12V #PWR2
 U 1 1 454F6B43
 P 7700 4850
-F 0 "#PWR022" H 7700 4800 20  0001 C C
+F 0 "#PWR2" H 7700 4800 20  0001 C C
 F 1 "+12V" H 7700 4950 30  0000 C C
 	1    7700 4850
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR023
+L +5V #PWR9
 U 1 1 454F6B38
 P 7900 4850
-F 0 "#PWR023" H 7900 4940 20  0001 C C
+F 0 "#PWR9" H 7900 4940 20  0001 C C
 F 1 "+5V" H 7900 4940 30  0000 C C
 	1    7900 4850
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR024
+L +5V #PWR8
 U 1 1 454F6B16
 P 2550 900
-F 0 "#PWR024" H 2550 990 20  0001 C C
+F 0 "#PWR8" H 2550 990 20  0001 C C
 F 1 "+5V" H 2550 990 30  0000 C C
 	1    2550 900 
 	1    0    0    -1  
 $EndComp
 $Comp
-L +12V #PWR025
+L +12V #PWR1
 U 1 1 454F6AE4
 P 1250 900
-F 0 "#PWR025" H 1250 850 20  0001 C C
+F 0 "#PWR1" H 1250 850 20  0001 C C
 F 1 "+12V" H 1250 1000 30  0000 C C
 	1    1250 900 
 	1    0    0    -1  
 $EndComp
 $Comp
-L +5V #PWR026
+L +5V #PWR7
 U 1 1 454F6AAD
 P 3800 1600
-F 0 "#PWR026" H 3800 1690 20  0001 C C
+F 0 "#PWR7" H 3800 1690 20  0001 C C
 F 1 "+5V" H 3800 1690 30  0000 C C
 	1    3800 1600
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR027
+L GND #PWR15
 U 1 1 454F69F2
 P 2300 1700
-F 0 "#PWR027" H 2300 1700 30  0001 C C
+F 0 "#PWR15" H 2300 1700 30  0001 C C
 F 1 "GND" H 2300 1630 30  0001 C C
 	1    2300 1700
 	1    0    0    -1  
