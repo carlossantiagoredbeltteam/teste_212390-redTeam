@@ -87,7 +87,7 @@
 				</td>
 				<td>
 					<input type="hidden" name="module_id[<?=$module->id?>]" value="<?=$module->id?>" />
-					<b><a href="/uniquepart:<?=$module->id?>"><?=$module->get('name')?></a></b>
+					<b><a href="<?=$module->getViewUrl()?>"><?=$module->get('name')?></a></b>
 					<img src="/img/help-icon.gif" onclick="Element.toggle('description_<?=$module->id?>')">
 				</td>
 				<td align="center"><input type="text" name="quantities[<?=$module->id?>]" value="1" size="3"></td>

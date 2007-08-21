@@ -34,7 +34,7 @@
 					<? foreach ($data AS $unique_id): ?>
 						<? $unique = $list->getUnique($unique_id); ?>
 						<tr>
-							<td><a href="/uniquepart:<?=$unique->id?>"><?=$unique->get('name')?></a>
+							<td><a href="<?=$unique->getViewUrl()?>"><?=$unique->get('name')?></a>
 							</td>
 							<td><a href="/type/<?=$type?>"><?=UniquePart::typeToEnglish($type)?></a></td>
 							<td><?=$list->getUniqueQuantity($unique->id)?></td>
@@ -72,11 +72,11 @@
 					$part = new UniquePart($parent->get('part_id'));
 			?>
 				<p>
-					<b><a href="/uniquepart:<?=$part->id?>"><?=$part->get('name')?></a></b> (<?=$raw->get('raw_text')?>)
+					<b><a href="<?=$part->getViewUrl()?>"><?=$part->get('name')?></a></b> (<?=$raw->get('raw_text')?>)
 				</p>
 			<? else: ?>
 				<p>
-					<b><a href="/uniquepart:<?=$part->id?>"><?=$part->get('name')?></a></b> <?=$part->get('description')?>
+					<b><a href="<?=$part->getViewUrl()?>"><?=$part->get('name')?></a></b> <?=$part->get('description')?>
 				</p>
 			<? endif ?>
 		<? endforeach ?>
