@@ -6,7 +6,7 @@
 			parent::__construct($id, "unique_parts");
 		}
 		
-		public static function byName($name)
+		public static function byName($name, $type)
 		{
 			$name = db()->safe($name);
 			
@@ -14,6 +14,7 @@
 				SELECT id
 				FROM unique_parts
 				WHERE name = '$name'
+					AND type = '$type'
 			";
 			
 			return new UniquePart(db()->getValue($sql));
@@ -35,7 +36,7 @@
 		
 		public function getViewUrl()
 		{
-			return "/uniquepart/" . urlencode($this->get('name'));
+			return "/part/" . $this->get('type') . "/" . urlencode($this->get('name'));
 		}
 		
 		public function lookupRawPart()

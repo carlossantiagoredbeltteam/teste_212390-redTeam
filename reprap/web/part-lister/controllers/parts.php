@@ -3,7 +3,7 @@
 	{
 		public function bysupplier()
 		{
-			$supplier = new Supplier($this->args('id'));
+			$supplier = Supplier::byName($this->args('name'));
 			$parts = $supplier->getSuppliedParts()->getAll();
 			
 			$this->set('parts', $parts);
@@ -23,8 +23,8 @@
 		{
 			if ($this->args('id'))
 				$part = new UniquePart($this->args('id'));
-			else if ($this->args('name'))
-				$part = UniquePart::byName($this->args('name'));
+			else if ($this->args('name') && $this->args('type'))
+				$part = UniquePart::byName($this->args('name'), $this->args('type'));
 			else
 				$this->set('error', "You didn't pass in the right parameters.");
 				
