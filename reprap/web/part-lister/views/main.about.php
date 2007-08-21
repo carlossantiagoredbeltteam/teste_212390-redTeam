@@ -20,7 +20,7 @@
 <ul>
 	<li><a href="http://spreadsheets.google.com/ccc?key=<?=RR_GOOGLE_DOC_KEY?>">Access the Google Spreadsheet</a></li>
 	<li><a href="/reprap-bill-of-materials.sql">Access the imported MySQL data</a></li>
-	<li><a href="http://reprap.svn.sourceforge.net/svnroot/reprap/trunk/reprap/web/hoekens-bom/">View the Subversion repository</a></li>
+	<li><a href="http://reprap.svn.sourceforge.net/svnroot/reprap/trunk/reprap/web/partlister/">View the Subversion repository</a></li>
 	<li>You can also link to a unique part like this: 'http://<?=$_SERVER['HTTP_HOST']?>/uniquepart/My Part Name'</li>
 </ul>
 
