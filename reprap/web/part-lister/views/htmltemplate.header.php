@@ -7,8 +7,10 @@
 			<title>RepRap Parts Lister</title>
 		<? endif ?>
 		<link rel="stylesheet" type="text/css" href="/css/style.css" />
+		<link rel="stylesheet" type="text/css" href="/dtree/dtree.css" />
 		<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
 		<script src="/js/prototype.js"></script>
+		<script src="/dtree/dtree.js"></script>
 	</head>
 	<body>
 		<ul id="nav">

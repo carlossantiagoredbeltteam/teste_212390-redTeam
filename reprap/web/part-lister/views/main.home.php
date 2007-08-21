@@ -114,3 +114,21 @@
 		</tr>
 	</table>
 </form>
+
+<h1>RepRap Tree View</h1>
+<p>
+	Click +/- to expand/collapse.  Click part name to view detail page.
+</p>
+<p>
+	<a href="javascript:d.openAll()">open all</a> | <a href="javascript:d.closeAll()">close all</a>
+</p>
+<p>
+	<script type="text/javascript">
+	<!--
+		d = new dTree('d');
+		d.add(<?=$root->id?>, -1, "<?=$root->get('name')?>", "<?=$root->getViewUrl()?>");
+		<?= Controller::byName('parts')->renderView('tree', array('root' => $root)) ?>
+		document.write(d);
+	//-->
+	</script>
+</p>
