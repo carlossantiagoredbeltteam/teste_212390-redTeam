@@ -1,6 +1,10 @@
 <?
 	include("../extensions/global.php");
 
+	//are we in the right place?
+	if ($_SERVER['HTTP_HOST'] != SITE_HOSTNAME)
+		header("Location: http://" . SITE_HOSTNAME . $_SERVER['REQUEST_URI']);
+
 	//get our stuff.
 	$mode = $_GET['mode'];
 	$controller = $_GET['controller'];

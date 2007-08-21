@@ -6,6 +6,11 @@
 	<p>
 		<?=$part->get('description')?>
 	</p>
+	<? if ($part->get('url')): ?>
+		<p>
+			More information: <a href="<?=$part->get('url')?>"><?=parse_url($part->get('url'), PHP_URL_HOST)?></a>
+		</p>
+	<? endif ?>
 
 	<? if ($part->get('type') == 'module'): ?>
 		<h2>Generate Part List</h2>
