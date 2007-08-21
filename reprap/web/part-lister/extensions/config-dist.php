@@ -1,5 +1,7 @@
 <?php
 
+	define("SITE_HOSTNAME", "www.example.com");
+
 	define("RR_GOOGLE_DOC_KEY", "pmEMxYRcQzzATwbOb71BmGA");
 	define("RR_PROJECT_NAME", "RepRap Darwin v0.9");
 	

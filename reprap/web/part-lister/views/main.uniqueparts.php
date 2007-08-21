@@ -75,7 +75,10 @@
 									<input type="checkbox" id="use_<?=$unique->id?>" name="use_part[<?=$unique->id?>]" value="1" checked="true"/>
 									<a href="/uniquepart:<?=$unique->id?>"><?=$unique->get('name')?></a>
 									<img src="/img/help-icon.gif" onclick="Element.toggle('tooltip_<?=$unique->id?>')" style="cursor: pointer;">
-									<div id="tooltip_<?=$unique->id?>" class="tooltip" style="display: none"><?=$unique->get('description')?></div>
+									<? if ($unique->get('url')): ?>
+										<a href="<?=$unique->get('url')?>" target="_blank"><img src="/img/url-icon.gif" border="0"></a>
+									<? endif ?>
+									<div id="tooltip_<?=$unique->id?>" class="tooltip" style="display: none; margin-left: 20px; font-size: 90%;"><?=$unique->get('description')?></div>
 								</td>
 								<td>
 									<input type="text" name="quantity[<?=$unique->id?>]" value="<?=$quantity?>" size="3">
@@ -115,7 +118,7 @@
 															<a href="/uniquepart:<?=$parent->get('part_id')?>"><?=$parent->get('raw_text')?></a>)</span>
 														<? endif ?>
 													</td>
-													<td><?=$part->get('quantity')?></td>
+													<td><?=$part->get('quantity')?> <?= $unique->get('units') ?></td>
 												</tr>
 											<? endforeach ?>
 										</table>
