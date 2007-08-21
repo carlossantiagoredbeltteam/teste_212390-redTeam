@@ -10,7 +10,7 @@
 		<? $part = $row['UniquePart'] ?>
 		<? $spart = $row['SupplierPart'] ?>
 		<p>
-			<b><a href="/uniquepart:<?=$part->id?>"><?=$part->get('name')?></a></b>: <?=$spart->get('part_num')?>
+			<b><a href="<?=$part->getViewUrl()?>"><?=$part->get('name')?></a></b>: <?=$spart->get('part_num')?>
 			<a href="<?=$spart->getBuyUrl()?>">details/buy</a>
 		</p>
 	<? endforeach ?>

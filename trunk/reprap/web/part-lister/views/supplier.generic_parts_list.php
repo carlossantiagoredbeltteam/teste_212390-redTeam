@@ -17,7 +17,7 @@
 					<? endif ?>
 				</td>
 				<td>
-					<a href="/uniquepart:<?=$unique->id?>"><?=$unique->get('name')?></a>
+					<a href="<?=$unique->getViewUrl()?>"><?=$unique->get('name')?></a>
 				</td>
 				<td>
 					<?=$part->get('total_quantity')?><?=$unique->get('units')?> needed / 

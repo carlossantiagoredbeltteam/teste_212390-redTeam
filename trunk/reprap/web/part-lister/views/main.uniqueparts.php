@@ -22,7 +22,7 @@
 		}
 	</script>
 	<? if ($module): ?>
-		<h1><a href="/uniquepart:<?=$module->id?>"><?=$module->get('name')?></a> - <?=date("M j, Y")?></h1>
+		<h1><a href="<?=$module->getViewUrl()?>"><?=$module->get('name')?></a> - <?=date("M j, Y")?></h1>
 	<? else: ?>
 		<h1>Custom Part List - <?=date("M j, Y")?></h1>
 		<table>
@@ -31,7 +31,7 @@
 			</tr>
 			<? foreach ($modules AS $module): ?>
 				<tr>
-					<td><b><a href="/uniquepart:<?=$module->id?>"><?=$module->get('name')?></a></b></td>
+					<td><b><a href="<?=$module->getViewUrl()?>"><?=$module->get('name')?></a></b></td>
 					<td>x <?=$quantities[$module->id]?></td>
 				</tr>
 			<? endforeach ?>
@@ -73,7 +73,7 @@
 									<img src="/img/plus-icon.gif" id="plus_<?=$unique->id?>" onclick="toggleBreakdown(<?=$unique->id?>)" style="cursor: pointer;"/>
 									<img src="/img/minus-icon.gif" id="minus_<?=$unique->id?>" onclick="toggleBreakdown(<?=$unique->id?>)" style="cursor: pointer; display: none"/>
 									<input type="checkbox" id="use_<?=$unique->id?>" name="use_part[<?=$unique->id?>]" value="1" checked="true"/>
-									<a href="/uniquepart:<?=$unique->id?>"><?=$unique->get('name')?></a>
+									<a href="<?=$unique->getViewUrl()?>"><?=$unique->get('name')?></a>
 									<img src="/img/help-icon.gif" onclick="Element.toggle('tooltip_<?=$unique->id?>')" style="cursor: pointer;">
 									<? if ($unique->get('url')): ?>
 										<a href="<?=$unique->get('url')?>" target="_blank"><img src="/img/url-icon.gif" border="0"></a>
@@ -111,11 +111,11 @@
 												?>
 												<tr>
 													<td><?=$part->get('raw_text')?> <span style="font-size: 90%">(from 
+														<? $unique_parent = new UniquePart($parent->get('part_id')); ?>
 														<? if ($assembly instanceOf RawPart): ?>
-															<a href="/uniquepart:<?=$parent->get('part_id')?>"><?=$parent->get('raw_text')?></a> / <?=$assembly->get('raw_text')?>)</span>
+															<a href="<?=$unique_parent->getViewUrl()?>"><?=$parent->get('raw_text')?></a> / <?=$assembly->get('raw_text')?>)</span>
 														<? else: ?>
-															<!-- <a href="/uniquepart:<?=$grandparent->get('part_id')?>"><?=$grandparent->get('raw_text')?></a> / -->
-															<a href="/uniquepart:<?=$parent->get('part_id')?>"><?=$parent->get('raw_text')?></a>)</span>
+															<a href="<?=$unique_parent->getViewUrl()?>"><?=$parent->get('raw_text')?></a>)</span>
 														<? endif ?>
 													</td>
 													<td><?=$part->get('quantity')?> <?= $unique->get('units') ?></td>

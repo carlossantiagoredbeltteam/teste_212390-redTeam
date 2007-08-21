@@ -33,6 +33,11 @@
 			));
 		}
 		
+		public function getViewUrl()
+		{
+			return "/uniquepart/" . urlencode($this->get('name'));
+		}
+		
 		public function lookupRawPart()
 		{
 			//get a top level part that corresponds to this one.
