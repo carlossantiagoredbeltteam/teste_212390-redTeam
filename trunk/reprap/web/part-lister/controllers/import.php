@@ -55,20 +55,27 @@
 		$legend = array();
 		$legend['suppliers'] = 12;
 		$legend['unique_parts'] = 15;
+		$legend['legend'] = 8;
 		
-		//add in all our modules.
-		$data = getRawSheetData(8);
+		//open our legend page with info on what sheets to use.
+		$data = getRawSheetData($legend['legend']);
+		
+		//discard the first two human rows.
+		array_shift($data);
+		array_shift($data);
+		
+		//get the data!
 		foreach ($data AS $row)
 		{
-			if ((int)$row[3] || (int)$row[4])
+			if ($row[0])
 			{
 				//the first one is our 'main sheet'
 				if (!$legend['main_sheet'])
-					$legend['main_sheet'] = $row[3];
+					$legend['main_sheet'] = $row[1];
 				
 				//load up our keyed array.	
 				$karr = array();
-				$legend['raw_keys'][$row[0]] = $row[3];
+				$legend['raw_keys'][$row[0]] = $row[1];
 			}
 		}
 	
