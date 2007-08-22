@@ -7,8 +7,10 @@
 			Element.removeClassName('module_' + id, 'module_row_selected')
 	}
 </script>
-<h1>Quick Part List Lookup</h1>
+<h1>How to use this site</h1>
 <?= Controller::byName('main')->renderView('progressbar', array('step' => 1))?>
+
+<h1>Quick Part List Lookup</h1>
 <form action="/uniqueparts" method="POST" name="bom_form">
 	<table>
 		<tr>
@@ -53,17 +55,6 @@
 				</select>
 			</td>
 		</tr>
-
-		<tr>
-			<th>Output</th>
-			<td>
-				<select name="output">
-					<option value="html">HTML</option>
-					<option value="csv">CSV</option>
-					<option value="json">JSON</option>
-				</select>
-			</td>
-		</tr>
 -->		
 		<tr>
 			<td>&nbsp;</td><td><input type="submit" name="submit" value="Next Step"></td>
@@ -89,6 +80,9 @@
 					<input type="hidden" name="module_id[<?=$module->id?>]" value="<?=$module->id?>" />
 					<b><a href="<?=$module->getViewUrl()?>"><?=$module->get('name')?></a></b>
 					<img src="/img/help-icon.gif" onclick="Element.toggle('description_<?=$module->id?>')">
+					<? if ($module->get('url')): ?>
+						<a href="<?=$module->get('url')?>" target="_blank"><img src="/img/url-icon.gif" border="0"></a>
+					<? endif ?>
 				</td>
 				<td align="center"><input type="text" name="quantities[<?=$module->id?>]" value="1" size="3"></td>
 			</tr>
