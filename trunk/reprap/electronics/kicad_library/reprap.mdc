@@ -1,26 +1,20 @@
-PCBNEW-LibDoc----V1  19/6/2007-01:59:36
+PCBNEW-LibDoc----V1  22/8/2007-04:54:19
 #
-$MODULE P05
-Li P05
-Cd Connecteur 12 pins
-Kw CONN DEV
-$EndMODULE
-#
-$MODULE MOLEX Disk Drive Power
-Li MOLEX Disk Drive Power
+$MODULE MOLEX_4PIN
+Li MOLEX_4PIN
 Cd Connecteur 4 pibs
 Kw CONN DEV
 $EndMODULE
 #
-$MODULE AMP Economy Power 12pin
-Li AMP Economy Power 12pin
-Cd AMP Economy Power 12P
+$MODULE AMP_12PIN
+Li AMP_12PIN
+Cd AMP_12PIN
 Kw CONN DEV
 $EndMODULE
 #
-$MODULE AMP Economy Power 12pin
-Li AMP Economy Power 12pin
-Cd AMP Economy Power 12P
+$MODULE AMP_12PIN
+Li AMP_12PIN
+Cd AMP_12PIN
 Kw CONN DEV
 $EndMODULE
 #
@@ -48,10 +42,10 @@ Cd Connecteur 3 pins
 Kw CONN DEV
 $EndMODULE
 #
-$MODULE 2PIN_KEYED_180
-Li 2PIN_KEYED_180
-Cd 2 Pin Connector
-Kw CONN DEV
+$MODULE 78L05
+Li 78L05
+Cd Transistor TO92 brochage type BC237
+Kw TR TO92
 $EndMODULE
 #
 $EndLIBDOC
