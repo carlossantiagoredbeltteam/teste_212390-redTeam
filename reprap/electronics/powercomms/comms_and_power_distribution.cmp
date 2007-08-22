@@ -1,4 +1,4 @@
-Cmp-Mod V01 Genere par PcbNew le 6/5/2007-02:32:11
+Cmp-Mod V01 Created by Cvpcb (2007-07-09) date = 22/8/2007-04:56:10
 
 BeginCmp
 TimeStamp = 45A40A1C;
@@ -50,6 +50,34 @@ IdModule  = LEDV;
 EndCmp
 
 BeginCmp
+TimeStamp = 46B75CB9;
+Reference = D2;
+ValeurCmp = LED;
+IdModule  = LEDV;
+EndCmp
+
+BeginCmp
+TimeStamp = 46B75D1E;
+Reference = D3;
+ValeurCmp = LED;
+IdModule  = LEDV;
+EndCmp
+
+BeginCmp
+TimeStamp = 46C88FAD;
+Reference = D4;
+ValeurCmp = BILED;
+IdModule  = LEDV;
+EndCmp
+
+BeginCmp
+TimeStamp = 46C88FD5;
+Reference = D5;
+ValeurCmp = BILED;
+IdModule  = LEDV;
+EndCmp
+
+BeginCmp
 TimeStamp = 45A40B59;
 Reference = J1;
 ValeurCmp = DB9;
@@ -58,30 +86,30 @@ EndCmp
 
 BeginCmp
 TimeStamp = 463A9D69;
-Reference = M02;
+Reference = M06;
 ValeurCmp = MOLEX_4PIN;
-IdModule  = SIL-4;
+IdModule  = MOLEX_4PIN;
 EndCmp
 
 BeginCmp
 TimeStamp = 45A40B73;
 Reference = P2;
 ValeurCmp = CONN_2;
-IdModule  = SIL-2;
+IdModule  = 2PIN_KEYED;
 EndCmp
 
 BeginCmp
 TimeStamp = 45A40B82;
 Reference = P3;
 ValeurCmp = CONN_2;
-IdModule  = SIL-2;
+IdModule  = 2PIN_KEYED;
 EndCmp
 
 BeginCmp
 TimeStamp = 463198A7;
-Reference = P05;
+Reference = P09;
 ValeurCmp = AMP;
-IdModule  = SIL-12;
+IdModule  = AMP_12PIN;
 EndCmp
 
 BeginCmp
@@ -92,7 +120,35 @@ IdModule  = R3;
 EndCmp
 
 BeginCmp
-TimeStamp = 45A409E1;
+TimeStamp = 46B75D60;
+Reference = R2;
+ValeurCmp = 1K8;
+IdModule  = R3;
+EndCmp
+
+BeginCmp
+TimeStamp = 46B75D76;
+Reference = R3;
+ValeurCmp = 1K8;
+IdModule  = R3;
+EndCmp
+
+BeginCmp
+TimeStamp = 46B771DA;
+Reference = R4;
+ValeurCmp = 5K6;
+IdModule  = R3;
+EndCmp
+
+BeginCmp
+TimeStamp = 46B771FB;
+Reference = R5;
+ValeurCmp = 5K6;
+IdModule  = R3;
+EndCmp
+
+BeginCmp
+TimeStamp = 46CBC05E;
 Reference = U1;
 ValeurCmp = 78L05;
 IdModule  = TO92;
