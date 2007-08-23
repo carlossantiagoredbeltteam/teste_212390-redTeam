@@ -34,8 +34,7 @@
 					<? foreach ($data AS $unique_id): ?>
 						<? $unique = $list->getUnique($unique_id); ?>
 						<tr>
-							<td><a href="<?=$unique->getViewUrl()?>"><?=$unique->get('name')?></a>
-							</td>
+							<td><a href="<?=$unique->getViewUrl()?>"><?=$unique->get('name')?></a></td>
 							<td><a href="/type/<?=$type?>"><?=UniquePart::typeToEnglish($type)?></a></td>
 							<td><?=$list->getUniqueQuantity($unique->id)?></td>
 						</tr>
@@ -49,37 +48,57 @@
 
 	<h2>Suppliers</h2>
 	<? if (!empty($suppliers)): ?>
-		<? foreach ($suppliers AS $row): ?>
-			<p>
+		<table width="100%">
+			<tr>
+				<th width="33%">Name</th>
+				<th>Info</th>
+			</tr>
+			<? foreach ($suppliers AS $row): ?>
 				<? $supplier = $row['Supplier'] ?>
 				<? $spart = $row['SupplierPart'] ?>
-				<b><a href="<?=$supplier->getViewUrl()?>"><?=$supplier->get('name')?></a></b>: <?=$spart->get('part_num')?>
-				(<a href="<?=$spart->getBuyUrl()?>">buy</a>)
-			</p>
-		<? endforeach ?>
+				<? $url = $spart->getBuyUrl() ?>
+				
+				<tr>
+					<td><b><a href="<?=$supplier->getViewUrl()?>"><?=$supplier->get('name')?></a></b></td>
+					<? if ($url): ?>
+						<td><a href="<?=$url?>"><?=$spart->get('part_num')?></a></td>
+					<? else: ?>
+						<td><?=$spart->get('part_num')?></td>
+					<? endif ?>
+				</tr>
+			<? endforeach ?>
+		</table>
 	<? else: ?>
 		<b>No suppliers found.</b>
 	<? endif ?>
 
 	<h2>Where is it used?</h2>
 	<? if (!empty($modules)): ?>
-		<? foreach ($modules AS $row): ?>
-			<? $part = $row['UniquePart'] ?>
-			<? $raw = $row['RawPart'] ?>
-			<?
-				if (!$part->id):
-					$parent = new RawPart($raw->get('parent_id'));
-					$part = new UniquePart($parent->get('part_id'));
-			?>
-				<p>
-					<b><a href="<?=$part->getViewUrl()?>"><?=$part->get('name')?></a></b> (<?=$raw->get('raw_text')?>)
-				</p>
-			<? else: ?>
-				<p>
-					<b><a href="<?=$part->getViewUrl()?>"><?=$part->get('name')?></a></b> <?=$part->get('description')?>
-				</p>
-			<? endif ?>
-		<? endforeach ?>
+		<table width="100%">
+			<tr>
+				<th width="33%">Module</th>
+				<th>Subassembly</th>
+			</tr>
+			<? foreach ($modules AS $row): ?>
+				<? $part = $row['UniquePart'] ?>
+				<? $raw = $row['RawPart'] ?>
+				<?
+					if (!$part->id):
+						$parent = new RawPart($raw->get('parent_id'));
+						$part = new UniquePart($parent->get('part_id'));
+				?>
+					<tr>
+						<td><b><a href="<?=$part->getViewUrl()?>"><?=$part->get('name')?></a></b></td>
+						<td><?=$raw->get('raw_text')?></td>
+					</tr>
+				<? else: ?>
+					<tr>
+						<td><b><a href="<?=$part->getViewUrl()?>"><?=$part->get('name')?></a></b></td>
+						<td><?=$part->get('description')?></td>
+					</tr>
+				<? endif ?>
+			<? endforeach ?>
+		</table>
 	<? else: ?>
 		<b>This part is not used anywhere.</b>
 	<? endif ?>
