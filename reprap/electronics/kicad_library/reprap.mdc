@@ -1,10 +1,4 @@
-PCBNEW-LibDoc----V1  22/8/2007-05:20:46
-#
-$MODULE MOLEX_4PIN
-Li MOLEX_4PIN
-Cd Connecteur 4 pibs
-Kw CONN DEV
-$EndMODULE
+PCBNEW-LibDoc----V1  23/8/2007-00:50:39
 #
 $MODULE AMP_12PIN
 Li AMP_12PIN
@@ -46,6 +40,18 @@ $MODULE 78L05
 Li 78L05
 Cd Transistor TO92 brochage type BC237
 Kw TR TO92
+$EndMODULE
+#
+$MODULE MOLEX_4PIN
+Li MOLEX_4PIN
+Cd Connecteur 4 pibs
+Kw CONN DEV
+$EndMODULE
+#
+$MODULE MOUNTHOLE
+Li MOUNTHOLE
+Cd module 1 pin (ou trou mecanique de percage)
+Kw DEV
 $EndMODULE
 #
 $EndLIBDOC
