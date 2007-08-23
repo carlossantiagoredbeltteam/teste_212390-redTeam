@@ -29,7 +29,7 @@
 				</tr>
 			<? endforeach ?>
 			<tr>
-				<td colspan="4"><input type="submit" value="Buy the above products from Amazon" />
+				<td colspan="4" align="right"><input type="submit" value="Add to Amazon Cart" style="font-size: 20px" onclick="this.value = 'Creating cart. Please be patient.'; this.disabled = true; return true;"/>
 			</tr>
 		</table>
 		<br/>

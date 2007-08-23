@@ -49,33 +49,56 @@
 		
 		public function amazon_checkout()
 		{
-			die('under construction...');
+			//dont let us time out here.
+			set_time_limit(0);
 			
-			print_r($this->args());
-			
+			//get our items
 			$asins = $this->args('asin');
-			$qty = $this->args('quantities');
+			$qtys = $this->args('quantities');
 			
-			$url  = "http://ecs.amazonaws.com/onca/xml?Service=AWSECommerceService&AWSAccessKeyId=" . AWSAccessKeyId;
-			$url .= "&AssociateTag=" . AmazonAssociateTag;
-			$url .= "&Operation=CartCreate";
-			
-			foreach ($asins AS $key => $asin)
-			{
-				$quantity = $qty[$key];
-				
-				if ($quantity && $asin)
-					$url .= "&Item.{$key}.ASIN={$asin}&Item.{$key}.Quantity={$quantity}";
-					
-				break;
-			}
-			
+			//setup our base url.
+			$base_url = "http://ecs.amazonaws.com/onca/xml?Service=AWSECommerceService&AWSAccessKeyId=" . AWSAccessKeyId . "&AssociateTag=" . AmazonAssociateTag;
+
+			//create our cart (we need one product in there to start.)
+			$url = $base_url . "&Operation=CartCreate&Item.0.ASIN=0071459332&Item.0.Quantity=1";
 			$xml = simplexml_load_string(file_get_contents($url));
 			
-			echo "<!-- $url -->\n";
-			print_r($xml);
+			//get our cart values.
+			$cart_id = (string) $xml->Cart->CartId;
+			$hmac = (string) $xml->Cart->URLEncodedHMAC;
+
+			//clear our cart so that we start fresh each time. 
+			$url = $base_url . "&Operation=CartClear&CartId=$cart_id&HMAC=$hmac";
+			$xml = simplexml_load_string(file_get_contents($url));
 			
-			die();
+			//now add each product in individually.
+			foreach ($asins AS $key => $asin)
+			{
+				//get our data
+				$qty = $qtys[$key];
+
+				//create our url.
+				$url = $base_url . "&Operation=CartAdd&CartId=$cart_id&HMAC=$hmac&Item.0.ASIN={$asin}&Item.0.Quantity={$qty}";
+
+				//add our product in!
+				$xml = simplexml_load_string(file_get_contents($url));
+				
+				//was our request successful?
+				$result = (string) $xml->Cart->Request->IsValid;
+				if ($result != 'True')
+					$errors[] = "Error adding $asin to cart.";
+			}
+			
+			//get our final cart info.
+			$url = $base_url . "&Operation=CartGet&CartId=$cart_id&HMAC=$hmac";
+			$xml = simplexml_load_string(file_get_contents($url));
+			$cart = $xml->Cart;
+
+			//save our data for our view.
+			$this->set('cart', $cart);
+			$this->set('errors', $errors);
+			$this->set('cart_id', $cart_id);
+			$this->set('hmac', $hmac);
 		}
 	}
 ?>
