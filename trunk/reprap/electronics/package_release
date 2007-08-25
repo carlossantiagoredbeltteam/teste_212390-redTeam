@@ -2,7 +2,7 @@
 
 #init up
 BOARD=`basename $1`
-VERSION=${2:-`date +%Y%m%d`}
+VERSION=${2:-`date +%Y-%m-%d`}
 TO_DIR="reprap-$BOARD-$VERSION"
 FILELIST=""
 
