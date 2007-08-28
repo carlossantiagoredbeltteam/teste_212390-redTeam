@@ -1,4 +1,4 @@
-# EESchema Netlist Version 1.1 created  28/8/2007-05:00:13
+# EESchema Netlist Version 1.1 created  28/8/2007-05:09:13
 (
  ( 45A40A1C C1V5 C1 1uF
   ( 1 +5V )
@@ -117,7 +117,7 @@
   ( 1 N-000001 )
   ( 2 GND )
  )
- ( 46D3A833 TO92 U1 78L05
+ ( 46D3A833 TO92-INVERT U1 78L05
   ( 1 +5V )
   ( 2 GND )
   ( 3 +12V )

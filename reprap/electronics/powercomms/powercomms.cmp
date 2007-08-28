@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by Cvpcb (2007-07-09) date = 28/8/2007-05:00:13
+Cmp-Mod V01 Created by Cvpcb (2007-07-09) date = 28/8/2007-05:09:13
 
 BeginCmp
 TimeStamp = 45A40A1C;
@@ -193,7 +193,7 @@ BeginCmp
 TimeStamp = 46D3A833;
 Reference = U1;
 ValeurCmp = 78L05;
-IdModule  = TO92;
+IdModule  = TO92-INVERT;
 EndCmp
 
 BeginCmp
