@@ -47,7 +47,7 @@ Standard
   9
 $CLAYER
   8
-0
+Cuts
   9
 $DIMEXO
  40
@@ -911,7 +911,7 @@ LAYER
 100
 AcDbSymbolTable
  70
-3
+4
   0
 LAYER
   5
@@ -943,9 +943,9 @@ AcDbLayerTableRecord
   2
 Drawing Structure
  70
-1
+0
  62
--4
+4
   6
 CONTINUOUS
 370
@@ -966,6 +966,26 @@ Cuts
 0
  62
 1
+  6
+CONTINUOUS
+370
+0
+390
+F
+  0
+LAYER
+  5
+45
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
+Text
+ 70
+0
+ 62
+4
   6
 CONTINUOUS
 370
@@ -1299,7 +1319,7 @@ ENTITIES
   0
 POINT
   5
-45
+46
 100
 AcDbEntity
 100
@@ -1321,7 +1341,7 @@ ByLayer
   0
 CIRCLE
   5
-46
+47
 100
 AcDbEntity
 100
@@ -1345,7 +1365,7 @@ ByLayer
   0
 CIRCLE
   5
-47
+48
 100
 AcDbEntity
 100
@@ -1369,7 +1389,7 @@ ByLayer
   0
 CIRCLE
   5
-48
+49
 100
 AcDbEntity
 100
@@ -1393,7 +1413,7 @@ ByLayer
   0
 CIRCLE
   5
-49
+4A
 100
 AcDbEntity
 100
@@ -1417,7 +1437,7 @@ ByLayer
   0
 CIRCLE
   5
-4A
+4B
 100
 AcDbEntity
 100
@@ -1441,7 +1461,7 @@ ByLayer
   0
 CIRCLE
   5
-4B
+4C
 100
 AcDbEntity
 100
@@ -1465,7 +1485,7 @@ ByLayer
   0
 CIRCLE
   5
-4C
+4D
 100
 AcDbEntity
 100
@@ -1489,119 +1509,7 @@ ByLayer
   0
 LINE
   5
-4D
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Cuts
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-0.0
- 20
-300.0
- 30
-0.0
- 11
-300.0
- 21
-300.0
- 31
-0.0
-  0
-LINE
-  5
 4E
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Cuts
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-300.0
- 20
-300.0
- 30
-0.0
- 11
-300.0
- 21
--20.0
- 31
-0.0
-  0
-LINE
-  5
-4F
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Cuts
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-300.0
- 20
--20.0
- 30
-0.0
- 11
-0.0
- 21
--20.0
- 31
-0.0
-  0
-LINE
-  5
-50
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Cuts
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-0.0
- 20
--20.0
- 30
-0.0
- 11
-0.0
- 21
-300.0
- 31
-0.0
-  0
-LINE
-  5
-51
 100
 AcDbEntity
 100
@@ -1629,7 +1537,7 @@ ByLayer
   0
 LINE
   5
-52
+4F
 100
 AcDbEntity
 100
@@ -1657,7 +1565,7 @@ ByLayer
   0
 LINE
   5
-53
+50
 100
 AcDbEntity
 100
@@ -1685,7 +1593,7 @@ ByLayer
   0
 CIRCLE
   5
-54
+51
 100
 AcDbEntity
 100
@@ -1709,7 +1617,7 @@ ByLayer
   0
 CIRCLE
   5
-55
+52
 100
 AcDbEntity
 100
@@ -1733,7 +1641,7 @@ ByLayer
   0
 LINE
   5
-56
+53
 100
 AcDbEntity
 100
@@ -1754,6 +1662,90 @@ ByLayer
 0.0
  11
 111.0
+ 21
+152.0
+ 31
+0.0
+  0
+LINE
+  5
+54
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Drawing Structure
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+111.0
+ 20
+152.0
+ 30
+0.0
+ 11
+111.0
+ 21
+200.0
+ 31
+0.0
+  0
+LINE
+  5
+55
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Drawing Structure
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+111.0
+ 20
+200.0
+ 30
+0.0
+ 11
+69.0
+ 21
+200.0
+ 31
+0.0
+  0
+LINE
+  5
+56
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Drawing Structure
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+69.0
+ 20
+200.0
+ 30
+0.0
+ 11
+69.0
  21
 152.0
  31
@@ -1775,15 +1767,15 @@ Drawing Structure
   6
 ByLayer
  10
-111.0
+0.0
  20
-152.0
+-10.4749999999999996
  30
 0.0
  11
-111.0
+10.0
  21
-200.0
+-10.4749999999999996
  31
 0.0
   0
@@ -1803,105 +1795,21 @@ Drawing Structure
   6
 ByLayer
  10
-111.0
+0.0
  20
-200.0
+-10.4749999999999996
  30
 0.0
  11
-69.0
+10.0
  21
-200.0
+-10.4749999999999996
  31
 0.0
   0
 LINE
   5
 59
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Drawing Structure
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-69.0
- 20
-200.0
- 30
-0.0
- 11
-69.0
- 21
-152.0
- 31
-0.0
-  0
-LINE
-  5
-5A
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Drawing Structure
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-0.0
- 20
--10.4749999999999996
- 30
-0.0
- 11
-10.0
- 21
--10.4749999999999996
- 31
-0.0
-  0
-LINE
-  5
-5B
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Drawing Structure
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-0.0
- 20
--10.4749999999999996
- 30
-0.0
- 11
-10.0
- 21
--10.4749999999999996
- 31
-0.0
-  0
-LINE
-  5
-5C
 100
 AcDbEntity
 100
@@ -1929,7 +1837,7 @@ ByLayer
   0
 CIRCLE
   5
-5D
+5A
 100
 AcDbEntity
 100
@@ -1953,7 +1861,7 @@ ByLayer
   0
 CIRCLE
   5
-5E
+5B
 100
 AcDbEntity
 100
@@ -1977,7 +1885,7 @@ ByLayer
   0
 CIRCLE
   5
-5F
+5C
 100
 AcDbEntity
 100
@@ -2001,7 +1909,7 @@ ByLayer
   0
 CIRCLE
   5
-60
+5D
 100
 AcDbEntity
 100
@@ -2025,7 +1933,7 @@ ByLayer
   0
 LINE
   5
-61
+5E
 100
 AcDbEntity
 100
@@ -2053,7 +1961,7 @@ ByLayer
   0
 LINE
   5
-62
+5F
 100
 AcDbEntity
 100
@@ -2081,7 +1989,7 @@ ByLayer
   0
 POINT
   5
-63
+60
 100
 AcDbEntity
 100
@@ -2103,7 +2011,7 @@ ByLayer
   0
 LINE
   5
-64
+61
 100
 AcDbEntity
 100
@@ -2131,7 +2039,7 @@ ByLayer
   0
 LINE
   5
-65
+62
 100
 AcDbEntity
 100
@@ -2159,7 +2067,7 @@ ByLayer
   0
 CIRCLE
   5
-66
+63
 100
 AcDbEntity
 100
@@ -2183,7 +2091,7 @@ ByLayer
   0
 CIRCLE
   5
-67
+64
 100
 AcDbEntity
 100
@@ -2204,6 +2112,278 @@ ByLayer
 0.0
  40
 2.0
+  0
+ARC
+  5
+65
+100
+AcDbEntity
+  8
+Cuts
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+10.0
+ 20
+-10.0000000000000018
+ 30
+0.0
+ 40
+10.0
+100
+AcDbArc
+ 50
+180.0
+ 51
+270.0
+  0
+LINE
+  5
+66
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Cuts
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+290.0
+ 20
+-20.0
+ 30
+0.0
+ 11
+10.0
+ 21
+-20.0
+ 31
+0.0
+  0
+ARC
+  5
+67
+100
+AcDbEntity
+  8
+Cuts
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+290.0
+ 20
+-10.0
+ 30
+0.0
+ 40
+10.0
+100
+AcDbArc
+ 50
+270.0
+ 51
+0.0
+  0
+LINE
+  5
+68
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Cuts
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+300.0
+ 20
+290.0
+ 30
+0.0
+ 11
+300.0
+ 21
+-10.0
+ 31
+0.0
+  0
+ARC
+  5
+69
+100
+AcDbEntity
+  8
+Cuts
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+290.0
+ 20
+290.0
+ 30
+0.0
+ 40
+10.0
+100
+AcDbArc
+ 50
+0.0
+ 51
+90.0
+  0
+LINE
+  5
+6A
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Cuts
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+10.0
+ 20
+300.0
+ 30
+0.0
+ 11
+290.0
+ 21
+300.0
+ 31
+0.0
+  0
+LINE
+  5
+6B
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Cuts
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+0.0
+ 20
+-10.0000000000000018
+ 30
+0.0
+ 11
+0.0
+ 21
+290.0
+ 31
+0.0
+  0
+ARC
+  5
+6C
+100
+AcDbEntity
+  8
+Cuts
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+10.0
+ 20
+290.0
+ 30
+0.0
+ 40
+10.0
+100
+AcDbArc
+ 50
+90.0
+ 51
+180.0
+  0
+MTEXT
+  5
+6D
+100
+AcDbEntity
+100
+AcDbMText
+  8
+Text
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+220.3194182008709845
+ 20
+259.5
+ 30
+0.0
+ 40
+7.0
+ 41
+100.0
+ 71
+5
+ 72
+0
+  1
+http://www.RepRap.org\PMcWire\~Cartesian\~Bot\~v1.0\P'Base\~Plate'
+  7
+standard
+ 50
+0.0
+ 73
+1
+ 44
+1.0
   0
 ENDSEC
   0
@@ -2243,7 +2423,7 @@ E
   3
 AcDbVariableDictionary
 350
-68
+6E
   0
 DICTIONARY
   5
@@ -2707,7 +2887,7 @@ Layout2
   0
 DICTIONARY
   5
-68
+6E
 100
 AcDbDictionary
 281
@@ -2715,15 +2895,15 @@ AcDbDictionary
   3
 DIMASSOC
 350
-6A
+70
   3
 HIDETEXT
 350
-69
+6F
   0
 DICTIONARYVAR
   5
-69
+6F
 100
 DictionaryVariables
 280
@@ -2733,7 +2913,7 @@ DictionaryVariables
   0
 DICTIONARYVAR
   5
-6A
+70
 100
 DictionaryVariables
 280
