@@ -1,4 +1,4 @@
-PCBNEW-LibDoc----V1  23/8/2007-00:50:39
+PCBNEW-LibDoc----V1  29/8/2007-01:35:31
 #
 $MODULE AMP_12PIN
 Li AMP_12PIN
@@ -50,6 +50,24 @@ $EndMODULE
 #
 $MODULE MOUNTHOLE
 Li MOUNTHOLE
+Cd module 1 pin (ou trou mecanique de percage)
+Kw DEV
+$EndMODULE
+#
+$MODULE MOUNT_HOLE
+Li MOUNT_HOLE
+Cd module 1 pin (ou trou mecanique de percage)
+Kw DEV
+$EndMODULE
+#
+$MODULE CP16MM
+Li CP16MM
+Cd Condensateur polarise vertical
+Kw CP
+$EndMODULE
+#
+$MODULE 1pin
+Li 1pin
 Cd module 1 pin (ou trou mecanique de percage)
 Kw DEV
 $EndMODULE
