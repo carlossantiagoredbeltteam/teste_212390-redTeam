@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by Cvpcb (2007-07-09) date = 28/8/2007-05:09:13
+Cmp-Mod V01 Created by Cvpcb (2007-07-09) date = 29/8/2007-00:43:37
 
 BeginCmp
 TimeStamp = 45A40A1C;
@@ -38,8 +38,8 @@ EndCmp
 BeginCmp
 TimeStamp = 45A40A15;
 Reference = C6;
-ValeurCmp = 4700uF;
-IdModule  = CP36V;
+ValeurCmp = 2200uF;
+IdModule  = CP16MM;
 EndCmp
 
 BeginCmp
@@ -47,6 +47,13 @@ TimeStamp = 46D048FC;
 Reference = C7;
 ValeurCmp = 10nF;
 IdModule  = C2;
+EndCmp
+
+BeginCmp
+TimeStamp = 46D4B72A;
+Reference = C8;
+ValeurCmp = 2200uF;
+IdModule  = CP16MM;
 EndCmp
 
 BeginCmp
@@ -155,6 +162,13 @@ IdModule  = 2PIN_KEYED;
 EndCmp
 
 BeginCmp
+TimeStamp = 46D4B8DD;
+Reference = P10;
+ValeurCmp = CONN_2;
+IdModule  = 2PIN_KEYED;
+EndCmp
+
+BeginCmp
 TimeStamp = 45A40D8A;
 Reference = R1;
 ValeurCmp = 560R;
@@ -190,7 +204,7 @@ IdModule  = R3;
 EndCmp
 
 BeginCmp
-TimeStamp = 46D3A833;
+TimeStamp = 46D4BC1A;
 Reference = U1;
 ValeurCmp = 78L05;
 IdModule  = TO92-INVERT;
