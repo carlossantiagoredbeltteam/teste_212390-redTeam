@@ -1,4 +1,4 @@
-PCBNEW-LibDoc----V1  29/8/2007-01:35:31
+PCBNEW-LibDoc----V1  29/8/2007-23:01:33
 #
 $MODULE AMP_12PIN
 Li AMP_12PIN
@@ -22,12 +22,6 @@ $MODULE POWER
 Li POWER
 Cd Bornier d'alimentation 2 pins
 Kw DEV
-$EndMODULE
-#
-$MODULE 2PIN_KEYED
-Li 2PIN_KEYED
-Cd 2 Pin Connector
-Kw CONN DEV
 $EndMODULE
 #
 $MODULE 3PIN_KEYED
@@ -70,6 +64,12 @@ $MODULE 1pin
 Li 1pin
 Cd module 1 pin (ou trou mecanique de percage)
 Kw DEV
+$EndMODULE
+#
+$MODULE 2PIN_KEYED
+Li 2PIN_KEYED
+Cd 2 Pin Connector
+Kw CONN DEV
 $EndMODULE
 #
 $EndLIBDOC
