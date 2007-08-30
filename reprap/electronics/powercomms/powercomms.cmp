@@ -1,4 +1,4 @@
-Cmp-Mod V01 Created by Cvpcb (2007-07-09) date = 29/8/2007-00:43:37
+Cmp-Mod V01 Genere par PcbNew le 30/8/2007-01:40:46
 
 BeginCmp
 TimeStamp = 45A40A1C;
@@ -45,7 +45,7 @@ EndCmp
 BeginCmp
 TimeStamp = 46D048FC;
 Reference = C7;
-ValeurCmp = 10nF;
+ValeurCmp = 0.1uF;
 IdModule  = C2;
 EndCmp
 
@@ -54,6 +54,13 @@ TimeStamp = 46D4B72A;
 Reference = C8;
 ValeurCmp = 2200uF;
 IdModule  = CP16MM;
+EndCmp
+
+BeginCmp
+TimeStamp = 46D61BC6;
+Reference = C9;
+ValeurCmp = 0.1uF;
+IdModule  = C2;
 EndCmp
 
 BeginCmp
@@ -172,35 +179,35 @@ BeginCmp
 TimeStamp = 45A40D8A;
 Reference = R1;
 ValeurCmp = 560R;
-IdModule  = R3;
+IdModule  = R4;
 EndCmp
 
 BeginCmp
 TimeStamp = 46B75D60;
 Reference = R2;
 ValeurCmp = 1K8;
-IdModule  = R3;
+IdModule  = R4;
 EndCmp
 
 BeginCmp
 TimeStamp = 46B75D76;
 Reference = R3;
 ValeurCmp = 1K8;
-IdModule  = R3;
+IdModule  = R4;
 EndCmp
 
 BeginCmp
 TimeStamp = 46B771DA;
 Reference = R4;
 ValeurCmp = 5K6;
-IdModule  = R3;
+IdModule  = R4;
 EndCmp
 
 BeginCmp
 TimeStamp = 46B771FB;
 Reference = R5;
 ValeurCmp = 5K6;
-IdModule  = R3;
+IdModule  = R4;
 EndCmp
 
 BeginCmp
