@@ -59,7 +59,7 @@ Standard
   9
 $CLAYER
   8
-Base Drawings
+Y Drawings
   9
 $DIMEXO
  40
@@ -71,7 +71,7 @@ $DIMTXT
   9
 $CLAYER
   8
-Base Drawings
+Y Drawings
   0
 ENDSEC
   0
@@ -935,9 +935,9 @@ AcDbLayerTableRecord
   2
 0
  70
-0
+1
  62
-7
+-7
   6
 CONTINUOUS
 370
@@ -995,9 +995,9 @@ AcDbLayerTableRecord
   2
 Base Text
  70
-0
+1
  62
-4
+-4
   6
 CONTINUOUS
 370
@@ -1015,9 +1015,9 @@ AcDbLayerTableRecord
   2
 X Rails
  70
-0
+1
  62
-81
+-81
   6
 CONTINUOUS
 370
@@ -1055,9 +1055,9 @@ AcDbLayerTableRecord
   2
 Y Rails
  70
-0
+1
  62
-171
+-171
   6
 CONTINUOUS
 370
@@ -1075,9 +1075,9 @@ AcDbLayerTableRecord
   2
 Y Stage
  70
-0
+1
  62
-5
+-5
   6
 CONTINUOUS
 370
@@ -1095,9 +1095,9 @@ AcDbLayerTableRecord
   2
 Y Drawings
  70
-0
+1
  62
-4
+-4
   6
 CONTINUOUS
 370
@@ -1115,9 +1115,9 @@ AcDbLayerTableRecord
   2
 X Drive
  70
-0
+1
  62
-76
+-76
   6
 CONTINUOUS
 370
@@ -1135,9 +1135,9 @@ AcDbLayerTableRecord
   2
 Y Drive
  70
-0
+1
  62
-166
+-166
   6
 CONTINUOUS
 370
@@ -1155,9 +1155,9 @@ AcDbLayerTableRecord
   2
 X Text
  70
-0
+1
  62
-7
+-7
   6
 CONTINUOUS
 370
@@ -1175,9 +1175,9 @@ AcDbLayerTableRecord
   2
 Y Text
  70
-0
+1
  62
-7
+-7
   6
 CONTINUOUS
 370
@@ -1195,9 +1195,9 @@ AcDbLayerTableRecord
   2
 Base Measurements
  70
-0
+1
  62
-2
+-2
   6
 CONTINUOUS
 370
@@ -1215,9 +1215,9 @@ AcDbLayerTableRecord
   2
 X Measurements
  70
-0
+1
  62
-2
+-2
   6
 CONTINUOUS
 370
@@ -1235,9 +1235,9 @@ AcDbLayerTableRecord
   2
 X Drawings
  70
-0
+1
  62
-4
+-4
   6
 CONTINUOUS
 370
@@ -1255,9 +1255,9 @@ AcDbLayerTableRecord
   2
 Y Measurements
  70
-0
+1
  62
-2
+-2
   6
 CONTINUOUS
 370
@@ -1275,9 +1275,9 @@ AcDbLayerTableRecord
   2
 Opto Endstop
  70
-0
+1
  62
-7
+-7
   6
 CONTINUOUS
 370
@@ -7953,6 +7953,54 @@ ByLayer
  31
 0.0
   0
+CIRCLE
+  5
+134
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+X Drawings
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+210.0
+ 20
+38.0499999999999972
+ 30
+0.0
+ 40
+10.0
+  0
+CIRCLE
+  5
+135
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Y Drawings
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+79.0500000000000114
+ 20
+120.0
+ 30
+0.0
+ 40
+10.0
+  0
 ENDSEC
   0
 SECTION
@@ -7991,7 +8039,7 @@ E
   3
 AcDbVariableDictionary
 350
-134
+136
   0
 DICTIONARY
   5
@@ -8455,7 +8503,7 @@ Layout2
   0
 DICTIONARY
   5
-134
+136
 100
 AcDbDictionary
 281
@@ -8463,15 +8511,15 @@ AcDbDictionary
   3
 DIMASSOC
 350
-136
+138
   3
 HIDETEXT
 350
-135
+137
   0
 DICTIONARYVAR
   5
-135
+137
 100
 DictionaryVariables
 280
@@ -8481,7 +8529,7 @@ DictionaryVariables
   0
 DICTIONARYVAR
   5
-136
+138
 100
 DictionaryVariables
 280
