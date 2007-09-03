@@ -47,7 +47,7 @@ Standard
   9
 $CLAYER
   8
-Dimensions
+Z Stage
   9
 $DIMEXO
  40
@@ -1063,9 +1063,9 @@ AcDbLayerTableRecord
   2
 Z Drive
  70
-1
+0
  62
--76
+76
   6
 CONTINUOUS
 370
@@ -1473,7 +1473,7 @@ standard
  50
 90.0
  73
-0
+1
  44
 1.0
   0
@@ -3597,54 +3597,6 @@ Z Stage
   6
 ByLayer
  10
-28.9954999999999927
- 20
--2.7800000000000296
- 30
-0.0
- 40
-0.4445
-  0
-CIRCLE
-  5
-9A
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Z Stage
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-41.0045000000000073
- 20
--2.7800000000000296
- 30
-0.0
- 40
-0.4445
-  0
-CIRCLE
-  5
-9B
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Z Stage
- 62
-256
-370
--1
-  6
-ByLayer
- 10
 30.5653293721086925
  20
 0.4444999999999766
@@ -3655,7 +3607,7 @@ ByLayer
   0
 CIRCLE
   5
-9C
+9A
 100
 AcDbEntity
 100
@@ -3679,7 +3631,7 @@ ByLayer
   0
 LINE
   5
-9D
+9B
 100
 AcDbEntity
 100
@@ -3707,7 +3659,7 @@ ByLayer
   0
 LINE
   5
-9E
+9C
 100
 AcDbEntity
 100
@@ -3735,7 +3687,7 @@ ByLayer
   0
 LINE
   5
-9F
+9D
 100
 AcDbEntity
 100
@@ -3763,7 +3715,7 @@ ByLayer
   0
 CIRCLE
   5
-A0
+9E
 100
 AcDbEntity
 100
@@ -3787,7 +3739,7 @@ ByLayer
   0
 CIRCLE
   5
-A1
+9F
 100
 AcDbEntity
 100
@@ -3811,7 +3763,7 @@ ByLayer
   0
 CIRCLE
   5
-A2
+A0
 100
 AcDbEntity
 100
@@ -3835,7 +3787,7 @@ ByLayer
   0
 CIRCLE
   5
-A3
+A1
 100
 AcDbEntity
 100
@@ -3859,7 +3811,7 @@ ByLayer
   0
 ARC
   5
-A4
+A2
 100
 AcDbEntity
   8
@@ -3889,7 +3841,7 @@ AcDbArc
   0
 LINE
   5
-A5
+A3
 100
 AcDbEntity
 100
@@ -3912,6 +3864,64 @@ ByLayer
 90.0
  21
 85.0
+ 31
+0.0
+  0
+ARC
+  5
+A4
+100
+AcDbEntity
+  8
+Vertical Base
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+100.0
+ 20
+80.0
+ 30
+0.0
+ 40
+5.0
+100
+AcDbArc
+ 50
+0.0
+ 51
+90.0
+  0
+LINE
+  5
+A5
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Vertical Base
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+105.0
+ 20
+80.0
+ 30
+0.0
+ 11
+105.0
+ 21
+-80.0
  31
 0.0
   0
@@ -3933,7 +3943,7 @@ AcDbCircle
  10
 100.0
  20
-80.0
+-80.0
  30
 0.0
  40
@@ -3941,9 +3951,9 @@ AcDbCircle
 100
 AcDbArc
  50
-0.0
+270.0
  51
-90.0
+0.0
   0
 LINE
   5
@@ -3961,64 +3971,6 @@ Vertical Base
   6
 ByLayer
  10
-105.0
- 20
-80.0
- 30
-0.0
- 11
-105.0
- 21
--80.0
- 31
-0.0
-  0
-ARC
-  5
-A8
-100
-AcDbEntity
-  8
-Vertical Base
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-100.0
- 20
--80.0
- 30
-0.0
- 40
-5.0
-100
-AcDbArc
- 50
-270.0
- 51
-0.0
-  0
-LINE
-  5
-A9
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Vertical Base
- 62
-256
-370
--1
-  6
-ByLayer
- 10
 100.0
  20
 -85.0
@@ -4033,7 +3985,7 @@ ByLayer
   0
 ARC
   5
-AA
+A8
 100
 AcDbEntity
   8
@@ -4063,7 +4015,7 @@ AcDbArc
   0
 LINE
   5
-AB
+A9
 100
 AcDbEntity
 100
@@ -4091,7 +4043,7 @@ ByLayer
   0
 ARC
   5
-AC
+AA
 100
 AcDbEntity
   8
@@ -4121,7 +4073,7 @@ AcDbArc
   0
 LINE
   5
-AD
+AB
 100
 AcDbEntity
 100
@@ -4149,7 +4101,7 @@ ByLayer
   0
 LINE
   5
-AE
+AC
 100
 AcDbEntity
 100
@@ -4177,7 +4129,7 @@ ByLayer
   0
 LINE
   5
-AF
+AD
 100
 AcDbEntity
 100
@@ -4205,7 +4157,7 @@ ByLayer
   0
 LINE
   5
-B0
+AE
 100
 AcDbEntity
 100
@@ -4228,6 +4180,62 @@ ByLayer
 64.625
  21
 -115.0
+ 31
+0.0
+  0
+LINE
+  5
+AF
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Z Rails
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+64.625
+ 20
+-115.0
+ 30
+0.0
+ 11
+83.6750000000000114
+ 21
+-115.0
+ 31
+0.0
+  0
+LINE
+  5
+B0
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Z Rails
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+83.6750000000000114
+ 20
+115.0
+ 30
+0.0
+ 11
+64.625
+ 21
+115.0
  31
 0.0
   0
@@ -4247,13 +4255,13 @@ Z Rails
   6
 ByLayer
  10
-64.625
+85.0
  20
--115.0
+115.0
  30
 0.0
  11
-83.6750000000000114
+85.0
  21
 -115.0
  31
@@ -4262,62 +4270,6 @@ ByLayer
 LINE
   5
 B2
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Z Rails
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-83.6750000000000114
- 20
-115.0
- 30
-0.0
- 11
-64.625
- 21
-115.0
- 31
-0.0
-  0
-LINE
-  5
-B3
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Z Rails
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-85.0
- 20
-115.0
- 30
-0.0
- 11
-85.0
- 21
--115.0
- 31
-0.0
-  0
-LINE
-  5
-B4
 100
 AcDbEntity
 100
@@ -4345,7 +4297,7 @@ ByLayer
   0
 CIRCLE
   5
-B5
+B3
 100
 AcDbEntity
 100
@@ -4369,7 +4321,7 @@ ByLayer
   0
 CIRCLE
   5
-B6
+B4
 100
 AcDbEntity
 100
@@ -4390,6 +4342,62 @@ ByLayer
 0.0
  40
 3.1749999999999998
+  0
+LINE
+  5
+B5
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Z Drawing
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+75.4749999999999943
+ 20
+115.0
+ 30
+0.0
+ 11
+75.4749999999999943
+ 21
+-115.0
+ 31
+0.0
+  0
+LINE
+  5
+B6
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Z Drawing
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+65.0
+ 20
+-95.0
+ 30
+0.0
+ 11
+85.0
+ 21
+-95.0
+ 31
+0.0
   0
 LINE
   5
@@ -4407,15 +4415,15 @@ Z Drawing
   6
 ByLayer
  10
-75.4749999999999943
+65.0
  20
-115.0
+31.6666667000000075
  30
 0.0
  11
-75.4749999999999943
+85.0
  21
--115.0
+31.6666667000000075
  31
 0.0
   0
@@ -4437,75 +4445,19 @@ ByLayer
  10
 65.0
  20
--95.0
+-31.6666667000000075
  30
 0.0
  11
 85.0
  21
--95.0
+-31.6666667000000075
  31
 0.0
   0
 LINE
   5
 B9
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Z Drawing
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-65.0
- 20
-31.6666667000000075
- 30
-0.0
- 11
-85.0
- 21
-31.6666667000000075
- 31
-0.0
-  0
-LINE
-  5
-BA
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Z Drawing
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-65.0
- 20
--31.6666667000000075
- 30
-0.0
- 11
-85.0
- 21
--31.6666667000000075
- 31
-0.0
-  0
-LINE
-  5
-BB
 100
 AcDbEntity
 100
@@ -4533,7 +4485,7 @@ ByLayer
   0
 CIRCLE
   5
-BC
+BA
 100
 AcDbEntity
 100
@@ -4550,6 +4502,54 @@ ByLayer
 75.4749999999999943
  20
 95.0
+ 30
+0.0
+ 40
+2.0
+  0
+CIRCLE
+  5
+BB
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Vertical Base
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+75.4749999999999943
+ 20
+31.6666667000000075
+ 30
+0.0
+ 40
+2.0
+  0
+CIRCLE
+  5
+BC
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Vertical Base
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+75.4749999999999943
+ 20
+-31.6666667000000075
  30
 0.0
  40
@@ -4573,54 +4573,6 @@ ByLayer
  10
 75.4749999999999943
  20
-31.6666667000000075
- 30
-0.0
- 40
-2.0
-  0
-CIRCLE
-  5
-BE
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Vertical Base
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-75.4749999999999943
- 20
--31.6666667000000075
- 30
-0.0
- 40
-2.0
-  0
-CIRCLE
-  5
-BF
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Vertical Base
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-75.4749999999999943
- 20
 -95.0
  30
 0.0
@@ -4629,7 +4581,7 @@ ByLayer
   0
 LINE
   5
-C0
+BE
 100
 AcDbEntity
 100
@@ -4657,6 +4609,62 @@ ByLayer
   0
 LINE
   5
+BF
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Z Drawing
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+-15.0
+ 20
+121.3500000000000227
+ 30
+0.0
+ 11
+85.0
+ 21
+121.3500000000000227
+ 31
+0.0
+  0
+LINE
+  5
+C0
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Z Drawing
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+-15.0
+ 20
+121.3500000000000227
+ 30
+0.0
+ 11
+-15.0
+ 21
+115.0
+ 31
+0.0
+  0
+LINE
+  5
 C1
 100
 AcDbEntity
@@ -4671,7 +4679,7 @@ Z Drawing
   6
 ByLayer
  10
--15.0
+85.0
  20
 121.3500000000000227
  30
@@ -4679,69 +4687,13 @@ ByLayer
  11
 85.0
  21
-121.3500000000000227
+115.0
  31
 0.0
   0
 LINE
   5
 C2
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Z Drawing
- 62
-256
-370
--1
-  6
-ByLayer
- 10
--15.0
- 20
-121.3500000000000227
- 30
-0.0
- 11
--15.0
- 21
-115.0
- 31
-0.0
-  0
-LINE
-  5
-C3
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Z Drawing
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-85.0
- 20
-121.3500000000000227
- 30
-0.0
- 11
-85.0
- 21
-115.0
- 31
-0.0
-  0
-LINE
-  5
-C4
 100
 AcDbEntity
 100
@@ -4769,7 +4721,7 @@ ByLayer
   0
 ARC
   5
-C5
+C3
 100
 AcDbEntity
   8
@@ -4799,7 +4751,7 @@ AcDbArc
   0
 LINE
   5
-C6
+C4
 100
 AcDbEntity
 100
@@ -4827,7 +4779,7 @@ ByLayer
   0
 LINE
   5
-C7
+C5
 100
 AcDbEntity
 100
@@ -4855,7 +4807,7 @@ ByLayer
   0
 ARC
   5
-C8
+C6
 100
 AcDbEntity
   8
@@ -4882,6 +4834,158 @@ AcDbArc
 0.0
  51
 90.0
+  0
+LINE
+  5
+C7
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Z Drawing
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+29.4399999999999977
+ 20
+-1.2500000000000284
+ 30
+0.0
+ 11
+40.5600000000000023
+ 21
+-1.2500000000000284
+ 31
+0.0
+  0
+LINE
+  5
+C8
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Z Drawing
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+29.4399999999999977
+ 20
+-4.3100000000000307
+ 30
+0.0
+ 11
+40.5600000000000023
+ 21
+-4.3100000000000307
+ 31
+0.0
+  0
+CIRCLE
+  5
+C9
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Z Stage
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+28.9954999999999927
+ 20
+-1.2500000000000284
+ 30
+0.0
+ 40
+0.4445
+  0
+CIRCLE
+  5
+CA
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Z Stage
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+41.0045000000000073
+ 20
+-1.2500000000000284
+ 30
+0.0
+ 40
+0.4445
+  0
+CIRCLE
+  5
+CB
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Z Stage
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+28.9954999999999927
+ 20
+-4.3100000000000307
+ 30
+0.0
+ 40
+0.4445
+  0
+CIRCLE
+  5
+CC
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Z Stage
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+41.0045000000000073
+ 20
+-4.3100000000000307
+ 30
+0.0
+ 40
+0.4445
   0
 ENDSEC
   0
@@ -4921,7 +5025,7 @@ E
   3
 AcDbVariableDictionary
 350
-C9
+CD
   0
 DICTIONARY
   5
@@ -5385,7 +5489,7 @@ Layout2
   0
 DICTIONARY
   5
-C9
+CD
 100
 AcDbDictionary
 281
@@ -5393,15 +5497,15 @@ AcDbDictionary
   3
 DIMASSOC
 350
-CB
+CF
   3
 HIDETEXT
 350
-CA
+CE
   0
 DICTIONARYVAR
   5
-CA
+CE
 100
 DictionaryVariables
 280
@@ -5411,7 +5515,7 @@ DictionaryVariables
   0
 DICTIONARYVAR
   5
-CB
+CF
 100
 DictionaryVariables
 280
