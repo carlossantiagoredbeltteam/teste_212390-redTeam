@@ -11,6 +11,10 @@ echo "Making Files..."
 mkdir -p "$TO_DIR"
 mkdir -p "$TO_DIR/gerber"
 mkdir -p "$TO_DIR/pdf"
+mkdir -p "$TO_DIR/kicad"
+mkdir -p "$TO_DIR/kicad/src"
+mkdir -p "$TO_DIR/kicad/library"
+mkdir -p "$TO_DIR/kicad/modules"
 
 #copy our files...
 echo "Copying Files..."
@@ -27,11 +31,15 @@ cp $BOARD/*-SilkSCmp.ps "$TO_DIR/pdf/SilkScreen.ps"
 cp $BOARD/*.drl "$TO_DIR/gerber"
 
 #create our source dir
-cp -R $BOARD "$TO_DIR/src";
+cp $BOARD/* "$TO_DIR/kicad/src";
 rm -rf $TO_DIR/src/*.ps
 rm -rf $TO_DIR/src/*.pdf
 rm -rf $TO_DIR/src/*.pho
 rm -rf $TO_DIR/src/.svn
+
+#save our kicad files
+cp kicad_library/reprap.mod "$TO_DIR/kicad/modules"
+cp kicad_library/reprap.lib "$TO_DIR/kicad/library"
 
 #convert to pdf...
 echo "Converting to PDF..."
