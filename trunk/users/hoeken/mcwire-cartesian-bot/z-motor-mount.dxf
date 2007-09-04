@@ -37,6 +37,14 @@ $PLIMMAX
  20
 297.0
   9
+$PINSBASE
+ 10
+-96.4751677852348166
+ 20
+134.3476510067114589
+ 30
+0.0
+  9
 $INSUNITS
  70
 4
@@ -59,7 +67,7 @@ $DIMTXT
   9
 $CLAYER
   8
-Drawings
+Z Motor Mount
   0
 ENDSEC
   0
@@ -943,9 +951,9 @@ AcDbLayerTableRecord
   2
 Z Assembly
  70
-0
+1
  62
-7
+-7
   6
 CONTINUOUS
 370
@@ -963,9 +971,9 @@ AcDbLayerTableRecord
   2
 Drawings
  70
-0
+1
  62
-7
+-7
   6
 CONTINUOUS
 370
@@ -1023,9 +1031,9 @@ AcDbLayerTableRecord
   2
 Dimensions
  70
-0
+1
  62
-2
+-2
   6
 CONTINUOUS
 370
@@ -1581,49 +1589,9 @@ ByLayer
  31
 0.0
   0
-MTEXT
-  5
-50
-100
-AcDbEntity
-100
-AcDbMText
-  8
-Z Mount Text
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-275.4224295518475856
- 20
-66.4590943922667634
- 30
-0.0
- 40
-3.0
- 41
-100.0
- 71
-5
- 72
-2
-  1
-"Z\~Motor\~Mount\~-\~NEMA\~17"\PMcWire\~Cartesian\~Bot\~v1.0\Pwww.RepRap.org
-  7
-standard
- 50
-0.0
- 73
-1
- 44
-1.0
-  0
 LINE
   5
-51
+50
 100
 AcDbEntity
 100
@@ -1651,7 +1619,7 @@ ByLayer
   0
 CIRCLE
   5
-52
+51
 100
 AcDbEntity
 100
@@ -1675,7 +1643,7 @@ ByLayer
   0
 CIRCLE
   5
-53
+52
 100
 AcDbEntity
 100
@@ -1690,6 +1658,30 @@ Z Motor Mount
 ByLayer
  10
 180.0
+ 20
+110.9500000000000171
+ 30
+0.0
+ 40
+1.5
+  0
+CIRCLE
+  5
+53
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Z Motor Mount
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+220.0
  20
 110.9500000000000171
  30
@@ -1715,30 +1707,6 @@ ByLayer
  10
 220.0
  20
-110.9500000000000171
- 30
-0.0
- 40
-1.5
-  0
-CIRCLE
-  5
-55
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Z Motor Mount
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-220.0
- 20
 70.9500000000000171
  30
 0.0
@@ -1747,7 +1715,7 @@ ByLayer
   0
 CIRCLE
   5
-56
+55
 100
 AcDbEntity
 100
@@ -1771,7 +1739,7 @@ ByLayer
   0
 LINE
   5
-57
+56
 100
 AcDbEntity
 100
@@ -1799,7 +1767,7 @@ ByLayer
   0
 CIRCLE
   5
-58
+57
 100
 AcDbEntity
 100
@@ -1814,6 +1782,30 @@ Drawings
 ByLayer
  10
 180.0
+ 20
+110.9500000000000171
+ 30
+0.0
+ 40
+4.5974000000000004
+  0
+CIRCLE
+  5
+58
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Drawings
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+220.0
  20
 110.9500000000000171
  30
@@ -1839,7 +1831,7 @@ ByLayer
  10
 220.0
  20
-110.9500000000000171
+70.9500000000000171
  30
 0.0
  40
@@ -1861,30 +1853,6 @@ Drawings
   6
 ByLayer
  10
-220.0
- 20
-70.9500000000000171
- 30
-0.0
- 40
-4.5974000000000004
-  0
-CIRCLE
-  5
-5B
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Drawings
- 62
-256
-370
--1
-  6
-ByLayer
- 10
 180.0
  20
 70.9500000000000171
@@ -1895,7 +1863,7 @@ ByLayer
   0
 ARC
   5
-5C
+5B
 100
 AcDbEntity
   8
@@ -1925,65 +1893,7 @@ AcDbArc
   0
 LINE
   5
-5D
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Z Motor Mount
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-150.0
- 20
-115.9499999999999886
- 30
-0.0
- 11
-150.0
- 21
-65.9499999999999886
- 31
-0.0
-  0
-ARC
-  5
-5E
-100
-AcDbEntity
-  8
-Z Motor Mount
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-155.0
- 20
-65.9499999999999886
- 30
-0.0
- 40
-5.0
-100
-AcDbArc
- 50
-180.0
- 51
-270.0
-  0
-LINE
-  5
-5F
+5C
 100
 AcDbEntity
 100
@@ -2011,7 +1921,7 @@ ByLayer
   0
 CIRCLE
   5
-60
+5D
 100
 AcDbEntity
 100
@@ -2033,33 +1943,9 @@ ByLayer
  40
 2.0
   0
-CIRCLE
-  5
-61
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Drawings
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-160.0
- 20
-105.2374999999999972
- 30
-0.0
- 40
-4.5974000000000004
-  0
 LINE
   5
-62
+5E
 100
 AcDbEntity
 100
@@ -2087,7 +1973,7 @@ ByLayer
   0
 ARC
   5
-63
+5F
 100
 AcDbEntity
   8
@@ -2117,13 +2003,13 @@ AcDbArc
   0
 LINE
   5
-64
+60
 100
 AcDbEntity
 100
 AcDbLine
   8
-Z Motor Mount
+Z Assembly
  62
 256
 370
@@ -2131,15 +2017,127 @@ Z Motor Mount
   6
 ByLayer
  10
-250.0
+100.0
  20
-115.9499999999999886
+100.4749999999999943
  30
 0.0
  11
 250.0
  21
-65.9499999999999886
+100.4749999999999943
+ 31
+0.0
+  0
+LINE
+  5
+61
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Z Assembly
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+100.0
+ 20
+110.0
+ 30
+0.0
+ 11
+250.0
+ 21
+110.0
+ 31
+0.0
+  0
+LINE
+  5
+62
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Drawings
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+100.0
+ 20
+105.2374999999999972
+ 30
+0.0
+ 11
+250.0
+ 21
+105.2374999999999972
+ 31
+0.0
+  0
+LINE
+  5
+63
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Drawings
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+100.0
+ 20
+90.9499999999999886
+ 30
+0.0
+ 11
+250.0
+ 21
+90.9499999999999886
+ 31
+0.0
+  0
+LINE
+  5
+64
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Z Assembly
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+100.0
+ 20
+81.4249999999999972
+ 30
+0.0
+ 11
+250.0
+ 21
+81.4249999999999972
  31
 0.0
   0
@@ -2151,7 +2149,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Z Motor Mount
+Drawings
  62
 256
 370
@@ -2159,219 +2157,21 @@ Z Motor Mount
   6
 ByLayer
  10
-155.0
+100.0
  20
-60.9499999999999886
+75.0750000000000028
  30
 0.0
  11
-245.0
+250.0
  21
-60.9499999999999957
+75.0750000000000028
  31
 0.0
   0
-ARC
+LINE
   5
 66
-100
-AcDbEntity
-  8
-Z Motor Mount
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-245.0
- 20
-65.9499999999999886
- 30
-0.0
- 40
-5.0
-100
-AcDbArc
- 50
-270.0
- 51
-0.0
-  0
-LINE
-  5
-67
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Z Assembly
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-100.0
- 20
-100.4749999999999943
- 30
-0.0
- 11
-250.0
- 21
-100.4749999999999943
- 31
-0.0
-  0
-LINE
-  5
-68
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Z Assembly
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-100.0
- 20
-110.0
- 30
-0.0
- 11
-250.0
- 21
-110.0
- 31
-0.0
-  0
-LINE
-  5
-69
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Drawings
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-100.0
- 20
-105.2374999999999972
- 30
-0.0
- 11
-250.0
- 21
-105.2374999999999972
- 31
-0.0
-  0
-LINE
-  5
-6A
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Drawings
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-100.0
- 20
-90.9499999999999886
- 30
-0.0
- 11
-250.0
- 21
-90.9499999999999886
- 31
-0.0
-  0
-LINE
-  5
-6B
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Z Assembly
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-100.0
- 20
-81.4249999999999972
- 30
-0.0
- 11
-250.0
- 21
-81.4249999999999972
- 31
-0.0
-  0
-LINE
-  5
-6C
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Drawings
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-100.0
- 20
-75.0750000000000028
- 30
-0.0
- 11
-250.0
- 21
-75.0750000000000028
- 31
-0.0
-  0
-LINE
-  5
-6D
 100
 AcDbEntity
 100
@@ -2399,7 +2199,7 @@ ByLayer
   0
 CIRCLE
   5
-6E
+67
 100
 AcDbEntity
 100
@@ -2423,7 +2223,7 @@ ByLayer
   0
 CIRCLE
   5
-6F
+68
 100
 AcDbEntity
 100
@@ -2444,6 +2244,214 @@ ByLayer
 0.0
  40
 4.5999999999999996
+  0
+CIRCLE
+  5
+69
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Drawings
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+160.0
+ 20
+105.2374999999999972
+ 30
+0.0
+ 40
+4.5974000000000004
+  0
+LINE
+  5
+6A
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Z Motor Mount
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+150.0
+ 20
+115.9499999999999886
+ 30
+0.0
+ 11
+150.0
+ 21
+60.9499999999999886
+ 31
+0.0
+  0
+ARC
+  5
+6B
+100
+AcDbEntity
+  8
+Z Motor Mount
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+155.0
+ 20
+60.9499999999999886
+ 30
+0.0
+ 40
+5.0
+100
+AcDbArc
+ 50
+180.0
+ 51
+270.0
+  0
+LINE
+  5
+6C
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Z Motor Mount
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+250.0
+ 20
+115.9499999999999886
+ 30
+0.0
+ 11
+250.0
+ 21
+60.9499999999999957
+ 31
+0.0
+  0
+LINE
+  5
+6D
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Z Motor Mount
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+155.0
+ 20
+55.9499999999999886
+ 30
+0.0
+ 11
+245.0
+ 21
+55.9499999999999957
+ 31
+0.0
+  0
+ARC
+  5
+6E
+100
+AcDbEntity
+  8
+Z Motor Mount
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+245.0
+ 20
+60.9499999999999957
+ 30
+0.0
+ 40
+5.0
+100
+AcDbArc
+ 50
+270.0
+ 51
+0.0
+  0
+MTEXT
+  5
+6F
+100
+AcDbEntity
+100
+AcDbMText
+  8
+Z Mount Text
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+241.0
+ 20
+79.0
+ 30
+0.0
+ 40
+2.0
+ 41
+100.0
+ 71
+5
+ 72
+2
+  1
+"Z\~Motor\~Mount\~-\~NEMA\~17"\PMcWire\~Cartesian\~Bot\~v1.0\Pwww.RepRap.org
+  7
+standard
+ 50
+90.0
+ 73
+0
+ 44
+1.0
   0
 ENDSEC
   0
