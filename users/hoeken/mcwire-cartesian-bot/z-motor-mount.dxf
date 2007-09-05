@@ -55,7 +55,7 @@ Standard
   9
 $CLAYER
   8
-Drawings
+Z Motor Mount
   9
 $DIMEXO
  40
@@ -67,7 +67,7 @@ $DIMTXT
   9
 $CLAYER
   8
-Z Motor Mount
+Z Mount Text
   0
 ENDSEC
   0
@@ -1013,7 +1013,7 @@ Z Mount Text
  70
 0
  62
-7
+23
   6
 CONTINUOUS
 370
@@ -2449,7 +2449,7 @@ standard
  50
 90.0
  73
-0
+1
  44
 1.0
   0
