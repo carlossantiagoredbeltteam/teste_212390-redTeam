@@ -25,6 +25,7 @@
 			
 			//import our data!  order is important here.
 			$legend = loadLegend();
+			loadCountries($legend);
 			loadSuppliers($legend);
 			loadUniqueParts($legend);
 			loadRawSheets($legend);
@@ -53,6 +54,7 @@
 	function loadLegend()
 	{
 		$legend = array();
+		$legend['countries'] = 21;
 		$legend['suppliers'] = 12;
 		$legend['unique_parts'] = 15;
 		$legend['legend'] = 8;
@@ -80,6 +82,24 @@
 		}
 	
 		return $legend;
+	}
+	
+	function loadCountries($legend)
+	{
+		$data = getRawSheetData($legend['countries']);
+		array_shift($data);
+		array_shift($data);
+		
+		foreach ($data AS $row)
+		{
+			$country = new Country();
+			$country->set('name', $row[0]);
+			$country->set('code', $row[1]);
+			$country->set('group', $row[2]);
+			$country->save();
+		}
+		
+		echo "Loaded " . count($data) . " countries.<br/><br/>\n";
 	}
 	
 	function loadSuppliers($legend)
