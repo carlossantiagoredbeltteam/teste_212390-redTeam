@@ -132,6 +132,15 @@
 				GROUP BY type
 				ORDER BY cnt DESC
 			"));
+
+			$this->set('unique_quantity_parts', db()->getArray("
+				SELECT up.id, SUM(quantity) AS cnt, up.type, name, units
+				FROM raw_parts rp
+				INNER JOIN unique_parts up
+					ON up.id = rp.part_id
+				GROUP BY name
+				ORDER BY units, cnt DESC
+			"));
 		}
 	}
 ?>
