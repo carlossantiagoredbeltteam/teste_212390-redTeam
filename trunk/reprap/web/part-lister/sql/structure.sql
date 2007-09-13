@@ -25,9 +25,11 @@ INDEX ( `supplier_id` , `country_id` )
 
 CREATE TABLE `countries` (
 `id` INT (11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-`short` VARCHAR( 10 ) NOT NULL ,
-`long` VARCHAR( 255 ) NOT NULL ,
-INDEX ( `short` )
+`name` VARCHAR( 255 ) NOT NULL ,
+`code` CHAR( 2 ) NOT NULL ,
+`group` VARCHAR (255),
+INDEX ( `name` ),
+INDEX ( `group` )
 ) ENGINE = MYISAM ;
 
 CREATE TABLE `unique_parts` (
