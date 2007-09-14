@@ -20,9 +20,13 @@
 		{
 			//add in our unique part.
 			$unique = new UniquePart($part->get('part_id'));
-			$this->addUnique($unique);
 			
-			$this->raw_list[$unique->id][] = $part;
+			//is it legit?
+			if ($unique->id)
+			{
+				$this->addUnique($unique);
+				$this->raw_list[$unique->id][] = $part;
+			}
 		}
 		
 		public function getUnique($unique_id)
