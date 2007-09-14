@@ -34,13 +34,13 @@
 		<th>Quantity</th>
 		<th>Units</th>
 	</tr>
-	<? foreach ($unique_quantity_parts AS $row): ?>
-		<? $part = new UniquePart($row['id']) ?>
+	<? foreach ($unique_quantities AS $id => $qty): ?>
+		<? $part = $unique_parts->getUnique($id); ?>
 		<tr>
 			<td><b><a href="<?=$part->getViewUrl()?>"><?=$part->get('name')?></a></b></td>
-			<td><a href="/type/<?=$row['type']?>"><?=UniquePart::typeToEnglish($row['type'])?></a></td>
-			<td align="right"><?=$row['cnt']?></td>
-			<td><?=$row['units']?></td>
+			<td><a href="/type/<?=$part->get('type')?>"><?=UniquePart::typeToEnglish($part->get('type'))?></a></td>
+			<td align="right"><?=$qty?></td>
+			<td><?=$part->get('units')?></td>
 		</tr>
 	<? endforeach ?>
 	

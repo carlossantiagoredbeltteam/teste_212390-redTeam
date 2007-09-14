@@ -17,7 +17,7 @@
 		
 		public function uniqueparts()
 		{
-			$ids = $this->args('module_id');
+			$ids= $this->args('module_id');
 			
 			if (is_array($ids))
 			{
@@ -133,14 +133,19 @@
 				ORDER BY cnt DESC
 			"));
 
-			$this->set('unique_quantity_parts', db()->getArray("
-				SELECT up.id, SUM(quantity) AS cnt, up.type, name, units
-				FROM raw_parts rp
-				INNER JOIN unique_parts up
-					ON up.id = rp.part_id
-				GROUP BY name
-				ORDER BY units, cnt DESC
-			"));
+			//get the unique parts/quantities for darwin.
+			$part = UniquePart::byName("RepRap Darwin v1.0", 'module');
+			$list = $part->getUniquePartList(true);
+
+			//get an array of id => quantity, sorted by quantity.
+			$qty_lookup = array();
+			foreach ($list->uniques AS $unique)
+				$qty_lookup[$unique->id] = $list->getUniqueQuantity($unique->id);
+			arsort($qty_lookup);
+			
+			//save it for the view.
+			$this->set('unique_parts', $list);
+			$this->set('unique_quantities', $qty_lookup);
 		}
 	}
 ?>
