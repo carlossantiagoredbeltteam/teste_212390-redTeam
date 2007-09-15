@@ -1,0 +1,175 @@
+/*
+<?xml version='1.0' standalone='yes' ?>
+
+<script>
+	<name>Drill</name>
+	<author>Thomee Wright</author>
+	<version>0.1</version>
+	<date>12-Sept-2007</date>
+	<description>
+This script generates "drill bits" for use in boolean
+modelling.  It can create round and hexagonal drill
+bits whose maximum slope does not exceed a given
+threshold (defaults to 45 deg).  These can then be
+subtracted from another solid to create an object which
+is suitable for manufacture by an FDM machine, such as
+RepRap.
+
+Slope is the maximum allowed slope, in degrees, of an
+overhang.  Angles are measured off of vertical, so a max
+slope of 0 doesn't allow any overhang, and a max slope
+of 90 allows a completely horizontal overhang.
+
+For round drills, the size parameter is the diameter
+of the circular portion, and for hexagonal drills,
+the size parameter is the distance from the center of
+one flat to the center of the opposite flat.  It
+is done this way rather than the distance from one
+point to the opposite point (which would make it the
+diameter of the circle which circumscribes the hexagon),
+because this is how standard sockets and wrenches are
+sized.  Thus a 10mm hexagonal drill bit will produce
+a hole which will fit a 10mm nut or hex bolt head.
+
+Portions of this script are based on Teardrop-Shaper
+by Remy de Winter and Adrian Bowyer, as well as on
+Autosmooth Mesh by Peter Eastman.
+	</description>
+</script>
+*/
+scene = window.getScene();
+
+shapeChoice = new BComboBox (new String [] {
+    "Round", "Hex (point down)", "Hex (flat down)" });
+slopeField = new ValueField (45, ValueField.POSITIVE);
+sizeField = new ValueField (10, ValueField.POSITIVE);
+lengthField = new ValueField (40, ValueField.POSITIVE);
+
+dlg = new ComponentsDialog (window, "Drill Tool",
+    new Widget [] {shapeChoice, slopeField, sizeField, lengthField},
+    new String [] {"Shape:", "Max slope:", "Size:", "Length:"});
+if (!dlg.clickedOk()) { return; }
+
+shape = shapeChoice.getSelectedIndex();
+double size, length, theta, phi, angle;
+length = lengthField.getValue();
+size = sizeField.getValue();
+theta = slopeField.getValue() * Math.PI / 180.0;
+name = "";
+
+switch (shape)
+{
+  case 0: // round
+    {
+      radius = size / 2;
+      numberSides = 24;
+      phi = (Math.PI + 2 * theta) / (numberSides - 2);
+      angle = ((Math.PI / 2.0) - theta);
+      y0 = radius / Math.sin(theta);
+
+      name = "Teardrop";
+      break;
+    }
+  case 1: // hex, point down
+    {
+      if (theta > (Math.PI / 3.0)) { theta = Math.PI / 3.0; }
+      radius = size / Math.sqrt(3);
+      numberSides = 6;
+      phi = Math.PI / 3.0;
+      angle = Math.PI / 3.0;
+      y0 = (radius / 2.0) + (size / (2.0 * Math.tan(theta)));
+      smooth = Mesh.NO_SMOOTHING;
+
+      name = "Hexdrop(pointy)";
+      break;
+    }
+  case 2: // hex, flat down
+    {
+      radius = size / Math.sqrt(3);
+      phi = Math.PI / 3.0;
+      y0 = radius / Math.tan(theta);
+      if (theta <= (Math.PI / 6.0))
+      {
+        numberSides = 5;
+        angle = Math.PI / 2.0;
+      }
+      else
+      {
+        numberSides = 7;
+        angle = Math.PI / 6.0;
+        y0 += size;
+        y0 /= 2;
+      }
+      smooth = Mesh.NO_SMOOTHING;
+
+      name = "Hexdrop(flat)";
+      break;
+    }
+}
+name += " size " + size;
+
+Vec3[] v = new Vec3[numberSides];
+float[] smoothness = new float[numberSides];
+v[0] = new Vec3(0, y0, 0);
+smoothness[0] = 0;
+
+for (int i = 0; i < (numberSides - 1); i++)
+{
+  x = Math.sin(angle + phi * i);
+  y = Math.cos(angle + phi * i);
+  v[i+1] = new Vec3(x, y, 0);
+  v[i+1].scale (radius);
+  smoothness[i+1] = 0;
+}
+
+// we don't smooth our initial curve; we'll extrude and create
+// the mesh with no smoothing, to keep the triangle count down,
+// then turn on smoothing on the final object
+curve = new Curve (v, smoothness, Mesh.NO_SMOOTHING, true);
+coords = new CoordinateSystem();
+tube = artofillusion.tools.ExtrudeTool.extrudeCurve
+        (curve, coords, new Vec3(0, 0, length), 1, 0, false);
+mesh = tube.convertToTriangleMesh (0.001);
+mesh_info = new ObjectInfo (mesh, coords, "");
+
+tmp_win = new LayoutWindow (new Scene());
+tmp_win.addObject (mesh_info, null);
+mesh_ed = new artofillusion.TriMeshEditorWindow
+        (tmp_win, "foowin", mesh_info, null, true);
+mesh_ed.selectObjectBoundaryCommand();
+mesh_ed.closeBoundaryCommand();
+new_mesh = mesh_ed.getObject().object;
+sel = new boolean[new_mesh.getEdges().length];
+for (i = 0; i < sel.length; i++) { sel[i] = true; }
+new TriMeshSimplifier (new_mesh, sel, 0.001, tmp_win);
+
+// At this point, we've finished constructing the mesh.  Now we need
+// to set its smoothing properly.
+if (shape != 0) // hex
+{
+  new_mesh.setSmoothingMethod(Mesh.NO_SMOOTHING);
+}
+else // round
+{
+  new_mesh.setSmoothingMethod(Mesh.APPROXIMATING);
+  edge = new_mesh.getEdges();
+  face = new_mesh.getFaces();
+  vert = new_mesh.getVertices();
+  cutoffAngle = (theta < (Math.PI/4.0))?(theta*2.0):(Math.PI/2.0);
+  cutoff = Math.cos (cutoffAngle);
+  for (int i = 0; i < edge.length; i++)
+  {
+    ed = edge[i];
+    f1 = face[ed.f1];
+    f2 = face[ed.f2];
+    norm1 = vert[f1.v1].r.minus(vert[f1.v2].r).cross(vert[f1.v1].r.minus(vert[f1.v3].r));
+    norm2 = vert[f2.v1].r.minus(vert[f2.v2].r).cross(vert[f2.v1].r.minus(vert[f2.v3].r));
+    norm1.normalize();
+    norm2.normalize();
+    ed.smoothness =  (norm1.dot(norm2) < cutoff)?0.0f:1.0f;
+  }
+}
+
+window.addObject (new_mesh, coords, name, null);
+undo = new UndoRecord (window, false, UndoRecord.DELETE_OBJECT, new Object[] { new Integer(window.getScene().getNumObjects()-1) });
+window.setUndoRecord (undo);
