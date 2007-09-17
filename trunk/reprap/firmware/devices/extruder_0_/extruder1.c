@@ -55,6 +55,7 @@ static void isr() interrupt 0 {
     timerTick();
     TMR1IF = 0;
   }
+  temp_counting &= 0xfe;
 
 }
 
@@ -137,7 +138,8 @@ void main() {
       processCommand();
       releaseLock();
     }
-    checkTemperature();
+    if(temp_counting)
+    	checkTemperature();
     clearwdt();
   }
 }

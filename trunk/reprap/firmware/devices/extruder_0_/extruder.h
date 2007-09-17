@@ -12,6 +12,7 @@ void timerTick();
 void checkTemperature();
 
 extern byte PWMPeriod;
+extern volatile byte temp_counting;
 
 #ifdef UNIVERSAL_PCB
 // RA0 is L298 4 (Fan)
