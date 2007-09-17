@@ -60,7 +60,9 @@ static byte lastTemperatureRef = 0;
 
 static byte temperatureVRef = 3;
 
-static byte portaval = 0;
+volatile byte temp_counting;
+
+volatile static byte portaval = 0;
 
 // Note: when reversing motor direction, the speed should be set to 0
 // and then delayed long enough for the motor to come to rest.
@@ -93,7 +95,7 @@ volatile static addressableInt currentPosition, seekPosition;
 #define CMD_SETVREF       52
 #define CMD_SETTEMPSCALER 53
 
-#define HEATER_PWM_PERIOD 255
+#define HEATER_PWM_PERIOD 253
 
 #ifdef UNIVERSAL_PCB
 
@@ -244,8 +246,8 @@ void init2()
   requestedHeat0 = 0;
   requestedHeat1 = 0;
   heatCounter = 0;
-  lastTemperature = 0;
-  lastTemperatureRef = 0;
+  lastTemperature = 255;    // Set as if we need to re-range at the start
+  lastTemperatureRef = 255;
   temperatureVRef = 3;
   portaval = 0;
   PORTA = portaval;
@@ -328,7 +330,7 @@ void timerTick()
   heatCounter++;
   TMR1H = HEATER_PWM_PERIOD;
   TMR1L = 0;
-
+  temp_counting = 7;  // Force temperature measurement
 _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _currentPosition
 _endasm;
@@ -396,7 +398,7 @@ void checkTemperature()
   // A1 is comparator
 
   // Remember what PORTA should be
-  byte val = portaval;
+  volatile byte val = portaval;
 
   // Assume capacitor is discharged from previous round or powerup
 
@@ -417,16 +419,21 @@ void checkTemperature()
   TRISA = BIN(10000010) | PORTATRIS;
   portaval = val | BIN(01000000);
   PORTA = portaval;
+  temp_counting = 1;
   GIE = 1;
  	
   // Wait for cap to reach vref
   TMR0 = 0;
   while (C2OUT)
     ;
-  if (T0IF)
-    lastTemperatureRef = 255;
-  else
-    lastTemperatureRef = TMR0;
+  if(temp_counting)  // True if wait wasn't interrupted
+  {
+    if (T0IF)
+      lastTemperatureRef = 255;
+    else
+      lastTemperatureRef = TMR0;
+  } else
+    temp_counting = 2;  // Flag that we were interrupted for later
 
   // Discharge cap
   // Set A1 to low, float others
@@ -455,6 +462,7 @@ void checkTemperature()
   portaval = val | BIN(10000000);
   PORTA = portaval;
   TRISA = BIN(01000010) | PORTATRIS;
+  temp_counting |= 1;   // Keep 2 if that was set above
   GIE = 1;
   
   // Use 8 bit Timer0 to measure time
@@ -462,10 +470,13 @@ void checkTemperature()
   TMR0 = 0;
   while (C2OUT)
     ;
-  if (T0IF)
-    lastTemperature = 255;
-  else
-    lastTemperature = TMR0;
+  if(temp_counting == 1) // We weren't interrupted again
+  {
+    if (T0IF)
+      lastTemperature = 255;
+    else
+      lastTemperature = TMR0;
+  }
 
   // Discharge cap
   // Set A1 to low, float others
@@ -487,7 +498,7 @@ void checkTemperature()
 
   TRISA = BIN(11000010) | PORTATRIS;
   VRCON = 0;  // Turn off vref
-
+  temp_counting = 0;
 _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _currentPosition
 _endasm;
