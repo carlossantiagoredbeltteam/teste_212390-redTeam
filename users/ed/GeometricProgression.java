@@ -1,47 +1,26 @@
 import java.applet.*;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseEvent;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.JOptionPane;
-import javax.swing.Timer;
 import java.lang.Math;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.IOException;
-import java.awt.geom.Point2D;
 import java.util.*;
 import java.awt.geom.Ellipse2D;
-
-import java.applet.*;
 import java.awt.*;
 
-
+/*
+ * Program to express the power of self replication
+ * No death here ;-)
+ */
 
 public class GeometricProgression extends Applet
 {
-
-	
-//	public GeometricProgression()
-//	{
-//		MouseListener clickListener = new MousePressListener();
-//		addMouseListener(clickListener);
-//	}
 	   int cycles = 16;
-	   
 	   int width, height;
 	
 	   Color[] spectrum;    // an array of elements, each of type Color
-	   Color[] spectrum2;   // another array
-
+	
 	   public void init() {
 	
-		  resize(600,600);
+		  resize(1000,700);
 		  
 		  width = getSize().width;
 	      height = getSize().height;
@@ -56,45 +35,51 @@ public class GeometricProgression extends Applet
 	          // a utility routine to convert it to an RGB value before
 	          // passing it to the Color() constructor.
 	          spectrum[i] = new Color( Color.HSBtoRGB(i/(float)cycles,1,1) );
-
 	      }
 	   }
 	
 	public void paint(Graphics g)
-	
 	{
 		final Graphics2D g2 = (Graphics2D)g;
 		
-		final int FONT_SIZE = 40;
-		Font hugeFont = new Font("Serif", Font.BOLD, FONT_SIZE);
-		g2.setFont(hugeFont);
-				
-		for (int click = 0; click < cycles; click++)
+		final int FONT_SIZE = 20;
+		Font key = new Font("Courier", Font.BOLD, FONT_SIZE);
+		g2.setFont(key);
+		
+		for (int n = 0; n < 4; n++)
 		{
-			g2.setColor( spectrum[ click ] );
-			
-			
-			for (int i=0; i< (Math.pow(2,click)-Math.pow(2,(click-1))); i++)
+			for (int click = 0; click < cycles; click++)
 			{
-				Random rand = new Random();
-				double x = (width-60) * Math.abs(rand.nextDouble());
-				double y = height * Math.abs(rand.nextDouble());
-			
-				Ellipse2D.Double dot = new Ellipse2D.Double(x+60,y,6,6);
-
-				g2.fill(dot);
-			}
+				g2.setColor( spectrum[ click ] );
 				
-			g2.drawString(Integer.toString(click), 5, (height/cycles)*click);
-			
-			System.out.println(Math.pow(2,click));
-	
-				for (long j = 0;  j < 300000000; j++)
+				g2.drawString("(R)ep cycles", 5, FONT_SIZE);
+				g2.drawString("(T)otal orgs", 5, FONT_SIZE*2);
+				
+				for (int i=0; i< (Math.pow(2,click)-Math.pow(2,(click-1))); i++)
 				{
-					//sleep
-				}
+					Random rand = new Random();
+					double x = (width-160) * Math.abs(rand.nextDouble());
+					double y = height * Math.abs(rand.nextDouble());
 				
-						
+					Ellipse2D.Double dot = new Ellipse2D.Double(x+160,y,10,10);
+	
+					g2.fill(dot);
+				}
+					
+				g2.drawString("R = " + click, 5, ((height/(cycles+2))*click+2*(height/(cycles+2))));
+				g2.drawString("T = " + (int)Math.pow(2,click), 5, (height/(cycles+2))*click+FONT_SIZE+2*(height/(cycles+2)));
+							
+				System.out.println(Math.pow(2,click));
+		
+				try{
+					Thread.sleep(1000);
+				}
+				catch(InterruptedException e){
+					System.out.println("Error:" + e); 
+				}
+		
+			}
+			repaint();
 		}
 	}
 	
