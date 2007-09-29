@@ -2,14 +2,14 @@ EAGLE AutoRouter Statistics:
 
 Job           : /Users/iowa/Desktop/reprap/trunk/users/hoeken/freeduino-power-transistors/power-transistors.brd
 
-Start at      :   20:04:16  ( 9/27/2007)
-End at        :   20:04:16  ( 9/27/2007)
+Start at      :   18:39:59  ( 9/29/2007)
+End at        :   18:39:59  ( 9/29/2007)
 Elapsed time  :   00:00:00
 
 Signals       :    15   RoutingGrid: 50 mil  Layers: 2
-Connections   :    39   predefined:  1 ( 0 Vias )
+Connections   :    39   predefined:  39 ( 3 Vias )
 
-Router memory :   14416
+Router memory :   14688
 
 Passname          :     Route Optimize1 Optimize2 Optimize3 Optimize4
 
@@ -18,7 +18,7 @@ Number of Ripups  :         0         0         0         0         0
 max. Level        :         0         0         0         0         0
 max. Total        :         0         0         0         0         0
 
-Routed            :        38        38        38        38        38
+Routed            :         0         0         0         0         0
 Vias              :         0         0         0         0         0
 Resolution        :   100.0 %   100.0 %   100.0 %   100.0 %   100.0 %
 
