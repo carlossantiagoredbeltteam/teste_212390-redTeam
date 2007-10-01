@@ -10,7 +10,6 @@ FILELIST=""
 echo "Making Files..."
 mkdir -p "$TO_DIR"
 mkdir -p "$TO_DIR/gerber"
-mkdir -p "$TO_DIR/pdf"
 mkdir -p "$TO_DIR/eagle"
 
 #copy our files...
