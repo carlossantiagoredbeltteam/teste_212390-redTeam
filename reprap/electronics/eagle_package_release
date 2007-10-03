@@ -12,6 +12,7 @@ mkdir -p "$TO_DIR"
 mkdir -p "$TO_DIR/gerber"
 mkdir -p "$TO_DIR/pdf"
 mkdir -p "$TO_DIR/eagle"
+mkdir -p "$TO_DIR/renders"
 
 #create our gerber files!
 echo "Creating Gerber Files..."
@@ -24,6 +25,9 @@ eagle -X -N -d GERBER_RS274X -o "$TO_DIR/gerber/SilkScreen.pho" $BOARD/*.brd Dim
 # Drill data for NC drill st.
 # warning : eagle takes path of -R option from input file directory.
 #eagle -X -N -d EXCELLON -E -0.02 -E 0.1 -R fab/eurocircuits.drl -o $@ $< Drills Holes
+
+#clean up the process
+rm -rf $TO_DIR/gerber/*.gpi 
 
 echo "Creating PS Files..."
 eagle -X -N -d PS -o "$TO_DIR/pdf/Schematic.ps" $BOARD/*.sch Nets Busses Symbols Names Values
@@ -41,11 +45,17 @@ do
 done
 rm $TO_DIR/pdf/*.ps
 
+#render our board with POVRay and eagle3d - high quality
+echo "Rendering board with eagle3D and POVRay..."
+#eagle -X -N -d eagle3D/ulp/3d41.ulp -o "$TO_DIR/renders/render.pov" $BOARD/*.brd
+povray eagle3D/render.ini +I${BOARD}/${BOARD}.pov +Otemp.png +FN +W1200 +H1024 +Q9 +A +AM2 -D
+mv temp.png ${TO_DIR}/renders/${BOARD}.png
+cp ${BOARD}/*.pov ${TO_DIR}/renders
+
 #create our source dir
 cp $BOARD/*.brd "$TO_DIR/eagle/";
 cp $BOARD/*.sch "$TO_DIR/eagle/";
 cp $BOARD/*.pro "$TO_DIR/eagle/";
-
 
 #create our archive
 echo "Archiving..."
