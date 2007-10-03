@@ -10,31 +10,42 @@ FILELIST=""
 echo "Making Files..."
 mkdir -p "$TO_DIR"
 mkdir -p "$TO_DIR/gerber"
+mkdir -p "$TO_DIR/pdf"
 mkdir -p "$TO_DIR/eagle"
 
-#copy our files...
-echo "Copying Files..."
-cp $BOARD/*.cmp "$TO_DIR/gerber/ComponentTraces.pho"
-cp $BOARD/*.sol "$TO_DIR/gerber/CopperTraces.pho"
-cp $BOARD/*.stc "$TO_DIR/gerber/SolderMaskComponent.pho"
-cp $BOARD/*.sts "$TO_DIR/gerber/SolderMaskCopper.pho"
-cp $BOARD/*.plc "$TO_DIR/gerber/SilkScreen.pho"
-cp $BOARD/*.drl "$TO_DIR/gerber"
-cp $BOARD/*.drd "$TO_DIR/gerber"
+#create our gerber files!
+echo "Creating Gerber Files..."
+eagle -X -N -d GERBER_RS274X -o "$TO_DIR/gerber/ComponentTraces.pho" $BOARD/*.brd Top Pads Vias
+eagle -X -N -d GERBER_RS274X -o "$TO_DIR/gerber/CopperTraces.pho" $BOARD/*.brd Bottom Pads Vias
+eagle -X -N -d GERBER_RS274X -o "$TO_DIR/gerber/SolderMaskComponent.pho" $BOARD/*.brd tStop
+eagle -X -N -d GERBER_RS274X -o "$TO_DIR/gerber/SolderMaskCopper.pho" $BOARD/*.brd bStop
+eagle -X -N -d GERBER_RS274X -o "$TO_DIR/gerber/SilkScreen.pho" $BOARD/*.brd Dimension tPlace tDocu
+
+# Drill data for NC drill st.
+# warning : eagle takes path of -R option from input file directory.
+#eagle -X -N -d EXCELLON -E -0.02 -E 0.1 -R fab/eurocircuits.drl -o $@ $< Drills Holes
+
+echo "Creating PS Files..."
+eagle -X -N -d PS -o "$TO_DIR/pdf/Schematic.ps" $BOARD/*.sch Nets Busses Symbols Names Values
+eagle -X -N -d PS -o "$TO_DIR/pdf/ComponentTraces.ps" $BOARD/*.brd Top Pad Via Dimension
+eagle -X -N -d PS -o "$TO_DIR/pdf/ComponentSilkscreen.ps" $BOARD/*.brd Pad Via Dimension tPlace tNames tDocu
+eagle -X -N -d PS -o "$TO_DIR/pdf/CopperTraces.ps" $BOARD/*.brd Bottom Pad Via Dimension 
+eagle -X -N -d PS -o "$TO_DIR/pdf/CopperSilkscreen.ps" $BOARD/*.brd Pad Via Dimension bPlace bNames bDocu
+
+#convert to pdf...
+echo "Converting to PDF..."
+for PS in $TO_DIR/pdf/*.ps
+do
+	TO_FILE=`basename $PS .ps`.pdf
+	ps2pdf $PS $TO_DIR/pdf/$TO_FILE
+done
+rm $TO_DIR/pdf/*.ps
 
 #create our source dir
 cp $BOARD/*.brd "$TO_DIR/eagle/";
 cp $BOARD/*.sch "$TO_DIR/eagle/";
 cp $BOARD/*.pro "$TO_DIR/eagle/";
 
-#convert to pdf...
-#echo "Converting to PDF..."
-#for PS in $TO_DIR/pdf/*.ps
-#do
-#	TO_FILE=`basename $PS .ps`.pdf
-#	ps2pdf $PS $TO_DIR/pdf/$TO_FILE
-#done
-#rm $TO_DIR/pdf/*.ps
 
 #create our archive
 echo "Archiving..."
