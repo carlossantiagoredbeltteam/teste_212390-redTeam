@@ -43,8 +43,10 @@
 		$url = "http://spreadsheets.google.com/pub?key=pmEMxYRcQzzATwbOb71BmGA&output=csv&gid=$id";
 	
 		echo "<!-- getting $url -->\n";
-	
-		$fp = fopen($url, "r");
+
+		//open the file.
+		$file = new File(TEMP_DIR);
+		$fp = $file->open($url);
 		while ($ar = fgetcsv($fp))
 			$data[] = $ar;
 	

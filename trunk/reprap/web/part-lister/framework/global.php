@@ -38,6 +38,7 @@
 	include(BASE_DIR . "collection.php");
 	include(BASE_DIR . "db.php");
 	include(BASE_DIR . "exceptions.php");
+	include(BASE_DIR . "file.php");
 	
 	function __autoload($class)
 	{
