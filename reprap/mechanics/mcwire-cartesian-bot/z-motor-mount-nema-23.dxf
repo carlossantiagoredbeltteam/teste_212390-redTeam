@@ -55,7 +55,7 @@ Standard
   9
 $CLAYER
   8
-Vertical Base
+Drawings
   9
 $DIMEXO
  40
@@ -2691,13 +2691,13 @@ ByLayer
  72
 2
   1
-"Z\~Motor\~Mount\~-\~NEMA\~23"\PMcWire\~Cartesian\~Bot\~v1.0\Pwww.RepRap.org
+"Z\~Motor\~Mount\~-\~NEMA\~23"\PMCB\~v1.1\Pmake.rrrf.org/mcb-1.1
   7
 standard
  50
 90.0
  73
-0
+1
  44
 1.0
   0
