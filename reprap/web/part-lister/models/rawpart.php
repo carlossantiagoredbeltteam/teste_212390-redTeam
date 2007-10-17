@@ -21,11 +21,11 @@
 				$name = $this->getLookupName();
 			if ($type === null)
 				$type = $this->get('type');
-
+			
 			$sql = "
 				SELECT id
 				FROM unique_parts
-				WHERE name = '$name'
+				WHERE name = '" . db()->safe($name) . "'
 					AND type = '$type'
 			";
 			$partId = db()->getValue($sql);
@@ -65,7 +65,7 @@
 					break;
 
 				case 'wire':
-					if (!preg_match("/^Nichrome/i", $this->get('raw_text')))
+					if (preg_match("/AWG/i", $this->get('raw_text')))
 					{
 						if (preg_match("/(\d+) AWG/", $this->get('raw_text'), $matches))
 								return "$matches[1] AWG";
