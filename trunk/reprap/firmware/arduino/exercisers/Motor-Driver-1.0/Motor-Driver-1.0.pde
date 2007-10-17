@@ -19,7 +19,7 @@ void setup()
 	digitalWrite(dir_pin_b, LOW);
 }
 
-void setup()
+void loop()
 {
 	Serial.println("Speeding motors up to max.");
 	
@@ -31,9 +31,11 @@ void setup()
 		delay(100);
 	}
 
-	Serial.println("Motors at max, slowing down to 0;");
+        Serial.println("Motors at max.");
+        delay(1000);
+	Serial.println("Slowing down to 0;");
 
-	for (i=255; i>=0; i++)
+	for (i=255; i>=0; i--)
 	{
 		analogWrite(speed_pin_a, i);
 		analogWrite(speed_pin_b, i);
@@ -41,7 +43,9 @@ void setup()
 		delay(100);
 	}
 
-	Serial.println("Motors stopped, switching directions.");
+	Serial.println("Motors stopped.");
+        delay(1000);
+        Serial.println("Switching directions.");
 
 	digitalWrite(dir_pin_a, !digitalRead(dir_pin_a));
 	digitalWrite(dir_pin_b, !digitalRead(dir_pin_b));
