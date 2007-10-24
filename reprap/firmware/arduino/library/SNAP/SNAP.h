@@ -4,7 +4,7 @@
  *
  * http://reprap.org/
  *
- * RepRap is copyright (C) 2005-6 University of Bath, the RepRap
+ * RepRap is copyright (C) 2005-7 University of Bath, the RepRap
  * researchers (see the project's People webpage), and other contributors.
  *
  * RepRap is free; you can redistribute it and/or modify it under the
@@ -31,20 +31,14 @@
  *
  */
 
-#ifndef _serial_h
-#define _serial_h
+#ifndef SNAP_h
+#define SNAP_h
 
-#include "pic14.h"
+// include types & constants of Wiring core API
+#include "WConstants.h"
 
 #define MAX_TRANSMIT_BUFFER 16  ///< Transmit buffer size.
-
 #define MAX_PAYLOAD 16          ///< Size of largest possible message.
-
-#define LED			PORTA4      ///< Port to which the LED is attached - 0 is on
-#define FLASHRATE   50          ///< Default flashrate
-void flashLED();
-void LEDon();
-void setFlash(byte on, byte off);
 
 void uartTransmit(byte c);
 void sendReply();
