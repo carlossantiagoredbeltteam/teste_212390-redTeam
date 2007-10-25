@@ -28,7 +28,7 @@ Stepper myStepper(motorSteps, motorPin1, motorPin2);
 void setup()
 {
 	Serial.begin(9600);
-	Serial.printLn('Starting stepper exerciser.');
+	Serial.println('Starting stepper exerciser.');
 }
 
 void loop()
