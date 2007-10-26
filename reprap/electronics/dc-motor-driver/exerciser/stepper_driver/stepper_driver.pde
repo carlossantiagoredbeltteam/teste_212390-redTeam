@@ -35,7 +35,7 @@ void loop()
 {
 	int i;
 
-	for (i=0; i<= 60; i+=5)
+	for (i=25; i<=60; i+=5)
 	{
 		//set our new motor speed
 		Serial.print("Speed ");
@@ -54,7 +54,7 @@ void loop()
 
 	}
 
-	for (i=60; i>=0; i-=5)
+	for (i=60; i>=; i-=5)
 	{
 		//set our new motor speed
 		Serial.print("Speed ");
