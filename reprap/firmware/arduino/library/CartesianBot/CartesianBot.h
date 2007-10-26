@@ -25,10 +25,16 @@ struct Point {
 	int z;
 };
 
+#define MODE_PAUSE 0
+#define MODE_SEEK 1
+
 // library interface description
 class CartesianBot {
   public:
 
+	Point target_point;
+	Point current_position;
+	
     // constructors:
     CartesianBot();
 
@@ -46,6 +52,10 @@ class CartesianBot {
 	bool queuePoint(Point &point);
 	void clearQueue();
 	void setTargetPoint(Point &point);
+	void setCurrentPoint(Point &point);
+
+	void stop();
+	void start();
 
 	//our interface methods
 	bool readState();
@@ -72,6 +82,7 @@ class CartesianBot {
 
   private:
 	
+	byte mode;
 	bool atPoint(Point &point);
 	struct Point unqueuePoint();
 		
@@ -79,8 +90,6 @@ class CartesianBot {
 	//this is for tracking to a point.
 	byte point_index = 0;
 	Point point_queue[POINT_QUEUE_SIZE];
-	Point target_point;
-	Point current_position;
 };
 
 #endif
