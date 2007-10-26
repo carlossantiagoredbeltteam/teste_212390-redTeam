@@ -13,7 +13,6 @@ mkdir -p "$TO_DIR/gerber"
 mkdir -p "$TO_DIR/pdf"
 mkdir -p "$TO_DIR/eagle"
 mkdir -p "$TO_DIR/renders"
-mkdir -p "$TO_DIR/exerciser"
 
 #create our gerber files!
 echo "Creating Gerber Files..."
@@ -64,7 +63,14 @@ fi
 cp $BOARD/*.brd "$TO_DIR/eagle/";
 cp $BOARD/*.sch "$TO_DIR/eagle/";
 cp $BOARD/*.pro "$TO_DIR/eagle/";
-cp $BOARD/exerciser/* "$TO_DIR/exerciser/";
+
+if [ -d ${BOARD}/exerciser ]
+then
+	svn export https://reprap.svn.sourceforge.net/svnroot/reprap/trunk/reprap/electronics/${BOARD}/exerciser "$TO_DIR/exerciser"
+	echo "Exporting exerciser scripts."
+else
+	echo "No exerciser directory found, bailing."
+fi
 
 #create our archive
 echo "Archiving..."
