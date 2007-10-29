@@ -37,16 +37,6 @@ class CartesianBot {
 	
     // constructors:
     CartesianBot();
-
-	// add various physical hardware options
-	void addStepper(char axis, int steps, int dir_pin, int step_pin);
-	void addEncoder(char axis, int encoder_pin);
-	void addHomeSwitch(char axis, int switch_pin);
-	
-	//info on if we have axes or not.
-	bool hasStepper(char axis);
-	bool hasEncoder(char axis);
-	bool hasHomeSwitch(char axis);
 	
 	// add in various points
 	bool queuePoint(Point &point);
@@ -66,19 +56,9 @@ class CartesianBot {
     int version();
 
 	//our variables
-	RepStepper x_stepper;
-	RepStepper y_stepper;
-	RepStepper z_stepper;
-
-	//our limit switches!
-	LimitSwitch x_home;
-	LimitSwitch y_home;
-	LimitSwitch z_home;
-
-	//our encoders!
-	Encoder x_encoder;
-	Encoder y_encoder;
-	Encoder z_encoder;
+	LinearAxis x;
+	LinearAxis y;
+	LinearAxis z;
 
   private:
 	
