@@ -26,7 +26,8 @@ class RepStepper {
     RepStepper(int number_of_steps, int step_pin, int dir_pin);
 
     // various setters methods:
-    void setSpeed(byte whatSpeed);
+	void setRPM(byte rpm);
+    void setSpeed(int speed);
 	void setTarget(int target);
 	void setDirection(bool direction);
 	
