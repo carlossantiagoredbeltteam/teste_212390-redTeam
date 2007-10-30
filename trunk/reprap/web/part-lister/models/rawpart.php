@@ -62,6 +62,8 @@
 				case 'stud':
 					if (preg_match("/M(\d+)\D+(\d+)/", $this->get('raw_text'), $matches))
 						return "M{$matches[1]}";
+					if (preg_match('|1/4"-20\D+(\d+)|', $this->get('raw_text', $matches)))
+						return '1/4"-20';
 					break;
 
 				case 'wire':
@@ -96,6 +98,8 @@
 				case 'stud':
 					if (preg_match("/M(\d+)\D+(\d+)/", $this->get('raw_text'), $matches))
 						return $matches[2] * $this->get('quantity');
+					if (preg_match('|1/4"-20\D+(\d+)|', $this->get('raw_text'), $matches))
+						return $matches[1] * $this->get('quantity');;
 					break;
 			}
 			

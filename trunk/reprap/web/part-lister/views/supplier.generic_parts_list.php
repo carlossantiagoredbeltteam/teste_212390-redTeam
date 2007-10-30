@@ -20,8 +20,8 @@
 					<a href="<?=$unique->getViewUrl()?>"><?=$unique->get('name')?></a>
 				</td>
 				<td>
-					<?=$part->get('total_quantity')?><?=$unique->get('units')?> needed / 
-					<?=$part->get('quantity')?><?=$unique->get('units')?> per unit
+					<?=$part->get('total_quantity')?> <?=$unique->get('units')?> needed / 
+					<?=$part->get('quantity')?> <?=$unique->get('units')?> per unit
 				</td>
 				<td>
 					<b><?=$part->orderQuantity()?> total</b>
