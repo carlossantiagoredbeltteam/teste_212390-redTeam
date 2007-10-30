@@ -2,6 +2,10 @@
 #include "WProgram.h"
 #include "LimitSwitch.h"
 
+LimitSwitch::LimitSwitch()
+{
+}
+
 LimitSwitch::LimitSwitch(int pin)
 {
 	this->pin = pin;

@@ -23,24 +23,26 @@ class LinearAxis {
 	LimitSwitch min;
 	LimitSwitch max;
 	
-	AnalogEncoder encoder;
-	
-	int current;			//this is our current position.
-	float dda_position;		//this is our 'position' in DDA terms.	
-	float delta;			//this is our change for DDA.
-	bool can_move;			//are we allowed to take a step yet?
+//	AnalogEncoder encoder;
 	
 	// constructors:
     LinearAxis();
 
-	//this guy tells us to do a DDA move.
-	void dda_move();
-	
+	//various guys to interface with class
+	void ddaStep();
+	bool canStep();
+	void setDelta(float delta);
+	int getPosition();
+	void setPosition(int position);
+
 	//random other functions
     int version();
 
   private:
-
+	bool can_step;			//are we allowed to take a step yet?
+	int current_position;			//this is our current position.
+	float dda_position;		//this is our 'position' in DDA terms.	
+	float delta;			//this is our change for DDA.
 };
 
 #endif

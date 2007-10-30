@@ -20,6 +20,7 @@ class LimitSwitch {
   public:
 
     // constructors:
+    LimitSwitch();
     LimitSwitch(int pin);
 
 	//our interface methods
