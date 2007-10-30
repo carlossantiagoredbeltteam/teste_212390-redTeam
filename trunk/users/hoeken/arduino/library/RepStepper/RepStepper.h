@@ -23,6 +23,7 @@
 class RepStepper {
   public:
     // constructors:
+	RepStepper();
     RepStepper(int number_of_steps, int step_pin, int dir_pin);
 
     // various setters methods:
