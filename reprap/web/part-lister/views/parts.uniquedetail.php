@@ -36,7 +36,7 @@
 						<tr>
 							<td><a href="<?=$unique->getViewUrl()?>"><?=$unique->get('name')?></a></td>
 							<td><a href="/type/<?=$type?>"><?=UniquePart::typeToEnglish($type)?></a></td>
-							<td><?=$list->getUniqueQuantity($unique->id)?></td>
+							<td><?=$list->getUniqueQuantity($unique->id)?> <?=$unique->get('units')?></td>
 						</tr>
 					<? endforeach ?>
 				<? endforeach ?>
