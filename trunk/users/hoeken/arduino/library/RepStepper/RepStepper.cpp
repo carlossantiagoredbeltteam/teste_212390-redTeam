@@ -1,5 +1,4 @@
 
-#include "WProgram.h"
 #include "RepStepper.h"
 
 /*
@@ -28,11 +27,24 @@ RepStepper::RepStepper(int number_of_steps, int step_pin, int direction_pin)
 
 /*
   Sets the speed in revs per minute
-
 */
-void RepStepper::setSpeed(byte whatSpeed)
+void RepStepper::setSpeed(int speed)
 {
-	this->speed = whatSpeed;
+	this->speed = speed;
+
+	if (this->speed > 0)
+		this->step_delay = 60L * 1000L / this->number_of_steps / this->speed;
+	else
+		this->step_delay = 100000;
+}
+
+
+/*
+  Sets the speed in revs per minute
+*/
+void RepStepper::setRPM(uint8_t rpm)
+{
+	this->speed = rpm;
 
 	if (this->speed > 0)
 		this->step_delay = 60L * 1000L / this->number_of_steps / this->speed;

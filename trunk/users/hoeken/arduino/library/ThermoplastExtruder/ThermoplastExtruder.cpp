@@ -1,5 +1,5 @@
 
-#include "WProgram.h"
+#include "WConstants.h"
 #include "ThermoplastExtruder.h"
 
 ThermoplastExtruder::ThermoplastExtruder(int motor_dir_pin, int motor_speed_pin, int heater_pin, int thermistor_pin)

@@ -14,10 +14,6 @@
 
 #define POINT_QUEUE_SIZE 64
 
-// include types & constants of Wiring core API
-#include "WConstants.h"
-#include "RepStepper.h"
-
 // our point structure to make things nice.
 struct Point {
 	int x;
@@ -62,13 +58,13 @@ class CartesianBot {
 
   private:
 	
-	byte mode;
+	uint8_t mode;
 	bool atPoint(Point &point);
 	struct Point unqueuePoint();
 		
 
 	//this is for tracking to a point.
-	byte point_index = 0;
+	uint8_t point_index;
 	Point point_queue[POINT_QUEUE_SIZE];
 };
 

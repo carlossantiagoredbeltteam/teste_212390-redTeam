@@ -13,11 +13,10 @@
 #ifndef RepStepper_h
 #define RepStepper_h
 
+#include "WConstants.h"
+
 #define RS_FORWARD 1
 #define RS_REVERSE 0
-
-// include types & constants of Wiring core API
-#include "WConstants.h"
 
 // library interface description
 class RepStepper {
@@ -27,7 +26,7 @@ class RepStepper {
     RepStepper(int number_of_steps, int step_pin, int dir_pin);
 
     // various setters methods:
-	void setRPM(byte rpm);
+	void setRPM(uint8_t rpm);
     void setSpeed(int speed);
 	void setTarget(int target);
 	void setDirection(bool direction);
@@ -46,7 +45,7 @@ class RepStepper {
     
 	//various internal variables
     bool direction;				// Direction of rotation
-    byte speed;		// Speed in RPMs
+    uint8_t speed;				// Speed in RPMs
     int step_delay;   			// delay between steps, in microseconds, based on speed
     int number_of_steps;		// total number of steps this motor can take
     int current_step;			// which step the motor is on

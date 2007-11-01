@@ -7,10 +7,8 @@
   The interface for controlling a linear axis: stepper motor + min/max sensors + optional encoder
 */
 
-#include "WConstants.h"
 #include "LinearAxis.h"
-#include "RepStepper.h"
-#include "LimitSwitch.h"
+#include "WConstants.h"
 
 LinearAxis::LinearAxis()
 {

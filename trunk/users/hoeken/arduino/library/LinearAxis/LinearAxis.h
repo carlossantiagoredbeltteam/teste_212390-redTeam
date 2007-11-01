@@ -11,9 +11,6 @@
 #ifndef LinearAxis_h
 #define LinearAxis_h
 
-// include types & constants of Wiring core API
-#include "WConstants.h"
-
 // library interface description
 class LinearAxis {
   public:

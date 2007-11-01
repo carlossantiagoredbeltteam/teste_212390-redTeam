@@ -12,9 +12,6 @@
 #ifndef ThermoplastExtruder_h
 #define ThermoplastExtruder_h
 
-// include types & constants of Wiring core API
-#include "WConstants.h"
-
 // library interface description
 class ThermoplastExtruder {
   public:
