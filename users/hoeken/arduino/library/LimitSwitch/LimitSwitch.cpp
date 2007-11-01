@@ -1,6 +1,6 @@
 
-#include "WProgram.h"
 #include "LimitSwitch.h"
+#include "WConstants.h"
 
 LimitSwitch::LimitSwitch()
 {

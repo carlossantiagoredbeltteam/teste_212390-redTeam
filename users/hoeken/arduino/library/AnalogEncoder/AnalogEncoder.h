@@ -24,7 +24,7 @@ class AnalogEncoder {
     AnalogEncoder(int pin);
 
 	//our interface methods
-	int readState();
+	void readState();
 	int getPosition();
 	int getDirection();
 

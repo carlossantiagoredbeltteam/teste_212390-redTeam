@@ -1,5 +1,5 @@
 
-#include "WProgram.h"
+#include "WConstants.h"
 #include "LimitSwitch.h"
 
 LimitSwitch::LimitSwitch(int pin)

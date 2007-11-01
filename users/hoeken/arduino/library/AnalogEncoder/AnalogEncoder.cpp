@@ -1,5 +1,5 @@
 
-#include "WProgram.h"
+#include "WConstants.h"
 #include "AnalogEncoder.h"
 
 AnalogEncoder::AnalogEncoder(int pin)
@@ -11,7 +11,7 @@ AnalogEncoder::AnalogEncoder(int pin)
 }
 
 //our interface methods
-int AnalogEncoder::readState()
+void AnalogEncoder::readState()
 {
 	this->last_position = this->current_position;
 	this->current_position = analogRead(this->pin);

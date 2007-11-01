@@ -12,9 +12,6 @@
 #ifndef LimitSwitch_h
 #define LimitSwitch_h
 
-// include types & constants of Wiring core API
-#include "WConstants.h"
-
 // library interface description
 class LimitSwitch {
   public:

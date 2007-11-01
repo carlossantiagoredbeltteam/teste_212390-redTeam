@@ -1,18 +1,18 @@
 
-#include "WProgram.h"
+#include "WConstants.h"
 #include "Fader.h"
 
-void function fadeUp(int pin, int delayTime)
+void fadeUp(int pin, int delayTime)
 {
 	fadeTo(pin, 0, 255, delayTime);
 }
 
-void function fadeDown(int pin, int delayTime)
+void fadeDown(int pin, int delayTime)
 {
 	fadeTo(pin, 255, 0, delayTime);
 }
 
-void function fadeTo(int pin, int start, int stop, int delayTime)
+void fadeTo(int pin, int start, int stop, int delayTime)
 {
 	int i;
 	
