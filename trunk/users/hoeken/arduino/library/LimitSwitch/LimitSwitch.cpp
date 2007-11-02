@@ -4,6 +4,7 @@
 
 LimitSwitch::LimitSwitch()
 {
+	this->pin = -1;
 }
 
 LimitSwitch::LimitSwitch(int pin)
@@ -20,8 +21,11 @@ bool LimitSwitch::getState()
 
 bool LimitSwitch::readState()
 {
-	this->state = digitalRead(pin);
-	
+	if (this->pin >= 0)
+		this->state = digitalRead(pin);
+	else
+		this->state = false;
+		
 	return this->state;
 }
 
