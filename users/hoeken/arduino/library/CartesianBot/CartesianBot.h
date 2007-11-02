@@ -36,9 +36,15 @@ class CartesianBot {
     // constructors:
     CartesianBot();
 	
-	// add in various points
+	// our queue stuff
 	bool queuePoint(Point &point);
+	struct Point unqueuePoint();
 	void clearQueue();
+	bool isQueueFull();
+	bool isQueueEmpty();
+	int getQueueSize();
+	
+	//cartesian bot specific.
 	void setTargetPoint(Point &point);
 	void setCurrentPoint(Point &point);
 
@@ -46,7 +52,7 @@ class CartesianBot {
 	void start();
 
 	//our interface methods
-	bool readState();
+	void readState();
 	void move();
 	void abort();
 	
@@ -62,11 +68,12 @@ class CartesianBot {
 	
 	uint8_t mode;
 	bool atPoint(Point &point);
-	struct Point unqueuePoint();
 		
 
 	//this is for tracking to a point.
-	uint8_t point_index;
+	uint8_t head;
+	uint8_t tail;
+	int size;
 	Point point_queue[POINT_QUEUE_SIZE];
 };
 
