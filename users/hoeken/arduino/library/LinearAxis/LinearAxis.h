@@ -11,6 +11,9 @@
 #ifndef LinearAxis_h
 #define LinearAxis_h
 
+#include <LimitSwitch.h>
+#include <RepStepper.h>
+
 // library interface description
 class LinearAxis {
   public:

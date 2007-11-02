@@ -19,6 +19,11 @@ ThermoplastExtruder::ThermoplastExtruder(int motor_dir_pin, int motor_speed_pin,
 	this->setTargetTemp(0);
 }
 
+void ThermoplastExtruder::readState()
+{
+	this->getTemp();
+}
+
 void ThermoplastExtruder::setSpeed(byte whatSpeed)
 {
 	this->speed = whatSpeed;

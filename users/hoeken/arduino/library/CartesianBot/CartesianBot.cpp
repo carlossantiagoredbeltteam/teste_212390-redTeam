@@ -1,28 +1,7 @@
 
 #include "WConstants.h"
-#include "LimitSwitch.h"
+#include "CartesianBot.h"
 
-LimitSwitch::LimitSwitch(int pin)
+CartesianBot::CartesianBot()
 {
-	this->pin = pin;
-	
-	pinMode(pin, INPUT);
-}
-
-bool LimitSwitch::getState()
-{
-	return this->state;
-}
-
-bool LimitSwitch::readState()
-{
-	this->state = digitalRead(pin);
-	
-	return this->state;
-}
-
-//random other functions
-int LimitSwitch::version()
-{
-	return 1;
 }

@@ -12,6 +12,8 @@
 #ifndef CartesianBot_h
 #define CartesianBot_h
 
+#include <LinearAxis.h>
+
 #define POINT_QUEUE_SIZE 64
 
 // our point structure to make things nice.
