@@ -18,15 +18,14 @@
 class LinearAxis {
   public:
     
+	// constructors:
+    LinearAxis(int steps, int dir_pin, int step_pin, int min_pin, int max_pin);
+
+	//these are our other object variables.
 	RepStepper stepper;
-	
 	LimitSwitch min;
 	LimitSwitch max;
-	
 //	AnalogEncoder encoder;
-	
-	// constructors:
-    LinearAxis();
 
 	//various guys to interface with class
 	void ddaStep();
