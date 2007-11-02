@@ -17,6 +17,10 @@ CartesianBot::CartesianBot()
 
 	this->head = 0;
 	this->tail = 0;
+	
+	this->x = LinearAxis();
+	this->y = LinearAxis();
+	this->z = LinearAxis();
 }
 
 int CartesianBot::getQueueSize()
