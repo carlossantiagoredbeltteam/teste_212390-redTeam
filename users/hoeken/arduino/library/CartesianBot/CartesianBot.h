@@ -13,6 +13,8 @@
 #define CartesianBot_h
 
 #include <LinearAxis.h>
+#include <RepStepper.h>
+#include <LimitSwitch.h>
 
 #define POINT_QUEUE_SIZE 64
 
