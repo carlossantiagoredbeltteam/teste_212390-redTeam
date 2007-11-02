@@ -12,9 +12,8 @@
 #ifndef CartesianBot_h
 #define CartesianBot_h
 
-#include <LinearAxis.h>
-#include <RepStepper.h>
-#include <LimitSwitch.h>
+#include "LinearAxis.h"
+#include "WConstants.h"
 
 #define POINT_QUEUE_SIZE 64
 
@@ -36,7 +35,11 @@ class CartesianBot {
 	Point current_position;
 	
     // constructors:
-    CartesianBot();
+    CartesianBot(
+		int x_steps, int x_dir_pin, int x_step_pin, int x_min_pin, int x_max_pin,
+		int y_steps, int y_dir_pin, int y_step_pin, int y_min_pin, int y_max_pin,
+		int z_steps, int z_dir_pin, int z_step_pin, int z_min_pin, int z_max_pin
+	);
 	
 	// our queue stuff
 	bool queuePoint(Point &point);

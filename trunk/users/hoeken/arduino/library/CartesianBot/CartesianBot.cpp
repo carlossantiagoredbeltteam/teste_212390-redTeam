@@ -2,25 +2,16 @@
 #include "WConstants.h"
 #include "CartesianBot.h"
 
-CartesianBot::CartesianBot()
+CartesianBot::CartesianBot(
+	int x_steps, int x_dir_pin, int x_step_pin, int x_min_pin, int x_max_pin,
+	int y_steps, int y_dir_pin, int y_step_pin, int y_min_pin, int y_max_pin,
+	int z_steps, int z_dir_pin, int z_step_pin, int z_min_pin, int z_max_pin
+) : x(x_steps, x_dir_pin, x_step_pin, x_min_pin, x_max_pin) : y(y_steps, y_dir_pin, y_step_pin, y_min_pin, y_max_pin) : z(z_steps, z_dir_pin, z_step_pin, z_min_pin, z_max_pin)
 {
 	this->mode = MODE_PAUSE;
 
-/*
-	this->target_point.x = 0;
-	this->target_point.y = 0;
-	this->target_point.z = 0;
-	this->current_point.x = 0;
-	this->current_point.y = 0;
-	this->current_point.z = 0;
-*/
-
 	this->head = 0;
 	this->tail = 0;
-	
-	this->x = LinearAxis();
-	this->y = LinearAxis();
-	this->z = LinearAxis();
 }
 
 int CartesianBot::getQueueSize()
