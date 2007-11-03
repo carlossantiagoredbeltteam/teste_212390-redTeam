@@ -10,7 +10,7 @@
 #include "LinearAxis.h"
 #include "WConstants.h"
 
-LinearAxis::LinearAxis(int steps, int dir_pin, int step_pin, int min_pin, int max_pin) : stepper(steps, dir_pin, step_pin) : min(min_pin) : max(max_pin)
+LinearAxis::LinearAxis(int steps, int dir_pin, int step_pin, int min_pin, int max_pin) : stepper(steps, dir_pin, step_pin), min_switch(min_pin), max_switch(max_pin)
 {
 	this->current_position = 0;
 	this->dda_position = 0;
