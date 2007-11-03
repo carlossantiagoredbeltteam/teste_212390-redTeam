@@ -23,8 +23,8 @@ class LinearAxis {
 
 	//these are our other object variables.
 	RepStepper stepper;
-	LimitSwitch min;
-	LimitSwitch max;
+	LimitSwitch min_switch;
+	LimitSwitch max_switch;
 //	AnalogEncoder encoder;
 
 	//various guys to interface with class

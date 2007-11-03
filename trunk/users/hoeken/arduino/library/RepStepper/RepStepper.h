@@ -29,6 +29,11 @@ class RepStepper {
     void setSpeed(int speed);
 	void setTarget(int target);
 	void setDirection(bool direction);
+	void setSteps(int steps);
+	
+	int getSteps();
+	int getRPM();
+	int getSpeed();
 	
     // mover method:
     void step();
@@ -44,8 +49,9 @@ class RepStepper {
     
 	//various internal variables
     bool direction;				// Direction of rotation
-    uint8_t speed;				// Speed in RPMs
-    int step_delay;   			// delay between steps, in microseconds, based on speed
+    int speed;					// Speed in seconds between steps
+	int rpm;					// Speed in RPMs
+	int step_delay;   			// delay between steps, in microseconds, based on speed
     int number_of_steps;		// total number of steps this motor can take
     int current_step;			// which step the motor is on
 	int target_step;			//the target position

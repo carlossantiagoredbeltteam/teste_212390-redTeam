@@ -38,6 +38,11 @@ void RepStepper::setSpeed(int speed)
 		this->step_delay = 100000;
 }
 
+int RepStepper::getSpeed()
+{
+	return this->step_delay;
+}
+
 
 /*
   Sets the speed in revs per minute
@@ -50,6 +55,21 @@ void RepStepper::setRPM(uint8_t rpm)
 		this->step_delay = 60L * 1000L / this->number_of_steps / this->speed;
 	else
 		this->step_delay = 100000;
+}
+
+int RepStepper::getRPM()
+{
+	return this->rpm;
+}
+
+void RepStepper::setSteps(int steps)
+{
+	
+}
+
+int RepStepper::getSteps()
+{
+	
 }
 
 void RepStepper::setTarget(int steps)
