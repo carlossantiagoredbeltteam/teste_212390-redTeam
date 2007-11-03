@@ -9,10 +9,7 @@ RepStepper::RepStepper(int number_of_steps, int step_pin, int direction_pin)
 {
 	//init our variables.
 	this->direction = 1;
-	this->speed = 0;
-	this->step_delay = 0;
-	this->current_step = 0;
-	this->target_step = 0;
+	this->setRPM(60);
 	this->last_step_time = 0;
 
 	//get our parameters
@@ -30,12 +27,10 @@ RepStepper::RepStepper(int number_of_steps, int step_pin, int direction_pin)
 */
 void RepStepper::setSpeed(int speed)
 {
-	this->speed = speed;
-
-	if (this->speed > 0)
-		this->step_delay = 60L * 1000L / this->number_of_steps / this->speed;
-	else
-		this->step_delay = 100000;
+	this->step_delay = speed;
+	
+	if (this->step_delay > 0);
+		this->rpm = 60000000L / (this->step_delay * this->number_of_steps);
 }
 
 int RepStepper::getSpeed()
@@ -47,14 +42,18 @@ int RepStepper::getSpeed()
 /*
   Sets the speed in revs per minute
 */
-void RepStepper::setRPM(uint8_t rpm)
+void RepStepper::setRPM(int rpm)
 {
-	this->speed = rpm;
-
-	if (this->speed > 0)
-		this->step_delay = 60L * 1000L / this->number_of_steps / this->speed;
+	if (rpm <= 0)
+	{
+		this->step_delay = 0;
+		this->rpm = 0;
+	}
 	else
-		this->step_delay = 100000;
+	{
+		this->rpm = rpm;
+		this->step_delay = 60000000L / this->number_of_steps / this->rpm;
+	}
 }
 
 int RepStepper::getRPM()
@@ -64,23 +63,15 @@ int RepStepper::getRPM()
 
 void RepStepper::setSteps(int steps)
 {
+	this->number_of_steps = steps;
 	
+	//recalculate our speed.
+	this->setRPM(this->getRPM());
 }
 
 int RepStepper::getSteps()
 {
-	
-}
-
-void RepStepper::setTarget(int steps)
-{
-	if (steps < 0)
-		this->setDirection(RS_REVERSE);
-	else
-		this->setDirection(RS_FORWARD);
-		
-	this->current_step = 0;
-	this->target_step = abs(steps);
+	return this->number_of_steps;
 }
 
 void RepStepper::setDirection(bool direction)
@@ -89,36 +80,45 @@ void RepStepper::setDirection(bool direction)
 	digitalWrite(this->direction_pin, this->direction);
 }
 
-void RepStepper::step()
-{  
-	if (this->canStep())
-	{
-		this->pulse();
-		this->current_step++;		
-	}
-}
-
 bool RepStepper::canStep()
 {
-	int now = millis();
+	//bail if we have no speed.
+	if (!this->step_delay)
+		return false;
 	
-	if (this->current_step < this->target_step && now > last_step_time + step_delay)
-		return true;
+	unsigned int now = this->micros();
 	
+	//if its like this, its normal.
+	if (this->last_step_time < now)
+	{
+		if (now > this->last_step_time + this->step_delay)
+			return true;
+	}
+	//nope, we're probably dealing with overflow.
+	else
+	{
+		if (this->step_delay < (65535 - this->last_step_time + now))
+			return true;
+	}
+	
+	//okay, nobody said they're ready, bail.
 	return false;
 }
 
-void RepStepper::pulse()
-{
+void RepStepper::step()
+{  
 	digitalWrite(this->step_pin, HIGH);
-	delayMicroseconds(2);
 	digitalWrite(this->step_pin, LOW);
+	
+	this->last_step_time = this->micros();
 }
 
-/*
-* returns the version of the library:
-*/
 int RepStepper::version(void)
 {
   return 1;
+}
+
+unsigned int RepStepper::micros()
+{
+	return TCNT1;
 }

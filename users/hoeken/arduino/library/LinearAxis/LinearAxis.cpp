@@ -18,6 +18,12 @@ LinearAxis::LinearAxis(int steps, int dir_pin, int step_pin, int min_pin, int ma
 	this->can_step = false;
 }
 
+void LinearAxis::readState()
+{
+	min_switch.readState();
+	max_switch.readState();
+}
+
 void LinearAxis::ddaStep()
 {
 	this->dda_position += this->delta;
@@ -34,9 +40,27 @@ bool LinearAxis::canStep()
 	return this->can_step;
 }
 
+bool LinearAxis::doStep()
+{
+	if (stepper.canStep())
+	{
+		stepper.step();
+		this->can_step = false;
+		return true;
+	}
+	
+	return false;
+}
+
 void LinearAxis::setDelta(float delta)
 {
 	this->delta = delta;
+	
+	//which way are we going?
+	if (this->delta >= 0)
+		stepper.setDirection(RS_FORWARD);
+	else
+		stepper.setDirection(RS_REVERSE);
 }
 
 int LinearAxis::getPosition()

@@ -13,7 +13,7 @@ ThermoplastExtruder::ThermoplastExtruder(int motor_dir_pin, int motor_speed_pin,
 	pinMode(this->motor_speed_pin, OUTPUT);
 	pinMode(this->heater_pin, OUTPUT);
 	
-	this->getTemp();
+	this->readTemp();
 	this->setDirection(1);
 	this->setSpeed(0);
 	this->setTargetTemp(0);
@@ -21,7 +21,7 @@ ThermoplastExtruder::ThermoplastExtruder(int motor_dir_pin, int motor_speed_pin,
 
 void ThermoplastExtruder::readState()
 {
-	this->getTemp();
+	this->readTemp();
 }
 
 void ThermoplastExtruder::setSpeed(byte whatSpeed)
@@ -53,8 +53,13 @@ bool ThermoplastExtruder::getDirection()
 
 int ThermoplastExtruder::getTemp()
 {
+	return this->current_temp;
+}
+
+int ThermoplastExtruder::readTemp()
+{
 	this->current_temp = analogRead(this->thermistor_pin);
-	
+
 	return this->current_temp;
 }
 
@@ -71,12 +76,10 @@ void ThermoplastExtruder::manageTemp()
 
 void ThermoplastExtruder::calculateHeaterPWM()
 {
-	this->getTemp();
-
 	if (this->current_temp < this->target_temp)
 		this->heater_pwm = 255;
 	else
-		this->heater_pwm = 255;
+		this->heater_pwm = 0;
 }
 
 int ThermoplastExtruder::version()

@@ -31,6 +31,7 @@ class ThermoplastExtruder {
 	
 	//manage the extruder
 	void readState();
+	int readTemp();
 	void manageTemp();
 
 	//random other functions

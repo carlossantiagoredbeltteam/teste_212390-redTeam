@@ -28,8 +28,10 @@ class LinearAxis {
 //	AnalogEncoder encoder;
 
 	//various guys to interface with class
+	void readState();
 	void ddaStep();
 	bool canStep();
+	bool doStep();
 	void setDelta(float delta);
 	int getPosition();
 	void setPosition(int position);
