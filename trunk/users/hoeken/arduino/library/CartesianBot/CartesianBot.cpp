@@ -97,7 +97,9 @@ void CartesianBot::start()
 
 void CartesianBot::readState()
 {
-	
+	x.readState();
+	y.readState();
+	z.readState();
 }
 
 void CartesianBot::move()

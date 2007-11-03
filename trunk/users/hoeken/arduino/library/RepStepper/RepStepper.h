@@ -25,15 +25,16 @@ class RepStepper {
     RepStepper(int number_of_steps, int step_pin, int dir_pin);
 
     // various setters methods:
-	void setRPM(uint8_t rpm);
+	void setRPM(int rpm);
     void setSpeed(int speed);
-	void setTarget(int target);
 	void setDirection(bool direction);
 	void setSteps(int steps);
-	
-	int getSteps();
+
+	//our getter methods to help us out
 	int getRPM();
 	int getSpeed();
+	bool getDirection();
+	int getSteps();
 	
     // mover method:
     void step();
@@ -45,22 +46,20 @@ class RepStepper {
     int version();
 
   private:
-    void pulse();
+
+	unsigned int micros();
     
 	//various internal variables
     bool direction;				// Direction of rotation
-    int speed;					// Speed in seconds between steps
 	int rpm;					// Speed in RPMs
 	int step_delay;   			// delay between steps, in microseconds, based on speed
     int number_of_steps;		// total number of steps this motor can take
-    int current_step;			// which step the motor is on
-	int target_step;			//the target position
 	
     // motor pin numbers:
     int step_pin;				//the step signal pin.
     int direction_pin;			//the direction pin.
     
-    int last_step_time;			// time stamp in ms of when the last step was taken
+    unsigned int last_step_time;			// time stamp in ms of when the last step was taken
 };
 
 #endif
