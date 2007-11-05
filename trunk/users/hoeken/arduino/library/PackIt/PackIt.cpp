@@ -1,5 +1,6 @@
 
 #include "PackIt.h"
+#include "HardwareSerial.h"
 #include "WConstants.h"
 
 PackIt::PackIt(byte to, byte from)
@@ -13,7 +14,7 @@ PackIt::PackIt(byte to, byte from)
 boolean PackIt::add(byte b)
 {
 	//do we have room left?
-	if (this->size <= MAX_PACKET_SIZE)
+	if (this->size < MAX_PACKET_SIZE-1)
 	{
 		//add it in!
 		this->packets[this->size] = b;
@@ -21,17 +22,11 @@ boolean PackIt::add(byte b)
 		
 		//calculate our crc
 		this->crc = this->crc ^ b;
+		
+		return true;
 	}
 	else
 		return false;
-}
-
-boolean PackIt::add(boolean b)
-{
-	if (b)
-		return this->add((byte)1);
-	else
-		return this->add((byte)0);
 }
 
 boolean PackIt::add(char c)
@@ -76,7 +71,7 @@ boolean PackIt::add(long l)
 
 boolean PackIt::add(unsigned long l)
 {
-	return this->add((long)l)
+	return this->add((long)l);
 }
 
 boolean PackIt::add(float f)
@@ -109,7 +104,7 @@ boolean PackIt::add(double d)
 	return result;
 }
 
-void send()
+void PackIt::send()
 {
 	byte i;
 
