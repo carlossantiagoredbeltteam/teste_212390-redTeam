@@ -9,8 +9,9 @@ RepStepper::RepStepper(int number_of_steps, int step_pin, int direction_pin)
 {
 	//init our variables.
 	this->direction = 1;
-	this->setRPM(60);
+	this->setSpeed(0);
 	this->last_step_time = 0;
+	this->next_step_time = 0;
 
 	//get our parameters
 	this->number_of_steps = number_of_steps;
@@ -23,21 +24,23 @@ RepStepper::RepStepper(int number_of_steps, int step_pin, int direction_pin)
 }
 
 /*
-  Sets the speed in revs per minute
+  Sets the speed in ticks per step
 */
 void RepStepper::setSpeed(int speed)
 {
 	this->step_delay = speed;
 	
 	if (this->step_delay > 0);
-		this->rpm = 60000000L / (this->step_delay * this->number_of_steps);
+		this->rpm = 15000000L / (this->step_delay * this->number_of_steps);
 }
 
+/*
+  Gets the speed in ticks per step
+*/
 int RepStepper::getSpeed()
 {
 	return this->step_delay;
 }
-
 
 /*
   Sets the speed in revs per minute
@@ -52,7 +55,10 @@ void RepStepper::setRPM(int rpm)
 	else
 	{
 		this->rpm = rpm;
-		this->step_delay = 60000000L / this->number_of_steps / this->rpm;
+		
+		//our high precision time is measured in 4us ticks, so get the # of ticks in 1 minute / 
+		// number of steps per rev / number of revolutions per minute = ticks per step
+		this->step_delay = 15000000L / this->number_of_steps / this->rpm;
 	}
 }
 
@@ -86,18 +92,19 @@ bool RepStepper::canStep()
 	if (!this->step_delay)
 		return false;
 	
-	unsigned int now = this->micros();
+	unsigned long now = this->hpticks();
 	
 	//if its like this, its normal.
-	if (this->last_step_time < now)
+	if (last_step_time <= next_step_time)
 	{
-		if (now > this->last_step_time + this->step_delay)
+		if (now >= this->next_step_time);
 			return true;
 	}
 	//nope, we're probably dealing with overflow.
 	else
 	{
-		if (this->step_delay < (65535 - this->last_step_time + now))
+		//is the time since our last step bigger than our delay?
+		if ((4294967295L - this->last_step_time + now) >= this->step_delay)
 			return true;
 	}
 	
@@ -110,7 +117,9 @@ void RepStepper::step()
 	digitalWrite(this->step_pin, HIGH);
 	digitalWrite(this->step_pin, LOW);
 	
-	this->last_step_time = this->micros();
+	//calculate our next step.
+	this->last_step_time = this->hpticks();
+	this->next_step_time = this->last_step_time + $this->step_delay;
 }
 
 int RepStepper::version(void)
@@ -118,7 +127,7 @@ int RepStepper::version(void)
   return 1;
 }
 
-unsigned int RepStepper::micros()
+unsigned long RepStepper::hpticks()
 {
-	return TCNT1;
+	return (timer0_overflow_count << 8) + TCNT0;
 }
