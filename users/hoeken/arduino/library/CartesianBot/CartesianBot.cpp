@@ -100,7 +100,7 @@ void CartesianBot::getNextPoint()
 	}
 }
 
-void calculateDDA()
+void CartesianBot::calculateDDA()
 {
 	int dx, dy, dz;
 	float xInc, yInc, zInc;
@@ -167,6 +167,11 @@ void CartesianBot::move()
 		y.ddaStep();
 		z.ddaStep();
 	}
+}
+
+void CartesianBot::notifyTargetReached()
+{
+	
 }
 
 void CartesianBot::abort()
