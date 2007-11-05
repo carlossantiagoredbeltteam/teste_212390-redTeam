@@ -77,12 +77,53 @@ void CartesianBot::clearQueue()
 
 void CartesianBot::setTargetPoint(Point &point)
 {
-	
+	this->target_point = point;
 }
 
 void CartesianBot::setCurrentPoint(Point &point)
 {
+	this->current_position = point;
+}
+
+void CartesianBot::getNextPoint()
+{
+	if (!this->isQueueFull())
+	{
+		this->target_point = this->unqueuePoint();
+		this->calculateDDA();
+	}
+	else
+	{
+		x.setDelta(0);
+		y.setDelta(0);
+		z.setDelta(0);
+	}
+}
+
+void calculateDDA()
+{
+	int dx, dy, dz;
+	float xInc, yInc, zInc;
+	int steps;
 	
+	//get the change deltas
+	dx = this->target_point.x - this->current_position.x;
+	dy = this->target_point.y - this->current_position.y;
+	dz = this->target_point.z - this->current_position.z;
+	
+	//what is the biggest one?
+	steps = max(abs(dx), abs(dy));
+	steps = max(steps, abs(dz));
+
+	//calculate our increments
+	xInc = dx / steps;
+	yInc = dy / steps;
+	zInc = dz / steps;
+	
+	//save it to each axis.
+	x.setDelta(xInc);
+	y.setDelta(yInc);
+	z.setDelta(zInc);
 }
 
 void CartesianBot::stop()
@@ -104,7 +145,28 @@ void CartesianBot::readState()
 
 void CartesianBot::move()
 {
+	if (x.canStep() || y.canStep() || z.canStep())
+	{
+		if (x.canStep())
+			x.doStep();
+		if (y.canStep())
+			y.doStep();
+		if (z.canStep())
+			z.doStep();
 	
+		//are we at the point?
+		if (this->atPoint(this->target_point))
+		{
+			this->notifyTargetReached();
+			this->getNextPoint();
+		}
+	}
+	else
+	{
+		x.ddaStep();
+		y.ddaStep();
+		z.ddaStep();
+	}
 }
 
 void CartesianBot::abort()
