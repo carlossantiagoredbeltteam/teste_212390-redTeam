@@ -59,7 +59,9 @@ class RepStepper {
     int step_pin;				//the step signal pin.
     int direction_pin;			//the direction pin.
     
-    unsigned int last_step_time;			// time stamp in ms of when the last step was taken
+	//our time counter variables.
+	unsigned long last_step_time;			// time stamp in ticks of when our last step was.
+    unsigned long next_step_time;			// time stamp in ticks of when the next step can be.
 };
 
 #endif

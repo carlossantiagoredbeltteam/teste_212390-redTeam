@@ -78,20 +78,19 @@ void CartesianBot::clearQueue()
 void CartesianBot::setTargetPoint(Point &point)
 {
 	this->target_point = point;
+	this->calculateDDA();
 }
 
 void CartesianBot::setCurrentPoint(Point &point)
 {
 	this->current_position = point;
+	this->calculateDDA();
 }
 
 void CartesianBot::getNextPoint()
 {
 	if (!this->isQueueFull())
-	{
-		this->target_point = this->unqueuePoint();
-		this->calculateDDA();
-	}
+		this->setTargetPoint(this->unqueuePoint());
 	else
 	{
 		x.setDelta(0);
@@ -145,33 +144,41 @@ void CartesianBot::readState()
 
 void CartesianBot::move()
 {
-	if (x.canStep() || y.canStep() || z.canStep())
+	if (this->mode == MODE_SEEK)
 	{
-		if (x.canStep())
-			x.doStep();
-		if (y.canStep())
-			y.doStep();
-		if (z.canStep())
-			z.doStep();
-	
-		//are we at the point?
-		if (this->atPoint(this->target_point))
+		if (x.canStep() || y.canStep() || z.canStep())
 		{
-			this->notifyTargetReached();
-			this->getNextPoint();
+			if (x.canStep())
+				x.doStep();
+			if (y.canStep())
+				y.doStep();
+			if (z.canStep())
+				z.doStep();
+
+			//are we at the point?
+			if (this->atPoint(this->target_point))
+			{
+				this->notifyTargetReached();
+				this->getNextPoint();
+			}
 		}
-	}
-	else
-	{
-		x.ddaStep();
-		y.ddaStep();
-		z.ddaStep();
+		else
+		{
+			x.ddaStep();
+			y.ddaStep();
+			z.ddaStep();
+		}
 	}
 }
 
 void CartesianBot::notifyTargetReached()
 {
-	
+	packet.create(HOST_ADDRESS, MY_ADDRESS);
+	packet.add(CMD_GET_POS);
+	packet.add(current_position.x);
+	packet.add(current_position.y);
+	packet.add(current_position.z);
+	packet.send();
 }
 
 void CartesianBot::abort()
