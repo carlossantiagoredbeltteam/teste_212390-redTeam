@@ -74,7 +74,8 @@ class CartesianBot {
 	
 	uint8_t mode;
 	bool atPoint(Point &point);
-	void calculateDDA();		
+	void calculateDDA();
+	void notifyTargetReached();	
 
 	//this is for tracking to a point.
 	uint8_t head;
