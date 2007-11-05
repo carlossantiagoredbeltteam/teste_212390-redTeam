@@ -24,6 +24,8 @@ void LinearAxis::readState()
 	max_switch.readState();
 }
 
+
+
 void LinearAxis::ddaStep()
 {
 	this->dda_position += this->delta;

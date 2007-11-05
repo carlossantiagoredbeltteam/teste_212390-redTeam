@@ -52,6 +52,7 @@ class CartesianBot {
 	//cartesian bot specific.
 	void setTargetPoint(Point &point);
 	void setCurrentPoint(Point &point);
+	void getNextPoint();
 
 	void stop();
 	void start();
@@ -73,7 +74,7 @@ class CartesianBot {
 	
 	uint8_t mode;
 	bool atPoint(Point &point);
-		
+	void calculateDDA();		
 
 	//this is for tracking to a point.
 	uint8_t head;
