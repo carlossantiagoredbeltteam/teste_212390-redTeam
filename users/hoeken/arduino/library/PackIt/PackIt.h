@@ -12,10 +12,12 @@
 #ifndef PackIt_h
 #define PackId_h
 
+#include "WConstants.h"
+
 //give us a default size of 255
 #ifndef MAX_PACKET_SIZE
 #define MAX_PACKET_SIZE 255
-#ifndef
+#endif
 
 // library interface description
 class PackIt {
@@ -26,7 +28,6 @@ class PackIt {
 
 	//our interface methods
 	boolean add(byte b);
-	boolean add(boolean b);
 	boolean add(char c);
 	boolean add(int i);
 	boolean add(unsigned int i);
