@@ -97,6 +97,7 @@ bool RepStepper::canStep()
 	if (!this->step_delay)
 		return false;
 	
+	//get our current time
 	this->now = this->hpticks();
 	
 	//if its like this, its normal.
@@ -111,32 +112,50 @@ bool RepStepper::canStep()
 		//is the time since our last step bigger than our delay?
 		if ((4294967295UL - this->last_step_time + this->now) > this->step_delay)
 			return true;
-	}	
+	}
+	
 	//okay, nobody said they're ready, bail.
 	return false;
 }
 
-void RepStepper::step()
-{  
-	digitalWrite(this->step_pin, HIGH);
-	digitalWrite(this->step_pin, LOW);
+void RepStepper::nonBlockingStep()
+{
+	if (this->canStep())
+		this->pulse();
 	
 	//calculate our next step.
 	this->last_step_time = this->hpticks();
 	this->next_step_time = this->last_step_time + this->step_delay;
 }
 
+void RepStepper::pulse()
+{
+	//this sends a pulse to our stepper controller.
+	digitalWrite(this->step_pin, HIGH);
+	digitalWrite(this->step_pin, LOW);
+}
+
 void RepStepper::blockingStep(int steps)
 {
 	int i;
 	
+	//use steps to figure out the direction.
+	if (steps > 0)
+		this->setDirection(RS_FORWARD);
+	else
+		this->setDirection(RS_REVERSE);
+	
+	//we only want the number of steps now.
+	steps = abs(steps);
+	
+	//okay, now step it!
 	for (i=0; i<steps; i++)
 	{
-		//this->step();
-		digitalWrite(this->step_pin, HIGH);
-		digitalWrite(this->step_pin, LOW);
+		//do our step.
+		this->pulse();
 		
-		delayMicroseconds(this->step_delay << 2);
+		//our ticks are 4 microseconds each, so multiply by 4
+		delayMicroseconds(this->step_delay * 4);
 	}
 }
 
