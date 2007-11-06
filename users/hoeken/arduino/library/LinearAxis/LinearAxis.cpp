@@ -20,11 +20,20 @@ LinearAxis::LinearAxis(int steps, int dir_pin, int step_pin, int min_pin, int ma
 
 void LinearAxis::readState()
 {
-	min_switch.readState();
-	max_switch.readState();
+	//encoder.readState();
+	//min_switch.readState();
+	//max_switch.readState();
 }
 
+bool LinearAxis::atMin()
+{
+	return min_switch.getState();
+}
 
+bool LinearAxis::atMax()
+{
+	return max_switch.getState();
+}
 
 void LinearAxis::ddaStep()
 {
@@ -44,11 +53,15 @@ bool LinearAxis::canStep()
 
 bool LinearAxis::doStep()
 {
-	if (stepper.canStep())
+	if (!this->atMin() && !this->atMax())
 	{
-		stepper.step();
-		this->can_step = false;
-		return true;
+		if (stepper.nonBlockingStep())
+		{
+			this->can_step = false;
+			this->current_position = (int)this->dda_position;
+
+			return true;
+		}
 	}
 	
 	return false;
@@ -65,19 +78,14 @@ void LinearAxis::setDelta(float delta)
 		stepper.setDirection(RS_REVERSE);
 }
 
-int LinearAxis::getPosition()
+unsigned long LinearAxis::getPosition()
 {
 	return this->current_position;
 }
 
-void LinearAxis::setPosition(int position)
+void LinearAxis::setPosition(unsigned long position)
 {
 	this->current_position = position;
 	this->dda_position = position;
 	this->can_step = false;
-}
-
-int LinearAxis::version()
-{
-	return 1;
 }

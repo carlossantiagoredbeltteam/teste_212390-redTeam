@@ -135,6 +135,37 @@ void CartesianBot::start()
 	this->mode = MODE_SEEK;
 }
 
+void CartesianBot::home()
+{
+	Point p;
+	boolean home = false;
+	
+	//going towards 0
+	x.stepper.setDirection(RS_REVERSE);
+	y.stepper.setDirection(RS_REVERSE);
+	z.stepper.setDirection(RS_REVERSE);
+	
+	//move us home!
+	while (!home)
+	{
+		if (!x.atMin())
+			x.stepper.nonBlockingStep();
+		if (!y.atMin())
+			y.stepper.nonBlockingStep();
+		if (!z.atMin())
+			z.stepper.nonBlockingStep();
+
+		if (x.atMin() && y.atMin() && z.atMin())
+			home = true;
+	}
+	
+	//mark us as home.
+	p.x = 0;
+	p.y = 0;
+	p.z = 0;
+	this->setCurrentPoint(p);
+}
+
 void CartesianBot::readState()
 {
 	x.readState();
