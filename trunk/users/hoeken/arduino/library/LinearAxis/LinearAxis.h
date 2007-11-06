@@ -23,8 +23,6 @@ class LinearAxis {
 
 	//these are our other object variables.
 	RepStepper stepper;
-	LimitSwitch min_switch;
-	LimitSwitch max_switch;
 //	AnalogEncoder encoder;
 
 	//various guys to interface with class
@@ -33,17 +31,21 @@ class LinearAxis {
 	bool canStep();
 	bool doStep();
 	void setDelta(float delta);
-	int getPosition();
-	void setPosition(int position);
-
-	//random other functions
-    int version();
+	unsigned long getPosition();
+	void setPosition(unsigned long position);
+	
+	//our limit switch functions
+	bool atMin();
+	bool atMax();
 
   private:
-	bool can_step;			//are we allowed to take a step yet?
-	int current_position;			//this is our current position.
-	float dda_position;		//this is our 'position' in DDA terms.	
-	float delta;			//this is our change for DDA.
+	bool can_step;						//are we allowed to take a step yet?
+	unsigned long current_position;		//this is our current position.
+	float dda_position;					//this is our 'position' in DDA terms.	
+	float delta;						//this is our change for DDA.
+
+	LimitSwitch min_switch;
+	LimitSwitch max_switch;
 };
 
 #endif

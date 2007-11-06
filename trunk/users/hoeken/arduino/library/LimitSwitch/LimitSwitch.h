@@ -17,19 +17,14 @@ class LimitSwitch {
   public:
 
     // constructors:
-    LimitSwitch();
     LimitSwitch(int pin);
 
-	//our interface methods
+	//our interface method
 	bool getState();
-	bool readState();
-
-    int version();
 
   private:
 
     int pin;		//the switch state pin.
-    bool state;		//the state of the switch on last read.
 };
 
 #endif

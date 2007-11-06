@@ -1,11 +1,12 @@
 /*
-  LimitSwitch.h - RepRap Limit Switch library for Arduino - Version 0.1
+	LimitSwitch.h - RepRap Limit Switch library for Arduino - Version 0.1
 
-  This library is used to interface with a reprap optical limit switch.
+	This library is used to interface with a RepRap Cartesian Bot
 
-  History:
-  * Created intiial library (0.1) by Zach Smith.
+	History:
+	* Created intial library (0.1) by Zach Smith.
 
+	License: GPL v2.0
 */
 
 // ensure this library description is only included once
@@ -15,17 +16,17 @@
 #include "LinearAxis.h"
 #include "WConstants.h"
 
-#define POINT_QUEUE_SIZE 64
+// 21 is so we can send our whole queue in one PackIt: 21 * 4 * 3 = 252 bytes
+#define POINT_QUEUE_SIZE 21
+#define MODE_PAUSE 0
+#define MODE_SEEK 1
 
 // our point structure to make things nice.
 struct Point {
-	int x;
-	int y;
-	int z;
+	unsigned long x;
+	unsigned long y;
+ 	unsigned long z;
 };
-
-#define MODE_PAUSE 0
-#define MODE_SEEK 1
 
 // library interface description
 class CartesianBot {
@@ -60,6 +61,7 @@ class CartesianBot {
 	//our interface methods
 	void readState();
 	void move();
+	void home();
 	void abort();
 	
 	//boring version stuff

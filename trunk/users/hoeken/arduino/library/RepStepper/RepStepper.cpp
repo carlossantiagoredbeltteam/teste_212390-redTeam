@@ -118,14 +118,20 @@ bool RepStepper::canStep()
 	return false;
 }
 
-void RepStepper::nonBlockingStep()
+boolean RepStepper::nonBlockingStep()
 {
 	if (this->canStep())
+	{
 		this->pulse();
+
+		//calculate our next step.
+		this->last_step_time = this->hpticks();
+		this->next_step_time = this->last_step_time + this->step_delay;
+
+		return true;
+	}
 	
-	//calculate our next step.
-	this->last_step_time = this->hpticks();
-	this->next_step_time = this->last_step_time + this->step_delay;
+	return false;
 }
 
 void RepStepper::pulse()
