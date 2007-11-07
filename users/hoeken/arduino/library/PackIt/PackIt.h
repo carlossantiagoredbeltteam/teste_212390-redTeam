@@ -24,9 +24,9 @@ class PackIt {
   public:
 
     // constructors:
-    PackIt(byte to, byte from);
-
-	//our interface methods
+	PackIt(byte from);
+	
+	//our adder methods
 	boolean add(byte b);
 	boolean add(char c);
 	boolean add(int i);
@@ -37,7 +37,8 @@ class PackIt {
 	boolean add(double d);
 	
 	//our sender function
-	void send();
+	void send(byte to);
+	void clear();
 
   private:
 

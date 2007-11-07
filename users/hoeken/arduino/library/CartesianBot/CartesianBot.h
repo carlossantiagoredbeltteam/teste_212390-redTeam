@@ -55,6 +55,7 @@ class CartesianBot {
 	void setCurrentPoint(Point &point);
 	void getNextPoint();
 
+	//mode commands
 	void stop();
 	void start();
 
