@@ -36,6 +36,7 @@
 
 // include types & constants of Wiring core API
 #include "WConstants.h"
+#include "HardwareSerial.h"
 
 //how many devices we have on this meta device
 #ifndef MAX_DEVICE_COUNT
@@ -54,7 +55,7 @@
 
 #define SNAP_SYNC B01010100
 
-enum SNAP_states {
+enum {
   SNAP_idle = 0x30,
   SNAP_haveSync,
   SNAP_haveHDB2,
@@ -73,10 +74,9 @@ enum SNAP_states {
   SNAP_readingDataPass
 };
 
-class SNAP
-{
+class SNAP {
 	public:
-		SNAP();
+		SNAP(void);
 		
 		void receiveByte(byte b);
 		void addDevice(byte b);
@@ -127,6 +127,6 @@ class SNAP
 		// the address of our internal device sending message
 		byte deviceAddresses[MAX_DEVICE_COUNT];
 		byte deviceCount;
-}
+};
 
 #endif

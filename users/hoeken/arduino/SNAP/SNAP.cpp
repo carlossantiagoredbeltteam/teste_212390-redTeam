@@ -176,9 +176,8 @@
 
 #include "SNAP.h"
 #include "WConstants.h"
-#include "HardwareSerial.h"
 
-SNAP::SNAP()
+SNAP::SNAP(void)
 {
 	uartState = SNAP_idle;
 	processingLock = 0;
