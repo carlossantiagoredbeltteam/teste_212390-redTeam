@@ -34,12 +34,25 @@
 #ifndef SNAP_h
 #define SNAP_h
 
-#define RX_BUFFER_SIZE 16		// Transmit buffer size.
-#define TX_BUFFER_SIZE 16		// Size of largest possible message.
-#define SNAP_SYNC B01010100
-
 // include types & constants of Wiring core API
 #include "WConstants.h"
+
+//how many devices we have on this meta device
+#ifndef MAX_DEVICE_COUNT
+	#define MAX_DEVICE_COUNT 3
+#endif
+
+// Transmit buffer size.
+#ifndef RX_BUFFER_SIZE
+	#define RX_BUFFER_SIZE 16
+#endif
+
+// Size of largest possible message.
+#ifndef TX_BUFFER_SIZE
+	#define TX_BUFFER_SIZE 16
+#endif
+
+#define SNAP_SYNC B01010100
 
 enum SNAP_states {
   SNAP_idle = 0x30,
@@ -63,47 +76,44 @@ enum SNAP_states {
 class SNAP
 {
 	public:
-		void receiveByte(byte b);
+		SNAP();
 		
-	private:
-		void transmit(byte c);
+		void receiveByte(byte b);
+		void addDevice(byte b);
+		
 		void sendReply();
 		void sendDataByte(byte c);
-		void endMessage();
-		void releaseLock();
-		void serialInterruptHandler();
-		byte packetReady();
-		void waitForPacket();
 		void sendMessage(byte dest);
-		void sendDataByte(byte c);
-
-		byte uartState = SNAP_idle;		// Current SNAP state machine state
+		
+		byte packetReady();
+		void releaseLock();
+		
+	private:
+		
+		bool hasDevice(byte b);
+		void transmit(byte c);
+		void endMessage();
+		byte computeCRC(byte c);
+		
+		byte uartState;		// Current SNAP state machine state
 		byte in_hdb1;					// Temporary buffers needed to
 		byte in_hdb2;					// pass packets on from various states
 		byte packetLength;				// Length of packet being received
+		byte destAddress;				// Destination of packet being received
 		byte sourceAddress;				// Source of packet being received
 		byte receivedSourceAddress;		// Source of packet previously received
-		byte bufferIndex;				// Current receive buffer index
 		byte crc;						// Incrementally calculated CRC value
 
+		byte rxBufferIndex;				// Current receive buffer index
 		byte rxBuffer[RX_BUFFER_SIZE];	// Receive buffer
-		
-		// Circular transmit buffer.
-		// Tail has the buffer index that will next be written to.  Head is
-		// the buffer index that will next be transmitted.
-		// If head == tail, the buffer is empty.
-		// The purpose of this buffer is to allow background sending of
-		// data rather than busy looping.
-		byte txBuffer[TX_BUFFER_SIZE];		// Transmit buffer
-		byte txBufferHead = 0;				// Start of circular transmit buffer
-		byte txBufferTail = 0;				// End of circular transmit buffer
 		
 		// This buffer stores the last complete packet body (not the headers
 		// as they can be reconstructed).  This is to allow automatic re-sending
 		// if a NAK is received.
-		byte lastPacket[TX_BUFFER_SIZE];	// Last packet data, for auto resending on a NAK
-		byte lastPacketDestination;			// Last packet destination
-
+		byte sendPacket[TX_BUFFER_SIZE];	// Last packet data, for auto resending on a NAK
+		byte sendPacketDestination;			// Last packet destination
+		byte sendPacketLength;				// Last packet length
+		
 		// When sending a packet this is set to 0 and incremented for
 		// every NAK.  After too many have occurred, the packet is just
 		// dropped.
@@ -111,11 +121,12 @@ class SNAP
 
 		// General flags:
 		// @bug these should be "sbit" rather than "byte" but sdcc is breaking a bit
-		byte processingLock = 0;
+		byte processingLock;
 		byte ackRequested;
 
 		// the address of our internal device sending message
-		byte deviceAddress;
+		byte deviceAddresses[MAX_DEVICE_COUNT];
+		byte deviceCount;
 }
 
 #endif
