@@ -175,20 +175,263 @@
 /// these addresses, it will not be chained on correctly.
 
 #include "SNAP.h"
+#include "WConstants.h"
+#include "HardwareSerial.h"
 
-/// @todo Remove when sdcc initialisers fixed
 SNAP::SNAP()
 {
 	uartState = SNAP_idle;
-	transmitBufferHead = transmitBufferTail = 0;
+	processingLock = 0;
+	deviceCount = 0;
+}
+
+void SNAP::receiveByte(byte c)
+{
+	switch(this->uartState)
+	{
+		case SNAP_idle:
+			// In the idle state, we wait for a sync byte.  If none is
+			// received, we remain in this state.
+			if (c == SNAP_SYNC)
+				uartState = SNAP_haveSync;
+			break;
+
+		case SNAP_haveSync:
+			// In this state we are waiting for header definition bytes. First
+			// HDB2.  We currently insist that all packets meet our expected
+			// format which is 1 byte destination address, 1 byte source
+			// address, and no protocol specific bytes.  The ACK/NAK bits may
+			// be anything.
+			in_hdb2 = c;
+			if ((c & B11111100) != B01010000)
+			{
+				// Unsupported header.  Just pass it on to the next node.
+				// We assume there are 1 byte addresses still, for simplicity.
+				this->transmit(SNAP_SYNC);
+				this->transmit(c);
+				uartState = SNAP_haveHDB2Pass;
+			}
+			else
+			{
+				// All is well
+				if ((c & B00000011) == B00000001)
+					ackRequested = 1;
+				else
+					ackRequested = 0;
+
+				crc = 0;
+				this->computeCRC(c);
+				uartState = SNAP_haveHDB2;
+			}
+			break;
+
+		case SNAP_haveHDB2:
+			// For HDB1, we insist CMD = 0, EDM = 8-bit CRC.
+			in_hdb1 = c;
+			if ((c & B11110000) != B00110000)
+			{
+				// Bail out
+				this->transmit(SNAP_SYNC);
+				this->transmit(in_hdb2);
+				this->transmit(c);
+				uartState = SNAP_haveHDB1Pass;
+			}
+			else
+			{
+				packetLength = c & 0x0f;
+				if (packetLength & 8)
+					packetLength = 8 << (c & 7);
+				
+				this->computeCRC(c);
+				uartState = SNAP_haveHDB1;
+			}
+			break;
+
+		case SNAP_haveHDB1:
+			// We should be reading the destination address now
+			if (!this->hasDevice(c))
+			{
+				this->transmit(SNAP_SYNC);
+				this->transmit(in_hdb2);
+				this->transmit(in_hdb1);
+				this->transmit(c);
+				uartState = SNAP_haveDABPass;
+			}
+			else
+			{
+				this->computeCRC(c);
+				uartState = SNAP_haveDAB;
+				destAddress = c;
+			}
+			break;
+
+		case SNAP_haveDAB:
+			sourceAddress = c;
+			rxBufferIndex = 0;
+			this->computeCRC(c);
+			uartState = SNAP_readingData;
+			break;
+
+		case SNAP_readingData:
+			if (!processingLock)
+				rxBuffer[rxBufferIndex] = c;
+
+			rxBufferIndex++;
+
+			this->computeCRC(c);
+
+			if (rxBufferIndex == packetLength)
+				uartState = SNAP_dataComplete;
+			break;
+
+		case SNAP_dataComplete:
+			// We should be receiving a CRC after data, and it
+			// should match what we have already computed
+			{
+				byte hdb2 = B01010000; // 1 byte addresses
+
+				if (c == crc)
+				{
+					// All is good, so process the command.  Rather than calling the
+					// appropriate function directly, we just set a flag to say
+					// something is ready for processing.  Then in the main loop we
+					// detect this and process the command.  This allows further
+					// comms processing (such as passing other tokens around the
+					// ring) while we're actioning the command.
+
+					if (processingLock)
+					{
+						// If we're already processing, NAK and ignore
+						hdb2 |= B00000011;
+					}
+					else
+					{
+						// Otherwise ACK and set the flag to allow processing to start
+						hdb2 |= B00000010;
+						processingLock = 1;
+						receivedSourceAddress = sourceAddress;
+					}
+				}
+				else
+				{
+					// CRC mismatch, so we will NAK the packet
+					hdb2 |= B00000011;
+				}
+
+				if (ackRequested)
+				{
+					// Send ACK or NAK back to source
+					this->transmit(SNAP_SYNC);
+					crc = 0;
+					this->transmit(computeCRC(hdb2));
+					// HDB1: 0 bytes, with 8 bit CRC
+					this->transmit(computeCRC(B00110000));
+					this->transmit(computeCRC(sourceAddress));  // Return to sender
+					this->transmit(computeCRC(destAddress));  // From us
+					this->transmit(crc);  // CRC
+				}
+			}
+			uartState = SNAP_idle;
+			break;
+
+		case SNAP_haveHDB2Pass:
+			this->transmit(c);  // We will be reading HDB1; pass it on
+			packetLength = c & 0x0f;
+			if (packetLength & 8)
+				packetLength = 8 << (c & 7);
+			uartState = SNAP_haveHDB1Pass;
+			break;
+
+		case SNAP_haveHDB1Pass:
+			this->transmit(c);  // We will be reading dest addr; pass it on
+			uartState = SNAP_haveDABPass;
+			break;
+
+		case SNAP_haveDABPass:
+			this->transmit(c);  // We will be reading source addr; pass it on
+
+			// Increment data length by 1 so that we just copy the CRC
+			// at the end as well.
+			packetLength++;
+
+			uartState = SNAP_readingDataPass;
+			break;
+
+		case SNAP_readingDataPass:
+			this->transmit(c);  // This is a data byte; pass it on
+			if (packetLength > 1)
+				packetLength--;
+			else
+				uartState = SNAP_idle;
+			break;
+	}
+}
+
+void SNAP::addDevice(byte c)
+{
+	if (deviceCount == MAX_DEVICE_COUNT)
+		return;
+		
+	deviceAddresses[deviceCount] = c;
+	deviceCount++;
+}
+
+void SNAP::sendReply()
+{
+	this->sendMessage(receivedSourceAddress);
+}
+
+/// High level routine that queues a byte during construction of a packet
+void SNAP::sendDataByte(byte c)
+{
+	// Put byte into packet sending buffer.  Don't calculated CRCs
+	// yet as we don't have complete information.
+
+	// Drop if trying to send too much
+	if (sendPacketLength >= TX_BUFFER_SIZE)
+		return;
+
+	sendPacket[sendPacketLength] = c;
+	sendPacketLength++;
+}
+
+void SNAP::sendMessage(byte dest)
+{
+	sendPacketDestination = dest;
+	sendPacketLength = 0;
+}
+
+byte SNAP::packetReady()
+{
+	return processingLock;
+}
+
+void SNAP::releaseLock()
+{
 	processingLock = 0;
 }
 
-//===========================================================================//
-
-byte SNAP::computeCRC(byte dataval)
+bool SNAP::hasDevice(byte c)
 {
-	byte i = dataval ^ crc;
+	int i;
+	
+	for (i=0; i<deviceCount; i++)
+	{
+		if (deviceAddresses[i] == c)
+			return true;
+	}
+	
+	return false;
+}
+
+void SNAP::transmit(byte c)
+{
+	Serial.print(c, BYTE);
+}
+
+byte SNAP::computeCRC(byte c)
+{
+	byte i = c ^ crc;
 
 	crc = 0;
 
@@ -209,238 +452,10 @@ byte SNAP::computeCRC(byte dataval)
 	if(i & 0x80)
 		crc ^= 0x8c;
 
-	return dataval;
+	return c;
 }
 
-void SNAP::receiveByte(byte c)
-{
-	switch(uartState)
-	{
-		case SNAP_idle:
-			// In the idle state, we wait for a sync byte.  If none is
-			// received, we remain in this state.
-			if (c == SNAP_SYNC)
-				uartState = SNAP_haveSync;
-			break;
 
-		case SNAP_haveSync:
-			// In this state we are waiting for header definition bytes. First
-			// HDB2.  We currently insist that all packets meet our expected
-			// format which is 1 byte destination address, 1 byte source
-			// address, and no protocol specific bytes.  The ACK/NAK bits may
-			// be anything.
-			in_hdb2 = c;
-			if ((c & B11111100) != B01010000)
-			{
-				// Unsupported header.  Just pass it on to the next node.
-				// We assume there are 1 byte addresses still, for simplicity.
-				uartTransmit(SNAP_SYNC);
-				uartTransmit(c);
-				uartState = SNAP_haveHDB2Pass;
-			}
-			else
-			{
-				// All is well
-				if ((c & B00000011) == B00000001)
-					ackRequested = 1;
-				else
-					ackRequested = 0;
-
-				crc = 0;
-				computeCRC(c);
-				uartState = SNAP_haveHDB2;
-			}
-			break;
-
-		case SNAP_haveHDB2:
-			// For HDB1, we insist CMD = 0, EDM = 8-bit CRC.
-			in_hdb1 = c;
-			if ((c & BIN(11110000)) != BIN(00110000))
-			{
-				// Bail out
-				uartTransmit(SNAP_SYNC);
-				uartTransmit(in_hdb2);
-				uartTransmit(c);
-				uartState = SNAP_haveHDB1Pass;
-			}
-			else
-			{
-				packetLength = c & 0x0f;
-				if (packetLength & 8)
-				packetLength = 8 << (c & 7);
-				computeCRC(c);
-				uartState = SNAP_haveHDB1;
-			}
-			break;
-
-		case SNAP_haveHDB1:
-			// We should be reading the destination address now
-			if (c != deviceAddress)
-			{
-				uartTransmit(SNAP_SYNC);
-				uartTransmit(in_hdb2);
-				uartTransmit(in_hdb1);
-				uartTransmit(c);
-				uartState = SNAP_haveDABPass;
-			}
-			else
-			{
-				computeCRC(c);
-				uartState = SNAP_haveDAB;
-			}
-			break;
-
-		case SNAP_haveDAB:
-			sourceAddress = c;
-			bufferIndex = 0;
-			computeCRC(c);
-			uartState = SNAP_readingData;
-			break;
-
-		case SNAP_readingData:
-			if (!processingLock)
-				buffer[bufferIndex] = c;
-
-			bufferIndex++;
-
-			computeCRC(c);
-
-			if (bufferIndex == packetLength)
-				uartState = SNAP_dataComplete;
-			break;
-
-		case SNAP_dataComplete:
-			// We should be receiving a CRC after data, and it
-			// should match what we have already computed
-			{
-				byte hdb2 = BIN(01010000); // 1 byte addresses
-
-				if (c == crc)
-				{
-					// All is good, so process the command.  Rather than calling the
-					// appropriate function directly, we just set a flag to say
-					// something is ready for processing.  Then in the main loop we
-					// detect this and process the command.  This allows further
-					// comms processing (such as passing other tokens around the
-					// ring) while we're actioning the command.
-
-					if (processingLock)
-					{
-						// If we're already processing, NAK and ignore
-						hdb2 |= BIN(11);
-					}
-					else
-					{
-						// Otherwise ACK and set the flag to allow processing to start
-						hdb2 |= BIN(10);
-						processingLock = 1;
-						receivedSourceAddress = sourceAddress;
-					}
-				}
-				else
-				{
-					// CRC mismatch, so we will NAK the packet
-					hdb2 |= BIN(11);
-				}
-
-				if (ackRequested)
-				{
-					// Send ACK or NAK back to source
-					uartTransmit(SNAP_SYNC);
-					crc = 0;
-					uartTransmit(computeCRC(hdb2));
-					// HDB1: 0 bytes, with 8 bit CRC
-					uartTransmit(computeCRC(BIN(00110000)));
-					uartTransmit(computeCRC(sourceAddress));  // Return to sender
-					uartTransmit(computeCRC(deviceAddress));  // From us
-					uartTransmit(crc);  // CRC
-				}
-			}
-			uartState = SNAP_idle;
-			break;
-
-		case SNAP_haveHDB2Pass:
-			uartTransmit(c);  // We will be reading HDB1; pass it on
-			packetLength = c & 0x0f;
-			if (packetLength & 8)
-				packetLength = 8 << (c & 7);
-			uartState = SNAP_haveHDB1Pass;
-			break;
-
-		case SNAP_haveHDB1Pass:
-			uartTransmit(c);  // We will be reading dest addr; pass it on
-			uartState = SNAP_haveDABPass;
-			break;
-
-		case SNAP_haveDABPass:
-			uartTransmit(c);  // We will be reading source addr; pass it on
-
-			// Increment data length by 1 so that we just copy the CRC
-			// at the end as well.
-			packetLength++;
-
-			uartState = SNAP_readingDataPass;
-			break;
-
-		case SNAP_readingDataPass:
-			uartTransmit(c);  // This is a data byte; pass it on
-			if (packetLength > 1)
-				packetLength--;
-			else
-				uartState = SNAP_idle;
-			break;
-	}
-}
-
-/// High level routine that queues a byte during construction of a packet
-void SNAP::sendDataByte(byte c)
-{
-	// Put byte into packet sending buffer.  Don't calculated CRCs
-	// yet as we don't have complete information.
-
-	// Drop if trying to send too much
-	if (sendPacketLength >= MAX_PAYLOAD)
-		return;
-
-	sendPacket[sendPacketLength] = c;
-	sendPacketLength++;
-}
-
-void SNAP::releaseLock()
-{
-	processingLock = 0;
-}
-
-void SNAP::sendMessage(byte dest)
-{
-	sendPacketDestination = dest;
-	sendPacketLength = 0;
-}
-
-//===========================================================================//
-void SNAP::sendReply()
-{
-	sendMessage(receivedSourceAddress);
-}
-
-//===========================================================================//
-void SNAP::awaitDelivery()
-{
-}
-
-//===========================================================================//
-byte SNAP::deliveryStatus()
-{
-	return 0;
-}
-
-//===========================================================================//
-byte SNAP::packetReady()
-{
-	return processingLock;
-}
-
-//===========================================================================//
 void SNAP::endMessage()
 {
 	byte length = sendPacketLength;
@@ -453,21 +468,21 @@ void SNAP::endMessage()
 	}
 
 	// Send the message
-	uartTransmit(SNAP_SYNC);
+	this->transmit(SNAP_SYNC);
 	crc = 0;
-	uartTransmit(computeCRC(BIN(01010001)));   // Request ACK
-	uartTransmit(computeCRC(BIN(00110000) | length));
-	uartTransmit(computeCRC(sendPacketDestination));
-	uartTransmit(computeCRC(deviceAddress));
+	this->transmit(computeCRC(B01010001));   // Request ACK
+	this->transmit(computeCRC(B00110000 | length));
+	this->transmit(computeCRC(sendPacketDestination));
+	this->transmit(computeCRC(destAddress));
 	for(i = 0; i < sendPacketLength; i++)
-		uartTransmit(computeCRC(sendPacket[i]));
-	uartTransmit(crc); /// @todo crc here
+		this->transmit(computeCRC(sendPacket[i]));
+	this->transmit(crc); /// @todo crc here
 
 	/// @bug Because interrupts are now disabled during sending
 	/// the buffer cannot empty, so if too much is sent, it
 	/// will probably cause a lock-up (I've not actually seen
 	/// this happen yet, but it probably will).  It should
 	/// be a bit smarter to prevent this or else enable
-	/// interrupts briefly during uartTransmit if it is full and
+	/// interrupts briefly during this->transmit if it is full and
 	/// then restore interrupts to their start state.
 }
