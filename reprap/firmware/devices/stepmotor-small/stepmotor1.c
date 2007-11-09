@@ -94,8 +94,10 @@ void main()
   uartTransmit(0);
 
   for(;;) {
-    waitForPacket();
-    processCommand();
-    releaseLock();
+    if (packetReady()) {
+      processCommand();
+      releaseLock();
+    }
+    clearwdt();
   }
 }

@@ -38,6 +38,23 @@ volatile byte buffer[MAX_PAYLOAD];   ///< Receive buffer
 volatile byte transmitBuffer[MAX_TRANSMIT_BUFFER];
 byte sendPacket[MAX_PAYLOAD];
 
+void delay_10us()
+{
+  _asm
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+  _endasm;
+}
+
+
 void clearwdt()
 {
 _asm

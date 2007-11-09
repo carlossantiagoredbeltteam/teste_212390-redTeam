@@ -48,21 +48,24 @@ void setFlash(byte on, byte off);
 
 void uartTransmit(byte c);
 void sendReply();
-void sendDataByte(byte c);
-void endMessage();
-void releaseLock();
-void serialInterruptHandler();
-byte packetReady();
-void waitForPacket();
 void sendMessage(byte dest);
 void sendDataByte(byte c);
+void endMessage();
+byte sendMessageISR(byte dest);
+void sendDataByteISR(byte c);
+void endMessageISR();
+void releaseLock();
+void serialInterruptHandler();
+
+byte packetReady();
 
 extern volatile byte buffer[];
+extern volatile byte serialStatus;
 
-// REMOVE
 void uartNotifyReceive();
 void serial_init();
 
+void delay_10us();
 void clearwdt();
 
 #endif

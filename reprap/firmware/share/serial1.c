@@ -109,10 +109,6 @@
  *   interrupt driven.  If called, it will block until the delivery is
  *   complete and return fail/success.
  *
- * - deliveryStatus returns the same information as awaitDelivery
- *   (except tristate values indicating still sending, success,
- *   failure).  This does not block however.
- *
  * - When sending a new message rather than a reply, the sendMessage
  *   function is called with the destination address.
  *
@@ -174,6 +170,25 @@
 /// some currently unknown reason.  If you send a message to one of
 /// these addresses, it will not be chained on correctly.
 
+/* 
+ * andreas, 2007-09-16: 
+ *   simplify the communication to get rid of corrupt messages:
+ *   synchronize the communication so that only one message can be in the ring. 
+ *   the host-software is the master, the devices are the slaves.
+ *   the master sends messages to set values in a device (setMessages) or to request information from a device
+ *     (requestMessages). 
+ *   only the master requires an ACK. If the master doesn't get an correct answer in a given time,
+ *     he should resend his message. 
+ *   the devices gets a message and ACK it, if requested. If the message requires an
+ *     answer then the device sends the answer in the processCommand-loop.
+ *   if the master sends an requestMessage, then the master has to wait for the answer. it is not allowed to send
+ *     another message until the answer is received, otherwise the device will reset the serial-communication with
+ *     sending MAX_TRANSMIT_BUFFER bytes of the value 0.
+ *   it is not allowed to call sendDataByte() or endMessage() from within an interrupt-routine!
+ *
+ *   messages are synchronized to prevent mixing up messages (e.g. mixing of isr-messages with normal-messages and 
+ *     forwarding messages)
+ */
 #include "serial.h"
 
 enum SNAP_states {
@@ -197,6 +212,7 @@ enum SNAP_states {
 
 #define SNAP_SYNC BIN(01010100)
 
+//initialization do not work!
 static volatile byte uartState = SNAP_idle; ///< Current SNAP state machine state
 static volatile byte in_hdb1;  ///< Temporary buffers needed to
 static volatile byte in_hdb2;  ///  pass packets on from various states
@@ -213,8 +229,8 @@ static volatile byte crc; ///< Incrementally calculated CRC value
 /// The purpose of this buffer is to allow background sending of
 /// data rather than busy looping.
 extern volatile byte transmitBuffer[];
-static volatile byte transmitBufferHead = 0; ///< Start of circular transmit buffer
-static volatile byte transmitBufferTail = 0; ///< End of circular transmit buffer
+static volatile byte transmitBufferHead; ///< Start of circular transmit buffer
+static volatile byte transmitBufferTail; ///< End of circular transmit buffer
 
 /// This buffer stores the last complete packet body (not the headers
 /// as they can be reconstructed).  This is to allow automatic re-sending
@@ -225,14 +241,38 @@ static byte sendPacketLength;
 /// When sending a packet this is set to 0 and incremented for
 /// every NAK.  After too many have occurred, the packet is just
 /// dropped.
-static byte nakCount;
+//static byte nakCount;
 
 /// General flags:
 /// @bug these should be "sbit" rather than "byte" but sdcc is breaking a bit
-static volatile byte processingLock = 0;
-static volatile byte ackRequested;
+//static volatile byte ackRequested;
 
 extern byte deviceAddress;
+
+volatile byte serialStatus; //flags for checking status of the serial-communication
+#define serialErrorBit     BIN(00000001)
+        //Bit0 is for serialError-flag for checking if an serial error has occured,
+	//  if set, we will reset the communication
+	//
+#define inTransmitMsgBit   BIN(00000010)
+	//Bit1 is set if we are currently transmitting a message, that means bytes of 
+	//  a message have been put in the transmitBuffer, but the message is not 
+	//  finished.
+#define inSendQueueMsgBit  BIN(00000100)
+	//Bit2 is set if we are currently building a send-message
+
+#define msgAbortedBit  BIN(00001000)
+	//Bit3 is set if we are busy with the last command and have to abort the message
+	
+#define wrongStateErrorBit BIN(00010000)
+	//Bit4 is set when we have a wrong uartState
+#define wrongByteErrorBit  BIN(00100000)
+	//Bit5 is set when we receive a wrong byte
+#define ackRequestedBit    BIN(01000000)
+	//Bit6 is set if we have to acknowledge a received message
+#define processingLockBit  BIN(10000000)
+        //Bit7 is set if we have received a message for local processing
+
 
 //===============================================================================
 
@@ -282,8 +322,10 @@ void setFlash(byte on, byte off)
 void serial_init()
 {
   uartState = SNAP_idle;
-  transmitBufferHead = transmitBufferTail = 0;
-  processingLock = 0;
+  transmitBufferHead = 0;
+  transmitBufferTail = 0;
+  serialStatus = 0;
+  crc = 0;
   flash = 0;
   flashON = FLASHRATE;
   flashOFF = FLASHRATE;
@@ -349,25 +391,64 @@ _endasm;
 }
 #pragma restore
 
+
+
 //===========================================================================//
 #pragma save
 #pragma nooverlay
- void uartNotifyReceive()
+void uartReceiveError()
 {
+  byte i;
 
-  byte c = RCREG;
+
+  if ((serialStatus & msgAbortedBit) == 0) {
+    //wipe the corrupt-message out of the receive-buffers of the nodes
+    for (i=0; i<8; i++) { //if we are sending too much for the transmit-buffer, it is discarded
+      uartTransmit(0);
+    }
+    //TODO: remove
+    //uartTransmit(serialStatus);
+  }
+
+  /*
+    serialStatus &= ~serialErrorBit;  //clear
+    serialStatus &= ~inTransmitMsgBit; //clear
+    serialStatus &= ~ackRequestedBit; //clear
+    serialStatus &= ~inSendQueueMsgBit; //clear
+    serialStatus &= ~processingLockBit; //clear, maybe we should not do that
+  */
+  serialStatus = (serialStatus & msgAbortedBit); //clear all bits except msgAbortedBit;
+
+  uartState = SNAP_idle;
+}
+#pragma restore
+
+//===========================================================================//
+#pragma save
+#pragma nooverlay
+void uartNotifyReceive()
+{
+  byte c; 
+
+  
+  c = RCREG;
 
   // If error occurred then reset by clearing CREN, but
   // attempt to continue processing anyway.
   /// @todo Should we do something else in this situation?
-  if (OERR)
+  if (OERR) {
     CREN = 0;
-  else
-    CREN = 1;
+    //don't set the error: serialStatus |= serialErrorBit
+    //because c and the next RCREG will be ok and maybe
+    //we got a correct message
+  }
+  CREN = 1;
 
-  //uartTransmit(0x55);
-  //uartTransmit(c);
-  //uartTransmit(uartState);
+  if (serialStatus & serialErrorBit) {
+    uartReceiveError();
+    return;
+  }
+  
 
   switch(uartState) {
 
@@ -375,8 +456,10 @@ _endasm;
   case SNAP_idle:
     // In the idle state, we wait for a sync byte.  If none is
     // received, we remain in this state.
-    if (c == SNAP_SYNC)
+    if (c == SNAP_SYNC) {
       uartState = SNAP_haveSync;
+      serialStatus &= ~msgAbortedBit; //clear
+    }
     break;
 
   // ----------------------------------------------------------------------- //
@@ -388,17 +471,16 @@ _endasm;
     // be anything.
     in_hdb2 = c;
     if ((c & BIN(11111100)) != BIN(01010000)) {
-      // Unsupported header.  Just pass it on to the next node.
-      // We assume there are 1 byte addresses still, for simplicity.
-      uartTransmit(SNAP_SYNC);
-      uartTransmit(c);
-      uartState = SNAP_haveHDB2Pass;
+      // Unsupported header.  Drop it an reset
+      serialStatus |= serialErrorBit;  //set serialError
+      serialStatus |= wrongByteErrorBit; 
+      uartReceiveError();
     } else {
       // All is well
       if ((c & BIN(00000011)) == BIN(00000001))
-	ackRequested = 1;
+	serialStatus |= ackRequestedBit;  //set ackRequested-Bit
       else
-	ackRequested = 0;
+	serialStatus &= ~ackRequestedBit; //clear
       crc = 0;
       computeCRC(c);
       uartState = SNAP_haveHDB2;
@@ -407,18 +489,17 @@ _endasm;
 
   // ----------------------------------------------------------------------- //
   case SNAP_haveHDB2:
-    // For HDB1, we insist CMD = 0, EDM = 8-bit CRC.
+    // For HDB1, we insist on high bits are 0011 and low bits are the length 
+    //   of the payload.
     in_hdb1 = c;
     if ((c & BIN(11110000)) != BIN(00110000)) {
-      // Bail out
-      uartTransmit(SNAP_SYNC);
-      uartTransmit(in_hdb2);
-      uartTransmit(c);
-      uartState = SNAP_haveHDB1Pass;
+      serialStatus |= serialErrorBit;  //set serialError
+      serialStatus |= wrongByteErrorBit; 
+      uartReceiveError();
     } else {
       packetLength = c & 0x0f;
-      if (packetLength & 8)
-	packetLength = 8 << (c & 7);
+      if (packetLength > MAX_PAYLOAD)
+	packetLength = MAX_PAYLOAD;
       computeCRC(c);
       uartState = SNAP_haveHDB1;
     }
@@ -433,6 +514,8 @@ _endasm;
       uartTransmit(in_hdb1);
       uartTransmit(c);
       uartState = SNAP_haveDABPass;
+      serialStatus &= ~ackRequestedBit; //clear
+      serialStatus |= inTransmitMsgBit; 
     } else {
       computeCRC(c);
       uartState = SNAP_haveDAB;
@@ -449,19 +532,38 @@ _endasm;
 
       /// @todo Deal with this situation
     }
-    sourceAddress = c;
-    bufferIndex = 0;
-    computeCRC(c);
-    uartState = SNAP_readingData;
+    if (serialStatus & processingLockBit) {
+      //we have not finished the last order, reject
+      uartTransmit(SNAP_SYNC);
+      crc = 0;
+      uartTransmit(computeCRC(BIN(01010011))); //HDB2
+      // HDB1: 0 bytes, with 8 bit CRC
+      uartTransmit(computeCRC(BIN(00110000)));  //HDB1
+      uartTransmit(computeCRC(sourceAddress));  // Return to sender
+      uartTransmit(computeCRC(deviceAddress));  // From us
+ //TODO: remove
+ /*for debugging add serialStatus
+ uartTransmit(computeCRC(BIN(00110001)));   //HDB1
+ uartTransmit(computeCRC(sourceAddress));  // Return to sender
+ uartTransmit(computeCRC(deviceAddress));  // From us
+ uartTransmit(computeCRC(serialStatus));  // Return to sender
+ */
+      uartTransmit(crc);  // CRC
+      serialStatus &= ~ackRequestedBit; //clear
+      serialStatus |= msgAbortedBit; //set
+      uartState = SNAP_idle;
+    } else {
+      sourceAddress = c;
+      bufferIndex = 0;
+      computeCRC(c);
+      uartState = SNAP_readingData;
+    }
     break;
 
   // ----------------------------------------------------------------------- //
   case SNAP_readingData:
-    if (!processingLock)
-      buffer[bufferIndex] = c;
-
+    buffer[bufferIndex] = c;
     bufferIndex++;
-
     computeCRC(c);
 
     if (bufferIndex == packetLength)
@@ -483,20 +585,14 @@ _endasm;
 	// comms processing (such as passing other tokens around the
 	// ring) while we're actioning the command.
 	
-	if (processingLock) {
-	  // If we're already processing, NAK and ignore
-	  hdb2 |= BIN(11);
-	} else {
-	  // Otherwise ACK and set the flag to allow processing to start
-	  hdb2 |= BIN(10);
-	  processingLock = 1;
-	  receivedSourceAddress = sourceAddress;
-	}
+	hdb2 |= BIN(10);
+	serialStatus |= processingLockBit;  //set processingLockBit
+	receivedSourceAddress = sourceAddress;
       } else {
 	// CRC mismatch, so we will NAK the packet
 	hdb2 |= BIN(11);
       }
-      if (ackRequested) {
+      if (serialStatus & ackRequestedBit) {
 	// Send ACK or NAK back to source
 	uartTransmit(SNAP_SYNC);
 	crc = 0;
@@ -506,6 +602,7 @@ _endasm;
 	uartTransmit(computeCRC(sourceAddress));  // Return to sender
 	uartTransmit(computeCRC(deviceAddress));  // From us
 	uartTransmit(crc);  // CRC
+	serialStatus &= ~ackRequestedBit; //clear
       }
     }
     uartState = SNAP_idle;
@@ -515,8 +612,8 @@ _endasm;
   case SNAP_haveHDB2Pass:
     uartTransmit(c);  // We will be reading HDB1; pass it on
     packetLength = c & 0x0f;
-    if (packetLength & 8)
-      packetLength = 8 << (c & 7);
+    if (packetLength > MAX_PAYLOAD)
+      packetLength = MAX_PAYLOAD;
     uartState = SNAP_haveHDB1Pass;
     break;
 
@@ -542,157 +639,261 @@ _endasm;
     uartTransmit(c);  // This is a data byte; pass it on
     if (packetLength > 1)
       packetLength--;
-    else
+    else {
       uartState = SNAP_idle;
+      serialStatus &= ~inTransmitMsgBit; //clear
+    }
     break;
+
+  default:
+    serialStatus |= serialErrorBit;  //set serialError
+    serialStatus |= wrongStateErrorBit;  
+    uartReceiveError();
   }
+
+
 }
 #pragma restore
 
 //===========================================================================//
 /// Low level routine that queues a byte directly for the hardware
+//GIE must be disabled
 #pragma save
 #pragma nooverlay
 void uartTransmit(byte c)
 {
-  //// Wait for idle
-  //while(!TRMT) ;
-  //TXREG = c;
 
   byte newTail;
 
-  transmitBuffer[transmitBufferTail] = c;
-  
   newTail = transmitBufferTail + 1;
   if (newTail >= MAX_TRANSMIT_BUFFER)
-    newTail = 0;
-  
-  // If full, wait for buffer to empty sufficiently
-  while(newTail == transmitBufferHead)
-    ;
-  
-  transmitBufferTail = newTail;
-  TXIE = 1;
+     newTail = 0;
+
+  //only do it if we have one free space in the buffer
+  //if the buffer is full, discard it
+  if (newTail != transmitBufferHead) {
+    transmitBuffer[transmitBufferTail] = c;
+    transmitBufferTail = newTail;
+
+    if (TXIE == 0) {
+      TXIE=1; //enabling TXIE sets also TXIF
+    }
+  }
+
 
 _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _uartState;
 _endasm;
+
 }
 #pragma restore
 
 //===========================================================================//
-/// High level routine that queues a byte during construction of a packet
 #pragma save
 #pragma nooverlay
-void sendDataByte(byte c)
+static void sendDataByteIntern(byte c)
 {
-  // Put byte into packet sending buffer.  Don't calculated CRCs
-  // yet as we don't have complete information.
+  if (serialStatus & inSendQueueMsgBit)  {
+    // Put byte into packet sending buffer.  Don't calculated CRCs
+    // yet as we don't have complete information.
+    // Drop if trying to send too much
+    if (sendPacketLength < MAX_PAYLOAD)
+      sendPacket[sendPacketLength++] = c;
+  } //else serialError has cleared the inSendQueueMsgBit
 
-  // Drop if trying to send too much
-  if (sendPacketLength >= MAX_PAYLOAD)
-    return;
-
-  sendPacket[sendPacketLength++] = c;
-}
-#pragma restore
-
-//===========================================================================//
-void releaseLock()
-{
-  processingLock = 0;
-
-  /// @todo If sending is in progress or waiting for ACK, block.
 _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _uartState;
 _endasm;
 }
+#pragma restore
 
 //===========================================================================//
+//High level routine that queues a byte during construction of a packet
+//Should only be called between sendMessage() and endMessage() 
+void sendDataByte(byte c)
+{
+  GIE=0;
+  sendDataByteIntern(c);
+  GIE=1;
+}
+
+//===========================================================================//
+//High level routine that queues a byte during construction of a packet 
+//  in an interrupt-routine
+//Should only be called between sendMessageISR() and endMessageISR() 
+void sendDataByteISR(byte c)
+{
+  sendDataByteIntern(c);
+}
+
+//===========================================================================//
+//should not be called from an interrupt-routine!
+#pragma save
+#pragma nooverlay
+void releaseLock()
+{
+  GIE=0;
+  serialStatus &= ~processingLockBit; //clear
+  GIE=1;
+}
+#pragma restore
+
+
+
+//===========================================================================//
+//GIE must be disabled
+static void sendMessageIntern(byte dest)
+{
+  serialStatus |= inSendQueueMsgBit; //set bit
+  sendPacketDestination = dest;
+  sendPacketLength = 0;
+}
+
+//===========================================================================//
+//High level routine that queues a byte during construction of a packet 
+//in an interrupt-routine
+//
+//because we are in an isr we cannot block.
+//we return 1 if we can send instantly otherwise we do nothing and return 0;
+//  
+byte sendMessageISR(byte dest)
+{
+  //send if transmitBuffer is empty and we are not already forwarding a message
+  //  or queuing a message
+  //because we are in the isr, we will not receive other data,
+  //  this means, forwarding would not interfer because we are finished before the next byte 
+  //  will be received
+  if ((serialStatus & inSendQueueMsgBit) || (serialStatus & inTransmitMsgBit) ||
+      (transmitBufferHead != transmitBufferTail)) {
+    return 0; 
+  } else {
+   sendMessageIntern(dest);	  
+  }
+  return 1;
+}
+
+
+//===========================================================================//
+//High level routine that queues a byte during construction of a packet 
+//should not be called within an interrupt-routine!
+//we are blocking until we can send the message
+//we are also blocking in endMessage, therefor other bytes can be received 
+//after sendMessage()
+//
+//GIE must be enabled
 #pragma save
 #pragma nooverlay
 void sendMessage(byte dest)
 {
-  sendPacketDestination = dest;
-  sendPacketLength = 0;
+  GIE=0;
+  while (serialStatus & inSendQueueMsgBit) { 
+    //wait until we can use the buffer
+    GIE=1;
+    delay_10us();
+    delay_10us();
+    delay_10us();
+    delay_10us();
+    delay_10us();
+    GIE=0;
+  }
+  
+  sendMessageIntern(dest);
+  GIE=1;
 }
 #pragma restore
 
 //===========================================================================//
+//should not be called within an interrupt!
 void sendReply()
 {
   sendMessage(receivedSourceAddress);
 }
 
-//===========================================================================//
-void awaitDelivery()
-{
-}
+
 
 //===========================================================================//
-byte deliveryStatus()
-{
-  return 0;
-}
-
-//===========================================================================//
+//returns 1 if a packet for processing has been received 
+//should not be called from an interrupt-routine!
+#pragma save
+#pragma nooverlay
 byte packetReady()
-{
-  return processingLock;
+{  byte ready;
+   GIE=0;
+   ready = (serialStatus & processingLockBit);
+   if (transmitBufferHead != transmitBufferTail)
+     ready = 0;
+   GIE=1;
+   return ready;
 }
+#pragma restore
+
 
 //===========================================================================//
-void waitForPacket()
+//sends the message in the queue
+//after sending we are freeing the sendQueueLock: inSendQueueMsgBit
+//GIE must be disabled
+#pragma save
+#pragma nooverlay
+static void endMessageIntern()
 {
-  /// @todo It would be nice if this slept or something sensible
-  while(!processingLock) {
-    clearwdt();
+  byte i;
+  if (serialStatus & inSendQueueMsgBit) {  
+    //test if inSendQueueMsgBit is set, otherwise it has been resetted by serialError
+    
+    // Send the message
+    uartTransmit(SNAP_SYNC);
+    crc = 0;
+    uartTransmit(computeCRC(BIN(01010001)));   // Request ACK
+    uartTransmit(computeCRC(BIN(00110000) | sendPacketLength));
+    uartTransmit(computeCRC(sendPacketDestination));
+    uartTransmit(computeCRC(deviceAddress));
+    for(i = 0; i < sendPacketLength; i++)
+      uartTransmit(computeCRC(sendPacket[i]));
+    uartTransmit(crc); /// @todo crc here
+    
+    serialStatus &= ~inSendQueueMsgBit;  //clear 
   }
 }
+#pragma restore
 
 //===========================================================================//
+//High level routine that sends the queued message
+//GIE must be disabled
+//we should have a free transmitBuffer, we checked this in sendMessageISR();
+#pragma save
+#pragma nooverlay
+void endMessageISR()
+{
+  endMessageIntern();
+}
+#pragma restore
+
+//===========================================================================//
+//High level routine that sends the queued message
+//should not be called within an interrupt-routine!
+//GIE must be enalbled
+//we are waiting until inTransmitMsgBit is clear,
+//  (otherwise we would interfer with forwarding messages
 #pragma save
 #pragma nooverlay
 void endMessage()
 {
-  byte interruptEnabledState;
-  byte length = sendPacketLength;
-  byte i;
-  if (length > 7) {
-    length = 8;
-    sendPacketLength = 16;
+  GIE=0;
+  //wait until forwarding-Message is complete
+  while (serialStatus & inTransmitMsgBit) {
+    GIE=1;
+    delay_10us();
+    delay_10us();
+    delay_10us();
+    delay_10us();
+    delay_10us();
+    GIE=0;
   }
-
-  interruptEnabledState = GIE;
-  if (!interruptEnabledState)
-    GIE = 0;
-  // Send the message
-  uartTransmit(SNAP_SYNC);
-  crc = 0;
-  uartTransmit(computeCRC(BIN(01010001)));   // Request ACK
-  uartTransmit(computeCRC(BIN(00110000) | length));
-  uartTransmit(computeCRC(sendPacketDestination));
-  uartTransmit(computeCRC(deviceAddress));
-  for(i = 0; i < sendPacketLength; i++)
-    uartTransmit(computeCRC(sendPacket[i]));
-  uartTransmit(crc); /// @todo crc here
-  
-  if (!interruptEnabledState)
-    GIE = 1;
-
-  /// @bug Because interrupts are now disabled during sending
-  /// the buffer cannot empty, so if too much is sent, it
-  /// will probably cause a lock-up (I've not actually seen
-  /// this happen yet, but it probably will).  It should
-  /// be a bit smarter to prevent this or else enable
-  /// interrupts briefly during uartTransmit if it is full and
-  /// then restore interrupts to their start state.
-
-_asm  /// @todo Remove when sdcc bug fixed
-  BANKSEL _uartState;
-_endasm;
+  endMessageIntern();
+  GIE=1;
 }
 #pragma restore
+
 
 //===========================================================================//
 #pragma save
@@ -701,22 +902,33 @@ void serialInterruptHandler()
 {
   // Process serial
   // Finished sending something?
-  
   if (TXIF && TXIE) {
-    if (transmitBufferHead != transmitBufferTail) {
+    if (transmitBufferHead == transmitBufferTail) {
+      // If empty now and transfer is completed (TRMT==1), disable XMIT interrupts
+      if (TRMT) 
+         TXIE = 0;
+    } else {
+      TXREG = transmitBuffer[transmitBufferHead];
+      transmitBufferHead++;
+      if (transmitBufferHead >= MAX_TRANSMIT_BUFFER)
+	transmitBufferHead = 0;
+    }
+  }
+/* also working
+  if (TXIF  && (transmitBufferHead != transmitBufferTail)) {
       byte c = transmitBuffer[transmitBufferHead];
       transmitBufferHead++;
       if (transmitBufferHead >= MAX_TRANSMIT_BUFFER)
 	transmitBufferHead = 0;
-      // If empty now, disable XMIT interrupts
-      if (transmitBufferHead == transmitBufferTail)
-	TXIE = 0;
       TXREG = c;
-    }
   }
+*/
+  
   // Any data received?
-  if (RCIF)
+  if (RCIF) {
     uartNotifyReceive();
+  }
+  
 _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _uartState;
 _endasm;

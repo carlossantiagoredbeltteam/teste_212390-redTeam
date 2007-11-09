@@ -35,34 +35,31 @@
 #include "extruder.h"
 #include "serial.h"
 
-byte PWMPeriod = 255;
-volatile static byte currentDirection = 0;
+//initialization does not work!
+byte PWMPeriod;
+volatile static byte currentDirection;
 
 // Non-zero indicates seeking is in progress (and its speed)
-volatile static byte seekSpeed = 0;
+volatile static byte seekSpeed;
 
-volatile static byte seekNotify = 255;
+volatile static byte seekNotify;
 
-volatile static byte lastPortB = 0;
-volatile static byte lastPortA = 0;
-volatile static byte extrude_click = 0;
-volatile static byte material_click = 0;
+volatile static byte lastPortB;
+volatile static byte lastPortA;
+volatile static byte extrude_click;
+volatile static byte material_click;
 
-static byte requestedHeat0 = 0;
-static byte requestedHeat1 = 0;
-volatile static byte heatCounter = 0;
-static byte temperatureLimit0 = 0;
-static byte temperatureLimit1 = 0;
+volatile static byte requestedHeat0;
+volatile static byte requestedHeat1;
+volatile static byte heatCounter;
+volatile static byte temperatureLimit0;
+volatile static byte temperatureLimit1;
 
-//volatile static byte delay_counter;
-static byte lastTemperature = 0;
-static byte lastTemperatureRef = 0;
+volatile static byte lastTemperature;
+static byte temperatureVRef;
+volatile static byte temperatureNotUpdatedCounter;
 
-static byte temperatureVRef = 3;
-
-volatile byte temp_counting;
-
-volatile static byte portaval = 0;
+volatile static byte portaval;
 
 // Note: when reversing motor direction, the speed should be set to 0
 // and then delayed long enough for the motor to come to rest.
@@ -94,8 +91,10 @@ volatile static addressableInt currentPosition, seekPosition;
 #define CMD_PRESCALER     51
 #define CMD_SETVREF       52
 #define CMD_SETTEMPSCALER 53
+#define CMD_GETDEBUGINFO  54
+#define CMD_GETTEMPINFO   55
 
-#define HEATER_PWM_PERIOD 253
+#define HEATER_PWM_PERIOD 255
 
 #ifdef UNIVERSAL_PCB
 
@@ -132,6 +131,7 @@ void change_log()
   char changes, current;
   extrude_click = 0;
   material_click = 0;
+/* andi: PORTB1 == serial-receive ! should that be PORTB0???
   current = PORTB1;  // Store so it doesn't change half way through processing
   changes = lastPortB ^ current;
 
@@ -142,6 +142,7 @@ void change_log()
     }
   }
   lastPortB = current;
+*/
   
   current = PORTA5;  // Store so it doesn't change half way through processing
   changes = lastPortA ^ current;  
@@ -239,20 +240,24 @@ void init2()
   seekNotify = 255;
   lastPortB = 0;
   lastPortA = 0;
+  extrude_click = 0;
+  material_click = 0;
   currentPosition.bytes[0] = 0;
   currentPosition.bytes[1] = 0;
   seekPosition.bytes[0] = 0;
   seekPosition.bytes[1] = 0;
   requestedHeat0 = 0;
   requestedHeat1 = 0;
+  temperatureLimit0 = 0;
+  temperatureLimit1 = 0;
   heatCounter = 0;
-  lastTemperature = 255;    // Set as if we need to re-range at the start
-  lastTemperatureRef = 255;
-  temperatureVRef = 3;
+  lastTemperature = 255;
+  temperatureVRef = 0; //set to 0, should be set by the host software
   portaval = 0;
   PORTA = portaval;
   TMR1H = HEATER_PWM_PERIOD;
   TMR1L = 0;
+  temperatureNotUpdatedCounter=0;
 }
 
 #pragma save
@@ -265,6 +270,10 @@ void pwmSet()
     	PR2 = 0;
   	else
     	PR2 = PWMPeriod;
+
+_asm  /// @todo Remove when sdcc bug fixed
+  BANKSEL _currentPosition
+_endasm;
 }
 #pragma restore
 
@@ -312,16 +321,20 @@ void timerTick()
   // temperatureLimit0 and temperatureLimit1 then it runs at the
   // lower power setting requestedHeat0.  If it is hotter than
   // temperatureLimit1, the power shuts down completely.
-  if (lastTemperature <= temperatureLimit1) {
+  if ((lastTemperature < 0x10) || (temperatureNotUpdatedCounter > 100)) { 
+	  //minimum time for the measurement, we don't know if the temperature is lower
+	  //or we were unable to update the measurement -> we don't know if the temperature is to high
+    heater_off();  
+  } else if (lastTemperature <= temperatureLimit1) {
     // Reached critical limit, so power off
     heater_off();
-  } else if (lastTemperature <= temperatureLimit0 &&
-	     heatCounter >= requestedHeat0 && requestedHeat0 != 255) {
-    // In medium zone, heater off period (based on low heat)
+  } else if ((lastTemperature <= temperatureLimit0) &&
+	     (heatCounter >= requestedHeat1) && (requestedHeat1 != 255)) {
+    // In medium zone, heater off period (based on high heat power)
     heater_off();
-  } else if (lastTemperature > temperatureLimit0 &&
-	     heatCounter >= requestedHeat1 && requestedHeat1 != 255) {
-    // In low zone, heater off period (based on high heat)
+  } else if ((lastTemperature > temperatureLimit0) &&
+	     (heatCounter >= requestedHeat0) && (requestedHeat0 != 255)) {
+    // In low zone, heater off period (based on low heat power)
     heater_off();
   } else {
     // Heater on
@@ -330,7 +343,7 @@ void timerTick()
   heatCounter++;
   TMR1H = HEATER_PWM_PERIOD;
   TMR1L = 0;
-  temp_counting = 7;  // Force temperature measurement
+
 _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _currentPosition
 _endasm;
@@ -340,12 +353,14 @@ _endasm;
 
 #pragma save
 #pragma nooverlay
+//will not be called with UNIVERSIAL_PCB, because RBIF will never be set
+//except if connector 11 is used. RB7, RB6 are unused, RB5, RB4 are output
 void motorTick()
 {
   // Clear interrupt flag
   RBIF = 0;
   
-  change_log();
+  change_log();  //not correct for UNIVERSIAL_PCB
 
   if (extrude_click) {
       
@@ -355,16 +370,21 @@ void motorTick()
       else
 	currentPosition.ival++;
       
-      if (seekSpeed != 0 && currentPosition.ival == seekPosition.ival) {
+      if ((seekSpeed != 0) && (currentPosition.ival == seekPosition.ival)) {
 	// Turn off motor
 	extruder_stop();
     }
   }
+  
   if (material_click) {
-      sendMessage(seekNotify);
-      sendDataByte(CMD_ISEMPTY);
-      sendDataByte(1);
-      endMessage();
+    if (sendMessageISR(seekNotify)) { 
+      //if we cannot send, then the notify is lost (RBIF is a onchange-Interrupt)
+      //TODO: maybe save the message and send later or save it and send 
+      //      in the main-loop
+      sendDataByteISR(CMD_ISEMPTY);
+      sendDataByteISR(1);
+      endMessageISR();
+    }
   }
 
  _asm  /// @todo Remove when sdcc bug fixed
@@ -374,22 +394,8 @@ void motorTick()
 #pragma restore
 
 
-void delay_10us()
-{
-_asm
-  NOP
-  NOP
-  NOP
-  NOP
-  NOP
-  NOP
-  NOP
-  NOP
-  NOP
-  NOP
-_endasm;
-}
-
+#pragma save
+#pragma nooverlay
 void checkTemperature()
 {
   // Assumes:
@@ -397,112 +403,92 @@ void checkTemperature()
   // A7 is thermistor
   // A1 is comparator
 
-  // Remember what PORTA should be
-  volatile byte val = portaval;
-
+  byte tmpLastTemperature; 
+  byte i;
+  
+  //we need a random-faktor, otherwise we have times where the timerTick always occurs during our tempMeasurement.
+  for (i=temperatureNotUpdatedCounter; i>0; i--) {
+    __asm
+      nop
+    __endasm;
+  }
+  
   // Assume capacitor is discharged from previous round or powerup
 
   // Set Timer0 to timer mode and use watchdog prescaler
   T0CS = 0;
   PSA = 0;
-
-  // Set vref to test level and give it time to stabilise
-  VRCON = BIN(10000000) | temperatureVRef;
   CMCON = BIN(00000010);
-  delay_10us();
-
-  T0IF = 0;
-
-  // Set A6 to high, float others
-  // Don't allow interrupts to mess with these
-  GIE = 0;   
-  TRISA = BIN(10000010) | PORTATRIS;
-  portaval = val | BIN(01000000);
-  PORTA = portaval;
-  temp_counting = 1;
-  GIE = 1;
- 	
-  // Wait for cap to reach vref
-  TMR0 = 0;
-  while (C2OUT)
-    ;
-  if(temp_counting)  // True if wait wasn't interrupted
-  {
-    if (T0IF)
-      lastTemperatureRef = 255;
-    else
-      lastTemperatureRef = TMR0;
-  } else
-    temp_counting = 2;  // Flag that we were interrupted for later
-
-  // Discharge cap
-  // Set A1 to low, float others
-  GIE = 0;
-  portaval = val;
-  PORTA = portaval;
-  TRISA = BIN(11000000) | PORTATRIS;
-  GIE = 1;
-  
-  // Set vref to low
-  VRCON = BIN(10100001); // should be 1010xxxx to not output value
-  delay_10us();
-  // Wait for voltage to go low
-  while (!C2OUT)
-    ;
-  // Extra delay for full discharge
-  delay_10us();
 
   // Set vref to test level and give it time to stabilise
   VRCON = BIN(10000000) | temperatureVRef;
   delay_10us();
-
-  T0IF = 0;
   // Set A7 to high, float others
-  GIE = 0;
-  portaval = val | BIN(10000000);
-  PORTA = portaval;
-  TRISA = BIN(01000010) | PORTATRIS;
-  temp_counting |= 1;   // Keep 2 if that was set above
-  GIE = 1;
-  
   // Use 8 bit Timer0 to measure time
   // Wait for cap to reach vref
-  TMR0 = 0;
-  while (C2OUT)
-    ;
-  if(temp_counting == 1) // We weren't interrupted again
-  {
-    if (T0IF)
-      lastTemperature = 255;
-    else
-      lastTemperature = TMR0;
-  }
-
-  // Discharge cap
-  // Set A1 to low, float others
-  // Restore PORTA to its original value
   GIE = 0;
-  portaval = val;
+  T0IF = 0;
+  portaval &= BIN(00111101);
+  portaval |= BIN(10000000);
+  TRISA = BIN(01000010) | PORTATRIS;
+  PORTA = portaval;  //must be set after TRISA
+  TMR0 = 0; 
+  interruptTemp = 0;
+  GIE = 1;
+  
+  //if lastTemperature is to low and prescaler is set to 0, then the duration of
+  // the measurement inhibits, that lastTemperature is getting lower -> it could happen
+  // that temperatureLimit1 is never reached and the heater is always on!!!
+  // Therefore I have added a test in timerTick() for the minimal value (== minimal time for measurement)
+  while (C2OUT) 
+    ; 
+  GIE = 0;
+  tmpLastTemperature = TMR0;
+  if (T0IF) {
+    tmpLastTemperature = 255;
+  } 
+  if (interruptTemp == 1) {
+    temperatureNotUpdatedCounter++;
+  } else {
+    lastTemperature = tmpLastTemperature;
+    temperatureNotUpdatedCounter = 0;
+  }
+  GIE = 1;
+  
+  if (temperatureNotUpdatedCounter == 255)
+     temperatureNotUpdatedCounter--;  //to prevent an overflow
+
+  delay_10us(); //to handle interrupts
+
+  //
+  // Discharge cap
+  // Set A7, A6, A1 to low and output
+  GIE = 0;
+  portaval &= BIN(00111101);
+  TRISA = BIN(00000000) | PORTATRIS;
   PORTA = portaval;
-  TRISA = BIN(11000000) | PORTATRIS;
   GIE = 1;
 
   // Set vref to low
-  VRCON = BIN(10100001); // should be 1010xxxx to not output value
+  VRCON = BIN(10100000); //should be 1010xxxx to not output value
+                         //maybe should be >0 if we cannot fully unload to 0 
+			 //VRCON = BIN(10100000) do not work for me
   delay_10us();
   // Wait for voltage to reach 0
   while (!C2OUT)
     ;
   // Extra delay for full discharge
   delay_10us();
+  delay_10us();
 
   TRISA = BIN(11000010) | PORTATRIS;
   VRCON = 0;  // Turn off vref
-  temp_counting = 0;
+
 _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _currentPosition
 _endasm;
 }
+#pragma restore
 
 void processCommand()
 {
@@ -579,17 +565,19 @@ void processCommand()
     break;
 
   case CMD_SETHEAT:
+    GIE=0;
     requestedHeat0 = buffer[1];
     requestedHeat1 = buffer[2];
     temperatureLimit0 = buffer[3];
     temperatureLimit1 = buffer[4];
+    GIE=1;
     break;
 
   case CMD_GETTEMP:
     sendReply();
     sendDataByte(CMD_GETTEMP);
     sendDataByte(lastTemperature);
-    sendDataByte(lastTemperatureRef);
+    sendDataByte(0);
     endMessage();
     break;
 
@@ -617,15 +605,45 @@ void processCommand()
     break;
 
   case CMD_SETVREF:
+    GIE=0;
     temperatureVRef = buffer[1];
+    GIE=1;
     break;
 
   case CMD_SETTEMPSCALER:
+    GIE=0;
     OPTION_REG = (OPTION_REG & BIN(11111000)) | (buffer[1] & BIN(111));
+    GIE=1;
     break;
 
+  case CMD_GETDEBUGINFO:
+    sendReply();
+    sendDataByte(CMD_GETDEBUGINFO);
+    sendDataByte(heatCounter);
+    sendDataByte(PORTA);
+    sendDataByte(TRISA);
+    sendDataByte(OPTION_REG);
+    sendDataByte(temperatureVRef);
+    endMessage();
+    break;
+
+  case CMD_GETTEMPINFO:
+    sendReply();
+    sendDataByte(CMD_GETTEMPINFO);
+    sendDataByte(requestedHeat0);
+    sendDataByte(requestedHeat1);
+    sendDataByte(temperatureLimit0);
+    sendDataByte(temperatureLimit1);
+    sendDataByte(lastTemperature);
+    sendDataByte(temperatureNotUpdatedCounter);
+    endMessage();
+    break;
+											
   }
 
+_asm  /// @todo Remove when sdcc bug fixed
+  BANKSEL _currentPosition
+_endasm;
 }
 
 // To work around sdcc issue

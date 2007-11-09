@@ -130,7 +130,9 @@ void main() {
   serial_init();
 
   // Clear up any boot noise from the TSR
+  GIE=0;
   uartTransmit(0);
+  GIE=1;
 
   for(;;) {
     if (packetReady()) {
@@ -138,6 +140,7 @@ void main() {
       releaseLock();
     }
     checkTemperature();
+    delay_10us();
     clearwdt();
   }
 }

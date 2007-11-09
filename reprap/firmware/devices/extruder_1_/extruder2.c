@@ -415,10 +415,11 @@ void motorTick()
     }
   }
   if (material_click) {
-      sendMessage(seekNotify);
-      sendDataByte(CMD_ISEMPTY);
-      sendDataByte(1);
-      endMessage();
+      if (sendMessageISR(seekNotify)) { //TODO: if sending is not possible, what todo?
+        sendDataByteISR(CMD_ISEMPTY);
+        sendDataByteISR(1);
+        endMessageISR();
+      }
   }
 
  _asm  /// @todo Remove when sdcc bug fixed
@@ -427,22 +428,6 @@ void motorTick()
 }
 #pragma restore
 
-
-void delay_10us()
-{
-_asm
-  NOP
-  NOP
-  NOP
-  NOP
-  NOP
-  NOP
-  NOP
-  NOP
-  NOP
-  NOP
-_endasm;
-}
 
 void checkTemperature()
 {

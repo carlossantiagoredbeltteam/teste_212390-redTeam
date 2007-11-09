@@ -355,6 +355,7 @@ void setTimer(byte newspeed)
 {
   speed = newspeed;
   if (speed) {
+    TMR1ON = 0;  //TMR1H, TMR1L should only be set, when TMR1ON is off
     TMR1H = speed;
     TMR1L = 0;
     TMR1ON = 1;
@@ -394,32 +395,36 @@ static void dda_step()
 {
   if (currentPosition.ival == seekPosition.ival) {
     function = func_idle;
-    speed = 0;
-    if (seekNotify != 255) {
-      sendMessage(seekNotify);
-      sendDataByte(CMD_DDA);
-      sendDataByte(currentPosition.bytes[0]);
-      sendDataByte(currentPosition.bytes[1]);
-      endMessage();
-    }
-    return; 
   } else if (currentPosition.ival < seekPosition.ival) {
     forward1();
   } else {
     reverse1();
   }
-
-  dda_error += dda_deltay.ival;
-  if ((dda_error + dda_error) > dda_deltax) {
-    // Y needs to be stepped, so signal
-    strobe_sync();
-    dda_error -= dda_deltax;
+  if (function == func_idle && seekNotify != 255) {
+    if (sendMessageISR(seekNotify)) { 
+      sendDataByteISR(CMD_DDA);
+      sendDataByteISR(currentPosition.bytes[0]);
+      sendDataByteISR(currentPosition.bytes[1]);
+      endMessageISR();
+    } else {
+      //sending is not possible, call this function again!
+      function = func_ddamaster;
+    }
+  } else if (function != func_idle) {
+    dda_error += dda_deltay.ival;
+    if ((dda_error + dda_error) > dda_deltax) {
+      // Y needs to be stepped, so signal
+      strobe_sync();
+      dda_error -= dda_deltax;
+    }
   }
 }
 #pragma restore
 
 #pragma save
 #pragma nooverlay
+// if speed is set to 0, then TMR1ON should also be set to 0, therefore
+//   set function to func_idle and then next round both will be set to 0
 void timerTick()
 {
   switch(function) {
@@ -440,17 +445,21 @@ void timerTick()
     } else if (currentPosition.ival > seekPosition.ival) {
       reverse1();
     } else {
-      // Reached, switch to 0 speed
-      speed = 0;
+      // Reached
       LEDon();
       // Uncomment next line to remove torque on arrival
       //motor_stop();
-      if (seekNotify != 255) {
-	sendMessage(seekNotify);
-	sendDataByte(CMD_SEEK);
-	sendDataByte(currentPosition.bytes[0]);
-	sendDataByte(currentPosition.bytes[1]);
-	endMessage();
+      function=func_idle;
+    }
+    if (function == func_idle && seekNotify != 255) {
+      if (sendMessageISR(seekNotify)) {
+        sendDataByteISR(CMD_SEEK);
+        sendDataByteISR(currentPosition.bytes[0]);
+        sendDataByteISR(currentPosition.bytes[1]);
+        endMessageISR();
+      } else {
+        //sending is not possible, call this function again!
+        function=func_seek;
       }
     }
     break;
@@ -468,15 +477,19 @@ void timerTick()
       maxPosition.bytes[0] = currentPosition.bytes[0];
       maxPosition.bytes[1] = currentPosition.bytes[1];
       function = func_idle;
-      if (seekNotify != 255) {
-	sendMessage(seekNotify);
-	sendDataByte(CMD_CALIBRATE);
-	sendDataByte(currentPosition.bytes[0]);
-	sendDataByte(currentPosition.bytes[1]);
-	endMessage();
-      }
     } else {
       forward1();
+    }
+    if (function == func_idle && seekNotify != 255) {
+      if (sendMessageISR(seekNotify)) {
+        sendDataByteISR(CMD_CALIBRATE);
+        sendDataByteISR(currentPosition.bytes[0]);
+        sendDataByteISR(currentPosition.bytes[1]);
+        endMessageISR();
+      } else {
+        //sending is not possible, call this function again!
+        function = func_findmax;
+      }
     }
     break;
   case func_syncwait:
@@ -490,14 +503,18 @@ void timerTick()
       currentPosition.bytes[0] = 0;
       currentPosition.bytes[1] = 0;
       function = func_idle;
-      if (seekNotify != 255) {
-	sendMessage(seekNotify);
-	sendDataByte(CMD_HOMERESET);
-	endMessage();
-      }
     } else {
       reverse1();
     }
+    if (function == func_idle && seekNotify != 255) {
+      if (sendMessageISR(seekNotify)) {
+        sendDataByteISR(CMD_HOMERESET);
+        endMessageISR();
+      } else {
+        //sending is not possible, call this function again!
+        function = func_homereset;
+      }
+    }      
     break;
   }
   setTimer(speed);
