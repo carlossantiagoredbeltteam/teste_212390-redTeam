@@ -80,19 +80,24 @@ class SNAP {
 		
 		void receiveByte(byte b);
 		void addDevice(byte b);
+		void releaseLock();
 		
 		void sendReply();
 		void sendDataByte(byte c);
 		void sendMessage(byte dest);
+		void endMessage();
 		
 		byte packetReady();
-		void releaseLock();
+		byte getByte(byte index);
+		byte getPacketLength();
+		byte getDestination();
+		byte getSource();
+
 		
 	private:
 		
 		bool hasDevice(byte b);
 		void transmit(byte c);
-		void endMessage();
 		byte computeCRC(byte c);
 		
 		byte uartState;		// Current SNAP state machine state
