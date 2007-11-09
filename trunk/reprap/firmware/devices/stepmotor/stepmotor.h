@@ -45,6 +45,9 @@ void timerTick();
 void processCommand();
 void syncStrobe();
 
+extern byte syncEnabled;
+extern byte syncCounter;
+
 #ifdef UNIVERSAL_PCB
 #define SYNCA       PORTA1
 #define SYNCA_TRIS  TRISA1

@@ -126,7 +126,9 @@ void main() {
   serial_init();
 
   // Clear up any boot noise from the TSR
+  GIE=0;
   uartTransmit(0);
+  GIE=1;
  
   if (SYNCA) // Only enable if SYNCA is by default high
     syncEnabled = 1;

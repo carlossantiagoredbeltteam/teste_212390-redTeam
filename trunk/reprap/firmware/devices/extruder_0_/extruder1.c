@@ -44,28 +44,42 @@ config at 0x2007 __CONFIG = _CP_OFF &
  _LVP_OFF;
 
 byte deviceAddress = PORT;
+volatile byte interruptTemp;  //will be set, if an interrupt occures
+
 
 static void isr() interrupt 0 {
+  interruptTemp = 1; //set flag, to check if the measurement is finishing during our isr
+
   serialInterruptHandler();
 
-  if (RBIF)
-    motorTick();
+  if (RBIF) 
+    motorTick();  //should not occur in UNIVERSAL_PCB
 
   if (TMR1IF) {
     timerTick();
     TMR1IF = 0;
   }
-  temp_counting &= 0xfe;
-
+  if (C2OUT) {
+    interruptTemp = 0; //measurement is not finished
+  }
 }
 
 void init1()
 {
-  byte v = 0;
+  INTCON = BIN(00000000);     // Interrupts disabled
+  PIR1 = 0;                   // Clear peripheral interrupt flags
+  PIE1 = BIN(00000000);       // All peripheral interrupts initially disabled
 
-  OPTION_REG = BIN(01011111); // Disable TMR0 on RA4, 1:128 WDT, pullups on
-  CMCON = BIN(00000010);      // Comparator: compare RA0 to int. ref.
-  TRISA = BIN(11111111);      // Port A all inputs for now
+  OPTION_REG = BIN(01010111); // Disable TMR0 on RA4, 1:256 Prescaler for TMR0, pullups on
+
+  //serial communication
+  SPBRG = 12;                 // 12 = ~19200 baud @ 4MHz
+  TXSTA = BIN(00000100);      // 8 bit high speed 
+  RCSTA = BIN(10000000);      // Enable port for 8 bit receive
+  CREN = 1;  // Start reception
+  TXEN = 1;  // Enable transmit
+  RCIE = 1;  // Enable receive interrupts
+
 // RB0 is Extrude speed sensor
 // RB1 is Rx
 // RB2 is Tx 
@@ -74,46 +88,31 @@ void init1()
 // RB5 is L298 1 (Extrude)
 // RB6 is not used
 // RB7 is not used
+  RBIE = 1;  // Enable RB port change interrupt 
+             //(should not occur in UNIVERSAL_PCB, except if connector 11 is used)
+  PEIE = 1;  // Peripheral interrupts on
 #ifdef UNIVERSAL_PCB
+  TRISA = BIN(11000010) | PORTATRIS;  // Turn off A/D lines,
+                                      // but set others as required  
   TRISB = BIN(11000111);
-#else 
+  PORTA = 0;
+  PORTB = BIN(11000001);
+#else
+  TRISA = BIN(11000010) | PORTATRIS;  // Turn off A/D lines,
+                                      // but set others as required  
   TRISB = BIN(11000110);      // Port B outputs, except 1/2 for serial and
                               // RB7 for optointerrupter input
                               // RB6 for material out detector
                               // RB0 for heater controller output
-#endif
-  // Note port B3 will be used for PWM output (CCP1)
-  PIE1 = BIN(00000000);       // All peripheral interrupts initially disabled
-  INTCON = BIN(00000000);     // Interrupts disabled
-  PIR1 = 0;                   // Clear peripheral interrupt flags
-  SPBRG = 12;                 // 12 = ~19200 baud @ 4MHz
-  TXSTA = BIN(00000100);      // 8 bit high speed 
-  RCSTA = BIN(10000000);      // Enable port for 8 bit receive
-
-  RCIE = 1;  // Enable receive interrupts
-  CREN = 1;  // Start reception
-
-  TXEN = 1;  // Enable transmit
-  RBIE = 1;  // Enable RB port change interrupt
-
-  PEIE = 1;  // Peripheral interrupts on
-  GIE = 1;   // Now turn on interrupts
-#ifdef UNIVERSAL_PCB
-  PORTB = BIN(11000001);
-  TRISA = BIN(11000010) | PORTATRIS;  // Turn off A/D lines,
-                                      // but set others as required  
   PORTA = 0;
-#else
   PORTB = BIN(11000000);  // Pullup on RB6,RB7 for opto-inputs
-  TRISA = BIN(11000010) | PORTATRIS;  // Turn off A/D lines,
-                                      // but set others as required  
-  PORTA = 0;
 #endif
 
+  CMCON = BIN(00000010);   // Comparator: compare RA0 to int. ref.
 
   TMR1IE = 0;
-  T1CON = BIN(00000000);  // Timer 1 in clock mode with 1:1 scale
-  TMR1IE = 1;  // Enable timer interrupt
+  T1CON = BIN(00000000);   // Timer 1 in clock mode with 1:1 scale
+  TMR1IE = 1;              // Enable timer interrupt
   TMR1ON = 1;
 
   PR2 = PWMPeriod;          // Initial PWM period
@@ -121,7 +120,19 @@ void init1()
   CCPR1L = 0;               // Start turned off
   
   T2CON = BIN(00000100);    // Enable timer 2 and set prescale to 1
+  GIE = 1;   // Now turn on interrupts
 }
+
+/* for debugging
+void waitSec() {
+  int i;
+  for (i=30000; i > 0; i--) {
+    delay_10us();
+    delay_10us();
+    delay_10us();
+  }
+}
+*/
 
 void main() {
   init2();  // Order is important here, otherwise interrupts will occur
@@ -131,15 +142,21 @@ void main() {
   serial_init();
 
   // Clear up any boot noise from the TSR
+  GIE=0;
   uartTransmit(0);
+  uartTransmit(0);
+  GIE=1;
 
   for(;;) {
     if (packetReady()) {
       processCommand();
       releaseLock();
-    }
-    if(temp_counting)
-    	checkTemperature();
-    clearwdt();
+    }  
+
+    checkTemperature();
+
+    delay_10us();
+//not used:
+//    clearwdt();
   }
 }
