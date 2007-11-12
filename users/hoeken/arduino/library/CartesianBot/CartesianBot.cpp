@@ -89,40 +89,41 @@ void CartesianBot::setCurrentPoint(Point &point)
 
 void CartesianBot::getNextPoint()
 {
-	if (!this->isQueueFull())
-		this->setTargetPoint(this->unqueuePoint());
+	Point p;
+	
+	if (!this->isQueueEmpty())
+	{
+		p = this->unqueuePoint();
+
+		x.setTarget(p.x);
+		y.setTarget(p.y);
+		z.setTarget(p.z);
+	}
 	else
 	{
-		x.setDelta(0);
-		y.setDelta(0);
-		z.setDelta(0);
+		x.setTarget(x.getPosition());
+		y.setTarget(y.getPosition());
+		z.setTarget(z.getPosition());
 	}
+	
+	this->calculateDDA();
 }
 
 void CartesianBot::calculateDDA()
 {
-	int dx, dy, dz;
-	float xInc, yInc, zInc;
-	int steps;
-	
-	//get the change deltas
-	dx = this->target_point.x - this->current_position.x;
-	dy = this->target_point.y - this->current_position.y;
-	dz = this->target_point.z - this->current_position.z;
+	long steps;
 	
 	//what is the biggest one?
-	steps = max(abs(dx), abs(dy));
-	steps = max(steps, abs(dz));
+	max_delta = max(x.getDelta(), y.getDelta());
+	max_delta = max(max_delta, z.getDelta());
 
-	//calculate our increments
-	xInc = dx / steps;
-	yInc = dy / steps;
-	zInc = dz / steps;
+	//do our dda calculation
+	steps = -max_delta/2;
 	
-	//save it to each axis.
-	x.setDelta(xInc);
-	y.setDelta(yInc);
-	z.setDelta(zInc);
+	//save it into each object.
+	x.initDDA(steps);
+	y.initDDA(steps);
+	z.initDDA(steps);
 }
 
 void CartesianBot::stop()
@@ -187,17 +188,14 @@ void CartesianBot::move()
 				z.doStep();
 
 			//are we at the point?
-			if (this->atPoint(this->target_point))
-			{
-				this->notifyTargetReached();
+			if (x.atTarget() && y.atTarget() && z.atTarget())
 				this->getNextPoint();
-			}
 		}
 		else
 		{
-			x.ddaStep();
-			y.ddaStep();
-			z.ddaStep();
+			x.ddaStep(max_delta);
+			y.ddaStep(max_delta);
+			z.ddaStep(max_delta);
 		}
 	}
 }
