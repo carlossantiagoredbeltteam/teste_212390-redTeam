@@ -12,10 +12,11 @@
 
 LinearAxis::LinearAxis(int steps, int dir_pin, int step_pin, int min_pin, int max_pin) : stepper(steps, dir_pin, step_pin), min_switch(min_pin), max_switch(max_pin)
 {
-	this->current_position = 0;
-	this->dda_position = 0;
-	this->delta = 0.0;
+	this->position = 0;
+	this->target = 0;
+	this->delta = 0;
 	this->can_step = false;
+	stepper.setDirection(RS_FORWARD);
 }
 
 void LinearAxis::readState()
@@ -35,15 +36,22 @@ bool LinearAxis::atMax()
 	return max_switch.getState();
 }
 
-void LinearAxis::ddaStep()
+void LinearAxis::initDDA(long counter)
 {
-	this->dda_position += this->delta;
-	
-	//can we step now?
-	if ((int)this->dda_position != this->current_position)
-		this->can_step = true;
+	this->counter = counter;
+}
+
+void LinearAxis::ddaStep(long max_delta)
+{
+	counter += delta;
+
+	if (counter > 0)
+	{
+		can_step = true;
+		counter -= max_delta;
+	}
 	else
-		this->can_step = false;
+		can_step = false;
 }
 
 bool LinearAxis::canStep()
@@ -57,8 +65,17 @@ bool LinearAxis::doStep()
 	{
 		if (stepper.nonBlockingStep())
 		{
-			this->can_step = false;
-			this->current_position = (int)this->dda_position;
+			//dont let any more steps happen
+			can_step = false;
+			
+			//record our step
+			if (stepper.getDirection())
+				position++;
+			else
+				position--;
+			
+			//record our delta change
+			delta--;
 
 			return true;
 		}
@@ -67,25 +84,38 @@ bool LinearAxis::doStep()
 	return false;
 }
 
-void LinearAxis::setDelta(float delta)
-{
-	this->delta = delta;
-	
-	//which way are we going?
-	if (this->delta >= 0)
-		stepper.setDirection(RS_FORWARD);
-	else
-		stepper.setDirection(RS_REVERSE);
-}
-
-unsigned long LinearAxis::getPosition()
+long LinearAxis::getPosition()
 {
 	return this->current_position;
 }
 
-void LinearAxis::setPosition(unsigned long position)
+void LinearAxis::setPosition(long position)
 {
-	this->current_position = position;
-	this->dda_position = position;
+	this->current = position;
 	this->can_step = false;
+	
+	//recalculate stuff.
+	this->setTarget(target);
+}
+
+long LinearAxis::getTarget()
+{
+	return target;
+}
+
+void LinearAxis::setTarget(long t)
+{
+	target = t;
+	
+	if (target > current)
+		stepper.setDirection(RS_FORWARD);
+	else
+		stepper.setDirection(RS_REVERSE);
+
+	delta = abs(target - current);
+}
+
+void LinearAxis::getDelta()
+{
+	return delta;
 }

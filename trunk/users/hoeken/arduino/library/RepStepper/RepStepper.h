@@ -51,22 +51,22 @@ class RepStepper {
   private:
 
 	//various internal variables
-    bool direction;				// Direction of rotation
+    bool direction;						// Direction of rotation
 	unsigned int rpm;					// Speed in RPMs
-	unsigned int step_delay;   // delay between steps, in microseconds, based on speed
+	unsigned int step_delay;  			// delay between steps, in microseconds, based on speed
     unsigned int number_of_steps;		// total number of steps this motor can take
 
 	//our time counter variables.
-	unsigned long last_step_time;			// time stamp in ticks of when our last step was.
-    unsigned long next_step_time;			// time stamp in ticks of when the next step can be.
-    unsigned long now;						// the 'current' timestamp in ticks of right now.
+	unsigned long last_step_time;		// time stamp in ticks of when our last step was.
+    unsigned long next_step_time;		// time stamp in ticks of when the next step can be.
+    unsigned long now;					// the 'current' timestamp in ticks of right now.
 	
     // motor pin numbers:
-    int step_pin;				//the step signal pin.
-    int direction_pin;			//the direction pin.
+    int step_pin;						//the step signal pin.
+    int direction_pin;					//the direction pin.
 
 	//our time function
-	unsigned long hpticks(void);
+	unsigned long hpticks(void);		//our high precision time function
 };
 
 #endif

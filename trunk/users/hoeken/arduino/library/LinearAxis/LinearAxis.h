@@ -27,22 +27,30 @@ class LinearAxis {
 
 	//various guys to interface with class
 	void readState();
-	void ddaStep();
 	bool canStep();
 	bool doStep();
-	void setDelta(float delta);
-	unsigned long getPosition();
-	void setPosition(unsigned long position);
+
+	//our DDA based functions
+	void initDDA(long counter);
+	void ddaStep(long max_delta);
+	long getDelta();
+	
+	//various position things.
+	long getPosition();
+	void setPosition(long position);
+	long getTarget();
+	void setTarget(long t);
 	
 	//our limit switch functions
 	bool atMin();
 	bool atMax();
 
   private:
-	bool can_step;						//are we allowed to take a step yet?
-	unsigned long current_position;		//this is our current position.
-	float dda_position;					//this is our 'position' in DDA terms.	
-	float delta;						//this is our change for DDA.
+	bool can_step;				//are we allowed to take a step yet?
+	long current;				//this is our current position.
+	long target;				//this is our target position.
+	long counter;				//this is our 'counter' for dda operations.	
+	long delta;					//this is our change for DDA.
 
 	LimitSwitch min_switch;
 	LimitSwitch max_switch;

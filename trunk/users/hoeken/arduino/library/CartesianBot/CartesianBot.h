@@ -16,8 +16,9 @@
 #include "LinearAxis.h"
 #include "WConstants.h"
 
-// 21 is so we can send our whole queue in one PackIt: 21 * 4 * 3 = 252 bytes
-#define POINT_QUEUE_SIZE 21
+// how big do we want our point queue?
+#define POINT_QUEUE_SIZE 16
+
 #define MODE_PAUSE 0
 #define MODE_SEEK 1
 
@@ -32,9 +33,6 @@ struct Point {
 class CartesianBot {
   public:
 
-	Point target_point;
-	Point current_position;
-	
     // constructors:
     CartesianBot(
 		int x_steps, int x_dir_pin, int x_step_pin, int x_min_pin, int x_max_pin,
@@ -54,7 +52,8 @@ class CartesianBot {
 	void setTargetPoint(Point &point);
 	void setCurrentPoint(Point &point);
 	void getNextPoint();
-
+	void calculateDDA();
+	
 	//mode commands
 	void stop();
 	void start();
@@ -74,10 +73,11 @@ class CartesianBot {
 	LinearAxis z;
 
   private:
+
+	long max_delta;
 	
 	uint8_t mode;
 	bool atPoint(Point &point);
-	void calculateDDA();
 	void notifyTargetReached();	
 
 	//this is for tracking to a point.
