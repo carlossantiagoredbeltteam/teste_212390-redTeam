@@ -40,9 +40,9 @@ class RepStepper {
 	int getSteps();
 	
     //various methods dealing with stepping.
-    boolean nonBlockingStep();
+    bool nonBlockingStep();
 	void blockingStep(int steps);
-	boolean canStep();
+	bool canStep();
 	void pulse();
 
 	//random other functions

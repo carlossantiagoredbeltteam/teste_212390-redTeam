@@ -118,7 +118,7 @@ bool RepStepper::canStep()
 	return false;
 }
 
-boolean RepStepper::nonBlockingStep()
+bool RepStepper::nonBlockingStep()
 {
 	if (this->canStep())
 	{
