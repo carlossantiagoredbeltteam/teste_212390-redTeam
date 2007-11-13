@@ -46,17 +46,20 @@ class CartesianBot {
 	void clearQueue();
 	bool isQueueFull();
 	bool isQueueEmpty();
-	int getQueueSize();
+	byte getQueueSize();
 	
 	//cartesian bot specific.
 	void setTargetPoint(Point &point);
 	void setCurrentPoint(Point &point);
 	void getNextPoint();
 	void calculateDDA();
+	bool atTarget();
+	bool atHome();
 	
 	//mode commands
 	void stop();
 	void start();
+	byte getMode();
 
 	//our interface methods
 	void readState();
@@ -72,18 +75,17 @@ class CartesianBot {
 	LinearAxis y;
 	LinearAxis z;
 
+	long max_delta;
+	byte mode;
+
   private:
 
-	long max_delta;
-	
-	uint8_t mode;
-	bool atPoint(Point &point);
 	void notifyTargetReached();	
 
 	//this is for tracking to a point.
-	uint8_t head;
-	uint8_t tail;
-	int size;
+	byte head;
+	byte tail;
+	byte size;
 	Point point_queue[POINT_QUEUE_SIZE];
 };
 

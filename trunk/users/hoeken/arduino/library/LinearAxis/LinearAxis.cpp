@@ -12,10 +12,11 @@
 
 LinearAxis::LinearAxis(int steps, int dir_pin, int step_pin, int min_pin, int max_pin) : stepper(steps, dir_pin, step_pin), min_switch(min_pin), max_switch(max_pin)
 {
-	this->position = 0;
-	this->target = 0;
-	this->delta = 0;
-	this->can_step = false;
+	counter = 0;
+	current = 0;
+	target = 0;
+	delta = 0;
+	can_step = false;
 	stepper.setDirection(RS_FORWARD);
 }
 
@@ -61,7 +62,12 @@ bool LinearAxis::canStep()
 
 bool LinearAxis::doStep()
 {
-	if (!this->atMin() && !this->atMax())
+	//can we move?
+	if (
+		(!this->atMin() && !this->atMax()) ||
+		(this->atMin() && stepper.getDirection() == RS_FORWARD) ||
+		(this->atMax() && stepper.getDirection() == RS_REVERSE)
+	)
 	{
 		if (stepper.nonBlockingStep())
 		{
@@ -70,9 +76,9 @@ bool LinearAxis::doStep()
 			
 			//record our step
 			if (stepper.getDirection())
-				position++;
+				current++;
 			else
-				position--;
+				current--;
 			
 			//record our delta change
 			delta--;
@@ -86,13 +92,13 @@ bool LinearAxis::doStep()
 
 long LinearAxis::getPosition()
 {
-	return this->current_position;
+	return current;
 }
 
 void LinearAxis::setPosition(long position)
 {
-	this->current = position;
-	this->can_step = false;
+	current = position;
+	can_step = false;
 	
 	//recalculate stuff.
 	this->setTarget(target);
@@ -115,7 +121,17 @@ void LinearAxis::setTarget(long t)
 	delta = abs(target - current);
 }
 
-void LinearAxis::getDelta()
+bool LinearAxis::atTarget()
+{
+	return (target == current);
+}
+
+long LinearAxis::getDelta()
 {
 	return delta;
+}
+
+long LinearAxis::getCounter()
+{
+	return counter;
 }

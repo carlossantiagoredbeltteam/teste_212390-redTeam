@@ -40,6 +40,8 @@ class LinearAxis {
 	void setPosition(long position);
 	long getTarget();
 	void setTarget(long t);
+	bool atTarget();
+	long getCounter();
 	
 	//our limit switch functions
 	bool atMin();

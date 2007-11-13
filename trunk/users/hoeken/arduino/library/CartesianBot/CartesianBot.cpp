@@ -8,15 +8,13 @@ CartesianBot::CartesianBot(
 	int z_steps, int z_dir_pin, int z_step_pin, int z_min_pin, int z_max_pin
 ) : x(x_steps, x_dir_pin, x_step_pin, x_min_pin, x_max_pin), y(y_steps, y_dir_pin, y_step_pin, y_min_pin, y_max_pin), z(z_steps, z_dir_pin, z_step_pin, z_min_pin, z_max_pin)
 {
-	this->mode = MODE_PAUSE;
-
-	this->head = 0;
-	this->tail = 0;
+	this->stop();
+	this->clearQueue();
 }
 
-int CartesianBot::getQueueSize()
+byte CartesianBot::getQueueSize()
 {
-	return this->size;
+	return size;
 }
 
 bool CartesianBot::isQueueEmpty()
@@ -47,7 +45,7 @@ bool CartesianBot::queuePoint(Point &point)
 		this->tail = 0;
 	
 	//keep track
-	this->size++;
+	size++;
 		
 	//queue up our point!
 	this->point_queue[this->tail] = point;
@@ -63,7 +61,7 @@ struct Point CartesianBot::unqueuePoint()
 		this->head = 0;
 	
 	//keep track.
-	this->size--;
+	size--;
 	
 	return this->point_queue[this->head];
 }
@@ -72,19 +70,7 @@ void CartesianBot::clearQueue()
 {
 	this->head = 0;
 	this->tail = 0;
-	this->size = 0;
-}
-
-void CartesianBot::setTargetPoint(Point &point)
-{
-	this->target_point = point;
-	this->calculateDDA();
-}
-
-void CartesianBot::setCurrentPoint(Point &point)
-{
-	this->current_position = point;
-	this->calculateDDA();
+	size = 0;
 }
 
 void CartesianBot::getNextPoint()
@@ -128,26 +114,28 @@ void CartesianBot::calculateDDA()
 
 void CartesianBot::stop()
 {
-	this->mode = MODE_PAUSE;
+	mode = MODE_PAUSE;
 }
 
 void CartesianBot::start()
 {
-	this->mode = MODE_SEEK;
+	mode = MODE_SEEK;
+}
+
+byte CartesianBot::getMode()
+{
+	return mode;
 }
 
 void CartesianBot::home()
 {
-	Point p;
-	boolean home = false;
-	
 	//going towards 0
 	x.stepper.setDirection(RS_REVERSE);
 	y.stepper.setDirection(RS_REVERSE);
 	z.stepper.setDirection(RS_REVERSE);
 	
 	//move us home!
-	while (!home)
+	while (!this->atHome())
 	{
 		if (!x.atMin())
 			x.stepper.nonBlockingStep();
@@ -155,16 +143,17 @@ void CartesianBot::home()
 			y.stepper.nonBlockingStep();
 		if (!z.atMin())
 			z.stepper.nonBlockingStep();
-
-		if (x.atMin() && y.atMin() && z.atMin())
-			home = true;
 	}
 	
 	//mark us as home.
-	p.x = 0;
-	p.y = 0;
-	p.z = 0;
-	this->setCurrentPoint(p);
+	x.setPosition(0);
+	y.setPosition(0);
+	z.setPosition(0);
+}
+
+bool CartesianBot::atHome()
+{
+	return (x.atMin() && y.atMin() && z.atMin());
 }
 
 void CartesianBot::readState()
@@ -176,7 +165,7 @@ void CartesianBot::readState()
 
 void CartesianBot::move()
 {
-	if (this->mode == MODE_SEEK)
+	if (mode == MODE_SEEK)
 	{
 		if (x.canStep() || y.canStep() || z.canStep())
 		{
@@ -188,7 +177,7 @@ void CartesianBot::move()
 				z.doStep();
 
 			//are we at the point?
-			if (x.atTarget() && y.atTarget() && z.atTarget())
+			if (this->atTarget())
 				this->getNextPoint();
 		}
 		else
@@ -200,14 +189,21 @@ void CartesianBot::move()
 	}
 }
 
+bool CartesianBot::atTarget()
+{
+	return (x.atTarget() && y.atTarget() && z.atTarget());
+}
+
 void CartesianBot::notifyTargetReached()
 {
+/*
 	packet.create(HOST_ADDRESS, MY_ADDRESS);
 	packet.add(CMD_GET_POS);
 	packet.add(current_position.x);
 	packet.add(current_position.y);
 	packet.add(current_position.z);
 	packet.send();
+*/
 }
 
 void CartesianBot::abort()
@@ -219,13 +215,4 @@ void CartesianBot::abort()
 int CartesianBot::version()
 {
 	return 1;
-}
-
-bool CartesianBot::atPoint(Point &point)
-{
-	return (
-		point.x == this->current_position.x &&
-		point.y == this->current_position.y &&
-		point.z == this->current_position.z
-	);
 }
