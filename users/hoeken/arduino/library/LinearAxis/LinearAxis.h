@@ -28,10 +28,10 @@ class LinearAxis {
 	//various guys to interface with class
 	void readState();
 	bool canStep();
-	bool doStep();
+	void doStep();
 
 	//our DDA based functions
-	void initDDA(long counter);
+	void initDDA(long max_delta);
 	void ddaStep(long max_delta);
 	long getDelta();
 	
@@ -48,7 +48,8 @@ class LinearAxis {
 	bool atMax();
 
   private:
-	bool can_step;				//are we allowed to take a step yet?
+	bool can_step;				//are we capable of taking a step yet?
+	bool dda_ready;				//are we allowed to take a step yet?
 	long current;				//this is our current position.
 	long target;				//this is our target position.
 	long counter;				//this is our 'counter' for dda operations.	

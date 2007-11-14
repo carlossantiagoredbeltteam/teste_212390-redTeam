@@ -16,6 +16,7 @@ LinearAxis::LinearAxis(int steps, int dir_pin, int step_pin, int min_pin, int ma
 	current = 0;
 	target = 0;
 	delta = 0;
+	dda_ready = false;
 	can_step = false;
 	stepper.setDirection(RS_FORWARD);
 }
@@ -25,6 +26,13 @@ void LinearAxis::readState()
 	//encoder.readState();
 	//min_switch.readState();
 	//max_switch.readState();
+	
+	can_step = (
+		(current != target) ||
+		(!this->atMin() && !this->atMax()) ||
+		(this->atMin() && stepper.getDirection() == RS_FORWARD) ||
+		(this->atMax() && stepper.getDirection() == RS_REVERSE)
+	);	
 }
 
 bool LinearAxis::atMin()
@@ -37,9 +45,9 @@ bool LinearAxis::atMax()
 	return max_switch.getState();
 }
 
-void LinearAxis::initDDA(long counter)
+void LinearAxis::initDDA(long max_delta)
 {
-	this->counter = counter;
+	this->counter = -max_delta/2;
 }
 
 void LinearAxis::ddaStep(long max_delta)
@@ -48,46 +56,31 @@ void LinearAxis::ddaStep(long max_delta)
 
 	if (counter > 0)
 	{
-		can_step = true;
+		dda_ready = true;
 		counter -= max_delta;
 	}
 	else
-		can_step = false;
+		dda_ready = false;
 }
 
 bool LinearAxis::canStep()
 {
-	return this->can_step;
+	return can_step && dda_ready;
 }
 
-bool LinearAxis::doStep()
+void LinearAxis::doStep()
 {
-	//can we move?
-	if (
-		(!this->atMin() && !this->atMax()) ||
-		(this->atMin() && stepper.getDirection() == RS_FORWARD) ||
-		(this->atMax() && stepper.getDirection() == RS_REVERSE)
-	)
-	{
-		if (stepper.nonBlockingStep())
-		{
-			//dont let any more steps happen
-			can_step = false;
-			
-			//record our step
-			if (stepper.getDirection())
-				current++;
-			else
-				current--;
-			
-			//record our delta change
-			//delta--;
+	//dont let any more steps happen
+	dda_ready = false;
 
-			return true;
-		}
-	}
+	//record our step
+	if (stepper.getDirection())
+		current++;
+	else
+		current--;
 	
-	return false;
+	//do our step!
+	stepper.pulse();
 }
 
 long LinearAxis::getPosition()
@@ -98,7 +91,7 @@ long LinearAxis::getPosition()
 void LinearAxis::setPosition(long position)
 {
 	current = position;
-	can_step = false;
+	dda_ready = false;
 	
 	//recalculate stuff.
 	this->setTarget(target);

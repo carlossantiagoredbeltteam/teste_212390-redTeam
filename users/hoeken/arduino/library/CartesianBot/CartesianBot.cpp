@@ -10,6 +10,23 @@ CartesianBot::CartesianBot(
 {
 	this->stop();
 	this->clearQueue();
+
+	//output mode = compare output, non pwm clear OC0A on match
+	TCCR0A &= (1<<COM0A1); 
+	TCCR0A &= (0<<COM0A0); 
+
+	//waveform generation = mode 3 = CTC
+	TCCR0B &= (0<<WGM02)
+	TCCR0A &= (1<<WGM01); 
+	TCCR0A &= (1<<WGM00);
+	
+	//set our prescaler to 8. one tick == 0.5 microseconds.
+	TCCR0B &= (0<<CS02);
+	TCCR0B &= (1<<CS01);
+	TCCR0B &= (0<<CS00);
+
+	//set the max counter here.  interrupt every 50 microseconds.
+	OCR0A = 100;
 }
 
 byte CartesianBot::getQueueSize()
@@ -97,19 +114,14 @@ void CartesianBot::getNextPoint()
 
 void CartesianBot::calculateDDA()
 {
-	long steps;
-	
 	//what is the biggest one?
 	max_delta = max(x.getDelta(), y.getDelta());
 	max_delta = max(max_delta, z.getDelta());
 
-	//do our dda calculation
-	steps = -max_delta/2;
-	
 	//save it into each object.
-	x.initDDA(steps);
-	y.initDDA(steps);
-	z.initDDA(steps);
+	x.initDDA(max_delta);
+	y.initDDA(max_delta);
+	z.initDDA(max_delta);
 }
 
 void CartesianBot::stop()
@@ -129,6 +141,9 @@ byte CartesianBot::getMode()
 
 void CartesianBot::home()
 {
+	//pause it to disable our interrupt handler.
+	mode = MODE_PAUSE;
+	
 	//going towards 0
 	x.stepper.setDirection(RS_REVERSE);
 	y.stepper.setDirection(RS_REVERSE);
@@ -165,27 +180,40 @@ void CartesianBot::readState()
 
 void CartesianBot::move()
 {
+	//are we in moving mode?
 	if (mode == MODE_SEEK)
 	{
-		if (x.canStep() || y.canStep() || z.canStep())
+		//only do a DDA step if we're waiting to send a step signal.
+		if (!x.canStep() && !y.canStep() && !z.canStep())
 		{
-			if (x.canStep())
-				x.doStep();
-			if (y.canStep())
-				y.doStep();
-			if (z.canStep())
-				z.doStep();
-
 			//are we at the point?
 			if (this->atTarget())
 				this->getNextPoint();
-		}
-		else
-		{
+
+			//do our steps
 			x.ddaStep(max_delta);
 			y.ddaStep(max_delta);
 			z.ddaStep(max_delta);
 		}
+	}
+}
+
+void CartesianBot::handleInterrupt()
+{
+	stepper_ticks++;
+	
+	//make sure we're in seek mode
+	if (mode == MODE_SEEK)
+	{
+		//check each axis and move it if necessary.
+		if (x.canStep())
+			x.doStep();
+
+		if (y.canStep())
+			y.doStep();
+
+		if (z.canStep())
+			z.doStep();
 	}
 }
 
