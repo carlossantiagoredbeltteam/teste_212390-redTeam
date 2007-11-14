@@ -81,7 +81,7 @@ bool LinearAxis::doStep()
 				current--;
 			
 			//record our delta change
-			delta--;
+			//delta--;
 
 			return true;
 		}
