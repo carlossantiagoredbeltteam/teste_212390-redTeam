@@ -16,7 +16,7 @@
 #include "WConstants.h"
 
 extern volatile unsigned long timer0_overflow_count;
-
+extern volatile unsigned int stepper_ticks;
 
 #define RS_FORWARD 1
 #define RS_REVERSE 0

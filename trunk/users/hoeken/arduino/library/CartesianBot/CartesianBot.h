@@ -14,6 +14,7 @@
 #define CartesianBot_h
 
 #include "LinearAxis.h"
+#include "RepStepper.h"
 #include "WConstants.h"
 
 // how big do we want our point queue?
@@ -28,6 +29,8 @@ struct Point {
 	unsigned long y;
  	unsigned long z;
 };
+
+extern volatile unsigned int stepper_ticks;
 
 // library interface description
 class CartesianBot {
@@ -66,6 +69,9 @@ class CartesianBot {
 	void move();
 	void home();
 	void abort();
+	
+	//our interrupt handler for driving steppers.
+	void handleInterrupt();
 	
 	//boring version stuff
     int version();
