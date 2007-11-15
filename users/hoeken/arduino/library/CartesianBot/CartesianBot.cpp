@@ -186,22 +186,22 @@ void CartesianBot::move()
 
 void CartesianBot::setupInterrupt()
 {
-	//output mode = compare output, non pwm clear OC0A on match
-	TCCR0A |= (1<<COM0A1); 
-	TCCR0A &= ~(1<<COM0A0); 
+	//output mode = compare output, non pwm clear OC2A on match
+	TCCR2A |= (1<<COM2A1); 
+	TCCR2A &= ~(1<<COM2A0); 
 
-	//waveform generation = mode 3 = CTC
-	TCCR0B &= ~(1<<WGM02);
-	TCCR0A |= (1<<WGM01); 
-	TCCR0A |= (1<<WGM00);
+	//waveform generation = mode 2 = CTC
+	TCCR2B &= ~(1<<WGM22);
+	TCCR2A |= (1<<WGM21); 
+	TCCR2A &= ~(1<<WGM20);
 	
 	//set our prescaler to 8. one tick == 0.5 microseconds.
-	TCCR0B &= ~(1<<CS02);
-	TCCR0B |= (1<<CS01);
-	TCCR0B &= ~(1<<CS00);
+	TCCR2B &= ~(1<<CS22);
+	TCCR2B |= (1<<CS21);
+	TCCR2B &= ~(1<<CS20);
 
-	//set the max counter here.  interrupt every 50 microseconds.
-	OCR0A = 99;
+	//set the max counter here.  interrupt every 50 microseconds. (0.5 micros * 100) = 50 micros
+	OCR2A = 99;
 }
 
 void CartesianBot::handleInterrupt()
