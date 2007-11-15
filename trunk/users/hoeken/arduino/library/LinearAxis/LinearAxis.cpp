@@ -65,7 +65,7 @@ void LinearAxis::ddaStep(long max_delta)
 
 bool LinearAxis::canStep()
 {
-	return can_step && dda_ready;
+	return can_step && dda_ready && stepper.canStep();
 }
 
 void LinearAxis::doStep()
@@ -80,7 +80,7 @@ void LinearAxis::doStep()
 		current--;
 	
 	//do our step!
-	stepper.pulse();
+	stepper.step();
 }
 
 long LinearAxis::getPosition()

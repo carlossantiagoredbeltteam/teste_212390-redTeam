@@ -30,8 +30,6 @@ struct Point {
  	unsigned long z;
 };
 
-extern volatile unsigned int stepper_tick_count;
-
 // library interface description
 class CartesianBot {
   public:
@@ -71,6 +69,7 @@ class CartesianBot {
 	void abort();
 	
 	//our interrupt handler for driving steppers.
+	void setupInterrupt();
 	void handleInterrupt();
 	
 	//boring version stuff
@@ -81,12 +80,12 @@ class CartesianBot {
 	LinearAxis y;
 	LinearAxis z;
 
-	long max_delta;
-	byte mode;
-
   private:
 
 	void notifyTargetReached();	
+
+	long max_delta;
+	byte mode;
 
 	//this is for tracking to a point.
 	byte head;

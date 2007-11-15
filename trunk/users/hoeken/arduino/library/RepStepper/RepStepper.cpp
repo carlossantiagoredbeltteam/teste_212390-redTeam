@@ -1,8 +1,6 @@
 
 #include "RepStepper.h"
 
-volatile unsigned int stepper_tick_count;
-
 /*
  * two-wire constructor.
  * Sets which wires should control the motor.
@@ -30,10 +28,10 @@ RepStepper::RepStepper(int number_of_steps, int step_pin, int direction_pin)
 */
 void RepStepper::setSpeed(int speed)
 {
-	this->step_delay = speed;
+	step_delay = speed;
 	
-	if (this->step_delay > 0);
-		this->rpm = 15000000UL / (this->step_delay * this->number_of_steps);
+	if (step_delay > 0);
+		rpm = 15000000UL / (step_delay * number_of_steps);
 }
 
 /*
@@ -41,37 +39,37 @@ void RepStepper::setSpeed(int speed)
 */
 int RepStepper::getSpeed()
 {
-	return this->step_delay;
+	return step_delay;
 }
 
 /*
   Sets the speed in revs per minute
 */
-void RepStepper::setRPM(int rpm)
+void RepStepper::setRPM(int new_rpm)
 {
-	if (rpm == 0)
+	if (new_rpm == 0)
 	{
-		this->step_delay = 0;
-		this->rpm = 0;
+		step_delay = 0;
+		rpm = 0;
 	}
 	else
 	{
-		this->rpm = rpm;
+		rpm = new_rpm;
 		
 		//our high precision time is measured in 4us ticks, so get the # of ticks in 1 minute / 
 		// number of steps per rev / number of revolutions per minute = ticks per step
-		this->step_delay = (15000000UL / this->number_of_steps) / this->rpm;
+		step_delay = (15000000UL / number_of_steps) / rpm;
 	}
 }
 
 int RepStepper::getRPM()
 {
-	return this->rpm;
+	return rpm;
 }
 
 void RepStepper::setSteps(int steps)
 {
-	this->number_of_steps = steps;
+	number_of_steps = steps;
 	
 	//recalculate our speed.
 	this->setRPM(this->getRPM());
@@ -79,7 +77,7 @@ void RepStepper::setSteps(int steps)
 
 int RepStepper::getSteps()
 {
-	return this->number_of_steps;
+	return number_of_steps;
 }
 
 void RepStepper::setDirection(bool direction)
@@ -90,29 +88,29 @@ void RepStepper::setDirection(bool direction)
 
 bool RepStepper::getDirection()
 {
-	return this->direction;
+	return direction;
 }
 
 bool RepStepper::canStep()
 {
 	//bail if we have no speed.
-	if (!this->step_delay)
+	if (!step_delay)
 		return false;
 	
 	//get our current time
-	this->now = this->hpticks();
+	now = this->hpticks();
 	
 	//if its like this, its normal.
-	if (this->last_step_time < this->next_step_time)
+	if (last_step_time < next_step_time)
 	{
-		if (this->now > this->next_step_time)
+		if (now > next_step_time)
 			return true;
 	}
 	//nope, we're probably dealing with overflow.
 	else
 	{
 		//is the time since our last step bigger than our delay?
-		if ((4294967295UL - this->last_step_time + this->now) > this->step_delay)
+		if ((4294967295UL - last_step_time + now) > step_delay)
 			return true;
 	}
 	
@@ -120,30 +118,23 @@ bool RepStepper::canStep()
 	return false;
 }
 
-bool RepStepper::nonBlockingStep()
+void RepStepper::step()
 {
-	if (this->canStep())
-	{
-		this->pulse();
+	this->pulse();
 
-		//calculate our next step.
-		this->last_step_time = this->hpticks();
-		this->next_step_time = this->last_step_time + this->step_delay;
-
-		return true;
-	}
-	
-	return false;
+	//calculate our next step.
+	last_step_time = this->hpticks();
+	next_step_time = last_step_time + step_delay;
 }
 
 void RepStepper::pulse()
 {
 	//this sends a pulse to our stepper controller.
-	digitalWrite(this->step_pin, HIGH);
-	digitalWrite(this->step_pin, LOW);
+	digitalWrite(step_pin, HIGH);
+	digitalWrite(step_pin, LOW);
 }
 
-void RepStepper::blockingStep(int steps)
+void RepStepper::moveTo(int steps)
 {
 	int i;
 	
@@ -163,7 +154,7 @@ void RepStepper::blockingStep(int steps)
 		this->pulse();
 		
 		//our ticks are 4 microseconds each, so multiply by 4
-		delayMicroseconds(this->step_delay * 4);
+		delayMicroseconds(step_delay * 4);
 	}
 }
 
