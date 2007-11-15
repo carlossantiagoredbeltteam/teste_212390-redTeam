@@ -1,6 +1,8 @@
 
 #include "RepStepper.h"
 
+volatile unsigned int stepper_tick_count;
+
 /*
  * two-wire constructor.
  * Sets which wires should control the motor.

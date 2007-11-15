@@ -180,7 +180,7 @@
 SNAP::SNAP(void)
 {
 	uartState = SNAP_idle;
-	processingLock = 0;
+	processingLock = false;
 	deviceCount = 0;
 }
 
@@ -307,7 +307,7 @@ void SNAP::receiveByte(byte c)
 					{
 						// Otherwise ACK and set the flag to allow processing to start
 						hdb2 |= B00000010;
-						processingLock = 1;
+						processingLock = true;
 						receivedSourceAddress = sourceAddress;
 					}
 				}
@@ -400,14 +400,14 @@ void SNAP::sendMessage(byte dest)
 	sendPacketLength = 0;
 }
 
-byte SNAP::packetReady()
+bool SNAP::packetReady()
 {
 	return processingLock;
 }
 
 void SNAP::releaseLock()
 {
-	processingLock = 0;
+	processingLock = false;
 }
 
 bool SNAP::hasDevice(byte c)

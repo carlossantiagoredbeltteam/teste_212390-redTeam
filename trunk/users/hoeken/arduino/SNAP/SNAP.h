@@ -39,35 +39,35 @@
 #include "HardwareSerial.h"
 
 //how many devices we have on this meta device
-#ifndef MAX_DEVICE_COUNT
+//#ifndef MAX_DEVICE_COUNT
 	#define MAX_DEVICE_COUNT 3
-#endif
+//#endif
 
 // Transmit buffer size.
-#ifndef RX_BUFFER_SIZE
+//#ifndef RX_BUFFER_SIZE
 	#define RX_BUFFER_SIZE 16
-#endif
+//#endif
 
 // Size of largest possible message.
-#ifndef TX_BUFFER_SIZE
+//#ifndef TX_BUFFER_SIZE
 	#define TX_BUFFER_SIZE 16
-#endif
+//#endif
 
 #define SNAP_SYNC B01010100
 
+
+ // The *Pass states below represent states where
+ // we should just be passing the data on to the next node.
+ // This is either because we bailed out, or because the
+ // packet wasn't destined for us.
 enum {
-  SNAP_idle = 0x30,
+  SNAP_idle,
   SNAP_haveSync,
   SNAP_haveHDB2,
   SNAP_haveHDB1,
   SNAP_haveDAB,
   SNAP_readingData,
   SNAP_dataComplete,
-
-  // The *Pass states below represent states where
-  // we should just be passing the data on to the next node.
-  // This is either because we bailed out, or because the
-  // packet wasn't destined for us.
   SNAP_haveHDB2Pass,
   SNAP_haveHDB1Pass,
   SNAP_haveDABPass,
@@ -87,7 +87,7 @@ class SNAP {
 		void sendMessage(byte dest);
 		void endMessage();
 		
-		byte packetReady();
+		bool packetReady();
 		byte getByte(byte index);
 		byte getPacketLength();
 		byte getDestination();
@@ -126,8 +126,8 @@ class SNAP {
 
 		// General flags:
 		// @bug these should be "sbit" rather than "byte" but sdcc is breaking a bit
-		byte processingLock;
-		byte ackRequested;
+		bool processingLock;
+		bool ackRequested;
 
 		// the address of our internal device sending message
 		byte deviceAddresses[MAX_DEVICE_COUNT];
