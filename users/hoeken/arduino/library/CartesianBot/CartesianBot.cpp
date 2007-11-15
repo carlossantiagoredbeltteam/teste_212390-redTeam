@@ -10,23 +10,6 @@ CartesianBot::CartesianBot(
 {
 	this->stop();
 	this->clearQueue();
-
-	//output mode = compare output, non pwm clear OC0A on match
-	TCCR0A |= (1<<COM0A1); 
-	TCCR0A &= ~(1<<COM0A0); 
-
-	//waveform generation = mode 3 = CTC
-	TCCR0B &= ~(1<<WGM02);
-	TCCR0A |= (1<<WGM01); 
-	TCCR0A |= (1<<WGM00);
-	
-	//set our prescaler to 8. one tick == 0.5 microseconds.
-	TCCR0B &= ~(1<<CS02);
-	TCCR0B |= (1<<CS01);
-	TCCR0B &= ~(1<<CS00);
-
-	//set the max counter here.  interrupt every 50 microseconds.
-	OCR0A = 99;
 }
 
 byte CartesianBot::getQueueSize()
@@ -188,7 +171,10 @@ void CartesianBot::move()
 		{
 			//are we at the point?
 			if (this->atTarget())
+			{
+//				this->notifyTargetReached();
 				this->getNextPoint();
+			}
 
 			//do our steps
 			x.ddaStep(max_delta);
@@ -198,10 +184,28 @@ void CartesianBot::move()
 	}
 }
 
+void CartesianBot::setupInterrupt()
+{
+	//output mode = compare output, non pwm clear OC0A on match
+	TCCR0A |= (1<<COM0A1); 
+	TCCR0A &= ~(1<<COM0A0); 
+
+	//waveform generation = mode 3 = CTC
+	TCCR0B &= ~(1<<WGM02);
+	TCCR0A |= (1<<WGM01); 
+	TCCR0A |= (1<<WGM00);
+	
+	//set our prescaler to 8. one tick == 0.5 microseconds.
+	TCCR0B &= ~(1<<CS02);
+	TCCR0B |= (1<<CS01);
+	TCCR0B &= ~(1<<CS00);
+
+	//set the max counter here.  interrupt every 50 microseconds.
+	OCR0A = 99;
+}
+
 void CartesianBot::handleInterrupt()
 {
-	stepper_tick_count++;
-	
 	//make sure we're in seek mode
 	if (mode == MODE_SEEK)
 	{
