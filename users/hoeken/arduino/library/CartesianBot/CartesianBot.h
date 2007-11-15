@@ -30,7 +30,7 @@ struct Point {
  	unsigned long z;
 };
 
-extern volatile unsigned int stepper_ticks;
+extern volatile unsigned int stepper_tick_count;
 
 // library interface description
 class CartesianBot {
