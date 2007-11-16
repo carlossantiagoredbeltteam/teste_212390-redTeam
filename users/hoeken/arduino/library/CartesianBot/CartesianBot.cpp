@@ -186,6 +186,9 @@ void CartesianBot::move()
 
 void CartesianBot::setupInterrupt()
 {
+	//enable our timer interrupt!
+	TIMSK2 |= (1<<OCIE2A);
+	
 	//output mode = compare output, non pwm clear OC2A on match
 	TCCR2A |= (1<<COM2A1); 
 	TCCR2A &= ~(1<<COM2A0); 
