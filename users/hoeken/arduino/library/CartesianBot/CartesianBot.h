@@ -79,13 +79,14 @@ class CartesianBot {
 	LinearAxis x;
 	LinearAxis y;
 	LinearAxis z;
+	
+	long max_delta;
+	byte mode;
 
   private:
 
 	void notifyTargetReached();	
 
-	long max_delta;
-	byte mode;
 
 	//this is for tracking to a point.
 	byte head;

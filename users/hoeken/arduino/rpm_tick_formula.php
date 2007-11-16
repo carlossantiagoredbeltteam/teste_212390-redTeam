@@ -7,7 +7,7 @@
 	$size_data = array();
 	
 //	foreach ($tick_sizes AS $tick_size)
-	for ($tick_size = 16; $tick_size<=64; $tick_size++)
+	for ($tick_size = 16; $tick_size<=100; $tick_size++)
 	{
 		for ($rpm=1; $rpm <= 500; $rpm++)
 		{
@@ -32,7 +32,7 @@
 		echo "$tick_size: " . array_sum($data) . "\n";
 	}
 
-	foreach ($size_data[50] AS $rpm => $key)
+	foreach ($size_data[75] AS $rpm => $key)
 	{
 		echo "rpm: $rpm\n";
 	}
