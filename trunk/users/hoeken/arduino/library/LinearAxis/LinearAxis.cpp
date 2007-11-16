@@ -24,14 +24,16 @@ LinearAxis::LinearAxis(int steps, int dir_pin, int step_pin, int min_pin, int ma
 void LinearAxis::readState()
 {
 	//encoder.readState();
-	//min_switch.readState();
-	//max_switch.readState();
+	
+	min_switch.readState();
+	max_switch.readState();
 	
 	can_step = (
-		(current != target) ||
-		(!this->atMin() && !this->atMax()) ||
-		(this->atMin() && stepper.getDirection() == RS_FORWARD) ||
-		(this->atMax() && stepper.getDirection() == RS_REVERSE)
+		(current != target) && (
+			(!this->atMin() && !this->atMax()) ||
+			(this->atMin() && stepper.getDirection() == RS_FORWARD) ||
+			(this->atMax() && stepper.getDirection() == RS_REVERSE)
+		)
 	);	
 }
 

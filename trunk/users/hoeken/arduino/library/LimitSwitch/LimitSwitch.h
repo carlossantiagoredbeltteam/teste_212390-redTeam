@@ -20,10 +20,12 @@ class LimitSwitch {
     LimitSwitch(int pin);
 
 	//our interface method
+	void readState();
 	bool getState();
 
   private:
 
+	bool state;		//the last state of the switch.
     int pin;		//the switch state pin.
 };
 

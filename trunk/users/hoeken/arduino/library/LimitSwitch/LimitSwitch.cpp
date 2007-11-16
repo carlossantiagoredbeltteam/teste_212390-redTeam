@@ -5,15 +5,21 @@
 LimitSwitch::LimitSwitch(int pin)
 {
 	this->pin = pin;
+	state = false;
 
 	if (pin >= 0)
 		pinMode(pin, INPUT);
 }
 
-bool LimitSwitch::getState()
+void LimitSwitch::readState()
 {
 	if (pin >= 0)
-		return digitalRead(pin);
-	
-	return false;
+		state = digitalRead(pin);
+	else
+		state = false;
+}
+
+bool LimitSwitch::getState()
+{
+	return state;
 }

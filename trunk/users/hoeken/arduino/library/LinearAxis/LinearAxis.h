@@ -47,12 +47,13 @@ class LinearAxis {
 	bool atMin();
 	bool atMax();
 
-  private:
 	bool can_step;				//are we capable of taking a step yet?
 	bool dda_ready;				//are we allowed to take a step yet?
+	long counter;				//this is our 'counter' for dda operations.	
+
+  private:
 	long current;				//this is our current position.
 	long target;				//this is our target position.
-	long counter;				//this is our 'counter' for dda operations.	
 	long delta;					//this is our change for DDA.
 
 	LimitSwitch min_switch;

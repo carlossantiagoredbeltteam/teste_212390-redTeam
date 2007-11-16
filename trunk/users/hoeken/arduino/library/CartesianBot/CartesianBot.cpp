@@ -126,6 +126,9 @@ void CartesianBot::home()
 {
 	//pause it to disable our interrupt handler.
 	mode = MODE_PAUSE;
+
+	//get an initial reading.
+	this->readState();
 	
 	//going towards 0
 	x.stepper.setDirection(RS_REVERSE);
@@ -135,12 +138,14 @@ void CartesianBot::home()
 	//move us home!
 	while (!this->atHome())
 	{
-		if (!x.atMin())
-			x.stepper.nonBlockingStep();
-		if (!y.atMin())
-			y.stepper.nonBlockingStep();
-		if (!z.atMin())
-			z.stepper.nonBlockingStep();
+		if (!x.atMin() && x.stepper.canStep())
+			x.stepper.step();
+		if (!y.atMin() && y.stepper.canStep())
+			y.stepper.step();
+		if (!z.atMin() && z.stepper.canStep())
+			z.stepper.step();
+
+		this->readState();
 	}
 	
 	//mark us as home.
@@ -173,14 +178,20 @@ void CartesianBot::move()
 			if (this->atTarget())
 			{
 //				this->notifyTargetReached();
-				this->getNextPoint();
+//				this->getNextPoint();
 			}
 
-			//do our steps
-			x.ddaStep(max_delta);
-			y.ddaStep(max_delta);
-			z.ddaStep(max_delta);
 		}
+
+		//do our steps
+		if (!x.atTarget())
+			x.ddaStep(max_delta);
+		
+		if (!y.atTarget())
+			y.ddaStep(max_delta);
+		
+		if (!z.atTarget())
+			z.ddaStep(max_delta);
 	}
 }
 
@@ -203,8 +214,8 @@ void CartesianBot::setupInterrupt()
 	TCCR2B |= (1<<CS21);
 	TCCR2B &= ~(1<<CS20);
 
-	//set the max counter here.  interrupt every 50 microseconds. (0.5 micros * 100) = 50 micros
-	OCR2A = 99;
+	//set the max counter here.  interrupt every 100 microseconds. (0.5 micros * 100) = 50 micros
+	OCR2A = 200;
 }
 
 void CartesianBot::handleInterrupt()
