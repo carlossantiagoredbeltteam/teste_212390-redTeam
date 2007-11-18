@@ -19,19 +19,12 @@ byte CartesianBot::getQueueSize()
 
 bool CartesianBot::isQueueEmpty()
 {
-	if (this->head == this->tail)
-		return true;
-	else
-		return false;
+	return (size == 0);
 }
 
 bool CartesianBot::isQueueFull()
 {
-	//is our queue full?
-	if (this->tail+1 == this->head || (this->tail+1 == POINT_QUEUE_SIZE && !this->head))
-		return true;
-	else
-		return false;
+	return (size == POINT_QUEUE_SIZE);
 }
 
 bool CartesianBot::queuePoint(Point &point)
@@ -39,37 +32,40 @@ bool CartesianBot::queuePoint(Point &point)
 	if (this->isQueueFull())
 		return false;
 		
-	//increment our tail pointer.
-	this->tail++;
-	if (this->tail == POINT_QUEUE_SIZE)
-		this->tail = 0;
+	//queue up our point (at the old tail spot)!
+	point_queue[tail] = point;
 	
 	//keep track
 	size++;
-		
-	//queue up our point!
-	this->point_queue[this->tail] = point;
 
+	//move our tail to the next tail location
+	tail++;
+	if (tail == POINT_QUEUE_SIZE)
+		tail = 0;
+	
 	return true;
 }
 
 struct Point CartesianBot::unqueuePoint()
 {
-	//move our head to the new item to return.
-	this->head++;
-	if (this->head == POINT_QUEUE_SIZE)
-		this->head = 0;
+	//save our old head.
+	byte oldHead = head;
 	
+	//move our head to the head for next time.
+	head++;
+	if (head == POINT_QUEUE_SIZE)
+		head = 0;
+
 	//keep track.
 	size--;
-	
-	return this->point_queue[this->head];
+			
+	return point_queue[oldHead];
 }
 
 void CartesianBot::clearQueue()
 {
-	this->head = 0;
-	this->tail = 0;
+	head = 0;
+	tail = 0;
 	size = 0;
 }
 
@@ -166,56 +162,28 @@ void CartesianBot::readState()
 	z.readState();
 }
 
-void CartesianBot::move()
-{
-	//are we in moving mode?
-	if (mode == MODE_SEEK)
-	{
-		//only do a DDA step if we're waiting to send a step signal.
-		if (!x.canStep() && !y.canStep() && !z.canStep())
-		{
-			//are we at the point?
-			if (this->atTarget())
-			{
-//				this->notifyTargetReached();
-//				this->getNextPoint();
-			}
-
-		}
-
-		//do our steps
-		if (!x.atTarget())
-			x.ddaStep(max_delta);
-		
-		if (!y.atTarget())
-			y.ddaStep(max_delta);
-		
-		if (!z.atTarget())
-			z.ddaStep(max_delta);
-	}
-}
-
 void CartesianBot::setupInterrupt()
 {
 	//enable our timer interrupt!
-	TIMSK2 |= (1<<OCIE2A);
+	TIMSK1 |= (1<<OCIE1A);
 	
 	//output mode = compare output, non pwm clear OC2A on match
-	TCCR2A |= (1<<COM2A1); 
-	TCCR2A &= ~(1<<COM2A0); 
+	TCCR1A |= (1<<COM1A1); 
+	TCCR1A &= ~(1<<COM1A0); 
 
-	//waveform generation = mode 2 = CTC
-	TCCR2B &= ~(1<<WGM22);
-	TCCR2A |= (1<<WGM21); 
-	TCCR2A &= ~(1<<WGM20);
+	//waveform generation = mode 4 = CTC
+	TCCR1B &= ~(1<<WGM13);
+	TCCR1B |= (1<<WGM12);
+	TCCR1A &= ~(1<<WGM11); 
+	TCCR1A &= ~(1<<WGM10);
 	
-	//set our prescaler to 8. one tick == 0.5 microseconds.
-	TCCR2B &= ~(1<<CS22);
-	TCCR2B |= (1<<CS21);
-	TCCR2B &= ~(1<<CS20);
+	//set our prescaler to 64. one tick == 4 microsecond.
+	TCCR1B &= ~(1<<CS12);
+	TCCR1B |= (1<<CS11);
+	TCCR1B |= (1<<CS10);
 
-	//set the max counter here.  interrupt every 100 microseconds. (0.5 micros * 100) = 50 micros
-	OCR2A = 200;
+	//set the max counter here.  interrupt every time the X stepper would be ready to step.
+	OCR1A = x.stepper.getSpeed();
 }
 
 void CartesianBot::handleInterrupt()
@@ -223,15 +191,17 @@ void CartesianBot::handleInterrupt()
 	//make sure we're in seek mode
 	if (mode == MODE_SEEK)
 	{
-		//check each axis and move it if necessary.
-		if (x.canStep())
-			x.doStep();
-
-		if (y.canStep())
-			y.doStep();
-
-		if (z.canStep())
-			z.doStep();
+		//do our DDA maths.
+		x.ddaStep(max_delta);
+		y.ddaStep(max_delta);
+		z.ddaStep(max_delta);
+		
+		//did we make it?	
+		if (this->atTarget())
+		{
+			this->notifyTargetReached();
+			this->getNextPoint();
+		}
 	}
 }
 

@@ -16,7 +16,6 @@ LinearAxis::LinearAxis(int steps, int dir_pin, int step_pin, int min_pin, int ma
 	current = 0;
 	target = 0;
 	delta = 0;
-	dda_ready = false;
 	can_step = false;
 	stepper.setDirection(RS_FORWARD);
 }
@@ -24,7 +23,7 @@ LinearAxis::LinearAxis(int steps, int dir_pin, int step_pin, int min_pin, int ma
 void LinearAxis::readState()
 {
 	//encoder.readState();
-	
+
 	min_switch.readState();
 	max_switch.readState();
 	
@@ -49,7 +48,7 @@ bool LinearAxis::atMax()
 
 void LinearAxis::initDDA(long max_delta)
 {
-	this->counter = -max_delta/2;
+	counter = -max_delta/2;
 }
 
 void LinearAxis::ddaStep(long max_delta)
@@ -58,23 +57,13 @@ void LinearAxis::ddaStep(long max_delta)
 
 	if (counter > 0)
 	{
-		dda_ready = true;
+		this->doStep();
 		counter -= max_delta;
 	}
-	else
-		dda_ready = false;
-}
-
-bool LinearAxis::canStep()
-{
-	return can_step && dda_ready && stepper.canStep();
 }
 
 void LinearAxis::doStep()
 {
-	//dont let any more steps happen
-	dda_ready = false;
-
 	//record our step
 	if (stepper.getDirection())
 		current++;
@@ -82,7 +71,7 @@ void LinearAxis::doStep()
 		current--;
 	
 	//do our step!
-	stepper.step();
+	stepper.pulse();
 }
 
 long LinearAxis::getPosition()
@@ -93,7 +82,6 @@ long LinearAxis::getPosition()
 void LinearAxis::setPosition(long position)
 {
 	current = position;
-	dda_ready = false;
 	
 	//recalculate stuff.
 	this->setTarget(target);
