@@ -64,7 +64,6 @@ class CartesianBot {
 
 	//our interface methods
 	void readState();
-	void move();
 	void home();
 	void abort();
 	
@@ -83,15 +82,16 @@ class CartesianBot {
 	long max_delta;
 	byte mode;
 
+	//this is for tracking to a point.
+	byte head;
+	byte tail;
+	byte size;
+
   private:
 
 	void notifyTargetReached();	
 
 
-	//this is for tracking to a point.
-	byte head;
-	byte tail;
-	byte size;
 	Point point_queue[POINT_QUEUE_SIZE];
 };
 

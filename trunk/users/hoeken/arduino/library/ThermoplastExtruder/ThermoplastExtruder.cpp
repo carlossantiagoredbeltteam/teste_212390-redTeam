@@ -26,60 +26,67 @@ void ThermoplastExtruder::readState()
 
 void ThermoplastExtruder::setSpeed(byte whatSpeed)
 {
-	this->speed = whatSpeed;
-	analogWrite(this->motor_speed_pin, this->speed);
+	speed = whatSpeed;
+	analogWrite(motor_speed_pin, speed);
 }
 
 void ThermoplastExtruder::setDirection(bool direction)
 {
 	this->direction = direction;
-	digitalWrite(this->motor_dir_pin, this->direction);
+	digitalWrite(motor_dir_pin, direction);
 }
 
 void ThermoplastExtruder::setTargetTemp(int target)
 {
-	this->target_temp = target;
+	target_temp = target;
 }
 
 byte ThermoplastExtruder::getSpeed()
 {
-	return this->speed;
+	return speed;
 }
 
 bool ThermoplastExtruder::getDirection()
 {
-	return this->direction;
+	return direction;
 }
 
 int ThermoplastExtruder::getTemp()
 {
-	return this->current_temp;
+	return current_temp;
 }
 
 int ThermoplastExtruder::readTemp()
 {
-	this->current_temp = analogRead(this->thermistor_pin);
+	current_temp = analogRead(thermistor_pin);
 
-	return this->current_temp;
+	return current_temp;
 }
 
 int ThermoplastExtruder::getTargetTemp()
 {
-	return this->target_temp;
+	return target_temp;
 }
 
 void ThermoplastExtruder::manageTemp()
 {
+	//turn off our motor if we're not at our target temp yet.
+	if (speed && current_temp > (target_temp + 10))
+		digitalWrite(motor_speed_pin, 0);
+	else if (speed)
+		digitalWrite(motor_speed_pin, speed);
+		
 	this->calculateHeaterPWM();
-	analogWrite(this->heater_pin, this->heater_pwm);
+	analogWrite(heater_pin, heater_pwm);
 }
 
 void ThermoplastExtruder::calculateHeaterPWM()
 {
-	if (this->current_temp < this->target_temp)
-		this->heater_pwm = 255;
+	//lower values == hotter temps.
+	if (current_temp > target_temp)
+		heater_pwm = 255;
 	else
-		this->heater_pwm = 0;
+		heater_pwm = 0;
 }
 
 int ThermoplastExtruder::version()
