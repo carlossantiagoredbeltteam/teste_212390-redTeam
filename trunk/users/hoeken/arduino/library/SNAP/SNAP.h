@@ -1,36 +1,3 @@
-/*
- *
- * RepRap, The Replicating Rapid Prototyper Project
- *
- * http://reprap.org/
- *
- * RepRap is copyright (C) 2005-7 University of Bath, the RepRap
- * researchers (see the project's People webpage), and other contributors.
- *
- * RepRap is free; you can redistribute it and/or modify it under the
- * terms of the GNU Library General Public Licence as published by the
- * Free Software Foundation; either version 2 of the Licence, or (at your
- * option) any later version.
- *
- * RepRap is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library General Public
- * Licence for more details.
- *
- * For this purpose the words "software" and "library" in the GNU Library
- * General Public Licence are taken to mean any and all computer programs
- * computer files data results documents and other copyright information
- * available from the RepRap project.
- *
- * You should have received a copy of the GNU Library General Public
- * Licence along with RepRap (in reports, it will be one of the
- * appendices, for example); if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA, or see
- *
- * http://www.gnu.org/
- *
- */
-
 #ifndef SNAP_h
 #define SNAP_h
 
@@ -39,35 +6,48 @@
 #include "HardwareSerial.h"
 
 //how many devices we have on this meta device
-//#ifndef MAX_DEVICE_COUNT
-	#define MAX_DEVICE_COUNT 3
-//#endif
+#define MAX_DEVICE_COUNT 5	// size of our array to store virtual addresses
+#define TX_BUFFER_SIZE 16	// Transmit buffer size.
+#define RX_BUFFER_SIZE 16	// Receive buffer size.
 
-// Transmit buffer size.
-//#ifndef RX_BUFFER_SIZE
-	#define RX_BUFFER_SIZE 16
-//#endif
-
-// Size of largest possible message.
-//#ifndef TX_BUFFER_SIZE
-	#define TX_BUFFER_SIZE 16
-//#endif
-
+//our sync packet value.
 #define SNAP_SYNC B01010100
 
+//The defines below are for error checking and such.
+//Bit0 is for serialError-flag for checking if an serial error has occured,
+//  if set, we will reset the communication
+//Bit1 is set if we are currently transmitting a message, that means bytes of 
+//  a message have been put in the transmitBuffer, but the message is not 
+//  finished.
+//Bit2 is set if we are currently building a send-message
+//Bit3 is set if we are busy with the last command and have to abort the message
+//Bit4 is set when we have a wrong uartState
+//Bit5 is set when we receive a wrong byte
+//Bit6 is set if we have to acknowledge a received message
+//Bit7 is set if we have received a message for local processing
+#define serialErrorBit		B00000001
+#define inTransmitMsgBit	B00000010
+#define inSendQueueMsgBit	B00000100
+#define msgAbortedBit		B00001000
+#define wrongStateErrorBit	B00010000
+#define wrongByteErrorBit	B00100000
+#define ackRequestedBit		B01000000
+#define processingLockBit	B10000000
 
- // The *Pass states below represent states where
- // we should just be passing the data on to the next node.
- // This is either because we bailed out, or because the
- // packet wasn't destined for us.
-enum {
-  SNAP_idle,
+//these are the states for processing a packet.
+enum SNAP_states {
+  SNAP_idle = 0x30,
   SNAP_haveSync,
   SNAP_haveHDB2,
   SNAP_haveHDB1,
   SNAP_haveDAB,
   SNAP_readingData,
   SNAP_dataComplete,
+
+  // The *Pass states below represent states where
+  // we should just be passing the data on to the next node.
+  // This is either because we bailed out, or because the
+  // packet wasn't destined for us.
   SNAP_haveHDB2Pass,
   SNAP_haveHDB1Pass,
   SNAP_haveDABPass,
@@ -96,11 +76,12 @@ class SNAP {
 		
 	private:
 		
+		void receiveError();
 		bool hasDevice(byte b);
 		void transmit(byte c);
 		byte computeCRC(byte c);
 		
-		byte uartState;		// Current SNAP state machine state
+		byte packetState;				// Current SNAP packet state
 		byte in_hdb1;					// Temporary buffers needed to
 		byte in_hdb2;					// pass packets on from various states
 		byte packetLength;				// Length of packet being received
@@ -108,6 +89,7 @@ class SNAP {
 		byte sourceAddress;				// Source of packet being received
 		byte receivedSourceAddress;		// Source of packet previously received
 		byte crc;						// Incrementally calculated CRC value
+		byte serialStatus;				//flags for checking status of the serial-communication
 
 		byte rxBufferIndex;				// Current receive buffer index
 		byte rxBuffer[RX_BUFFER_SIZE];	// Receive buffer
@@ -115,9 +97,9 @@ class SNAP {
 		// This buffer stores the last complete packet body (not the headers
 		// as they can be reconstructed).  This is to allow automatic re-sending
 		// if a NAK is received.
-		byte sendPacket[TX_BUFFER_SIZE];	// Last packet data, for auto resending on a NAK
-		byte sendPacketDestination;			// Last packet destination
-		byte sendPacketLength;				// Last packet length
+		byte txBuffer[TX_BUFFER_SIZE];	// Last packet data, for auto resending on a NAK
+		byte txDestination;				// Last packet destination
+		byte txLength;					// Last packet length
 		
 		// When sending a packet this is set to 0 and incremented for
 		// every NAK.  After too many have occurred, the packet is just
