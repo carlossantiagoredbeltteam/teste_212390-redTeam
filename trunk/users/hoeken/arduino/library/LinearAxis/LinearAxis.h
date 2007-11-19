@@ -35,6 +35,12 @@ class LinearAxis {
 	void ddaStep(long max_delta);
 	long getDelta();
 	
+	//our function for full on timer based stepping.
+	void initTimer();
+	void handleInterrupt();
+	void setTimerResolution(byte r);
+	void setTimerFrequency(byte f);
+	
 	//various position things.
 	long getPosition();
 	void setPosition(long position);
@@ -47,6 +53,7 @@ class LinearAxis {
 	bool atMin();
 	bool atMax();
 
+	byte id;					//what is our id? x, y, z, etc.
 	bool can_step;				//are we capable of taking a step yet?
 	bool dda_ready;				//are we allowed to take a step yet?
 	long counter;				//this is our 'counter' for dda operations.	
