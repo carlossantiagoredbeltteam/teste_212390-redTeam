@@ -20,6 +20,114 @@ LinearAxis::LinearAxis(int steps, int dir_pin, int step_pin, int min_pin, int ma
 	stepper.setDirection(RS_FORWARD);
 }
 
+void initTimer()
+{
+	//break it into 3 different resolutions
+	//then essentially calculate the PWM required.
+	
+	int speed = stepper.getSpeed();
+	byte pwm;
+	 
+	if (speed < 1000)
+	{
+		this->setTimerResolution(1);
+		pwm = ((speed / 1000) > 8);
+	}
+	else if (speed < 10000)
+	{
+		this->setTimerResolution(2);
+		pwm = ((speed / 10000) > 8);
+	}
+	else
+	{
+		this->setTimerResolution(3);
+		pwm = ((speed / 100000L) > 8);
+	}
+
+	this->setTimerFrequency(pwm);
+}
+
+void setTimerResolution(byte r)
+{
+	//this guy uses TIMER0
+	if (id == 'x')
+	{
+		// ~4 usec intervals
+		if (r == 1)
+		{
+			
+		}
+		// ~40 usec intervals
+		else if (r == 2)
+		{
+			
+		}
+		// ~400 usec intervals
+		else
+		{
+			
+		}
+	}
+	
+	//this guy uses TIMER2
+	if (id == 'y')
+	{
+		// ~4 usec intervals
+		if (r == 1)
+		{
+			
+		}
+		// ~40 usec intervals
+		else if (r == 2)
+		{
+			
+		}
+		// ~400 usec intervals
+		else
+		{
+			
+		}
+	}
+	
+	//this guy uses TIMER2
+	if (id == 'z')
+	{
+		// ~4 usec intervals
+		if (r == 1)
+		{
+			
+		}
+		// ~40 usec intervals
+		else if (r == 2)
+		{
+			
+		}
+		// ~400 usec intervals
+		else
+		{
+			
+		}
+	}
+}
+
+void setTimerFrequency(byte f)
+{
+	if (id == 'x')
+		OCR0A = f;
+	
+	if (id == 'y')
+		OCR1A = f;
+
+	if (id == 'z')
+		OCR2A = f
+}
+
+void handleInterrupt()
+{
+	if (can_step && !this->atTarget())
+		stepper.pulse();
+}
+
 void LinearAxis::readState()
 {
 	//encoder.readState();
