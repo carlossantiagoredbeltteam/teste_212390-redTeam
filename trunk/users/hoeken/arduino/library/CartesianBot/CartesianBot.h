@@ -36,9 +36,9 @@ class CartesianBot {
 
     // constructors:
     CartesianBot(
-		int x_steps, int x_dir_pin, int x_step_pin, int x_min_pin, int x_max_pin,
-		int y_steps, int y_dir_pin, int y_step_pin, int y_min_pin, int y_max_pin,
-		int z_steps, int z_dir_pin, int z_step_pin, int z_min_pin, int z_max_pin
+		byte x_id, int x_steps, int x_dir_pin, int x_step_pin, int x_min_pin, int x_max_pin,
+		byte y_id, int y_steps, int y_dir_pin, int y_step_pin, int y_min_pin, int y_max_pin,
+		byte z_id, int z_steps, int z_dir_pin, int z_step_pin, int z_min_pin, int z_max_pin
 	);
 	
 	// our queue stuff
@@ -67,10 +67,6 @@ class CartesianBot {
 	void home();
 	void abort();
 	
-	//our interrupt handler for driving steppers.
-	void setupInterrupt();
-	void handleInterrupt();
-	
 	//boring version stuff
     int version();
 
@@ -79,18 +75,15 @@ class CartesianBot {
 	LinearAxis y;
 	LinearAxis z;
 	
-	long max_delta;
+  private:
+
+	//this is the mode we're currently in... started/stopped
 	byte mode;
 
-	//this is for tracking to a point.
+	//this is for our queue of points.
 	byte head;
 	byte tail;
 	byte size;
-
-  private:
-
-	void notifyTargetReached();	
-
 
 	Point point_queue[POINT_QUEUE_SIZE];
 };
