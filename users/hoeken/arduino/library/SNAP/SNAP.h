@@ -56,7 +56,7 @@ enum SNAP_states {
 
 class SNAP {
 	public:
-		SNAP(void);
+		SNAP(byte b);
 		
 		void receiveByte(byte b);
 		void addDevice(byte b);
