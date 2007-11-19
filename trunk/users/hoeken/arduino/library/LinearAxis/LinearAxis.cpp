@@ -39,6 +39,11 @@ void LinearAxis::readState()
 	);	
 }
 
+bool LinearAxis::canStep()
+{
+	return can_step;
+}
+
 bool LinearAxis::atMin()
 {
 	return min_switch.getState();

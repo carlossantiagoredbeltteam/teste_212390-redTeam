@@ -3,7 +3,7 @@
 #include "SNAP.h"
 #include "WConstants.h"
 
-SNAP::SNAP(void)
+SNAP::SNAP(byte b)
 {
 	packetState = SNAP_idle;
 	processingLock = false;
