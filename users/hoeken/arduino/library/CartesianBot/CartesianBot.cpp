@@ -3,10 +3,10 @@
 #include "CartesianBot.h"
 
 CartesianBot::CartesianBot(
-	int x_steps, int x_dir_pin, int x_step_pin, int x_min_pin, int x_max_pin,
-	int y_steps, int y_dir_pin, int y_step_pin, int y_min_pin, int y_max_pin,
-	int z_steps, int z_dir_pin, int z_step_pin, int z_min_pin, int z_max_pin
-) : x(x_steps, x_dir_pin, x_step_pin, x_min_pin, x_max_pin), y(y_steps, y_dir_pin, y_step_pin, y_min_pin, y_max_pin), z(z_steps, z_dir_pin, z_step_pin, z_min_pin, z_max_pin)
+	byte x_id, int x_steps, int x_dir_pin, int x_step_pin, int x_min_pin, int x_max_pin,
+	byte y_id, int y_steps, int y_dir_pin, int y_step_pin, int y_min_pin, int y_max_pin,
+	byte z_id, int z_steps, int z_dir_pin, int z_step_pin, int z_min_pin, int z_max_pin
+) : x(x_id, x_steps, x_dir_pin, x_step_pin, x_min_pin, x_max_pin), y(y_id, y_steps, y_dir_pin, y_step_pin, y_min_pin, y_max_pin), z(z_id, z_steps, z_dir_pin, z_step_pin, z_min_pin, z_max_pin)
 {
 	this->stop();
 	this->clearQueue();
@@ -93,6 +93,8 @@ void CartesianBot::getNextPoint()
 
 void CartesianBot::calculateDDA()
 {
+	long max_delta;
+	
 	//what is the biggest one?
 	max_delta = max(x.getDelta(), y.getDelta());
 	max_delta = max(max_delta, z.getDelta());
@@ -106,11 +108,19 @@ void CartesianBot::calculateDDA()
 void CartesianBot::stop()
 {
 	mode = MODE_PAUSE;
+
+	x.disableTimerInterrupt();
+	y.disableTimerInterrupt();
+	z.disableTimerInterrupt();
 }
 
 void CartesianBot::start()
 {
 	mode = MODE_SEEK;
+
+	x.enableTimerInterrupt();
+	y.enableTimerInterrupt();
+	z.enableTimerInterrupt();
 }
 
 byte CartesianBot::getMode()
@@ -121,7 +131,7 @@ byte CartesianBot::getMode()
 void CartesianBot::home()
 {
 	//pause it to disable our interrupt handler.
-	mode = MODE_PAUSE;
+	this->stop();
 
 	//get an initial reading.
 	this->readState();
@@ -148,6 +158,17 @@ void CartesianBot::home()
 	x.setPosition(0);
 	y.setPosition(0);
 	z.setPosition(0);
+	
+	//set our new target
+	x.setTarget(0);
+	y.setTarget(0);
+	z.setTarget(0);
+	
+	//start it up (ie... enable interrupt handler)
+	this->start();
+	
+	//do our dda calcs.
+	this->calculateDDA();
 }
 
 bool CartesianBot::atHome()
@@ -162,64 +183,9 @@ void CartesianBot::readState()
 	z.readState();
 }
 
-void CartesianBot::setupInterrupt()
-{
-	//enable our timer interrupt!
-	TIMSK1 |= (1<<OCIE1A);
-	
-	//output mode = compare output, non pwm clear OC2A on match
-	TCCR1A |= (1<<COM1A1); 
-	TCCR1A &= ~(1<<COM1A0); 
-
-	//waveform generation = mode 4 = CTC
-	TCCR1B &= ~(1<<WGM13);
-	TCCR1B |= (1<<WGM12);
-	TCCR1A &= ~(1<<WGM11); 
-	TCCR1A &= ~(1<<WGM10);
-	
-	//set our prescaler to 64. one tick == 4 microsecond.
-	TCCR1B &= ~(1<<CS12);
-	TCCR1B |= (1<<CS11);
-	TCCR1B |= (1<<CS10);
-
-	//set the max counter here.  interrupt every time the X stepper would be ready to step.
-	OCR1A = x.stepper.getSpeed();
-}
-
-void CartesianBot::handleInterrupt()
-{
-	//make sure we're in seek mode
-	if (mode == MODE_SEEK)
-	{
-		//do our DDA maths.
-		x.ddaStep(max_delta);
-		y.ddaStep(max_delta);
-		z.ddaStep(max_delta);
-		
-		//did we make it?	
-		if (this->atTarget())
-		{
-			this->notifyTargetReached();
-			this->getNextPoint();
-		}
-	}
-}
-
 bool CartesianBot::atTarget()
 {
 	return (x.atTarget() && y.atTarget() && z.atTarget());
-}
-
-void CartesianBot::notifyTargetReached()
-{
-/*
-	packet.create(HOST_ADDRESS, MY_ADDRESS);
-	packet.add(CMD_GET_POS);
-	packet.add(current_position.x);
-	packet.add(current_position.y);
-	packet.add(current_position.z);
-	packet.send();
-*/
 }
 
 void CartesianBot::abort()

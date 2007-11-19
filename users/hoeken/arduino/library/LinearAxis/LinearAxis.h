@@ -19,7 +19,7 @@ class LinearAxis {
   public:
     
 	// constructors:
-    LinearAxis(int steps, int dir_pin, int step_pin, int min_pin, int max_pin);
+    LinearAxis(byte id, int steps, int dir_pin, int step_pin, int min_pin, int max_pin);
 
 	//these are our other object variables.
 	RepStepper stepper;
@@ -36,10 +36,11 @@ class LinearAxis {
 	long getDelta();
 	
 	//our function for full on timer based stepping.
-	void initTimer();
-	void handleInterrupt();
+	void setTimer(int speed);
 	void setTimerResolution(byte r);
 	void setTimerFrequency(byte f);
+	void enableTimerInterrupt();
+	void disableTimerInterrupt();
 	
 	//various position things.
 	long getPosition();
