@@ -96,9 +96,9 @@ void CartesianBot::calculateDDA()
 	long max_delta;
 
 	//stop them all to make the transition smooth.
-	x.enableTimerInterrupt();
-	y.enableTimerInterrupt();
-	z.enableTimerInterrupt();
+	x.disableTimerInterrupt();
+	y.disableTimerInterrupt();
+	z.disableTimerInterrupt();
 	
 	//what is the biggest one?
 	max_delta = max(x.getDelta(), y.getDelta());
