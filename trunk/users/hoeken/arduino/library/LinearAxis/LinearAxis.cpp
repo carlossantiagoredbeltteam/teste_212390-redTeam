@@ -15,34 +15,28 @@ LinearAxis::LinearAxis(byte id, int steps, int dir_pin, int step_pin, int min_pi
 	this->id = id;
 	current = 0;
 	target = 0;
-	can_step = false;
 
 	stepper.setDirection(RS_FORWARD);
-//	this->enableTimerInterrupt();
-	this->disableTimerInterrupt();
+	this->setupTimerInterrupt();
 }
 
 void LinearAxis::readState()
 {
 	//encoder.readState();
-
 	min_switch.readState();
 	max_switch.readState();
 	
-	// we can only step if we're not at our target and one of the following:
-	// 1. we're not at an endstop, 2. we're at home and moving away, or 3. we're at max and moving home.
-	can_step = (
-		(current != target) && (
-			(!this->atMin() && !this->atMax()) ||
-			(this->atMin() && stepper.getDirection() == RS_FORWARD) ||
-			(this->atMax() && stepper.getDirection() == RS_REVERSE)
-		)
-	);	
-}
+	//stop us if we're on target
+	if (current == target)
+		this->disableTimerInterrupt();
+	
+	//stop us if we're at home and still going 
+	if (this->atMin() && stepper.getDirection() == RS_REVERSE)
+		this->disableTimerInterrupt();
 
-bool LinearAxis::canStep()
-{
-	return can_step;
+	//stop us if we're at max and still going
+	if (this->atMax() && stepper.getDirection() == RS_FORWARD)
+		this->disableTimerInterrupt();
 }
 
 bool LinearAxis::atMin()
@@ -55,9 +49,9 @@ bool LinearAxis::atMax()
 	return max_switch.getState();
 }
 
-void LinearAxis::initDDA(long max_delta)
+int LinearAxis::calculateDDASpeed(long max_delta)
 {
-	new_speed = (long)(((float)max_delta / (float)this->getDelta()) * (float)(stepper.getSpeed() << 2));
+	int new_speed = (int)(((float)max_delta / (float)this->getDelta()) * (float)(stepper.getSpeed() << 2));
 
 /*	
 	Serial.print("dda for ");
@@ -74,6 +68,9 @@ void LinearAxis::initDDA(long max_delta)
 */	
 	//calculate our new speed.
 	this->setTimer(new_speed);
+	
+	//send it back
+	return new_speed;
 }
 
 void LinearAxis::doStep()
@@ -126,7 +123,7 @@ long LinearAxis::getDelta()
 	return abs(target - current);
 }
 
-void LinearAxis::enableTimerInterrupt()
+void LinearAxis::setupTimerInterrupt()
 {
 	//x uses TIMER0
 	if (id == 'x')
@@ -144,9 +141,6 @@ void LinearAxis::enableTimerInterrupt()
 		//output mode = 10 (clear OC0A on match)
 		TCCR0A |=  (1<<COM0A1); 
 		TCCR0A &= ~(1<<COM0A0);
-		
-		//enable our timer interrupt!
-		TIMSK0 |=  (1<<OCIE0A);
 	}
 	//y uses TIMER1
 	else if (id == 'y')
@@ -166,9 +160,6 @@ void LinearAxis::enableTimerInterrupt()
 		//output mode = 10 (clear OC1A on match)
 		TCCR1A |=  (1<<COM1A1); 
 		TCCR1A &= ~(1<<COM1A0);
-
-		//enable our timer interrupt!
-		TIMSK1 |=  (1<<OCIE1A);
 	}
 	//z uses TIMER2
 	else if (id == 'z')
@@ -186,14 +177,36 @@ void LinearAxis::enableTimerInterrupt()
 		//output mode = 10 (clear OC1A on match)
 		TCCR2A |=  (1<<COM2A1); 
 		TCCR2A &= ~(1<<COM2A0);
-		
-		//enable our timer interrupt!
-		TIMSK2 |=  (1<<OCIE2A);
 	}
 	
 	//start off with a slow frequency.
 	this->setTimerResolution(3);
 	this->setTimerFrequency(255);
+}
+
+void LinearAxis::enableTimerInterrupt()
+{
+	//reset our timer to 0 for reliable timing
+	//then enable our interrupt!
+	
+	//x uses TIMER0
+	if (id == 'x')
+	{
+		TCNT0 = 0;
+		TIMSK0 |= (1<<OCIE0A);
+	}
+	//y uses TIMER1
+	else if (id == 'y')
+	{
+		TCNT1 = 0;
+		TIMSK1 |= (1<<OCIE1A);
+	}
+	//z uses TIMER2
+	else if (id == 'z')
+	{
+		TCNT2 = 0;
+		TIMSK2 |= (1<<OCIE2A);
+	}
 }
 
 void LinearAxis::disableTimerInterrupt()
@@ -240,8 +253,6 @@ void LinearAxis::setTimer(int speed)
 		this->setTimerResolution(3);
 		pwm = 255;
 	}
-	
-	my_pwm = pwm;
 
 	//now update our clock!!
 	this->setTimerFrequency(pwm);
@@ -249,8 +260,6 @@ void LinearAxis::setTimer(int speed)
 
 void LinearAxis::setTimerResolution(byte r)
 {
-	resolution = r;
-	
 	//this guy uses TIMER0
 	if (id == 'x')
 	{
@@ -339,9 +348,6 @@ void LinearAxis::setTimerResolution(byte r)
 
 void LinearAxis::setTimerFrequency(byte f)
 {
-	Serial.print("frequency: ");
-	Serial.println(f, DEC);
-	
 	if (id == 'x')
 		OCR0A = f;
 	
