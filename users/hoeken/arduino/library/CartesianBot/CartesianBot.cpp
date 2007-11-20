@@ -94,15 +94,25 @@ void CartesianBot::getNextPoint()
 void CartesianBot::calculateDDA()
 {
 	long max_delta;
+
+	//stop them all to make the transition smooth.
+	x.enableTimerInterrupt();
+	y.enableTimerInterrupt();
+	z.enableTimerInterrupt();
 	
 	//what is the biggest one?
 	max_delta = max(x.getDelta(), y.getDelta());
 	max_delta = max(max_delta, z.getDelta());
 
-	//save it into each object.
-	x.initDDA(max_delta);
-	y.initDDA(max_delta);
-	z.initDDA(max_delta);
+	//calculate speeds for each axis.
+	x.calculateDDASpeed(max_delta);
+	y.calculateDDASpeed(max_delta);
+	z.calculateDDASpeed(max_delta);
+
+	//start them all at the same time
+	x.enableTimerInterrupt();
+	y.enableTimerInterrupt();
+	z.enableTimerInterrupt();
 }
 
 void CartesianBot::stop()
@@ -119,7 +129,7 @@ void CartesianBot::start()
 	mode = MODE_SEEK;
 
 	x.enableTimerInterrupt();
-//	y.enableTimerInterrupt();
+	y.enableTimerInterrupt();
 	z.enableTimerInterrupt();
 }
 
@@ -130,30 +140,31 @@ byte CartesianBot::getMode()
 
 void CartesianBot::home()
 {
-
 	//pause it to disable our interrupt handler.
 	this->stop();
 
 	//get an initial reading.
 	this->readState();
 	
-	//going towards 0
-	x.stepper.setDirection(RS_REVERSE);
-	y.stepper.setDirection(RS_REVERSE);
-	z.stepper.setDirection(RS_REVERSE);
+	//going towards home
+	x.setTarget(-9000000);
+	y.setTarget(-9000000);
+	z.setTarget(-9000000);
 
-	//move us home!
+	//use our max speed!
+	x.setTimer(x.stepper.getSpeed() << 2);
+	y.setTimer(y.stepper.getSpeed() << 2);
+	z.setTimer(z.stepper.getSpeed() << 2);
+
+	//okay, enable our movement!
+	this->start();
+	
+	//move us home! (interrupts will do stepping... we just read state.)
 	while (!this->atHome())
-	{
-		if (!x.atMin() && x.stepper.canStep())
-			x.stepper.step();
-		if (!y.atMin() && y.stepper.canStep())
-			y.stepper.step();
-		if (!z.atMin() && z.stepper.canStep())
-			z.stepper.step();
-
 		this->readState();
-	}
+	
+	//stop movement now.
+	this->stop();
 	
 	//mark us as home.
 	x.setPosition(0);
@@ -164,9 +175,6 @@ void CartesianBot::home()
 	x.setTarget(0);
 	y.setTarget(0);
 	z.setTarget(0);
-
-	//start it up (ie... enable interrupt handler)
-	this->start();
 
 	//do our dda calcs.
 	this->calculateDDA();

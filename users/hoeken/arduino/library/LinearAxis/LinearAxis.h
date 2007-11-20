@@ -28,18 +28,17 @@ class LinearAxis {
 
 	//various guys to interface with class
 	void readState();
-	bool canStep();
 	void doStep();
 
 	//our DDA based functions
-	void initDDA(long max_delta);
-	void ddaStep(long max_delta);
+	int calculateDDASpeed(long max_delta);
 	long getDelta();
 	
 	//our function for full on timer based stepping.
 	void setTimer(int speed);
 	void setTimerResolution(byte r);
 	void setTimerFrequency(byte f);
+	void setupTimerInterrupt();
 	void enableTimerInterrupt();
 	void disableTimerInterrupt();
 	
@@ -49,7 +48,6 @@ class LinearAxis {
 	long getTarget();
 	void setTarget(long t);
 	bool atTarget();
-	long getCounter();
 	
 	//our limit switch functions
 	bool atMin();
@@ -59,15 +57,9 @@ class LinearAxis {
 	bool can_step;				//are we capable of taking a step yet?
 	bool dda_ready;				//are we allowed to take a step yet?
 
-	//temp variables for debugging
-	long new_speed;
-	byte my_pwm;
-	byte resolution;
-
   private:
 	long current;				//this is our current position.
 	long target;				//this is our target position.
-	long delta;					//this is our change for DDA.
 
 	LimitSwitch min_switch;
 	LimitSwitch max_switch;
