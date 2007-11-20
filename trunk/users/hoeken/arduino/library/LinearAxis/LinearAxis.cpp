@@ -18,7 +18,8 @@ LinearAxis::LinearAxis(byte id, int steps, int dir_pin, int step_pin, int min_pi
 	can_step = false;
 
 	stepper.setDirection(RS_FORWARD);
-	this->enableTimerInterrupt();
+//	this->enableTimerInterrupt();
+	this->disableTimerInterrupt();
 }
 
 void LinearAxis::readState()
@@ -56,8 +57,23 @@ bool LinearAxis::atMax()
 
 void LinearAxis::initDDA(long max_delta)
 {
+	new_speed = (long)(((float)max_delta / (float)this->getDelta()) * (float)(stepper.getSpeed() << 2));
+
+/*	
+	Serial.print("dda for ");
+	Serial.print(id);
+	Serial.print(": ");
+	Serial.print(max_delta, DEC);
+	Serial.print(" / ");
+	Serial.print(this->getDelta(), DEC);
+	Serial.print(" * ");
+	Serial.print((stepper.getSpeed() << 2), DEC);
+	Serial.print(" = ");
+	Serial.print(new_speed);
+	Serial.println(" ");
+*/	
 	//calculate our new speed.
-	this->setTimer((this->getDelta() / max_delta) * stepper.getSpeed());
+	this->setTimer(new_speed);
 }
 
 void LinearAxis::doStep()
@@ -114,50 +130,70 @@ void LinearAxis::enableTimerInterrupt()
 {
 	//x uses TIMER0
 	if (id == 'x')
-	{
-		//enable our timer interrupt!
-		TIMSK0 |=  (1<<OCIE0A);
-
-		//output mode = 10 (clear OC0A on match)
-		TCCR0A |=  (1<<COM0A1); 
-		TCCR0A &= ~(1<<COM0A0); 
-
+	{	
+		//clear the registers
+		TCCR0A = 0;
+		TCCR0B = 0;
+		TIMSK0 = 0;
+	
 		//waveform generation = 010 = CTC
 		TCCR0B &= ~(1<<WGM02);
 		TCCR0A |=  (1<<WGM01); 
 		TCCR0A &= ~(1<<WGM00);
+
+		//output mode = 10 (clear OC0A on match)
+		TCCR0A |=  (1<<COM0A1); 
+		TCCR0A &= ~(1<<COM0A0);
+		
+		//enable our timer interrupt!
+		TIMSK0 |=  (1<<OCIE0A);
 	}
 	//y uses TIMER1
 	else if (id == 'y')
 	{
-		//enable our timer interrupt!
-		TIMSK1 |=  (1<<OCIE1A);
-
-		//output mode = 10 (clear OC1A on match)
-		TCCR1A |=  (1<<COM1A1); 
-		TCCR1A &= ~(1<<COM1A0); 
-
+		//clear the registers
+		TCCR1A = 0;
+		TCCR1B = 0;
+		TCCR1C = 0;
+		TIMSK1 = 0;
+		
 		//waveform generation = 0100 = CTC
 		TCCR1B &= ~(1<<WGM13);
 		TCCR1B |=  (1<<WGM12);
 		TCCR1A &= ~(1<<WGM11); 
 		TCCR1A &= ~(1<<WGM10);
+
+		//output mode = 10 (clear OC1A on match)
+		TCCR1A |=  (1<<COM1A1); 
+		TCCR1A &= ~(1<<COM1A0);
+
+		//enable our timer interrupt!
+		TIMSK1 |=  (1<<OCIE1A);
 	}
 	//z uses TIMER2
 	else if (id == 'z')
 	{
-		//enable our timer interrupt!
-		TIMSK2 |=  (1<<OCIE2A);
-
-		//output mode = 10 (clear OC1A on match)
-		TCCR2A |=  (1<<COM2A1); 
-		TCCR2A &= ~(1<<COM2A0);
+		//clear the registers
+		TCCR2A = 0;
+		TCCR2B = 0;
+		TIMSK2 = 0;
 		
 		//waveform generation = 010 = CTC
 		TCCR2B &= ~(1<<WGM22);
 		TCCR2A |=  (1<<WGM21); 
 		TCCR2A &= ~(1<<WGM20);
+
+		//output mode = 10 (clear OC1A on match)
+		TCCR2A |=  (1<<COM2A1); 
+		TCCR2A &= ~(1<<COM2A0);
+		
+		//enable our timer interrupt!
+		TIMSK2 |=  (1<<OCIE2A);
 	}
+	
+	//start off with a slow frequency.
+	this->setTimerResolution(3);
+	this->setTimerFrequency(255);
 }
 
 void LinearAxis::disableTimerInterrupt()
@@ -204,6 +240,8 @@ void LinearAxis::setTimer(int speed)
 		this->setTimerResolution(3);
 		pwm = 255;
 	}
+	
+	my_pwm = pwm;
 
 	//now update our clock!!
 	this->setTimerFrequency(pwm);
@@ -211,6 +249,8 @@ void LinearAxis::setTimer(int speed)
 
 void LinearAxis::setTimerResolution(byte r)
 {
+	resolution = r;
+	
 	//this guy uses TIMER0
 	if (id == 'x')
 	{
@@ -239,9 +279,8 @@ void LinearAxis::setTimerResolution(byte r)
 			TCCR0B |=  (1<<CS00);
 		}
 	}
-	
 	//this guy uses TIMER1
-	if (id == 'y')
+	else if (id == 'y')
 	{
 		// prescale of /64 == 4 usec tick
 		if (r == 1)
@@ -268,9 +307,8 @@ void LinearAxis::setTimerResolution(byte r)
 			TCCR1B |=  (1<<CS10);
 		}
 	}
-	
 	//this guy uses TIMER2
-	if (id == 'z')
+	else if (id == 'z')
 	{
 		// prescale of /64 == 4 usec tick
 		if (r == 1)
@@ -301,6 +339,9 @@ void LinearAxis::setTimerResolution(byte r)
 
 void LinearAxis::setTimerFrequency(byte f)
 {
+	Serial.print("frequency: ");
+	Serial.println(f, DEC);
+	
 	if (id == 'x')
 		OCR0A = f;
 	

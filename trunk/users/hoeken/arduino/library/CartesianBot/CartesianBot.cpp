@@ -119,7 +119,7 @@ void CartesianBot::start()
 	mode = MODE_SEEK;
 
 	x.enableTimerInterrupt();
-	y.enableTimerInterrupt();
+//	y.enableTimerInterrupt();
 	z.enableTimerInterrupt();
 }
 
@@ -130,6 +130,7 @@ byte CartesianBot::getMode()
 
 void CartesianBot::home()
 {
+
 	//pause it to disable our interrupt handler.
 	this->stop();
 
@@ -140,7 +141,7 @@ void CartesianBot::home()
 	x.stepper.setDirection(RS_REVERSE);
 	y.stepper.setDirection(RS_REVERSE);
 	z.stepper.setDirection(RS_REVERSE);
-	
+
 	//move us home!
 	while (!this->atHome())
 	{
@@ -163,10 +164,10 @@ void CartesianBot::home()
 	x.setTarget(0);
 	y.setTarget(0);
 	z.setTarget(0);
-	
+
 	//start it up (ie... enable interrupt handler)
 	this->start();
-	
+
 	//do our dda calcs.
 	this->calculateDDA();
 }

@@ -13,6 +13,7 @@
 #ifndef CartesianBot_h
 #define CartesianBot_h
 
+//#include "HardwareSerial.h"
 #include "LinearAxis.h"
 #include "RepStepper.h"
 #include "WConstants.h"
