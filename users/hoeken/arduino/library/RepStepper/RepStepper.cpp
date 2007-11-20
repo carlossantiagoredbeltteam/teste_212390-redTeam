@@ -30,8 +30,10 @@ void RepStepper::setSpeed(int speed)
 {
 	step_delay = speed;
 	
-	if (step_delay > 0);
+	if (step_delay > 0)
 		rpm = 15000000UL / (step_delay * number_of_steps);
+	else
+		rpm = 0;
 }
 
 /*

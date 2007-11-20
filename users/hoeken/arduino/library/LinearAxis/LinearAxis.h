@@ -11,6 +11,7 @@
 #ifndef LinearAxis_h
 #define LinearAxis_h
 
+#include "HardwareSerial.h"
 #include <LimitSwitch.h>
 #include <RepStepper.h>
 
@@ -57,7 +58,11 @@ class LinearAxis {
 	byte id;					//what is our id? x, y, z, etc.
 	bool can_step;				//are we capable of taking a step yet?
 	bool dda_ready;				//are we allowed to take a step yet?
-	long counter;				//this is our 'counter' for dda operations.	
+
+	//temp variables for debugging
+	long new_speed;
+	byte my_pwm;
+	byte resolution;
 
   private:
 	long current;				//this is our current position.
