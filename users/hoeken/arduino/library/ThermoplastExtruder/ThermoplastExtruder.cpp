@@ -1,95 +1,159 @@
-
 #include "WConstants.h"
 #include "ThermoplastExtruder.h"
 
-ThermoplastExtruder::ThermoplastExtruder(int motor_dir_pin, int motor_speed_pin, int heater_pin, int thermistor_pin)
-{
-	this->motor_dir_pin = motor_dir_pin;
-    this->motor_speed_pin = motor_speed_pin;
-	this->heater_pin = heater_pin;
-    this->thermistor_pin = thermistor_pin;
+#define NUMTEMPS  22
+short temptable[NUMTEMPS][2] = {
+// { adc ,  temp }
+   { 1 ,  608 } ,
+   { 60 ,  176 } ,
+   { 70 ,  166 } ,
+   { 80 ,  157 } ,
+   { 90 ,  150 } ,
+   { 100 ,  143 } ,
+   { 110 ,  137 } ,
+   { 120 ,  131 } ,
+   { 130 ,  125 } ,
+   { 140 ,  120 } ,
+   { 150 ,  115 } ,
+   { 160 ,  110 } ,
+   { 170 ,  105 } ,
+   { 180 ,  100 } ,
+   { 190 ,  95 } ,
+   { 200 ,  91 } ,
+   { 210 ,  86 } ,
+   { 220 ,  81 } ,
+   { 230 ,  75 } ,
+   { 240 ,  70 } ,
+   { 250 ,  64 } ,
+   { 300 ,  4 }
+};
 
-	pinMode(this->motor_dir_pin, OUTPUT);
-	pinMode(this->motor_speed_pin, OUTPUT);
-	pinMode(this->heater_pin, OUTPUT);
+/*!
+  motor_pwm_pin and heater_pin must be PWM capable outputs.
+  thermistor_pin must be an analog input.
+  motor_dir_pin must be a digital output.
+*/
+ThermoplastExtruder::ThermoplastExtruder(byte motor_dir_pin, byte motor_pwm_pin, 
+                                         byte heater_pin, byte thermistor_pin)
+{
+  this->motor_dir_pin = motor_dir_pin;
+  this->motor_pwm_pin = motor_pwm_pin;
+  this->heater_pin = heater_pin;
+  this->thermistor_pin = thermistor_pin;
+
+  pinMode(this->motor_dir_pin, OUTPUT);
+  pinMode(this->motor_pwm_pin, OUTPUT);
+  pinMode(this->heater_pin, OUTPUT);
 	
-	this->readTemp();
-	this->setDirection(1);
-	this->setSpeed(0);
-	this->setTargetTemp(0);
+  this->readTemp();
+  this->setSpeed(0);
+  this->setTargetTemp(0);
 }
 
-void ThermoplastExtruder::readState()
+/*!
+  Sets the motor speed from 0-255 (0 is off).
+*/
+void ThermoplastExtruder::setSpeed(byte speed)
 {
-	this->readTemp();
+  this->motor_pwm = speed;
+  analogWrite(this->motor_pwm_pin, this->motor_pwm);
 }
 
-void ThermoplastExtruder::setSpeed(byte whatSpeed)
+/*!
+  Sets the motor direction (true = forward, false = backward)
+*/
+void ThermoplastExtruder::setDirection(bool dir)
 {
-	speed = whatSpeed;
-	analogWrite(motor_speed_pin, speed);
-}
-
-void ThermoplastExtruder::setDirection(bool direction)
-{
-	this->direction = direction;
-	digitalWrite(motor_dir_pin, direction);
+  this->motor_dir = dir;
+  digitalWrite(this->motor_dir_pin, this->motor_dir);
 }
 
 void ThermoplastExtruder::setTargetTemp(int target)
 {
-	target_temp = target;
+  this->target_celcius = target;
 }
 
 byte ThermoplastExtruder::getSpeed()
 {
-	return speed;
+  return this->motor_pwm;
 }
 
 bool ThermoplastExtruder::getDirection()
 {
-	return direction;
+  return this->motor_dir;
 }
 
 int ThermoplastExtruder::getTemp()
 {
-	return current_temp;
-}
-
-int ThermoplastExtruder::readTemp()
-{
-	current_temp = analogRead(thermistor_pin);
-
-	return current_temp;
+  return this->current_celcius;
 }
 
 int ThermoplastExtruder::getTargetTemp()
 {
-	return target_temp;
+  return this->target_celcius;
 }
 
+/*!
+  Samples the temperature and converts it to degrees Celcius.
+  Returns degrees Celcius.
+*/
+int ThermoplastExtruder::readTemp()
+{
+  int rawtemp = analogRead(this->thermistor_pin);
+  this->rawtmp = rawtemp;
+  byte i;
+  for (i=1;i<NUMTEMPS;i++) {
+    if (temptable[i][0] > rawtemp) {
+      this->current_celcius = temptable[i-1][1] +
+        (rawtemp - temptable[i-1][0]) * (temptable[i][1] - temptable[i-1][1]) /
+        (temptable[i][0] - temptable[i-1][0]);
+      break;
+    }
+  }
+  if (i == NUMTEMPS) {
+    // Overflow: We just clamp to 0 degrees celcius
+    this->current_celcius = 0;
+  }
+  return this->current_celcius;
+}
+
+/*!
+  Manages motor and heater based on measured temperature:
+  o If temp is too low, don't start the motor
+  o Adjust the heater power to keep the temperature at the target
+ */
 void ThermoplastExtruder::manageTemp()
 {
-	//turn off our motor if we're not at our target temp yet.
-	if (speed && current_temp > (target_temp + 10))
-		digitalWrite(motor_speed_pin, 0);
-	else if (speed)
-		digitalWrite(motor_speed_pin, speed);
-		
-	this->calculateHeaterPWM();
-	analogWrite(heater_pin, heater_pwm);
+  // Stop the motor if temp is too low
+  if (this->current_celcius < this->target_celcius) {
+    analogWrite(this->motor_pwm_pin, 0);
+  }
+  // Start the motor again if temp is high enough
+  else {
+    analogWrite(this->motor_pwm_pin, this->motor_pwm);
+  }
+  
+  // Adjust the heater power
+  this->calculateHeaterPWM();
+  analogWrite(this->heater_pin, this->heater_pwm);
 }
 
+/*!
+ */
 void ThermoplastExtruder::calculateHeaterPWM()
 {
-	//lower values == hotter temps.
-	if (current_temp > target_temp)
-		heater_pwm = 255;
-	else
-		heater_pwm = 0;
+  // FIXME: This is as simple on/off scheme - make it adjust gradually?
+  //lower values == hotter temps.
+  if (this->current_celcius > this->target_celcius)
+    this->heater_pwm = 255;
+  else
+    this->heater_pwm = 0;
 }
 
-int ThermoplastExtruder::version()
+/*!
+  Raw temperature reading - just for debugging.
+ */
+int ThermoplastExtruder::getRaw()
 {
-	return 1;
+  return this->rawtmp;
 }

@@ -4,55 +4,54 @@
   This library is used to read, control, and handle a thermoplastic extruder.
 
   History:
-  * Created intiial library (0.1) by Zach Smith.
+  * Created intial library (0.1) by Zach Smith.
+  * Initial rework (0.2) by Marius Kintel <kintel@sim.no>
 
-*/
+  */
 
-// ensure this library description is only included once
-#ifndef ThermoplastExtruder_h
-#define ThermoplastExtruder_h
+#ifndef THERMOPLASTEXTRUDER_H
+#define THERMOPLASTEXTRUDER_H
 
-// library interface description
-class ThermoplastExtruder {
-  public:
-    // constructors:
-    ThermoplastExtruder(int motor_dir_pin, int motor_speed_pin, int heater_pin, int thermistor_pin);
+class ThermoplastExtruder
+{
+ public:
+  ThermoplastExtruder(byte motor_dir_pin, byte motor_pwm_pin, 
+                      byte heater_pin, byte thermistor_pin);
 
-    // various setters methods:
-    void setSpeed(byte whatSpeed);
-	void setDirection(bool direction);
-	void setTargetTemp(int target);
+  // various setters methods:
+  void setSpeed(byte speed);
+  void setDirection(bool dir);
+  void setTargetTemp(int target);
 
-	//get various info things.
-	byte getSpeed();
-	bool getDirection();
-	int getTemp();
-	int getTargetTemp();
-	
-	//manage the extruder
-	void readState();
-	int readTemp();
-	void manageTemp();
+  //get various info things.
+  byte getSpeed();
+  bool getDirection();
+  int getTemp();
+  int getTargetTemp();
 
-	//random other functions
-    int version();
+  //manage the extruder
+  int readTemp();
+  void manageTemp();
 
-  private:
+  int getRaw();
+ private:
 
-	void calculateHeaterPWM();
+  void calculateHeaterPWM();
 
-    //pin numbers:
-    int motor_dir_pin;			//the step signal pin.
-    int motor_speed_pin;		//the direction pin.
-    int heater_pin;				//the direction pin.
-    int thermistor_pin;			//the direction pin.
+  //pin numbers:
+  byte motor_pwm_pin;     // motor PWM pin
+  byte motor_dir_pin;     // motor direction pin
+  byte heater_pin;        // heater PWM pin
+  byte thermistor_pin;    // thermistor analog input pin
 
-	//extruder variables
-    bool direction;				// Direction of rotation, 1=forward, 0=reverse
-    byte speed;					// Speed in PWM, 0-255
-	byte heater_pwm;			// Heater PWM, 0-255
-	int target_temp;			// Our target temperature, 0-1024
-	int current_temp;			// Our current temperature, 0-1024
+  //extruder variables
+  bool motor_dir;        // Motor direction (true = forward, false = backward)
+  byte motor_pwm;        // Speed in PWM, 0-255
+  byte heater_pwm;       // Heater PWM, 0-255
+  int target_celcius;    // Our target temperature
+  int current_celcius;   // Our current temperature
+
+  int rawtmp;
 };
 
 #endif
