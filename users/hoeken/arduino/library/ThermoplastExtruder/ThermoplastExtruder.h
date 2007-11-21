@@ -21,22 +21,22 @@ class ThermoplastExtruder
   // various setters methods:
   void setSpeed(byte speed);
   void setDirection(bool dir);
-  void setTargetTemp(int target);
+  void setTargetTemp(byte targettemp);
+  void setHeater(byte heat);
 
   //get various info things.
   byte getSpeed();
   bool getDirection();
-  int getTemp();
-  int getTargetTemp();
+  byte getTargetTemp();
+  byte getTemp();
+  byte getHeater();
 
   //manage the extruder
-  int readTemp();
+  byte readTemp();
   void manageTemp();
 
   int getRaw();
  private:
-
-  void calculateHeaterPWM();
 
   //pin numbers:
   byte motor_pwm_pin;     // motor PWM pin
@@ -48,8 +48,8 @@ class ThermoplastExtruder
   bool motor_dir;        // Motor direction (true = forward, false = backward)
   byte motor_pwm;        // Speed in PWM, 0-255
   byte heater_pwm;       // Heater PWM, 0-255
-  int target_celcius;    // Our target temperature
-  int current_celcius;   // Our current temperature
+  byte target_celcius;    // Our target temperature
+  byte current_celcius;   // Our current temperature
 
   int rawtmp;
 };
