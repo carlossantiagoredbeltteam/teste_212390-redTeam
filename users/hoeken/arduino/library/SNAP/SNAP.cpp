@@ -287,6 +287,13 @@ void SNAP::sendDataByte(byte c)
   this->txLength++;
 }
 
+void SNAP::sendDataInt(int i)
+{
+  this->sendDataByte(i>>8);
+  this->sendDataByte(i&0xFF);
+}
+
+
 /*!
   Create headers and synchronously transmit the message.
 */
@@ -381,4 +388,9 @@ byte SNAP::getPacketLength()
 byte SNAP::getByte(byte index)
 {
   return this->rxBuffer[index];
+}
+
+int SNAP::getInt(byte index)
+{
+  return ((int)this->rxBuffer[index]) << 8 + this->rxBuffer[index+1];
 }
