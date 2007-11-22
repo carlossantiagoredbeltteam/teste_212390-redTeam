@@ -1,0 +1,180 @@
+Index: host/src/org/reprap/devices/GenericExtruder.java
+===================================================================
+--- host/src/org/reprap/devices/GenericExtruder.java	(revision 1108)
++++ host/src/org/reprap/devices/GenericExtruder.java	(working copy)
+@@ -428,47 +428,58 @@
+ 			Debug.d(material + " extruder temperature set to " + requestedTemperature +
+ 				"C, which is not the standard temperature (" + extrusionTemp + "C).");
+ 		}
+-		// Aim for 10% above our target to ensure we reach it.  It doesn't matter
+-		// if we go over because the power will be adjusted when we get there.  At
+-		// the same time, if we aim too high, we'll overshoot a bit before we
+-		// can react.
+-		double temperature0 = temperature * 1.1;
++//		// Aim for 10% above our target to ensure we reach it.  It doesn't matter
++//		// if we go over because the power will be adjusted when we get there.  At
++//		// the same time, if we aim too high, we'll overshoot a bit before we
++//		// can react.
++//		double temperature0 = temperature * 1.1;
++//		
++//		// A safety cutoff will be set at 20% above requested setting
++//		double temperatureSafety = temperature * 1.2;
++//		
++//		// Calculate power output from hm, hb.  In general, the temperature
++//		// we achieve is power * hm + hb.  So to achieve a given temperature
++//		// we need a power of (temperature - hb) / hm
++//		
++//		// If we reach our temperature, rather than switching completely off
++//		// go to a reduced power level.
++//		int power0 = (int)Math.round(((0.9 * temperature0) - hb) / hm);
++//		if (power0 < 0) power0 = 0;
++//		if (power0 > 255) power0 = 255;
++//
++//		// Otherwise, this is the normal power level we will maintain
++//		int power1 = (int)Math.round((temperature0 - hb) / hm);
++//		if (power1 < 0) power1 = 0;
++//		if (power1 > 255) power1 = 255;
++//
++//		// Now convert temperatures to equivalent raw PIC temperature resistance value
++//		// Here we use the original specified temperature, not the slight overshoot
++//		double resistance0 = calculateResistanceForTemperature(temperature);
++//		double resistanceSafety = calculateResistanceForTemperature(temperatureSafety);
++//
++//		// Determine equivalent raw value
++//		int t0 = calculatePicTempForResistance(resistance0);
++//		if (t0 < 0) t0 = 0;
++//		if (t0 > 255) t0 = 255;
++//		int t1 = calculatePicTempForResistance(resistanceSafety);
++//		if (t1 < 0) t1 = 0;
++//		if (t1 > 255) t1 = 255;
++//		
++//		if (temperature == 0)
++//			setHeater(0, 0, lock);
++//		else {
++//			setHeater(power0, power1, t0, t1, lock);
++//		}
+ 		
+-		// A safety cutoff will be set at 20% above requested setting
+-		double temperatureSafety = temperature * 1.2;
+-		
+-		// Calculate power output from hm, hb.  In general, the temperature
+-		// we achieve is power * hm + hb.  So to achieve a given temperature
+-		// we need a power of (temperature - hb) / hm
+-		
+-		// If we reach our temperature, rather than switching completely off
+-		// go to a reduced power level.
+-		int power0 = (int)Math.round(((0.9 * temperature0) - hb) / hm);
+-		if (power0 < 0) power0 = 0;
+-		if (power0 > 255) power0 = 255;
+-
+-		// Otherwise, this is the normal power level we will maintain
+-		int power1 = (int)Math.round((temperature0 - hb) / hm);
+-		if (power1 < 0) power1 = 0;
+-		if (power1 > 255) power1 = 255;
+-
+-		// Now convert temperatures to equivalent raw PIC temperature resistance value
+-		// Here we use the original specified temperature, not the slight overshoot
+-		double resistance0 = calculateResistanceForTemperature(temperature);
+-		double resistanceSafety = calculateResistanceForTemperature(temperatureSafety);
+-
+-		// Determine equivalent raw value
+-		int t0 = calculatePicTempForResistance(resistance0);
++		int t0 = (int)temperature;
+ 		if (t0 < 0) t0 = 0;
+ 		if (t0 > 255) t0 = 255;
+-		int t1 = calculatePicTempForResistance(resistanceSafety);
+-		if (t1 < 0) t1 = 0;
+-		if (t1 > 255) t1 = 255;
++
+ 		
+ 		if (temperature == 0)
+ 			setHeater(0, 0, lock);
+ 		else {
+-			setHeater(power0, power1, t0, t1, lock);
++			setHeater(255, t0, lock);
+ 		}
+ 	}
+ 	
+@@ -759,25 +770,31 @@
+ 		lock();
+ 		try {
+ 			int rawHeat = 0;
+-			int calibration = 0;
+-			for(;;) { // Don't repeatedly re-range?
+-				OutgoingMessage request = new OutgoingBlankMessage(MSG_GetTemp);
+-				RequestTemperatureResponse reply = new RequestTemperatureResponse(this, request, 500);
+-				
+-				rawHeat = reply.getHeat();
+-				//System.out.println(material + " extruder raw temp " + rawHeat);
+-
+-				calibration = reply.getCalibration();
+-				
+-				if(rerangeTemperature(rawHeat))
+-					break; // All ok
+-				else
+-					Thread.sleep(500); // Wait for PIC temp routine to settle before going again
+-			}
+ 			
+-			double resistance = calculateResistance(rawHeat, calibration);
+ 			
+-			currentTemperature = calculateTemperature(resistance);
++//			int calibration = 0;
++//			for(;;) { // Don't repeatedly re-range?
++//				OutgoingMessage request = new OutgoingBlankMessage(MSG_GetTemp);
++//				RequestTemperatureResponse reply = new RequestTemperatureResponse(this, request, 500);
++//				
++//				rawHeat = reply.getHeat();
++//				//System.out.println(material + " extruder raw temp " + rawHeat);
++//
++//				calibration = reply.getCalibration();
++//				
++//				if(rerangeTemperature(rawHeat))
++//					break; // All ok
++//				else
++//					Thread.sleep(500); // Wait for PIC temp routine to settle before going again
++//			}
++//			
++//			double resistance = calculateResistance(rawHeat, calibration);
++//			
++//			currentTemperature = calculateTemperature(resistance);
++		
++			OutgoingMessage request = new OutgoingBlankMessage(MSG_GetTemp);
++			RequestTemperatureResponse reply = new RequestTemperatureResponse(this, request, 500);
++			currentTemperature = reply.getHeat();
+ 			Debug.d(material + " extruder current temp " + currentTemperature);
+ 			
+ 			lastTemperatureUpdate = System.currentTimeMillis();
+@@ -914,6 +931,7 @@
+ 		    if (reply == null || reply.length != 3)
+ 		    		throw new InvalidPayloadException();
+ 		    return reply[1] < 0 ? reply[1] + 256 : reply[1];
++		    //return reply[1];
+ 		}
+ 
+ 		/**
+Index: host/src/org/reprap/gui/extrudertest/Main.java
+===================================================================
+--- host/src/org/reprap/gui/extrudertest/Main.java	(revision 1108)
++++ host/src/org/reprap/gui/extrudertest/Main.java	(working copy)
+@@ -72,7 +72,7 @@
+ 	* Auto-generated main method to display this JDialog
+ 	*/
+ 	public static void main(String[] args) throws Exception {
+-		Thread.currentThread().setName("Extruder Exerciser");
++		Thread.currentThread().setName("Extruder Exerciser test");
+ 		JFrame frame = new JFrame();
+ 		Main inst = new Main(frame);
+ 		inst.setVisible(true);
+Index: host/src/org/reprap/Main.java
+===================================================================
+--- host/src/org/reprap/Main.java	(revision 1108)
++++ host/src/org/reprap/Main.java	(working copy)
+@@ -78,7 +78,7 @@
+ 
+ 	private void createAndShowGUI() throws Exception {
+         JFrame.setDefaultLookAndFeelDecorated(false);
+-        mainFrame = new JFrame("RepRap");
++        mainFrame = new JFrame("RepRap hacket at Metalab");
+         mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+ 
+         // Required so menus float over Java3D
