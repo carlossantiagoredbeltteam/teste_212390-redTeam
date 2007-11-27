@@ -71,7 +71,8 @@
 		//get the data!
 		foreach ($data AS $row)
 		{
-			if ($row[0])
+			//only add it if it has a name and number.
+			if ($row[0] && $row[1])
 			{
 				//the first one is our 'main sheet'
 				if (!$legend['main_sheet'])
