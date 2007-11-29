@@ -110,9 +110,9 @@ void CartesianBot::calculateDDA()
 	z.calculateDDASpeed(max_delta);
 
 	//start them all at the same time
-	x.enableTimerInterrupt();
-	y.enableTimerInterrupt();
-	z.enableTimerInterrupt();
+        if (!x.atTarget()) x.enableTimerInterrupt();
+        if (!y.atTarget()) y.enableTimerInterrupt();
+        if (!z.atTarget()) z.enableTimerInterrupt();
 }
 
 void CartesianBot::stop()
@@ -138,6 +138,9 @@ byte CartesianBot::getMode()
 	return mode;
 }
 
+/*!
+  Synchronously move to home.
+*/
 void CartesianBot::home()
 {
 	//pause it to disable our interrupt handler.
