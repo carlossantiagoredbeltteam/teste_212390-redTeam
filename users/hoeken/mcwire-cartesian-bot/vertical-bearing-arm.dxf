@@ -1417,34 +1417,6 @@ Bearing
   6
 ByLayer
  10
-24.0000000000000071
- 20
-30.0
- 30
-0.0
- 11
-16.0000000000000071
- 21
-30.0
- 31
-0.0
-  0
-LINE
-  5
-49
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Bearing
- 62
-256
-370
--1
-  6
-ByLayer
- 10
 20.0
  20
 5.9999999999999964
@@ -1459,7 +1431,7 @@ ByLayer
   0
 LINE
   5
-4A
+49
 100
 AcDbEntity
 100
@@ -1487,7 +1459,7 @@ ByLayer
   0
 LINE
   5
-4B
+4A
 100
 AcDbEntity
 100
@@ -1515,31 +1487,7 @@ ByLayer
   0
 CIRCLE
   5
-4C
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-0
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-20.0
- 20
-30.0
- 30
-0.0
- 40
-0.5
-  0
-CIRCLE
-  5
-4D
+4B
 100
 AcDbEntity
 100
@@ -1563,55 +1511,7 @@ ByLayer
   0
 CIRCLE
   5
-4E
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-0
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-20.0
- 20
-50.0
- 30
-0.0
- 40
-3.96875
-  0
-CIRCLE
-  5
-4F
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Text
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-20.0
- 20
-50.0
- 30
-0.0
- 40
-7.5700000000000003
-  0
-CIRCLE
-  5
-50
+4C
 100
 AcDbEntity
 100
@@ -1635,7 +1535,7 @@ ByLayer
   0
 ARC
   5
-51
+4D
 100
 AcDbEntity
   8
@@ -1651,7 +1551,7 @@ AcDbCircle
  10
 20.0
  20
-10.0
+50.0
  30
 0.0
  40
@@ -1659,8 +1559,120 @@ AcDbCircle
 100
 AcDbArc
  50
-180.0
+0.0
  51
+180.0
+  0
+LINE
+  5
+4E
+100
+AcDbEntity
+100
+AcDbLine
+  8
+0
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+20.0
+ 20
+10.0
+ 30
+0.0
+ 11
+12.0
+ 21
+10.0
+ 31
+0.0
+  0
+LINE
+  5
+4F
+100
+AcDbEntity
+100
+AcDbLine
+  8
+0
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+19.9999999999999964
+ 20
+-10.0
+ 30
+0.0
+ 11
+20.0
+ 21
+-10.0
+ 31
+0.0
+  0
+LINE
+  5
+50
+100
+AcDbEntity
+100
+AcDbLine
+  8
+0
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+19.9999999999999964
+ 20
+-10.0
+ 30
+0.0
+ 11
+20.0
+ 21
+-10.0
+ 31
+0.0
+  0
+LINE
+  5
+51
+100
+AcDbEntity
+100
+AcDbLine
+  8
+0
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+10.0000000000000036
+ 20
+-9.9999999999999982
+ 30
+0.0
+ 11
+10.0
+ 21
+50.0
+ 31
 0.0
   0
 ARC
@@ -1679,9 +1691,9 @@ ByLayer
 100
 AcDbCircle
  10
-20.0
+20.0000000000000036
  20
-50.0
+-10.0
  30
 0.0
  40
@@ -1689,17 +1701,15 @@ AcDbCircle
 100
 AcDbArc
  50
-0.0
- 51
 180.0
+ 51
+270.0
   0
-LINE
+ARC
   5
 53
 100
 AcDbEntity
-100
-AcDbLine
   8
 0
  62
@@ -1708,17 +1718,21 @@ AcDbLine
 -1
   6
 ByLayer
+100
+AcDbCircle
  10
-10.0
+20.0000000000000036
  20
-10.0
+-10.0
  30
 0.0
- 11
+ 40
 10.0
- 21
-50.0
- 31
+100
+AcDbArc
+ 50
+270.0
+ 51
 0.0
   0
 LINE
@@ -1737,9 +1751,9 @@ AcDbLine
   6
 ByLayer
  10
-30.0
+30.0000000000000036
  20
-10.0
+-10.0
  30
 0.0
  11
@@ -1749,9 +1763,57 @@ ByLayer
  31
 0.0
   0
-MTEXT
+CIRCLE
   5
 55
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+0
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+19.9999999999999964
+ 20
+-10.0
+ 30
+0.0
+ 40
+0.5
+  0
+CIRCLE
+  5
+56
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+0
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+20.0
+ 20
+50.0
+ 30
+0.0
+ 40
+3.2000000000000002
+  0
+MTEXT
+  5
+57
 100
 AcDbEntity
 100
@@ -1779,7 +1841,7 @@ ByLayer
  72
 2
   1
-"Bearing\~Arm"\PMCB\~v1.2\Pmake.rrrf.org/mcb-1.2
+"Vert\~Bearing\~Arm"\PMCB\~v1.2\Pmake.rrrf.org/mcb-1.2
   7
 standard
  50
@@ -1827,7 +1889,7 @@ E
   3
 AcDbVariableDictionary
 350
-56
+58
   0
 DICTIONARY
   5
@@ -2291,7 +2353,7 @@ Layout2
   0
 DICTIONARY
   5
-56
+58
 100
 AcDbDictionary
 281
@@ -2299,15 +2361,15 @@ AcDbDictionary
   3
 DIMASSOC
 350
-58
+5A
   3
 HIDETEXT
 350
-57
+59
   0
 DICTIONARYVAR
   5
-57
+59
 100
 DictionaryVariables
 280
@@ -2317,7 +2379,7 @@ DictionaryVariables
   0
 DICTIONARYVAR
   5
-58
+5A
 100
 DictionaryVariables
 280
