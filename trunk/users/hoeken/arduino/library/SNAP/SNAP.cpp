@@ -11,6 +11,16 @@ SNAP::SNAP()
   crc = 0;
 }
 
+void SNAP::receivePacket()
+{
+  byte cmd;
+
+  while (Serial.available() > 0) {
+    cmd = Serial.read();
+    this->receiveByte(cmd);
+  }
+}
+
 void SNAP::receiveError()
 {
   byte i;

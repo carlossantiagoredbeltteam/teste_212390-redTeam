@@ -61,6 +61,7 @@ class SNAP
                 
   void addDevice(byte b);
 
+  void receivePacket();
   void receiveByte(byte b);
 
   bool packetReady();
