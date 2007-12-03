@@ -1,0 +1,12 @@
+#!/bin/php
+<?
+	$files = glob("*.dxf");
+	foreach ($files AS $file)
+	{
+		$base = basename($file, ".dxf");
+		$cmd = "dxf2svg $file > {$base}.svg";
+		echo "$cmd\n";
+		echo "Converting $file to SVG.\n";
+		exec($cmd);
+	}
+?>
