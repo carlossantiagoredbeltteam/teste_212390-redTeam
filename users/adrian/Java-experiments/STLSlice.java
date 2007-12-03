@@ -429,8 +429,8 @@ public class STLSlice
 	 */
 	private double toGrid(double x)
 	{
-		return x;
-		//return (double)((int)(x*Preferences.grid() + 0.5))*Preferences.gridRes();
+		//return x;
+		return (double)((int)(x*Preferences.grid() + 0.5))*Preferences.gridRes();
 	}
 	
 	/**
@@ -685,7 +685,7 @@ public class STLSlice
 			{
 				v = coords.get(p).doubleValue();
 				g = v - vpOld;
-				if(g > Preferences.machineResolution())
+				if(g > Preferences.gridRes()*0.1)
 				{
 					return 0.5*(vpOld + v);
 				}
@@ -699,7 +699,7 @@ public class STLSlice
 			{
 				v = coords.get(m).doubleValue();
 				g = vmOld - v;
-				if(g > Preferences.machineResolution())
+				if(g > Preferences.gridRes()*0.1)
 				{
 					return 0.5*(v + vmOld);
 				}
@@ -710,7 +710,7 @@ public class STLSlice
 			}
 		}
 		
-		if(biggest.length() > Preferences.machineResolution()*0.1)
+		if(biggest.length() > Preferences.gridRes()*0.1)
 			return biggest.low() + 0.5*biggest.length();
 		else
 		{
@@ -728,6 +728,7 @@ public class STLSlice
 	private Rr2Point biggestGap()
 	{
 		Rr2Point result = new Rr2Point(findGap(xCoords, box.x()), findGap(yCoords, box.y()));
+		System.out.println("Box: " + box.toString() + "   centre: " + result.toString());
 		
 		// Not needed any more
 		
@@ -1095,7 +1096,7 @@ public class STLSlice
 
 				// Make sure nothing falls down the cracks.
 
-				sFactor = 1.0; //Preferences.swell();
+				sFactor = Preferences.swell();
 				box = box.scale(sFactor);
 				resolution_2 = box.d_2()*Preferences.tiny();
 
