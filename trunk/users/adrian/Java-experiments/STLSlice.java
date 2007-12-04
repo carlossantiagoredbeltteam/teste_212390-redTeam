@@ -728,7 +728,7 @@ public class STLSlice
 	private Rr2Point biggestGap()
 	{
 		Rr2Point result = new Rr2Point(findGap(xCoords, box.x()), findGap(yCoords, box.y()));
-		System.out.println("Box: " + box.toString() + "   centre: " + result.toString());
+		//System.out.println("Box: " + box.toString() + "   centre: " + result.toString());
 		
 		// Not needed any more
 		
@@ -757,27 +757,27 @@ public class STLSlice
 		Rr2Point se = box.se();
 		
 		Rr2Point cen = biggestGap();
+		double w = cen.x() - (cen.x() - sw.x())*(sFactor - 1);
+		double n = cen.y() + (nw.y() - cen.y())*(sFactor - 1);
+		double e = cen.x() + (se.x() - cen.x())*(sFactor - 1);
+		double s = cen.y() - (cen.y() - sw.y())*(sFactor - 1);
 		
 //		 Put the results in the children
 		
-		RrBox s = new RrBox(cen, nw);
-		s = s.scale(sFactor);
-		q1 = new STLSlice(edges, s);
+		RrBox b = new RrBox(nw, new Rr2Point(e, s));
+		q1 = new STLSlice(edges, b);
 		q1.prune();
 		
-		s = new RrBox(cen, ne);
-		s = s.scale(sFactor);
-		q2 = new STLSlice(edges, s);
+		b = new RrBox(ne, new Rr2Point(w, s));
+		q2 = new STLSlice(edges, b);
 		q2.prune();
 		
-		s = new RrBox(se, cen);
-		s = s.scale(sFactor);
-		q3 = new STLSlice(edges, s);
+		b = new RrBox(se, new Rr2Point(w, n));
+		q3 = new STLSlice(edges, b);
 		q3.prune();
 		
-		s = new RrBox(sw, cen);
-		s = s.scale(sFactor);
-		q4 = new STLSlice(edges, s);
+		b = new RrBox(sw, new Rr2Point(e, n));
+		q4 = new STLSlice(edges, b);
 		q4.prune();
 	}
 	
@@ -1106,7 +1106,7 @@ public class STLSlice
 				// ends.
 
 				divide();
-				RrGraphics g = new RrGraphics(this, true);
+				//RrGraphics g = new RrGraphics(this, true);
 				//recursiveReport();
 				
 				// Run round joining up all the pairs of ends...
