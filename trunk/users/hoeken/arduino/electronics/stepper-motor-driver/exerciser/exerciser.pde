@@ -22,7 +22,7 @@ void loop()
       Serial.print("Speed: ");
       Serial.println(i);
       
-      for (j=0; j<800; j++)
+      for (j=0; j<2000; j++)
       {
         digitalWrite(stepPin, HIGH);
         delayMicroseconds(2);
@@ -34,7 +34,7 @@ void loop()
       Serial.println("Switching directions.");
       digitalWrite(dirPin, !digitalRead(dirPin));
 
-      for (j=0; j<800; j++)
+      for (j=0; j<2000; j++)
       {
         digitalWrite(stepPin, HIGH);
         delayMicroseconds(2);
