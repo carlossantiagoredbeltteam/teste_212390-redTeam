@@ -3,7 +3,7 @@
 #init up
 VERSION=${1:-`date +%Y%m%d`}
 TO_DIR="reprap-firmware-$VERSION"
-FILELIST="extruder iobox stepmotor stepmotorb stepmotorc stepmotor-small"
+FILELIST="extruder_0_ extruder_1_ iobox stepmotor stepmotorb stepmotorc stepmotor-small"
 
 #directory structure
 mkdir -p "$TO_DIR"

@@ -36,14 +36,12 @@
 
 // Simple stepper controller.
 //
-// This is for a common ground, 4 coil stepper.
+// This is for a bipolar stepper - either 4 coils with pairs wired
+// in series, or two coils.
 //
 // A total of 8 steps are achieved for finer movement by also making
 // use of "half-steps".
 //
-// Other stepper motor types are supported by changing the
-// stepCount value and the stepValue function.  Currently
-// stepCount must be a power of 2.
 
 // I/O ports - old design:
 
@@ -56,7 +54,7 @@
 //   A3 - Sync B input/output (optional)
 //   A5 - Max optointerrupter (optional)
 
-// I/O ports - Universal PCB:
+// I/O ports - Universal PCB (new design):
 
 // RA0 is L298 4
 // RA1 is Sync
@@ -125,6 +123,9 @@ volatile static byte speed = 0;
 
 volatile static byte seekNotify = 255;
 
+// Uncomment this when we have more memory...
+//volatile static byte stepPower = 32;
+
 volatile static addressableInt currentPosition, seekPosition, maxPosition;
 
 volatile static addressableInt dda_deltay;
@@ -174,6 +175,12 @@ _endasm;
 #pragma save
 #pragma nooverlay
 
+// This will adjust the motor power on the half steps to
+// get the same (lower) torque as on the full steps
+// to get the smoothest running.
+// See http://www.sxlist.com/techref/io/stepper/linistep/halfstep.htm
+// Uncomment the setPower() lines when we have more memory.
+
 void motor_click()
 {
   byte cp;
@@ -183,54 +190,62 @@ void motor_click()
   cp = coilPosition << 1;
 #endif
   switch(cp) {
-  case 0:
-    PORTB5 = 1;
-    PORTB4 = 0;
-	PORTA2 = 0;
-	PORTA0 = 0;
-	break;
-  case 1:
-    PORTB5 = 1;
-    PORTB4 = 0;
-	PORTA2 = 1;
-	PORTA0 = 0;
-	break;    
-  case 2:
-    PORTB5 = 0;
-    PORTB4 = 0;
-	PORTA2 = 1;
-	PORTA0 = 0;
-	break;     
-  case 3:
-    PORTB5 = 0;
-    PORTB4 = 1;
-	PORTA2 = 1;
-	PORTA0 = 0;
-	break;     
-  case 4:
-    PORTB5 = 0;
-    PORTB4 = 1;
-	PORTA2 = 0;
-	PORTA0 = 0;
-	break;     
-  case 5:
-    PORTB5 = 0;
-    PORTB4 = 1;
-	PORTA2 = 0;
-	PORTA0 = 1;
-	break;    
-  case 6:
-    PORTB5 = 0;
-    PORTB4 = 0;
-	PORTA2 = 0;
-	PORTA0 = 1;
-	break;    
   case 7:
+    //setPower((stepPower >> 1) + (stepPower >> 3));
     PORTB5 = 1;
     PORTB4 = 0;
-	PORTA2 = 0;
-	PORTA0 = 1;
-	break;    
+    PORTA2 = 1;
+    PORTA0 = 0;
+    break;
+  case 6:
+    //setPower(stepPower);
+    PORTB5 = 1;
+    PORTB4 = 0;
+    PORTA2 = 0;
+    PORTA0 = 0;
+    break;    
+  case 5:
+    //setPower((stepPower >> 1) + (stepPower >> 3));
+    PORTB5 = 1;
+    PORTB4 = 0;
+    PORTA2 = 0;
+    PORTA0 = 1;
+    break;     
+  case 4:
+    //setPower(stepPower);
+    PORTB5 = 0;
+    PORTB4 = 0;
+    PORTA2 = 0;
+    PORTA0 = 1;
+    break;     
+  case 3:
+    //setPower((stepPower >> 1) + (stepPower >> 3));
+    PORTB5 = 0;
+    PORTB4 = 1;
+    PORTA2 = 0;
+    PORTA0 = 1;
+    break;     
+  case 2:
+    //setPower(stepPower);
+    PORTB5 = 0;
+    PORTB4 = 1;
+    PORTA2 = 0;
+    PORTA0 = 0;
+    break;    
+  case 1:
+    //setPower((stepPower >> 1) + (stepPower >> 3));
+    PORTB5 = 0;
+    PORTB4 = 1;
+    PORTA2 = 1;
+    PORTA0 = 0;
+    break;    
+  case 0:
+    //setPower(stepPower);
+    PORTB5 = 0;
+    PORTB4 = 0;
+    PORTA2 = 1;
+    PORTA0 = 0;
+    break;    
   }
 _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _coilPosition
@@ -544,6 +559,17 @@ void syncStrobe() {
   }
 }
 
+void setPower(byte p)
+{
+    // This is a value from 0 to 63 (6 bits)
+    // The low two bits are stored in CCP1CON, and the remaining
+    // four bits in CCPR1L
+    CCPR1L = p >> 2;
+    PR2 = 16;  // The maximum range
+    // Store low 2 bits and turn on PWM
+    CCP1CON = BIN(1100) | ((p & BIN(11)) << 4);
+}
+
 void processCommand()
 {
   switch(buffer[0]) {
@@ -652,13 +678,10 @@ void processCommand()
     break;
 
   case CMD_SETPOWER:
-    // This is a value from 0 to 63 (6 bits)
-    // The low two bits are stored in CCP1CON, and the remaining
-    // four bits in CCPR1L
-    CCPR1L = buffer[1] >> 2;
-    PR2 = 16;  // The maximum range
-    // Store low 2 bits and turn on PWM
-    CCP1CON = BIN(1100) | ((buffer[1] & BIN(11)) << 4);
+    // Uncomment these when we have more memory
+    //stepPower = buffer[1];
+    //setPower(stepPower);
+    setPower(buffer[1]);
     break;
 
   case CMD_GETSENSOR:

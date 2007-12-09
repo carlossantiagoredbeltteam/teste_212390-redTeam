@@ -36,14 +36,18 @@
 
 #include "pic14.h"
 
-// Half-stepping not needed for 400-step-per-rev motors
+// Half-stepping not needed for 400-step-per-rev motors.
+// Enable this for 200-step-per-rev motors (also for 400 step
+// for smoother but slower running).
 //#define HALFSTEP
+
 #define UNIVERSAL_PCB
 
 void init2();
 void timerTick();
 void processCommand();
 void syncStrobe();
+void setPower(byte p);
 
 extern byte syncEnabled;
 extern byte syncCounter;
