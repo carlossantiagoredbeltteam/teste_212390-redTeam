@@ -1,12 +1,37 @@
-#!/bin/php
-<?
-	$files = glob("*.dxf");
-	foreach ($files AS $file)
-	{
-		$base = basename($file, ".dxf");
-		$cmd = "dxf2svg $file > {$base}.svg";
-		echo "$cmd\n";
-		echo "Converting $file to SVG.\n";
-		exec($cmd);
-	}
-?>
+#!/bin/bash
+
+#init up
+BOARD="mcwire-cartesian-bot"
+VERSION=${1:-`date +%Y-%m-%d`}
+TO_DIR="reprap-$BOARD-$VERSION"
+FILELIST=""
+
+#directory structure
+echo "Making Files..."
+mkdir -p "$TO_DIR"
+mkdir -p "$TO_DIR/svg"
+mkdir -p "$TO_DIR/dxf"
+#mkdir -p "$TO_DIR/pdf"
+#mkdir -p "$TO_DIR/png"
+
+#copy our dxf files!
+cp *.dxf "$TO_DIR/dxf"
+
+#create our gerber files!
+echo "Creating SVG Files..."
+for DXF in $TO_DIR/dxf/*.dxf
+do
+	TO_FILE=`basename $DXF .dxf`.svg
+	dxf2svg $DXF > $TO_DIR/svg/$TO_FILE
+done
+
+#create our archive
+echo "Archiving..."
+zip -qr "$TO_DIR.zip" "$TO_DIR"
+
+#cleanup
+echo "Cleanup..."
+rm -rf "$TO_DIR"
+
+#done!
+echo "Release v$VERSION created as ${TO_DIR}.zip"
