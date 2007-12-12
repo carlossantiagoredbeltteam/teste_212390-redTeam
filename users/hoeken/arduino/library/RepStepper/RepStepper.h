@@ -24,7 +24,7 @@ extern volatile unsigned long timer0_overflow_count;
 class RepStepper {
   public:
     // constructors:
-    RepStepper(int number_of_steps, int step_pin, int dir_pin);
+    RepStepper(int number_of_steps, int dir_pin, int step_pin);
 
     // various setters methods:
 	void setRPM(int rpm);
