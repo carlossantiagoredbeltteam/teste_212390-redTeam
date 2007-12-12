@@ -5,7 +5,7 @@
  * two-wire constructor.
  * Sets which wires should control the motor.
  */
-RepStepper::RepStepper(int number_of_steps, int step_pin, int direction_pin)
+RepStepper::RepStepper(int number_of_steps, int dir_pin, int step_pin)
 {
 	//init our variables.
 	this->direction = 1;
@@ -16,7 +16,7 @@ RepStepper::RepStepper(int number_of_steps, int step_pin, int direction_pin)
 	//get our parameters
 	this->number_of_steps = number_of_steps;
 	this->step_pin = step_pin;
-	this->direction_pin = direction_pin;
+	this->direction_pin = dir_pin;
 	
 	// setup the pins on the microcontroller:
 	pinMode(this->step_pin, OUTPUT);
@@ -133,6 +133,7 @@ void RepStepper::pulse()
 {
 	//this sends a pulse to our stepper controller.
 	digitalWrite(step_pin, HIGH);
+	delayMicroseconds(1);
 	digitalWrite(step_pin, LOW);
 }
 

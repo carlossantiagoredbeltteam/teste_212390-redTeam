@@ -17,7 +17,7 @@ LinearAxis::LinearAxis(byte id, int steps, int dir_pin, int step_pin, int min_pi
 	target = 0;
 
 	stepper.setDirection(RS_FORWARD);
-	this->setupTimerInterrupt();
+	//this->setupTimerInterrupt();
 }
 
 void LinearAxis::readState()
@@ -26,6 +26,7 @@ void LinearAxis::readState()
 	min_switch.readState();
 	max_switch.readState();
 	
+/*
 	//stop us if we're on target
 	if (current == target)
 		this->disableTimerInterrupt();
@@ -37,6 +38,7 @@ void LinearAxis::readState()
 	//stop us if we're at max and still going
 	if (this->atMax() && stepper.getDirection() == RS_FORWARD)
 		this->disableTimerInterrupt();
+*/
 }
 
 bool LinearAxis::atMin()
@@ -83,6 +85,20 @@ void LinearAxis::doStep()
 	
 	//do our step!
 	stepper.pulse();
+}
+
+void LinearAxis::forward1()
+{
+	stepper.setDirection(RS_FORWARD);
+	stepper.pulse();
+	current++;
+}
+
+void LinearAxis::reverse1()
+{
+	stepper.setDirection(RS_REVERSE);
+	stepper.pulse();
+	current--;
 }
 
 long LinearAxis::getPosition()

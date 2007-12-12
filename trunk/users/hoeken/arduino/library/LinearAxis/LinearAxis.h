@@ -49,6 +49,9 @@ class LinearAxis {
 	void setTarget(long t);
 	bool atTarget();
 	
+	void forward1();
+	void reverse1();
+		
 	//our limit switch functions
 	bool atMin();
 	bool atMax();
