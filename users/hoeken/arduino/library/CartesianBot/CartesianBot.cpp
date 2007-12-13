@@ -8,6 +8,7 @@ CartesianBot::CartesianBot(
 	byte z_id, int z_steps, int z_dir_pin, int z_step_pin, int z_min_pin, int z_max_pin
 ) : x(x_id, x_steps, x_dir_pin, x_step_pin, x_min_pin, x_max_pin), y(y_id, y_steps, y_dir_pin, y_step_pin, y_min_pin, y_max_pin), z(z_id, z_steps, z_dir_pin, z_step_pin, z_min_pin, z_max_pin)
 {
+	this->setupTimerInterrupt();
 	this->stop();
 	this->clearQueue();
 }
@@ -87,50 +88,40 @@ void CartesianBot::getNextPoint()
 		y.setTarget(y.getPosition());
 		z.setTarget(z.getPosition());
 	}
-	
-	this->calculateDDA();
 }
 
 void CartesianBot::calculateDDA()
 {
-	long max_delta;
-
-	//stop them all to make the transition smooth.
-	x.disableTimerInterrupt();
-	y.disableTimerInterrupt();
-	z.disableTimerInterrupt();
+	//let us do the maths before stepping.
+	this->disableTimerInterrupt();
+	
+	//set up the interrupt timer 
+	this->setTimer(x.stepper.getSpeed());
 	
 	//what is the biggest one?
 	max_delta = max(x.getDelta(), y.getDelta());
 	max_delta = max(max_delta, z.getDelta());
 
 	//calculate speeds for each axis.
-	x.calculateDDASpeed(max_delta);
-	y.calculateDDASpeed(max_delta);
-	z.calculateDDASpeed(max_delta);
-
-	//start them all at the same time
-        if (!x.atTarget()) x.enableTimerInterrupt();
-        if (!y.atTarget()) y.enableTimerInterrupt();
-        if (!z.atTarget()) z.enableTimerInterrupt();
+	x.initDDA(max_delta);
+	y.initDDA(max_delta);
+	z.initDDA(max_delta);
+	
+	//okies, go!
+	this->enableTimerInterrupt();
 }
 
 void CartesianBot::stop()
 {
+	this->disableTimerInterrupt();
 	mode = MODE_PAUSE;
-
-	x.disableTimerInterrupt();
-	y.disableTimerInterrupt();
-	z.disableTimerInterrupt();
 }
 
-void CartesianBot::start()
+void CartesianBot::startSeek()
 {
 	mode = MODE_SEEK;
-
-	x.enableTimerInterrupt();
-	y.enableTimerInterrupt();
-	z.enableTimerInterrupt();
+	this->setTimer(x.stepper.getSpeed());
+	this->enableTimerInterrupt();
 }
 
 byte CartesianBot::getMode()
@@ -143,9 +134,6 @@ byte CartesianBot::getMode()
 */
 void CartesianBot::home()
 {
-	//pause it to disable our interrupt handler.
-	this->stop();
-
 	//get an initial reading.
 	this->readState();
 	
@@ -154,17 +142,14 @@ void CartesianBot::home()
 	y.setTarget(-9000000);
 	z.setTarget(-9000000);
 
-	//use our max speed!
-	x.setTimer(x.stepper.getSpeed() << 2);
-	y.setTimer(y.stepper.getSpeed() << 2);
-	z.setTimer(z.stepper.getSpeed() << 2);
-
 	//okay, enable our movement!
-	this->start();
+	this->startSeek();
 	
-	//move us home! (interrupts will do stepping... we just read state.)
+	//move us home!
 	while (!this->atHome())
+	{
 		this->readState();
+	}
 	
 	//stop movement now.
 	this->stop();
@@ -179,8 +164,8 @@ void CartesianBot::home()
 	y.setTarget(0);
 	z.setTarget(0);
 
-	//do our dda calcs.
-	this->calculateDDA();
+	//seek to our point!
+	this->startSeek();
 }
 
 bool CartesianBot::atHome()
@@ -209,4 +194,117 @@ void CartesianBot::abort()
 int CartesianBot::version()
 {
 	return 1;
+}
+
+
+void CartesianBot::setupTimerInterrupt()
+{
+	//clear the registers
+	TCCR1A = 0;
+	TCCR1B = 0;
+	TCCR1C = 0;
+	TIMSK1 = 0;
+	
+	//waveform generation = 0100 = CTC
+	TCCR1B &= ~(1<<WGM13);
+	TCCR1B |=  (1<<WGM12);
+	TCCR1A &= ~(1<<WGM11); 
+	TCCR1A &= ~(1<<WGM10);
+
+	//output mode = 10 (clear OC1A on match)
+	TCCR1A |=  (1<<COM1A1); 
+	TCCR1A &= ~(1<<COM1A0);
+
+	//start off with a slow frequency.
+	this->setTimerResolution(3);
+	this->setTimerCeiling(255);
+}
+
+void CartesianBot::enableTimerInterrupt()
+{
+	//reset our timer to 0 for reliable timing
+	TCNT1 = 0;
+
+	//then enable our interrupt!
+	TIMSK1 |= (1<<OCIE1A);
+}
+
+void CartesianBot::disableTimerInterrupt()
+{
+	TIMSK1 &= ~(1<<OCIE1A);
+}
+
+void CartesianBot::setTimer(unsigned long speed)
+{
+	//speed is the delay between steps in microseconds.
+	//
+	//we break it into 3 different resolutions
+	//then essentially calculate the timer ceiling required. (ie what the counter counts to)
+	//the way we do that is to take the ratio of speed to the max of the resolution,
+	//multiply it by the the max value of the counter... except in a different order
+	//due to integer math.  we then set that as the timer value so it fires an interrupt every
+	//x microseconds.
+	unsigned int ceiling;
+	 
+	// our slowest speed at our highest resolution ( (2^16-1) * 4 usecs = 262140 usecs)
+	if (speed <= 65535L)
+	{
+		this->setTimerResolution(1);
+		ceiling = speed;
+	}
+	// our slowest speed at our medium resolution ( (2^16-1) * 16 usecs = 1048560 usecs)
+	else if (speed <= 262140L)
+	{
+		this->setTimerResolution(2);
+		ceiling = speed / 4;
+	}
+	// our slowest speed at our lowest resolution ((2^16-1) * 64 usecs = 4194240 usecs)
+	else if (speed <= 1048560L)
+	{
+		this->setTimerResolution(3);
+		ceiling = speed / 16;
+	}
+	//its really slow... hopefully we can just get by with super slow.
+	else
+	{
+		//otherwise, set it to our slowest speed.
+		this->setTimerResolution(3);
+		ceiling = 65535;
+	}
+
+	//now update our clock!!
+	this->setTimerCeiling(ceiling);
+}
+
+void CartesianBot::setTimerResolution(byte r)
+{
+	// prescale of /64 == 4 usec tick
+	if (r == 1)
+	{
+		// 011 = clk/64
+		TCCR1B &= ~(1<<CS12);
+		TCCR1B |=  (1<<CS11);
+		TCCR1B |=  (1<<CS10);
+	}
+	// prescale of /256 == 16 usec tick
+	else if (r == 2)
+	{
+		// 100 = clk/256
+		TCCR1B |=  (1<<CS12);
+		TCCR1B &= ~(1<<CS11);
+		TCCR1B &= ~(1<<CS10);
+	}
+	// prescale of /1024 == 64 usec tick
+	else
+	{
+		// 101 = clk/1024
+		TCCR1B |=  (1<<CS12);
+		TCCR1B &= ~(1<<CS11);
+		TCCR1B |=  (1<<CS10);
+	}
+}
+
+void CartesianBot::setTimerCeiling(unsigned int f)
+{
+	OCR1A = f;
 }

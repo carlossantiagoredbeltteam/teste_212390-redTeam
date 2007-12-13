@@ -23,6 +23,7 @@
 
 #define MODE_PAUSE 0
 #define MODE_SEEK 1
+#define MODE_DDA 2
 
 // our point structure to make things nice.
 struct Point {
@@ -60,7 +61,7 @@ class CartesianBot {
 	
 	//mode commands
 	void stop();
-	void start();
+	void startSeek();
 	byte getMode();
 
 	//our interface methods
@@ -71,15 +72,26 @@ class CartesianBot {
 	//boring version stuff
     int version();
 
+	//our timer interrupt interface functions.
+	void setupTimerInterrupt();
+	void enableTimerInterrupt();
+	void disableTimerInterrupt();
+	void setTimer(unsigned long speed);
+	void setTimerResolution(byte r);
+	void setTimerCeiling(unsigned int f);
+
 	//our variables
 	LinearAxis x;
 	LinearAxis y;
 	LinearAxis z;
-	
-  private:
+
+	//for DDA stuff.
+	byte max_delta;
 
 	//this is the mode we're currently in... started/stopped
 	byte mode;
+	
+  private:
 
 	//this is for our queue of points.
 	byte head;

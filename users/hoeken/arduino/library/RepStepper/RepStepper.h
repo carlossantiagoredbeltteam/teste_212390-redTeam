@@ -52,7 +52,7 @@ class RepStepper {
 	//various internal variables
     bool direction;						// Direction of rotation
 	unsigned int rpm;					// Speed in RPMs
-	unsigned int step_delay;  			// delay between steps, in microseconds, based on speed
+	unsigned long step_delay;  			// delay between steps, in microseconds, based on speed
     unsigned int number_of_steps;		// total number of steps this motor can take
 
 	//our time counter variables.
