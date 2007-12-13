@@ -31,16 +31,9 @@ class LinearAxis {
 	void doStep();
 
 	//our DDA based functions
-	int calculateDDASpeed(long max_delta);
 	long getDelta();
-	
-	//our function for full on timer based stepping.
-	void setTimer(int speed);
-	void setTimerResolution(byte r);
-	void setTimerFrequency(byte f);
-	void setupTimerInterrupt();
-	void enableTimerInterrupt();
-	void disableTimerInterrupt();
+	void initDDA(long max_delta);
+	void ddaStep(long max_delta);
 	
 	//various position things.
 	long getPosition();
@@ -58,12 +51,14 @@ class LinearAxis {
 
 	byte id;					//what is our id? x, y, z, etc.
 	bool can_step;				//are we capable of taking a step yet?
-	bool dda_ready;				//are we allowed to take a step yet?
+	int function;				//what function are we at?
 
   private:
 	long current;				//this is our current position.
 	long target;				//this is our target position.
-
+	long delta;					//our delta for our DDA moves.
+	long counter;				//our dda counter for dda moves.
+	
 	LimitSwitch min_switch;
 	LimitSwitch max_switch;
 };
