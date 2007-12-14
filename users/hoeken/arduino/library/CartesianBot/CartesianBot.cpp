@@ -123,6 +123,12 @@ void CartesianBot::startSeek()
 	this->enableTimerInterrupt();
 }
 
+void CartesianBot::startHomeReset()
+{
+	mode = MODE_HOMERESET;
+	this->enableTimerInterrupt();
+}
+
 byte CartesianBot::getMode()
 {
 	return mode;
