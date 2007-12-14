@@ -86,7 +86,7 @@ class CartesianBot {
 	LinearAxis z;
 
 	//for DDA stuff.
-	byte max_delta;
+	long max_delta;
 
 	//this is the mode we're currently in... started/stopped
 	byte mode;

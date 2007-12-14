@@ -53,11 +53,12 @@ class LinearAxis {
 	bool can_step;				//are we capable of taking a step yet?
 	int function;				//what function are we at?
 
+	long delta;					//our delta for our DDA moves.
+	long counter;				//our dda counter for dda moves.
+
   private:
 	long current;				//this is our current position.
 	long target;				//this is our target position.
-	long delta;					//our delta for our DDA moves.
-	long counter;				//our dda counter for dda moves.
 	
 	LimitSwitch min_switch;
 	LimitSwitch max_switch;
