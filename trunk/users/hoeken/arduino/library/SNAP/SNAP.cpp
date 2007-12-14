@@ -263,6 +263,13 @@ void SNAP::addDevice(byte c)
   this->deviceCount++;
 }
 
+void SNAP::startMessage(byte from)
+{
+	this->destAddress = from;
+	
+	//TODO: we probably need something to handle being mid-message
+}
+
 /*!
   Initiates a message to whoever we last received a message from
 */

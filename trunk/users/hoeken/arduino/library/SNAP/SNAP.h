@@ -72,6 +72,7 @@ class SNAP
   byte getByte(byte index);
   int getInt(byte index); // get 16 bits
 
+  void startMessage(byte from);
   void sendReply();
   void sendMessage(byte dest);
   void sendDataByte(byte c);
