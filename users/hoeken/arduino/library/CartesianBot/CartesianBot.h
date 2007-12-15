@@ -81,10 +81,12 @@ class CartesianBot {
 	void setupTimerInterrupt();
 	void enableTimerInterrupt();
 	void disableTimerInterrupt();
-	void setTimer(unsigned long speed);
+	void setTimer(unsigned long delay);
 	void setTimerResolution(byte r);
-	void setTimerCeiling(unsigned int f);
-
+	void setTimerCeiling(unsigned int c);
+	byte getTimerResolution(unsigned long delay);
+	unsigned int getTimerCeiling(unsigned long delay);
+	
 	//our variables
 	LinearAxis x;
 	LinearAxis y;

@@ -225,6 +225,8 @@ void CartesianBot::setupTimerInterrupt()
 	//output mode = 00 (disconnected)
 	TCCR1A &= ~(1<<COM1A1); 
 	TCCR1A &= ~(1<<COM1A0);
+	TCCR1A &= ~(1<<COM1B1); 
+	TCCR1A &= ~(1<<COM1B0);
 
 	//start off with a slow frequency.
 	this->setTimerResolution(1);
@@ -237,18 +239,42 @@ void CartesianBot::enableTimerInterrupt()
 	TCNT1 = 0;
 
 	//then enable our interrupt!
+	TIMSK1 |= (1<<ICIE1);
 	TIMSK1 |= (1<<OCIE1A);
 }
 
 void CartesianBot::disableTimerInterrupt()
 {
+	TIMSK1 &= ~(1<<ICIE1);
 	TIMSK1 &= ~(1<<OCIE1A);
 }
 
 void CartesianBot::setTimerResolution(byte r)
 {
-	// prescale of /64 == 4 usec tick
+	//here's how you figure out the tick size:
+	// 1000000 / ((16000000 / prescaler))
+	// 1000000 = microseconds in 1 second
+	// 16000000 = cycles in 1 second
+	// prescaler = your prescaler
+
+	// no prescaler == 0.0625 usec tick
+	if (r == 0)
+	{
+		// 001 = clk/1
+		TCCR1B &= ~(1<<CS12);
+		TCCR1B &= ~(1<<CS11);
+		TCCR1B |=  (1<<CS10);
+	}	
+	// prescale of /8 == 0.5 usec tick
 	if (r == 1)
+	{
+		// 010 = clk/8
+		TCCR1B &= ~(1<<CS12);
+		TCCR1B |=  (1<<CS11);
+		TCCR1B &= ~(1<<CS10);
+	}
+	// prescale of /64 == 4 usec tick
+	if (r == 2)
 	{
 		// 011 = clk/64
 		TCCR1B &= ~(1<<CS12);
@@ -256,7 +282,7 @@ void CartesianBot::setTimerResolution(byte r)
 		TCCR1B |=  (1<<CS10);
 	}
 	// prescale of /256 == 16 usec tick
-	else if (r == 2)
+	else if (r == 3)
 	{
 		// 100 = clk/256
 		TCCR1B |=  (1<<CS12);
@@ -273,118 +299,66 @@ void CartesianBot::setTimerResolution(byte r)
 	}
 }
 
-void CartesianBot::setTimer(unsigned long speed)
+void CartesianBot::setTimerCeiling(unsigned int c)
 {
-	//speed is the delay between steps in microseconds.
+	OCR1A = c;
+}
+
+void CartesianBot::setTimer(unsigned long delay)
+{
+	// delay is the delay between steps in 4 microsecond ticks.
 	//
-	//we break it into 3 different resolutions
-	//then essentially calculate the timer ceiling required. (ie what the counter counts to)
-	//the way we do that is to take the ratio of speed to the max of the resolution,
-	//multiply it by the the max value of the counter... except in a different order
-	//due to integer math.  we then set that as the timer value so it fires an interrupt every
-	//x microseconds.
-	byte ceiling = 255;
-	 
-	if (speed <= 255L)
-	{
-		this->setTimerResolution(1);
-		ceiling = speed;
-	}
-	else if (speed <= 1020L)
-	{
-		this->setTimerResolution(2);
-		ceiling = speed / 4;
-	}
-	// our slowest speed at our lowest resolution ((2^16-1) * 64 usecs = 4194240 usecs)
-	else if (speed <= 4080L)
-	{
-		this->setTimerResolution(3);
-		ceiling = speed / 16;
-	}
-	//its really slow... hopefully we can just get by with super slow.
-	else
-	{
-		//otherwise, set it to our slowest speed.
-		this->setTimerResolution(3);
-		ceiling = 255;
-	}
+	// we break it into 5 different resolutions based on the delay. 
+	// then we set the resolution based on the size of the delay.
+	// we also then calculate the timer ceiling required. (ie what the counter counts to)
+	// the result is the timer counts up to the appropriate time and then fires an interrupt.
 
-	//now update our clock!!
-	this->setTimerCeiling(ceiling);
-}
-
-void CartesianBot::setTimerCeiling(unsigned int f)
-{
-	OCR1A = f;
-}
-
-/*
-// I cannot for the life of me get the atmega to use the full 16 bits of the OCR1A, it only uses the lower 8 bits.
-// TODO: fix it to use full 16 bits.
-
-void CartesianBot::setTimer(unsigned long speed)
-{
-	//speed is the delay between steps in microseconds.
-	//
-	//we break it into 3 different resolutions
-	//then essentially calculate the timer ceiling required. (ie what the counter counts to)
-	//the way we do that is to take the ratio of speed to the max of the resolution,
-	//multiply it by the the max value of the counter... except in a different order
-	//due to integer math.  we then set that as the timer value so it fires an interrupt every
-	//x microseconds.
-	unsigned int ceiling = 65535;
-	 
-	// our slowest speed at our highest resolution ( (2^16-1) * 4 usecs = 262140 usecs)
-	if (speed <= 65535L)
-	{
-		this->setTimerResolution(1);
-		ceiling = speed & 0xffff;
-	}
-	// our slowest speed at our medium resolution ( (2^16-1) * 16 usecs = 1048560 usecs)
-	else if (speed <= 262140L)
-	{
-		this->setTimerResolution(2);
-		ceiling = speed / 4;
-	}
-	// our slowest speed at our lowest resolution ((2^16-1) * 64 usecs = 4194240 usecs)
-	else if (speed <= 1048560L)
-	{
-		this->setTimerResolution(3);
-		ceiling = speed / 16;
-	}
-	//its really slow... hopefully we can just get by with super slow.
-	else
-	{
-		//otherwise, set it to our slowest speed.
-		this->setTimerResolution(3);
-		ceiling = 65535;
-	}
-
-	//now update our clock!!
-	this->setTimerCeiling(ceiling);
-}
-
-
-
-void CartesianBot::setTimerCeiling(unsigned int f)
-{
-	unsigned char sreg;
-	
-	//disable global interrupts
-	sreg = SREG;
-	SREG &= ~(1<<7);
-	
-	//disable our timer interrupt
 	this->disableTimerInterrupt();
-
-// none of these calls work.
-//	OCR1A = f;	
-//	OCR1AH = (f >> 8);
-//	OCR1AL = (f & 0xff);
-	OCR1A = f & 0xffff;
-	
-	//re-enable interrupts.
-	SREG = sreg;
+	this->setTimerCeiling(this->getTimerCeiling(delay));
+	this->setTimerResolution(this->getTimerResolution(delay));
 	this->enableTimerInterrupt();
 }
-*/
+
+unsigned int CartesianBot::getTimerCeiling(unsigned long delay)
+{
+	// our slowest speed at our highest resolution ( (2^16-1) * 0.0625 usecs = 4095 usecs)
+	if (delay <= 1023L)
+		return ((delay * 64) & 0xffff);
+	// our slowest speed at our next highest resolution ( (2^16-1) * 0.5 usecs = 32767 usecs)
+	else if (delay <= 8191L)
+		return ((delay * 8) & 0xffff);
+	// our slowest speed at our medium resolution ( (2^16-1) * 4 usecs = 262140 usecs)
+	else if (delay <= 65535L)
+		return (delay & 0xffff);
+	// our slowest speed at our medium-low resolution ( (2^16-1) * 16 usecs = 1048560 usecs)
+	else if (delay <= 262140L)
+		return (delay / 4);
+	// our slowest speed at our lowest resolution ((2^16-1) * 64 usecs = 4194240 usecs)
+	else if (delay <= 1048560L)
+		return (delay / 16);
+	//its really slow... hopefully we can just get by with super slow.
+	else
+		return 65535;
+}
+
+byte CartesianBot::getTimerResolution(unsigned long delay)
+{
+	// our slowest speed at our highest resolution ( (2^16-1) * 0.0625 usecs = 4095 usecs)
+	if (delay <= 1023L)
+		return 0;
+	// our slowest speed at our next highest resolution ( (2^16-1) * 0.5 usecs = 32767 usecs)
+	else if (delay <= 8191L)
+		return 1;
+	// our slowest speed at our medium resolution ( (2^16-1) * 4 usecs = 262140 usecs)
+	else if (delay <= 65535L)
+		return 2;
+	// our slowest speed at our medium-low resolution ( (2^16-1) * 16 usecs = 1048560 usecs)
+	else if (delay <= 262140L)
+		return 3;
+	// our slowest speed at our lowest resolution ((2^16-1) * 64 usecs = 4194240 usecs)
+	else if (delay <= 1048560L)
+		return 4;
+	//its really slow... hopefully we can just get by with super slow.
+	else
+		return 4;
+}
