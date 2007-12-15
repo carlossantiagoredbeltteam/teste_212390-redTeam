@@ -25,6 +25,8 @@
 #define MODE_SEEK 1
 #define MODE_DDA 2
 #define MODE_HOMERESET 3
+#define MODE_FIND_MIN 4
+#define MODE_FIND_MAX 5
 
 // our point structure to make things nice.
 struct Point {
@@ -64,6 +66,7 @@ class CartesianBot {
 	void stop();
 	void startSeek();
 	void startHomeReset();
+	void startCalibration();
 	byte getMode();
 
 	//our interface methods

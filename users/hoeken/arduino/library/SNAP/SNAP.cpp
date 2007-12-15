@@ -306,8 +306,8 @@ void SNAP::sendDataByte(byte c)
 
 void SNAP::sendDataInt(int i)
 {
-  this->sendDataByte(i>>8);
-  this->sendDataByte(i&0xFF);
+	this->sendDataByte(i & 0xff);
+	this->sendDataByte(i >> 8);
 }
 
 
@@ -407,7 +407,7 @@ byte SNAP::getByte(byte index)
   return this->rxBuffer[index];
 }
 
-int SNAP::getInt(byte index)
+unsigned int SNAP::getInt(byte index)
 {
-  return ((int)this->rxBuffer[index]) << 8 + this->rxBuffer[index+1];
+  return (this->rxBuffer[index+1] << 8) + this->rxBuffer[index];
 }
