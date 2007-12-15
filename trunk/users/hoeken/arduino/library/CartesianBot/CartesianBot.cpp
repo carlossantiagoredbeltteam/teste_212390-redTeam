@@ -129,6 +129,12 @@ void CartesianBot::startHomeReset()
 	this->enableTimerInterrupt();
 }
 
+void CartesianBot::startCalibration()
+{
+	mode = MODE_FIND_MIN;
+	this->enableTimerInterrupt();
+}
+
 byte CartesianBot::getMode()
 {
 	return mode;

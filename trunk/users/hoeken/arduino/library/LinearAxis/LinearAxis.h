@@ -41,6 +41,8 @@ class LinearAxis {
 	long getTarget();
 	void setTarget(long t);
 	bool atTarget();
+	void setMax(long m);
+	long getMax();
 	
 	void forward1();
 	void reverse1();
@@ -51,7 +53,7 @@ class LinearAxis {
 
 	byte id;					//what is our id? x, y, z, etc.
 	bool can_step;				//are we capable of taking a step yet?
-	int function;				//what function are we at?
+	byte function;				//what function are we at?
 
 	long delta;					//our delta for our DDA moves.
 	long counter;				//our dda counter for dda moves.
@@ -59,6 +61,7 @@ class LinearAxis {
   private:
 	long current;				//this is our current position.
 	long target;				//this is our target position.
+	long max;					//this is our max coordinate.
 	
 	LimitSwitch min_switch;
 	LimitSwitch max_switch;
