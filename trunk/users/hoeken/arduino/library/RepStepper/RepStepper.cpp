@@ -58,9 +58,10 @@ void RepStepper::setRPM(int new_rpm)
 	{
 		rpm = new_rpm;
 		
-		//our high precision time is measured in 4us ticks, so get the # of ticks in 1 minute / 
-		// number of steps per rev / number of revolutions per minute = ticks per step
-		step_delay = (15000000UL / number_of_steps) / rpm;
+		//lets use the highest precision possible... processor ticks.
+		// 16MHZ = 16,000,000 ticks/sec * 60 seconds in a minute = 960,000,000 ticks / minute
+		// take the total # of ticks / steps per rev / number of revolutions per minute = ticks per step
+		step_delay = (960000000UL / number_of_steps) / rpm;
 	}
 }
 

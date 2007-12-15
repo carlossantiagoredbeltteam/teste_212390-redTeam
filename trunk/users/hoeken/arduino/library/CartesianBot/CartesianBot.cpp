@@ -322,20 +322,20 @@ void CartesianBot::setTimer(unsigned long delay)
 unsigned int CartesianBot::getTimerCeiling(unsigned long delay)
 {
 	// our slowest speed at our highest resolution ( (2^16-1) * 0.0625 usecs = 4095 usecs)
-	if (delay <= 1023L)
-		return ((delay * 64) & 0xffff);
-	// our slowest speed at our next highest resolution ( (2^16-1) * 0.5 usecs = 32767 usecs)
-	else if (delay <= 8191L)
-		return ((delay * 8) & 0xffff);
-	// our slowest speed at our medium resolution ( (2^16-1) * 4 usecs = 262140 usecs)
-	else if (delay <= 65535L)
+	if (delay <= 65535L)
 		return (delay & 0xffff);
+	// our slowest speed at our next highest resolution ( (2^16-1) * 0.5 usecs = 32767 usecs)
+	else if (delay <= 524280L)
+		return ((delay / 8) & 0xffff);
+	// our slowest speed at our medium resolution ( (2^16-1) * 4 usecs = 262140 usecs)
+	else if (delay <= 4194240L)
+		return ((delay / 64) & 0xffff);
 	// our slowest speed at our medium-low resolution ( (2^16-1) * 16 usecs = 1048560 usecs)
-	else if (delay <= 262140L)
-		return (delay / 4);
+	else if (delay <= 16776960L)
+		return (delay / 256);
 	// our slowest speed at our lowest resolution ((2^16-1) * 64 usecs = 4194240 usecs)
-	else if (delay <= 1048560L)
-		return (delay / 16);
+	else if (delay <= 67107840L)
+		return (delay / 1024);
 	//its really slow... hopefully we can just get by with super slow.
 	else
 		return 65535;
@@ -343,20 +343,27 @@ unsigned int CartesianBot::getTimerCeiling(unsigned long delay)
 
 byte CartesianBot::getTimerResolution(unsigned long delay)
 {
-	// our slowest speed at our highest resolution ( (2^16-1) * 0.0625 usecs = 4095 usecs)
-	if (delay <= 1023L)
+	// these also represent frequency: 1000000 / delay / 2 = frequency in hz.
+	
+	// our slowest speed at our highest resolution ( (2^16-1) * 0.0625 usecs = 4095 usecs (4 millisecond max))
+	// range: 8Mhz max - 122hz min
+	if (delay <= 65535L)
 		return 0;
-	// our slowest speed at our next highest resolution ( (2^16-1) * 0.5 usecs = 32767 usecs)
-	else if (delay <= 8191L)
+	// our slowest speed at our next highest resolution ( (2^16-1) * 0.5 usecs = 32767 usecs (32 millisecond max))
+	// range:1Mhz max - 15.26hz min
+	else if (delay <= 524280L)
 		return 1;
-	// our slowest speed at our medium resolution ( (2^16-1) * 4 usecs = 262140 usecs)
-	else if (delay <= 65535L)
+	// our slowest speed at our medium resolution ( (2^16-1) * 4 usecs = 262140 usecs (0.26 seconds max))
+	// range: 125Khz max - 1.9hz min
+	else if (delay <= 4194240L)
 		return 2;
-	// our slowest speed at our medium-low resolution ( (2^16-1) * 16 usecs = 1048560 usecs)
-	else if (delay <= 262140L)
+	// our slowest speed at our medium-low resolution ( (2^16-1) * 16 usecs = 1048560 usecs (1.04 seconds max))
+	// range: 31.25Khz max - 0.475hz min
+	else if (delay <= 16776960L)
 		return 3;
-	// our slowest speed at our lowest resolution ((2^16-1) * 64 usecs = 4194240 usecs)
-	else if (delay <= 1048560L)
+	// our slowest speed at our lowest resolution ((2^16-1) * 64 usecs = 4194240 usecs (4.19 seconds max))
+	// range: 7.812Khz max - 0.119hz min
+	else if (delay <= 67107840L)
 		return 4;
 	//its really slow... hopefully we can just get by with super slow.
 	else
