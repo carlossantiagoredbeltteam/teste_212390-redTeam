@@ -229,7 +229,7 @@ void CartesianBot::setupTimerInterrupt()
 	TCCR1A &= ~(1<<COM1B0);
 
 	//start off with a slow frequency.
-	this->setTimerResolution(1);
+	this->setTimerResolution(4);
 	this->setTimerCeiling(65535);
 }
 
@@ -266,7 +266,7 @@ void CartesianBot::setTimerResolution(byte r)
 		TCCR1B |=  (1<<CS10);
 	}	
 	// prescale of /8 == 0.5 usec tick
-	if (r == 1)
+	else if (r == 1)
 	{
 		// 010 = clk/8
 		TCCR1B &= ~(1<<CS12);
@@ -274,7 +274,7 @@ void CartesianBot::setTimerResolution(byte r)
 		TCCR1B &= ~(1<<CS10);
 	}
 	// prescale of /64 == 4 usec tick
-	if (r == 2)
+	else if (r == 2)
 	{
 		// 011 = clk/64
 		TCCR1B &= ~(1<<CS12);
