@@ -24,19 +24,19 @@ extern volatile unsigned long timer0_overflow_count;
 class RepStepper {
   public:
     // constructors:
-    RepStepper(int number_of_steps, int dir_pin, int step_pin);
+    RepStepper(unsigned int number_of_steps, byte dir_pin, byte step_pin);
 
     // various setters methods:
-	void setRPM(int rpm);
-    void setSpeed(int speed);
+	void setRPM(unsigned int rpm);
+    void setSpeed(unsigned long speed);
 	void setDirection(bool direction);
-	void setSteps(int steps);
+	void setSteps(unsigned int steps);
 
 	//our getter methods to help us out
-	int getRPM();
-	int getSpeed();
+	unsigned int getRPM();
+	unsigned long getSpeed();
 	bool getDirection();
-	int getSteps();
+	unsigned int getSteps();
 	
     //various methods dealing with stepping.
 	bool canStep();
@@ -61,8 +61,8 @@ class RepStepper {
     unsigned long now;					// the 'current' timestamp in ticks of right now.
 	
     // motor pin numbers:
-    int step_pin;						//the step signal pin.
-    int direction_pin;					//the direction pin.
+    byte step_pin;						//the step signal pin.
+    byte direction_pin;					//the direction pin.
 
 	//our time function
 	unsigned long hpticks(void);		//our high precision time function

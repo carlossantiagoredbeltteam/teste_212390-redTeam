@@ -5,7 +5,7 @@
  * two-wire constructor.
  * Sets which wires should control the motor.
  */
-RepStepper::RepStepper(int number_of_steps, int dir_pin, int step_pin)
+RepStepper::RepStepper(unsigned int number_of_steps, byte dir_pin, byte step_pin)
 {
 	//init our variables.
 	this->direction = 1;
@@ -26,12 +26,12 @@ RepStepper::RepStepper(int number_of_steps, int dir_pin, int step_pin)
 /*
   Sets the speed in ticks per step
 */
-void RepStepper::setSpeed(int speed)
+void RepStepper::setSpeed(unsigned long speed)
 {
 	step_delay = speed;
 	
 	if (step_delay > 0)
-		rpm = 15000000UL / (step_delay * number_of_steps);
+		rpm = 960000000UL / (step_delay * number_of_steps);
 	else
 		rpm = 0;
 }
@@ -39,7 +39,7 @@ void RepStepper::setSpeed(int speed)
 /*
   Gets the speed in ticks per step
 */
-int RepStepper::getSpeed()
+unsigned long RepStepper::getSpeed()
 {
 	return step_delay;
 }
@@ -47,7 +47,7 @@ int RepStepper::getSpeed()
 /*
   Sets the speed in revs per minute
 */
-void RepStepper::setRPM(int new_rpm)
+void RepStepper::setRPM(unsigned int new_rpm)
 {
 	if (new_rpm == 0)
 	{
@@ -65,12 +65,12 @@ void RepStepper::setRPM(int new_rpm)
 	}
 }
 
-int RepStepper::getRPM()
+unsigned int RepStepper::getRPM()
 {
 	return rpm;
 }
 
-void RepStepper::setSteps(int steps)
+void RepStepper::setSteps(unsigned int steps)
 {
 	number_of_steps = steps;
 	
@@ -78,7 +78,7 @@ void RepStepper::setSteps(int steps)
 	this->setRPM(this->getRPM());
 }
 
-int RepStepper::getSteps()
+unsigned int RepStepper::getSteps()
 {
 	return number_of_steps;
 }
