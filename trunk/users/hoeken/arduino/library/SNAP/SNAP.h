@@ -6,9 +6,10 @@
 #include "HardwareSerial.h"
 
 //how many devices we have on this meta device
-#define MAX_DEVICE_COUNT 5        // size of our array to store virtual addresses
-#define TX_BUFFER_SIZE 16        // Transmit buffer size.
-#define RX_BUFFER_SIZE 16        // Receive buffer size.
+#define MAX_DEVICE_COUNT 5		// size of our array to store virtual addresses
+#define TX_BUFFER_SIZE 16		// Transmit buffer size.
+#define RX_BUFFER_SIZE 16		// Receive buffer size.
+#define HOST_ADDRESS 0			// address of the host.
 
 //our sync packet value.
 #define SNAP_SYNC 0x54
@@ -119,5 +120,8 @@ class SNAP
   byte deviceAddresses[MAX_DEVICE_COUNT];
   byte deviceCount;
 };
+
+//global variable declaration.
+extern SNAP snap;
 
 #endif

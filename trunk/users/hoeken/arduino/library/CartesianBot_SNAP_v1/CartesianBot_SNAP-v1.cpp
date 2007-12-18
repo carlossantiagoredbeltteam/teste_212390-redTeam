@@ -1,124 +1,19 @@
-/*
-  3Axis_SNAP.pde - RepRap cartesian firmware for Arduino
 
-  History:
-  * Created initial version (0.1) by Zach Smith.
-  * Rewrite (0.2) by Marius Kintel <kintel@sim.no> and Philipp Tiefenbacher <wizards23@gmail.com>
-  * Updated and tested (0.3) to work with current RepRap host software by Zach Smith <hoeken@rrrf.org>
-  */
-#include <SNAP.h>
-#include <LimitSwitch.h>
-#include <RepStepper.h>
-#include <LinearAxis.h>
-#include <CartesianBot.h>
-
-//the addresses of our emulated axes.
-#define X_ADDRESS 2
-#define Y_ADDRESS 3
-#define Z_ADDRESS 4
-
-/********************************
- * digital i/o pin assignment
- ********************************/
-
-//this uses the undocumented feature of Arduino - pins 14-19 correspond to analog 0-5
-#define X_STEP_PIN 2
-#define X_DIR_PIN 3
-#define X_MIN_PIN 4
-#define X_MAX_PIN 5
-#define X_ENABLE_PIN 14
-#define Y_STEP_PIN 6
-#define Y_DIR_PIN 7
-#define Y_MIN_PIN 8
-#define Y_MAX_PIN 9
-#define Y_ENABLE_PIN 15
-#define Z_STEP_PIN 10
-#define Z_DIR_PIN 11
-#define Z_MIN_PIN 12
-#define Z_MAX_PIN 13
-#define Z_ENABLE_PIN 16
-
-/********************************
- * how many steps do our motors have?
- ********************************/
-#define X_MOTOR_STEPS 400
-#define Y_MOTOR_STEPS 400
-#define Z_MOTOR_STEPS 400
-
-/********************************
- * command declarations
- ********************************/
-#define CMD_VERSION   0
-#define CMD_FORWARD   1
-#define CMD_REVERSE   2
-#define CMD_SETPOS    3
-#define CMD_GETPOS    4
-#define CMD_SEEK      5
-#define CMD_FREE      6
-#define CMD_NOTIFY    7
-#define CMD_SYNC      8
-#define CMD_CALIBRATE 9
-#define CMD_GETRANGE  10
-#define CMD_DDA       11
-#define CMD_FORWARD1  12
-#define CMD_BACKWARD1 13
-#define CMD_SETPOWER  14
-#define CMD_GETSENSOR 15
-#define CMD_HOMERESET 16
-
-/********************************
- *  Global mode declarations
- ********************************/
-enum functions {
-	func_idle,
-	func_forward,
-	func_reverse,
-	func_syncwait,   // Waiting for sync prior to seeking
-	func_seek,
-	func_findmin,    // Calibration, finding minimum
-	func_findmax,    // Calibration, finding maximum
-	func_ddamaster,
-	func_homereset   // Move to min position and reset
-};
-
-/********************************
- *  Sync mode declarations
- ********************************/
-enum sync_modes {
-  sync_none,     // no sync (default)
-  sync_seek,     // synchronised seeking
-  sync_inc,      // inc motor on each pulse
-  sync_dec       // dec motor on each pulse
-};
-byte x_sync_mode = sync_none;
-byte y_sync_mode = sync_none;
-
-/********************************
- *  Global variable declarations
- ********************************/
-
-//our cartesian bot object
-CartesianBot bot(
+/**********************************
+*  Global variable instantiations
+**********************************/
+CartesianBot bot = CartesianBot(
 	'x', X_MOTOR_STEPS, X_DIR_PIN, X_STEP_PIN, X_MIN_PIN, X_MAX_PIN,
 	'y', Y_MOTOR_STEPS, Y_DIR_PIN, Y_STEP_PIN, Y_MIN_PIN, Y_MAX_PIN,
 	'z', Z_MOTOR_STEPS, Z_DIR_PIN, Z_STEP_PIN, Z_MIN_PIN, Z_MAX_PIN
 );
 
-//our communicator object
-SNAP snap;
-
 byte x_notify = 255;
 byte y_notify = 255;
 byte z_notify = 255;
 
-//uncomment this define to enable the debug mode.
-#define DEBUG_MODE
-#ifdef DEBUG_MODE
-	#include <SoftwareSerial.h>
-	#define DEBUG_RX_PIN 14
-	#define DEBUG_TX_PIN 15
-	SoftwareSerial debug =  SoftwareSerial(DEBUG_RX_PIN, DEBUG_TX_PIN);
-#endif
+byte x_sync_mode = sync_none;
+byte y_sync_mode = sync_none;
 
 SIGNAL(SIG_OUTPUT_COMPARE1A)
 {
@@ -309,46 +204,17 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
 		}
 	}
 }
-	
-void setup()
+
+void setup_cartesian_bot_snap_v1()
 {
 	bot.setupTimerInterrupt();
-
-	Serial.begin(19200);
+	
 	snap.addDevice(X_ADDRESS);
 	snap.addDevice(Y_ADDRESS);
 	snap.addDevice(Z_ADDRESS);
-
-	bot.stop();
-
-	#ifdef DEBUG_MODE
-		pinMode(DEBUG_RX_PIN, INPUT);
-		pinMode(DEBUG_TX_PIN, OUTPUT);
-		debug.begin(2400);
-		debug.println("Debug active.");
-	#endif
 }
 
-void loop()
-{	
-	//process our commands
-	snap.receivePacket();
-	if (snap.packetReady())
-		executeCommands();
-
-	//get our state status.
-	bot.readState();
-
-	//if we are at our target, stop us.
-//	if (bot.atTarget())
-//		bot.stop();
-}
-
-int notImplemented(int cmd)
-{
-}
-
-void executeCommands()
+void process_cartesian_bot_snap_commands_v1()
 {
 	byte cmd = snap.getByte(0);
 	byte dest = snap.getDestination();
@@ -568,7 +434,6 @@ void executeCommands()
 			//which axis is leading?
 			if (dest == X_ADDRESS)
 			{
-				debug.println("x master");
 				bot.x.setTarget(position);
 				
 				//we can figure out the target based on the sync mode
@@ -579,7 +444,6 @@ void executeCommands()
 			}
 			else if (dest == Y_ADDRESS)
 			{
-				debug.println("y master");
 				bot.y.setTarget(position);
 				bot.x.setTarget(target);
 
@@ -589,26 +453,6 @@ void executeCommands()
 				else
 					bot.x.setTarget(bot.x.getPosition() - target);
 			}
-			
-			debug.print("position: ");
-			debug.println(position);
-			debug.print("target: ");
-			debug.println(target);
-	
-			debug.print("x: ");
-			debug.print((int)bot.x.getPosition());
-			debug.print(" -> ");
-			debug.println((int)bot.x.getTarget());
-
-			debug.print("y: ");
-			debug.print((int)bot.y.getPosition());
-			debug.print(" -> ");
-			debug.println((int)bot.y.getTarget());
-			
-			debug.print("x notify: ");
-			debug.println(x_notify, DEC);
-			debug.print("y notify: ");
-			debug.println(y_notify, DEC);
 			
 			//set z's target to itself.
 			bot.z.setTarget(bot.z.getPosition());
@@ -697,9 +541,6 @@ void executeCommands()
 
 void notifyHomeReset(byte to, byte from)
 {
-	debug.print(from, DEC);
-	debug.println(" at home");
-	
 	snap.startMessage(from);
 	snap.sendMessage(to);
 	snap.sendDataByte(CMD_HOMERESET);
@@ -708,11 +549,6 @@ void notifyHomeReset(byte to, byte from)
 
 void notifyCalibrate(byte to, byte from, unsigned int position)
 {
-	debug.print("calibrate: ");
-	debug.print(from, DEC);
-	debug.print(" at ");
-	debug.println((int)position, DEC);
-	
 	snap.startMessage(from);
 	snap.sendMessage(to);
 	snap.sendDataByte(CMD_CALIBRATE);
@@ -722,11 +558,6 @@ void notifyCalibrate(byte to, byte from, unsigned int position)
 
 void notifySeek(byte to, byte from, unsigned int position)
 {
-	debug.print("seek: ");
-	debug.print(from, DEC);
-	debug.print(" at ");
-	debug.println((int)position, DEC);
-
 	snap.startMessage(from);
 	snap.sendMessage(to);
 	snap.sendDataByte(CMD_SEEK);
@@ -736,15 +567,9 @@ void notifySeek(byte to, byte from, unsigned int position)
 
 void notifyDDA(byte to, byte from, unsigned int position)
 {
-	debug.print("dda: ");
-	debug.print(from, DEC);
-	debug.print(" at ");
-	debug.println((int)position, DEC);
-	
 	snap.startMessage(from);
 	snap.sendMessage(to);
 	snap.sendDataByte(CMD_DDA);
 	snap.sendDataInt(position);
 	snap.endMessage();
 }
-

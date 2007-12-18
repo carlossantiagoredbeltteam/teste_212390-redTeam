@@ -1,98 +1,14 @@
-/*
-  Extruder_SNAP.pde - RepRap Thermoplastic Extruder firmware for Arduino
+//instantiate our extruder class.
+ThermoplastExtruder extruder = ThermoplastExtruder(EXTRUDER_MOTOR_DIR_PIN, EXTRUDER_MOTOR_SPEED_PIN, EXTRUDER_HEATER_PIN, EXTRUDER_THERMISTOR_PIN);
 
-  Main firmware for the extruder (heater, motor and temp. sensor)
-
-  History:
-  * Created intial version (0.1) by Philipp Tiefenbacher and Marius Kintel
-
-*/
-
-#include <ThermoplastExtruder.h>
-#include <SNAP.h>
-
-#define VERSION_MAJOR 0
-#define VERSION_MINOR 2
-#define HOST_ADDRESS 0
-
-//
-// Extrude commands
-//
-#define CMD_VERSION       0
-#define CMD_FORWARD       1
-#define CMD_REVERSE       2
-#define CMD_SETPOS        3
-#define CMD_GETPOS        4
-#define CMD_SEEK          5
-#define CMD_FREE          6
-#define CMD_NOTIFY        7
-#define CMD_ISEMPTY       8
-#define CMD_SETHEAT       9
-#define CMD_GETTEMP       10
-#define CMD_SETCOOLER     11
-#define CMD_PWMPERIOD     50
-#define CMD_PRESCALER     51
-#define CMD_SETVREF       52
-#define CMD_SETTEMPSCALER 53
-#define CMD_GETDEBUGINFO  54
-#define CMD_GETTEMPINFO   55
-
-#define EXTRUDER_MOTOR_SPEED_PIN  3
-#define EXTRUDER_MOTOR_DIR_PIN    4
-#define EXTRUDER_HEATER_PIN       5
-#define EXTRUDER_THERMISTOR_PIN   0
-
-SNAP snap;
-ThermoplastExtruder extruder(EXTRUDER_MOTOR_DIR_PIN, EXTRUDER_MOTOR_SPEED_PIN, EXTRUDER_HEATER_PIN, EXTRUDER_THERMISTOR_PIN);
-
-//uncomment this define to enable the debug mode.
-#define DEBUG_MODE
-#ifdef DEBUG_MODE
-	#include <SoftwareSerial.h>
-	#define DEBUG_RX_PIN 10
-	#define DEBUG_TX_PIN 11
-	SoftwareSerial debug = SoftwareSerial(DEBUG_RX_PIN, DEBUG_TX_PIN);
-#endif
-
-void setup()
+//this guys sets us up.
+void setup_extruder_snap_v2()
 {
-	Serial.begin(19200);
-
-	snap.addDevice(8);
-
-	for (byte i=8;i<14;i++)
-	{
-		pinMode(i, OUTPUT);
-		digitalWrite(i, 0);
-	}
-	
-	#ifdef DEBUG_MODE
-		pinMode(DEBUG_RX_PIN, INPUT);
-		pinMode(DEBUG_TX_PIN, OUTPUT);
-		debug.begin(4800);
-		debug.println("Debug active.");
-	#endif
+	snap.addDevice(EXTRUDER_ADDRESS);
 }
 
-void loop()
-{
-	//process our commands
-	snap.receivePacket();
-	if (snap.packetReady())
-		executeCommands();
-
-	//manage our temperature
-	extruder.manageTemperature();
-}
-  
-int currentPos = 0;
-byte currentHeat = 0;
-byte requestedHeat0 = 0;
-byte requestedHeat1 = 0;
-byte temperatureLimit0 = 0;
-byte temperatureLimit1 = 0;
-
-void executeCommands()
+//this guy actually processes the commands.
+void process_thermoplast_extruder_snap_commands_v2()
 {
 	byte cmd = snap.getByte(0);
 
@@ -175,6 +91,7 @@ void executeCommands()
 			debug.println(extruder.getTemperature(), DEC);
 			debug.print("raw: ");
 			debug.println(extruder.getRawTemperature(), DEC);
+
 			snap.sendReply();
 			snap.sendDataByte(CMD_GETTEMP); 
 			snap.sendDataByte(extruder.getTemperature());

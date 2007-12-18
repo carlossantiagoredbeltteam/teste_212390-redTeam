@@ -411,3 +411,6 @@ unsigned int SNAP::getInt(byte index)
 {
   return (this->rxBuffer[index+1] << 8) + this->rxBuffer[index];
 }
+
+// Preinstantiate Objects
+SNAP snap = SNAP();
