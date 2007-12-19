@@ -24,7 +24,7 @@ extern volatile unsigned long timer0_overflow_count;
 class RepStepper {
   public:
     // constructors:
-    RepStepper(unsigned int number_of_steps, byte dir_pin, byte step_pin);
+    RepStepper(unsigned int number_of_steps, byte dir_pin, byte step_pin, byte enable_pin);
 
     // various setters methods:
 	void setRPM(unsigned int rpm);
@@ -43,6 +43,9 @@ class RepStepper {
     void step();
 	void pulse();
 	void moveTo(int steps);
+	void enable();
+	void disable();
+	bool isEnabled();
 
 	//random other functions
     int version();
@@ -51,6 +54,7 @@ class RepStepper {
 
 	//various internal variables
     bool direction;						// Direction of rotation
+	bool enabled;						// whether or not we're enabled.
 	unsigned int rpm;					// Speed in RPMs
 	unsigned long step_delay;  			// delay between steps, in microseconds, based on speed
     unsigned int number_of_steps;		// total number of steps this motor can take
@@ -63,6 +67,7 @@ class RepStepper {
     // motor pin numbers:
     byte step_pin;						//the step signal pin.
     byte direction_pin;					//the direction pin.
+    byte enable_pin;					//the enable pin.
 
 	//our time function
 	unsigned long hpticks(void);		//our high precision time function

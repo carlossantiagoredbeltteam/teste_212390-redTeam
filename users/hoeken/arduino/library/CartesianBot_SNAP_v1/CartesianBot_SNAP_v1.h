@@ -1,5 +1,17 @@
+#ifndef CARTESIAN_BOT_SNAP_V1_H
+#define CARTESIAN_BOT_SNAP_V1_H
+
+//all our includes.
+#include <SNAP.h>
+#include <LimitSwitch.h>
+#include <RepStepper.h>
+#include <LinearAxis.h>
+#include <CartesianBot.h>
+
 //this guy actually processes the v1 SNAP commands.
+void setup_cartesian_bot_snap_v1();
 void process_cartesian_bot_snap_commands_v1();
+void handleInterrupt();
 
 //notification functions to let the host know whats up.
 void notifyHomeReset(byte to, byte from);
@@ -68,3 +80,5 @@ enum sync_modes {
   sync_inc,      // inc motor on each pulse
   sync_dec       // dec motor on each pulse
 };
+
+#endif

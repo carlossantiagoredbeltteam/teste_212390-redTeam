@@ -20,7 +20,7 @@ class LinearAxis {
   public:
     
 	// constructors:
-    LinearAxis(byte id, int steps, int dir_pin, int step_pin, int min_pin, int max_pin);
+    LinearAxis(char id, int steps, byte dir_pin, byte step_pin, byte min_pin, byte max_pin, byte enable_pin);
 
 	//these are our other object variables.
 	RepStepper stepper;
@@ -51,7 +51,7 @@ class LinearAxis {
 	bool atMin();
 	bool atMax();
 
-	byte id;					//what is our id? x, y, z, etc.
+	char id;					//what is our id? x, y, z, etc.
 	bool can_step;				//are we capable of taking a step yet?
 	byte function;				//what function are we at?
 

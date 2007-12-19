@@ -1,12 +1,8 @@
+#include "CartesianBot_SNAP_v1.h"
 
 /**********************************
 *  Global variable instantiations
 **********************************/
-CartesianBot bot = CartesianBot(
-	'x', X_MOTOR_STEPS, X_DIR_PIN, X_STEP_PIN, X_MIN_PIN, X_MAX_PIN,
-	'y', Y_MOTOR_STEPS, Y_DIR_PIN, Y_STEP_PIN, Y_MIN_PIN, Y_MAX_PIN,
-	'z', Z_MOTOR_STEPS, Z_DIR_PIN, Z_STEP_PIN, Z_MIN_PIN, Z_MAX_PIN
-);
 
 byte x_notify = 255;
 byte y_notify = 255;
@@ -15,7 +11,7 @@ byte z_notify = 255;
 byte x_sync_mode = sync_none;
 byte y_sync_mode = sync_none;
 
-SIGNAL(SIG_OUTPUT_COMPARE1A)
+void handleInterrupt()
 {
 	bot.readState();
 	
@@ -304,7 +300,7 @@ void process_cartesian_bot_snap_commands_v1()
 				position = bot.x.getPosition();
 			else if (dest == Y_ADDRESS)
 				position = bot.y.getPosition();
-			else if (dest == Z_ADDRESS)
+			else
 				position = bot.z.getPosition();
 
 			snap.sendReply();
@@ -345,18 +341,18 @@ void process_cartesian_bot_snap_commands_v1()
 		case CMD_FREE:
 			if (dest == X_ADDRESS)
 			{
-				digitalWrite(X_ENABLE_PIN, LOW);
+				bot.x.stepper.disable();
 				bot.x.function = func_idle;
 			}
 			if (dest == Y_ADDRESS)
 			{
-				digitalWrite(Y_ENABLE_PIN, LOW);
+				bot.y.stepper.disable();
 				bot.y.function = func_idle;
 			}
 			if (dest == Z_ADDRESS)
 			{
-				digitalWrite(Z_ENABLE_PIN, LOW);
-				bot.y.function = func_idle;
+				bot.z.stepper.disable();
+				bot.z.function = func_idle;
 			}
 		break;
 
@@ -411,7 +407,7 @@ void process_cartesian_bot_snap_commands_v1()
 				position = bot.x.getMax();
 			else if (dest == Y_ADDRESS)
 				position = bot.y.getMax();
-			else if (dest == Z_ADDRESS)
+			else
 				position = bot.z.getMax();
 
 			//tell the host.
