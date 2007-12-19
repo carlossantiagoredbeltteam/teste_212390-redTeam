@@ -1,3 +1,9 @@
+#ifndef THERMOPLAST_EXTRUDER_SNAP_V2_H
+#define THERMOPLAST_EXTRUDER_SNAP_V2_H
+
+//our include files.
+#include <ThermoplastExtruder.h>
+#include <SNAP.h>
 
 //
 // Various processing commands.
@@ -10,6 +16,7 @@ void process_thermoplast_extruder_snap_commands_v2();
 //
 #define VERSION_MAJOR 2
 #define VERSION_MINOR 0
+#define EXTRUDER_ADDRESS 8
 
 //
 // Extruder commands
@@ -34,3 +41,5 @@ void process_thermoplast_extruder_snap_commands_v2();
 #define CMD_GETTEMPINFO   55
 
 extern ThermoplastExtruder extruder;
+
+#endif

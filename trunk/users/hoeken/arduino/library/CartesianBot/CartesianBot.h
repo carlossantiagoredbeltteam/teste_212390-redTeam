@@ -41,9 +41,9 @@ class CartesianBot {
 
     // constructors:
     CartesianBot(
-		byte x_id, int x_steps, int x_dir_pin, int x_step_pin, int x_min_pin, int x_max_pin,
-		byte y_id, int y_steps, int y_dir_pin, int y_step_pin, int y_min_pin, int y_max_pin,
-		byte z_id, int z_steps, int z_dir_pin, int z_step_pin, int z_min_pin, int z_max_pin
+		char x_id, int x_steps, byte x_dir_pin, byte x_step_pin, byte x_min_pin, byte x_max_pin, byte x_enable_pin,
+		char y_id, int y_steps, byte y_dir_pin, byte y_step_pin, byte y_min_pin, byte y_max_pin, byte y_enable_pin,
+		char z_id, int z_steps, byte z_dir_pin, byte z_step_pin, byte z_min_pin, byte z_max_pin, byte z_enable_pin
 	);
 	
 	// our queue stuff

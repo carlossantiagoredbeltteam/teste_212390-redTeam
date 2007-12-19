@@ -12,6 +12,8 @@
 #ifndef THERMOPLASTEXTRUDER_H
 #define THERMOPLASTEXTRUDER_H
 
+#include "WConstants.h"
+
 class ThermoplastExtruder
 {
 	public:

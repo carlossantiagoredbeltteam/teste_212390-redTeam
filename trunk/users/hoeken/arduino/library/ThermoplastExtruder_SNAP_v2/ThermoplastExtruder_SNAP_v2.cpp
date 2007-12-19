@@ -1,5 +1,11 @@
-//instantiate our extruder class.
-ThermoplastExtruder extruder = ThermoplastExtruder(EXTRUDER_MOTOR_DIR_PIN, EXTRUDER_MOTOR_SPEED_PIN, EXTRUDER_HEATER_PIN, EXTRUDER_THERMISTOR_PIN);
+#include <ThermoPlastExtruder_SNAP_v2.h>
+
+int currentPos = 0;
+byte currentHeat = 0;
+byte requestedHeat0 = 0;
+byte requestedHeat1 = 0;
+byte temperatureLimit0 = 0;
+byte temperatureLimit1 = 0;
 
 //this guys sets us up.
 void setup_extruder_snap_v2()
@@ -47,7 +53,7 @@ void process_thermoplast_extruder_snap_commands_v2()
 		break;
 
 		case CMD_SEEK:
-			debug.println("n/i: seek");
+			//debug.println("n/i: seek");
 		break;
 
 		case CMD_FREE:
@@ -57,7 +63,7 @@ void process_thermoplast_extruder_snap_commands_v2()
 		break;
 
 		case CMD_NOTIFY:
-			debug.println("n/i: notify");
+			//debug.println("n/i: notify");
 		break;
 
 		case CMD_ISEMPTY:
@@ -76,6 +82,7 @@ void process_thermoplast_extruder_snap_commands_v2()
 			extruder.setTargetTemperature(temperatureLimit1);
 			extruder.setHeater(requestedHeat1);
 
+			/*
 			debug.print("requestedHeat0: ");
 			debug.println(requestedHeat0);
 			debug.print("requestedHeat1: ");
@@ -84,14 +91,16 @@ void process_thermoplast_extruder_snap_commands_v2()
 			debug.println(temperatureLimit0);
 			debug.print("temperatureLimit1: ");
 			debug.println(temperatureLimit1);
+			*/
 		break;
 
 		case CMD_GETTEMP:
+			/*
 			debug.print("temp: ");
 			debug.println(extruder.getTemperature(), DEC);
 			debug.print("raw: ");
 			debug.println(extruder.getRawTemperature(), DEC);
-
+			*/
 			snap.sendReply();
 			snap.sendDataByte(CMD_GETTEMP); 
 			snap.sendDataByte(extruder.getTemperature());
@@ -100,28 +109,28 @@ void process_thermoplast_extruder_snap_commands_v2()
 		break;
 
 		case CMD_SETCOOLER:
-			debug.println("n/i: set cooler");
+			//debug.println("n/i: set cooler");
 		break;
 
 		// "Hidden" low level commands
 		case CMD_PWMPERIOD:
-			debug.println("n/i: pwm period");
+			//debug.println("n/i: pwm period");
 		break;
 
 		case CMD_PRESCALER:
-			debug.println("n/i: prescaler");
+			//debug.println("n/i: prescaler");
 		break;
 
 		case CMD_SETVREF:
-			debug.println("n/i: set vref");
+			//debug.println("n/i: set vref");
 		break;
 
 		case CMD_SETTEMPSCALER:
-			debug.println("n/i: set temp scaler");
+			//debug.println("n/i: set temp scaler");
 		break;
 
 		case CMD_GETDEBUGINFO:
-			debug.println("n/i: get debug info");
+			//debug.println("n/i: get debug info");
 		break;
 
 		case CMD_GETTEMPINFO:

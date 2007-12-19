@@ -5,7 +5,7 @@
  * two-wire constructor.
  * Sets which wires should control the motor.
  */
-RepStepper::RepStepper(unsigned int number_of_steps, byte dir_pin, byte step_pin)
+RepStepper::RepStepper(unsigned int number_of_steps, byte dir_pin, byte step_pin, byte enable_pin)
 {
 	//init our variables.
 	this->direction = 1;
@@ -17,10 +17,12 @@ RepStepper::RepStepper(unsigned int number_of_steps, byte dir_pin, byte step_pin
 	this->number_of_steps = number_of_steps;
 	this->step_pin = step_pin;
 	this->direction_pin = dir_pin;
+	this->enable_pin = enable_pin;
 	
 	// setup the pins on the microcontroller:
 	pinMode(this->step_pin, OUTPUT);
 	pinMode(this->direction_pin, OUTPUT);
+	this->enable();
 }
 
 /*
@@ -119,6 +121,32 @@ bool RepStepper::canStep()
 	
 	//okay, nobody said they're ready, bail.
 	return false;
+}
+
+void RepStepper::enable()
+{
+	if (enable_pin != 255)
+	{
+		enabled = true;
+		digitalWrite(enable_pin, HIGH);
+	}
+}
+
+void RepStepper::disable()
+{
+	if (enable_pin != 255)
+	{
+		enabled = false;
+		digitalWrite(enable_pin, LOW);
+	}
+}
+
+bool RepStepper::isEnabled()
+{
+	if (enable_pin != 255)
+		return enabled;
+	else
+		return true;
 }
 
 void RepStepper::step()
