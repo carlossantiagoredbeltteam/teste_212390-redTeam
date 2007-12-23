@@ -33,11 +33,12 @@ short temptable[NUMTEMPS][2] = {
 	motor_pwm_pin and heater_pin must be PWM capable outputs.
 	thermistor_pin must be an analog input.
 */
-ThermoplastExtruder::ThermoplastExtruder(byte motor_dir_pin, byte motor_pwm_pin, byte heater_pin, byte thermistor_pin)
+ThermoplastExtruder::ThermoplastExtruder(byte motor_dir_pin, byte motor_pwm_pin, byte heater_pin, byte cooler_pin, byte thermistor_pin)
 {
 	this->motor_dir_pin = motor_dir_pin;
 	this->motor_pwm_pin = motor_pwm_pin;
 	this->heater_pin = heater_pin;
+	this->cooler_pin = cooler_pin;
 	this->thermistor_pin = thermistor_pin;
 
 	pinMode(this->motor_dir_pin, OUTPUT);
@@ -47,8 +48,12 @@ ThermoplastExtruder::ThermoplastExtruder(byte motor_dir_pin, byte motor_pwm_pin,
 	this->readTemperature();
 	this->setSpeed(0);
 	this->setDirection(true);
-	this->setTargetTemperature(0);
-	this->setHeater(0);
+
+	//init our temp stuff.
+	this->target_celsius = 0;
+	this->max_celsius = 0;
+	this->heater_low = 0;
+	this->heater_high = 0;
 }
 
 /*!
@@ -60,6 +65,12 @@ void ThermoplastExtruder::setSpeed(byte speed)
 	analogWrite(this->motor_pwm_pin, this->motor_pwm);
 }
 
+void ThermoplastExtruder::setCooler(byte speed)
+{
+	this->cooler_pwm = speed;
+	analogWrite(this->cooler_pin, this->cooler_pwm);
+}
+
 /*!
   Sets the motor direction (true = forward, false = backward)
 */
@@ -67,21 +78,6 @@ void ThermoplastExtruder::setDirection(bool dir)
 {
 	this->motor_dir = dir;
 	digitalWrite(this->motor_dir_pin, this->motor_dir);
-}
-
-void ThermoplastExtruder::setTargetTemperature(int target)
-{
-	this->target_celsius = target;
-}
-
-void ThermoplastExtruder::setHeater(byte heat)
-{
-	this->heater_pwm = heat;
-}
-
-byte ThermoplastExtruder::getHeater()
-{
-	return this->heater_pwm;
 }
 
 byte ThermoplastExtruder::getSpeed()
@@ -97,16 +93,6 @@ bool ThermoplastExtruder::getDirection()
 int ThermoplastExtruder::getTemperature()
 {
 	return this->current_celsius;
-}
-
-int ThermoplastExtruder::getTemperatureInFahrenheit()
-{
-	return (((this->current_celsius * 9) / 5) + 32);
-}
-
-int ThermoplastExtruder::getTargetTemperature()
-{
-	return target_celsius;
 }
 
 /**
@@ -162,17 +148,20 @@ void ThermoplastExtruder::manageTemperature()
 {
 	//make sure we know what our temp is.
 	this->readTemperature();
-	
-	// Stop the motor and start the heater if temp is too low
+
+	//put the heater into high mode if we're not at our target.
 	if (current_celsius < target_celsius)
 	{
-		analogWrite(motor_pwm_pin, 0);
-		analogWrite(heater_pin, heater_pwm);
+		analogWrite(heater_pin, heater_high);
 	}
-	// Start the motor again and stop the heater if temp is high enough
+	//put the heater on low if we're at our target.
+	else if (current_celsius < max_celsius)
+	{
+		analogWrite(heater_pin, heater_low);
+	}
+	//turn the heater off if we're above our max.
 	else
 	{
-		analogWrite(motor_pwm_pin, motor_pwm);
 		analogWrite(heater_pin, 0);
 	}
 }

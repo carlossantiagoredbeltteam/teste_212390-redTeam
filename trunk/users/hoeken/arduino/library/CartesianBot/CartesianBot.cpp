@@ -140,45 +140,6 @@ byte CartesianBot::getMode()
 	return mode;
 }
 
-/*!
-  Synchronously move to home.
-*/
-void CartesianBot::home()
-{
-	//get an initial reading.
-	this->readState();
-	
-	//going towards home
-	x.setTarget(-9000000);
-	y.setTarget(-9000000);
-	z.setTarget(-9000000);
-
-	//okay, enable our movement!
-	this->startSeek();
-	
-	//move us home!
-	while (!this->atHome())
-	{
-		this->readState();
-	}
-	
-	//stop movement now.
-	this->stop();
-	
-	//mark us as home.
-	x.setPosition(0);
-	y.setPosition(0);
-	z.setPosition(0);
-	
-	//set our new target
-	x.setTarget(0);
-	y.setTarget(0);
-	z.setTarget(0);
-
-	//seek to our point!
-	this->startSeek();
-}
-
 bool CartesianBot::atHome()
 {
 	return (x.atMin() && y.atMin() && z.atMin());
@@ -195,18 +156,6 @@ bool CartesianBot::atTarget()
 {
 	return (x.atTarget() && y.atTarget() && z.atTarget());
 }
-
-void CartesianBot::abort()
-{
-	this->stop();
-	this->clearQueue();
-}
-
-int CartesianBot::version()
-{
-	return 1;
-}
-
 
 void CartesianBot::setupTimerInterrupt()
 {

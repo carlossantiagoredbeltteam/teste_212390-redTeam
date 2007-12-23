@@ -1,25 +1,32 @@
-#include <ThermoPlastExtruder_SNAP_v2.h>
+#include <ThermoPlastExtruder_SNAP_v1.h>
+#include <math.h>
 
+//
+// Variables from host software
+//
+byte vRefFactor = 7;
+byte tempScaler = 4;
 int currentPos = 0;
-byte currentHeat = 0;
-byte requestedHeat0 = 0;
-byte requestedHeat1 = 0;
-byte temperatureLimit0 = 0;
-byte temperatureLimit1 = 0;
 
-//this guys sets us up.
-void setup_extruder_snap_v2()
+//this guys setup_extruder_snap_v2s us up.
+void setup_extruder_snap_v1()
 {
 	snap.addDevice(EXTRUDER_ADDRESS);
+
+	//init to defaults in java software.
+	vRefFactor = 7;
+	tempScaler = 4;
+	currentPos = 0;
 }
 
 //this guy actually processes the commands.
-void process_thermoplast_extruder_snap_commands_v2()
+void process_thermoplast_extruder_snap_commands_v1()
 {
 	byte cmd = snap.getByte(0);
 
 	switch (cmd)
 	{
+		// tell the host what version we are.
 		case CMD_VERSION:
 			snap.sendReply();
 			snap.sendDataByte(CMD_VERSION);
@@ -28,22 +35,24 @@ void process_thermoplast_extruder_snap_commands_v2()
 			snap.endMessage();
 		break;
 
-		// Extrude speed takes precedence over fan speed
+		// move motor forward.
 		case CMD_FORWARD:
 			extruder.setDirection(1);
 			extruder.setSpeed(snap.getByte(1));
 		break;
 
-		// seems to do the same as Forward
+		// move motor backward.
 		case CMD_REVERSE:
 			extruder.setDirection(0);
 			extruder.setSpeed(snap.getByte(1));
 		break;
 
+		// dunno what this is supposed to do...
 		case CMD_SETPOS:
 			currentPos = snap.getInt(1);
 		break;
 
+		// dunno what this is supposed to do either...
 		case CMD_GETPOS:
 			//send some Bogus data so the Host software is happy
 			snap.sendReply();
@@ -52,20 +61,22 @@ void process_thermoplast_extruder_snap_commands_v2()
 			snap.endMessage();
 		break;
 
+		// we also cant really do this.
 		case CMD_SEEK:
 			//debug.println("n/i: seek");
 		break;
 
+		// Free motor.  There is no torque hold for a DC motor, so all we do is switch off
 		case CMD_FREE:
-			// Free motor.  There is no torque hold for a DC motor,
-			// so all we do is switch off
 			extruder.setSpeed(0);
 		break;
 
+		// this is also a mystery... we cant really do this either.
 		case CMD_NOTIFY:
 			//debug.println("n/i: notify");
 		break;
 
+		// are we out of filament?
 		case CMD_ISEMPTY:
 			// We don't know so we say we're not empty
 			snap.sendReply();
@@ -74,76 +85,73 @@ void process_thermoplast_extruder_snap_commands_v2()
 			snap.endMessage();
 		break;
 
+		// set our heater and target information
 		case CMD_SETHEAT:
-			requestedHeat0 = snap.getByte(1);
-			requestedHeat1 = snap.getByte(2);
-			temperatureLimit0 = snap.getByte(3);
-			temperatureLimit1 = snap.getByte(4);
-			extruder.setTargetTemperature(temperatureLimit1);
-			extruder.setHeater(requestedHeat1);
-
-			/*
-			debug.print("requestedHeat0: ");
-			debug.println(requestedHeat0);
-			debug.print("requestedHeat1: ");
-			debug.println(requestedHeat1);
-			debug.print("temperatureLimit0: ");
-			debug.println(temperatureLimit0);
-			debug.print("temperatureLimit1: ");
-			debug.println(temperatureLimit1);
-			*/
+			extruder.heater_low = snap.getByte(1);
+			extruder.heater_high = snap.getByte(2);
+			extruder.target_celsius = calculatePicTempForCelsius(snap.getByte(3));
+			extruder.max_celsius = calculatePicTempForCelsius(snap.getByte(4));
 		break;
 
+		// tell the host software how hot we are.
 		case CMD_GETTEMP:
-			/*
-			debug.print("temp: ");
-			debug.println(extruder.getTemperature(), DEC);
-			debug.print("raw: ");
-			debug.println(extruder.getRawTemperature(), DEC);
-			*/
 			snap.sendReply();
 			snap.sendDataByte(CMD_GETTEMP); 
-			snap.sendDataByte(extruder.getTemperature());
-			snap.sendDataByte(0);
+			snap.sendDataByte(calculatePicTempForCelsius(extruder.getTemperature()));
 			snap.endMessage();
 		break;
 
+		// turn our fan on/off.
 		case CMD_SETCOOLER:
-			//debug.println("n/i: set cooler");
+			extruder.setCooler(snap.getByte(1));
 		break;
 
-		// "Hidden" low level commands
-		case CMD_PWMPERIOD:
-			//debug.println("n/i: pwm period");
-		break;
-
-		case CMD_PRESCALER:
-			//debug.println("n/i: prescaler");
-		break;
-
+		// used for temp conversion.
 		case CMD_SETVREF:
-			//debug.println("n/i: set vref");
+			vRefFactor = snap.getByte(1);
 		break;
 
+		// used for temp conversion.
 		case CMD_SETTEMPSCALER:
-			//debug.println("n/i: set temp scaler");
-		break;
-
-		case CMD_GETDEBUGINFO:
-			//debug.println("n/i: get debug info");
-		break;
-
-		case CMD_GETTEMPINFO:
-			snap.sendReply();
-			snap.sendDataByte(CMD_GETTEMPINFO); 
-			snap.sendDataByte(requestedHeat0);
-			snap.sendDataByte(requestedHeat1);
-			snap.sendDataByte(temperatureLimit0);
-			snap.sendDataByte(temperatureLimit1);
-			snap.sendDataByte(extruder.getTemperature());
-			snap.sendDataByte(0);
-			snap.endMessage();
+			tempScaler = snap.getByte(1);
 		break;
 	}
 	snap.releaseLock();
+}
+
+/***************
+* This is code for doing reading conversions since the Arduino does the temp readings via straight analog reads.
+***************/
+
+/**
+* Calculate temperature in celsius given resistance in ohms
+* @param resistance
+* @return
+*/
+int calculateTemperatureForPicTemp(byte picTemp)
+{
+	int scale = 1 << (tempScaler+1);
+	double clock = 4000000.0 / (4.0 * scale);  // hertz		
+	double vRef = 0.25 * 5.0 + 5.0 * vRefFactor / 32.0;  // volts
+	double T = (double)picTemp / clock; // seconds
+	double resistance =	-T / (log(1 - vRef / 5.0) * CAPACITOR);  // ohms
+
+	return (int)((1.0 / (1.0 / ABSOLUTE_ZERO + log(resistance/RZ) / BETA)) - ABSOLUTE_ZERO);
+}
+
+/**
+* Calculates an expected PIC Temperature expected for a
+* given resistance 
+* @param resistance
+* @return
+*/
+byte calculatePicTempForCelsius(int temperature)
+{
+	double resistance = RZ * exp(BETA * (1/(temperature + ABSOLUTE_ZERO) - 1/ABSOLUTE_ZERO));
+	int scale = 1 << (tempScaler+1);
+	double clock = 4000000.0 / (4.0 * scale);  // hertz		
+	double vRef = 0.25 * 5.0 + 5.0 * vRefFactor / 32.0;  // volts
+	double T = -resistance * (log(1 - vRef / 5.0) * CAPACITOR);
+
+	return (byte)(T * clock);
 }
