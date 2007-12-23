@@ -1,5 +1,5 @@
 /*
-	LimitSwitch.h - RepRap Limit Switch library for Arduino - Version 0.1
+	LinearAxis.h - RepRap Linear Axis library for Arduino - Version 0.1
 
 	This library is used to interface with a RepRap Cartesian Bot
 
@@ -71,12 +71,7 @@ class CartesianBot {
 
 	//our interface methods
 	void readState();
-	void home();
-	void abort();
 	
-	//boring version stuff
-    int version();
-
 	//our timer interrupt interface functions.
 	void setupTimerInterrupt();
 	void enableTimerInterrupt();

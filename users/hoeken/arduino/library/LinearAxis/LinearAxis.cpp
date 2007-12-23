@@ -25,10 +25,6 @@ LinearAxis::LinearAxis(char id, int steps, byte dir_pin, byte step_pin, byte min
 
 void LinearAxis::readState()
 {
-	//encoder.readState();
-	//min_switch.readState();
-	//max_switch.readState();
-	
 	//stop us if we're on target
 	if (this->atTarget())
 		can_step = false;
@@ -41,12 +37,6 @@ void LinearAxis::readState()
 	//default to being able to step
 	else
 		can_step = true;
-
-/*	put this back in when endstop stuff is ready.
-
-*/
-
-
 }
 
 bool LinearAxis::atMin()

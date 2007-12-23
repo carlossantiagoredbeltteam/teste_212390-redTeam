@@ -11,8 +11,6 @@
 #ifndef LinearAxis_h
 #define LinearAxis_h
 
-#include "HardwareSerial.h"
-#include <LimitSwitch.h>
 #include <RepStepper.h>
 
 // library interface description
@@ -24,7 +22,6 @@ class LinearAxis {
 
 	//these are our other object variables.
 	RepStepper stepper;
-//	AnalogEncoder encoder;
 
 	//various guys to interface with class
 	void readState();

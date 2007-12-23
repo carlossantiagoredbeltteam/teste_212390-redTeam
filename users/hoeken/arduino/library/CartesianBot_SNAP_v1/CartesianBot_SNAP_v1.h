@@ -3,7 +3,6 @@
 
 //all our includes.
 #include <SNAP.h>
-#include <LimitSwitch.h>
 #include <RepStepper.h>
 #include <LinearAxis.h>
 #include <CartesianBot.h>
