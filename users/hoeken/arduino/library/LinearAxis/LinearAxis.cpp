@@ -10,12 +10,14 @@
 #include "LinearAxis.h"
 #include "WConstants.h"
 
-LinearAxis::LinearAxis(char id, int steps, byte dir_pin, byte step_pin, byte min_pin, byte max_pin, byte enable_pin) : stepper(steps, dir_pin, step_pin, enable_pin), min_switch(min_pin), max_switch(max_pin)
+LinearAxis::LinearAxis(char id, int steps, byte dir_pin, byte step_pin, byte min_pin, byte max_pin, byte enable_pin) : stepper(steps, dir_pin, step_pin, enable_pin)
 {
 	this->id = id;
 	current = 0;
 	target = 0;
 	max = 0;
+	this->min_pin = min_pin;
+	this->max_pin = max_pin;
 
 	stepper.setDirection(RS_FORWARD);
 	//this->setupTimerInterrupt();
@@ -24,8 +26,8 @@ LinearAxis::LinearAxis(char id, int steps, byte dir_pin, byte step_pin, byte min
 void LinearAxis::readState()
 {
 	//encoder.readState();
-	min_switch.readState();
-	max_switch.readState();
+	//min_switch.readState();
+	//max_switch.readState();
 	
 	//stop us if we're on target
 	if (this->atTarget())
@@ -49,12 +51,12 @@ void LinearAxis::readState()
 
 bool LinearAxis::atMin()
 {
-	return min_switch.getState();
+	return digitalRead(min_pin);
 }
 
 bool LinearAxis::atMax()
 {
-	return max_switch.getState();
+	return digitalRead(max_pin);
 }
 
 void LinearAxis::doStep()

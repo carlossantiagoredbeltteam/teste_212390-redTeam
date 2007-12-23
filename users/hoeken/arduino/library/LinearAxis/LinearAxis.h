@@ -59,12 +59,14 @@ class LinearAxis {
 	long counter;				//our dda counter for dda moves.
 
   private:
+	byte min_pin;
+	byte max_pin;
 	long current;				//this is our current position.
 	long target;				//this is our target position.
 	long max;					//this is our max coordinate.
 	
-	LimitSwitch min_switch;
-	LimitSwitch max_switch;
+	//LimitSwitch min_switch;
+	//LimitSwitch max_switch;
 };
 
 #endif

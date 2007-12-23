@@ -39,16 +39,10 @@ class RepStepper {
 	unsigned int getSteps();
 	
     //various methods dealing with stepping.
-	bool canStep();
-    void step();
 	void pulse();
-	void moveTo(int steps);
 	void enable();
 	void disable();
 	bool isEnabled();
-
-	//random other functions
-    int version();
 
   private:
 
@@ -59,18 +53,10 @@ class RepStepper {
 	unsigned long step_delay;  			// delay between steps, in microseconds, based on speed
     unsigned int number_of_steps;		// total number of steps this motor can take
 
-	//our time counter variables.
-	unsigned long last_step_time;		// time stamp in ticks of when our last step was.
-    unsigned long next_step_time;		// time stamp in ticks of when the next step can be.
-    unsigned long now;					// the 'current' timestamp in ticks of right now.
-	
     // motor pin numbers:
     byte step_pin;						//the step signal pin.
     byte direction_pin;					//the direction pin.
     byte enable_pin;					//the enable pin.
-
-	//our time function
-	unsigned long hpticks(void);		//our high precision time function
 };
 
 #endif
