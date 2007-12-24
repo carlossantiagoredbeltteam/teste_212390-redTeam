@@ -1,12 +1,3 @@
-/*
-  LinearAxis.cpp - RepRap Linear Axis library for Arduino - Version 0.1
-
-  History:
-  * Created library (0.1) by Zach Smith.
-
-  The interface for controlling a linear axis: stepper motor + min/max sensors + optional encoder
-*/
-
 #include "LinearAxis.h"
 #include "WConstants.h"
 

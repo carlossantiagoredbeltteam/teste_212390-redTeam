@@ -1,10 +1,11 @@
 /*
-	LinearAxis.h - RepRap Linear Axis library for Arduino - Version 0.1
+	CartesianBot.h - RepRap Cartesian Bot library for Arduino
 
-	This library is used to interface with a RepRap Cartesian Bot
+	This library is used to interface with a RepRap Cartesian Bot (3 axis X/Y/Z machine)
 
 	History:
-	* Created intial library (0.1) by Zach Smith.
+	* (0.1) Ceated initial library by Zach Smith.
+	* (0.2) Optimized for smaller size and speed by Zach Smith.
 
 	License: GPL v2.0
 */

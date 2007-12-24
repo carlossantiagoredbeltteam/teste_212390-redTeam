@@ -1,10 +1,13 @@
 /*
-  LinearAxis.h - RepRap Linear Axis library for Arduino - Version 0.1
+	LinearAxis.h - RepRap Linear Axis library for Arduino
 
-  History:
-  * Created library (0.1) by Zach Smith.
+	The interface for controlling a linear axis: stepper motor + min/max sensors + optional encoder
 
-  The interface for controlling a linear axis: stepper motor + min/max sensors + optional encoder
+	History:
+	* (0.1) Created library by Zach Smith.
+	* (0.2) Optimized for less memory usage and faster performance
+
+	License: GPL v2.0
 */
 
 // ensure this library description is only included once
