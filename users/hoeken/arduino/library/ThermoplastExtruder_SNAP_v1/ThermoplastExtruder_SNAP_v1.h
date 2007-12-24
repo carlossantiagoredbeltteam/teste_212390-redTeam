@@ -31,8 +31,8 @@ void process_thermoplast_extruder_snap_commands_v1();
 //
 // Conversion commands
 //
-int calculateTemperatureForPicTemp(byte picTemp);
-byte calculatePicTempForCelsius(int temperature);
+int calculateTemperatureForPicTemp(int picTemp);
+int calculatePicTempForCelsius(int temperature);
 
 //
 // constants for temp/pic temp conversion. from reprap.properties.dist

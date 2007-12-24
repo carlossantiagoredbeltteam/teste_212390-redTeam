@@ -95,9 +95,11 @@ void process_thermoplast_extruder_snap_commands_v1()
 
 		// tell the host software how hot we are.
 		case CMD_GETTEMP:
+			delay(100);
 			snap.sendReply();
 			snap.sendDataByte(CMD_GETTEMP); 
 			snap.sendDataByte(calculatePicTempForCelsius(extruder.getTemperature()));
+			snap.sendDataByte(0); //dunno what this is for... its how it is in the old firmware too.
 			snap.endMessage();
 		break;
 
@@ -131,15 +133,10 @@ void process_thermoplast_extruder_snap_commands_v1()
 * This is code for doing reading conversions since the Arduino does the temp readings via straight analog reads.
 ***************/
 
-/**
-* Calculate temperature in celsius given resistance in ohms
-* @param resistance
-* @return
-*/
-int calculateTemperatureForPicTemp(byte picTemp)
+int calculateTemperatureForPicTemp(int picTemp)
 {
 	int scale = 1 << (tempScaler+1);
-	double clock = 4000000.0 / (4.0 * scale);  // hertz		
+	double clock = 4000000.0 / (4.0 * (double)scale);  // hertz		
 	double vRef = 0.25 * 5.0 + 5.0 * vRefFactor / 32.0;  // volts
 	double T = (double)picTemp / clock; // seconds
 	double resistance =	-T / (log(1 - vRef / 5.0) * CAPACITOR);  // ohms
@@ -153,13 +150,13 @@ int calculateTemperatureForPicTemp(byte picTemp)
 * @param resistance
 * @return
 */
-byte calculatePicTempForCelsius(int temperature)
+int calculatePicTempForCelsius(int temperature)
 {
-	double resistance = RZ * exp(BETA * (1/(temperature + ABSOLUTE_ZERO) - 1/ABSOLUTE_ZERO));
+	double resistance = RZ * exp(BETA * (1/((double)temperature + ABSOLUTE_ZERO) - 1/ABSOLUTE_ZERO));
 	int scale = 1 << (tempScaler+1);
-	double clock = 4000000.0 / (4.0 * scale);  // hertz		
+	double clock = 4000000.0 / (4.0 * (double)scale);  // hertz		
 	double vRef = 0.25 * 5.0 + 5.0 * vRefFactor / 32.0;  // volts
 	double T = -resistance * (log(1 - vRef / 5.0) * CAPACITOR);
 
-	return (byte)(T * clock);
+	return (int)(T * clock);
 }
