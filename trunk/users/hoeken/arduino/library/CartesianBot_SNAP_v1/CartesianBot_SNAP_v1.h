@@ -1,3 +1,20 @@
+/*
+	CartesianBot_SNAP_v1.h - Cartesian Bot SNAP Communications library for Arduino
+
+	This library implements/emulates v1 of the RepRap LinearAxis communications protocol.
+	Technically, the protocol was designed around the idea of one board per axis, each with
+	its own address and microcontroller.  This library emulates 3 of these boards: X, Y, and Z
+	on one Arduino.
+	
+	More information on the protocol here: 
+
+	History:
+	* (0.1) Created intial library by Zach Smith.
+    * (0.2) Optimized library for better performance
+
+	License: GPL v2.0
+*/
+
 #ifndef CARTESIAN_BOT_SNAP_V1_H
 #define CARTESIAN_BOT_SNAP_V1_H
 
@@ -26,6 +43,7 @@ extern CartesianBot bot;
 #define VERSION_MAJOR 1
 #define VERSION_MINOR 0
 #define HOST_ADDRESS 0
+#define DEVICE_TYPE 0
 
 //
 // Linear Axis commands
@@ -47,6 +65,7 @@ extern CartesianBot bot;
 #define CMD_SETPOWER  14
 #define CMD_GETSENSOR 15
 #define CMD_HOMERESET 16
+#define CMD_DEVICE_TYPE 255
 
 //
 // Addresses for our linear axes.

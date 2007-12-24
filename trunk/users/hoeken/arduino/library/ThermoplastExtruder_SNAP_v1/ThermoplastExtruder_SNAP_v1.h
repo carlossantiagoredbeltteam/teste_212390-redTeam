@@ -1,3 +1,20 @@
+/*
+	ThermoplastExtruder_SNAP_v1.h - Thermoplastic Extruder SNAP Communications library for Arduino
+
+	This library implements/emulates v1 of the RepRap Thermoplastic Extruder communications protocol.
+	The initial protocol was designed around measuring temperature by the amount of time
+	it takes to charge a capacitor through the thermistor.  In order to maintain compatibility,
+	the Arduino takes its analog reading and converts it into the value a PIC would return.
+	
+	More information on the protocol here: 
+
+	History:
+	* (0.1) Created intial library by Zach Smith.
+	* (0.2) Updated to emulate PIC based temperature measuring.
+
+	License: GPL v2.0
+*/
+
 #ifndef THERMOPLAST_EXTRUDER_SNAP_V2_H
 #define THERMOPLAST_EXTRUDER_SNAP_V2_H
 
@@ -18,11 +35,11 @@ int calculateTemperatureForPicTemp(byte picTemp);
 byte calculatePicTempForCelsius(int temperature);
 
 //
-// constants for temp/pic temp conversion.
+// constants for temp/pic temp conversion. from reprap.properties.dist
 //
-#define BETA 5000
-#define CAPACITOR 0.000001
-#define RZ 500000
+#define BETA 3480.0
+#define CAPACITOR 0.0000001
+#define RZ 29000.0
 #define ABSOLUTE_ZERO 273.15
 
 //
@@ -31,6 +48,7 @@ byte calculatePicTempForCelsius(int temperature);
 #define VERSION_MAJOR 1
 #define VERSION_MINOR 0
 #define EXTRUDER_ADDRESS 8
+#define DEVICE_TYPE 1
 
 //
 // Extruder commands
@@ -53,6 +71,7 @@ byte calculatePicTempForCelsius(int temperature);
 #define CMD_SETTEMPSCALER 53
 #define CMD_GETDEBUGINFO  54 //apparently doesnt exist...
 #define CMD_GETTEMPINFO   55 //apparently doesnt exist...
+#define CMD_DEVICE_TYPE   255
 
 extern ThermoplastExtruder extruder;
 

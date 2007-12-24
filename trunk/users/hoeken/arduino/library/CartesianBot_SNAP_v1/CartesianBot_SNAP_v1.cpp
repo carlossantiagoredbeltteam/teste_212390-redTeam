@@ -530,6 +530,13 @@ void process_cartesian_bot_snap_commands_v1()
 			bot.startHomeReset();
 
 		break;
+		
+		case CMD_DEVICE_TYPE:
+			snap.sendReply();
+			snap.sendDataByte(CMD_DEVICE_TYPE);
+			snap.sendDataByte(DEVICE_TYPE);
+			snap.endMessage();
+		break;
 	}
 
 	snap.releaseLock();

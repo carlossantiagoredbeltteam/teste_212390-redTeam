@@ -1,5 +1,5 @@
 /*
-  AnalogEncoder.h - RepRap Encoder library for Arduino - Version 0.1
+  AnalogEncoder.h - RepRap Encoder library for Arduino
 
   This library is used to interface with an Austria Microsystems magnetic encoder in analog mode.
 

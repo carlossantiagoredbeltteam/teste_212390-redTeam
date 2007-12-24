@@ -115,6 +115,14 @@ void process_thermoplast_extruder_snap_commands_v1()
 		case CMD_SETTEMPSCALER:
 			tempScaler = snap.getByte(1);
 		break;
+		
+		case CMD_DEVICE_TYPE:
+			snap.sendReply();
+			snap.sendDataByte(CMD_DEVICE_TYPE);
+			snap.sendDataByte(DEVICE_TYPE);
+			snap.endMessage();
+		break;
+
 	}
 	snap.releaseLock();
 }

@@ -1,12 +1,17 @@
 /*
-  RepStepper.h - RepRap Stepper library for Arduino - Version 0.1
-  
-  Based on Stepper library by Tom Igoe & others: http://www.arduino.cc/en/Reference/Stepper
+	RepStepper.h - RepRap Stepper library for Arduino
 
-  History:
-  * Forked library (0.1) by Zach Smith.
+	This library interfaces with the RepRap Stepper Motor Driver and other standard stepper controllers
+	that use the 2 wire Step/Direction interface.  Loosely based on the Stepper library by Tom Igoe & others: http://www.arduino.cc/en/Reference/Stepper
+		
+	More information on the stepper driver circuit here: http://make.rrrf.org/smd
 
-  Drives a bipolar stepper motor using 2 wires: Step and Direction.
+	History:
+	
+	* (0.1) Forked library by Zach Smith.
+	* (0.2) Optimizations to reduce code overhead by Zach Smith
+	
+	License: GPL v2.0
 */
 
 // ensure this library description is only included once
@@ -14,8 +19,6 @@
 #define RepStepper_h
 
 #include "WConstants.h"
-
-extern volatile unsigned long timer0_overflow_count;
 
 #define RS_FORWARD 1
 #define RS_REVERSE 0
@@ -47,10 +50,8 @@ class RepStepper {
   private:
 
 	//various internal variables
-    bool direction;						// Direction of rotation
-	bool enabled;						// whether or not we're enabled.
 	unsigned int rpm;					// Speed in RPMs
-	unsigned long step_delay;  			// delay between steps, in microseconds, based on speed
+	unsigned long step_delay;  			// delay between steps, in processor ticks, based on speed
     unsigned int number_of_steps;		// total number of steps this motor can take
 
     // motor pin numbers:

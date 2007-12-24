@@ -1,12 +1,16 @@
 /*
-	ThermoplastExtruder.h - RepRap Thermoplastic Extruder library for Arduino - Version 0.1
+	ThermoplastExtruder.h - RepRap Thermoplastic Extruder library for Arduino
 
 	This library is used to read, control, and handle a thermoplastic extruder.
+	
+	More information at: 
 
 	History:
-	* Created intial library (0.1) by Zach Smith.
-	* Initial rework (0.2) by Marius Kintel <kintel@sim.no>
-
+	* (0.1) Created intial library by Zach Smith.
+	* (0.2) Initial rework by Marius Kintel <kintel@sim.no>
+	* (0.3) Updated and optimized by Zach Smith
+	
+	License: GPL v2.0
 */
 
 #ifndef THERMOPLASTEXTRUDER_H

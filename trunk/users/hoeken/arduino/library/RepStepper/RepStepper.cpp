@@ -8,7 +8,6 @@
 RepStepper::RepStepper(unsigned int number_of_steps, byte dir_pin, byte step_pin, byte enable_pin)
 {
 	//init our variables.
-	this->direction = 1;
 	this->setSpeed(0);
 
 	//get our parameters
@@ -85,45 +84,37 @@ unsigned int RepStepper::getSteps()
 
 void RepStepper::setDirection(bool direction)
 {
-	this->direction = direction;
-	digitalWrite(this->direction_pin, this->direction);
+	digitalWrite(this->direction_pin, direction);
 }
 
 bool RepStepper::getDirection()
 {
-	return direction;
+	return digitalRead(this->direction_pin);
 }
 
 void RepStepper::enable()
 {
 	if (enable_pin != 255)
-	{
-		enabled = true;
 		digitalWrite(enable_pin, HIGH);
-	}
 }
 
 void RepStepper::disable()
 {
 	if (enable_pin != 255)
-	{
-		enabled = false;
 		digitalWrite(enable_pin, LOW);
-	}
 }
 
 bool RepStepper::isEnabled()
 {
 	if (enable_pin != 255)
-		return enabled;
+		return digitalRead(enable_pin);
 	else
 		return true;
 }
 
+//this sends a pulse to our stepper controller.
 void RepStepper::pulse()
 {
-	//this sends a pulse to our stepper controller.
 	digitalWrite(step_pin, HIGH);
-	delayMicroseconds(1);
 	digitalWrite(step_pin, LOW);
 }
