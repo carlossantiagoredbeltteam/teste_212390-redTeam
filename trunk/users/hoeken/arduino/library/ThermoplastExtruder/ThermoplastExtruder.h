@@ -3,7 +3,7 @@
 
 	This library is used to read, control, and handle a thermoplastic extruder.
 	
-	More information at: 
+	More information at: http://reprap.org/bin/view/Main/RepRapOneDarwinThermoplastExtruder
 
 	History:
 	* (0.1) Created intial library by Zach Smith.

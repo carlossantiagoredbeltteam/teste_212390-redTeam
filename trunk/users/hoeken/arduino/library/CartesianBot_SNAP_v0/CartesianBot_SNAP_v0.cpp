@@ -1,4 +1,4 @@
-#include "CartesianBot_SNAP_v1.h"
+#include "CartesianBot_SNAP_v0.h"
 
 /**********************************
 *  Global variable instantiations
@@ -201,7 +201,7 @@ void handleInterrupt()
 	}
 }
 
-void setup_cartesian_bot_snap_v1()
+void setup_cartesian_bot_snap_v0()
 {
 	bot.setupTimerInterrupt();
 	
@@ -210,7 +210,7 @@ void setup_cartesian_bot_snap_v1()
 	snap.addDevice(Z_ADDRESS);
 }
 
-void process_cartesian_bot_snap_commands_v1()
+void process_cartesian_bot_snap_commands_v0()
 {
 	byte cmd = snap.getByte(0);
 	byte dest = snap.getDestination();
