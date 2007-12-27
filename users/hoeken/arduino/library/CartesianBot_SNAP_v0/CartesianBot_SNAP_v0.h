@@ -1,12 +1,12 @@
 /*
-	CartesianBot_SNAP_v1.h - Cartesian Bot SNAP Communications library for Arduino
+	CartesianBot_SNAP_v0.h - Cartesian Bot SNAP Communications library for Arduino
 
-	This library implements/emulates v1 of the RepRap LinearAxis communications protocol.
+	This library implements/emulates v0 of the RepRap LinearAxis communications protocol.
 	Technically, the protocol was designed around the idea of one board per axis, each with
 	its own address and microcontroller.  This library emulates 3 of these boards: X, Y, and Z
 	on one Arduino.
 	
-	More information on the protocol here: 
+	More information on the protocol here: http://reprap.org/bin/view/Main/StepperMotorController
 
 	History:
 	* (0.1) Created intial library by Zach Smith.
@@ -25,8 +25,8 @@
 #include <CartesianBot.h>
 
 //this guy actually processes the v1 SNAP commands.
-void setup_cartesian_bot_snap_v1();
-void process_cartesian_bot_snap_commands_v1();
+void setup_cartesian_bot_snap_v0();
+void process_cartesian_bot_snap_commands_v0();
 void handleInterrupt();
 
 //notification functions to let the host know whats up.
