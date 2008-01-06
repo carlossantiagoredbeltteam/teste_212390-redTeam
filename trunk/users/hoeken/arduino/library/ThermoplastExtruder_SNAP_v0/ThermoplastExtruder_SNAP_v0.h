@@ -11,6 +11,7 @@
 	History:
 	* (0.1) Created intial library by Zach Smith.
 	* (0.2) Updated to emulate PIC based temperature measuring.
+	* (0.3) Updated with new values from Steve DeGroof (http://forums.reprap.org/read.php?70,8034)
 
 	License: GPL v2.0
 */
@@ -38,9 +39,9 @@ int calculatePicTempForCelsius(int temperature);
 //
 // constants for temp/pic temp conversion. from reprap.properties.dist
 //
-#define BETA 3480.0
-#define CAPACITOR 0.0000001
-#define RZ 29000.0
+#define BETA 550.0
+#define CAPACITOR 0.000003
+#define RZ 4837.0
 #define ABSOLUTE_ZERO 273.15
 
 //
