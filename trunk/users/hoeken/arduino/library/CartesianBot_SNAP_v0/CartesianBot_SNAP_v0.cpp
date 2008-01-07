@@ -221,8 +221,8 @@ void process_cartesian_bot_snap_commands_v0()
 		case CMD_VERSION:
 			snap.sendReply();
 			snap.sendDataByte(CMD_VERSION);  // Response type 0
-			snap.sendDataByte(VERSION_MINOR);
 			snap.sendDataByte(VERSION_MAJOR);
+			snap.sendDataByte(VERSION_MINOR);
 			snap.endMessage();
 		break;
 
