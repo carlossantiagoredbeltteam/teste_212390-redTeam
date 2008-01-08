@@ -36,6 +36,15 @@
 
 #include "pic14.h"
 
+#define MAJOR_VERSION_NUMBER 2
+#define MINOR_VERSION_NUMBER 0
+#define LinearAxisStepperController 0
+#define ThermoplasticExtruder 1
+#define SupportExtruder 2
+#define CartesianRobot 3
+#define LaserCutterEtcher 4
+#define CuttingToolhead 5
+
 #define MAX_TRANSMIT_BUFFER 16  ///< Transmit buffer size.
 
 #define MAX_PAYLOAD 16          ///< Size of largest possible message.
