@@ -227,6 +227,7 @@ UsedLibrary="/Applications/EAGLE-X11/lbr/wirepad.lbr"
 UsedLibrary="/Applications/EAGLE-X11/lbr/wuerth-elektronik.lbr"
 UsedLibrary="/Applications/EAGLE-X11/lbr/zetex.lbr"
 UsedLibrary="/Applications/EAGLE-X11/lbr/zilog.lbr"
+UsedLibrary="/Users/iowa/Desktop/reprap/trunk/users/hoeken/arduino/electronics/reprap.lbr"
 
 [Win_1]
 Type="Board Editor"
