@@ -98,6 +98,7 @@ volatile static addressableInt currentPosition, seekPosition;
 #define CMD_PRESCALER     51
 #define CMD_SETVREF       52
 #define CMD_SETTEMPSCALER 53
+#define CMD_GETMODULETYPE 255
 
 #define HEATER_PWM_PERIOD 255
 
@@ -541,8 +542,15 @@ void processCommand()
   case CMD_VERSION:
     sendReply();
     sendDataByte(CMD_VERSION);  // Response type 0
-    sendDataByte(0);  // These don't really mean much right now
-    sendDataByte(2);
+    sendDataByte(MINOR_VERSION_NUMBER);  // Minor
+    sendDataByte(MAJOR_VERSION_NUMBER);  // Major
+    endMessage();
+    break;
+
+  case CMD_GETMODULETYPE:
+    sendReply();
+    sendDataByte(CMD_GETMODULETYPE);
+    sendDataByte(SupportExtruder);
     endMessage();
     break;
 

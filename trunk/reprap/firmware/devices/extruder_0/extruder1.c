@@ -74,6 +74,7 @@ void init1()
 
   //serial communication
   SPBRG = 12;                 // 12 = ~19200 baud @ 4MHz
+  
   TXSTA = BIN(00000100);      // 8 bit high speed 
   RCSTA = BIN(10000000);      // Enable port for 8 bit receive
   CREN = 1;  // Start reception

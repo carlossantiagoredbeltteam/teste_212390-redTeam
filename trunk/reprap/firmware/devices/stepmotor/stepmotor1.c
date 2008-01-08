@@ -90,6 +90,7 @@ void init1()
   INTCON = BIN(00000000);     // Interrupts disabled
   PIR1 = 0;                   // Clear peripheral interrupt flags
   SPBRG = 12;                 // 12 = 19200 (actually 19230) baud @ 4MHz
+
   TXSTA = BIN(00000100);      // 8 bit high speed 
   RCSTA = BIN(10000000);      // Enable port for 8 bit receive
 

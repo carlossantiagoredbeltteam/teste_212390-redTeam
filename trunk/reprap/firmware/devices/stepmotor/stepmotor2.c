@@ -105,6 +105,7 @@ volatile static byte coilPosition = 0;
 #define CMD_SETPOWER  14
 #define CMD_GETSENSOR 15
 #define CMD_HOMERESET 16
+#define CMD_GETMODULETYPE 255
 
 enum functions {
   func_idle,
@@ -576,8 +577,15 @@ void processCommand()
   case CMD_VERSION:
     sendReply();
     sendDataByte(CMD_VERSION);  // Response type 0
-    sendDataByte(0);  // Minor
-    sendDataByte(2);  // Major
+    sendDataByte(MINOR_VERSION_NUMBER);  // Minor
+    sendDataByte(MAJOR_VERSION_NUMBER);  // Major
+    endMessage();
+    break;
+
+  case CMD_GETMODULETYPE:
+    sendReply();
+    sendDataByte(CMD_GETMODULETYPE);
+    sendDataByte(LinearAxisStepperController);
     endMessage();
     break;
 

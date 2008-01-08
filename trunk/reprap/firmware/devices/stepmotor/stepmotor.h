@@ -39,7 +39,7 @@
 // Half-stepping not needed for 400-step-per-rev motors.
 // Enable this for 200-step-per-rev motors (also for 400 step
 // for smoother but slower running).
-//#define HALFSTEP
+#define HALFSTEP
 
 #define UNIVERSAL_PCB
 
