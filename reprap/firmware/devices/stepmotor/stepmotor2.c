@@ -585,7 +585,7 @@ void processCommand()
   case CMD_GETMODULETYPE:
     sendReply();
     sendDataByte(CMD_GETMODULETYPE);
-    sendDataByte(LinearAxisStepperController);
+    sendDataByte(LINEAR_AXIS_TYPE);
     endMessage();
     break;
 

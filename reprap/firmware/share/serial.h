@@ -38,12 +38,14 @@
 
 #define MAJOR_VERSION_NUMBER 1
 #define MINOR_VERSION_NUMBER 0
-#define LinearAxisStepperController 0
-#define ThermoplasticExtruder 1
-#define SupportExtruder 2
-#define CartesianRobot 3
-#define LaserCutterEtcher 4
-#define CuttingToolhead 5
+
+//type definitions.  see: http://reprap.org/bin/view/Main/Modules
+#define LINEAR_AXIS_TYPE 0
+#define THERMOPLASTIC_EXTRUDER_TYPE 1
+#define SUPPORT_EXTRUDER_TYPE 2
+#define CARTESIAN_ROBOT_TYPE 3
+#define LASER_CUTTER_ETCHER_TYPE 4
+#define CUTTING_TOOLHEAD_TYPE 5
 
 #define MAX_TRANSMIT_BUFFER 16  ///< Transmit buffer size.
 
