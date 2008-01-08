@@ -27,6 +27,9 @@ cp LICENCE "$TO_DIR/"
 cp NEWS "$TO_DIR/"
 cp README "$TO_DIR/"
 
+#export our source.
+svn export ../firmware "$TO_DIR/src"
+
 #create our archive
 zip -qr "$TO_DIR.zip" "$TO_DIR"
 
