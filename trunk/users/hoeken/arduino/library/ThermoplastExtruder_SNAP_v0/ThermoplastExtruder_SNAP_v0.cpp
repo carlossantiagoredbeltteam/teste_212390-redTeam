@@ -1,4 +1,4 @@
-#include <ThermoPlastExtruder_SNAP_v0.h>
+#include <ThermoplastExtruder_SNAP_v0.h>
 
 //
 // Variables from host software
