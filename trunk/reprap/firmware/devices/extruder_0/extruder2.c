@@ -497,8 +497,8 @@ void processCommand()
   case CMD_VERSION:
     sendReply();
     sendDataByte(CMD_VERSION);  // Response type 0
-    sendDataByte(MINOR_VERSION_NUMBER);  // Minor
-    sendDataByte(MAJOR_VERSION_NUMBER);  // Major
+    sendDataByte(MAJOR_VERSION_NUMBER);
+    sendDataByte(MINOR_VERSION_NUMBER);
     endMessage();
     break;
 

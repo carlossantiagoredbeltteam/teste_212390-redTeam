@@ -36,7 +36,7 @@
 
 #include "pic14.h"
 
-#define MAJOR_VERSION_NUMBER 2
+#define MAJOR_VERSION_NUMBER 1
 #define MINOR_VERSION_NUMBER 0
 #define LinearAxisStepperController 0
 #define ThermoplasticExtruder 1
