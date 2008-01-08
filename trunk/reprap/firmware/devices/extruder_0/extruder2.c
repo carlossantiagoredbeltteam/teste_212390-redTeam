@@ -505,7 +505,7 @@ void processCommand()
   case CMD_GETMODULETYPE:
     sendReply();
     sendDataByte(CMD_GETMODULETYPE);
-    sendDataByte(ThermoplasticExtruder);
+    sendDataByte(THERMOPLASTIC_EXTRUDER_TYPE);
     endMessage();
     break;
 

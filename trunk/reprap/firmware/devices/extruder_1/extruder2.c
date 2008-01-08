@@ -550,7 +550,7 @@ void processCommand()
   case CMD_GETMODULETYPE:
     sendReply();
     sendDataByte(CMD_GETMODULETYPE);
-    sendDataByte(SupportExtruder);
+    sendDataByte(SUPPORT_EXTRUDER_TYPE);
     endMessage();
     break;
 
