@@ -1,25 +1,25 @@
 EAGLE AutoRouter Statistics:
 
-Job           : /Users/zachsmith/Desktop/reprap/trunk/users/hoeken/arduino/electronics/thermocouple-board/thermocouple.brd
+Job           : /Users/iowa/Desktop/reprap/trunk/users/hoeken/arduino/electronics/thermocouple-board/thermocouple.brd
 
-Start at      :   23:46:35  (12/10/2007)
-End at        :   23:46:35  (12/10/2007)
-Elapsed time  :   00:00:00
+Start at      :   15:32:27  ( 1/09/2008)
+End at        :   15:32:28  ( 1/09/2008)
+Elapsed time  :   00:00:01
 
-Signals       :     4   RoutingGrid: 50 mil  Layers: 2
-Connections   :    11   predefined:  6 ( 0 Vias )
+Signals       :     6   RoutingGrid: 5 mil  Layers: 2
+Connections   :    12   predefined:  5 ( 0 Vias )
 
-Router memory :   4224
+Router memory :   275760
 
-Passname          :    Busses     Route Optimize1 Optimize2 Optimize3 Optimize4
+Passname          :     Route Optimize1 Optimize2 Optimize3 Optimize4
 
-Time per pass     :  00:00:00  00:00:00  00:00:00  00:00:00  00:00:00  00:00:00
-Number of Ripups  :         0         0         0         0         0         0
-max. Level        :         0         0         0         0         0         0
-max. Total        :         0         0         0         0         0         0
+Time per pass     :  00:00:00  00:00:00  00:00:01  00:00:00  00:00:00
+Number of Ripups  :         0         0         0         0         0
+max. Level        :         0         0         0         0         0
+max. Total        :         0         0         0         0         0
 
-Routed            :         1         5         5         5         5         5
-Vias              :         0         0         0         0         0         0
-Resolution        :    63.6 %   100.0 %   100.0 %   100.0 %   100.0 %   100.0 %
+Routed            :         7         7         7         7         7
+Vias              :         3         0         1         1         1
+Resolution        :   100.0 %   100.0 %   100.0 %   100.0 %   100.0 %
 
 Final             : 100.0% finished
