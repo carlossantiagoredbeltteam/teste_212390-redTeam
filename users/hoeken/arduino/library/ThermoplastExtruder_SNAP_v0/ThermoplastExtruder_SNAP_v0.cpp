@@ -88,8 +88,8 @@ void process_thermoplast_extruder_snap_commands_v0()
 		case CMD_SETHEAT:
 			extruder.heater_low = snap.getByte(1);
 			extruder.heater_high = snap.getByte(2);
-			extruder.target_celsius = calculatePicTempForCelsius(snap.getByte(3));
-			extruder.max_celsius = calculatePicTempForCelsius(snap.getByte(4));
+			extruder.target_celsius = calculateTemperatureForPicTemp(snap.getByte(3));
+			extruder.max_celsius = calculateTemperatureForPicTemp(snap.getByte(4));
 		break;
 
 		// tell the host software how hot we are.
@@ -98,8 +98,8 @@ void process_thermoplast_extruder_snap_commands_v0()
 			snap.sendReply();
 			snap.sendDataByte(CMD_GETTEMP); 
 			snap.sendDataByte(calculatePicTempForCelsius(extruder.getTemperature()));
-			snap.sendDataByte(0); //dunno what this is for... its how it is in the old firmware too.
-			snap.endMessage();
+			snap.sendDataByte(extruder.getTemperature()); //dunno what this is for... its how it is in the old firmware too.
+			snap.endMessage();			
 		break;
 
 		// turn our fan on/off.
@@ -151,11 +151,19 @@ int calculateTemperatureForPicTemp(int picTemp)
 */
 int calculatePicTempForCelsius(int temperature)
 {
-	double resistance = RZ * exp(BETA * (1/((double)temperature + ABSOLUTE_ZERO) - 1/ABSOLUTE_ZERO));
+	double resistance = RZ * exp(BETA * (1/(temperature + ABSOLUTE_ZERO) - 1/ABSOLUTE_ZERO));
 	int scale = 1 << (tempScaler+1);
-	double clock = 4000000.0 / (4.0 * (double)scale);  // hertz		
+	double clock = 4000000.0 / (4.0 * scale);  // hertz		
 	double vRef = 0.25 * 5.0 + 5.0 * vRefFactor / 32.0;  // volts
 	double T = -resistance * (log(1 - vRef / 5.0) * CAPACITOR);
 
-	return (int)(T * clock);
+	int pictemp = (int)(T * clock);
+
+	//prevent tempscaling taking us to crazy heights.
+	if (pictemp <= 0)
+		pictemp = 1;
+	if (pictemp >= 255)
+		pictemp = 255;
+		
+	return pictemp;
 }

@@ -19,6 +19,14 @@
 #ifndef THERMOPLAST_EXTRUDER_SNAP_V2_H
 #define THERMOPLAST_EXTRUDER_SNAP_V2_H
 
+//
+// constants for temp/pic temp conversion. from reprap.properties.dist
+//
+#define BETA 550.0
+#define CAPACITOR 0.000003
+#define RZ 4837
+#define ABSOLUTE_ZERO 273.15
+
 //our include files.
 #include <ThermoplastExtruder.h>
 #include <SNAP.h>
@@ -35,14 +43,6 @@ void process_thermoplast_extruder_snap_commands_v0();
 //
 int calculateTemperatureForPicTemp(int picTemp);
 int calculatePicTempForCelsius(int temperature);
-
-//
-// constants for temp/pic temp conversion. from reprap.properties.dist
-//
-#define BETA 550.0
-#define CAPACITOR 0.000003
-#define RZ 4837.0
-#define ABSOLUTE_ZERO 273.15
 
 //
 // Version information
