@@ -68,7 +68,7 @@ def main(argv):
 	max_adc = int(1023);
 	
 	try:
-		opts, args = getopt.getopt(argv, "h", ["help", "r0=", "t0=", "beta=", "r1=", "r2="])
+		opts, args = getopt.getopt(argv, "h", ["help", "r0=", "t0=", "beta=", "r1=", "r2=", "max-adc="])
 	except getopt.GetoptError:
 		usage()
 		sys.exit(2)
@@ -87,7 +87,9 @@ def main(argv):
 			r1 = int(arg)
 		elif opt == "--r2":
 			r2 = int(arg)
-
+		elif opt == "--max-adc":
+			max_adc = int(arg)
+			
 	increment = int(max_adc/(num_temps-1));
 	
 	t = Thermistor(r0, t0, beta, r1, r2)
