@@ -1,10 +1,4 @@
-EESchema-DOCLIB  Version 2.0  10/12/2007-13:59:35
-#
-$CMP 7805
-D Linear Regulator +5V
-K POWER REGUL
-F regulator/lm78*.*
-$ENDCMP
+EESchema-DOCLIB  Version 2.0  13/1/2008-18:30:13
 #
 $CMP C
 D Condensateur non polarise
@@ -42,6 +36,18 @@ $ENDCMP
 $CMP DIODE
 D Diode simple
 K DEV DIODE
+$ENDCMP
+#
+$CMP LM7805
+D Linear Regulator +5V
+K POWER REGUL
+F regulator/lm78*.*
+$ENDCMP
+#
+$CMP PIC16F648
+D FLASH-Based 8-Bit CMOS Microcontroller
+K 16F648
+F www.microchip.com
 $ENDCMP
 #
 $CMP R

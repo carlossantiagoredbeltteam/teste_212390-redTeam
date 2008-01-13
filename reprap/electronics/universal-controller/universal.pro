@@ -1,5 +1,5 @@
-update=16/4/2007-03:41:19
-last_client=kicad
+update=8/12/2007-14:29:14
+last_client=eeschema
 [cvpcb]
 version=1
 NetITyp=0
@@ -21,6 +21,10 @@ LibName5=pin_array
 LibName6=divers
 LibName7=libcms
 LibName8=display
+[general]
+version=1
+RootSch=universal.sch
+BoardNm=universal.brd
 [eeschema]
 version=1
 LibDir=
@@ -56,7 +60,7 @@ SimCmd=
 UseNetN=0
 [eeschema/libraries]
 LibName1=power
-LibName2=reprap
+LibName2=/home/ensab/workspace/electronics/kicad_library/reprap
 LibName3=device
 LibName4=conn
 LibName5=linear
@@ -80,7 +84,3 @@ LibName22=display
 LibName23=cypress
 LibName24=siliconi
 LibName25=contrib
-[general]
-version=1
-RootSch=universal.sch
-BoardNm=universal.brd

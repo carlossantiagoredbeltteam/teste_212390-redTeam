@@ -1,10 +1,4 @@
-EESchema-DOCLIB  Version 2.0  Date: 5/5/2007-14:39:41
-#
-$CMP 7805
-D Linear Regulator +5V
-K POWER REGUL
-F regulator/lm78*.*
-$ENDCMP
+EESchema-DOCLIB  Version 2.0  Date: 13/1/2008-18:25:51
 #
 $CMP 78L05
 D Linear Regulator +5V
@@ -97,6 +91,12 @@ $ENDCMP
 $CMP PIC16F628
 D FLASH-Based 8-Bit CMOS Microcontroller
 K 16F628
+F www.microchip.com
+$ENDCMP
+#
+$CMP PIC16F648
+D FLASH-Based 8-Bit CMOS Microcontroller
+K 16F648
 F www.microchip.com
 $ENDCMP
 #
