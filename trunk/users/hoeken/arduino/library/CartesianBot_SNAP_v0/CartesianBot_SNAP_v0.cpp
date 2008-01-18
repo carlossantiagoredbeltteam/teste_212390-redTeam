@@ -48,9 +48,9 @@ void handleInterrupt()
 		if (bot.atTarget())
 		{
 			if (x_notify != 255)
-				notifyDDA(x_notify, X_ADDRESS, (int)bot.x.getPosition());
+				notifyDDA(x_notify, X_ADDRESS, (unsigned int)bot.x.getPosition());
 			if (y_notify != 255)
-				notifyDDA(y_notify, Y_ADDRESS, (int)bot.y.getPosition());
+				notifyDDA(y_notify, Y_ADDRESS, (unsigned int)bot.y.getPosition());
 			
 			bot.stop();
 		}
@@ -276,8 +276,8 @@ void process_cartesian_bot_snap_commands_v0()
 		break;
 
 		case CMD_SETPOS:
-			position = ((snap.getByte(2) << 8) + (snap.getByte(1)));
-
+			position = snap.getInt(1);
+			
 			if (dest == X_ADDRESS)
 			{
 				bot.x.setPosition(position);
@@ -305,14 +305,13 @@ void process_cartesian_bot_snap_commands_v0()
 
 			snap.sendReply();
 			snap.sendDataByte(CMD_GETPOS);
-			snap.sendDataByte(position & 0xff);
-			snap.sendDataByte(position >> 8);
+			snap.sendDataInt(position);
 			snap.endMessage();
 		break;
 
 		case CMD_SEEK:
 			// Goto position
-			position = ((snap.getByte(3) << 8) + snap.getByte(2));
+			position = snap.getInt(2);
 
 			//okay, set our speed.
 			if (dest == X_ADDRESS)
@@ -370,7 +369,7 @@ void process_cartesian_bot_snap_commands_v0()
 			// Set sync mode.. used to determine which direction to move slave stepper
 			if (dest == X_ADDRESS)
 				x_sync_mode = snap.getByte(1);
-			else if (dest == Y_ADDRESS)
+			if (dest == Y_ADDRESS)
 				y_sync_mode = snap.getByte(1);
 		break;
 
@@ -441,7 +440,6 @@ void process_cartesian_bot_snap_commands_v0()
 			else if (dest == Y_ADDRESS)
 			{
 				bot.y.setTarget(position);
-				bot.x.setTarget(target);
 
 				//we can figure out the target based on the sync mode
 				if (x_sync_mode == sync_inc)
@@ -449,7 +447,7 @@ void process_cartesian_bot_snap_commands_v0()
 				else
 					bot.x.setTarget(bot.x.getPosition() - target);
 			}
-			
+
 			//set z's target to itself.
 			bot.z.setTarget(bot.z.getPosition());
 			
@@ -574,5 +572,14 @@ void notifyDDA(byte to, byte from, unsigned int position)
 	snap.sendMessage(to);
 	snap.sendDataByte(CMD_DDA);
 	snap.sendDataInt(position);
+	snap.endMessage();
+}
+
+void snapDebug(byte from, unsigned int debug)
+{
+	snap.startMessage(from);
+	snap.sendMessage(0);
+	snap.sendDataByte(0);
+	snap.sendDataInt(debug);
 	snap.endMessage();
 }
