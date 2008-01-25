@@ -20,6 +20,7 @@ RepStepper::RepStepper(unsigned int number_of_steps, byte dir_pin, byte step_pin
 	pinMode(this->step_pin, OUTPUT);
 	pinMode(this->direction_pin, OUTPUT);
 	this->enable();
+	this->setDirection(RS_FORWARD);
 }
 
 /*
@@ -85,36 +86,46 @@ unsigned int RepStepper::getSteps()
 void RepStepper::setDirection(bool direction)
 {
 	digitalWrite(this->direction_pin, direction);
+	delayMicroseconds(5); //make sure it stabilizes..
+	this->direction = direction; //save our direction.
 }
 
 bool RepStepper::getDirection()
 {
-	return digitalRead(this->direction_pin);
+	return direction;
 }
 
 void RepStepper::enable()
 {
 	if (enable_pin != 255)
+	{
 		digitalWrite(enable_pin, HIGH);
+		delayMicroseconds(5); //make sure it stabilizes
+	}
+
+	enabled = true;
 }
 
 void RepStepper::disable()
 {
 	if (enable_pin != 255)
+	{
 		digitalWrite(enable_pin, LOW);
+		delayMicroseconds(5); //make sure it stabilizes
+	}
+
+	enabled = false;
 }
 
 bool RepStepper::isEnabled()
 {
-	if (enable_pin != 255)
-		return digitalRead(enable_pin);
-	else
-		return true;
+	return enabled;
 }
 
 //this sends a pulse to our stepper controller.
 void RepStepper::pulse()
 {
 	digitalWrite(step_pin, HIGH);
+	delayMicroseconds(5); //make sure it stabilizes... for opto isolated stepper drivers.
 	digitalWrite(step_pin, LOW);
 }

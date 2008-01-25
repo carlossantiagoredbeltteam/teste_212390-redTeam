@@ -10,6 +10,7 @@
 	
 	* (0.1) Forked library by Zach Smith.
 	* (0.2) Optimizations to reduce code overhead by Zach Smith
+	* (0.3) Added delays for optocoupled driver boards as well as variables to record enable/direction status.
 	
 	License: GPL v2.0
 */
@@ -58,6 +59,9 @@ class RepStepper {
     byte step_pin;						//the step signal pin.
     byte direction_pin;					//the direction pin.
     byte enable_pin;					//the enable pin.
+
+	bool enabled;						//are we enabled?
+	bool direction;						//what is our direction?
 };
 
 #endif
