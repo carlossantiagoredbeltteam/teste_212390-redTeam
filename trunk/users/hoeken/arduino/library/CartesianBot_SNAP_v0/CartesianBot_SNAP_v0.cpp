@@ -214,7 +214,7 @@ void process_cartesian_bot_snap_commands_v0()
 {
 	byte cmd = snap.getByte(0);
 	byte dest = snap.getDestination();
-	unsigned long position;
+	unsigned int position;
 
 	switch (cmd)
 	{
@@ -300,7 +300,7 @@ void process_cartesian_bot_snap_commands_v0()
 				position = bot.x.getPosition();
 			else if (dest == Y_ADDRESS)
 				position = bot.y.getPosition();
-			else
+			else if (dest == Z_ADDRESS)
 				position = bot.z.getPosition();
 
 			snap.sendReply();
@@ -484,9 +484,8 @@ void process_cartesian_bot_snap_commands_v0()
 		case CMD_GETSENSOR:
 			snap.sendReply();
 			snap.sendDataByte(CMD_GETSENSOR);
-			// FIXME: Dummy values for now
-			snap.sendDataByte(0);
-			snap.sendDataByte(0);
+			// Dummy values to satisfy PIC emulation
+			snap.sendDataInt(0);
 			snap.endMessage();
 		break;
 
