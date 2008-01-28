@@ -316,21 +316,21 @@ void process_cartesian_bot_snap_commands_v0()
 			//okay, set our speed.
 			if (dest == X_ADDRESS)
 			{
+				bot.x.setTarget(position);
 				bot.x.stepper.setRPM(snap.getByte(1));
 				bot.setTimer(bot.x.stepper.getSpeed());
-				bot.x.setTarget(position);
 			}
 			else if (dest == Y_ADDRESS)
 			{
+				bot.y.setTarget(position);
 				bot.y.stepper.setRPM(snap.getByte(1));
 				bot.setTimer(bot.y.stepper.getSpeed());
-				bot.y.setTarget(position);
 			}
 			else if (dest == Z_ADDRESS)
 			{
+				bot.z.setTarget(position);
 				bot.z.stepper.setRPM(snap.getByte(1));
 				bot.setTimer(bot.z.stepper.getSpeed());
-				bot.z.setTarget(position);
 			}
 
 			//start our seek.

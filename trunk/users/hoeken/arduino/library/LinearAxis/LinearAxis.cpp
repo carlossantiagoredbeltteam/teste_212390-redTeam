@@ -92,7 +92,7 @@ void LinearAxis::setTarget(long t)
 {
 	target = t;
 	
-	if (target > current)
+	if (target >= current)
 		stepper.setDirection(RS_FORWARD);
 	else
 		stepper.setDirection(RS_REVERSE);
