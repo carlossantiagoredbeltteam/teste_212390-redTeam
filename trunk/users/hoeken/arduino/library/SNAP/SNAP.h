@@ -4,6 +4,8 @@
 	This library implements easy SNAP based communication with the RepRap host software
 	with easy commands to enable receiving, sending, and passing along SNAP messages.
 
+	Memory Usage Estimate: 14 + MAX_DEVICE_COUNT + RX_BUFFER_SIZE + TX_BUFFER_SIZE = 51
+
 	History:
 	* (0.1) Ported from PIC library by Zach Smith.
 	* (0.2) Updated and fixed by the guys from Metalab in Austra (kintel and wizard23)

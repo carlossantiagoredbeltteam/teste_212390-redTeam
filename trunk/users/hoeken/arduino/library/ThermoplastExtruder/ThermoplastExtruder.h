@@ -5,6 +5,8 @@
 	
 	More information at: http://reprap.org/bin/view/Main/RepRapOneDarwinThermoplastExtruder
 
+	Memory Usage Estimate: 18 bytes
+
 	History:
 	* (0.1) Created intial library by Zach Smith.
 	* (0.2) Initial rework by Marius Kintel <kintel@sim.no>

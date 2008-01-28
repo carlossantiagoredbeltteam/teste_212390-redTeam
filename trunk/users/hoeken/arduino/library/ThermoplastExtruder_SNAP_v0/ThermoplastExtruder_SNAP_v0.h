@@ -8,6 +8,8 @@
 	
 	More information on the protocol here: http://reprap.org/bin/view/Main/ExtruderController
 
+	Memory Usage Estimate: 5 - 50? + ThermoplastExtruder
+
 	History:
 	* (0.1) Created intial library by Zach Smith.
 	* (0.2) Updated to emulate PIC based temperature measuring.

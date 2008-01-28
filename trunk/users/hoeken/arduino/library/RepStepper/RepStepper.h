@@ -6,6 +6,8 @@
 		
 	More information on the stepper driver circuit here: http://make.rrrf.org/smd
 
+	Memory Usage Estimate: 13 bytes
+
 	History:
 	
 	* (0.1) Forked library by Zach Smith.

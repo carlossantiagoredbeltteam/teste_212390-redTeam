@@ -3,6 +3,8 @@
 
 	This library is used to interface with a RepRap Cartesian Bot (3 axis X/Y/Z machine)
 
+	Memory Usage Estimate: 8 + 12 * POINT_QUEUE_SIZE + 3 * LinearAxis usage.
+
 	History:
 	* (0.1) Ceated initial library by Zach Smith.
 	* (0.2) Optimized for smaller size and speed by Zach Smith.
