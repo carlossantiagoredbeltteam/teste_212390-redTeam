@@ -92,7 +92,7 @@ void RepStepper::setDirection(bool direction)
 
 bool RepStepper::getDirection()
 {
-	return direction;
+	return this->direction;
 }
 
 void RepStepper::enable()
