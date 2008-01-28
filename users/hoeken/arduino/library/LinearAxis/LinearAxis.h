@@ -3,6 +3,8 @@
 
 	The interface for controlling a linear axis: stepper motor + min/max sensors + optional encoder
 
+	Memory Usage Estimate: 25 + repstepper usage.
+
 	History:
 	* (0.1) Created library by Zach Smith.
 	* (0.2) Optimized for less memory usage and faster performance

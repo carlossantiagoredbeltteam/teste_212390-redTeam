@@ -8,6 +8,8 @@
 	
 	More information on the protocol here: http://reprap.org/bin/view/Main/StepperMotorController
 
+	Memory Usage Estimate: 11 bytes + CartesianBot
+
 	History:
 	* (0.1) Created intial library by Zach Smith.
     * (0.2) Optimized library for better performance
