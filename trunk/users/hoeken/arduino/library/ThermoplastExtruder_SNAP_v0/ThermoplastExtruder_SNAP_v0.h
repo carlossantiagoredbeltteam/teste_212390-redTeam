@@ -1,7 +1,7 @@
 /*
-	ThermoplastExtruder_SNAP_v0.h - Thermoplastic Extruder SNAP Communications library for Arduino
+	ThermoplastExtruder_SNAP_v1.h - Thermoplastic Extruder SNAP Communications library for Arduino
 
-	This library implements/emulates v0 of the RepRap Thermoplastic Extruder communications protocol.
+	This library implements/emulates v1 of the RepRap Thermoplastic Extruder communications protocol.
 	The initial protocol was designed around measuring temperature by the amount of time
 	it takes to charge a capacitor through the thermistor.  In order to maintain compatibility,
 	the Arduino takes its analog reading and converts it into the value a PIC would return.
@@ -18,8 +18,8 @@
 	License: GPL v2.0
 */
 
-#ifndef THERMOPLAST_EXTRUDER_SNAP_V2_H
-#define THERMOPLAST_EXTRUDER_SNAP_V2_H
+#ifndef THERMOPLAST_EXTRUDER_SNAP_V1H
+#define THERMOPLAST_EXTRUDER_SNAP_V1_H
 
 //
 // constants for temp/pic temp conversion. from reprap.properties.dist
@@ -37,8 +37,8 @@
 //
 // Various processing commands.
 //
-void setup_extruder_snap_v0();
-void process_thermoplast_extruder_snap_commands_v0();
+void setup_extruder_snap_v1();
+void process_thermoplast_extruder_snap_commands_v1();
 
 //
 // Conversion commands
