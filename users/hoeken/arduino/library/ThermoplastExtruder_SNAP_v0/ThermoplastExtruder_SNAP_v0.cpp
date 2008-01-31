@@ -1,4 +1,4 @@
-#include <ThermoplastExtruder_SNAP_v0.h>
+#include <ThermoplastExtruder_SNAP_v1.h>
 
 //
 // Variables from host software
@@ -8,7 +8,7 @@ byte tempScaler = 4;
 int currentPos = 0;
 
 //this guys sets us up.
-void setup_extruder_snap_v0()
+void setup_extruder_snap_v1()
 {
 	snap.addDevice(EXTRUDER_ADDRESS);
 
@@ -19,7 +19,7 @@ void setup_extruder_snap_v0()
 }
 
 //this guy actually processes the commands.
-void process_thermoplast_extruder_snap_commands_v0()
+void process_thermoplast_extruder_snap_commands_v1()
 {
 	byte cmd = snap.getByte(0);
 
