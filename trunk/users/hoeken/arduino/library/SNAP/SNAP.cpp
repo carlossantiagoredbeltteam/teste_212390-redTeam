@@ -17,6 +17,22 @@ SNAP::SNAP()
 	this->crc = 0;
 }
 
+//initialize the serial stuff.
+void SNAP::begin(long baud)
+{
+	UBRR0H = ((F_CPU / 16 + baud / 2) / baud - 1) >> 8;
+	UBRR0L = ((F_CPU / 16 + baud / 2) / baud - 1);
+
+	// enable rx and tx
+	sbi(UCSR0B, RXEN0);
+	sbi(UCSR0B, TXEN0);
+
+	// enable interrupt on complete reception of a byte
+	sbi(UCSR0B, RXCIE0);
+
+	// defaults to 8-bit, no parity, 1 stop bit
+}
+
 //TODO: test see if we can eliminate cmd variable.
 void SNAP::receivePacket()
 {
@@ -416,6 +432,16 @@ void SNAP::transmit(byte c)
 	Serial.print(c, BYTE);
 }
 
+void SNAP::transmitNew(byte c)
+{
+	//wait until we can transmit!
+	while (!(UCSR0A & (1 << UDRE0)))
+		;
+
+	//send it!
+	UDR0 = c;
+}
+
 /**
 *	Incrementally adds c to crc computation and updates this->crc.
 *	returns \c.
@@ -466,3 +492,13 @@ unsigned int SNAP::getInt(byte index)
 
 // Preinstantiate Objects
 SNAP snap = SNAP();
+
+//our receive interrupt guy.
+/*
+SIGNAL(SIG_USART_RECV)
+{
+	unsigned char c = UDR0;
+
+	SNAP.receiveByte(c);
+}
+*/

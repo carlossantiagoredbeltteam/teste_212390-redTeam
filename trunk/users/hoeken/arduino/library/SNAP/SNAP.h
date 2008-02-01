@@ -75,10 +75,14 @@ class SNAP
 	public:
 		SNAP();
             
+		void begin(long baud);
 		void addDevice(byte b);
 
+		//TODO: this is for async comms, should be removed
 		void receivePacket();
+		
 		void receiveByte(byte b);
+		void receive();
 
 		bool packetReady();
 
@@ -101,37 +105,42 @@ class SNAP
 		void receiveError();
 		bool hasDevice(byte b);
 		void transmit(byte c);
+		void transmitNew(byte c);
 		byte computeCRC(byte c);
             
+		//Rx Packet Data
+		//TODO: change to rxPacketState
 		byte packetState;               // Current SNAP packet state
+		//TODO: change to rxHDB1
 		byte in_hdb1;                   // Temporary buffers needed to
+		//TODO: change to rxHDB2
 		byte in_hdb2;                   // pass packets on from various states
+		//TODO: change to rxPacketLength
 		byte packetLength;              // Length of packet being received
+		
+		//TODO: create rxDestAddress and txDestAddress
 		byte destAddress;               // Destination of packet being received
+		
+		//TODO: create rxSourceAddress and txSourceAddress
 		byte sourceAddress;             // Source of packet being received
+		
+		//TODO: create rxCRC and txCRC
 		byte crc;                       // Incrementally calculated CRC value
+		
+		//TODO: change to rxSerialStatus
 		byte serialStatus;              // flags for checking status of the serial-communication
 
-		byte rxBufferIndex;                                // Current receive buffer index
-		byte rxBuffer[RX_BUFFER_SIZE];        // Receive buffer
+		byte rxBufferIndex;             // Current receive buffer index
+		byte rxBuffer[RX_BUFFER_SIZE];  // Receive buffer
             
 		// This buffer stores the last complete packet body (not the headers
 		// as they can be reconstructed).  This is to allow automatic re-sending
 		// if a NAK is received.
-		byte txBuffer[TX_BUFFER_SIZE];        // Last packet data, for auto resending on a NAK
-		byte txDestination;                                // Last packet destination
-		byte txLength;                                        // Last packet length
+		byte txBuffer[TX_BUFFER_SIZE];  // Last packet data, for auto resending on a NAK
+		byte txDestination;             // Last packet destination
+		byte txLength;                  // Last packet length
             
-		// When sending a packet this is set to 0 and incremented for
-		// every NAK.  After too many have occurred, the packet is just
-		// dropped.
-		byte nakCount;
-
-		// General flags:
-		// @bug these should be "sbit" rather than "byte" but sdcc is breaking a bit
-		bool ackRequested;
-
-		// the address of our internal device sending message
+		// the addresses of our internal devices sending messages
 		byte deviceAddresses[MAX_DEVICE_COUNT];
 		byte deviceCount;
 };
