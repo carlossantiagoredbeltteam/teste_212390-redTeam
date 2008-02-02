@@ -36,6 +36,7 @@ void SNAP::begin(long baud)
 //TODO: test see if we can eliminate cmd variable.
 void SNAP::receivePacket()
 {
+	/*
 	byte cmd;
 
 	while (Serial.available() > 0)
@@ -43,6 +44,7 @@ void SNAP::receivePacket()
 		cmd = Serial.read();
 		this->receiveByte(cmd);
 	}
+	*/
 }
 
 void SNAP::receiveError()
@@ -76,6 +78,7 @@ void SNAP::receiveByte(byte c)
 		return;
 	}
 
+	byte hdb2 = B01010000; // 1 byte addresses
   
 	switch (this->packetState)
 	{
@@ -150,27 +153,27 @@ void SNAP::receiveByte(byte c)
 		break;
 
 		case SNAP_haveHDB1:
-		// We should be reading the destination address now
-		if (!this->hasDevice(c))
-		{
-			//we dont know that device, pass it on.
-			this->transmit(SNAP_SYNC);
-			this->transmit(this->in_hdb2);
-			this->transmit(this->in_hdb1);
-			this->transmit(c);
-			this->packetState = SNAP_haveDABPass;
-			this->serialStatus &= ~ackRequestedBit; //clear
-			this->serialStatus |= inTransmitMsgBit; //set
-		}
-		else
-		{
-			//save our address, as we may have multiple addresses on one arduino.
-			this->destAddress = c;
+			// We should be reading the destination address now
+			if (!this->hasDevice(c))
+			{
+				//we dont know that device, pass it on.
+				this->transmit(SNAP_SYNC);
+				this->transmit(this->in_hdb2);
+				this->transmit(this->in_hdb1);
+				this->transmit(c);
+				this->packetState = SNAP_haveDABPass;
+				this->serialStatus &= ~ackRequestedBit; //clear
+				this->serialStatus |= inTransmitMsgBit; //set
+			}
+			else
+			{
+				//save our address, as we may have multiple addresses on one arduino.
+				this->destAddress = c;
 
-			//update our CRC and status.
-			this->computeCRC(c);
-			this->packetState = SNAP_haveDAB;
-		}
+				//update our CRC and status.
+				this->computeCRC(c);
+				this->packetState = SNAP_haveDAB;
+			}
 		break;
 
 		case SNAP_haveDAB:
@@ -231,7 +234,7 @@ void SNAP::receiveByte(byte c)
 		case SNAP_dataComplete:
 			// We should be receiving a CRC after data, and it
 			// should match what we have already computed
-			byte hdb2 = B01010000; // 1 byte addresses
+
 
 			if (c == crc)
 			{
@@ -316,6 +319,7 @@ void SNAP::receiveByte(byte c)
 			this->serialStatus |= serialErrorBit;  //set serialError
 			this->serialStatus |= wrongStateErrorBit;  
 			this->receiveError();
+		break;
 	}
 }
 
@@ -429,7 +433,7 @@ bool SNAP::hasDevice(byte c)
 
 void SNAP::transmit(byte c)
 {
-	Serial.print(c, BYTE);
+//	Serial.print(c, BYTE);
 }
 
 void SNAP::transmitNew(byte c)

@@ -18,7 +18,6 @@
 
 // include types & constants of Wiring core API
 #include "WConstants.h"
-#include "HardwareSerial.h"
 
 //how many devices we have on this meta device
 #define MAX_DEVICE_COUNT 5		// size of our array to store virtual addresses
@@ -148,4 +147,8 @@ class SNAP
 //global variable declaration.
 extern SNAP snap;
 
+#endif
+
+#ifndef sbi
+#define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
 #endif
