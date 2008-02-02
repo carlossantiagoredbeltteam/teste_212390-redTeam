@@ -214,7 +214,7 @@ void process_cartesian_bot_snap_commands_v1()
 {
 	byte cmd = snap.getByte(0);
 	byte dest = snap.getDestination();
-	unsigned int position;
+	unsigned int position = 0;
 
 	switch (cmd)
 	{
