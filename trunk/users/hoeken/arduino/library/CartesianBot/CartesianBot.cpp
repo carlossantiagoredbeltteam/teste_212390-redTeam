@@ -105,7 +105,7 @@ void CartesianBot::calculateDDA()
 	z.initDDA(max_delta);
 	
 	//we're in dda mode
-	mode = MODE_DDA;
+	this->mode = MODE_DDA;
 	
 	//okies, go!
 	this->enableTimerInterrupt();

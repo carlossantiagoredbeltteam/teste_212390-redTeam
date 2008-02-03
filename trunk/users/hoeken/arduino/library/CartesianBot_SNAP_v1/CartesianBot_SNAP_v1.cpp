@@ -1,4 +1,5 @@
 #include "CartesianBot_SNAP_v1.h"
+#include <avr/interrupt.h>
 
 /**********************************
 *  Global variable instantiations
@@ -11,7 +12,7 @@ byte z_notify = 255;
 byte x_sync_mode = sync_none;
 byte y_sync_mode = sync_none;
 
-void handleInterrupt()
+SIGNAL(SIG_OUTPUT_COMPARE1A)
 {
 	bot.readState();
 	
@@ -43,16 +44,14 @@ void handleInterrupt()
 		if (bot.y.can_step)
 			bot.y.ddaStep(bot.max_delta);
 			
-		//z-axis not supported in v1.0 of comms.	
-
 		if (bot.atTarget())
 		{
+			bot.stop();
+
 			if (x_notify != 255)
 				notifyDDA(x_notify, X_ADDRESS, (unsigned int)bot.x.getPosition());
 			if (y_notify != 255)
 				notifyDDA(y_notify, Y_ADDRESS, (unsigned int)bot.y.getPosition());
-			
-			bot.stop();
 		}
 	}
 	else if (bot.mode == MODE_HOMERESET)
@@ -434,8 +433,10 @@ void process_cartesian_bot_snap_commands_v1()
 				//we can figure out the target based on the sync mode
 				if (y_sync_mode == sync_inc)
 					bot.y.setTarget(bot.y.getPosition() + target);
-				else
+				else if (y_sync_mode == sync_dec)
 					bot.y.setTarget(bot.y.getPosition() - target);
+				else
+					bot.y.setTarget(bot.y.getPosition());
 			}
 			else if (dest == Y_ADDRESS)
 			{
@@ -444,8 +445,10 @@ void process_cartesian_bot_snap_commands_v1()
 				//we can figure out the target based on the sync mode
 				if (x_sync_mode == sync_inc)
 					bot.x.setTarget(bot.x.getPosition() + target);
-				else
+				else if (x_sync_mode == sync_dec)
 					bot.x.setTarget(bot.x.getPosition() - target);
+				else
+					bot.x.setTarget(bot.x.getPosition());
 			}
 
 			//set z's target to itself.
@@ -454,9 +457,15 @@ void process_cartesian_bot_snap_commands_v1()
 			//set our speed.
 			bot.x.stepper.setRPM(snap.getByte(1));
 			bot.setTimer(bot.x.stepper.getSpeed());
-			
+
 			//init our DDA stuff!
 			bot.calculateDDA();
+
+			//snapDebug(dest, snap.getByte(1));
+			//snapDebug(X_ADDRESS, bot.x.getDelta());
+			//snapDebug(Y_ADDRESS, bot.y.getDelta());
+			//snapDebug(Z_ADDRESS, bot.z.getDelta());
+
 		break;
 
 		case CMD_FORWARD1:
@@ -578,7 +587,6 @@ void snapDebug(byte from, unsigned int debug)
 {
 	snap.startMessage(from);
 	snap.sendMessage(0);
-	snap.sendDataByte(0);
 	snap.sendDataInt(debug);
 	snap.endMessage();
 }
