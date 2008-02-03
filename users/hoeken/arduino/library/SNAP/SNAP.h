@@ -77,11 +77,7 @@ class SNAP
 		void begin(long baud);
 		void addDevice(byte b);
 
-		//TODO: this is for async comms, should be removed
-		void receivePacket();
-		
 		void receiveByte(byte b);
-		void receive();
 
 		bool packetReady();
 

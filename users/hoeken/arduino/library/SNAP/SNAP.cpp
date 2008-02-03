@@ -1,5 +1,7 @@
 #include "SNAP.h"
 #include "WConstants.h"
+#include <avr/interrupt.h>
+
 
 /**************************************
 * TODO:
@@ -31,20 +33,6 @@ void SNAP::begin(long baud)
 	sbi(UCSR0B, RXCIE0);
 
 	// defaults to 8-bit, no parity, 1 stop bit
-}
-
-//TODO: test see if we can eliminate cmd variable.
-void SNAP::receivePacket()
-{
-	/*
-	byte cmd;
-
-	while (Serial.available() > 0)
-	{
-		cmd = Serial.read();
-		this->receiveByte(cmd);
-	}
-	*/
 }
 
 void SNAP::receiveError()
@@ -433,11 +421,6 @@ bool SNAP::hasDevice(byte c)
 
 void SNAP::transmit(byte c)
 {
-//	Serial.print(c, BYTE);
-}
-
-void SNAP::transmitNew(byte c)
-{
 	//wait until we can transmit!
 	while (!(UCSR0A & (1 << UDRE0)))
 		;
@@ -498,11 +481,9 @@ unsigned int SNAP::getInt(byte index)
 SNAP snap = SNAP();
 
 //our receive interrupt guy.
-/*
 SIGNAL(SIG_USART_RECV)
 {
 	unsigned char c = UDR0;
 
-	SNAP.receiveByte(c);
+	snap.receiveByte(c);
 }
-*/
