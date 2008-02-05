@@ -15,17 +15,17 @@ CartesianBot::CartesianBot(
 
 byte CartesianBot::getQueueSize()
 {
-	return size;
+	return this->size;
 }
 
 bool CartesianBot::isQueueEmpty()
 {
-	return (size == 0);
+	return (this->size == 0);
 }
 
 bool CartesianBot::isQueueFull()
 {
-	return (size == POINT_QUEUE_SIZE);
+	return (this->size == POINT_QUEUE_SIZE);
 }
 
 bool CartesianBot::queuePoint(Point &point)
@@ -34,15 +34,15 @@ bool CartesianBot::queuePoint(Point &point)
 		return false;
 		
 	//queue up our point (at the old tail spot)!
-	point_queue[tail] = point;
+	this->point_queue[this->tail] = point;
 	
 	//keep track
-	size++;
+	this->size++;
 
 	//move our tail to the next tail location
-	tail++;
-	if (tail == POINT_QUEUE_SIZE)
-		tail = 0;
+	this->tail++;
+	if (this->tail == POINT_QUEUE_SIZE)
+		this->tail = 0;
 	
 	return true;
 }
@@ -50,24 +50,24 @@ bool CartesianBot::queuePoint(Point &point)
 struct Point CartesianBot::unqueuePoint()
 {
 	//save our old head.
-	byte oldHead = head;
+	byte oldHead = this->head;
 	
 	//move our head to the head for next time.
-	head++;
-	if (head == POINT_QUEUE_SIZE)
-		head = 0;
+	this->head++;
+	if (this->head == POINT_QUEUE_SIZE)
+		this->head = 0;
 
 	//keep track.
-	size--;
+	this->size--;
 			
-	return point_queue[oldHead];
+	return this->point_queue[oldHead];
 }
 
 void CartesianBot::clearQueue()
 {
-	head = 0;
-	tail = 0;
-	size = 0;
+	this->head = 0;
+	this->tail = 0;
+	this->size = 0;
 }
 
 void CartesianBot::getNextPoint()
@@ -96,13 +96,13 @@ void CartesianBot::calculateDDA()
 	this->disableTimerInterrupt();
 	
 	//what is the biggest one?
-	max_delta = max(x.getDelta(), y.getDelta());
-	max_delta = max(max_delta, z.getDelta());
+	this->max_delta = max(x.getDelta(), y.getDelta());
+	this->max_delta = max(this->max_delta, z.getDelta());
 
 	//calculate speeds for each axis.
-	x.initDDA(max_delta);
-	y.initDDA(max_delta);
-	z.initDDA(max_delta);
+	x.initDDA(this->max_delta);
+	y.initDDA(this->max_delta);
+	z.initDDA(this->max_delta);
 	
 	//we're in dda mode
 	this->mode = MODE_DDA;
@@ -114,30 +114,30 @@ void CartesianBot::calculateDDA()
 void CartesianBot::stop()
 {
 	this->disableTimerInterrupt();
-	mode = MODE_PAUSE;
+	this->mode = MODE_PAUSE;
 }
 
 void CartesianBot::startSeek()
 {
-	mode = MODE_SEEK;
+	this->mode = MODE_SEEK;
 	this->enableTimerInterrupt();
 }
 
 void CartesianBot::startHomeReset()
 {
-	mode = MODE_HOMERESET;
+	this->mode = MODE_HOMERESET;
 	this->enableTimerInterrupt();
 }
 
 void CartesianBot::startCalibration()
 {
-	mode = MODE_FIND_MIN;
+	this->mode = MODE_FIND_MIN;
 	this->enableTimerInterrupt();
 }
 
 byte CartesianBot::getMode()
 {
-	return mode;
+	return this->mode;
 }
 
 bool CartesianBot::atHome()
