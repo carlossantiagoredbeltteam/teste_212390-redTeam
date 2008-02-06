@@ -2,7 +2,6 @@
 #include "WConstants.h"
 #include <avr/interrupt.h>
 
-
 /**************************************
 * TODO:
 *
@@ -10,6 +9,53 @@
 *  - Switch to interrupt based stuff and dont use the built in Arduino Serial.foo() stuff.
 *  - Play with some of the TODO questions.
 */
+
+
+//these are for our interrupt handler.
+byte SNAP_rxBufferHead = 0;
+byte SNAP_rxBufferTail = 0;
+byte SNAP_rxBufferSize = 0;
+byte SNAP_rxBuffer[RX_BUFFER_SIZE];
+
+bool SNAP_bufferEmpty()
+{
+	return (SNAP_rxBufferSize == 0);
+}
+
+bool SNAP_bufferFull()
+{
+	return (SNAP_rxBufferSize == RX_BUFFER_SIZE); 
+}
+
+void SNAP_pushByte(unsigned char b)
+{
+	if (SNAP_bufferFull())
+		return;
+		
+	SNAP_rxBuffer[SNAP_rxBufferTail] = b;
+	
+	SNAP_rxBufferSize++;
+	
+	SNAP_rxBufferTail++;
+	if (SNAP_rxBufferTail == RX_BUFFER_SIZE)
+		SNAP_rxBufferTail = 0;
+}
+
+byte SNAP_popByte()
+{
+	//save our old head.
+	byte oldHead = SNAP_rxBufferHead;
+	
+	//move our head to the head for next time.
+	SNAP_rxBufferHead++;
+	if (SNAP_rxBufferHead == RX_BUFFER_SIZE)
+		SNAP_rxBufferHead = 0;
+
+	//keep track.
+	SNAP_rxBufferSize--;
+			
+	return SNAP_rxBuffer[oldHead];
+}
 
 SNAP::SNAP()
 {
@@ -366,6 +412,14 @@ void SNAP::sendDataInt(int i)
 	this->sendDataByte(i >> 8);
 }
 
+void SNAP::sendDataLong(long i)
+{
+	this->sendDataByte(i >> 24);
+	this->sendDataByte(i >> 16);
+	this->sendDataByte(i >> 8);
+	this->sendDataByte(i & 0xff);
+}
+
 
 /**
 *	Create headers and synchronously transmit the message.
@@ -396,6 +450,9 @@ void SNAP::endMessage()
 
 bool SNAP::packetReady()
 {
+	while (!SNAP_bufferEmpty())
+		this->receiveByte(SNAP_popByte());
+		
 	return (this->serialStatus & processingLockBit);
 }
 
@@ -481,9 +538,9 @@ unsigned int SNAP::getInt(byte index)
 SNAP snap = SNAP();
 
 //our receive interrupt guy.
-SIGNAL(SIG_USART_RECV)
+ISR(SIG_USART_RECV)
 {
 	unsigned char c = UDR0;
 
-	snap.receiveByte(c);
+	SNAP_pushByte(c);
 }

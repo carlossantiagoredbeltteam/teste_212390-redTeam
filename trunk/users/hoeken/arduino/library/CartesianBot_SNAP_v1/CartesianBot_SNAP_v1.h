@@ -29,6 +29,7 @@
 //this guy actually processes the v1 SNAP commands.
 void setup_cartesian_bot_snap_v1();
 void process_cartesian_bot_snap_commands_v1();
+void cartesian_bot_snap_v1_loop();
 void handleInterrupt();
 
 //notification functions to let the host know whats up.
@@ -37,7 +38,7 @@ void notifyCalibrate(byte to, byte from, unsigned int position);
 void notifySeek(byte to, byte from, unsigned int position);
 void notifyDDA(byte to, byte from, unsigned int position);
 
-void snapDebug(byte from, unsigned int debug);
+void snapDebug(byte from, long debug);
 
 extern CartesianBot bot;
 
@@ -95,12 +96,17 @@ enum functions {
 
 /********************************
  *  Sync mode declarations
- ********************************/
 enum sync_modes {
   sync_none,     // no sync (default)
   sync_seek,     // synchronised seeking
   sync_inc,      // inc motor on each pulse
   sync_dec       // dec motor on each pulse
 };
+********************************/
+
+#define sync_none 0
+#define sync_seek 1
+#define sync_inc  2
+#define sync_dec  3
 
 #endif

@@ -106,9 +106,6 @@ void CartesianBot::calculateDDA()
 	
 	//we're in dda mode
 	this->mode = MODE_DDA;
-	
-	//okies, go!
-	this->enableTimerInterrupt();
 }
 
 void CartesianBot::stop()
@@ -120,19 +117,16 @@ void CartesianBot::stop()
 void CartesianBot::startSeek()
 {
 	this->mode = MODE_SEEK;
-	this->enableTimerInterrupt();
 }
 
 void CartesianBot::startHomeReset()
 {
 	this->mode = MODE_HOMERESET;
-	this->enableTimerInterrupt();
 }
 
 void CartesianBot::startCalibration()
 {
 	this->mode = MODE_FIND_MIN;
-	this->enableTimerInterrupt();
 }
 
 byte CartesianBot::getMode()
@@ -265,7 +259,7 @@ void CartesianBot::setTimer(unsigned long delay)
 	this->disableTimerInterrupt();
 	this->setTimerCeiling(this->getTimerCeiling(delay));
 	this->setTimerResolution(this->getTimerResolution(delay));
-	this->enableTimerInterrupt();
+	//this->enableTimerInterrupt();
 }
 
 unsigned int CartesianBot::getTimerCeiling(unsigned long delay)

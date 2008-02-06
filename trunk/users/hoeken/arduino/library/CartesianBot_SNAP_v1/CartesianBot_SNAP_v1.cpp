@@ -12,94 +12,37 @@ byte z_notify = 255;
 byte x_sync_mode = sync_none;
 byte y_sync_mode = sync_none;
 
-SIGNAL(SIG_OUTPUT_COMPARE1A)
+ISR(SIG_OUTPUT_COMPARE1A)
 {
-	bot.readState();
-	
-	if (bot.mode == MODE_SEEK)
+	if (bot.mode == MODE_DDA)
+	{
+		if (bot.y.can_step)
+			bot.y.ddaStep(bot.max_delta);
+
+		if (bot.x.can_step)
+			bot.x.ddaStep(bot.max_delta);
+	}
+	else if (bot.mode == MODE_SEEK)
 	{
 		if (bot.x.can_step)
 			bot.x.doStep();
-		if (bot.x.atTarget() && x_notify != 255)
-			notifySeek(x_notify, X_ADDRESS, (int)bot.x.getPosition());
 
 		if (bot.y.can_step)
 			bot.y.doStep();
-		if (bot.y.atTarget() && y_notify != 255)
-			notifySeek(y_notify, Y_ADDRESS, (int)bot.y.getPosition());
 
 		if (bot.z.can_step)
 			bot.z.doStep();
-		if (bot.z.atTarget() && z_notify != 255)
-			notifySeek(z_notify, Z_ADDRESS, (int)bot.z.getPosition());
-			
-		if (bot.atTarget())
-			bot.stop();
-	}
-	else if (bot.mode == MODE_DDA)
-	{
-		if (bot.x.can_step)
-			bot.x.ddaStep(bot.max_delta);
-		
-		if (bot.y.can_step)
-			bot.y.ddaStep(bot.max_delta);
-			
-		if (bot.atTarget())
-		{
-			bot.stop();
-
-			if (x_notify != 255)
-				notifyDDA(x_notify, X_ADDRESS, (unsigned int)bot.x.getPosition());
-			if (y_notify != 255)
-				notifyDDA(y_notify, Y_ADDRESS, (unsigned int)bot.y.getPosition());
-		}
 	}
 	else if (bot.mode == MODE_HOMERESET)
 	{
-		if (bot.x.function == func_homereset)
-		{
-			if (!bot.x.atMin())
+		if (bot.x.function == func_homereset && !bot.x.atMin())
 				bot.x.stepper.pulse();
-			else
-			{
-				bot.x.setPosition(0);
-				bot.x.function = func_idle;
-				bot.stop();
-				
-				if (x_notify != 255)
-					notifyHomeReset(x_notify, X_ADDRESS);
-			}
-		}
 
-		if (bot.y.function == func_homereset)
-		{
-			if (!bot.y.atMin())
+		if (bot.y.function == func_homereset && !bot.y.atMin())
 				bot.y.stepper.pulse();
-			else
-			{
-				bot.y.setPosition(0);
-				bot.y.function = func_idle;
-				bot.stop();
-				
-				if (y_notify != 255)
-					notifyHomeReset(y_notify, Y_ADDRESS);	
-			}
-		}
 
-		if (bot.z.function == func_homereset)
-		{
-			if (!bot.z.atMin())
+		if (bot.z.function == func_homereset && !bot.z.atMin())
 				bot.z.stepper.pulse();
-			else
-			{
-				bot.z.setPosition(0);
-				bot.z.function = func_idle;
-				bot.stop();
-
-				if (z_notify != 255)
-					notifyHomeReset(z_notify, Z_ADDRESS);
-			}
-		}
 	}
 	else if (bot.mode == MODE_FIND_MIN)
 	{
@@ -107,7 +50,124 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
 		{
 			if (!bot.x.atMin())
 				bot.x.stepper.pulse();
-			else
+		}
+
+		if (bot.y.function == func_findmin)
+		{
+			if (!bot.y.atMin())
+				bot.y.stepper.pulse();
+		}
+
+		if (bot.z.function == func_findmin)
+		{
+			if (!bot.z.atMin())
+				bot.z.stepper.pulse();
+		}
+	}
+	else if (bot.mode == MODE_FIND_MAX)
+	{
+		if (bot.x.function == func_findmax)
+		{
+			//do a step if we're not there yet.
+			if (!bot.x.atMax())
+				bot.x.doStep();
+		}
+		
+		if (bot.y.function == func_findmax)
+		{
+			//do a step if we're not there yet.
+			if (!bot.y.atMax())
+				bot.y.doStep();
+		}
+		
+		if (bot.z.function == func_findmax)
+		{
+			//do a step if we're not there yet.
+			if (!bot.z.atMax())
+				bot.z.doStep();
+		}
+	}
+}
+
+void setup_cartesian_bot_snap_v1()
+{
+	bot.setupTimerInterrupt();
+	
+	snap.addDevice(X_ADDRESS);
+	snap.addDevice(Y_ADDRESS);
+	snap.addDevice(Z_ADDRESS);
+	
+	snapDebug(X_ADDRESS, (long)bot.x.getPosition());
+}
+
+void cartesian_bot_snap_v1_loop()
+{
+	if (bot.mode == MODE_DDA)
+	{
+		if (bot.atTarget())
+		{
+			if (x_notify != 255)
+				notifyDDA(x_notify, X_ADDRESS, (unsigned int)bot.x.getPosition());
+			if (y_notify != 255)
+				notifyDDA(y_notify, Y_ADDRESS, (unsigned int)bot.y.getPosition());
+
+			bot.stop();
+		}
+	}
+	else if (bot.mode == MODE_SEEK)
+	{
+		if (bot.x.atTarget() && x_notify != 255)
+			notifySeek(x_notify, X_ADDRESS, (int)bot.x.getPosition());
+
+		if (bot.y.atTarget() && y_notify != 255)
+			notifySeek(y_notify, Y_ADDRESS, (int)bot.y.getPosition());
+
+		if (bot.z.atTarget() && z_notify != 255)
+			notifySeek(z_notify, Z_ADDRESS, (int)bot.z.getPosition());
+
+		if (bot.atTarget())
+			bot.stop();
+	}
+	else if (bot.mode == MODE_HOMERESET)
+	{
+		if (bot.x.function == func_homereset && bot.x.atMin())
+		{
+			bot.x.setPosition(0);
+			bot.x.function = func_idle;
+			bot.x.stepper.setDirection(RS_FORWARD);
+			bot.stop();
+
+			if (x_notify != 255)
+				notifyHomeReset(x_notify, X_ADDRESS);
+		}
+
+		if (bot.y.function == func_homereset && bot.y.atMin())
+		{
+			bot.y.setPosition(0);
+			bot.y.function = func_idle;
+			bot.y.stepper.setDirection(RS_FORWARD);
+			bot.stop();
+
+			if (y_notify != 255)
+				notifyHomeReset(y_notify, Y_ADDRESS);	
+		}
+
+		if (bot.z.function == func_homereset && bot.z.atMin())
+		{
+			bot.z.setPosition(0);
+			bot.z.function = func_idle;
+			bot.z.stepper.setDirection(RS_FORWARD);
+			bot.stop();
+
+			if (z_notify != 255)
+				notifyHomeReset(z_notify, Z_ADDRESS);
+		}
+	}
+	else if (bot.mode == MODE_FIND_MIN)
+	{
+		if (bot.x.function == func_findmin)
+		{
+			if (bot.x.atMin())
 			{
 				bot.x.setPosition(0);
 				bot.x.stepper.setDirection(RS_FORWARD);
@@ -118,9 +178,7 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
 
 		if (bot.y.function == func_findmin)
 		{
-			if (!bot.y.atMin())
-				bot.y.stepper.pulse();
-			else
+			if (bot.y.atMin())
 			{
 				bot.y.setPosition(0);
 				bot.y.stepper.setDirection(RS_FORWARD);
@@ -131,9 +189,7 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
 
 		if (bot.z.function == func_findmin)
 		{
-			if (!bot.z.atMin())
-				bot.z.stepper.pulse();
-			else
+			if (bot.z.atMin())
 			{
 				bot.z.setPosition(0);
 				bot.z.stepper.setDirection(RS_FORWARD);
@@ -146,67 +202,46 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
 	{
 		if (bot.x.function == func_findmax)
 		{
-			//do a step if we're not there yet.
-			if (!bot.x.atMax())
-				bot.x.doStep();
-			
 			//are we there yet?
 			if (bot.x.atMax())
 			{
 				bot.x.setMax(bot.x.getPosition());
 				bot.x.function = func_idle;
 				bot.stop();
-				
+
 				if (x_notify != 255)
 					notifyCalibrate(x_notify, X_ADDRESS, bot.x.getMax());
 			}
 		}
-		
+
 		if (bot.y.function == func_findmax)
 		{
-			//do a step if we're not there yet.
-			if (!bot.y.atMax())
-				bot.y.doStep();
-			
 			//are we there yet?
 			if (bot.y.atMax())
 			{
 				bot.y.setMax(bot.y.getPosition());
 				bot.y.function = func_idle;
 				bot.stop();
-				
+
 				if (x_notify != 255)
 					notifyCalibrate(x_notify, X_ADDRESS, bot.y.getMax());
 			}
 		}
-		
+
 		if (bot.z.function == func_findmax)
 		{
-			//do a step if we're not there yet.
-			if (!bot.z.atMax())
-				bot.z.doStep();
-			
 			//are we there yet?
 			if (bot.z.atMax())
 			{
 				bot.z.setMax(bot.z.getPosition());
 				bot.z.function = func_idle;
 				bot.stop();
-				
+
 				if (x_notify != 255)
 					notifyCalibrate(x_notify, X_ADDRESS, bot.z.getMax());
 			}
 		}
 	}
-}
-
-void setup_cartesian_bot_snap_v1()
-{
-	bot.setupTimerInterrupt();
-	
-	snap.addDevice(X_ADDRESS);
-	snap.addDevice(Y_ADDRESS);
-	snap.addDevice(Z_ADDRESS);
 }
 
 void process_cartesian_bot_snap_commands_v1()
@@ -464,7 +499,7 @@ void process_cartesian_bot_snap_commands_v1()
 			//snapDebug(dest, snap.getByte(1));
 			//snapDebug(X_ADDRESS, bot.x.getDelta());
 			//snapDebug(Y_ADDRESS, bot.y.getDelta());
-			//snapDebug(Z_ADDRESS, bot.z.getDelta());
+			snapDebug(Z_ADDRESS, (long)1);
 
 		break;
 
@@ -546,6 +581,7 @@ void process_cartesian_bot_snap_commands_v1()
 	}
 
 	snap.releaseLock();
+	bot.enableTimerInterrupt();
 }
 
 void notifyHomeReset(byte to, byte from)
@@ -583,7 +619,7 @@ void notifyDDA(byte to, byte from, unsigned int position)
 	snap.endMessage();
 }
 
-void snapDebug(byte from, unsigned int debug)
+void snapDebug(byte from, long debug)
 {
 	snap.startMessage(from);
 	snap.sendMessage(0);

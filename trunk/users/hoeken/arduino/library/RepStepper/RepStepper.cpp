@@ -97,7 +97,7 @@ bool RepStepper::getDirection()
 
 void RepStepper::enable()
 {
-	if (enable_pin != 255)
+	if (this->enable_pin != 255)
 	{
 		digitalWrite(enable_pin, HIGH);
 		delayMicroseconds(5); //make sure it stabilizes
@@ -108,9 +108,9 @@ void RepStepper::enable()
 
 void RepStepper::disable()
 {
-	if (enable_pin != 255)
+	if (this->enable_pin != 255)
 	{
-		digitalWrite(enable_pin, LOW);
+		digitalWrite(this->enable_pin, LOW);
 		delayMicroseconds(5); //make sure it stabilizes
 	}
 

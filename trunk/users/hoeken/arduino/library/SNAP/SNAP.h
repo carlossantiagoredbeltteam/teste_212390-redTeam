@@ -25,6 +25,13 @@
 #define RX_BUFFER_SIZE 8		// Receive buffer size.
 #define HOST_ADDRESS 0			// address of the host.
 
+
+//functions for working with the buffer.
+bool SNAP_bufferEmpty();
+bool SNAP_bufferFull();
+void SNAP_pushByte(unsigned char b);
+byte SNAP_popByte();
+
 //our sync packet value.
 #define SNAP_SYNC 0x54
 
@@ -92,6 +99,7 @@ class SNAP
 		void sendMessage(byte dest);
 		void sendDataByte(byte c);
 		void sendDataInt(int data);
+		void sendDataLong(long data);
 		void endMessage();
 
 		void releaseLock();
@@ -100,7 +108,6 @@ class SNAP
 		void receiveError();
 		bool hasDevice(byte b);
 		void transmit(byte c);
-		void transmitNew(byte c);
 		byte computeCRC(byte c);
             
 		//Rx Packet Data
