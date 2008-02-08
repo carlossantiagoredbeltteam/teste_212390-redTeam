@@ -18,12 +18,13 @@ void SNAP::begin(long baud)
 
 void SNAP::receivePacket()
 {
-  byte cmd;
+	byte cmd;
 
-  while (Serial.available() > 0) {
-    cmd = Serial.read();
-    this->receiveByte(cmd);
-  }
+	while (Serial.available() > 0 && !this->packetReady())
+	{
+		cmd = Serial.read();
+		this->receiveByte(cmd);
+	}
 }
 
 void SNAP::receiveError()
@@ -349,9 +350,7 @@ void SNAP::endMessage()
 }
 
 bool SNAP::packetReady()
-{
-	this->receivePacket();
-	
+{	
 	return (this->serialStatus & processingLockBit);
 }
 
