@@ -97,7 +97,7 @@ void setup_cartesian_bot_snap_v1()
 	snap.addDevice(Y_ADDRESS);
 	snap.addDevice(Z_ADDRESS);
 	
-	snapDebug(X_ADDRESS, (long)bot.x.getPosition());
+	snapDebug(X_ADDRESS, (long)0);
 }
 
 void cartesian_bot_snap_v1_loop()
@@ -499,7 +499,7 @@ void process_cartesian_bot_snap_commands_v1()
 			//snapDebug(dest, snap.getByte(1));
 			//snapDebug(X_ADDRESS, bot.x.getDelta());
 			//snapDebug(Y_ADDRESS, bot.y.getDelta());
-			snapDebug(Z_ADDRESS, (long)1);
+			//snapDebug(Z_ADDRESS, (long)1);
 
 		break;
 
@@ -623,6 +623,6 @@ void snapDebug(byte from, long debug)
 {
 	snap.startMessage(from);
 	snap.sendMessage(0);
-	snap.sendDataInt(debug);
+	snap.sendDataLong(debug);
 	snap.endMessage();
 }

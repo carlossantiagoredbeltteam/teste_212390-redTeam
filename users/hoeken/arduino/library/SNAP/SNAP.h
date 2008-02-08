@@ -4,8 +4,6 @@
 	This library implements easy SNAP based communication with the RepRap host software
 	with easy commands to enable receiving, sending, and passing along SNAP messages.
 
-	Memory Usage Estimate: 14 + MAX_DEVICE_COUNT + RX_BUFFER_SIZE + TX_BUFFER_SIZE = 51
-
 	History:
 	* (0.1) Ported from PIC library by Zach Smith.
 	* (0.2) Updated and fixed by the guys from Metalab in Austra (kintel and wizard23)
@@ -18,19 +16,13 @@
 
 // include types & constants of Wiring core API
 #include "WConstants.h"
+#include "HardwareSerial.h"
 
 //how many devices we have on this meta device
 #define MAX_DEVICE_COUNT 5		// size of our array to store virtual addresses
-#define TX_BUFFER_SIZE 8		// Transmit buffer size.
-#define RX_BUFFER_SIZE 8		// Receive buffer size.
+#define TX_BUFFER_SIZE 16		// Transmit buffer size.
+#define RX_BUFFER_SIZE 16		// Receive buffer size.
 #define HOST_ADDRESS 0			// address of the host.
-
-
-//functions for working with the buffer.
-bool SNAP_bufferEmpty();
-bool SNAP_bufferFull();
-void SNAP_pushByte(unsigned char b);
-byte SNAP_popByte();
 
 //our sync packet value.
 #define SNAP_SYNC 0x54
@@ -58,100 +50,93 @@ byte SNAP_popByte();
 
 //these are the states for processing a packet.
 enum SNAP_states {
-	SNAP_idle = 0x30,
-	SNAP_haveSync,
-	SNAP_haveHDB2,
-	SNAP_haveHDB1,
-	SNAP_haveDAB,
-	SNAP_readingData,
-	SNAP_dataComplete,
+  SNAP_idle = 0x30,
+  SNAP_haveSync,
+  SNAP_haveHDB2,
+  SNAP_haveHDB1,
+  SNAP_haveDAB,
+  SNAP_readingData,
+  SNAP_dataComplete,
 
-	// The *Pass states below represent states where
-	// we should just be passing the data on to the next node.
-	// This is either because we bailed out, or because the
-	// packet wasn't destined for us.
-	SNAP_haveHDB2Pass,
-	SNAP_haveHDB1Pass,
-	SNAP_haveDABPass,
-	SNAP_readingDataPass
+  // The *Pass states below represent states where
+  // we should just be passing the data on to the next node.
+  // This is either because we bailed out, or because the
+  // packet wasn't destined for us.
+  SNAP_haveHDB2Pass,
+  SNAP_haveHDB1Pass,
+  SNAP_haveDABPass,
+  SNAP_readingDataPass
 };
 
 class SNAP
 {
-	public:
-		SNAP();
-            
-		void begin(long baud);
-		void addDevice(byte b);
+ public:
+  SNAP();
 
-		void receiveByte(byte b);
+  void begin(long baud);
+  void addDevice(byte b);
 
-		bool packetReady();
+  void receivePacket();
+  void receiveByte(byte b);
 
-		byte getDestination();
-		byte getSource();
-		byte getPacketLength();
-		byte getByte(byte index);
-		unsigned int getInt(byte index); // get 16 bits
+  bool packetReady();
 
-		void startMessage(byte from);
-		void sendReply();
-		void sendMessage(byte dest);
-		void sendDataByte(byte c);
-		void sendDataInt(int data);
-		void sendDataLong(long data);
-		void endMessage();
+  byte getDestination();
+  byte getSource();
+  byte getPacketLength();
+  byte getByte(byte index);
+  unsigned int getInt(byte index); // get 16 bits
 
-		void releaseLock();
+  void startMessage(byte from);
+  void sendReply();
+  void sendMessage(byte dest);
+  void sendDataByte(byte c);
+  void sendDataInt(int data);
+  void sendDataLong(long data);
+  void endMessage();
 
-	private:
-		void receiveError();
-		bool hasDevice(byte b);
-		void transmit(byte c);
-		byte computeCRC(byte c);
-            
-		//Rx Packet Data
-		//TODO: change to rxPacketState
-		byte packetState;               // Current SNAP packet state
-		//TODO: change to rxHDB1
-		byte in_hdb1;                   // Temporary buffers needed to
-		//TODO: change to rxHDB2
-		byte in_hdb2;                   // pass packets on from various states
-		//TODO: change to rxPacketLength
-		byte packetLength;              // Length of packet being received
-		
-		//TODO: create rxDestAddress and txDestAddress
-		byte destAddress;               // Destination of packet being received
-		
-		//TODO: create rxSourceAddress and txSourceAddress
-		byte sourceAddress;             // Source of packet being received
-		
-		//TODO: create rxCRC and txCRC
-		byte crc;                       // Incrementally calculated CRC value
-		
-		//TODO: change to rxSerialStatus
-		byte serialStatus;              // flags for checking status of the serial-communication
+  void releaseLock();
 
-		byte rxBufferIndex;             // Current receive buffer index
-		byte rxBuffer[RX_BUFFER_SIZE];  // Receive buffer
-            
-		// This buffer stores the last complete packet body (not the headers
-		// as they can be reconstructed).  This is to allow automatic re-sending
-		// if a NAK is received.
-		byte txBuffer[TX_BUFFER_SIZE];  // Last packet data, for auto resending on a NAK
-		byte txDestination;             // Last packet destination
-		byte txLength;                  // Last packet length
-            
-		// the addresses of our internal devices sending messages
-		byte deviceAddresses[MAX_DEVICE_COUNT];
-		byte deviceCount;
+ private:
+  void receiveError();
+  bool hasDevice(byte b);
+  void transmit(byte c);
+  byte computeCRC(byte c);
+                
+  byte packetState;               // Current SNAP packet state
+  byte in_hdb1;                   // Temporary buffers needed to
+  byte in_hdb2;                   // pass packets on from various states
+  byte packetLength;              // Length of packet being received
+  byte destAddress;               // Destination of packet being received
+  byte sourceAddress;             // Source of packet being received
+  byte crc;                       // Incrementally calculated CRC value
+  byte serialStatus;              // flags for checking status of the serial-communication
+
+  byte rxBufferIndex;                                // Current receive buffer index
+  byte rxBuffer[RX_BUFFER_SIZE];        // Receive buffer
+                
+  // This buffer stores the last complete packet body (not the headers
+  // as they can be reconstructed).  This is to allow automatic re-sending
+  // if a NAK is received.
+  byte txBuffer[TX_BUFFER_SIZE];        // Last packet data, for auto resending on a NAK
+  byte txDestination;                                // Last packet destination
+  byte txLength;                                        // Last packet length
+                
+  // When sending a packet this is set to 0 and incremented for
+  // every NAK.  After too many have occurred, the packet is just
+  // dropped.
+  byte nakCount;
+
+  // General flags:
+  // @bug these should be "sbit" rather than "byte" but sdcc is breaking a bit
+  bool ackRequested;
+
+  // the address of our internal device sending message
+  byte deviceAddresses[MAX_DEVICE_COUNT];
+  byte deviceCount;
 };
 
 //global variable declaration.
 extern SNAP snap;
 
-#endif
-
-#ifndef sbi
-#define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
 #endif
