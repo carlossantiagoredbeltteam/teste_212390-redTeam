@@ -97,7 +97,7 @@ void setup_cartesian_bot_snap_v1()
 	snap.addDevice(Y_ADDRESS);
 	snap.addDevice(Z_ADDRESS);
 	
-	snapDebug(X_ADDRESS, (long)0);
+	//snapDebug(X_ADDRESS, (long)0);
 }
 
 void cartesian_bot_snap_v1_loop()
