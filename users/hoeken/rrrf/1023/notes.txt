@@ -1,0 +1,48 @@
+Form 1023 Additional Notes
+
+Part IV
+
+The RepRap Research Foundation has the primary goal of supporting research into 3D printing and self-replicating systems as part of the RepRap project.  The RepRap project itself, located at http://www.reprap.org is an open source project aimed at creating a self-replicating 3D printer.
+
+Due to the physical nature of the project, in order to participate in research, members need to have access to the actual physical components being developed.  The role of the foundation is to assist this process by buying and selling required parts at a low cost to interested researchers.  The Foundation should sell the parts at a low enough price so that access to the technology and fruits of research are readily available, but also high enough so that the Foundation can grow and continue to provide parts in perpetuity.  Any extra profit that the Foundation generates at the end of the year will be re-invested in the Foundation, or donated to charity.
+
+Eventually, the Foundation should provide an environment where interested persons may actually come and directly participate in the research and development of the technology.
+
+Practically, this means maintaining an online webstore located at http://store.rrrf.org where anyone may purchase parts at low prices, as well as maintaining a physical location where the parts may be manufactured and stored.  As the foundation grows, this location shall grow with it until eventually it becomes a hub for large scale research into self-replicating machines and automated manufacturing technologies.
+
+Part V
+
+Section 3b
+
+Zachary Smith
+Qualifications: technologist, founder of RRRF
+Average Hours Worked: 20 hours / week
+Duties: oversee nearly every facet of the operation of the RRRF, and any day to day activities
+
+Part VI
+
+Section 1a
+
+We provide low cost research materials to any interested researcher.  Research is open to the general public, therefore low cost research materials are available to the general public.
+
+Section 1b
+
+We provide low cost research materials to any interested researcher.  Research is open to the general public, therefore low cost research materials are available to the general public, including any public organization.
+
+Part VIII
+
+Section 4a
+
+It is possible that the Foundation will solicit donations at some point in the future.  This could be through a mail campaign, an email campaign, a phone campaign, through grant proposals, the Foundation website, or the RepRap website.  All fundraising activities will abide by local and federal laws, as well as being conducted in an ethical manner.
+
+Section 4d
+
+The Foundation will generally fundraise in the United States, but due to the international nature of the Internet, we may also accept donations internationally.
+
+Section 10
+
+The Foundation will most likely at some time hold intellectual property in the form of copyright and patents.  All intellectual property held by the Foundation will be released to the general public at zero cost under a license such as the General Public License (GPL) or equivalent.
+
+Section 11
+
+It is conceivable that the Foundation at some point will receive donations in the form of intellectual property and they will make them available under the same open guidelines as in Part VIII, Section 10 of this document.
