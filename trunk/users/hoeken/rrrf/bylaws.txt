@@ -123,7 +123,11 @@ to be submitted to the Board showing income, expenditures and pending income.
 The financial records of the organization are public information and shall
 be made available to the membership, Board members and the public.
 
-ARTICLE VI - AMENDMENTS
+ARTICLE VI - DISSOLUTION
+
+Section 1: Upon dissolution of RepRap Research Foundation, remaining assets must be donated to leading researchers in the RepRap project, to be determined by a vote of the Board.
+
+ARTICLE VII - AMENDMENTS
 	
 Section 1: These Bylaws may be amended when necessary by a two-thirds
 majority of the Board of Directors. Proposed amendments must be submitted
