@@ -33,9 +33,9 @@
 
 // our point structure to make things nice.
 struct Point {
-	unsigned long x;
-	unsigned long y;
- 	unsigned long z;
+	int x;
+	int y;
+ 	int z;
 };
 
 // library interface description
@@ -91,7 +91,7 @@ class CartesianBot {
 	LinearAxis z;
 
 	//for DDA stuff.
-	long max_delta;
+	int max_delta;
 
 	//this is the mode we're currently in... started/stopped
 	byte mode;

@@ -18,7 +18,7 @@ LinearAxis::LinearAxis(char id, int steps, byte dir_pin, byte step_pin, byte min
 void LinearAxis::readState()
 {
 	//stop us if we're on target
-	if (this->atTarget())
+	if (this->target == this->current)
 		this->can_step = false;
 	//stop us if we're at home and still going 
 	else if (digitalRead(this->min_pin) && (this->stepper.getDirection() == RS_REVERSE))
@@ -31,16 +31,6 @@ void LinearAxis::readState()
 		this->can_step = true;
 }
 
-bool LinearAxis::atMin()
-{
-	return digitalRead(this->min_pin);
-}
-
-bool LinearAxis::atMax()
-{
-	return digitalRead(this->max_pin);
-}
-
 void LinearAxis::doStep()
 {
 	//record our step
@@ -51,10 +41,6 @@ void LinearAxis::doStep()
 	
 	//do our step!
 	stepper.pulse();
-
-	//stop us from stepping if we're there.
-//	if (this->current == this->target)
-//		this->can_step = false;
 }
 
 void LinearAxis::forward1()
@@ -73,29 +59,19 @@ void LinearAxis::reverse1()
 	this->current--;
 }
 
-long LinearAxis::getPosition()
+void LinearAxis::setPosition(int p)
 {
-	return this->current;
-}
-
-void LinearAxis::setPosition(long position)
-{
-	this->current = position;
+	this->current = p;
 	
 	//recalculate stuff.
-	this->setTarget(target);
+	this->setTarget(this->target);
 }
 
-long LinearAxis::getTarget()
-{
-	return this->target;
-}
-
-void LinearAxis::setTarget(long t)
+void LinearAxis::setTarget(int t)
 {
 	this->target = t;
 	
-	if (target >= current)
+	if (this->target >= this->current)
 		stepper.setDirection(RS_FORWARD);
 	else
 		stepper.setDirection(RS_REVERSE);
@@ -103,33 +79,18 @@ void LinearAxis::setTarget(long t)
 	this->delta = this->getDelta();
 }
 
-void LinearAxis::setMax(long m)
-{
-	this->max = m;
-}
-
-long LinearAxis::getMax()
-{
-	return this->max;
-}
-
-bool LinearAxis::atTarget()
-{
-	return (this->target == this->current);
-}
-
-long LinearAxis::getDelta()
+int LinearAxis::getDelta()
 {
 	return abs(this->target - this->current);
 }
 
-void LinearAxis::initDDA(long max_delta)
+void LinearAxis::initDDA(int max_delta)
 {
 	this->counter = -max_delta/2;
 	this->delta = this->getDelta();
 }
 
-void LinearAxis::ddaStep(long max_delta)
+void LinearAxis::ddaStep(int max_delta)
 {
 	this->counter += this->delta;
 

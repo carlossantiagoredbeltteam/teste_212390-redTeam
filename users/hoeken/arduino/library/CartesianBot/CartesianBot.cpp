@@ -84,9 +84,9 @@ void CartesianBot::getNextPoint()
 	}
 	else
 	{
-		x.setTarget(x.getPosition());
-		y.setTarget(y.getPosition());
-		z.setTarget(z.getPosition());
+		x.setTarget(x.current);
+		y.setTarget(y.current);
+		z.setTarget(z.current);
 	}
 }
 
@@ -136,7 +136,7 @@ byte CartesianBot::getMode()
 
 bool CartesianBot::atHome()
 {
-	return (x.atMin() && y.atMin() && z.atMin());
+	return (digitalRead(x.min_pin) && digitalRead(y.min_pin) && digitalRead(z.min_pin));
 }
 
 void CartesianBot::readState()
@@ -148,7 +148,7 @@ void CartesianBot::readState()
 
 bool CartesianBot::atTarget()
 {
-	return (x.atTarget() && y.atTarget() && z.atTarget());
+	return ((x.current == x.target) && (y.current == y.target) && (z.current == z.target));
 }
 
 void CartesianBot::setupTimerInterrupt()
