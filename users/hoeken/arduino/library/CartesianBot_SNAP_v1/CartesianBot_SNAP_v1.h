@@ -38,8 +38,6 @@ void notifyCalibrate(byte to, byte from, unsigned int position);
 void notifySeek(byte to, byte from, unsigned int position);
 void notifyDDA(byte to, byte from, unsigned int position);
 
-void snapDebug(byte from, long debug);
-
 extern CartesianBot bot;
 
 //

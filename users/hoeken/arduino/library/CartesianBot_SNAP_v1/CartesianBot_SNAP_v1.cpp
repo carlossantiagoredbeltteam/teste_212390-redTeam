@@ -1,5 +1,6 @@
 #include "CartesianBot_SNAP_v1.h"
 #include <avr/interrupt.h>
+#include "HardwareSerial.h"
 
 /**********************************
 *  Global variable instantiations
@@ -16,14 +17,58 @@ ISR(SIG_OUTPUT_COMPARE1A)
 {
 	if (bot.mode == MODE_DDA)
 	{
+		/*
+		snap.debug();
+		Serial.print("x");
+		Serial.println(bot.x.counter);
+		
+		snap.debug();
+		Serial.print("y");
+		Serial.println(bot.y.counter);
+		
+		snap.debug();
+		Serial.print("m");
+		Serial.println(bot.max_delta);
+		*/
+
+//		snap.debug();
+//		Serial.println("s");
+
 		if (bot.y.can_step)
 			bot.y.ddaStep(bot.max_delta);
 
+//		snap.debug();
+//		Serial.println("m");
+
 		if (bot.x.can_step)
 			bot.x.ddaStep(bot.max_delta);
+
+//		snap.debug();
+//		Serial.println("f");
+		
+		return;
+	}
+	else if (bot.mode == MODE_HOMERESET)
+	{
+//		snap.debug();
+//		Serial.println("h");
+		
+		if (bot.x.function == func_homereset && !bot.x.atMin())
+				bot.x.stepper.pulse();
+
+		if (bot.y.function == func_homereset && !bot.y.atMin())
+				bot.y.stepper.pulse();
+
+		if (bot.z.function == func_homereset && !bot.z.atMin())
+				bot.z.stepper.pulse();
+				
+		return; 
 	}
 	else if (bot.mode == MODE_SEEK)
 	{
+		if (bot.atTarget())
+			bot.stop();
+			
 		if (bot.x.can_step)
 			bot.x.doStep();
 
@@ -33,17 +78,10 @@ ISR(SIG_OUTPUT_COMPARE1A)
 		if (bot.z.can_step)
 			bot.z.doStep();
 	}
-	else if (bot.mode == MODE_HOMERESET)
-	{
-		if (bot.x.function == func_homereset && !bot.x.atMin())
-				bot.x.stepper.pulse();
-
-		if (bot.y.function == func_homereset && !bot.y.atMin())
-				bot.y.stepper.pulse();
-
-		if (bot.z.function == func_homereset && !bot.z.atMin())
-				bot.z.stepper.pulse();
-	}
+	else
+		bot.stop();
+	
+	/*
 	else if (bot.mode == MODE_FIND_MIN)
 	{
 		if (bot.x.function == func_findmin)
@@ -87,6 +125,7 @@ ISR(SIG_OUTPUT_COMPARE1A)
 				bot.z.doStep();
 		}
 	}
+	*/
 }
 
 void setup_cartesian_bot_snap_v1()
@@ -97,7 +136,7 @@ void setup_cartesian_bot_snap_v1()
 	snap.addDevice(Y_ADDRESS);
 	snap.addDevice(Z_ADDRESS);
 	
-	//snapDebug(X_ADDRESS, (long)0);
+	
 }
 
 void cartesian_bot_snap_v1_loop()
@@ -106,36 +145,25 @@ void cartesian_bot_snap_v1_loop()
 	{
 		if (bot.atTarget())
 		{
+			bot.stop();
+
 			if (x_notify != 255)
-				notifyDDA(x_notify, X_ADDRESS, (unsigned int)bot.x.getPosition());
+				notifyDDA(x_notify, X_ADDRESS, (unsigned int)bot.x.current);
 			if (y_notify != 255)
-				notifyDDA(y_notify, Y_ADDRESS, (unsigned int)bot.y.getPosition());
+				notifyDDA(y_notify, Y_ADDRESS, (unsigned int)bot.y.current);
 
-			bot.stop();
 		}
-	}
-	else if (bot.mode == MODE_SEEK)
-	{
-		if (bot.x.atTarget() && x_notify != 255)
-			notifySeek(x_notify, X_ADDRESS, (int)bot.x.getPosition());
-
-		if (bot.y.atTarget() && y_notify != 255)
-			notifySeek(y_notify, Y_ADDRESS, (int)bot.y.getPosition());
-
-		if (bot.z.atTarget() && z_notify != 255)
-			notifySeek(z_notify, Z_ADDRESS, (int)bot.z.getPosition());
-
-		if (bot.atTarget())
-			bot.stop();
+		
+		return;
 	}
 	else if (bot.mode == MODE_HOMERESET)
 	{
 		if (bot.x.function == func_homereset && bot.x.atMin())
 		{
+			bot.stop();
 			bot.x.setPosition(0);
 			bot.x.function = func_idle;
 			bot.x.stepper.setDirection(RS_FORWARD);
-			bot.stop();
 
 			if (x_notify != 255)
 				notifyHomeReset(x_notify, X_ADDRESS);
@@ -143,10 +171,10 @@ void cartesian_bot_snap_v1_loop()
 
 		if (bot.y.function == func_homereset && bot.y.atMin())
 		{
+			bot.stop();
 			bot.y.setPosition(0);
 			bot.y.function = func_idle;
 			bot.y.stepper.setDirection(RS_FORWARD);
-			bot.stop();
 
 			if (y_notify != 255)
 				notifyHomeReset(y_notify, Y_ADDRESS);	
@@ -154,15 +182,32 @@ void cartesian_bot_snap_v1_loop()
 
 		if (bot.z.function == func_homereset && bot.z.atMin())
 		{
+			bot.stop();
 			bot.z.setPosition(0);
 			bot.z.function = func_idle;
 			bot.z.stepper.setDirection(RS_FORWARD);
-			bot.stop();
 
 			if (z_notify != 255)
 				notifyHomeReset(z_notify, Z_ADDRESS);
 		}
+		
+		return;
 	}
+	else if (bot.mode == MODE_SEEK)
+	{
+		if (bot.x.atTarget() && x_notify != 255)
+			notifySeek(x_notify, X_ADDRESS, (int)bot.x.current);
+
+		if (bot.y.atTarget() && y_notify != 255)
+			notifySeek(y_notify, Y_ADDRESS, (int)bot.y.current);
+
+		if (bot.z.atTarget() && z_notify != 255)
+			notifySeek(z_notify, Z_ADDRESS, (int)bot.z.current);
+			
+		return;
+	}
+	
+	/*
 	else if (bot.mode == MODE_FIND_MIN)
 	{
 		if (bot.x.function == func_findmin)
@@ -205,7 +250,7 @@ void cartesian_bot_snap_v1_loop()
 			//are we there yet?
 			if (bot.x.atMax())
 			{
-				bot.x.setMax(bot.x.getPosition());
+				bot.x.setMax(bot.x.current);
 				bot.x.function = func_idle;
 				bot.stop();
 
@@ -219,7 +264,7 @@ void cartesian_bot_snap_v1_loop()
 			//are we there yet?
 			if (bot.y.atMax())
 			{
-				bot.y.setMax(bot.y.getPosition());
+				bot.y.setMax(bot.y.current);
 				bot.y.function = func_idle;
 				bot.stop();
 
@@ -233,7 +278,7 @@ void cartesian_bot_snap_v1_loop()
 			//are we there yet?
 			if (bot.z.atMax())
 			{
-				bot.z.setMax(bot.z.getPosition());
+				bot.z.setMax(bot.z.current);
 				bot.z.function = func_idle;
 				bot.stop();
 
@@ -242,6 +287,7 @@ void cartesian_bot_snap_v1_loop()
 			}
 		}
 	}
+	*/
 }
 
 void process_cartesian_bot_snap_commands_v1()
@@ -258,6 +304,7 @@ void process_cartesian_bot_snap_commands_v1()
 			snap.sendDataByte(VERSION_MAJOR);
 			snap.sendDataByte(VERSION_MINOR);
 			snap.endMessage();
+		
 		break;
 
 		case CMD_FORWARD:
@@ -331,11 +378,11 @@ void process_cartesian_bot_snap_commands_v1()
 
 		case CMD_GETPOS:
 			if (dest == X_ADDRESS)
-				position = bot.x.getPosition();
+				position = bot.x.current;
 			else if (dest == Y_ADDRESS)
-				position = bot.y.getPosition();
+				position = bot.y.current;
 			else if (dest == Z_ADDRESS)
-				position = bot.z.getPosition();
+				position = bot.z.current;
 
 			snap.sendReply();
 			snap.sendDataByte(CMD_GETPOS);
@@ -467,11 +514,11 @@ void process_cartesian_bot_snap_commands_v1()
 				
 				//we can figure out the target based on the sync mode
 				if (y_sync_mode == sync_inc)
-					bot.y.setTarget(bot.y.getPosition() + target);
+					bot.y.setTarget(bot.y.current + target);
 				else if (y_sync_mode == sync_dec)
-					bot.y.setTarget(bot.y.getPosition() - target);
+					bot.y.setTarget(bot.y.current - target);
 				else
-					bot.y.setTarget(bot.y.getPosition());
+					bot.y.setTarget(bot.y.current);
 			}
 			else if (dest == Y_ADDRESS)
 			{
@@ -479,15 +526,32 @@ void process_cartesian_bot_snap_commands_v1()
 
 				//we can figure out the target based on the sync mode
 				if (x_sync_mode == sync_inc)
-					bot.x.setTarget(bot.x.getPosition() + target);
+					bot.x.setTarget(bot.x.current + target);
 				else if (x_sync_mode == sync_dec)
-					bot.x.setTarget(bot.x.getPosition() - target);
+					bot.x.setTarget(bot.x.current - target);
 				else
-					bot.x.setTarget(bot.x.getPosition());
+					bot.x.setTarget(bot.x.current);
 			}
 
+			//debug our stuff.
+			/*
+			snap.debug();
+			Serial.print("x");
+			Serial.print(bot.x.current);
+			Serial.print(":");
+			Serial.print(bot.x.target);
+			Serial.print('\n');
+
+			snap.debug();
+			Serial.print("y");
+			Serial.print(bot.y.current);
+			Serial.print(":");
+			Serial.print(bot.y.target);
+			Serial.print('\n');
+			*/
+
 			//set z's target to itself.
-			bot.z.setTarget(bot.z.getPosition());
+			bot.z.setTarget(bot.z.current);
 			
 			//set our speed.
 			bot.x.stepper.setRPM(snap.getByte(1));
@@ -495,12 +559,21 @@ void process_cartesian_bot_snap_commands_v1()
 
 			//init our DDA stuff!
 			bot.calculateDDA();
+			
+			/*
+			snap.debug();
+			Serial.print("x");
+			Serial.println(bot.x.delta);
 
-			//snapDebug(dest, snap.getByte(1));
-			//snapDebug(X_ADDRESS, bot.x.getDelta());
-			//snapDebug(Y_ADDRESS, bot.y.getDelta());
-			//snapDebug(Z_ADDRESS, (long)1);
+			snap.debug();
+			Serial.print("y");
+			Serial.println(bot.y.delta);
 
+			snap.debug();
+			Serial.print("m");
+			Serial.println(bot.max_delta);
+			*/
+						
 		break;
 
 		case CMD_FORWARD1:
@@ -616,13 +689,5 @@ void notifyDDA(byte to, byte from, unsigned int position)
 	snap.sendMessage(to);
 	snap.sendDataByte(CMD_DDA);
 	snap.sendDataInt(position);
-	snap.endMessage();
-}
-
-void snapDebug(byte from, long debug)
-{
-	snap.startMessage(from);
-	snap.sendMessage(0);
-	snap.sendDataLong(debug);
 	snap.endMessage();
 }

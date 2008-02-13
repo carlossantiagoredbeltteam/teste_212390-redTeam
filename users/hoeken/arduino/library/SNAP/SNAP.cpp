@@ -373,6 +373,11 @@ bool SNAP::hasDevice(byte c)
   return false;
 }
 
+void SNAP::debug()
+{
+	Serial.print('d');
+}
+
 void SNAP::transmit(byte c)
 {
   Serial.print(c, BYTE);
