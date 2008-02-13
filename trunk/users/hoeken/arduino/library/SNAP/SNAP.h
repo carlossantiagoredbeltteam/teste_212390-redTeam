@@ -75,6 +75,7 @@ class SNAP
 
   void begin(long baud);
   void addDevice(byte b);
+void debug();
 
   void receivePacket();
   void receiveByte(byte b);
