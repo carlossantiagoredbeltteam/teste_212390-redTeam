@@ -53,13 +53,13 @@ ISR(SIG_OUTPUT_COMPARE1A)
 //		snap.debug();
 //		Serial.println("h");
 		
-		if (bot.x.function == func_homereset && !bot.x.atMin())
+		if (bot.x.function == func_homereset && !digitalRead(bot.x.min_pin))
 				bot.x.stepper.pulse();
 
-		if (bot.y.function == func_homereset && !bot.y.atMin())
+		if (bot.y.function == func_homereset && !digitalRead(bot.y.min_pin))
 				bot.y.stepper.pulse();
 
-		if (bot.z.function == func_homereset && !bot.z.atMin())
+		if (bot.z.function == func_homereset && !digitalRead(bot.z.min_pin))
 				bot.z.stepper.pulse();
 				
 		return; 
@@ -86,19 +86,19 @@ ISR(SIG_OUTPUT_COMPARE1A)
 	{
 		if (bot.x.function == func_findmin)
 		{
-			if (!bot.x.atMin())
+			if (!digitalRead(bot.x.min_pin)
 				bot.x.stepper.pulse();
 		}
 
 		if (bot.y.function == func_findmin)
 		{
-			if (!bot.y.atMin())
+			if (!digitalRead(bot.y.min_pin)
 				bot.y.stepper.pulse();
 		}
 
 		if (bot.z.function == func_findmin)
 		{
-			if (!bot.z.atMin())
+			if (!digitalRead(bot.z.min_pin)
 				bot.z.stepper.pulse();
 		}
 	}
@@ -158,7 +158,7 @@ void cartesian_bot_snap_v1_loop()
 	}
 	else if (bot.mode == MODE_HOMERESET)
 	{
-		if (bot.x.function == func_homereset && bot.x.atMin())
+		if (bot.x.function == func_homereset && digitalRead(bot.x.min_pin))
 		{
 			bot.stop();
 			bot.x.setPosition(0);
@@ -169,7 +169,7 @@ void cartesian_bot_snap_v1_loop()
 				notifyHomeReset(x_notify, X_ADDRESS);
 		}
 
-		if (bot.y.function == func_homereset && bot.y.atMin())
+		if (bot.y.function == func_homereset && digitalRead(bot.y.min_pin))
 		{
 			bot.stop();
 			bot.y.setPosition(0);
@@ -180,7 +180,7 @@ void cartesian_bot_snap_v1_loop()
 				notifyHomeReset(y_notify, Y_ADDRESS);	
 		}
 
-		if (bot.z.function == func_homereset && bot.z.atMin())
+		if (bot.z.function == func_homereset && digitalRead(bot.z.min_pin))
 		{
 			bot.stop();
 			bot.z.setPosition(0);
@@ -195,13 +195,13 @@ void cartesian_bot_snap_v1_loop()
 	}
 	else if (bot.mode == MODE_SEEK)
 	{
-		if (bot.x.atTarget() && x_notify != 255)
+		if ((bot.x.current = bot.x.target) && x_notify != 255)
 			notifySeek(x_notify, X_ADDRESS, (int)bot.x.current);
 
-		if (bot.y.atTarget() && y_notify != 255)
+		if ((bot.y.current = bot.y.target) && y_notify != 255)
 			notifySeek(y_notify, Y_ADDRESS, (int)bot.y.current);
 
-		if (bot.z.atTarget() && z_notify != 255)
+		if ((bot.z.current = bot.z.target) && z_notify != 255)
 			notifySeek(z_notify, Z_ADDRESS, (int)bot.z.current);
 			
 		return;
@@ -212,7 +212,7 @@ void cartesian_bot_snap_v1_loop()
 	{
 		if (bot.x.function == func_findmin)
 		{
-			if (bot.x.atMin())
+			if (digitalRead(bot.x.min_pin)
 			{
 				bot.x.setPosition(0);
 				bot.x.stepper.setDirection(RS_FORWARD);
@@ -223,7 +223,7 @@ void cartesian_bot_snap_v1_loop()
 
 		if (bot.y.function == func_findmin)
 		{
-			if (bot.y.atMin())
+			if (digitalRead(bot.y.min_pin)
 			{
 				bot.y.setPosition(0);
 				bot.y.stepper.setDirection(RS_FORWARD);
@@ -234,7 +234,7 @@ void cartesian_bot_snap_v1_loop()
 
 		if (bot.z.function == func_findmin)
 		{
-			if (bot.z.atMin())
+			if (digitalRead(bot.z.min_pin)
 			{
 				bot.z.setPosition(0);
 				bot.z.stepper.setDirection(RS_FORWARD);
@@ -255,7 +255,7 @@ void cartesian_bot_snap_v1_loop()
 				bot.stop();
 
 				if (x_notify != 255)
-					notifyCalibrate(x_notify, X_ADDRESS, bot.x.getMax());
+					notifyCalibrate(x_notify, X_ADDRESS, bot.x.max);
 			}
 		}
 
@@ -269,7 +269,7 @@ void cartesian_bot_snap_v1_loop()
 				bot.stop();
 
 				if (x_notify != 255)
-					notifyCalibrate(x_notify, X_ADDRESS, bot.y.getMax());
+					notifyCalibrate(x_notify, X_ADDRESS, bot.y.max);
 			}
 		}
 
@@ -283,7 +283,7 @@ void cartesian_bot_snap_v1_loop()
 				bot.stop();
 
 				if (x_notify != 255)
-					notifyCalibrate(x_notify, X_ADDRESS, bot.z.getMax());
+					notifyCalibrate(x_notify, X_ADDRESS, bot.z.max);
 			}
 		}
 	}
@@ -484,11 +484,11 @@ void process_cartesian_bot_snap_commands_v1()
 
 		case CMD_GETRANGE:
 			if (dest == X_ADDRESS)
-				position = bot.x.getMax();
+				position = bot.x.max;
 			else if (dest == Y_ADDRESS)
-				position = bot.y.getMax();
+				position = bot.y.max;
 			else
-				position = bot.z.getMax();
+				position = bot.z.max;
 
 			//tell the host.
 			snap.sendReply();
