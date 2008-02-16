@@ -21,10 +21,10 @@ void LinearAxis::readState()
 	if (this->target == this->current)
 		this->can_step = false;
 	//stop us if we're at home and still going 
-	else if (digitalRead(this->min_pin) && (this->stepper.getDirection() == RS_REVERSE))
+	else if (digitalRead(this->min_pin) && (this->stepper.direction == RS_REVERSE))
 		this->can_step = false;
 	//stop us if we're at max and still going
-	else if (digitalRead(this->max_pin) && (this->stepper.getDirection() == RS_FORWARD))
+	else if (digitalRead(this->max_pin) && (this->stepper.direction == RS_FORWARD))
 		this->can_step = false;
 	//default to being able to step
 	else
@@ -33,8 +33,11 @@ void LinearAxis::readState()
 
 void LinearAxis::doStep()
 {
+	//gotta call readState() before you can step again!
+	//this->can_step = false;
+	
 	//record our step
-	if (stepper.getDirection())
+	if (stepper.direction == RS_FORWARD)
 		this->current++;
 	else
 		this->current--;

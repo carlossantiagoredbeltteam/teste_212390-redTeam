@@ -30,40 +30,32 @@
 class RepStepper {
   public:
     // constructors:
-    RepStepper(unsigned int number_of_steps, byte dir_pin, byte step_pin, byte enable_pin);
+    RepStepper(int number_of_steps, byte dir_pin, byte step_pin, byte enable_pin);
 
-    // various setters methods:
-	void setRPM(unsigned int rpm);
-    void setSpeed(unsigned long speed);
+    // various setters methods
+	void setRPM(int rpm);
+    void setSpeed(long speed);
 	void setDirection(bool direction);
-	void setSteps(unsigned int steps);
-
-	//our getter methods to help us out
-	unsigned int getRPM();
-	unsigned long getSpeed();
-	bool getDirection();
-	unsigned int getSteps();
+	void setSteps(int steps);
 	
     //various methods dealing with stepping.
 	void pulse();
 	void enable();
 	void disable();
-	bool isEnabled();
+	
+	//various internal variables: READ ONLY!  Do not set these directly.
+	int rpm;					// Speed in RPMs
+	long step_delay;  			// delay between steps, in processor ticks, based on speed
+    int number_of_steps;		// total number of steps this motor can take
+	bool enabled;				//are we enabled?
+	bool direction;				//what is our direction?
 
   private:
 
-	//various internal variables
-	unsigned int rpm;					// Speed in RPMs
-	unsigned long step_delay;  			// delay between steps, in processor ticks, based on speed
-    unsigned int number_of_steps;		// total number of steps this motor can take
-
     // motor pin numbers:
-    byte step_pin;						//the step signal pin.
-    byte direction_pin;					//the direction pin.
-    byte enable_pin;					//the enable pin.
-
-	bool enabled;						//are we enabled?
-	bool direction;						//what is our direction?
+    byte step_pin;				//the step signal pin.
+    byte direction_pin;			//the direction pin.
+    byte enable_pin;			//the enable pin.
 };
 
 #endif

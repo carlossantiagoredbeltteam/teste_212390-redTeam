@@ -13,202 +13,267 @@ byte z_notify = 255;
 byte x_sync_mode = sync_none;
 byte y_sync_mode = sync_none;
 
-ISR(SIG_OUTPUT_COMPARE1A)
+//our mode holder.
+byte bot_mode = MODE_PAUSE;
+byte x_mode = MODE_PAUSE;
+byte y_mode = MODE_PAUSE;
+byte z_mode = MODE_PAUSE;
+
+SIGNAL(SIG_OUTPUT_COMPARE1A)
 {
-	if (bot.mode == MODE_DDA)
+	if (bot_mode == MODE_PAUSE)
+		bot.disableTimerInterrupt();
+	else if (bot_mode == MODE_DDA)
+		interruptDDA();
+	else if (bot_mode == MODE_HOMERESET)
+		interruptHomeReset();
+	else if (bot_mode == MODE_SEEK)
+		interruptSeek();
+	else if (bot_mode == MODE_FIND_MIN)
+		interruptFindMin();
+	else if (bot_mode == MODE_FIND_MAX)
+		interruptFindMax();
+	else
 	{
-		/*
-		snap.debug();
-		Serial.print("x");
-		Serial.println(bot.x.counter);
-		
-		snap.debug();
-		Serial.print("y");
-		Serial.println(bot.y.counter);
-		
-		snap.debug();
-		Serial.print("m");
-		Serial.println(bot.max_delta);
-		*/
-
-//		snap.debug();
-//		Serial.println("s");
-
-		if (bot.y.can_step)
-			bot.y.ddaStep(bot.max_delta);
-
-//		snap.debug();
-//		Serial.println("m");
-
-		if (bot.x.can_step)
-			bot.x.ddaStep(bot.max_delta);
-
-//		snap.debug();
-//		Serial.println("f");
-		
-		return;
+		bot.mode = MODE_PAUSE;
+		bot.disableTimerInterrupt();
 	}
-	else if (bot.mode == MODE_HOMERESET)
+}
+
+void interruptDDA()
+{
+	/*
+	snap.debug();
+	Serial.print("x");
+	Serial.println(bot.x.counter);
+
+	snap.debug();
+	Serial.print("y");
+	Serial.println(bot.y.counter);
+
+	snap.debug();
+	Serial.print("m");
+	Serial.println(bot.max_delta);
+	*/
+
+//	snap.debug();
+//	Serial.println("s");
+
+	if (bot.y.can_step)
+		bot.y.ddaStep(bot.max_delta);
+
+//	snap.debug();
+//	Serial.println("m");
+
+	if (bot.x.can_step)
+		bot.x.ddaStep(bot.max_delta);
+
+//	snap.debug();
+//	Serial.println("f");
+}
+
+void interruptHomeReset()
+{
+//	snap.debug();
+//	Serial.println("h");
+
+	if (x_mode == func_homereset && !digitalRead(bot.x.min_pin))
+			bot.x.stepper.pulse();
+
+	if (y_mode == func_homereset && !digitalRead(bot.y.min_pin))
+			bot.y.stepper.pulse();
+
+	if (z_mode == func_homereset && !digitalRead(bot.z.min_pin))
+			bot.z.stepper.pulse();
+}
+
+void interruptSeek()
+{
+	if (bot.x.can_step)
+		bot.x.doStep();
+
+	if (bot.y.can_step)
+		bot.y.doStep();
+
+	if (bot.z.can_step)
+		bot.z.doStep();
+}
+
+void interruptFindMin()
+{
+	if (bot.x.function == func_findmin)
 	{
-//		snap.debug();
-//		Serial.println("h");
-		
-		if (bot.x.function == func_homereset && !digitalRead(bot.x.min_pin))
-				bot.x.stepper.pulse();
-
-		if (bot.y.function == func_homereset && !digitalRead(bot.y.min_pin))
-				bot.y.stepper.pulse();
-
-		if (bot.z.function == func_homereset && !digitalRead(bot.z.min_pin))
-				bot.z.stepper.pulse();
-				
-		return; 
+		if (!digitalRead(bot.x.min_pin))
+			bot.x.stepper.pulse();
 	}
-	else if (bot.mode == MODE_SEEK)
+
+	if (bot.y.function == func_findmin)
 	{
-		if (bot.atTarget())
-			bot.stop();
-			
-		if (bot.x.can_step)
+		if (!digitalRead(bot.y.min_pin))
+			bot.y.stepper.pulse();
+	}
+
+	if (bot.z.function == func_findmin)
+	{
+		if (!digitalRead(bot.z.min_pin))
+			bot.z.stepper.pulse();
+	}
+}
+
+void interruptFindMax()
+{
+/*
+	if (bot.x.function == func_findmax)
+	{
+		//do a step if we're not there yet.
+		if (!bot.x.atMax())
 			bot.x.doStep();
-
-		if (bot.y.can_step)
+	}
+	
+	if (bot.y.function == func_findmax)
+	{
+		//do a step if we're not there yet.
+		if (!bot.y.atMax())
 			bot.y.doStep();
-
-		if (bot.z.can_step)
+	}
+	
+	if (bot.z.function == func_findmax)
+	{
+		//do a step if we're not there yet.
+		if (!bot.z.atMax())
 			bot.z.doStep();
 	}
-	else
-		bot.stop();
-	
-	/*
-	else if (bot.mode == MODE_FIND_MIN)
-	{
-		if (bot.x.function == func_findmin)
-		{
-			if (!digitalRead(bot.x.min_pin)
-				bot.x.stepper.pulse();
-		}
-
-		if (bot.y.function == func_findmin)
-		{
-			if (!digitalRead(bot.y.min_pin)
-				bot.y.stepper.pulse();
-		}
-
-		if (bot.z.function == func_findmin)
-		{
-			if (!digitalRead(bot.z.min_pin)
-				bot.z.stepper.pulse();
-		}
-	}
-	else if (bot.mode == MODE_FIND_MAX)
-	{
-		if (bot.x.function == func_findmax)
-		{
-			//do a step if we're not there yet.
-			if (!bot.x.atMax())
-				bot.x.doStep();
-		}
-		
-		if (bot.y.function == func_findmax)
-		{
-			//do a step if we're not there yet.
-			if (!bot.y.atMax())
-				bot.y.doStep();
-		}
-		
-		if (bot.z.function == func_findmax)
-		{
-			//do a step if we're not there yet.
-			if (!bot.z.atMax())
-				bot.z.doStep();
-		}
-	}
-	*/
+*/
 }
+
 
 void setup_cartesian_bot_snap_v1()
 {
 	bot.setupTimerInterrupt();
+	bot.disableTimerInterrupt();
 	
 	snap.addDevice(X_ADDRESS);
 	snap.addDevice(Y_ADDRESS);
 	snap.addDevice(Z_ADDRESS);
-	
-	
 }
 
 void cartesian_bot_snap_v1_loop()
-{
-	if (bot.mode == MODE_DDA)
+{	
+	if (bot_mode == MODE_PAUSE)
+	{
+		x_mode = MODE_PAUSE;
+		y_mode = MODE_PAUSE;
+		z_mode = MODE_PAUSE;
+		
+		return;
+	}
+	else if (bot_mode == MODE_DDA)
 	{
 		if (bot.atTarget())
 		{
-			bot.stop();
+			bot_mode = MODE_PAUSE;
+			bot.disableTimerInterrupt();
 
 			if (x_notify != 255)
-				notifyDDA(x_notify, X_ADDRESS, (unsigned int)bot.x.current);
+				notifyDDA(x_notify, X_ADDRESS, bot.x.current);
 			if (y_notify != 255)
-				notifyDDA(y_notify, Y_ADDRESS, (unsigned int)bot.y.current);
+				notifyDDA(y_notify, Y_ADDRESS, bot.y.current);
+		}
+	}
+	else if (bot_mode == MODE_HOMERESET)
+	{
+		if (x_mode == MODE_HOMERESET)
+		{
+			if (digitalRead(bot.x.min_pin))
+			{
+				x_mode = MODE_PAUSE;
+				bot.x.setPosition(0);
+				bot.x.function = func_idle;
+				bot.x.stepper.setDirection(RS_FORWARD);
 
+				if (x_notify != 255)
+					notifyHomeReset(x_notify, X_ADDRESS);
+			}
+		}
+
+		if (y_mode == MODE_HOMERESET)
+		{
+			if (digitalRead(bot.y.min_pin))
+			{
+				y_mode = MODE_PAUSE;
+				bot.y.setPosition(0);
+				bot.y.function = func_idle;
+				bot.y.stepper.setDirection(RS_FORWARD);
+
+				if (y_notify != 255)
+					notifyHomeReset(y_notify, Y_ADDRESS);	
+			}
 		}
 		
-		return;
-	}
-	else if (bot.mode == MODE_HOMERESET)
-	{
-		if (bot.x.function == func_homereset && digitalRead(bot.x.min_pin))
+		if (z_mode == MODE_HOMERESET)
 		{
-			bot.stop();
-			bot.x.setPosition(0);
-			bot.x.function = func_idle;
-			bot.x.stepper.setDirection(RS_FORWARD);
+			if (digitalRead(bot.z.min_pin))
+			{
+				z_mode = MODE_PAUSE;
+				bot.z.setPosition(0);
+				bot.z.function = func_idle;
+				bot.z.stepper.setDirection(RS_FORWARD);
 
-			if (x_notify != 255)
-				notifyHomeReset(x_notify, X_ADDRESS);
-		}
-
-		if (bot.y.function == func_homereset && digitalRead(bot.y.min_pin))
-		{
-			bot.stop();
-			bot.y.setPosition(0);
-			bot.y.function = func_idle;
-			bot.y.stepper.setDirection(RS_FORWARD);
-
-			if (y_notify != 255)
-				notifyHomeReset(y_notify, Y_ADDRESS);	
-		}
-
-		if (bot.z.function == func_homereset && digitalRead(bot.z.min_pin))
-		{
-			bot.stop();
-			bot.z.setPosition(0);
-			bot.z.function = func_idle;
-			bot.z.stepper.setDirection(RS_FORWARD);
-
-			if (z_notify != 255)
-				notifyHomeReset(z_notify, Z_ADDRESS);
+				if (z_notify != 255)
+					notifyHomeReset(z_notify, Z_ADDRESS);
+			}
 		}
 		
-		return;
+		if (x_mode == MODE_PAUSE && y_mode == MODE_PAUSE && z_mode == MODE_PAUSE)
+		{
+			bot_mode = MODE_PAUSE;
+			bot.disableTimerInterrupt();
+		}
 	}
-	else if (bot.mode == MODE_SEEK)
+	else if (bot_mode == MODE_SEEK)
 	{
-		if ((bot.x.current = bot.x.target) && x_notify != 255)
-			notifySeek(x_notify, X_ADDRESS, (int)bot.x.current);
+		if (x_mode == MODE_SEEK)
+		{
+			if (bot.x.current == bot.x.target)
+			{
+				x_mode = MODE_PAUSE;
 
-		if ((bot.y.current = bot.y.target) && y_notify != 255)
-			notifySeek(y_notify, Y_ADDRESS, (int)bot.y.current);
-
-		if ((bot.z.current = bot.z.target) && z_notify != 255)
-			notifySeek(z_notify, Z_ADDRESS, (int)bot.z.current);
+				if (x_notify != 255)
+					notifySeek(x_notify, X_ADDRESS, (int)bot.x.current);
+			}
+		}
+		
+		if (y_mode == MODE_SEEK)
+		{
+			if (bot.y.current == bot.y.target)
+			{
+				y_mode = MODE_PAUSE;
 			
-		return;
+				if (y_notify != 255)
+					notifySeek(y_notify, Y_ADDRESS, (int)bot.y.current);
+			}
+		}
+		
+		if (z_mode == MODE_SEEK)
+		{
+			if (bot.z.current == bot.z.target)
+			{
+				z_mode = MODE_PAUSE;
+			
+				if (z_notify != 255)
+					notifySeek(z_notify, Z_ADDRESS, (int)bot.z.current);
+			}	
+		}
+		
+		if (x_mode == MODE_PAUSE && y_mode == MODE_PAUSE && z_mode == MODE_PAUSE)
+		{
+			bot_mode = MODE_PAUSE;
+			bot.disableTimerInterrupt();
+		}
 	}
 	
 	/*
-	else if (bot.mode == MODE_FIND_MIN)
+	else if (bot_mode == MODE_FIND_MIN)
 	{
 		if (bot.x.function == func_findmin)
 		{
@@ -217,7 +282,7 @@ void cartesian_bot_snap_v1_loop()
 				bot.x.setPosition(0);
 				bot.x.stepper.setDirection(RS_FORWARD);
 				bot.x.function = func_findmax;
-				bot.mode = MODE_FIND_MAX;
+				bot_mode = MODE_FIND_MAX;
 			}
 		}
 
@@ -228,7 +293,7 @@ void cartesian_bot_snap_v1_loop()
 				bot.y.setPosition(0);
 				bot.y.stepper.setDirection(RS_FORWARD);
 				bot.y.function = func_findmax;
-				bot.mode = MODE_FIND_MAX;
+				bot_mode = MODE_FIND_MAX;
 			}
 		}
 
@@ -239,11 +304,11 @@ void cartesian_bot_snap_v1_loop()
 				bot.z.setPosition(0);
 				bot.z.stepper.setDirection(RS_FORWARD);
 				bot.z.function = func_findmax;
-				bot.mode = MODE_FIND_MAX;
+				bot_mode = MODE_FIND_MAX;
 			}
 		}
 	}
-	else if (bot.mode == MODE_FIND_MAX)
+	else if (bot_mode == MODE_FIND_MAX)
 	{
 		if (bot.x.function == func_findmax)
 		{
@@ -252,7 +317,7 @@ void cartesian_bot_snap_v1_loop()
 			{
 				bot.x.setMax(bot.x.current);
 				bot.x.function = func_idle;
-				bot.stop();
+				bot.disableTimerInterrupt();
 
 				if (x_notify != 255)
 					notifyCalibrate(x_notify, X_ADDRESS, bot.x.max);
@@ -266,7 +331,7 @@ void cartesian_bot_snap_v1_loop()
 			{
 				bot.y.setMax(bot.y.current);
 				bot.y.function = func_idle;
-				bot.stop();
+				bot.disableTimerInterrupt();
 
 				if (x_notify != 255)
 					notifyCalibrate(x_notify, X_ADDRESS, bot.y.max);
@@ -280,7 +345,7 @@ void cartesian_bot_snap_v1_loop()
 			{
 				bot.z.setMax(bot.z.current);
 				bot.z.function = func_idle;
-				bot.stop();
+				bot.disableTimerInterrupt();
 
 				if (x_notify != 255)
 					notifyCalibrate(x_notify, X_ADDRESS, bot.z.max);
@@ -294,66 +359,69 @@ void process_cartesian_bot_snap_commands_v1()
 {
 	byte cmd = snap.getByte(0);
 	byte dest = snap.getDestination();
-	unsigned int position = 0;
+	int position = 0;
 
 	switch (cmd)
 	{
 		case CMD_VERSION:
-			snap.sendReply();
+			snap.startMessage(0, dest);
 			snap.sendDataByte(CMD_VERSION);  // Response type 0
 			snap.sendDataByte(VERSION_MAJOR);
 			snap.sendDataByte(VERSION_MINOR);
-			snap.endMessage();
-		
+			snap.sendMessage();
 		break;
 
 		case CMD_FORWARD:
+			/*
 			//okay, set our speed.
 			if (dest == X_ADDRESS)
 			{
 				bot.x.stepper.setRPM(snap.getByte(1));
 				bot.x.stepper.setDirection(RS_FORWARD);
 				bot.x.function = func_forward;
-				bot.setTimer(bot.x.stepper.getSpeed());
+				bot.setTimer(bot.x.stepper.step_delay);
 			}
 			else if (dest == Y_ADDRESS)
 			{
 				bot.y.stepper.setRPM(snap.getByte(1));
 				bot.y.stepper.setDirection(RS_FORWARD);
 				bot.y.function = func_forward;
-				bot.setTimer(bot.y.stepper.getSpeed());
+				bot.setTimer(bot.y.stepper.step_delay);
 			}
 			else if (dest == Z_ADDRESS)
 			{
 				bot.z.stepper.setRPM(snap.getByte(1));
 				bot.z.stepper.setDirection(RS_FORWARD);
 				bot.z.function = func_forward;
-				bot.setTimer(bot.z.stepper.getSpeed());
+				bot.setTimer(bot.z.stepper.step_delay);
 			}
+			*/
 		break;
 
 		case CMD_REVERSE:
+			/*
 			if (dest == X_ADDRESS)
 			{
 				bot.x.stepper.setRPM(snap.getByte(1));
 				bot.x.stepper.setDirection(RS_REVERSE);
 				bot.x.function = func_reverse;
-				bot.setTimer(bot.x.stepper.getSpeed());
+				bot.setTimer(bot.x.stepper.step_delay);
 			}
 			else if (dest == Y_ADDRESS)
 			{
 				bot.y.stepper.setRPM(snap.getByte(1));
 				bot.y.stepper.setDirection(RS_REVERSE);
 				bot.y.function = func_reverse;
-				bot.setTimer(bot.y.stepper.getSpeed());
+				bot.setTimer(bot.y.stepper.step_delay);
 			}
 			else if (dest == Z_ADDRESS)
 			{
 				bot.z.stepper.setRPM(snap.getByte(1));
 				bot.z.stepper.setDirection(RS_REVERSE);
 				bot.z.function = func_reverse;
-				bot.setTimer(bot.z.stepper.getSpeed());
+				bot.setTimer(bot.z.stepper.step_delay);
 			}
+			*/
 		break;
 
 		case CMD_SETPOS:
@@ -384,10 +452,13 @@ void process_cartesian_bot_snap_commands_v1()
 			else if (dest == Z_ADDRESS)
 				position = bot.z.current;
 
-			snap.sendReply();
+			snap.debug();
+			Serial.println(bot_mode, DEC);
+
+			snap.startMessage(0, dest);
 			snap.sendDataByte(CMD_GETPOS);
 			snap.sendDataInt(position);
-			snap.endMessage();
+			snap.sendMessage();
 		break;
 
 		case CMD_SEEK:
@@ -397,42 +468,46 @@ void process_cartesian_bot_snap_commands_v1()
 			//okay, set our speed.
 			if (dest == X_ADDRESS)
 			{
+				x_mode = MODE_SEEK;
 				bot.x.setTarget(position);
 				bot.x.stepper.setRPM(snap.getByte(1));
-				bot.setTimer(bot.x.stepper.getSpeed());
+				bot.setTimer(bot.x.stepper.step_delay);
 			}
 			else if (dest == Y_ADDRESS)
 			{
+				y_mode = MODE_SEEK;
 				bot.y.setTarget(position);
 				bot.y.stepper.setRPM(snap.getByte(1));
-				bot.setTimer(bot.y.stepper.getSpeed());
+				bot.setTimer(bot.y.stepper.step_delay);
 			}
 			else if (dest == Z_ADDRESS)
 			{
+				z_mode = MODE_SEEK;
 				bot.z.setTarget(position);
 				bot.z.stepper.setRPM(snap.getByte(1));
-				bot.setTimer(bot.z.stepper.getSpeed());
+				bot.setTimer(bot.z.stepper.step_delay);
 			}
 
 			//start our seek.
-			bot.startSeek();
+			bot_mode = MODE_SEEK;
+			bot.enableTimerInterrupt();
 	    break;
 
 		case CMD_FREE:
 			if (dest == X_ADDRESS)
 			{
 				bot.x.stepper.disable();
-				bot.x.function = func_idle;
+				x_mode = MODE_PAUSE;
 			}
 			if (dest == Y_ADDRESS)
 			{
 				bot.y.stepper.disable();
-				bot.y.function = func_idle;
+				y_mode = MODE_PAUSE;
 			}
 			if (dest == Z_ADDRESS)
 			{
 				bot.z.stepper.disable();
-				bot.z.function = func_idle;
+				z_mode = MODE_PAUSE;
 			}
 		break;
 
@@ -455,31 +530,29 @@ void process_cartesian_bot_snap_commands_v1()
 		break;
 
 		case CMD_CALIBRATE:
-			//stop other stuff.
-			bot.stop();
-		
 			// Request calibration (search at given speed)
 			if (dest == X_ADDRESS)
 			{
 				bot.x.stepper.setRPM(snap.getByte(1));
-				bot.setTimer(bot.x.stepper.getSpeed());
+				bot.setTimer(bot.x.stepper.step_delay);
 				bot.x.function = func_findmin;
 			}
 			else if (dest == Y_ADDRESS)
 			{
 				bot.y.stepper.setRPM(snap.getByte(1));
-				bot.setTimer(bot.y.stepper.getSpeed());
+				bot.setTimer(bot.y.stepper.step_delay);
 				bot.y.function = func_findmin;
 			}
 			else if (dest == Z_ADDRESS)
 			{
 				bot.z.stepper.setRPM(snap.getByte(1));
-				bot.setTimer(bot.z.stepper.getSpeed());
+				bot.setTimer(bot.z.stepper.step_delay);
 				bot.z.function = func_findmin;
 			}
 			
 			//start our calibration.
-			bot.startCalibration();
+			bot_mode = MODE_FIND_MIN;		
+			bot.enableTimerInterrupt();
 		break;
 
 		case CMD_GETRANGE:
@@ -491,18 +564,15 @@ void process_cartesian_bot_snap_commands_v1()
 				position = bot.z.max;
 
 			//tell the host.
-			snap.sendReply();
+			snap.startMessage(0, dest);
 			snap.sendDataByte(CMD_GETPOS);
 			snap.sendDataInt(position);
-			snap.endMessage();
+			snap.sendMessage();
 		break;
 
 		case CMD_DDA:
-			unsigned long target;
+			int target;
 
-			//stop the bot.
-			bot.stop();
-			
 			//get our coords.
 			position = snap.getInt(2);
 			target = snap.getInt(4);
@@ -555,10 +625,14 @@ void process_cartesian_bot_snap_commands_v1()
 			
 			//set our speed.
 			bot.x.stepper.setRPM(snap.getByte(1));
-			bot.setTimer(bot.x.stepper.getSpeed());
+			bot.setTimer(bot.x.stepper.step_delay);
 
 			//init our DDA stuff!
 			bot.calculateDDA();
+			
+			//start the dda!
+			bot_mode = MODE_DDA;
+			bot.enableTimerInterrupt();
 			
 			/*
 			snap.debug();
@@ -599,95 +673,99 @@ void process_cartesian_bot_snap_commands_v1()
 		break;
 
 		case CMD_GETSENSOR:
-			snap.sendReply();
+			snap.startMessage(0, dest);
 			snap.sendDataByte(CMD_GETSENSOR);
 			// Dummy values to satisfy PIC emulation
 			snap.sendDataInt(0);
-			snap.endMessage();
+			snap.sendMessage();
 		break;
 
 		case CMD_HOMERESET:
-			bot.stop();
-		
+
 			if (dest == X_ADDRESS)
 			{
 				//configure our axis
 				bot.x.stepper.setDirection(RS_REVERSE);
 				bot.x.stepper.setRPM(snap.getByte(1));
-				bot.setTimer(bot.x.stepper.getSpeed());
+				bot.setTimer(bot.x.stepper.step_delay);
 
 				//tell our axis to go home.
-				bot.x.function = func_homereset;
+				x_mode = MODE_HOMERESET;
 			}
 			else if (dest == Y_ADDRESS)
 			{
 				//configure our axis
 				bot.y.stepper.setDirection(RS_REVERSE);
 				bot.y.stepper.setRPM(snap.getByte(1));
-				bot.setTimer(bot.y.stepper.getSpeed());
+				bot.setTimer(bot.y.stepper.step_delay);
 
 				//tell our axis to go home.
-				bot.y.function = func_homereset;
+				y_mode = MODE_HOMERESET;
 			}
 			else if (dest == Z_ADDRESS)
 			{
 				//configure our axis
 				bot.z.stepper.setDirection(RS_REVERSE);
 				bot.z.stepper.setRPM(snap.getByte(1));
-				bot.setTimer(bot.z.stepper.getSpeed());
+				bot.setTimer(bot.z.stepper.step_delay);
 
 				//tell our axis to go home.
-				bot.z.function = func_homereset;
+				z_mode = func_homereset;
 			}
-			
-			//starts our home reset mode.
-			bot.startHomeReset();
 
+			//starts our home reset mode.
+			bot_mode = MODE_HOMERESET;
+			bot.enableTimerInterrupt();
 		break;
 		
 		case CMD_DEVICE_TYPE:
-			snap.sendReply();
+			snap.startMessage(0, dest);
 			snap.sendDataByte(CMD_DEVICE_TYPE);
 			snap.sendDataByte(DEVICE_TYPE);
-			snap.endMessage();
+			snap.sendMessage();
 		break;
 	}
-
-	snap.releaseLock();
-	bot.enableTimerInterrupt();
 }
 
 void notifyHomeReset(byte to, byte from)
 {
-	snap.startMessage(from);
-	snap.sendMessage(to);
+	snap.debug();
+	Serial.println("notifyhome");
+	
+	snap.startMessage(to, from);
 	snap.sendDataByte(CMD_HOMERESET);
-	snap.endMessage();
+	snap.sendMessage();
 }
 
-void notifyCalibrate(byte to, byte from, unsigned int position)
+void notifyCalibrate(byte to, byte from, int position)
 {
-	snap.startMessage(from);
-	snap.sendMessage(to);
+	snap.debug();
+	Serial.println("notifycali");
+	
+	snap.startMessage(to, from);
 	snap.sendDataByte(CMD_CALIBRATE);
 	snap.sendDataInt(position);
-	snap.endMessage();	
+	snap.sendMessage();	
 }
 
-void notifySeek(byte to, byte from, unsigned int position)
+void notifySeek(byte to, byte from, int position)
 {
-	snap.startMessage(from);
-	snap.sendMessage(to);
+	snap.debug();
+	Serial.println("notifyseek");
+	
+	snap.startMessage(to, from);
 	snap.sendDataByte(CMD_SEEK);
 	snap.sendDataInt(position);
-	snap.endMessage();
+	snap.sendMessage();
 }
 
-void notifyDDA(byte to, byte from, unsigned int position)
+void notifyDDA(byte to, byte from, int position)
 {
-	snap.startMessage(from);
-	snap.sendMessage(to);
+	snap.debug();
+	Serial.println("notifydda");
+	
+	snap.startMessage(to, from);
 	snap.sendDataByte(CMD_DDA);
 	snap.sendDataInt(position);
-	snap.endMessage();
+	snap.sendMessage();
 }
