@@ -9,7 +9,7 @@ CartesianBot::CartesianBot(
 ) : x(x_id, x_steps, x_dir_pin, x_step_pin, x_min_pin, x_max_pin, x_enable_pin), y(y_id, y_steps, y_dir_pin, y_step_pin, y_min_pin, y_max_pin, y_enable_pin), z(z_id, z_steps, z_dir_pin, z_step_pin, z_min_pin, z_max_pin, z_enable_pin)
 {
 	this->setupTimerInterrupt();
-	this->stop();
+	this->disableTimerInterrupt();
 	this->clearQueue();
 }
 
@@ -103,35 +103,6 @@ void CartesianBot::calculateDDA()
 	x.initDDA(this->max_delta);
 	y.initDDA(this->max_delta);
 	z.initDDA(this->max_delta);
-	
-	//we're in dda mode
-	this->mode = MODE_DDA;
-}
-
-void CartesianBot::stop()
-{
-	this->disableTimerInterrupt();
-	this->mode = MODE_PAUSE;
-}
-
-void CartesianBot::startSeek()
-{
-	this->mode = MODE_SEEK;
-}
-
-void CartesianBot::startHomeReset()
-{
-	this->mode = MODE_HOMERESET;
-}
-
-void CartesianBot::startCalibration()
-{
-	this->mode = MODE_FIND_MIN;
-}
-
-byte CartesianBot::getMode()
-{
-	return this->mode;
 }
 
 bool CartesianBot::atHome()
@@ -178,8 +149,8 @@ void CartesianBot::setupTimerInterrupt()
 
 void CartesianBot::enableTimerInterrupt()
 {
-	//reset our timer to 0 for reliable timing
-	TCNT1 = 0;
+	//reset our timer to 0 for reliable timing TODO: is this needed?
+	//TCNT1 = 0;
 
 	//then enable our interrupt!
 	TIMSK1 |= (1<<ICIE1);

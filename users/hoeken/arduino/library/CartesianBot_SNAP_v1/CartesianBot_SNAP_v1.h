@@ -30,13 +30,19 @@
 void setup_cartesian_bot_snap_v1();
 void process_cartesian_bot_snap_commands_v1();
 void cartesian_bot_snap_v1_loop();
-void handleInterrupt();
+
+//these are our functions for handling the interrupt.
+void interruptDDA();
+void interruptSeek();
+void interruptHomeReset();
+void interruptFindMin();
+void interruptFindMax();
 
 //notification functions to let the host know whats up.
 void notifyHomeReset(byte to, byte from);
-void notifyCalibrate(byte to, byte from, unsigned int position);
-void notifySeek(byte to, byte from, unsigned int position);
-void notifyDDA(byte to, byte from, unsigned int position);
+void notifyCalibrate(byte to, byte from, int position);
+void notifySeek(byte to, byte from, int position);
+void notifyDDA(byte to, byte from, int position);
 
 extern CartesianBot bot;
 
@@ -91,6 +97,14 @@ enum functions {
 	func_ddamaster,
 	func_homereset   // Move to min position and reset
 };
+
+//modes for the cartesian bot.
+#define MODE_PAUSE 0
+#define MODE_SEEK 1
+#define MODE_DDA 2
+#define MODE_HOMERESET 3
+#define MODE_FIND_MIN 4
+#define MODE_FIND_MAX 5
 
 /********************************
  *  Sync mode declarations

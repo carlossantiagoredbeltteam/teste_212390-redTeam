@@ -27,11 +27,11 @@ void process_thermoplast_extruder_snap_commands_v1()
 	{
 		// tell the host what version we are.
 		case CMD_VERSION:
-			snap.sendReply();
+			snap.startMessage(0, EXTRUDER_ADDRESS);
 			snap.sendDataByte(CMD_VERSION);
 			snap.sendDataByte(VERSION_MAJOR);
 			snap.sendDataByte(VERSION_MINOR);
-			snap.endMessage();
+			snap.sendMessage();
 		break;
 
 		// move motor forward.
@@ -54,10 +54,10 @@ void process_thermoplast_extruder_snap_commands_v1()
 		// dunno what this is supposed to do either...
 		case CMD_GETPOS:
 			//send some Bogus data so the Host software is happy
-			snap.sendReply();
+			snap.startMessage(0, EXTRUDER_ADDRESS);
 			snap.sendDataByte(CMD_GETPOS); 
 			snap.sendDataInt(currentPos);
-			snap.endMessage();
+			snap.sendMessage();
 		break;
 
 		// we also cant really do this.
@@ -78,10 +78,10 @@ void process_thermoplast_extruder_snap_commands_v1()
 		// are we out of filament?
 		case CMD_ISEMPTY:
 			// We don't know so we say we're not empty
-			snap.sendReply();
+			snap.startMessage(0, EXTRUDER_ADDRESS);
 			snap.sendDataByte(CMD_ISEMPTY); 
 			snap.sendDataByte(0);  
-			snap.endMessage();
+			snap.sendMessage();
 		break;
 
 		// set our heater and target information
@@ -94,12 +94,13 @@ void process_thermoplast_extruder_snap_commands_v1()
 
 		// tell the host software how hot we are.
 		case CMD_GETTEMP:
+			//TODO: is delay needed?
 			delay(100);
-			snap.sendReply();
+			snap.startMessage(0, EXTRUDER_ADDRESS);
 			snap.sendDataByte(CMD_GETTEMP); 
 			snap.sendDataByte(calculatePicTempForCelsius(extruder.getTemperature()));
 			snap.sendDataByte(extruder.getTemperature()); //dunno what this is for... its how it is in the old firmware too.
-			snap.endMessage();			
+			snap.sendMessage();			
 		break;
 
 		// turn our fan on/off.
@@ -118,10 +119,10 @@ void process_thermoplast_extruder_snap_commands_v1()
 		break;
 		
 		case CMD_DEVICE_TYPE:
-			snap.sendReply();
+			snap.startMessage(0, EXTRUDER_ADDRESS);
 			snap.sendDataByte(CMD_DEVICE_TYPE);
 			snap.sendDataByte(DEVICE_TYPE);
-			snap.endMessage();
+			snap.sendMessage();
 		break;
 
 	}

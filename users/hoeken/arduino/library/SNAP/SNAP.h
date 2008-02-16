@@ -49,92 +49,85 @@
 #define processingLockBit       B10000000
 
 //these are the states for processing a packet.
-enum SNAP_states {
-  SNAP_idle = 0x30,
-  SNAP_haveSync,
-  SNAP_haveHDB2,
-  SNAP_haveHDB1,
-  SNAP_haveDAB,
-  SNAP_readingData,
-  SNAP_dataComplete,
+enum SNAP_states
+{
+	SNAP_idle = 0x30,
+	SNAP_haveSync,
+	SNAP_haveHDB2,
+	SNAP_haveHDB1,
+	SNAP_haveDAB,
+	SNAP_readingData,
+	SNAP_dataComplete,
 
-  // The *Pass states below represent states where
-  // we should just be passing the data on to the next node.
-  // This is either because we bailed out, or because the
-  // packet wasn't destined for us.
-  SNAP_haveHDB2Pass,
-  SNAP_haveHDB1Pass,
-  SNAP_haveDABPass,
-  SNAP_readingDataPass
+	// The *Pass states below represent states where
+	// we should just be passing the data on to the next node.
+	// This is either because we bailed out, or because the
+	// packet wasn't destined for us.
+	SNAP_haveHDB2Pass,
+	SNAP_haveHDB1Pass,
+	SNAP_haveDABPass,
+	SNAP_readingDataPass
 };
 
 class SNAP
 {
- public:
-  SNAP();
+	public:
+		SNAP();
 
-  void begin(long baud);
-  void addDevice(byte b);
-void debug();
+		void begin(long baud);
+		void addDevice(byte b);
 
-  void receivePacket();
-  void receiveByte(byte b);
+		void receivePacket();
+		void receiveByte(byte b);
+		bool packetReady();
+		
+		byte getDestination();
+		byte getByte(byte index);
+		int getInt(byte index); // get 16 bits
 
-  bool packetReady();
+		void startMessage(byte to, byte from);
+		void sendDataByte(byte c);
+		void sendDataInt(int data);
+		void sendDataLong(long data);
+		void sendMessage();
 
-  byte getDestination();
-  byte getSource();
-  byte getPacketLength();
-  byte getByte(byte index);
-  unsigned int getInt(byte index); // get 16 bits
+		void debug();
 
-  void startMessage(byte from);
-  void sendReply();
-  void sendMessage(byte dest);
-  void sendDataByte(byte c);
-  void sendDataInt(int data);
-  void sendDataLong(long data);
-  void endMessage();
+		void releaseLock();
 
-  void releaseLock();
+	private:
+		void receiveError();
+		bool hasDevice(byte b);
+		void transmit(byte c);
+		
+		//our crc functions.
+		byte computeCRC(byte b, byte crc);
+		byte computeRxCRC(byte c);
+		byte computeTxCRC(byte c);
 
- private:
-  void receiveError();
-  bool hasDevice(byte b);
-  void transmit(byte c);
-  byte computeCRC(byte c);
-                
-  byte packetState;               // Current SNAP packet state
-  byte in_hdb1;                   // Temporary buffers needed to
-  byte in_hdb2;                   // pass packets on from various states
-  byte packetLength;              // Length of packet being received
-  byte destAddress;               // Destination of packet being received
-  byte sourceAddress;             // Source of packet being received
-  byte crc;                       // Incrementally calculated CRC value
-  byte serialStatus;              // flags for checking status of the serial-communication
+		//these are variables for the packet we're currently receiving.
+		byte rxState;				       // Current SNAP packet state
+		byte rxFlags;                      // flags for checking status of the serial-communication
+		byte rxHDB1;                       // 1st header byte
+		byte rxHDB2;                       // 2nd header byte
+		byte rxLength;                     // Length of packet being received
+		byte rxDestAddress;                // Destination of packet being received (us)
+		byte rxSourceAddress;              // Source of packet being received
+		byte rxCRC;                        // Incrementally calculated CRC value
+		byte rxBufferIndex;                // Current receive buffer index
+		byte rxBuffer[RX_BUFFER_SIZE];     // Receive buffer
+           
+		//these are the variables for the packet we're currently transmitting.
+		byte txHDB2;                      // 2nd header byte (1st header byte doesnt change!)
+		byte txLength;                    // transmit packet length
+		byte txDestAddress;               // transmit packet destination
+		byte txSourceAddress;             // transmit packet source (us)
+		byte txCRC;                       // incrementally calculated CRC value
+		byte txBuffer[TX_BUFFER_SIZE];    // Last packet data, for auto resending on a NAK
 
-  byte rxBufferIndex;                                // Current receive buffer index
-  byte rxBuffer[RX_BUFFER_SIZE];        // Receive buffer
-                
-  // This buffer stores the last complete packet body (not the headers
-  // as they can be reconstructed).  This is to allow automatic re-sending
-  // if a NAK is received.
-  byte txBuffer[TX_BUFFER_SIZE];        // Last packet data, for auto resending on a NAK
-  byte txDestination;                                // Last packet destination
-  byte txLength;                                        // Last packet length
-                
-  // When sending a packet this is set to 0 and incremented for
-  // every NAK.  After too many have occurred, the packet is just
-  // dropped.
-  byte nakCount;
-
-  // General flags:
-  // @bug these should be "sbit" rather than "byte" but sdcc is breaking a bit
-  bool ackRequested;
-
-  // the address of our internal device sending message
-  byte deviceAddresses[MAX_DEVICE_COUNT];
-  byte deviceCount;
+		// the address of our internal device sending message
+		byte deviceAddresses[MAX_DEVICE_COUNT];
+		byte deviceCount;
 };
 
 //global variable declaration.
