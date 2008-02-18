@@ -31,6 +31,8 @@ class LinearAxis {
 	//various guys to interface with class
 	void readState();
 	void doStep();
+	bool atMin();
+	bool atMax();
 
 	//our DDA based functions
 	int getDelta();
@@ -46,7 +48,6 @@ class LinearAxis {
 
 	char id;					//what is our id? x, y, z, etc.
 	bool can_step;				//are we capable of taking a step yet?
-	byte function;				//what function are we at?
 
 	int delta;					//our delta for our DDA moves.
 	int counter;				//our dda counter for dda moves.
@@ -54,10 +55,10 @@ class LinearAxis {
 	int target;					//this is our target position.
 	int max;					//this is our max coordinate.
 
+  private:
+	
 	byte min_pin;
 	byte max_pin;
-
-  private:
 };
 
 #endif

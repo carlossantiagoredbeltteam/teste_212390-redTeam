@@ -107,7 +107,7 @@ void CartesianBot::calculateDDA()
 
 bool CartesianBot::atHome()
 {
-	return (digitalRead(x.min_pin) && digitalRead(y.min_pin) && digitalRead(z.min_pin));
+	return (x.atMin() && y.atMin() && z.atMin());
 }
 
 void CartesianBot::readState()
