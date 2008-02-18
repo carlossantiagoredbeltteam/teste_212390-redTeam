@@ -99,6 +99,9 @@ void interruptSeek()
 	
 	if (bot.z.can_step)
 		bot.z.doStep();
+
+//	snap.debug();
+//	Serial.println("s");
 }
 
 void interruptFindMin()
@@ -194,9 +197,6 @@ void cartesian_bot_snap_v1_loop()
 		{
 			if (bot.x.atMin())
 			{
-				snap.debug();
-				Serial.println("x home.");
-				
 				x_mode = MODE_PAUSE;
 				bot.x.setPosition(0);
 				bot.x.setTarget(0);
@@ -211,6 +211,9 @@ void cartesian_bot_snap_v1_loop()
 		{
 			if (bot.y.atMin())
 			{
+				snap.debug();
+				Serial.println("y home.");
+
 				y_mode = MODE_PAUSE;
 				bot.y.setPosition(0);
 				bot.y.setTarget(0);
