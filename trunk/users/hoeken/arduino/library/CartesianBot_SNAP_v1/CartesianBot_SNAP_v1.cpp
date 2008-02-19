@@ -61,14 +61,14 @@ void interruptDDA()
 //	snap.debug();
 //	Serial.println("s");
 
-	if (bot.y.can_step)
-		bot.y.ddaStep(bot.max_delta);
+//	if (bot.y.can_step)
+//		bot.y.ddaStep(bot.max_delta);
 
 //	snap.debug();
 //	Serial.println("m");
 
-	if (bot.x.can_step)
-		bot.x.ddaStep(bot.max_delta);
+//	if (bot.x.can_step)
+//		bot.x.ddaStep(bot.max_delta);
 
 //	snap.debug();
 //	Serial.println("f");
