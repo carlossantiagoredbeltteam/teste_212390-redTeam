@@ -92,6 +92,7 @@ void CartesianBot::getNextPoint()
 
 void CartesianBot::calculateDDA()
 {
+	/*
 	//let us do the maths before stepping.
 	this->disableTimerInterrupt();
 	
@@ -103,6 +104,7 @@ void CartesianBot::calculateDDA()
 	x.initDDA(this->max_delta);
 	y.initDDA(this->max_delta);
 	z.initDDA(this->max_delta);
+	*/
 }
 
 bool CartesianBot::atHome()

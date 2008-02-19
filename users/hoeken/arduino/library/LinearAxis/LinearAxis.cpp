@@ -69,7 +69,7 @@ void LinearAxis::reverse1()
 	this->current--;
 }
 
-void LinearAxis::setPosition(int p)
+void LinearAxis::setPosition(long p)
 {
 	this->current = p;
 	
@@ -77,7 +77,7 @@ void LinearAxis::setPosition(int p)
 	this->setTarget(this->target);
 }
 
-void LinearAxis::setTarget(int t)
+void LinearAxis::setTarget(long t)
 {
 	this->target = t;
 	
@@ -86,26 +86,5 @@ void LinearAxis::setTarget(int t)
 	else
 		stepper.setDirection(RS_REVERSE);
 		
-	this->delta = this->getDelta();
-}
-
-int LinearAxis::getDelta()
-{
-	return abs(this->target - this->current);
-}
-
-void LinearAxis::initDDA(int max_delta)
-{
-	this->counter = -max_delta/2;
-}
-
-void LinearAxis::ddaStep(int max_delta)
-{
-	this->counter += this->delta;
-
-	if (this->counter > 0)
-	{
-		this->doStep();
-		this->counter -= max_delta;
-	}
+	this->delta = abs(this->target - this->current);
 }

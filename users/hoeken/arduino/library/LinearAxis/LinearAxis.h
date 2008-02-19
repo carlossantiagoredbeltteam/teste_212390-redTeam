@@ -33,27 +33,20 @@ class LinearAxis {
 	void doStep();
 	bool atMin();
 	bool atMax();
-
-	//our DDA based functions
-	int getDelta();
-	void initDDA(int max_delta);
-	void ddaStep(int max_delta);
 	
 	//various position things.
-	void setPosition(int position);
-	void setTarget(int t);
-	
+	void setPosition(long position);
+	void setTarget(long t);
 	void forward1();
 	void reverse1();
 
 	char id;					//what is our id? x, y, z, etc.
 	bool can_step;				//are we capable of taking a step yet?
 
-	int delta;					//our delta for our DDA moves.
-	int counter;				//our dda counter for dda moves.
-	int current;				//this is our current position.
-	int target;					//this is our target position.
-	int max;					//this is our max coordinate.
+	long delta;					//our delta for our DDA moves.
+	long current;				//this is our current position.
+	long target;				//this is our target position.
+	long max;					//this is our max coordinate.
 
   private:
 	
