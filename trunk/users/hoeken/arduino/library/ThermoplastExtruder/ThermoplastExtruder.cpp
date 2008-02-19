@@ -49,7 +49,7 @@ ThermoplastExtruder::ThermoplastExtruder(byte motor_dir_pin, byte motor_pwm_pin,
 	pinMode(this->motor_pwm_pin, OUTPUT);
 	pinMode(this->heater_pin, OUTPUT);
 
-	this->readTemperature();
+	this->getTemperature();
 	this->setSpeed(0);
 	this->setDirection(true);
 
@@ -84,28 +84,19 @@ void ThermoplastExtruder::setDirection(bool dir)
 	digitalWrite(this->motor_dir_pin, this->motor_dir);
 }
 
-byte ThermoplastExtruder::getSpeed()
+void ThermoplastExtruder::setTemperature(int temp)
 {
-	return this->motor_pwm;
-}
-
-bool ThermoplastExtruder::getDirection()
-{
-	return motor_dir;
-}
-
-int ThermoplastExtruder::getTemperature()
-{
-	return this->current_celsius;
+	this->target_celsius = temp;
+	this->max_celsius = (int)((float)temp * 1.1);
 }
 
 /**
 *  Samples the temperature and converts it to degrees celsius.
 *  Returns degrees celsius.
 */
-int ThermoplastExtruder::readTemperature()
+int ThermoplastExtruder::getTemperature()
 {
-	this->raw_temperature = this->getRawTemperature();
+	this->raw_temperature = analogRead(thermistor_pin);
 	this->current_celsius = this->calculateTemperatureFromRaw(this->raw_temperature);
 	
 	return this->current_celsius;
@@ -151,7 +142,7 @@ int ThermoplastExtruder::calculateTemperatureFromRaw(int raw)
 void ThermoplastExtruder::manageTemperature()
 {
 	//make sure we know what our temp is.
-	this->readTemperature();
+	this->getTemperature();
 
 	//put the heater into high mode if we're not at our target.
 	if (current_celsius < target_celsius)
@@ -168,12 +159,4 @@ void ThermoplastExtruder::manageTemperature()
 	{
 		analogWrite(heater_pin, 0);
 	}
-}
-
-/*!
-  Raw temperature reading
- */
-int ThermoplastExtruder::getRawTemperature()
-{
-	return analogRead(thermistor_pin);
 }

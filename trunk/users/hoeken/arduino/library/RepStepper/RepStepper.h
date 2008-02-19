@@ -38,6 +38,8 @@ class RepStepper {
 	void setDirection(bool direction);
 	void setSteps(int steps);
 	
+	int getMicros();
+	
     //various methods dealing with stepping.
 	void pulse();
 	void enable();

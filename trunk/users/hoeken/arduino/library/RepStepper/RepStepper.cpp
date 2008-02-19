@@ -72,6 +72,11 @@ void RepStepper::setDirection(bool direction)
 	this->direction = direction; //save our direction.
 }
 
+int RepStepper::getMicros()
+{
+	return step_delay / 16;
+}
+
 void RepStepper::enable()
 {
 	if (this->enable_pin != 255)

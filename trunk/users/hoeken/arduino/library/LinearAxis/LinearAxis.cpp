@@ -97,7 +97,6 @@ int LinearAxis::getDelta()
 void LinearAxis::initDDA(int max_delta)
 {
 	this->counter = -max_delta/2;
-	this->delta = this->getDelta();
 }
 
 void LinearAxis::ddaStep(int max_delta)
@@ -110,4 +109,3 @@ void LinearAxis::ddaStep(int max_delta)
 		this->counter -= max_delta;
 	}
 }
-
