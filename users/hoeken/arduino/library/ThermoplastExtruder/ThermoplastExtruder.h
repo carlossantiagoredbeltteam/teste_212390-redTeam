@@ -31,15 +31,10 @@ class ThermoplastExtruder
 		void setDirection(bool dir);
 		void setCooler(byte speed);
 
-		//get various info things.
-		byte getSpeed();
-		bool getDirection();
+		//temparature control
+		void setTemperature(int temp);
 		int getTemperature();
-		int getRawTemperature();
 		int calculateTemperatureFromRaw(int raw);
-
-		//manage the extruder
-		int readTemperature();
 		void manageTemperature();
 
 		//variables for easy access.
