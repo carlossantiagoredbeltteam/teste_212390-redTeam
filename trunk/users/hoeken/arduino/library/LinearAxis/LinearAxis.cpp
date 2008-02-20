@@ -88,3 +88,19 @@ void LinearAxis::setTarget(long t)
 		
 	this->delta = abs(this->target - this->current);
 }
+
+void LinearAxis::initDDA(long max_delta)
+{
+	this->counter = -max_delta/2;
+}
+
+void LinearAxis::ddaStep(long max_delta)
+{
+	this->counter += this->delta;
+
+	if (this->counter > 0)
+	{
+		this->doStep();
+		this->counter -= max_delta;
+	}
+}

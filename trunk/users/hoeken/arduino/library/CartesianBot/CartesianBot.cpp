@@ -92,19 +92,17 @@ void CartesianBot::getNextPoint()
 
 void CartesianBot::calculateDDA()
 {
-	/*
 	//let us do the maths before stepping.
 	this->disableTimerInterrupt();
 	
 	//what is the biggest one?
-	this->max_delta = max(x.getDelta(), y.getDelta());
-	this->max_delta = max(this->max_delta, z.getDelta());
+	this->max_delta = max(x.delta, y.delta);
+	this->max_delta = max(this->max_delta, z.delta);
 
 	//calculate speeds for each axis.
 	x.initDDA(this->max_delta);
 	y.initDDA(this->max_delta);
 	z.initDDA(this->max_delta);
-	*/
 }
 
 bool CartesianBot::atHome()
@@ -155,7 +153,6 @@ void CartesianBot::enableTimerInterrupt()
 	//TCNT1 = 0;
 
 	//then enable our interrupt!
-	TIMSK1 |= (1<<ICIE1);
 	TIMSK1 |= (1<<OCIE1A);
 }
 

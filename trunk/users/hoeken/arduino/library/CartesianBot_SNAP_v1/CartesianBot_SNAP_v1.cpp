@@ -44,41 +44,15 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
 
 void interruptDDA()
 {
-	/*
-	snap.debug();
-	Serial.print("x");
-	Serial.println(bot.x.counter);
+	if (bot.x.can_step)
+		bot.x.ddaStep(bot.max_delta);
 
-	snap.debug();
-	Serial.print("y");
-	Serial.println(bot.y.counter);
-
-	snap.debug();
-	Serial.print("m");
-	Serial.println(bot.max_delta);
-	*/
-
-//	snap.debug();
-//	Serial.println("s");
-
-//	if (bot.y.can_step)
-//		bot.y.ddaStep(bot.max_delta);
-
-//	snap.debug();
-//	Serial.println("m");
-
-//	if (bot.x.can_step)
-//		bot.x.ddaStep(bot.max_delta);
-
-//	snap.debug();
-//	Serial.println("f");
+	if (bot.y.can_step)
+		bot.y.ddaStep(bot.max_delta);
 }
 
 void interruptHomeReset()
 {
-//	snap.debug();
-//	Serial.println("h");
-
 	if (x_mode == MODE_HOMERESET && !bot.x.atMin())
 			bot.x.stepper.pulse();
 
@@ -99,9 +73,6 @@ void interruptSeek()
 	
 	if (bot.z.can_step)
 		bot.z.doStep();
-
-//	snap.debug();
-//	Serial.println("s");
 }
 
 void interruptFindMin()
@@ -211,9 +182,6 @@ void cartesian_bot_snap_v1_loop()
 		{
 			if (bot.y.atMin())
 			{
-				snap.debug();
-				Serial.println("y home.");
-
 				y_mode = MODE_PAUSE;
 				bot.y.setPosition(0);
 				bot.y.setTarget(0);
@@ -476,9 +444,6 @@ void process_cartesian_bot_snap_commands_v1()
 			// Goto position
 			position = snap.getInt(2);
 
-			snap.debug();
-			Serial.println("seekstart");
-
 			//okay, set our speed.
 			if (dest == X_ADDRESS)
 			{
@@ -486,10 +451,6 @@ void process_cartesian_bot_snap_commands_v1()
 				bot.x.setTarget(position);
 				bot.x.stepper.setRPM(snap.getByte(1));
 				bot.setTimer(bot.x.stepper.step_delay);
-				
-				snap.debug();
-				Serial.print("xdelay");
-				Serial.println(bot.x.stepper.step_delay);
 			}
 			else if (dest == Y_ADDRESS)
 			{
@@ -497,10 +458,6 @@ void process_cartesian_bot_snap_commands_v1()
 				bot.y.setTarget(position);
 				bot.y.stepper.setRPM(snap.getByte(1));
 				bot.setTimer(bot.y.stepper.step_delay);
-				
-				snap.debug();
-				Serial.print("ydelay");
-				Serial.println(bot.y.stepper.step_delay);
 			}
 			else if (dest == Z_ADDRESS)
 			{
@@ -508,10 +465,6 @@ void process_cartesian_bot_snap_commands_v1()
 				bot.z.setTarget(position);
 				bot.z.stepper.setRPM(snap.getByte(1));
 				bot.setTimer(bot.z.stepper.step_delay);
-				
-				snap.debug();
-				Serial.print("zdelay");
-				Serial.println(bot.z.stepper.step_delay);
 			}
 
 			//get everything current.
@@ -519,11 +472,6 @@ void process_cartesian_bot_snap_commands_v1()
 			
 			//start our seek.
 			bot_mode = MODE_SEEK;
-			
-			snap.debug();
-			Serial.println("seekend");
-			bot.enableTimerInterrupt();
-			
 	    break;
 
 		case CMD_FREE:
@@ -636,23 +584,6 @@ void process_cartesian_bot_snap_commands_v1()
 					bot.x.setTarget(bot.x.current);
 			}
 
-			//debug our stuff.
-			/*
-			snap.debug();
-			Serial.print("x");
-			Serial.print(bot.x.current);
-			Serial.print(":");
-			Serial.print(bot.x.target);
-			Serial.print('\n');
-
-			snap.debug();
-			Serial.print("y");
-			Serial.print(bot.y.current);
-			Serial.print(":");
-			Serial.print(bot.y.target);
-			Serial.print('\n');
-			*/
-
 			//set z's target to itself.
 			bot.z.setTarget(bot.z.current);
 			
@@ -669,21 +600,7 @@ void process_cartesian_bot_snap_commands_v1()
 			y_mode = MODE_DDA;
 			z_mode = MODE_DDA;
 			bot.enableTimerInterrupt();
-			
-			/*
-			snap.debug();
-			Serial.print("x");
-			Serial.println(bot.x.delta);
-
-			snap.debug();
-			Serial.print("y");
-			Serial.println(bot.y.delta);
-
-			snap.debug();
-			Serial.print("m");
-			Serial.println(bot.max_delta);
-			*/
-						
+					
 		break;
 
 		case CMD_FORWARD1:
@@ -765,9 +682,6 @@ void process_cartesian_bot_snap_commands_v1()
 
 void notifyHomeReset(byte to, byte from)
 {
-	snap.debug();
-	Serial.println("notifyhome");
-	
 	snap.startMessage(to, from);
 	snap.sendDataByte(CMD_HOMERESET);
 	snap.sendMessage();
@@ -775,9 +689,6 @@ void notifyHomeReset(byte to, byte from)
 
 void notifyCalibrate(byte to, byte from, int position)
 {
-	snap.debug();
-	Serial.println("notifycali");
-	
 	snap.startMessage(to, from);
 	snap.sendDataByte(CMD_CALIBRATE);
 	snap.sendDataInt(position);
@@ -786,9 +697,6 @@ void notifyCalibrate(byte to, byte from, int position)
 
 void notifySeek(byte to, byte from, int position)
 {
-	snap.debug();
-	Serial.println("notifyseek");
-	
 	snap.startMessage(to, from);
 	snap.sendDataByte(CMD_SEEK);
 	snap.sendDataInt(position);
@@ -797,9 +705,6 @@ void notifySeek(byte to, byte from, int position)
 
 void notifyDDA(byte to, byte from, int position)
 {
-	snap.debug();
-	Serial.println("notifydda");
-	
 	snap.startMessage(to, from);
 	snap.sendDataByte(CMD_DDA);
 	snap.sendDataInt(position);
