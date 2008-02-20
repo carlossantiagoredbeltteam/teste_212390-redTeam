@@ -39,6 +39,10 @@ class LinearAxis {
 	void setTarget(long t);
 	void forward1();
 	void reverse1();
+	
+	//dda functions
+	void initDDA(long max_delta);
+	void ddaStep(long max_delta);
 
 	char id;					//what is our id? x, y, z, etc.
 	bool can_step;				//are we capable of taking a step yet?
@@ -47,6 +51,7 @@ class LinearAxis {
 	long current;				//this is our current position.
 	long target;				//this is our target position.
 	long max;					//this is our max coordinate.
+	long counter;				//this is our counter variable for dda.
 
   private:
 	
