@@ -6,10 +6,12 @@
 *  Global variable instantiations
 **********************************/
 
+//who do we notify? 255 = nobody
 byte x_notify = 255;
 byte y_notify = 255;
 byte z_notify = 255;
 
+//what is our sync mode?
 byte x_sync_mode = sync_none;
 byte y_sync_mode = sync_none;
 
@@ -19,133 +21,104 @@ byte x_mode = MODE_PAUSE;
 byte y_mode = MODE_PAUSE;
 byte z_mode = MODE_PAUSE;
 
-SIGNAL(SIG_OUTPUT_COMPARE1A)
-{
-	if (bot_mode == MODE_PAUSE)
-		bot.disableTimerInterrupt();
-	else if (bot_mode == MODE_DDA)
-		interruptDDA();
-	else if (bot_mode == MODE_HOMERESET)
-		interruptHomeReset();
-	else if (bot_mode == MODE_SEEK)
-		interruptSeek();
-/*
-	else if (bot_mode == MODE_FIND_MIN)
-		true; //interruptFindMin();
-	else if (bot_mode == MODE_FIND_MAX)
-		true; //interruptFindMax();
-*/
-	else
-	{
-		bot.mode = MODE_PAUSE;
-		bot.disableTimerInterrupt();
-	}
-}
-
-void interruptDDA()
-{
-	if (bot.x.can_step)
-		bot.x.ddaStep(bot.max_delta);
-
-	if (bot.y.can_step)
-		bot.y.ddaStep(bot.max_delta);
-}
-
-void interruptHomeReset()
-{
-	if (x_mode == MODE_HOMERESET && !bot.x.atMin())
-			bot.x.stepper.pulse();
-
-	if (y_mode == MODE_HOMERESET && !bot.y.atMin())
-			bot.y.stepper.pulse();
-
-	if (z_mode == MODE_HOMERESET && !bot.z.atMin())
-			bot.z.stepper.pulse();
-}
-
-void interruptSeek()
-{
-	if (bot.x.can_step)
-		bot.x.doStep();
-
-	if (bot.y.can_step)
-		bot.y.doStep();
-	
-	if (bot.z.can_step)
-		bot.z.doStep();
-}
-
-void interruptFindMin()
-{
-	/*
-	if (bot.x.function == func_findmin)
-	{
-		if (!digitalRead(bot.x.min_pin))
-			bot.x.stepper.pulse();
-	}
-
-	if (bot.y.function == func_findmin)
-	{
-		if (!digitalRead(bot.y.min_pin))
-			bot.y.stepper.pulse();
-	}
-
-	if (bot.z.function == func_findmin)
-	{
-		if (!digitalRead(bot.z.min_pin))
-			bot.z.stepper.pulse();
-	}
-	*/
-}
-
-void interruptFindMax()
-{
-/*
-	if (bot.x.function == func_findmax)
-	{
-		//do a step if we're not there yet.
-		if (!bot.x.atMax())
-			bot.x.doStep();
-	}
-	
-	if (bot.y.function == func_findmax)
-	{
-		//do a step if we're not there yet.
-		if (!bot.y.atMax())
-			bot.y.doStep();
-	}
-	
-	if (bot.z.function == func_findmax)
-	{
-		//do a step if we're not there yet.
-		if (!bot.z.atMax())
-			bot.z.doStep();
-	}
-*/
-}
-
-
+//our setup function. intialize stuff.
 void setup_cartesian_bot_snap_v1()
 {
-	bot.setupTimerInterrupt();
-	bot.disableTimerInterrupt();
-	
 	snap.addDevice(X_ADDRESS);
 	snap.addDevice(Y_ADDRESS);
 	snap.addDevice(Z_ADDRESS);
 }
 
-void cartesian_bot_snap_v1_loop()
-{	
-	if (bot_mode == MODE_PAUSE)
+//our interrupt handler.  do stepping signals.
+SIGNAL(SIG_OUTPUT_COMPARE1A)
+{
+	if (bot_mode == MODE_DDA)
 	{
-		x_mode = MODE_PAUSE;
-		y_mode = MODE_PAUSE;
-		z_mode = MODE_PAUSE;
-		
-		return;
+		if (bot.x.can_step)
+			bot.x.ddaStep(bot.max_delta);
+
+		if (bot.y.can_step)
+			bot.y.ddaStep(bot.max_delta);
 	}
-	else if (bot_mode == MODE_DDA)
+	else if (bot_mode == MODE_HOMERESET)
+	{
+		if (x_mode == MODE_HOMERESET && !bot.x.atMin())
+				bot.x.stepper.pulse();
+
+		if (y_mode == MODE_HOMERESET && !bot.y.atMin())
+				bot.y.stepper.pulse();
+
+		if (z_mode == MODE_HOMERESET && !bot.z.atMin())
+				bot.z.stepper.pulse();
+	}
+	else if (bot_mode == MODE_SEEK)
+	{
+		if (bot.x.can_step)
+			bot.x.doStep();
+
+		if (bot.y.can_step)
+			bot.y.doStep();
+
+		if (bot.z.can_step)
+			bot.z.doStep();
+	}
+	else if (bot_mode == MODE_FIND_MIN)
+	{
+		if (x_mode == MODE_FIND_MIN)
+		{
+			if (!bot.x.atMin())
+				bot.x.stepper.pulse();
+		}
+
+		if (y_mode == MODE_FIND_MIN)
+		{
+			if (!bot.y.atMin())
+				bot.y.stepper.pulse();
+		}
+
+		if (z_mode == MODE_FIND_MIN)
+		{
+			if (!bot.z.atMin())
+				bot.z.stepper.pulse();
+		}
+	}
+	else if (bot_mode == MODE_FIND_MAX)
+	{
+		if (x_mode == MODE_FIND_MAX)
+		{
+			//do a step if we're not there yet.
+			if (!bot.x.atMax())
+				bot.x.stepper.pulse();
+		}
+
+		if (y_mode == MODE_FIND_MAX)
+		{
+			//do a step if we're not there yet.
+			if (!bot.y.atMax())
+				bot.y.stepper.pulse();
+		}
+
+		if (z_mode == MODE_FIND_MAX)
+		{
+			//do a step if we're not there yet.
+			if (!bot.z.atMax())
+				bot.z.stepper.pulse();
+		}
+	}
+	else // okay, disable our interrupt!
+	{
+		bot_mode = MODE_PAUSE;
+		bot.disableTimerInterrupt();
+	}
+}
+
+//our loop guy, check statuses of stuff.
+void cartesian_bot_snap_v1_loop()
+{
+	//first, lookup our state info!
+	bot.readState();
+	
+	if (bot_mode == MODE_DDA)
 	{
 		if (bot.atTarget())
 		{
@@ -171,7 +144,6 @@ void cartesian_bot_snap_v1_loop()
 				x_mode = MODE_PAUSE;
 				bot.x.setPosition(0);
 				bot.x.setTarget(0);
-				bot.x.stepper.setDirection(RS_FORWARD);
 
 				if (x_notify != 255)
 					notifyHomeReset(x_notify, X_ADDRESS);
@@ -185,7 +157,6 @@ void cartesian_bot_snap_v1_loop()
 				y_mode = MODE_PAUSE;
 				bot.y.setPosition(0);
 				bot.y.setTarget(0);
-				bot.y.stepper.setDirection(RS_FORWARD);
 
 				if (y_notify != 255)
 					notifyHomeReset(y_notify, Y_ADDRESS);	
@@ -199,7 +170,6 @@ void cartesian_bot_snap_v1_loop()
 				z_mode = MODE_PAUSE;
 				bot.z.setPosition(0);
 				bot.z.setTarget(0);
-				bot.z.stepper.setDirection(RS_FORWARD);
 
 				if (z_notify != 255)
 					notifyHomeReset(z_notify, Z_ADDRESS);
@@ -216,7 +186,7 @@ void cartesian_bot_snap_v1_loop()
 	{
 		if (x_mode == MODE_SEEK)
 		{
-			if (bot.x.current == bot.x.target)
+			if (!bot.x.can_step)
 			{
 				x_mode = MODE_PAUSE;
 
@@ -227,7 +197,7 @@ void cartesian_bot_snap_v1_loop()
 		
 		if (y_mode == MODE_SEEK)
 		{
-			if (bot.y.current == bot.y.target)
+			if (bot.y.can_step)
 			{
 				y_mode = MODE_PAUSE;
 			
@@ -238,7 +208,7 @@ void cartesian_bot_snap_v1_loop()
 		
 		if (z_mode == MODE_SEEK)
 		{
-			if (bot.z.current == bot.z.target)
+			if (bot.z.can_step)
 			{
 				z_mode = MODE_PAUSE;
 			
@@ -253,52 +223,51 @@ void cartesian_bot_snap_v1_loop()
 			bot.disableTimerInterrupt();
 		}
 	}
-	
-	/*
 	else if (bot_mode == MODE_FIND_MIN)
 	{
-		if (bot.x.function == func_findmin)
+		if (x_mode == MODE_FIND_MIN)
 		{
-			if (digitalRead(bot.x.min_pin)
+			if (bot.x.atMin())
 			{
 				bot.x.setPosition(0);
 				bot.x.stepper.setDirection(RS_FORWARD);
-				bot.x.function = func_findmax;
+				x_mode = MODE_FIND_MAX;
 				bot_mode = MODE_FIND_MAX;
 			}
 		}
 
-		if (bot.y.function == func_findmin)
+		if (y_mode == MODE_FIND_MIN)
 		{
-			if (digitalRead(bot.y.min_pin)
+			if (bot.y.atMin())
 			{
 				bot.y.setPosition(0);
 				bot.y.stepper.setDirection(RS_FORWARD);
-				bot.y.function = func_findmax;
+				y_mode = MODE_FIND_MAX;
 				bot_mode = MODE_FIND_MAX;
 			}
 		}
 
-		if (bot.z.function == func_findmin)
+		if (z_mode == MODE_FIND_MIN)
 		{
-			if (digitalRead(bot.z.min_pin)
+			if (bot.z.atMin())
 			{
 				bot.z.setPosition(0);
 				bot.z.stepper.setDirection(RS_FORWARD);
-				bot.z.function = func_findmax;
+				z_mode = MODE_FIND_MAX;
 				bot_mode = MODE_FIND_MAX;
 			}
 		}
 	}
 	else if (bot_mode == MODE_FIND_MAX)
 	{
-		if (bot.x.function == func_findmax)
+		if (x_mode == MODE_FIND_MAX)
 		{
 			//are we there yet?
 			if (bot.x.atMax())
 			{
-				bot.x.setMax(bot.x.current);
-				bot.x.function = func_idle;
+				bot.x.max = bot.x.current;
+				x_mode = MODE_PAUSE;
+				bot_mode = MODE_PAUSE;
 				bot.disableTimerInterrupt();
 
 				if (x_notify != 255)
@@ -306,37 +275,54 @@ void cartesian_bot_snap_v1_loop()
 			}
 		}
 
-		if (bot.y.function == func_findmax)
+		if (y_mode == MODE_FIND_MAX)
 		{
 			//are we there yet?
 			if (bot.y.atMax())
 			{
-				bot.y.setMax(bot.y.current);
-				bot.y.function = func_idle;
+				bot.y.max = bot.y.current;
+				z_mode = MODE_PAUSE;
+				bot_mode = MODE_PAUSE;
 				bot.disableTimerInterrupt();
 
-				if (x_notify != 255)
-					notifyCalibrate(x_notify, X_ADDRESS, bot.y.max);
+				if (y_notify != 255)
+					notifyCalibrate(y_notify, Y_ADDRESS, bot.y.max);
 			}
 		}
 
-		if (bot.z.function == func_findmax)
+		if (z_mode == MODE_FIND_MAX)
 		{
 			//are we there yet?
 			if (bot.z.atMax())
 			{
-				bot.z.setMax(bot.z.current);
-				bot.z.function = func_idle;
+				bot.z.max = bot.z.current;
+				z_mode = MODE_PAUSE;
+				bot_mode = MODE_PAUSE;
 				bot.disableTimerInterrupt();
 
-				if (x_notify != 255)
-					notifyCalibrate(x_notify, X_ADDRESS, bot.z.max);
+				if (z_notify != 255)
+					notifyCalibrate(z_notify, Z_ADDRESS, bot.z.max);
 			}
 		}
 	}
+	/*
+	//not enough room for the move modes.
+	else if (bot_mode == MODE_MOVE)
+	{
+		if (x_mode == MODE_FORWARD || x_mode == MODE_REVERSE)
+			bot.x.stepper.pulse();
+
+		if (y_mode == MODE_FORWARD || y_mode == MODE_REVERSE)
+			bot.y.stepper.pulse();
+
+		if (z_mode == MODE_FORWARD || z_mode == MODE_REVERSE)
+			bot.z.stepper.pulse();
+	}
 	*/
+	//else its in MODE_PAUSE... dont do anything.
 }
 
+//our command processor.  parse any SNAP commands.
 void process_cartesian_bot_snap_commands_v1()
 {
 	byte cmd = snap.getByte(0);
@@ -355,54 +341,64 @@ void process_cartesian_bot_snap_commands_v1()
 
 		case CMD_FORWARD:
 			/*
+			//not enough room for this mode.
 			//okay, set our speed.
 			if (dest == X_ADDRESS)
 			{
 				bot.x.stepper.setRPM(snap.getByte(1));
 				bot.x.stepper.setDirection(RS_FORWARD);
-				bot.x.function = func_forward;
+				x_mode = MODE_FORWARD;
 				bot.setTimer(bot.x.stepper.step_delay);
 			}
 			else if (dest == Y_ADDRESS)
 			{
 				bot.y.stepper.setRPM(snap.getByte(1));
 				bot.y.stepper.setDirection(RS_FORWARD);
-				bot.y.function = func_forward;
+				y_mode = MODE_FORWARD;
 				bot.setTimer(bot.y.stepper.step_delay);
 			}
 			else if (dest == Z_ADDRESS)
 			{
 				bot.z.stepper.setRPM(snap.getByte(1));
 				bot.z.stepper.setDirection(RS_FORWARD);
-				bot.z.function = func_forward;
+				z_mode = MODE_FORWARD;
 				bot.setTimer(bot.z.stepper.step_delay);
 			}
+			
+			//start our seek.
+			bot_mode = MODE_MOVE;
+			bot.enableTimerInterrupt();
 			*/
 		break;
 
 		case CMD_REVERSE:
 			/*
+			//not enough room for this mode.
 			if (dest == X_ADDRESS)
 			{
 				bot.x.stepper.setRPM(snap.getByte(1));
 				bot.x.stepper.setDirection(RS_REVERSE);
-				bot.x.function = func_reverse;
+				x_mode = MODE_REVERSE;
 				bot.setTimer(bot.x.stepper.step_delay);
 			}
 			else if (dest == Y_ADDRESS)
 			{
 				bot.y.stepper.setRPM(snap.getByte(1));
 				bot.y.stepper.setDirection(RS_REVERSE);
-				bot.y.function = func_reverse;
+				y_mode = MODE_REVERSE;
 				bot.setTimer(bot.y.stepper.step_delay);
 			}
 			else if (dest == Z_ADDRESS)
 			{
 				bot.z.stepper.setRPM(snap.getByte(1));
 				bot.z.stepper.setDirection(RS_REVERSE);
-				bot.z.function = func_reverse;
+				z_mode = MODE_REVERSE;
 				bot.setTimer(bot.z.stepper.step_delay);
 			}
+			
+			//start our seek.
+			bot_mode = MODE_MOVE;
+			bot.enableTimerInterrupt();
 			*/
 		break;
 
@@ -518,19 +514,19 @@ void process_cartesian_bot_snap_commands_v1()
 			{
 				bot.x.stepper.setRPM(snap.getByte(1));
 				bot.setTimer(bot.x.stepper.step_delay);
-				//bot.x.function = func_findmin;
+				x_mode = MODE_FIND_MIN;
 			}
 			else if (dest == Y_ADDRESS)
 			{
 				bot.y.stepper.setRPM(snap.getByte(1));
 				bot.setTimer(bot.y.stepper.step_delay);
-				//bot.y.function = func_findmin;
+				y_mode = MODE_FIND_MIN;
 			}
 			else if (dest == Z_ADDRESS)
 			{
 				bot.z.stepper.setRPM(snap.getByte(1));
 				bot.setTimer(bot.z.stepper.step_delay);
-				//bot.z.function = func_findmin;
+				z_mode = MODE_FIND_MIN;
 			}
 			
 			//start our calibration.

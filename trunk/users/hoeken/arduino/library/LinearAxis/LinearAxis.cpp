@@ -43,9 +43,6 @@ bool LinearAxis::atMax()
 
 void LinearAxis::doStep()
 {
-	//gotta call readState() before you can step again!
-	//this->can_step = false;
-	
 	//record our step
 	if (this->stepper.direction == RS_FORWARD)
 		this->forward1();

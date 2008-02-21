@@ -31,19 +31,13 @@ void setup_cartesian_bot_snap_v1();
 void process_cartesian_bot_snap_commands_v1();
 void cartesian_bot_snap_v1_loop();
 
-//these are our functions for handling the interrupt.
-void interruptDDA();
-void interruptSeek();
-void interruptHomeReset();
-void interruptFindMin();
-void interruptFindMax();
-
 //notification functions to let the host know whats up.
 void notifyHomeReset(byte to, byte from);
 void notifyCalibrate(byte to, byte from, int position);
 void notifySeek(byte to, byte from, int position);
 void notifyDDA(byte to, byte from, int position);
 
+//our cartesian bot object.
 extern CartesianBot bot;
 
 //
@@ -83,39 +77,18 @@ extern CartesianBot bot;
 #define Y_ADDRESS 3
 #define Z_ADDRESS 4
 
-/********************************
-*  Global mode declarations
-********************************/
-enum functions {
-	func_idle,
-	func_forward,
-	func_reverse,
-	func_syncwait,   // Waiting for sync prior to seeking
-	func_seek,
-	func_findmin,    // Calibration, finding minimum
-	func_findmax,    // Calibration, finding maximum
-	func_ddamaster,
-	func_homereset   // Move to min position and reset
-};
-
-//modes for the cartesian bot.
+//movement modes for the cartesian bot.
 #define MODE_PAUSE 0
 #define MODE_SEEK 1
 #define MODE_DDA 2
 #define MODE_HOMERESET 3
 #define MODE_FIND_MIN 4
 #define MODE_FIND_MAX 5
+#define MODE_MOVE 6
+#define MODE_FORWARD 7
+#define MODE_REVERSE 8
 
-/********************************
- *  Sync mode declarations
-enum sync_modes {
-  sync_none,     // no sync (default)
-  sync_seek,     // synchronised seeking
-  sync_inc,      // inc motor on each pulse
-  sync_dec       // dec motor on each pulse
-};
-********************************/
-
+// sync mode declarations
 #define sync_none 0
 #define sync_seek 1
 #define sync_inc  2
