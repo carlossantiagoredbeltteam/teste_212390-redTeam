@@ -86,8 +86,10 @@ void process_thermoplast_extruder_snap_commands_v1()
 
 		// set our heater and target information
 		case CMD_SETHEAT:
-			extruder.heater_low = snap.getByte(1);
-			extruder.heater_high = snap.getByte(2);
+			//extruder.heater_low = snap.getByte(1);
+			//extruder.heater_high = snap.getByte(2);
+			extruder.heater_low = 64;
+			extruder.heater_high = 255;
 			extruder.target_celsius = calculateTemperatureForPicTemp(snap.getByte(3));
 			extruder.max_celsius = calculateTemperatureForPicTemp(snap.getByte(4));
 		break;
