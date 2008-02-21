@@ -6,12 +6,17 @@ import serial, reprap, time, sys
 
 #work surface approx x 2523, y 2743
 
-reprap.serial = serial.Serial(0, 19200, timeout = reprap.snap.messageTimeout)
+#reprap.serial = serial.Serial(0, 19200, timeout = reprap.snap.messageTimeout)
+reprap.serial = serial.Serial(0, 19200, timeout = 60)
 
 reprap.cartesian.x.active = True	# these devices are present in network
 reprap.cartesian.y.active = True
 reprap.cartesian.z.active = True
 reprap.extruder.active = True
+
+reprap.cartesian.x.setNotify()						
+reprap.cartesian.y.setNotify()
+reprap.cartesian.z.setNotify()
 
 def printPos():
 	x, y, z = reprap.cartesian.getPos()
@@ -40,6 +45,12 @@ if sys.argv[1] == "pos":
 if sys.argv[1] == "goto":
 	reprap.cartesian.seek( ( int(sys.argv[2]), int(sys.argv[3]), 0 ), 200, False)
 	printPos()
+
+#goto a specific location (use sync)
+if sys.argv[1] == "gotos":
+	reprap.cartesian.syncSeek( ( int(sys.argv[2]), int(sys.argv[3]), 0 ), 200, False)
+	printPos()
+
 
 #test routine
 if sys.argv[1] == "go":	#stepper test

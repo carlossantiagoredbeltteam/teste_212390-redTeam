@@ -28,6 +28,9 @@
 
 import snap, time
 
+printDebug = False
+printDebug = True
+
 # SNAP Control Commands - Taken from PIC code #
 
 #extruder commands#
@@ -70,6 +73,12 @@ CMD_GETSENSOR		=  15
 CMD_HOMERESET		=  16
 CMD_GETMODULETYPE	= 255
 
+#sync modes#
+sync_none	= 0	# no sync (default)
+sync_seek	= 1	# synchronised seeking
+sync_inc	= 2	# inc motor on each pulse
+sync_dec	= 3	# dec motor on each pulse
+
 snap.localAddress = 0		# local address of host PC. This will always be 0.
 
 
@@ -106,6 +115,9 @@ def scanNetwork():
 	for d in devices:
 		#now get versions
 		print "device", d
+
+def getNotification(serial):
+	return snap.getPacket(serial)
 
 class extruderClass:
 	def __init__(self):
@@ -181,12 +193,14 @@ class axisClass:
 	def backward(self, speed):
 		p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_REVERSE, speed] ) 
 		p.send()
+
 	#debug only
 	def getSensors(self):
 		p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_GETSENSOR] )
 		p.send()
 		rep = p.getReply()
 		print rep.dataBytes[1], rep.dataBytes[2]##?
+
 	#get current axis position
 	def getPos(self):
 		if self.active:
@@ -197,38 +211,88 @@ class axisClass:
 				pos = bytes2int( rep.dataBytes[1], rep.dataBytes[2] )
 				return pos 
 		return False
+
 	#set current position (set variable not robot position)
 	def setPos(self, pos):
 		posMSB ,posLSB = int2bytes( pos )
 		p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SETPOS, posMSB, posLSB] )
 		p.send()
+
 	#power off coils on stepper
 	def free(self):
 		p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_FREE] ) 
 		p.send()
+
 	#seek to axis location. When waitArrival is True, funtion does not return until seek is compete
 	def seek(self, pos, speed, waitArrival):
 		if self.active:
 			posMSB ,posLSB = int2bytes( pos )
 			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SEEK, speed, posMSB ,posLSB] ) 
 			p.send()
-			while self.getPos() != pos and waitArrival:	#replace this with proper arival flag from pic
-				time.sleep(0.5)
+			if waitArrival:
+				if printDebug: print "    wait notify"
+				notif = getNotification( serial )
+				if notif.dataBytes[0] == CMD_SEEK:
+					if printDebug: print "valid notification for seek"
+				if printDebug: print "    rec notif"
 			return True
-		else:
-			return False
+		return False
 	
 	#goto 0 position. When waitArrival is True, funtion does not return until reset is compete
 	def homeReset(self, speed, waitArrival):
 		if self.active:
 			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_HOMERESET, speed] ) 
 			p.send()
-			time.sleep(0.5)
-			while self.getPos() > 0 and waitArrival:	#replace this with proper arival flag from pic
-				time.sleep(0.5)
+			#time.sleep(0.5)
+			if waitArrival:
+				if printDebug: print "reset wait"
+				notif = getNotification( serial )
+				if notif.dataBytes[0] == CMD_HOMERESET:
+					if printDebug: print "    valid notification for reset"
+				
+				if printDebug: print "reset done"
 			return True
+		return False
+
+	def setNotify(self):
+		if self.active:
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_NOTIFY, snap.localAddress] ) 	# set notifications to be sent to host
+			p.send()
+			return True
+		return False
+
+	def setSync( self, syncMode ):
+		if self.active:
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SYNC, syncMode] )
+			p.send()
+			return True
+		return False
+
+	def DDA( self, speed, seekTo, slaveDelta, waitArrival):
+		if self.active:
+			masterPosMSB, masterPosLSB = int2bytes( seekTo )
+			slaveDeltaMSB, slaveDeltaLSB = int2bytes( slaveDelta )
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_DDA, speed, masterPosMSB ,masterPosLSB, slaveDeltaMSB, slaveDeltaLSB] ) 	#start sync
+			p.send()
+			if waitArrival:
+				notif = getNotification( serial )
+				if notif.dataBytes[0] == CMD_DDA:
+					if printDebug: print "valid notification for DDA"	# todo: add actual enforement on wrong notification
+			return True
+		return False
+
+class syncAxis:
+	def __init__( self, axis, seekTo, delta, direction ):
+		self.axis = axis
+		self.seekTo = seekTo
+		self.delta = delta
+		self.direction = direction
+
+		if self.direction > 0:
+			self.syncMode = sync_inc
 		else:
-			return False
+			self.syncMode = sync_dec
+
 
 class cartesianClass:
 	def __init__(self):
@@ -238,20 +302,50 @@ class cartesianClass:
 		self.z = axisClass(4)
 	#goto home position (all axies)
 	def homeReset(self, speed, waitArrival):
-		self.x.homeReset( speed, False )
-		self.y.homeReset( speed, False )
-		self.z.homeReset( speed, False )
-		while ( self.x.getPos() > 0 or self.y.getPos() > 0 or self.z.getPos() > 0 ) and waitArrival:	#replace this with proper arival flag from pic, add z axis
-			time.sleep(0.5)
-	#seek to location (all axies). When waitArrival is True, funtion does not return until all seeks are compete
+		self.x.homeReset( speed, waitArrival )		#setting these to true breaks waitArrival convention. need to rework waitArrival and possibly have each axis storing it's arrival flag and pos as variables?
+		self.y.homeReset( speed, waitArrival )
+		self.z.homeReset( speed, waitArrival )
+		# add a way to collect all three notifications (in whatever order) then check they are all there. this will allow symultanious axis movement and use of waitArrival
+
+	# seek to location (all axies). When waitArrival is True, funtion does not return until all seeks are compete
+	# seek will automatically use syncSeek when it is required. Always use the seek function
 	def seek(self, pos, speed, waitArrival):
+		curX, curY, curZ = self.x.getPos(), self.y.getPos(), self.z.getPos()
 		x, y, z = pos
-		self.x.seek( x, speed, False )
-		self.y.seek( y, speed, False )
-		self.z.seek( z, speed, False )
-		time.sleep(0.5)
-		while ( self.x.getPos() != x or self.y.getPos() != y or self.z.getPos() != z ) and waitArrival:	#replace this with proper arival flag from pic
-			time.sleep(0.5)
+		if printDebug: print "seek from [", curX, curY, curZ, "] to [", x, y, z, "]"
+		if x == curX or y == curY:
+			if printDebug: print "    standard seek"
+			self.x.seek( x, speed, True )			#setting these to true breaks waitArrival convention. need to rework waitArrival and possibly have each axis storing it's arrival flag and pos as variables?
+			self.y.seek( y, speed, True )
+		else:
+			if printDebug: print "    sync seek"
+			self.syncSeek( pos, speed, waitArrival )
+		if z != curZ:
+			self.z.seek( z, speed, True )
+
+	def syncSeek(self, pos, speed, waitArrival):
+		curX, curY = self.x.getPos(), self.y.getPos()
+		newX, newY, nullZ = pos
+		deltaX = abs( curX - newX )		# calc delta movements
+		deltaY = abs( curY - newY )
+		directionX = ( curX - newX ) / -deltaX	# gives direction -1 or 1
+		directionY = ( curY - newY ) / -deltaY	
+		if printDebug: print "    dx", deltaX, "dy", deltaY, "dirX", directionX, "dirY", directionY
+		if printDebug: print "    using x master"
+
+		master = syncAxis( self.x, newX, deltaX, directionX )	# create two swapable data structures, set x as master, y as slave
+		slave = syncAxis( self.y, newY, deltaY, directionY )
+		
+		if slave.delta > master.delta:		# if y has the greater movement then make y master
+			slave, master = master, slave
+			if printDebug: print "    switching to y master"
+		if printDebug: print "    masterPos", master.seekTo, "slaveDelta", slave.delta
+		slave.axis.setSync( slave.syncMode )
+		master.axis.DDA( speed, master.seekTo, slave.delta, True )
+		time.sleep(0.1)
+		slave.axis.setSync( sync_none )
+		if printDebug: print "    sync seek complete"
+		
 	def getPos(self):
 		return self.x.getPos(), self.y.getPos(), self.z.getPos()
 	def stop(self):
