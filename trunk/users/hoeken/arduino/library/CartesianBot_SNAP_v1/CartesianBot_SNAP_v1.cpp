@@ -472,6 +472,8 @@ void process_cartesian_bot_snap_commands_v1()
 			
 			//start our seek.
 			bot_mode = MODE_SEEK;
+			bot.enableTimerInterrupt();
+			
 	    break;
 
 		case CMD_FREE:
@@ -663,7 +665,7 @@ void process_cartesian_bot_snap_commands_v1()
 				bot.setTimer(bot.z.stepper.step_delay);
 
 				//tell our axis to go home.
-				z_mode = func_homereset;
+				z_mode = MODE_HOMERESET;
 			}
 
 			//starts our home reset mode.
