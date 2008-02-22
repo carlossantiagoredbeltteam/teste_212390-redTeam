@@ -31,13 +31,19 @@ void setup_cartesian_bot_snap_v1();
 void process_cartesian_bot_snap_commands_v1();
 void cartesian_bot_snap_v1_loop();
 
+//these are our functions for handling the interrupt.
+void interruptDDA();
+void interruptSeek();
+void interruptHomeReset();
+void interruptFindMin();
+void interruptFindMax();
+
 //notification functions to let the host know whats up.
 void notifyHomeReset(byte to, byte from);
 void notifyCalibrate(byte to, byte from, int position);
 void notifySeek(byte to, byte from, int position);
 void notifyDDA(byte to, byte from, int position);
 
-//our cartesian bot object.
 extern CartesianBot bot;
 
 //
@@ -70,23 +76,19 @@ extern CartesianBot bot;
 #define CMD_HOMERESET 16
 #define CMD_DEVICE_TYPE 255
 
-//
+
 // Addresses for our linear axes.
-//
 #define X_ADDRESS 2
 #define Y_ADDRESS 3
 #define Z_ADDRESS 4
 
-//movement modes for the cartesian bot.
+//modes for the cartesian bot.
 #define MODE_PAUSE 0
 #define MODE_SEEK 1
 #define MODE_DDA 2
 #define MODE_HOMERESET 3
 #define MODE_FIND_MIN 4
 #define MODE_FIND_MAX 5
-#define MODE_MOVE 6
-#define MODE_FORWARD 7
-#define MODE_REVERSE 8
 
 // sync mode declarations
 #define sync_none 0
