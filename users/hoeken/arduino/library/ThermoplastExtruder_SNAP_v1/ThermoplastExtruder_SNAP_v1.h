@@ -14,6 +14,8 @@
 	* (0.1) Created intial library by Zach Smith.
 	* (0.2) Updated to emulate PIC based temperature measuring.
 	* (0.3) Updated with new values from Steve DeGroof (http://forums.reprap.org/read.php?70,8034)
+	* (0.4) Rewrote and refactored all code.  Fixed major interrupt bug by Zach Smith.
+	
 
 	License: GPL v2.0
 */

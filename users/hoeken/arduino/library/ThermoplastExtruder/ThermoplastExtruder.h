@@ -12,6 +12,8 @@
 	* (0.2) Initial rework by Marius Kintel <kintel@sim.no>
 	* (0.3) Updated and optimized by Zach Smith
 	* (0.4) Updated with new default values for 100K thermistor.
+	* (0.3) Rewrote and refactored all code by Zach Smith.
+	
 	
 	License: GPL v2.0
 */

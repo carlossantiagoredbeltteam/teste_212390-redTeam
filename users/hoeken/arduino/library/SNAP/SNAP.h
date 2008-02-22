@@ -7,6 +7,7 @@
 	History:
 	* (0.1) Ported from PIC library by Zach Smith.
 	* (0.2) Updated and fixed by the guys from Metalab in Austra (kintel and wizard23)
+	* (0.3) Rewrote and refactored all code.  Added separate buffers and variables for Rx/Tx by Zach Smith.	
 	
 	License: GPL v2.0
 */

@@ -8,6 +8,7 @@
 	History:
 	* (0.1) Ceated initial library by Zach Smith.
 	* (0.2) Optimized for smaller size and speed by Zach Smith.
+	* (0.3) Rewrote and refactored all code.  Fixed major interrupt bug by Zach Smith. Special thanks to Marius Kintel for finding the bug.
 
 	License: GPL v2.0
 */
