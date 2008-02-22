@@ -13,6 +13,7 @@
 	* (0.1) Forked library by Zach Smith.
 	* (0.2) Optimizations to reduce code overhead by Zach Smith
 	* (0.3) Added delays for optocoupled driver boards as well as variables to record enable/direction status.
+	* (0.4) Rewrote and refactored all code.  Fixed major interrupt bug by Zach Smith.
 	
 	License: GPL v2.0
 */
