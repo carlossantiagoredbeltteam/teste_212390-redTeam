@@ -66,6 +66,29 @@ class dxfEntity():
 					self.extrusionDirY = float(value)
 				elif param == "230":
 					self.extrusionDirZ = float(value)
+			elif self.type == "ARC":
+				if param == "100":
+					self.subclass = value
+				elif param == "39":
+					self.thickness = float(value)
+				elif param == "10":
+					self.centreX = float(value)
+				elif param == "20":
+					self.centreY = float(value)
+				elif param == "30":
+					self.centreZ = float(value)
+				elif param == "40":
+					self.radius = float(value)
+				elif param == "50":
+					self.startAngle = float(value)
+				elif param == "51":
+					self.endAngle = float(value)
+				elif param == "210":
+					self.extrusionDirX = float(value)
+				elif param == "220":
+					self.extrusionDirY = float(value)
+				elif param == "230":
+					self.extrusionDirZ = float(value)
 					
 class dxf():
 	def __init__( self, fileName ):
@@ -74,16 +97,26 @@ class dxf():
 		entStart = 0
 		currentEntStart = 0
 		self.entities = []
+		lineIsCommand = False
 		currentEnt = False
 		for n in range( 0, len(fileLines) ):
-			if fileLines[n] == "ENTITIES\n":
+			line = fileLines[n][:-1].strip()
+			#print "'" + line + "'"
+			if line == "ENTITIES":
 				entStart = n
-			if fileLines[n][:-1] == "CIRCLE" or fileLines[n][:-1] == "LINE" or fileLines[n][:-1] == "ENDSEC": #using endsec to catch the last entity, i think parameter 0 signifys the end of an ent though so should try and use this
-				if currentEnt:
+			elif line == "CIRCLE" or fileLines[n][:-1] == "LINE" or fileLines[n][:-1] == "ARC":
+				if not currentEnt:
+					currentEnt = dxfEntity()
+					lineIsCommand = False
+				else:
+					print "DXF Read Error"
+			elif line == "0":				# end of shape
+				if currentEnt and lineIsCommand:
 					self.entities.append( currentEnt )
-				currentEnt = dxfEntity()
+					currentEnt = False
 			if currentEnt:
 				currentEnt.addLine( fileLines[n] )
+				lineIsCommand = not lineIsCommand	# set for next loop
 
 		for e in self.entities:
 			e.decode()
@@ -94,6 +127,9 @@ class dxf():
 				print e.type, "from [", e.startX, e.startY, e.startZ, "] to [", e.endX, e.endY, e.endZ, "]"
 			elif e.type == "CIRCLE":
 				print e.type, "centre [", e.centreX, e.centreY, e.centreZ, "], radius [", e.radius, "]"
+			elif e.type == "ARC":
+				print e.type, "centre [", e.centreX, e.centreY, e.centreZ, "], radius [", e.radius, "] start [", e.startAngle, "] end [", e.endAngle, "]" 
+
 
 
 			
