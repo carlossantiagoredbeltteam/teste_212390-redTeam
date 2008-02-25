@@ -14,26 +14,15 @@
 """
 """    
     This is the main user imported module containing all end user functions    
-   
-    SNAP Addresses:
-    *  0 PC
-    * 1 Master controller (not currently used for ring network)
-    * 2 X axis
-    * 3 Y axis
-    * 4 Z axis
-    * 5-7 Reserved for 6 DoF? platforms (Stewart platform etc.)
-    * 8..27 Extruders 1 to 20
-    * 50 IOBox test tool
 """
 
 import snap, time
 
-printDebug = False
-printDebug = True
+printDebug = False	# print debug info
 
 # SNAP Control Commands - Taken from PIC code #
 
-#extruder commands#
+# extruder commands #
 CMD_VERSION       =  0
 CMD_FORWARD       =  1
 CMD_REVERSE       =  2
@@ -53,7 +42,7 @@ CMD_SETTEMPSCALER = 53
 CMD_GETDEBUGINFO  = 54
 CMD_GETTEMPINFO   = 55
 
-#stepper commands#
+# stepper commands #
 CMD_VERSION		=   0
 CMD_FORWARD		=   1
 CMD_REVERSE		=   2
@@ -73,7 +62,7 @@ CMD_GETSENSOR		=  15
 CMD_HOMERESET		=  16
 CMD_GETMODULETYPE	= 255
 
-#sync modes#
+# sync modes #
 sync_none	= 0	# no sync (default)
 sync_seek	= 1	# synchronised seeking
 sync_inc	= 2	# inc motor on each pulse
@@ -123,162 +112,222 @@ class extruderClass:
 	def __init__(self):
 		self.address = 8
 		self.active = False
+
 	def getModuleType(self):	#note: do pics not support this yet? I can't see it in code and get no reply from pic
-		p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_GETMODULETYPE] )	# Create SNAP packet requesting module type
-		if p.send():
-			rep = p.getReply()									# If packet sent ok and was acknoledged then await reply, otherwise return False
-			if rep:
-				return rep.dataBytes[1]								# If valid reply is recieved then return it, otherwise return False
+		if self.active:
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_GETMODULETYPE] )	# Create SNAP packet requesting module type
+			if p.send():
+				rep = p.getReply()
+				data = checkReplyPacket( rep, 2, CMD_GETMODULETYPE )						# If packet sent ok and was acknoledged then await reply, otherwise return False
+				if data:
+					return data[1]								# If valid reply is recieved then return it, otherwise return False
 		return False
+
 	def getVersion(self):
-		p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_VERSION] )
-		p.send()
-		rep = p.getReply()
-		if rep:
-			return rep.dataBytes[1], rep.dataBytes[2]
-		else:
-			return False
+		if self.active:
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_VERSION] )
+			if p.send():
+				rep = p.getReply()
+				data = checkReplyPacket( rep, 3, CMD_VERSION )
+				if data:
+					return data[1], data[2]
+		return False
+
 	def setMotor(self, direction, speed):
-		p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [direction, speed] ) ##no command being sent, whats going on?
-		p.send()
+		if self.active:
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [direction, speed] ) ##no command being sent, whats going on?
+			if p.send():
+				return True
+		return False
+
 	def getTemp(self):
 		if self.active:		
 			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_GETTEMP] )
-			p.send()
-			rep = p.getReply()
-			if rep:
-				#temp = bytes2int( rep.dataBytes[1], rep.dataBytes[2] )
-				return rep.dataBytes[1]
+			if p.send():
+				rep = p.getReply()
+				data = checkReplyPacket( rep, 2, CMD_GETTEMP )
+				if data:
+					return data[1]
 		return False
+
 	def setVoltateReference(self, val):
 		if self.active:
 			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SETVREF, val] )
-			p.send()
+			if p.send():
+				return True
 		return False
-	def setHeat(self, lowHeat, highHeat, tempTarget, tempMax):	
-		tempTargetMSB, tempTargetLSB = int2bytes( tempTarget )
-		tempMaxMSB ,tempMaxLSB = int2bytes( tempMax )
-		p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SETHEAT, lowHeat, highHeat, tempTargetMSB, tempTargetLSB, tempMaxMSB, tempMaxLSB] )	# assumes MSB first (don't know this!)
-		p.send()
+
+	def setHeat(self, lowHeat, highHeat, tempTarget, tempMax):
+		if self.active:	
+			tempTargetMSB, tempTargetLSB = int2bytes( tempTarget )
+			tempMaxMSB ,tempMaxLSB = int2bytes( tempMax )
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SETHEAT, lowHeat, highHeat, tempTargetMSB, tempTargetLSB, tempMaxMSB, tempMaxLSB] )	# assumes MSB first (don't know this!)
+			if p.send():
+				return True
+		return False
+
 	def setCooler(self, speed):
-		p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SETCOOLER, speed] )
-		p.send()
+		if self.active:
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SETCOOLER, speed] )
+			if p.send():
+				return True
+		return False
+
 	def freeMotor(self):
-		p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_FREE] )
-		p.send()
+		if self.active:
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_FREE] )
+			if p.send():
+				return True
+		return False
 
 extruder = extruderClass()
+
+
+def checkReplyPacket (packet, numExpectedBytes, command):
+	if packet:
+		if len( packet.dataBytes ) == numExpectedBytes:		# check correct number of data bytes have been recieved
+			if packet.dataBytes[0] == command:			# check reply is a reply to sent command
+				return packet.dataBytes
+	return False
+				
 
 class axisClass:
 	def __init__(self, address):
 		self.address = address
-		self.active = False	#when scanning network, set this, then in each func below, check alive before doing anything
+		self.active = False	# when scanning network, set this, then in each func below, check alive before doing anything
+		self.limit = 100000	# limit effectively disabled unless set
 	#move axis one step forward
 	def forward1(self):
-		p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_FORWARD1] ) 
-		p.send()
+		if self.active:
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_FORWARD1] ) 
+			if p.send():
+				return True
+		return False
+
 	#move axis one step backward
 	def backward1(self):
-		p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_BACKWARD1] ) 
-		p.send()
+		if self.active:
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_BACKWARD1] ) 
+			if p.send():
+				return True
+		return False
+
 	#spin axis forward at given speed
 	def forward(self, speed):
 		if self.active:
 			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_FORWARD, speed] ) 
-			p.send()
-			return True
-		else:
-			return False
+			if p.send():
+				return True
+		return False
+
 	#spin axis backward at given speed
 	def backward(self, speed):
-		p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_REVERSE, speed] ) 
-		p.send()
+		if self.active:
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_REVERSE, speed] ) 
+			if p.send():
+				return True
+		return False
 
 	#debug only
 	def getSensors(self):
-		p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_GETSENSOR] )
-		p.send()
-		rep = p.getReply()
-		print rep.dataBytes[1], rep.dataBytes[2]##?
+		if self.active:
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_GETSENSOR] )
+			if p.send():
+				rep = p.getReply()
+				data = checkReplyPacket( rep, 3, CMD_GETSENSOR )		# replace this with a proper object in SNAP module?
+				if data:
+					print data[1], data[2]
+		return False
 
 	#get current axis position
 	def getPos(self):
 		if self.active:
 			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_GETPOS] )
-			p.send()
-			rep = p.getReply()
-			if rep:
-				pos = bytes2int( rep.dataBytes[1], rep.dataBytes[2] )
-				return pos 
+			if p.send():
+				rep = p.getReply()
+				data = checkReplyPacket( rep, 3, CMD_GETPOS )
+				if data:
+					pos = bytes2int( data[1], data[2] )
+					return pos 						# return value
 		return False
 
 	#set current position (set variable not robot position)
 	def setPos(self, pos):
-		posMSB ,posLSB = int2bytes( pos )
-		p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SETPOS, posMSB, posLSB] )
-		p.send()
+		if self.active:
+			posMSB ,posLSB = int2bytes( pos )
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SETPOS, posMSB, posLSB] )
+			if p.send():
+				return True
+		return False
 
 	#power off coils on stepper
 	def free(self):
-		p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_FREE] ) 
-		p.send()
+		if self.active:
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_FREE] ) 
+			if p.send():
+				return True
+		return False
 
 	#seek to axis location. When waitArrival is True, funtion does not return until seek is compete
 	def seek(self, pos, speed, waitArrival):
-		if self.active:
+		if self.active and pos <= self.limit:
 			posMSB ,posLSB = int2bytes( pos )
 			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SEEK, speed, posMSB ,posLSB] ) 
-			p.send()
-			if waitArrival:
-				if printDebug: print "    wait notify"
-				notif = getNotification( serial )
-				if notif.dataBytes[0] == CMD_SEEK:
-					if printDebug: print "valid notification for seek"
-				if printDebug: print "    rec notif"
-			return True
+			if p.send():
+				if waitArrival:
+					if printDebug: print "    wait notify"
+					notif = getNotification( serial )
+					if notif.dataBytes[0] == CMD_SEEK:
+						if printDebug: print "    valid notification for seek"
+					else:
+						return False
+					if printDebug: print "    rec notif"
+				return True
 		return False
 	
 	#goto 0 position. When waitArrival is True, funtion does not return until reset is compete
 	def homeReset(self, speed, waitArrival):
 		if self.active:
 			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_HOMERESET, speed] ) 
-			p.send()
-			#time.sleep(0.5)
-			if waitArrival:
-				if printDebug: print "reset wait"
-				notif = getNotification( serial )
-				if notif.dataBytes[0] == CMD_HOMERESET:
-					if printDebug: print "    valid notification for reset"
-				
-				if printDebug: print "reset done"
-			return True
+			if p.send():
+				if waitArrival:
+					if printDebug: print "reset wait"
+					notif = getNotification( serial )
+					if notif.dataBytes[0] == CMD_HOMERESET:
+						if printDebug: print "    valid notification for reset"
+					else:
+						return False
+					if printDebug: print "reset done"
+				return True
 		return False
 
 	def setNotify(self):
 		if self.active:
 			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_NOTIFY, snap.localAddress] ) 	# set notifications to be sent to host
-			p.send()
-			return True
+			if p.send():
+				return True
 		return False
 
 	def setSync( self, syncMode ):
 		if self.active:
 			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SYNC, syncMode] )
-			p.send()
-			return True
+			if p.send():
+				return True
 		return False
 
 	def DDA( self, speed, seekTo, slaveDelta, waitArrival):
-		if self.active:
+		if self.active and seekTo <= self.limit:
 			masterPosMSB, masterPosLSB = int2bytes( seekTo )
 			slaveDeltaMSB, slaveDeltaLSB = int2bytes( slaveDelta )
 			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_DDA, speed, masterPosMSB ,masterPosLSB, slaveDeltaMSB, slaveDeltaLSB] ) 	#start sync
-			p.send()
-			if waitArrival:
-				notif = getNotification( serial )
-				if notif.dataBytes[0] == CMD_DDA:
-					if printDebug: print "valid notification for DDA"	# todo: add actual enforement on wrong notification
-			return True
+			if p.send():
+				if waitArrival:
+					notif = getNotification( serial )
+					if notif.dataBytes[0] == CMD_DDA:
+						if printDebug: print "    valid notification for DDA"	# todo: add actual enforement on wrong notification
+					else:
+						return False
+				return True
 		return False
 
 class syncAxis:
@@ -296,15 +345,19 @@ class syncAxis:
 
 class cartesianClass:
 	def __init__(self):
-		#initiate axies with addresses
+		# initiate axies with addresses
 		self.x = axisClass(2)
 		self.y = axisClass(3)
 		self.z = axisClass(4)
-	#goto home position (all axies)
+
+	# goto home position (all axies)
 	def homeReset(self, speed, waitArrival):
-		self.x.homeReset( speed, waitArrival )		#setting these to true breaks waitArrival convention. need to rework waitArrival and possibly have each axis storing it's arrival flag and pos as variables?
-		self.y.homeReset( speed, waitArrival )
-		self.z.homeReset( speed, waitArrival )
+		if self.x.homeReset( speed, waitArrival ):		#setting these to true breaks waitArrival convention. need to rework waitArrival and possibly have each axis storing it's arrival flag and pos as variables?
+			print "X Reset"		
+		if self.y.homeReset( speed, waitArrival ):
+			print "Y Reset"
+		if self.z.homeReset( speed, waitArrival ):
+			print "Z Reset"
 		# add a way to collect all three notifications (in whatever order) then check they are all there. this will allow symultanious axis movement and use of waitArrival
 
 	# seek to location (all axies). When waitArrival is True, funtion does not return until all seeks are compete
@@ -312,17 +365,21 @@ class cartesianClass:
 	def seek(self, pos, speed, waitArrival):
 		curX, curY, curZ = self.x.getPos(), self.y.getPos(), self.z.getPos()
 		x, y, z = pos
-		if printDebug: print "seek from [", curX, curY, curZ, "] to [", x, y, z, "]"
-		if x == curX or y == curY:
-			if printDebug: print "    standard seek"
-			self.x.seek( x, speed, True )			#setting these to true breaks waitArrival convention. need to rework waitArrival and possibly have each axis storing it's arrival flag and pos as variables?
-			self.y.seek( y, speed, True )
+		if x <= self.x.limit and y <= self.y.limit and z <= self.z.limit:
+			if printDebug: print "seek from [", curX, curY, curZ, "] to [", x, y, z, "]"
+			if x == curX or y == curY:
+				if printDebug: print "    standard seek"
+				self.x.seek( x, speed, True )			#setting these to true breaks waitArrival convention. need to rework waitArrival and possibly have each axis storing it's arrival flag and pos as variables?
+				self.y.seek( y, speed, True )
+			else:
+				if printDebug: print "    sync seek"
+				self.syncSeek( pos, speed, waitArrival )
+			if z != curZ:
+				self.z.seek( z, speed, True )
 		else:
-			if printDebug: print "    sync seek"
-			self.syncSeek( pos, speed, waitArrival )
-		if z != curZ:
-			self.z.seek( z, speed, True )
-
+			print "Trying to print outside of limit, aborting seek"
+	
+	# perform syncronised x/y movement. This is called by seek when needed.
 	def syncSeek(self, pos, speed, waitArrival):
 		curX, curY = self.x.getPos(), self.y.getPos()
 		newX, newY, nullZ = pos
@@ -345,20 +402,24 @@ class cartesianClass:
 		time.sleep(0.1)
 		slave.axis.setSync( sync_none )
 		if printDebug: print "    sync seek complete"
-		
+	
+	# get current position of all three axies	
 	def getPos(self):
 		return self.x.getPos(), self.y.getPos(), self.z.getPos()
+	
+	# stop all motors
 	def stop(self):
 		self.x.forward( 0 )
 		self.y.forward( 0 )
 		self.z.forward( 0 )
+
+	# free all motors (no current on coils)
 	def free(self):
 		self.x.free()
 		self.y.free()
 		self.z.free()
 
 	
-		
 cartesian = cartesianClass()
 
 #wait on serial only when after somthing? or do pics send messages without pc request?

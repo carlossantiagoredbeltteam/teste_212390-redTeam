@@ -1,8 +1,10 @@
+#!/usr/bin/python
 import serial, reprap, time, sys
 
 #reprap.snap.printOutgoingPackets = True
 #reprap.snap.printIncomingPackets = True
 #reprap.snap.printFailedPackets = True
+#reprap.printDebug = True
 
 #work surface approx x 2523, y 2743
 
@@ -17,6 +19,9 @@ reprap.extruder.active = True
 reprap.cartesian.x.setNotify()						
 reprap.cartesian.y.setNotify()
 reprap.cartesian.z.setNotify()
+reprap.cartesian.x.limit = 2523
+#reprap.cartesian.y.limit = 2743
+reprap.cartesian.y.limit = 2000
 
 def printPos():
 	x, y, z = reprap.cartesian.getPos()
@@ -34,7 +39,8 @@ if sys.argv[1] == "stop":
 
 #goto 0,0
 if sys.argv[1] == "reset":
-	reprap.cartesian.homeReset( 200, False )
+	reprap.cartesian.homeReset( 200, True )
+	#time.sleep(2)
 	printPos()
 
 #print current positon

@@ -183,7 +183,6 @@ class SNAPPacket:
 	#user send function, sends packet and awaits and checks acknoledgement.
 	def send(self):
 		self.encode()
-		#print self.check()
 		retriesLeft = retries
 		while retriesLeft > 0:				# try sending define number of times only
 			self.sendBytes()			# send data
@@ -196,12 +195,9 @@ class SNAPPacket:
 			ack = getPacket(self.serial)		# await ack, returns false on timout
 			if ack:					
 				ack.decode()
-				#ack.printPacket()
 				if ack.ACK == 1 and ack.SAB == self.DAB:		# check that packet is an acknoledgement and that it is from the device we just messaged.
-					#print "moo"
-					return
+					return True
 				#do some check on ack - TODO
-				print "not ack"
 				if printFailedPackets:
 					print "###FAILED OUTGOING PACKET##"
 					self.decode() #remove need for this (tidy up)
