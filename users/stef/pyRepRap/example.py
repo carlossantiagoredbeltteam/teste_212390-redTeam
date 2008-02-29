@@ -57,6 +57,9 @@ if sys.argv[1] == "gotos":
 	reprap.cartesian.syncSeek( ( int(sys.argv[2]), int(sys.argv[3]), 0 ), 200, False)
 	printPos()
 
+if sys.argv[1] == "power":
+	reprap.cartesian.setPower( int( sys.argv[2] ) )	# This is a value from 0 to 63 (6 bits)
+
 
 #test routine
 if sys.argv[1] == "go":	#stepper test

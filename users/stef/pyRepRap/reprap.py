@@ -73,12 +73,12 @@ snap.localAddress = 0		# local address of host PC. This will always be 0.
 
 # Convert two 8 bit bytes to one integer
 def bytes2int(LSB, MSB):		
-	return (0x100 * MSB) | LSB
+	return int( (0x100 * MSB) | LSB )
 
 # Convert integer to two 8 bit bytes
 def int2bytes(val):
-	MSB = (val & 0xFF00) / 0x100
-	LSB = val  & 0xFF
+	MSB = int( (val & 0xFF00) / 0x100 )
+	LSB = int( val  & 0xFF )
 	return LSB, MSB
 
 #def loopTest():
@@ -135,7 +135,7 @@ class extruderClass:
 
 	def setMotor(self, direction, speed):
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [direction, speed] ) ##no command being sent, whats going on?
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [int(direction), int(speed)] ) ##no command being sent, whats going on?
 			if p.send():
 				return True
 		return False
@@ -152,7 +152,7 @@ class extruderClass:
 
 	def setVoltateReference(self, val):
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SETVREF, val] )
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SETVREF, int(val)] )
 			if p.send():
 				return True
 		return False
@@ -161,14 +161,14 @@ class extruderClass:
 		if self.active:	
 			tempTargetMSB, tempTargetLSB = int2bytes( tempTarget )
 			tempMaxMSB ,tempMaxLSB = int2bytes( tempMax )
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SETHEAT, lowHeat, highHeat, tempTargetMSB, tempTargetLSB, tempMaxMSB, tempMaxLSB] )	# assumes MSB first (don't know this!)
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SETHEAT, int(lowHeat), int(highHeat), tempTargetMSB, tempTargetLSB, tempMaxMSB, tempMaxLSB] )	# assumes MSB first (don't know this!)
 			if p.send():
 				return True
 		return False
 
 	def setCooler(self, speed):
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SETCOOLER, speed] )
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SETCOOLER, int(speed)] )
 			if p.send():
 				return True
 		return False
@@ -215,7 +215,7 @@ class axisClass:
 	#spin axis forward at given speed
 	def forward(self, speed):
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_FORWARD, speed] ) 
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_FORWARD, int(speed)] ) 
 			if p.send():
 				return True
 		return False
@@ -223,7 +223,7 @@ class axisClass:
 	#spin axis backward at given speed
 	def backward(self, speed):
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_REVERSE, speed] ) 
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_REVERSE, int(speed)] ) 
 			if p.send():
 				return True
 		return False
@@ -272,7 +272,7 @@ class axisClass:
 	def seek(self, pos, speed, waitArrival):
 		if self.active and pos <= self.limit:
 			posMSB ,posLSB = int2bytes( pos )
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SEEK, speed, posMSB ,posLSB] ) 
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SEEK, int(speed), posMSB ,posLSB] ) 
 			if p.send():
 				if waitArrival:
 					if printDebug: print "    wait notify"
@@ -288,7 +288,7 @@ class axisClass:
 	#goto 0 position. When waitArrival is True, funtion does not return until reset is compete
 	def homeReset(self, speed, waitArrival):
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_HOMERESET, speed] ) 
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_HOMERESET, int(speed)] ) 
 			if p.send():
 				if waitArrival:
 					if printDebug: print "reset wait"
@@ -310,7 +310,7 @@ class axisClass:
 
 	def setSync( self, syncMode ):
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SYNC, syncMode] )
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SYNC, int(syncMode)] )
 			if p.send():
 				return True
 		return False
@@ -319,7 +319,7 @@ class axisClass:
 		if self.active and seekTo <= self.limit:
 			masterPosMSB, masterPosLSB = int2bytes( seekTo )
 			slaveDeltaMSB, slaveDeltaLSB = int2bytes( slaveDelta )
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_DDA, speed, masterPosMSB ,masterPosLSB, slaveDeltaMSB, slaveDeltaLSB] ) 	#start sync
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_DDA, int(speed), masterPosMSB ,masterPosLSB, slaveDeltaMSB, slaveDeltaLSB] ) 	#start sync
 			if p.send():
 				if waitArrival:
 					notif = getNotification( serial )
@@ -327,6 +327,13 @@ class axisClass:
 						if printDebug: print "    valid notification for DDA"	# todo: add actual enforement on wrong notification
 					else:
 						return False
+				return True
+		return False
+	
+	def setPower( self, power ):
+		if self.active:
+			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SETPOWER, int( power * 0.63 )] ) # This is a value from 0 to 63 (6 bits)
+			if p.send():
 				return True
 		return False
 
@@ -418,6 +425,10 @@ class cartesianClass:
 		self.x.free()
 		self.y.free()
 		self.z.free()
+	def setPower(self, power):
+		self.x.setPower( power )
+		self.y.setPower( power )
+		self.z.setPower( power )
 
 	
 cartesian = cartesianClass()
