@@ -204,12 +204,16 @@ reprap.cartesian.x.limit = 2523
 #reprap.cartesian.y.limit = 2743
 reprap.cartesian.y.limit = 2000	#with extra pen support
 
+
+
 offset = 0, 0
 scale = 1
-moveSpeed = 220
+#moveSpeed = 220
+moveSpeed = 200
 curveResolution = 3
 plotType = False
 windowZoom = 1
+torque = 48
 
 for n in range( len(sys.argv) ):
 	param = sys.argv[n]
@@ -227,6 +231,8 @@ for n in range( len(sys.argv) ):
 		windowZoom = float( sys.argv[n + 1] )
 	elif param == "-h" or param == "--help":
 		help = True
+	elif param == "-t" or param == "--torque":
+		torque = int( sys.argv[n + 1] )
 
 fileName = sys.argv[ len(sys.argv) - 1 ]
 
@@ -238,6 +244,7 @@ if fileName[-4:] == ".dxf" and plotType:
 	elif plotType == PLOT_SIMULATE:
 		simulatePlot( newdxf, scale, offset, windowZoom )
 	elif plotType == PLOT_REPRAP:
+		reprap.cartesian.setPower( int( torque * 0.63 ) )
 		plotToRepRap( newdxf, scale, offset, windowZoom )
 else:
 	print "\nsudo python dxfplot.py [options] command file"
@@ -245,6 +252,7 @@ else:
 	print "        -o   --offset   xOffset yOffset		Set plot offset"
 	print "        -s   --scale    scale			Set plot scale"
 	print "        -z   --zoom     zoom			Set window zoom"
+	print "        -t   --torque   torque			Set torque (%) 48% by default"
 	print "    Commands:"
 	print "        preview					Display CAD file"
 	print "        simulate					Simulate plot"

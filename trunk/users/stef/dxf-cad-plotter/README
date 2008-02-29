@@ -1,0 +1,7 @@
+The files reprap.py and snap.py (from pyReprap) must be in the same folder as dxfplot.py in order for it to work.
+
+dxfplot.py must be run as root (unless you have configured serial port permissions)
+
+For help run 'sudo python dxfplot.py --help"
+
+
