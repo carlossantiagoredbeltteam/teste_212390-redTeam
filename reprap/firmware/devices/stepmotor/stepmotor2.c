@@ -105,6 +105,7 @@ volatile static byte coilPosition = 0;
 #define CMD_SETPOWER  14
 #define CMD_GETSENSOR 15
 #define CMD_HOMERESET 16
+#define CMD_CHECKHOSTVERSION  254
 #define CMD_GETMODULETYPE 255
 
 enum functions {
@@ -581,6 +582,24 @@ void processCommand()
     sendDataByte(MINOR_VERSION_NUMBER);
     endMessage();
     break;
+
+  case CMD_CHECKHOSTVERSION:
+    sendReply();
+    sendDataByte(CMD_CHECKHOSTVERSION);    
+    if(buffer[1] > OLDHOST_MAJOR_VERSION_NUMBER)
+       sendDataByte(0xff);    
+    else if (buffer[1] == OLDHOST_MAJOR_VERSION_NUMBER)
+    {
+       if (buffer[2] >= OLDHOST_MINOR_VERSION_NUMBER)
+          sendDataByte(0xff);
+       else
+          sendDataByte(0);    
+    } else
+       sendDataByte(0);
+    sendDataByte(OLDHOST_MAJOR_VERSION_NUMBER);
+    sendDataByte(OLDHOST_MINOR_VERSION_NUMBER);
+    endMessage();
+    break;    
 
   case CMD_GETMODULETYPE:
     sendReply();

@@ -1,36 +1,96 @@
+Building the RepRap PIC firmware under Linux
+============================================
 
 
-The build process will automatically download and build an appropriate
-version of sdcc.  This will take a little while on the first build.
+Prerequisites
+=============
 
-A default build (ie make) will build all devices and tools for the pic16f628
+You need to have gputils and sdcc installed.  The standard version of
+gputils contains a bug, so you need to download a later one.
+Uninstall gputils and/or sdcc if the standard versions are already
+installed on your machine.  Then...
 
-The output is put into the build subdirectory.  A subdirectory will
-be created for each output architecture and within that a directory
-for each device.
+GPUTILS
+=======
+
+Create a directory for tools needed for RepRap firmware build and put gputils in it:
+
+$ mkdir $HOME/reprap-tools
+$ cd $HOME/reprap-tools
+$ cvs \
+  -d:pserver:anonymous@gputils.cvs.sourceforge.net:/cvsroot/gputils \
+  login
+$ cvs -z3 \
+  -d:pserver:anonymous@gputils.cvs.sourceforge.net:/cvsroot/gputils \
+  co -P gputils
+$ cd gputils
+$ ./configure --prefix=$HOME/reprap-tools
+$ make
+$ make install
 
 
-Build options:
-PROCESSOR
-  Build for a different processor
+SDCC
+====
 
-  eg
-  > PROCESSOR=16f627 make
+Once again, put this in the directory you created:
 
-  This will build for the 16f627 rather than the default 16f628
+$ cd $HOME/reprap-tools
+$ svn co https://sdcc.svn.sourceforge.net/svnroot/sdcc/trunk/sdcc
+$ cd sdcc
+$ ./configure --prefix=$HOME/reprap-tools --disable-mcs51-port \
+  --disable-gbz80-port --disable-z80-port --disable-avr-port \
+  --disable-ds390-port --disable-ds400-port --disable-xa51-port \
+  --disable-hc08-port --disable-ucsim
+$ make
+$ make install
 
-DEVICES
-  Build only specific devices
 
-  eg
-  > DEVICES=stepmotor make
+RepRap PIC Firmware
+===================
 
-  This will only build the stepmotor device (no other devices or tools)
+If you are doing RepRap development you will almost certainly be using
+Eclipse for the Java host code anyway.  Use subversion in Eclipse to
+check out
 
-Other examples
+  https://reprap.svn.sourceforge.net/svnroot/reprap/trunk/reprap/firmware
 
-  > PROCESSOR=16f627 DEVICES=stepmotor make && PROCESSOR=16f628 DEVICES=stepmotorb make
+and move to the directory where Eclipse put that:
 
-  This will build one controller for the 16f627 and the other for
-  a 16f628
+$ cd ~/workspace/firmware
 
+Add the directory you created previously to your path:
+
+$ PATH=$HOME/reprap-tools/bin:$PATH
+$ export PATH
+
+Now make the RepRap PIC firmware:
+
+$ ./configure
+$ make
+
+
+Files Built
+===========
+
+That should create five .hex files for the PIC16F648 (or PIC16F648A - either
+will work):
+
+   ~/workspace/firmware/stepmotor/stepmotorx.hex
+   ~/workspace/firmware/stepmotor/stepmotory.hex
+   ~/workspace/firmware/stepmotor/stepmotorz.hex
+
+   ~/workspace/firmware/extruder_0/extruder0.hex
+   ~/workspace/firmware/extruder_1/extruder1.hex
+
+The first three are for the axis stepper controllers, see:
+
+   http://reprap.org/bin/view/Main/DarwinStepperController_1_2 
+
+The file extruder0.hex is for the standard thermoplast extruder - see:
+
+   http://reprap.org/bin/view/Main/RepRapOneDarwinThermoplastExtruder
+
+The file extruder1.hex is for the experimental paste extruder - see:
+
+   http://reprap.org/bin/view/Main/SupportExtruder_1_0
+   
