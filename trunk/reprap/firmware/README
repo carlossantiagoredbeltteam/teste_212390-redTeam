@@ -93,4 +93,22 @@ The file extruder0.hex is for the standard thermoplast extruder - see:
 The file extruder1.hex is for the experimental paste extruder - see:
 
    http://reprap.org/bin/view/Main/SupportExtruder_1_0
+
+
+To do a rebuild, in the ~/workspace/firmware type
+
+$ make clean
+$ make
+
+The standard distribution has the X, Y, and Z axis code set to do
+half-stepping on the stepper motors.  To change this to full stepping
+edit the file:
+
+   ~/workspace/firmware/stepmotor/stepmotor.h
+
+comment out the line that says:
+
+   #define HALFSTEP
+
+and do a rebuild.
    
