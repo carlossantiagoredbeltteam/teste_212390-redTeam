@@ -36,8 +36,15 @@
 
 #include "pic14.h"
 
+// This firmware version
+
 #define MAJOR_VERSION_NUMBER 1
 #define MINOR_VERSION_NUMBER 0
+
+// The oldest host s/w this'll work with
+
+#define OLDHOST_MAJOR_VERSION_NUMBER 0
+#define OLDHOST_MINOR_VERSION_NUMBER 8
 
 //type definitions.  see: http://reprap.org/bin/view/Main/Modules
 #define LINEAR_AXIS_TYPE 0

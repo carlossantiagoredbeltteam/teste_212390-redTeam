@@ -93,6 +93,7 @@ volatile static addressableInt currentPosition, seekPosition;
 #define CMD_SETTEMPSCALER 53
 #define CMD_GETDEBUGINFO  54
 #define CMD_GETTEMPINFO   55
+#define CMD_CHECKHOSTVERSION  254
 #define CMD_GETMODULETYPE 255
 
 #define HEATER_PWM_PERIOD 255
@@ -501,6 +502,24 @@ void processCommand()
     sendDataByte(MINOR_VERSION_NUMBER);
     endMessage();
     break;
+
+  case CMD_CHECKHOSTVERSION:
+    sendReply();
+    sendDataByte(CMD_CHECKHOSTVERSION);    
+    if(buffer[1] > OLDHOST_MAJOR_VERSION_NUMBER)
+       sendDataByte(0xff);    
+    else if (buffer[1] == OLDHOST_MAJOR_VERSION_NUMBER)
+    {
+       if (buffer[2] >= OLDHOST_MINOR_VERSION_NUMBER)
+          sendDataByte(0xff);
+       else
+          sendDataByte(0);    
+    } else
+       sendDataByte(0);
+    sendDataByte(OLDHOST_MAJOR_VERSION_NUMBER);
+    sendDataByte(OLDHOST_MINOR_VERSION_NUMBER);
+    endMessage();
+    break;    
 
   case CMD_GETMODULETYPE:
     sendReply();
