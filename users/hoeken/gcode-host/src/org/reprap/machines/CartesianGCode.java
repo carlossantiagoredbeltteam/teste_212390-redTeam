@@ -16,42 +16,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
-import javax.media.j3d.*;
-
-import org.reprap.Attributes;
-import org.reprap.CartesianPrinter;
-import org.reprap.Preferences;
-import org.reprap.Extruder;
-import org.reprap.ReprapException;
-import org.reprap.gui.Previewer;
-import org.reprap.devices.NullExtruder;
-
 /**
  *
  */
-public class GCodeWriter extends RepRap {
-	
-	/**
-	 * 
-	 */
-	private Previewer previewer = null;
-
-	/**
-	 * 
-	 */
-	double totalDistanceMoved = 0.0;
-	
-	/**
-	 * 
-	 */
-	double totalDistanceExtruded = 0.0;
-	
-	//double extrusionSize, extrusionHeight, infillWidth;
-	
-	/**
-	 * 
-	 */
-	double currentX, currentY, currentZ;
+public class CartesianGCode extends CartesianBot {
 	
 	/**
 	 * 
@@ -90,19 +58,12 @@ public class GCodeWriter extends RepRap {
 	private int temperature;
 	
 	/**
-	 * @param config
+	 * @param prefs
+	 * @throws Exception
 	 */
-	public GCodeWriter(Preferences config) {
-		startTime = System.currentTimeMillis();
+	public CartesianSNAP(Preferences prefs) throws Exception {
 		
-		extruderCount = config.loadInt("NumberOfExtruders");
-		extruders = new NullExtruder[extruderCount];
-		for(int i = 0; i < extruderCount; i++)
-		{
-			String prefix = "Extruder" + i + "_";
-			extruders[i] = new NullExtruder(config, i);
-		}
-		extruder = 1;
+		super(prefs);
 
 		currentX = 0;
 		currentY = 0;
