@@ -12,59 +12,69 @@ import org.reprap.utilities.Debug;
 public abstract class CartesianBot implements CartesianPrinter {
 	
 	/**
-	 * 
+	 * This is our previewer window
 	 */
-	Previewer previewer = null;
+	protected Previewer previewer = null;
 
 	/**
-	 * 
+	 * How far have we moved, in mm.
 	 */
-	double totalDistanceMoved = 0.0;
+	protected double totalDistanceMoved = 0.0;
 	
 	/**
-	 * 
+	 * What distnace did we extrude, in mm.
 	 */
-	double totalDistanceExtruded = 0.0;
+	protected double totalDistanceExtruded = 0.0;
 	
 	/**
 	 * Scale for each axis in steps/mm.
 	 */
-	double scaleX, scaleY, scaleZ;
+	protected double scaleX, scaleY, scaleZ;
 	
 	/**
 	 * Current X, Y and Z position of the extruder 
 	 */
-	double currentX, currentY, currentZ;
+	protected double currentX, currentY, currentZ;
 	
 	/**
 	 * Maximum feedrate for X, Y, and Z axes
 	 */
-	double maxFeedrateX, maxFeedrateY, maxFeedrateZ;
+	protected double maxFeedrateX, maxFeedrateY, maxFeedrateZ;
 	
 	/**
 	 * Number of extruders on the 3D printer
 	 */
-	private int extruderCount;
+	protected int extruderCount;
 	
 	/**
 	 * Array containing the extruders on the 3D printer
 	 */
-	private Extruder extruders[];
+	protected Extruder extruders[];
 
 	/**
 	 * Current extruder?
 	 */
-	private int extruder;
+	protected int extruder;
+	
+	/**
+	 * When did we start printing?
+	 */
+	protected long startTime;
+	
+	/**
+	 * Do we idle the z axis?
+	 */
+	protected boolean idleZ;
 	
 	/**
 	 * 
 	 */
-	private long startTime;
+	private double overRun;
 	
 	/**
 	 * 
 	 */
-	private boolean idleZ;
+	private long delay;
 	
 	public CartesianSNAP(Preferences prefs) throws Exception
 	{
@@ -77,7 +87,7 @@ public abstract class CartesianBot implements CartesianPrinter {
 			
 		//load extruder prefs
 		extruderCount = prefs.loadInt("NumberOfExtruders");
-		extruders = new GenericExtruder[extruderCount];
+		extruders = new Extruder[extruderCount];
 		if (extruderCount < 1)
 			throw new Exception("A Reprap printer must contain at least one extruder");
 		
@@ -93,18 +103,28 @@ public abstract class CartesianBot implements CartesianPrinter {
 		maxFeedrateX = prefs.loadDouble("MaximumFeedrateX(mm/minute)");
 		maxFeedrateY = prefs.loadDouble("MaximumFeedrateY(mm/minute)");
 		maxFeedrateZ = prefs.loadDouble("MaximumFeedrateZ(mm/minute)");
+		
+		//init our stuff.
+		currentX = 0;
+		currentY = 0;
+		currentZ = 0;
 	}
 	
 	public void loadExtruders()
 	{
 		//instantiate extruders
 		extruderCount = config.loadInt("NumberOfExtruders");
+
+		//use our factory.
 		extruders = new Extruder[extruderCount];
 		for(int i = 0; i < extruderCount; i++)
-		{
-			String prefix = "Extruder" + i + "_";
 			extruders[i] = extruderFactory(prefs, i);
-		}
+
 		extruder = 0;
+	}
+	
+	public void extruderFactory(Preferences prefs, int count)
+	{
+		return new NullExtruder(prefs, count);
 	}
 }
