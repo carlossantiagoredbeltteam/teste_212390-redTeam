@@ -156,43 +156,44 @@ public class Producer {
 	 * @throws Exception
 	 */
 //	public void produce(boolean testPiece) throws Exception {
-	public void produce() throws Exception {
+	public void produce() throws Exception
+	{
+		boolean subtractive = Preferences.loadGlobalBool("Subtractive");
+/*		
+	MOVED ALL THIS TO reprap.initialize()
 
-        // Fallback defaults
+		//int coolingPeriod = Preferences.loadGlobalInt("CoolingPeriod");
+
+		// Fallback defaults
 		//int extrusionSpeed = 200;
 		//int extrusionTemp = 40;
 		//int movementSpeedXY = 230;
 		//int fastSpeedXY = 230;
 		int movementSpeedZ = 212;
-		
-		//int coolingPeriod = Preferences.loadGlobalInt("CoolingPeriod");
-		boolean subtractive = Preferences.loadGlobalBool("Subtractive");
-		
+	
 		try {
 //			extrusionSpeed = Preferences.loadGlobalInt("ExtrusionSpeed");
 //			extrusionTemp = Preferences.loadGlobalInt("ExtrusionTemp");
 //			movementSpeedXY = Preferences.loadGlobalInt("MovementSpeed");
 //			fastSpeedXY = Preferences.loadGlobalInt("FastSpeed");
-			movementSpeedZ = Preferences.loadGlobalInt("MovementSpeedZ(0..255)");
+//			movementSpeedZ = Preferences.loadGlobalInt("MovementSpeedZ(0..255)");
+			movementSpeedZ = Preferences.loadGlobalDouble("MaximumZFeedrate(mm/minute)");
 		} catch (Exception ex) {
 			System.out.println("Warning: could not load ExtrusionSpeed/MovementSpeed, using defaults");
 		}
-		
 
-//		reprap.setSpeed(movementSpeedXY);
-//		reprap.setFastSpeed(fastSpeedXY);
-		reprap.setSpeedZ(movementSpeedZ);
+		//		reprap.setSpeed(movementSpeedXY);
+		//		reprap.setFastSpeed(fastSpeedXY);
+				reprap.setSpeedZ(movementSpeedZ);
+
+*/		
+
 		Debug.d("Intialising reprap");
 		reprap.initialise();
-		Debug.d("Selecting material 0");
-		reprap.selectExtruder(0);
-		//reprap.setExtruderSpeed(extrusionSpeed);
-		Debug.d("Setting temperature");
-		reprap.getExtruder().heatOn();
 		
 		// A "warmup" segment to get things in working order
-		if (!subtractive) {
-			
+		if (!subtractive)
+		{
 			Debug.d("Printing warmup segments, moving to (5,5)");
 			reprap.setSpeed(reprap.getExtruder().getXYSpeed());
 			reprap.moveTo(5, 5, 0, false, false);
@@ -203,8 +204,13 @@ public class Producer {
 			
 			Debug.d("Printing warmup segments, printing to (5,50)");
 			reprap.moveTo(5, 25, 0, false, false);
-			reprap.setSpeed(LinePrinter.speedFix(reprap.getExtruder().getXYSpeed(), 
-					reprap.getExtruder().getOutlineSpeed()));
+
+//todo: set to outline speed.
+//			reprap.setSpeed(
+//				LinePrinter.speedFix(reprap.getExtruder().getXYSpeed(), 
+//				reprap.getExtruder().getOutlineSpeed())
+//			);
+
 			reprap.printTo(5, 60, 0, false);
 			Debug.d("Printing warmup segments, printing to (7,50)");
 			reprap.printTo(7, 60, 0, false);

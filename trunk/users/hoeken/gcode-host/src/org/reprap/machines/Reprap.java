@@ -643,11 +643,22 @@ public class Reprap implements CartesianPrinter {
 	 * @see org.reprap.Printer#initialise()
 	 */
 	public void initialise() throws Exception {
+		
 		if (previewer != null)
 			previewer.reset();
+				
+		Debug.d("Selecting material 0");
+		selectExtruder(0);
+		
+		Debug.d("Setting temperature");
+		getExtruder().heatOn();
+		
 		motorX.homeReset(fastSpeedXY);
 		motorY.homeReset(fastSpeedXY);
-		if (!excludeZ) motorZ.homeReset(speedZ);
+		
+		if (!excludeZ)
+			motorZ.homeReset(speedZ);
+		
 		currentX = currentY = currentZ = 0.0;
 	}
 

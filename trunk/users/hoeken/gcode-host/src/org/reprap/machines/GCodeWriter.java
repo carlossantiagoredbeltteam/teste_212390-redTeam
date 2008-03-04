@@ -29,7 +29,7 @@ import org.reprap.devices.NullExtruder;
 /**
  *
  */
-public class GCodeWriter implements CartesianPrinter {
+public class GCodeWriter extends RepRap {
 	
 	/**
 	 * 
