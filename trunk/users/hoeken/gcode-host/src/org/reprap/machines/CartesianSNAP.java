@@ -1,12 +1,7 @@
 package org.reprap.machines;
 
 import java.io.IOException;
-import javax.media.j3d.*;
 
-import org.reprap.Attributes;
-import org.reprap.CartesianPrinter;
-import org.reprap.Preferences;
-import org.reprap.ReprapException;
 import org.reprap.comms.Communicator;
 import org.reprap.comms.snap.SNAPAddress;
 import org.reprap.comms.snap.SNAPCommunicator;
@@ -14,9 +9,7 @@ import org.reprap.devices.GenericExtruder;
 import org.reprap.devices.GenericStepperMotor;
 import org.reprap.devices.pseudo.LinePrinter;
 import org.reprap.gui.CalibrateZAxis;
-import org.reprap.gui.Previewer;
-import org.reprap.Extruder;
-import org.reprap.utilities.Debug;
+
 
 /**
  * 
@@ -24,7 +17,7 @@ import org.reprap.utilities.Debug;
  * extruders
  *
  */
-public class CartesianSNAP implements CartesianPrinter {
+public class CartesianSNAP extends CartesianBot {
 	
 	/**
 	 * 
@@ -39,11 +32,6 @@ public class CartesianSNAP implements CartesianPrinter {
 	 * 
 	 */
 	private Communicator communicator;
-	
-	/**
-	 * 
-	 */
-	private Previewer previewer = null;
 
 	/**
 	 * Stepper motors for the 3 axis 
@@ -51,31 +39,11 @@ public class CartesianSNAP implements CartesianPrinter {
 	private GenericStepperMotor motorX;
 	private GenericStepperMotor motorY;
 	private GenericStepperMotor motorZ;
-	
-	/**
-	 * Total distance the carriage has moved in mm
-	 */
-	double totalDistanceMoved = 0.0;
-	
-	/**
-	 * Total distance the extruder has printed in mm
-	 */
-	double totalDistanceExtruded = 0.0;
 
 	/**
 	 * 
 	 */
 	private LinePrinter layerPrinter;
-	
-	/**
-	 * 
-	 */
-	double scaleX, scaleY, scaleZ;
-	
-	/**
-	 * Current X, Y and Z position of the extruder (?)
-	 */
-	double currentX, currentY, currentZ;
 	
 	/**
 	 * Initial default speed
@@ -90,23 +58,8 @@ public class CartesianSNAP implements CartesianPrinter {
 	/**
 	 * Initial default speed
 	 */
-	private int speedZ = 230;  			
+	private int speedZ = 230;
 	
-	/**
-	 * Number of extruders on the 3D printer
-	 */
-	private int extruderCount;
-	
-	/**
-	 * Array containing the extruders on the 3D printer
-	 */
-	private Extruder extruders[];
-
-	/**
-	 * Current extruder?
-	 */
-	private int extruder;
-
 	/**
 	 * Don't perform Z operations.  
 	 * FIXME: Should be removed later.
@@ -114,26 +67,12 @@ public class CartesianSNAP implements CartesianPrinter {
 	private boolean excludeZ = false;
 	
 	/**
-	 * 
-	 */
-	private long startTime;
-	
-	/**
-	 * 
-	 */
-	private boolean idleZ;
-	
-	
-	/**
 	 * @param prefs
 	 * @throws Exception
 	 */
 	public CartesianSNAP(Preferences prefs) throws Exception {
-		startTime = System.currentTimeMillis();
 		
-		int axes = prefs.loadInt("AxisCount");
-		if (axes != 3)
-			throw new Exception("A Reprap printer must contain 3 axes");
+		super(prefs);
 		
 		String commPortName = prefs.loadString("Port(name)");
 		
@@ -147,30 +86,9 @@ public class CartesianSNAP implements CartesianPrinter {
 		motorZ = new GenericStepperMotor(communicator,
 				new SNAPAddress(prefs.loadInt("ZAxisAddress")), prefs, 3);
 		
-		
-		extruderCount = prefs.loadInt("NumberOfExtruders");
-		extruders = new GenericExtruder[extruderCount];
-		if (extruderCount < 1)
-			throw new Exception("A Reprap printer must contain at least one extruder");
-		
-		for(int i = 0; i < extruderCount; i++)
-		{
-			String prefix = "Extruder" + i + "_";
-			extruders[i] = new GenericExtruder(communicator,
-				new SNAPAddress(prefs.loadInt(prefix + "Address")), prefs, i);
-		}
-		
-		extruder=0;
-		
 		layerPrinter = new LinePrinter(motorX, motorY, extruders[extruder]);
-
-		// TODO This should be from calibration
-		scaleX = prefs.loadDouble("XAxisScale(steps/mm)");
-		scaleY = prefs.loadDouble("YAxisScale(steps/mm)");
-		scaleZ = prefs.loadDouble("ZAxisScale(steps/mm)");
 	
 		idleZ = prefs.loadBool("IdleZAxis");
-		
 		fastSpeedXY = prefs.loadInt("FastSpeed(0..255)");
 		
 		try {
@@ -185,13 +103,22 @@ public class CartesianSNAP implements CartesianPrinter {
 			System.err.println("Z axis not responding and will be ignored");
 			excludeZ = true;
 		}
-
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#calibrate()
 	 */
 	public void calibrate() {
+	}
+	
+	public void loadExtruders()
+	{
+		for(int i = 0; i < extruderCount; i++)
+		{
+			String prefix = "Extruder" + i + "_";
+			extruders[i] = new GenericExtruder(communicator,
+				new SNAPAddress(prefs.loadInt(prefix + "Address")), prefs, i);
+		}
 	}
 
 	/* (non-Javadoc)
