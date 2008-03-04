@@ -57,6 +57,7 @@ public class Preferences {
 	public static double inchesToMillimetres() { return inToMM; }
 	public static double machineResolution() { return machineResolution; }
 	public static double absoluteZero() { return absoluteZero; }
+	
 	public static Appearance unselectedApp()
 	{
 		Color3f unselectedColour = null;

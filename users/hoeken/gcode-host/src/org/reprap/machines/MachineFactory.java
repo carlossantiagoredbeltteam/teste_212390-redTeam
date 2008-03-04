@@ -30,9 +30,9 @@ public class MachineFactory {
 		String geometry = prefs.loadString("Geometry");
 		
 		if (geometry.compareToIgnoreCase("cartesian") == 0)
-		  	return new Reprap(prefs);
+		  	return new CartesianSNAP(prefs);
 		else if (geometry.compareToIgnoreCase("gcodewriter") == 0)
-		  	return new GCodeWriter(prefs);
+		  	return new CartesianGCode(prefs);
 		else if (geometry.compareToIgnoreCase("nullcartesian") == 0)
 		    return new NullCartesianMachine(prefs);		
 		else

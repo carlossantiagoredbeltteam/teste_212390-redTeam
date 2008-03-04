@@ -34,7 +34,7 @@ public interface Extruder {
 	public void setExtrusion(int speed, boolean reverse) throws IOException; 
 	
 	/**
-	 * Turn the heater of the extruder on. Inital temperatur is defined by ???
+	 * Turn the heater of the extruder on. Inital temperature is defined by ???
 	 * @throws Exception
 	 */
 	public void heatOn() throws Exception; 
@@ -81,12 +81,22 @@ public interface Extruder {
 	/**
 	 * @return the infill speed as a value between [0,1]
 	 */
-	public double getInfillSpeed();
+	public double getInfillSpeedFactor();
+	
+	/**
+	 * @return the infill feedrate as a value in mm/minute
+	 */
+	public double getInfillFeedrate();
 
 	/**
 	 * @return the outline speed as a avlue between [0,1]
 	 */
-	public double getOutlineSpeed();
+	public double getOutlineSpeedFactor();
+
+	/**
+	 * @return the outline feedrate as a value in mm/minute
+	 */
+	public double getOutlineFeedrate();
 	
 	/**
 	 * @return The length in mm to speed up when going round corners
@@ -117,11 +127,11 @@ public interface Extruder {
 	 */
 	public boolean isAvailable(); 
 
-    /**
-     * The speed of X and Y movement
-     * @return the XY speed
-     */
-    public int getXYSpeed();
+	/**
+	 * The feedrate of X/Y movement
+	 * @return the XY feedrate in mm/minute
+	 */
+	public int getXYFeedrate();
  
     /**
      * @return the extruder speeds
@@ -226,8 +236,15 @@ public interface Extruder {
      * short lines.
      * @return
      */
-    public double getShortSpeed();
+    public double getShortLineSpeedFactor();
     
+	/**
+	 * Feedrate for short lines in mm/minute
+	 * @return
+	 */
+	public double getShortLineFeedrate();
+
+
     /**
      * Number of mm to overlap the hatching infill with the outline.  0 gives none; -ve will 
      * leave a gap between the two
