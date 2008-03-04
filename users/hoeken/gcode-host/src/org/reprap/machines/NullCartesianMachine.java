@@ -14,80 +14,13 @@ import org.reprap.devices.NullExtruder;
 /**
  *
  */
-public class NullCartesianMachine implements CartesianPrinter {
+public class NullCartesianMachine extends CartesianBot {
 	
-	/**
-	 * 
-	 */
-	private Previewer previewer = null;
-
-	/**
-	 * 
-	 */
-	double totalDistanceMoved = 0.0;
-	
-	/**
-	 * 
-	 */
-	double totalDistanceExtruded = 0.0;
-	
-	//double extrusionSize, extrusionHeight, infillWidth;
-	
-	/**
-	 * 
-	 */
-	double currentX, currentY, currentZ;
-	
-	/**
-	 * 
-	 */
-	private double overRun;
-	
-	/**
-	 * 
-	 */
-	private long delay;
-
-	/**
-	 * 
-	 */
-	private long startTime;
-	
-	/**
-	 * 
-	 */
-	private Extruder extruders[];
-	
-	/**
-	 * 
-	 */
-	private int extruder;
-	
-	/**
-	 * 
-	 */
-	private int extruderCount;
-
 	/**
 	 * @param config
 	 */
 	public NullCartesianMachine(Preferences config) {
-		startTime = System.currentTimeMillis();
-		
-		extruderCount = config.loadInt("NumberOfExtruders");
-		extruders = new NullExtruder[extruderCount];
-		for(int i = 0; i < extruderCount; i++)
-		{
-			String prefix = "Extruder" + i + "_";
-			extruders[i] = new NullExtruder(config, i);
-		}
-		extruder = 1;
-
-		currentX = 0;
-		currentY = 0;
-		currentZ = 0;
-		
-
+		super(config);
 	}
 	
 	/* (non-Javadoc)
