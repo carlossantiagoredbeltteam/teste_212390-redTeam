@@ -21,8 +21,50 @@ import javax.media.j3d.Material;
  * @author jwiel
  *
  */
-public class GenericExtruder extends Device implements Extruder
+public class SNAPExtruder extends GenericExtruder
 {
+	
+	/**
+	 * API for firmware
+	 * Activate the extruder motor in forward direction 
+	 */
+	public static final byte MSG_SetActive = 1;
+	
+	/**
+	 *  Activate the extruder motor in reverse direction
+	 */
+	public static final byte MSG_SetActiveReverse = 2;
+	
+	/**
+	 * There is no material left to extrude 
+	 */
+	public static final byte MSG_IsEmpty = 8;
+	
+	/**
+	 * Set the temperature of the extruder
+	 */
+	public static final byte MSG_SetHeat = 9;
+	
+	/**
+	 * Get the temperature of the extruder 
+	 */
+	public static final byte MSG_GetTemp = 10;
+		
+	/**
+	 * Turn the cooler/fan on 
+	 */
+	public static final byte MSG_SetCooler = 11;
+	
+	/**
+	 * Set Vref 
+	 */
+	public static final byte MSG_SetVRef = 52;
+	
+	/**
+	 * Set the Tempscaler 
+	 */
+	public static final byte MSG_SetTempScaler = 53;
+	 
 	/**
 	 * Offset of 0 degrees centigrade from absolute zero
 	 */
@@ -65,6 +107,43 @@ public class GenericExtruder extends Device implements Extruder
 	 * 
 	 */
 	private boolean pollThreadExiting = false;
+	
+	/**
+	 * 
+	 */
+	private int vRefFactor = 7;
+	
+	/**
+	 * 
+	 */
+	private int tempScaler = 4;
+	
+	
+	/**
+	 * Thermistor beta
+	 */
+	private double beta; 
+	
+	/**
+	 * Thermistor resistance at 0C
+	 */
+	private double rz;  
+	
+	/**
+	 * Thermistor timing capacitor in farads
+	 */
+	private double cap;    
+
+	/**
+	 * Heater power gradient
+	 */
+	private double hm;   
+
+	/**
+	 * Heater power intercept
+	 * TODO: hb should probably be ambient temperature measured at this point
+	 */
+	private double hb;    
 
 	/**
 	 * Maximum motor speed (value between 0-255)
@@ -239,6 +318,11 @@ public class GenericExtruder extends Device implements Extruder
 		myExtruderID = extruderId;
 		String prefName = "Extruder" + extruderId + "_";
 		
+		beta = prefs.loadDouble(prefName + "Beta(K)");
+		rz = prefs.loadDouble(prefName + "Rz(ohms)");
+		cap = prefs.loadDouble(prefName + "Capacitor(F)");
+		hm = prefs.loadDouble(prefName + "hm(C/pwr)");
+		hb = prefs.loadDouble(prefName + "hb(C)");
 		maxExtruderSpeed = prefs.loadInt(prefName + "MaxSpeed(0..255)");
 		extrusionSpeed = prefs.loadInt(prefName + "ExtrusionSpeed(0..255)");
 		extrusionTemp = prefs.loadDouble(prefName + "ExtrusionTemp(C)");
@@ -272,7 +356,6 @@ public class GenericExtruder extends Device implements Extruder
 		Color3f col = new Color3f((float)prefs.loadDouble(prefName + "ColourR(0..1)"), 
 				(float)prefs.loadDouble(prefName + "ColourG(0..1)"), 
 				(float)prefs.loadDouble(prefName + "ColourB(0..1)"));
-				
 		materialColour = new Appearance();
 		materialColour.setMaterial(new Material(col, black, col, black, 101f));
 		
