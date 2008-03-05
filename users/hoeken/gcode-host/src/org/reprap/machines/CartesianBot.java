@@ -1,4 +1,7 @@
+package org.reprap.machines;
+
 import javax.media.j3d.*;
+import java.io.IOException;
 
 import org.reprap.Attributes;
 import org.reprap.CartesianPrinter;
@@ -9,8 +12,8 @@ import org.reprap.devices.NullExtruder;
 import org.reprap.Extruder;
 import org.reprap.utilities.Debug;
 
-public abstract class CartesianBot implements CartesianPrinter {
-	
+public class CartesianBot implements CartesianPrinter
+{
 	/**
 	 * This is our previewer window
 	 */
@@ -133,6 +136,22 @@ public abstract class CartesianBot implements CartesianPrinter {
 	 */
 	public void calibrate() {
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.reprap.Printer#terminate()
+	 */
+	public void terminate() throws IOException {
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.reprap.Printer#isCancelled()
+	 */
+	public boolean isCancelled() {
+		if (previewer != null)
+			return previewer.isCancelled();
+		return false;
+	}
+
 	
 	public void loadExtruders()
 	{
@@ -338,6 +357,64 @@ public abstract class CartesianBot implements CartesianPrinter {
 	}
 	
 	/**
+	 * @param startX
+	 * @param startY
+	 * @param startZ
+	 * @param endX
+	 * @param endY
+	 * @param endZ
+	 * @throws ReprapException
+	 * @throws IOException
+	 */
+	public void printSegment(double startX, double startY, double startZ, 
+			double endX, double endY, double endZ, boolean turnOff) throws ReprapException, IOException {
+		moveTo(startX, startY, startZ, true, true);
+		printTo(endX, endY, endZ, turnOff);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.reprap.Printer#moveTo(double, double, double, boolean, boolean)
+	 */
+	public void moveTo(double x, double y, double z, boolean startUp, boolean endUp) throws ReprapException, IOException
+	{
+		if (isCancelled()) return;
+
+		totalDistanceMoved += segmentLength(x - currentX, y - currentY);
+		
+		//TODO - next bit needs to take account of startUp and endUp
+		if (z != currentZ)
+			totalDistanceMoved += Math.abs(currentZ - z);
+
+		currentX = x;
+		currentY = y;
+		currentZ = z;
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see org.reprap.Printer#printTo(double, double, double)
+	 */
+	public void printTo(double x, double y, double z, boolean turnOff) throws ReprapException, IOException
+	{		
+		if (previewer != null)
+			previewer.addSegment(currentX, currentY, currentZ, x, y, z);
+		
+		if (isCancelled())
+			return;
+
+		double distance = segmentLength(x - currentX, y - currentY);
+		if (z != currentZ)
+			distance += Math.abs(currentZ - z);
+			
+		totalDistanceExtruded += distance;
+		totalDistanceMoved += distance;
+		
+		currentX = x;
+		currentY = y;
+		currentZ = z;
+	}
+	
+	/**
 	 * @param enable
 	 * @throws IOException
 	 */
@@ -388,6 +465,18 @@ public abstract class CartesianBot implements CartesianPrinter {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.reprap.Printer#setZManual()
+	 */
+	public void setZManual() {
+		setZManual(0.0);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.reprap.Printer#setZManual(double)
+	 */
+	public void setZManual(double zeroPoint) {
+	}	
 	
 	//	public double getExtrusionSize() {
 	//		return extrusionSize;

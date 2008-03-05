@@ -10,6 +10,14 @@ import org.reprap.devices.GenericStepperMotor;
 import org.reprap.devices.pseudo.LinePrinter;
 import org.reprap.gui.CalibrateZAxis;
 
+import org.reprap.Attributes;
+import org.reprap.CartesianPrinter;
+import org.reprap.Preferences;
+import org.reprap.ReprapException;
+import org.reprap.gui.Previewer;
+import org.reprap.Extruder;
+import org.reprap.utilities.Debug;
+
 
 /**
  * 
@@ -480,7 +488,7 @@ public class CartesianSNAP extends CartesianBot {
 	 * @see org.reprap.Printer#initialise()
 	 */
 	public void initialise() throws Exception {
-		super.initialize();
+		super.initialise();
 
 		motorX.homeReset(fastSpeedXY);
 		motorY.homeReset(fastSpeedXY);
