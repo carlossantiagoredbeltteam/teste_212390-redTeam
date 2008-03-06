@@ -113,7 +113,7 @@ public class CartesianSNAP extends CartesianBot {
 		}
 	}
 	
-	public void loadExtruders()
+	public void loadExtruders(Preferences prefs)
 	{
 		for(int i = 0; i < extruderCount; i++)
 		{
@@ -274,7 +274,10 @@ public class CartesianSNAP extends CartesianBot {
 	public void terminate() throws Exception {
 		motorX.setIdle();
 		motorY.setIdle();
-		if (!excludeZ) motorZ.setIdle();
+		
+		if (!excludeZ)
+			motorZ.setIdle();
+			
 		extruders[extruder].setExtrusion(0);
 		extruders[extruder].setTemperature(0);
 	}

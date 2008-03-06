@@ -36,9 +36,9 @@ public class CartesianGCode extends CartesianBot {
 	 * @param prefs
 	 * @throws Exception
 	 */
-	public CartesianGCode(Preferences prefs) throws Exception {
+	public CartesianGCode(Preferences config) throws Exception {
 		
-		super(prefs);
+		super(config);
 
 		currentX = 0;
 		currentY = 0;
@@ -59,9 +59,6 @@ public class CartesianGCode extends CartesianBot {
 				file = System.out;
 			}
 		}
-		requestedSpeed = 0;
-		currentSpeed = 0;
-		temperature = config.loadInt("Extruder0_ExtrusionTemp(C)");
 	}
 
 	/* (non-Javadoc)
@@ -72,12 +69,9 @@ public class CartesianGCode extends CartesianBot {
 		if (isCancelled())
 			return;
 
-		super.moveTo();
+		super.moveTo(x, y, z, startUp, endUp);
 		
-		file.print("G0");
-		file.print(" X" + x + " Y" + y);
-		if (deltaZ != 0)
-			file.print(" Z" + z);
+		file.print("G0 X" + x + " Y" + y + " Z" + z);
 		file.println();
 	}
 
@@ -97,19 +91,9 @@ public class CartesianGCode extends CartesianBot {
 			distance += Math.abs(currentZ - z);
 		totalDistanceExtruded += distance;
 		totalDistanceMoved += distance;
-		
-		double deltaX = round(x - currentX);
-		double deltaY = round(y - currentY);
-		double deltaZ = round(z - currentZ);
 
-		file.print("G1");
-		file.print(" X" + deltaX + " Y" + deltaY);
-		if (deltaZ != 0) file.print(" Z" + deltaZ);
-		if (currentSpeed != requestedSpeed)
-		{
-			file.print(" F" + requestedSpeed);
-			currentSpeed = requestedSpeed;
-		}
+		file.print("G1 X" + x + " Y" + y + " Z" + z );
+		file.print(" F" + getFeedrate());
 		file.println();
 
 		currentX = x;
@@ -126,28 +110,6 @@ public class CartesianGCode extends CartesianBot {
 	 */
 	public int getSpeed() {
 		return 200;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.reprap.Printer#getFastSpeed()
-	 */
-	public int getFastSpeed() {
-		return getSpeed();
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.reprap.Printer#setSpeed(int)
-	 */
-	public void setSpeed(int speed) {
-		//	TODO: convert feedrate from RepRap host value to GCode value 
-		requestedSpeed = speed;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.reprap.Printer#setFastSpeed(int)
-	 */
-	public void setFastSpeed(int speed) {
-		file.println("RR: set fast speed: " + speed);
 	}
 
 	/* (non-Javadoc)
@@ -201,7 +163,9 @@ public class CartesianGCode extends CartesianBot {
 		// decide where to print in the beginning
 		// without messing up the rest of the Gcode
 		file.println("G91");
-		file.println("M104 P" + temperature);
+		
+		// Tell it to start warming up.
+		file.println("M104 P" + getExtruder().getTemperatureTarget());
 	}
 
 	/* (non-Javadoc)

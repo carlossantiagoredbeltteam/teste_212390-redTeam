@@ -195,6 +195,11 @@ public class SNAPExtruder extends GenericExtruder
 	 * The speed of movement in XY when depositing
 	 */
 	private int xySpeed; 
+
+	/**
+	 * The base speed of movement in XY in mm/minute
+	 */
+	private int xyFeedrate; 
 	
 	/**
 	 * Zero torque speed 
@@ -308,9 +313,11 @@ public class SNAPExtruder extends GenericExtruder
 	private int nozzleWipeFreq;
 
 	
-	public GenericExtruder(Communicator communicator, Address address, Preferences prefs, int extruderId) {
-		
-		super(communicator, address);
+	public SNAPExtruder(Communicator communicator, Address address, Preferences prefs, int extruderId) {
+
+//revert after cleaning up both files.		
+//		super(communicator, address);
+		super(communicator, address, prefs, extruderId);
 		
 		tH = new double[] {20, 20, 20}; // Bit of a hack - room temp
 		tHi = 0;
@@ -333,6 +340,7 @@ public class SNAPExtruder extends GenericExtruder
 		extrusionDelay = prefs.loadInt(prefName + "ExtrusionDelay(ms)");
 		coolingPeriod = prefs.loadInt(prefName + "CoolingPeriod(s)");
 		xySpeed = prefs.loadInt(prefName + "XYSpeed(0..255)");
+		xyFeedrate = prefs.loadInt(prefName + "XYFeedrate(mm/minute)");
 		t0 = prefs.loadInt(prefName + "t0(0..255)");
 		iSpeed = prefs.loadDouble(prefName + "InfillSpeed(0..1)");
 		oSpeed = prefs.loadDouble(prefName + "OutlineSpeed(0..1)");
@@ -1067,6 +1075,14 @@ public class SNAPExtruder extends GenericExtruder
     {
     	return xySpeed;
     }
+
+    /* (non-Javadoc)
+     * @see org.reprap.Extruder#getXYSpeed()
+     */
+    public int getXYFeedrate()
+    {
+    	return xyFeedrate;
+    }
     
     /* (non-Javadoc)
      * @see org.reprap.Extruder#getExtruderSpeed()
@@ -1222,16 +1238,25 @@ public class SNAPExtruder extends GenericExtruder
     {
     	return shortLength; 
     }
-    
+     
     /**
      * Factor (between 0 and 1) to use to set the speed for
      * short lines.
      * @return
      */
-    public double getShortSpeed()
+    public double getShortLineSpeedFactor()
     {
     	return shortSpeed; 
     }
+
+	/**
+	 * Feedrate for short lines in mm/minute
+	 * @return
+	 */
+	public double getShortLineFeedrate()
+	{
+		return getShortLineSpeedFactor() * getXYFeedrate();
+	}
     
     /**
      * Number of mm to overlap the hatching infill with the outline.  0 gives none; -ve will 

@@ -16,7 +16,7 @@ public class NullCartesianMachine extends CartesianBot {
 	/**
 	 * @param config
 	 */
-	public NullCartesianMachine(Preferences config) {
+	public NullCartesianMachine(Preferences config) throws Exception {
 		super(config);
 	}
 

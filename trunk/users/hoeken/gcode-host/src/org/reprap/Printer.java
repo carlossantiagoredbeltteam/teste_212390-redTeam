@@ -75,7 +75,7 @@ public interface Printer {
 	
 	/**
 	 * Select a specific material to print with
-	 * @param extr identifier of the material
+	 * @param extr identifier of the materialal
 	 */
 	public void selectExtruder(int extr);
 	
@@ -90,18 +90,25 @@ public interface Printer {
 	 */
 	public void dispose();
 	
-	
-//	public int getSpeed();
+	/**
+	 * @param speed
+	 */
+	public void setFeedrate(double feedrate);
 	
 	/**
 	 * @param speed
 	 */
-	public void setSpeed(int speed);
+	public void setFastFeedrate(double feedrate);
 	
 	/**
-	 * @param speed
+	 * @return the extrider fast speed
 	 */
-	public void setFastSpeed(int speed);
+	public double getFeedrate();
+	
+	/**
+	 * @return the extrider fast speed
+	 */
+	public double getFastFeedrateXY();
 	
 	/**
 	 * @return the extruder speed
@@ -134,11 +141,6 @@ public interface Printer {
 //	public double getAngleSpeedFactor();
 	
 	/**
-	 * @return the extrider fast speed
-	 */
-	public int getFastSpeed();
-	
-	/**
 	 * @throws Exception
 	 */
 	public void initialise() throws Exception;
@@ -162,6 +164,8 @@ public interface Printer {
 	 * @return the extruder for the printer
 	 */
 	public Extruder getExtruder();
+	
+	
 	public void stopExtruding() throws IOException;
 
 	/**
@@ -171,7 +175,7 @@ public interface Printer {
 	 * 
 	 * @throws IOException
 	 */
-	public void setZManual() throws IOException;
+	public void setZManual() throws Exception;
 
 	/**
 	 * Allow the user to manually calibrate the Z axis position to deal
@@ -181,7 +185,7 @@ public interface Printer {
 	 * @param zeroPoint The point the user selects will be treated as the
 	 * given Z value rather than 0.0 
 	 */
-	public void setZManual(double zeroPoint) throws IOException;
+	public void setZManual(double zeroPoint) throws Exception;
 	
 	/**
 	 * Returns the extrusion size for the currently selected material
