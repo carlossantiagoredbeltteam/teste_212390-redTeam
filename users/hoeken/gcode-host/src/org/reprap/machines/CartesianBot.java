@@ -12,7 +12,7 @@ import org.reprap.devices.NullExtruder;
 import org.reprap.Extruder;
 import org.reprap.utilities.Debug;
 
-public class CartesianBot implements CartesianPrinter
+public abstract class CartesianBot implements CartesianPrinter
 {
 	/**
 	 * This is our previewer window
@@ -43,6 +43,16 @@ public class CartesianBot implements CartesianPrinter
 	 * Maximum feedrate for X, Y, and Z axes
 	 */
 	protected double maxFeedrateX, maxFeedrateY, maxFeedrateZ;
+	
+	/**
+	* Current feedrate for the machine.
+	*/
+	protected double currentFeedrate;
+	
+	/**
+	* Feedrate for fast XY moves on the machine.
+	*/
+	protected double fastFeedrateXY;
 	
 	/**
 	 * Number of extruders on the 3D printer
@@ -79,33 +89,33 @@ public class CartesianBot implements CartesianPrinter
 	 */
 	private long delay;
 	
-	public CartesianBot(Preferences prefs) throws Exception
+	public CartesianBot(Preferences config) throws Exception
 	{
 		startTime = System.currentTimeMillis();
 		
 		//load axis prefs
-		int axes = prefs.loadInt("AxisCount");
+		int axes = config.loadInt("AxisCount");
 		if (axes != 3)
 			throw new Exception("A Cartesian Bot must contain 3 axes");
 			
 		//load extruder prefs
-		extruderCount = prefs.loadInt("NumberOfExtruders");
+		extruderCount = config.loadInt("NumberOfExtruders");
 		extruders = new Extruder[extruderCount];
 		if (extruderCount < 1)
 			throw new Exception("A Reprap printer must contain at least one extruder");
 		
 		//load our actual extruders.
-		loadExtruders();
+		loadExtruders(config);
 			
 		// TODO This should be from calibration
-		scaleX = prefs.loadDouble("XAxisScale(steps/mm)");
-		scaleY = prefs.loadDouble("YAxisScale(steps/mm)");
-		scaleZ = prefs.loadDouble("ZAxisScale(steps/mm)");
+		scaleX = config.loadDouble("XAxisScale(steps/mm)");
+		scaleY = config.loadDouble("YAxisScale(steps/mm)");
+		scaleZ = config.loadDouble("ZAxisScale(steps/mm)");
 		
 		// Load our maximum feedrate variables
-		maxFeedrateX = prefs.loadDouble("MaximumFeedrateX(mm/minute)");
-		maxFeedrateY = prefs.loadDouble("MaximumFeedrateY(mm/minute)");
-		maxFeedrateZ = prefs.loadDouble("MaximumFeedrateZ(mm/minute)");
+		maxFeedrateX = config.loadDouble("MaximumFeedrateX(mm/minute)");
+		maxFeedrateY = config.loadDouble("MaximumFeedrateY(mm/minute)");
+		maxFeedrateZ = config.loadDouble("MaximumFeedrateZ(mm/minute)");
 		
 		//init our stuff.
 		currentX = 0;
@@ -117,10 +127,8 @@ public class CartesianBot implements CartesianPrinter
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#initialise()
 	 */
-	public void initialise() throws Exception {
-		
-		super.initialize();
-		
+	public void initialise() throws Exception
+	{
 		if (previewer != null)
 			previewer.reset();
 				
@@ -138,9 +146,15 @@ public class CartesianBot implements CartesianPrinter
 	}
 	
 	/* (non-Javadoc)
+	 * @see org.reprap.Printer#calibrate()
+	 */
+	public void dispose() {
+	}
+	
+	/* (non-Javadoc)
 	 * @see org.reprap.Printer#terminate()
 	 */
-	public void terminate() throws IOException {
+	public void terminate() throws Exception {
 	}
 	
 	/* (non-Javadoc)
@@ -153,7 +167,7 @@ public class CartesianBot implements CartesianPrinter
 	}
 
 	
-	public void loadExtruders()
+	public void loadExtruders(Preferences config)
 	{
 		//instantiate extruders
 		extruderCount = config.loadInt("NumberOfExtruders");
@@ -161,12 +175,12 @@ public class CartesianBot implements CartesianPrinter
 		//use our factory.
 		extruders = new Extruder[extruderCount];
 		for(int i = 0; i < extruderCount; i++)
-			extruders[i] = extruderFactory(prefs, i);
+			extruders[i] = extruderFactory(config, i);
 
 		extruder = 0;
 	}
 	
-	public void extruderFactory(Preferences prefs, int count)
+	public Extruder extruderFactory(Preferences prefs, int count)
 	{
 		return new NullExtruder(prefs, count);
 	}
@@ -185,7 +199,7 @@ public class CartesianBot implements CartesianPrinter
 			extruder = materialIndex;
 
 		//todo: move back to cartesian snap
-		layerPrinter.changeExtruder(extruders[extruder]);
+		//layerPrinter.changeExtruder(extruders[extruder]);
 
 //		if (previewer != null)
 //			previewer.setExtruder(extruders[extruder]);
@@ -209,6 +223,11 @@ public class CartesianBot implements CartesianPrinter
 			}
 		}
 		System.err.println("selectExtruder() - extruder not found for: " + att.getMaterial());
+	}
+	
+	
+	public void stopExtruding() throws IOException {
+		
 	}
 	
 	/**
@@ -451,7 +470,7 @@ public class CartesianBot implements CartesianPrinter
 			int datumY = getExtruder().getNozzleWipeDatumY();
 			int stroke = getExtruder().getNozzleWipeStroke();
 			
-			setSpeed(fastSpeedXY);
+			setFeedrate(getFastFeedrateXY());
 			
 			// Moves nozzle over wiper
 			for (int w=0; w < freq; w++)
@@ -465,17 +484,38 @@ public class CartesianBot implements CartesianPrinter
 		}
 	}
 	
+	
+	public void setFeedrate(double feedrate)
+	{
+		currentFeedrate = feedrate;
+	}
+	
+	public void setFastFeedrate(double feedrate)
+	{
+		fastFeedrateXY = feedrate;
+	}
+	
+	public double getFeedrate()
+	{
+		return currentFeedrate;
+	}
+	
+	public double getFastFeedrateXY()
+	{
+		return fastFeedrateXY;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#setZManual()
 	 */
-	public void setZManual() {
+	public void setZManual() throws Exception {
 		setZManual(0.0);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#setZManual(double)
 	 */
-	public void setZManual(double zeroPoint) {
+	public void setZManual(double zeroPoint) throws Exception {
 	}	
 	
 	//	public double getExtrusionSize() {
@@ -501,4 +541,16 @@ public class CartesianBot implements CartesianPrinter
 		 * extruder on and starting to move it.
 		 */
 	//	public long getDelay() { return delay; }
+	
+	/* (non-Javadoc)
+	 * @see org.reprap.Printer#homeToZeroX()
+	 */
+	public void homeToZeroX() throws ReprapException, IOException {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.reprap.Printer#homeToZeroY()
+	 */
+	public void homeToZeroY() throws ReprapException, IOException {
+	}
 }

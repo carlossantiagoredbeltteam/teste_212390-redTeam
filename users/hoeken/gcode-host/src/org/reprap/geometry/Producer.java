@@ -195,7 +195,7 @@ public class Producer {
 		if (!subtractive)
 		{
 			Debug.d("Printing warmup segments, moving to (5,5)");
-			reprap.setSpeed(reprap.getExtruder().getXYSpeed());
+			reprap.setFeedrate(reprap.getExtruder().getXYFeedrate());
 			reprap.moveTo(5, 5, 0, false, false);
 			
 			// Workaround to get the thing to start heating up
@@ -205,11 +205,7 @@ public class Producer {
 			Debug.d("Printing warmup segments, printing to (5,50)");
 			reprap.moveTo(5, 25, 0, false, false);
 
-//todo: set to outline speed.
-//			reprap.setSpeed(
-//				LinePrinter.speedFix(reprap.getExtruder().getXYSpeed(), 
-//				reprap.getExtruder().getOutlineSpeed())
-//			);
+			reprap.setFeedrate(reprap.getExtruder().getOutlineFeedrate());
 
 			reprap.printTo(5, 60, 0, false);
 			Debug.d("Printing warmup segments, printing to (7,50)");
@@ -217,8 +213,8 @@ public class Producer {
 			Debug.d("Printing warmup segments, printing to (7,5)");
 			reprap.printTo(7, 25, 0, true);
 			Debug.d("Warmup complete");
-			reprap.setSpeed(reprap.getFastSpeed());
 			
+			reprap.setFeedrate(reprap.getFastFeedrateXY());
 		}
 		
 		// This should now split off layers one at a time
@@ -280,7 +276,7 @@ public class Producer {
 				reprap.getExtruder().setCooler(true);	// On with the fan.
 				//reprap.homeToZeroX();		// Seek (0,0)
 				//reprap.homeToZeroY();
-				reprap.setSpeed(reprap.getFastSpeed());
+				reprap.setFeedrate(reprap.getFastFeedrateXY());
 				reprap.moveTo(0, 0, z, true, true);
 				Thread.sleep(1000 * reprap.getExtruder().getCoolingPeriod());
 				reprap.getExtruder().setCooler(false);
@@ -293,7 +289,7 @@ public class Producer {
 				// The next layer will go where it wants to.
 				
 				//reprap.moveTo(storedX, storedY, z, true, true);
-				//reprap.setSpeed(reprap.getExtruder().getXYSpeed());
+				//reprap.setFeedrate(reprap.getExtruder().getXYFeedrate());
 				//reprap.moveTo(storedX, reprap.getY(), z, true, true);
 			}
 			

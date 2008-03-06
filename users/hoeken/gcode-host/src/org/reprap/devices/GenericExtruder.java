@@ -23,6 +23,48 @@ import javax.media.j3d.Material;
  */
 public class GenericExtruder extends Device implements Extruder
 {
+	
+	/**
+	 * API for firmware
+	 * Activate the extruder motor in forward direction 
+	 */
+	public static final byte MSG_SetActive = 1;
+	
+	/**
+	 *  Activate the extruder motor in reverse direction
+	 */
+	public static final byte MSG_SetActiveReverse = 2;
+	
+	/**
+	 * There is no material left to extrude 
+	 */
+	public static final byte MSG_IsEmpty = 8;
+	
+	/**
+	 * Set the temperature of the extruder
+	 */
+	public static final byte MSG_SetHeat = 9;
+	
+	/**
+	 * Get the temperature of the extruder 
+	 */
+	public static final byte MSG_GetTemp = 10;
+		
+	/**
+	 * Turn the cooler/fan on 
+	 */
+	public static final byte MSG_SetCooler = 11;
+	
+	/**
+	 * Set Vref 
+	 */
+	public static final byte MSG_SetVRef = 52;
+	
+	/**
+	 * Set the Tempscaler 
+	 */
+	public static final byte MSG_SetTempScaler = 53;
+	 
 	/**
 	 * Offset of 0 degrees centigrade from absolute zero
 	 */
@@ -65,6 +107,43 @@ public class GenericExtruder extends Device implements Extruder
 	 * 
 	 */
 	private boolean pollThreadExiting = false;
+	
+	/**
+	 * 
+	 */
+	private int vRefFactor = 7;
+	
+	/**
+	 * 
+	 */
+	private int tempScaler = 4;
+	
+	
+	/**
+	 * Thermistor beta
+	 */
+	private double beta; 
+	
+	/**
+	 * Thermistor resistance at 0C
+	 */
+	private double rz;  
+	
+	/**
+	 * Thermistor timing capacitor in farads
+	 */
+	private double cap;    
+
+	/**
+	 * Heater power gradient
+	 */
+	private double hm;   
+
+	/**
+	 * Heater power intercept
+	 * TODO: hb should probably be ambient temperature measured at this point
+	 */
+	private double hb;    
 
 	/**
 	 * Maximum motor speed (value between 0-255)
@@ -116,6 +195,11 @@ public class GenericExtruder extends Device implements Extruder
 	 * The speed of movement in XY when depositing
 	 */
 	private int xySpeed; 
+
+	/**
+	 * The base speed of movement in XY in mm/minute
+	 */
+	private int xyFeedrate; 
 	
 	/**
 	 * Zero torque speed 
@@ -239,6 +323,11 @@ public class GenericExtruder extends Device implements Extruder
 		myExtruderID = extruderId;
 		String prefName = "Extruder" + extruderId + "_";
 		
+		beta = prefs.loadDouble(prefName + "Beta(K)");
+		rz = prefs.loadDouble(prefName + "Rz(ohms)");
+		cap = prefs.loadDouble(prefName + "Capacitor(F)");
+		hm = prefs.loadDouble(prefName + "hm(C/pwr)");
+		hb = prefs.loadDouble(prefName + "hb(C)");
 		maxExtruderSpeed = prefs.loadInt(prefName + "MaxSpeed(0..255)");
 		extrusionSpeed = prefs.loadInt(prefName + "ExtrusionSpeed(0..255)");
 		extrusionTemp = prefs.loadDouble(prefName + "ExtrusionTemp(C)");
@@ -249,6 +338,7 @@ public class GenericExtruder extends Device implements Extruder
 		extrusionDelay = prefs.loadInt(prefName + "ExtrusionDelay(ms)");
 		coolingPeriod = prefs.loadInt(prefName + "CoolingPeriod(s)");
 		xySpeed = prefs.loadInt(prefName + "XYSpeed(0..255)");
+		xyFeedrate = prefs.loadInt(prefName + "XYFeedrate(mm/minute)");
 		t0 = prefs.loadInt(prefName + "t0(0..255)");
 		iSpeed = prefs.loadDouble(prefName + "InfillSpeed(0..1)");
 		oSpeed = prefs.loadDouble(prefName + "OutlineSpeed(0..1)");
@@ -272,7 +362,6 @@ public class GenericExtruder extends Device implements Extruder
 		Color3f col = new Color3f((float)prefs.loadDouble(prefName + "ColourR(0..1)"), 
 				(float)prefs.loadDouble(prefName + "ColourG(0..1)"), 
 				(float)prefs.loadDouble(prefName + "ColourB(0..1)"));
-				
 		materialColour = new Appearance();
 		materialColour.setMaterial(new Material(col, black, col, black, 101f));
 		
@@ -643,19 +732,36 @@ public class GenericExtruder extends Device implements Extruder
 	/**
 	 * The the outline speed and the infill speed [0,1]
 	 */
-	public double getInfillSpeed()
+	public double getInfillSpeedFactor()
 	{
 		return iSpeed;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.reprap.Extruder#getOutlineSpeed()
+	 * @see org.reprap.Extruder#getInfillFeedrate()
 	 */
-	public double getOutlineSpeed()
+	public double getInfillFeedrate()
+	{
+		return getInfillSpeedFactor() * getXYFeedrate();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.reprap.Extruder#getOutlineSpeedFactor()
+	 */
+	public double getOutlineSpeedFactor()
 	{
 		return oSpeed;
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see org.reprap.Extruder#getOutlineFeedrate()
+	 */
+	public double getOutlineFeedrate()
+	{
+		return getOutlineSpeedFactor() * getXYFeedrate();
+	}
+
+
 	/**
 	 * The length in mm to speed up when going round corners
 	 * (non-Javadoc)
@@ -984,6 +1090,14 @@ public class GenericExtruder extends Device implements Extruder
     {
     	return xySpeed;
     }
+
+    /* (non-Javadoc)
+     * @see org.reprap.Extruder#getXYSpeed()
+     */
+    public int getXYFeedrate()
+    {
+    	return xyFeedrate;
+    }
     
     /* (non-Javadoc)
      * @see org.reprap.Extruder#getExtruderSpeed()
@@ -1139,16 +1253,25 @@ public class GenericExtruder extends Device implements Extruder
     {
     	return shortLength; 
     }
-    
+     
     /**
      * Factor (between 0 and 1) to use to set the speed for
      * short lines.
      * @return
      */
-    public double getShortSpeed()
+    public double getShortLineSpeedFactor()
     {
     	return shortSpeed; 
     }
+
+	/**
+	 * Feedrate for short lines in mm/minute
+	 * @return
+	 */
+	public double getShortLineFeedrate()
+	{
+		return getShortLineSpeedFactor() * getXYFeedrate();
+	}
     
     /**
      * Number of mm to overlap the hatching infill with the outline.  0 gives none; -ve will 

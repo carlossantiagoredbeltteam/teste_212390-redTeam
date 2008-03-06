@@ -128,7 +128,6 @@ public interface Extruder {
 	public boolean isAvailable(); 
 
 	/**
-	 * The feedrate of X/Y movement
 	 * @return the XY feedrate in mm/minute
 	 */
 	public int getXYFeedrate();
