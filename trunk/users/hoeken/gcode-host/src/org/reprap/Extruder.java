@@ -4,9 +4,8 @@ import javax.media.j3d.Appearance;
 
 import org.reprap.Device;
 
-public interface Extruder {
-
-	
+public interface Extruder
+{
 	/**
 	 * Dispose of the extruder object 
 	 */
@@ -113,6 +112,10 @@ public interface Extruder {
 	 */
 	public double getAngleSpeedFactor();
 	
+	/**
+	 * @return the angle feedrate as a value in mm/minute
+	 */
+	public double getAngleFeedrate();
 	
 	/**
 	 * Turn the cooler (fan?) on or off

@@ -27,7 +27,7 @@ import java.io.PrintStream;
 /**
  *
  */
-public class CartesianGCode extends CartesianBot {
+public class CartesianGCode extends GenericCartesianPrinter {
 	
 	// Added by Blerik, needs JavaDoc
 	private java.io.PrintStream file;

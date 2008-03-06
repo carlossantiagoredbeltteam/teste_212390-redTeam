@@ -15,7 +15,7 @@ import org.reprap.comms.messages.VersionResponseMessage;
  * An "implemented" device refers to for example a UCB/Stepper motor combination, 
  * extruder or other. 
  */
-public abstract class Device {
+public class Device {
 
 	/**
 	 * Adress of the device. Identifier returned by the firmware in the device
@@ -77,7 +77,7 @@ public abstract class Device {
 	 * Method to lock communication to this device. 
 	 * <p>TODO: when called?</P> 
 	 */
-	protected void lock() {
+	public void lock() {
 		communicator.lock();
 	}
 	
@@ -86,7 +86,7 @@ public abstract class Device {
 	 * <p>TODO: when called?</P> 
 	 *  
 	 */
-	protected void unlock() {
+	public void unlock() {
 		communicator.unlock();
 	}
 	

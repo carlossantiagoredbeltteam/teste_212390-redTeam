@@ -12,7 +12,7 @@ import org.reprap.devices.NullExtruder;
 import org.reprap.Extruder;
 import org.reprap.utilities.Debug;
 
-public abstract class CartesianBot implements CartesianPrinter
+public abstract class GenericCartesianPrinter implements CartesianPrinter
 {
 	/**
 	 * This is our previewer window
@@ -89,7 +89,7 @@ public abstract class CartesianBot implements CartesianPrinter
 	 */
 	private long delay;
 	
-	public CartesianBot(Preferences config) throws Exception
+	public GenericCartesianPrinter(Preferences config) throws Exception
 	{
 		startTime = System.currentTimeMillis();
 		

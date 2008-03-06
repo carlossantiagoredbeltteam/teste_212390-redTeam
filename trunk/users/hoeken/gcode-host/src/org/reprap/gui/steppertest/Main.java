@@ -24,7 +24,7 @@ import org.reprap.Preferences;
 import org.reprap.comms.Communicator;
 import org.reprap.comms.snap.SNAPAddress;
 import org.reprap.comms.snap.SNAPCommunicator;
-import org.reprap.devices.GenericExtruder;
+import org.reprap.devices.SNAPExtruder;
 import org.reprap.gui.Utility;
 
 public class Main extends javax.swing.JDialog implements ChangeListener {
@@ -42,7 +42,7 @@ public class Main extends javax.swing.JDialog implements ChangeListener {
 	JCheckBox lockXYSpeed;
 	
 	StepperPanel motorX, motorY, motorZ;
-	GenericExtruder extruder = null;
+	SNAPExtruder extruder = null;
 	
 	Communicator communicator;
 	
@@ -90,7 +90,7 @@ public class Main extends javax.swing.JDialog implements ChangeListener {
 		
 		if (err.length() == 0)
 		{
-			extruder = new GenericExtruder(communicator,
+			extruder = new SNAPExtruder(communicator,
 					new SNAPAddress(Preferences.loadGlobalString("Extruder0_Address")),
 					Preferences.getGlobalPreferences(), 0);
 		
