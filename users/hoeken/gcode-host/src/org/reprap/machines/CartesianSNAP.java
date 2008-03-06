@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.reprap.comms.Communicator;
 import org.reprap.comms.snap.SNAPAddress;
 import org.reprap.comms.snap.SNAPCommunicator;
-import org.reprap.devices.GenericExtruder;
+import org.reprap.devices.SNAPExtruder;
 import org.reprap.devices.GenericStepperMotor;
 import org.reprap.devices.pseudo.LinePrinter;
 import org.reprap.gui.CalibrateZAxis;
@@ -25,7 +25,7 @@ import org.reprap.utilities.Debug;
  * extruders
  *
  */
-public class CartesianSNAP extends CartesianBot {
+public class CartesianSNAP extends GenericCartesianPrinter {
 	
 	/**
 	 * 
@@ -118,7 +118,7 @@ public class CartesianSNAP extends CartesianBot {
 		for(int i = 0; i < extruderCount; i++)
 		{
 			String prefix = "Extruder" + i + "_";
-			extruders[i] = new GenericExtruder(communicator,
+			extruders[i] = new SNAPExtruder(communicator,
 				new SNAPAddress(prefs.loadInt(prefix + "Address")), prefs, i);
 		}
 	}

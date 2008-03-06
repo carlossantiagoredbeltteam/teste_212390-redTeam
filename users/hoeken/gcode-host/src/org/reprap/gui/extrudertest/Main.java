@@ -20,7 +20,7 @@ import org.reprap.Preferences;
 import org.reprap.comms.Communicator;
 import org.reprap.comms.snap.SNAPAddress;
 import org.reprap.comms.snap.SNAPCommunicator;
-import org.reprap.devices.GenericExtruder;
+import org.reprap.devices.SNAPExtruder;
 import org.reprap.gui.Utility;
 
 /**
@@ -54,7 +54,7 @@ public class Main extends javax.swing.JDialog {
 	private JTextField desiredExtruder;
 	
 	private Communicator communicator;
-	private GenericExtruder extruders[];
+	private SNAPExtruder extruders[];
 	private int extruderCount;
 	private int extruder;
 	
@@ -86,14 +86,14 @@ public class Main extends javax.swing.JDialog {
 				myAddress);
 		
 		extruderCount = Preferences.loadGlobalInt("NumberOfExtruders");
-		extruders = new GenericExtruder[extruderCount];
+		extruders = new SNAPExtruder[extruderCount];
 		if (extruderCount < 1)
 			throw new Exception("A Reprap printer must contain at least one extruder");
 		
 		for(int i = 0; i < extruderCount; i++)
 		{
 			String prefix = "Extruder" + i + "_";
-			extruders[i] = new GenericExtruder(communicator,
+			extruders[i] = new SNAPExtruder(communicator,
 				new SNAPAddress(Preferences.loadGlobalInt(prefix + "Address")), 
 				Preferences.getGlobalPreferences(), i);
 		}

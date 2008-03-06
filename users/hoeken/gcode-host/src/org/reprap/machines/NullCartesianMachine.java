@@ -11,7 +11,7 @@ import org.reprap.devices.NullExtruder;
 /**
  *
  */
-public class NullCartesianMachine extends CartesianBot {
+public class NullCartesianMachine extends GenericCartesianPrinter {
 	
 	/**
 	 * @param config

@@ -70,10 +70,10 @@ class segmentSpeeds
 		p3 = Rr2Point.add(p2, Rr2Point.mul(a, fastLength));
 	}
 	
-	int speed(int currentSpeed, double angFac)
+	int speed(double currentFeedrate, double angFac)
 	{
 		double fac = (1 - 0.5*(1 + ca)*angFac);
-		return LinePrinter.speedFix(currentSpeed, fac);
+		return LinePrinter.speedFix((int)currentFeedrate, fac);
 	}
 }
 
@@ -146,7 +146,7 @@ public class LayerProducer {
 	/**
 	 * 
 	 */
-	private int currentSpeed;
+	private double currentFeedrate;
 	
 	/**
 	 * 
@@ -215,22 +215,25 @@ public class LayerProducer {
 	 */
 	private boolean shortLine(Rr2Point p) throws ReprapException, IOException
 	{
+		currentFeedrate = printer.getFeedrate();
+
 		double shortLen = printer.getExtruder().getShortLength();
 		if(shortLen < 0)
 			return false;
 		Rr2Point a = Rr2Point.sub(posNow(), p);
 		double amod = a.mod();
 		if(amod > shortLen) {
-			Debug.d("Long segment.  Current speed is: " + currentSpeed);
+			Debug.d("Long segment.  Current speed is: " + currentFeedrate);
 			return false;
 		}
-		printer.setSpeed(LinePrinter.speedFix(printer.getExtruder().getXYSpeed(), 
-				printer.getExtruder().getShortSpeed()));
+
+		printer.setFeedrate(printer.getExtruder().getShortLineFeedrate());
 		printer.printTo(p.x(), p.y(), z, true);
-		printer.setSpeed(currentSpeed);
-		Debug.d("Short segment at speed " +
-				LinePrinter.speedFix(currentSpeed, printer.getExtruder().getShortSpeed())
-				+" derived from speed: " + currentSpeed);
+
+		//switch back now.
+		printer.setFeedrate(currentFeedrate);
+		
+		Debug.d("Short segment at speed " + printer.getExtruder().getShortLineFeedrate() + " derived from feedrate: " + printer.getExtruder().getXYFeedrate());
 		return true;	
 	}
 	
@@ -243,14 +246,17 @@ public class LayerProducer {
 	 */
 	private void plot(Rr2Point first, Rr2Point second, boolean turnOff) throws ReprapException, IOException
 	{
-		if (printer.isCancelled()) return;
+		if (printer.isCancelled())
+			return;
 		
 		if(shortLine(first))
 			return;
 		
 		double speedUpLength = printer.getExtruder().getAngleSpeedUpLength();
 		if(speedUpLength > 0)
-		{
+		{	
+			currentFeedrate = printer.getFeedrate();
+			
 			segmentSpeeds ss = new segmentSpeeds(posNow(), first, second, 
 					speedUpLength);
 			if(ss.abandon)
@@ -260,17 +266,24 @@ public class LayerProducer {
 
 			if(ss.plotMiddle)
 			{
-				int straightSpeed = LinePrinter.speedFix(currentSpeed, (1 - 
+				/*
+				//old speed method
+				int straightSpeed = LinePrinter.speedFix(currentFeedrate, (1 - 
 						printer.getExtruder().getAngleSpeedFactor()));
 				printer.setSpeed(straightSpeed);
+				*/
+				
+				printer.setFeedrate(printer.getExtruder().getAngleFeedrate());
 				printer.printTo(ss.p2.x(), ss.p2.y(), z, false);
 			}
 
-			printer.setSpeed(ss.speed(currentSpeed, printer.getExtruder().getAngleSpeedFactor()));
+			//TODO: not entirely sure how to code this.
+			printer.setFeedrate(ss.speed(currentFeedrate, printer.getExtruder().getAngleSpeedFactor()));
 			printer.printTo(ss.p3.x(), ss.p3.y(), z, true);
 			pos = ss.p3;
-		// Leave speed set for the start of the next line.
-		} else
+			// Leave speed set for the start of the next line.
+		}
+		else
 			printer.printTo(first.x(), first.y(), z, true);
 	}
 
@@ -289,7 +302,7 @@ public class LayerProducer {
 		
 		if(startUp)
 		{
-			printer.setSpeed(printer.getFastSpeed());
+			printer.setFeedrate(printer.getFastFeedrateXY());
 			printer.moveTo(first.x(), first.y(), z, startUp, endUp);
 			return;
 		}
@@ -306,11 +319,12 @@ public class LayerProducer {
 
 			if(ss.plotMiddle)
 			{
-				printer.setSpeed(currentSpeed);
+				printer.setFeedrate(currentFeedrate);
 				printer.moveTo(ss.p2.x(), ss.p2.y(), z, startUp, startUp);
 			}
 
-			printer.setSpeed(ss.speed(currentSpeed, printer.getExtruder().getAngleSpeedFactor()));
+			//TODO: not sure exactly how to do this either.
+			printer.setFeedrate(ss.speed(currentFeedrate, printer.getExtruder().getAngleSpeedFactor()));
 			printer.moveTo(ss.p3.x(), ss.p3.y(), z, startUp, endUp);
 			pos = ss.p3;
 			// Leave speed set for the start of the next movement.
@@ -345,15 +359,10 @@ public class LayerProducer {
 			return;
 		}
 
+		double outlineFeedrate = printer.getExtruder().getOutlineFeedrate();
+		double infillFeedrate = printer.getExtruder().getInfillFeedrate();
 		
 		Attributes att = p.getAttributes();
-		
-		int baseSpeed = att.getExtruder(printer.getExtruders()).getXYSpeed();
-		int outlineSpeed = LinePrinter.speedFix(baseSpeed, 
-				att.getExtruder(printer.getExtruders()).getOutlineSpeed());
-		int infillSpeed = LinePrinter.speedFix(baseSpeed, 
-				att.getExtruder(printer.getExtruders()).getInfillSpeed());
-			
 		
 		printer.selectExtruder(att);
 		
@@ -368,21 +377,23 @@ public class LayerProducer {
 		
 		if (printer.isCancelled()) return;
 		
-		printer.setSpeed(printer.getFastSpeed());
+		printer.setFeedrate(printer.getFastFeedrateXY());
 		move(p.point(0), p.point(1), true, false);
 
 		plot(p.point(0), p.point(1), false);
+		
 		// Print any lead-in.
 		printer.printStartDelay(printer.getExtruder().getExtrusionDelay());
 		
 		if(outline)
 		{
-			printer.setSpeed(outlineSpeed);
-			currentSpeed = outlineSpeed;			
-		} else
+			printer.setFeedrate(outlineFeedrate);
+			currentFeedrate = outlineFeedrate;			
+		}
+		else
 		{
-			printer.setSpeed(infillSpeed);
-			currentSpeed = infillSpeed;			
+			printer.setFeedrate(infillFeedrate);
+			currentFeedrate = infillFeedrate;			
 		}
 		
 		if(outline)
