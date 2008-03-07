@@ -30,17 +30,12 @@ public class GCodeWriter
 	/**
 	* this is for doing easy writes
 	*/
-	private java.io.PrintStream outStream;
-	
-	/**
-	 * this is our write handle
-	 */
-	private OutputStream writeStream;
+	private PrintStream outStream;
 	
 	/**
 	 * this is our read handle
 	 */
-	private InputStream readStream;
+	private InputStream inStream;
 
 	/**
 	* are we printing to a file, or serial?
@@ -81,12 +76,16 @@ public class GCodeWriter
 		commands = new Vector();
 	}
 	
-	public void dispose()
+	public void finish()
 	{
+		Debug.d("disposing of gcodewriter.");
+		
+		//outStream.flush();
+		
 		try
 		{
-			if (readStream != null)
-				readStream.close();
+			if (inStream != null)
+				inStream.close();
 
 			if (outStream != null)
 				outStream.close();
@@ -114,8 +113,10 @@ public class GCodeWriter
 			outStream.println(cmd);
 		}
 		
+		//Debug.d(cmd);
+		
 		//make sure it gets written right now.
-		outStream.flush();
+		//outStream.flush();
 	}
 	
 	public void openSerialConnection(String portName)
@@ -170,8 +171,8 @@ public class GCodeWriter
 
 		//create our steams
 		try {
-			writeStream = port.getOutputStream();
-			readStream = port.getInputStream();
+			OutputStream writeStream = port.getOutputStream();
+			inStream = port.getInputStream();
 			outStream = new PrintStream(writeStream);
 		} catch (IOException e) {
 			Debug.d("Error opening serial port stream.");
@@ -187,6 +188,7 @@ public class GCodeWriter
 	
 	public void openFile(String filename)
 	{
+		Debug.d("Opening file for GCode output: " + filename);
 		if (filename.equals("stdout"))
 		{
 			outStream = System.out;
@@ -195,10 +197,12 @@ public class GCodeWriter
 		{
 			try
 			{
-				writeStream = new FileOutputStream(filename);
-				outStream = new PrintStream(writeStream);
+				Debug.d("opening: " + filename);
+				
+				FileOutputStream fileStream = new FileOutputStream(filename);
+				outStream = new PrintStream(fileStream);
 			} catch (FileNotFoundException e) {
-				System.err.println("File '" + filename + "' not found, printing to stdout");
+				Debug.d("File '" + filename + "' not found, printing to stdout");
 				outStream = System.out;
 			}
 		}
@@ -213,7 +217,7 @@ public class GCodeWriter
 		int result = chooser.showSaveDialog(null);
 		if (result == JFileChooser.APPROVE_OPTION)
 		{
-			String name = chooser.getSelectedFile().getName();
+			String name = chooser.getSelectedFile().getAbsolutePath();
 			openFile(name);
 		}
 		else

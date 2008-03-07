@@ -87,7 +87,7 @@ public abstract class GenericExtruder implements Extruder
 	/**
 	 * The base speed of movement in XY in mm/minute
 	 */
-	protected int xyFeedrate; 
+	protected double xyFeedrate; 
 	
 	/**
 	 * Zero torque speed 
@@ -212,7 +212,7 @@ public abstract class GenericExtruder implements Extruder
 		extrusionOverRun = prefs.loadDouble(prefName + "ExtrusionOverRun(mm)");
 		extrusionDelay = prefs.loadInt(prefName + "ExtrusionDelay(ms)");
 		coolingPeriod = prefs.loadInt(prefName + "CoolingPeriod(s)");
-		xyFeedrate = prefs.loadInt(prefName + "XYFeedrate(mm/minute)");
+		xyFeedrate = prefs.loadDouble(prefName + "XYFeedrate(mm/minute)");
 		t0 = prefs.loadInt(prefName + "t0(0..255)");
 		iSpeed = prefs.loadDouble(prefName + "InfillSpeed(0..1)");
 		oSpeed = prefs.loadDouble(prefName + "OutlineSpeed(0..1)");
@@ -380,7 +380,7 @@ public abstract class GenericExtruder implements Extruder
     /* (non-Javadoc)
      * @see org.reprap.Extruder#getXYSpeed()
      */
-    public int getXYFeedrate()
+    public double getXYFeedrate()
     {
     	return xyFeedrate;
     }

@@ -133,7 +133,7 @@ public interface Extruder
 	/**
 	 * @return the XY feedrate in mm/minute
 	 */
-	public int getXYFeedrate();
+	public double getXYFeedrate();
  
     /**
      * @return the extruder speeds

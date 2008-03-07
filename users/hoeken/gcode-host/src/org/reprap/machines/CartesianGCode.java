@@ -18,6 +18,7 @@ import org.reprap.gui.Previewer;
 import org.reprap.Extruder;
 import org.reprap.comms.GCodeWriter;
 import org.reprap.utilities.Debug;
+import org.reprap.devices.GCodeExtruder;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -43,7 +44,6 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		
 		super(config);
 
-
 		String portname = config.loadString("Port(name)");
 		boolean useSerialPort = config.loadBool("GCodeUseSerial");
 
@@ -52,6 +52,18 @@ public class CartesianGCode extends GenericCartesianPrinter {
 			gcode.openSerialConnection(portname);
 		else
 			gcode.openFile();
+	}
+	
+	public void loadExtruders(Preferences config)
+	{
+		extruders = new GCodeExtruder[extruderCount];
+		
+		super.loadExtruders(config);
+	}
+	
+	public Extruder extruderFactory(Preferences prefs, int count)
+	{
+		return new GCodeExtruder(gcode, prefs, count);
 	}
 
 	/* (non-Javadoc)
@@ -64,7 +76,11 @@ public class CartesianGCode extends GenericCartesianPrinter {
 
 		super.moveTo(x, y, z, startUp, endUp);
 		
-		gcode.queue("G0 X" + x + " Y" + y + " Z" + z);
+		double gx = round(x, 4);
+		double gy = round(y, 4);
+		double gz = round(z, 4);
+		
+		gcode.queue("G0 X" +gx + " Y" + gy + " Z" + gz);
 	}
 
 	/* (non-Javadoc)
@@ -84,7 +100,12 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		totalDistanceExtruded += distance;
 		totalDistanceMoved += distance;
 
-		gcode.queue("G1 X" + x + " Y" + y + " Z" + z + " F" + getFeedrate());
+		double gx = round(x, 4);
+		double gy = round(y, 4);
+		double gz = round(z, 4);
+		double feed = round(getFeedrate(), 4);
+
+		gcode.queue("G1 X" + gx + " Y" + gy + " Z" + gz + " F" + feed);
 
 		currentX = x;
 		currentY = y;
@@ -133,7 +154,7 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		gcode.queue("M104 P0");
 		
 		//write/close our file/serial port
-		gcode.dispose();
+		gcode.finish();
 	}
 
 
@@ -141,6 +162,7 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	 * @see org.reprap.Printer#initialise()
 	 */
 	public void initialise() {
+		
 		if (previewer != null)
 			previewer.reset();
 		
@@ -187,5 +209,12 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	 */
 	public void homeToZeroY() throws ReprapException, IOException {
 		gcode.queue("G0 Y-999");
+	}
+	
+	public double round(double c, double d)
+	{
+		double power = Math.pow(10.0, d);
+		
+		return Math.round(c*power)/power;
 	}
 }
