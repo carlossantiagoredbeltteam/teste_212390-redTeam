@@ -16,6 +16,7 @@ import org.reprap.Preferences;
 import org.reprap.ReprapException;
 import org.reprap.gui.Previewer;
 import org.reprap.Extruder;
+import org.reprap.comms.GCodeWriter;
 import org.reprap.utilities.Debug;
 
 import java.io.FileNotFoundException;
@@ -29,8 +30,10 @@ import java.io.PrintStream;
  */
 public class CartesianGCode extends GenericCartesianPrinter {
 	
-	// Added by Blerik, needs JavaDoc
-	private java.io.PrintStream file;
+	/**
+	* our class to send gcode instructions
+	*/
+	GCodeWriter gcode;
 	
 	/**
 	 * @param prefs
@@ -40,25 +43,15 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		
 		super(config);
 
-		currentX = 0;
-		currentY = 0;
-		currentZ = 0;
-		
-		// I open the file here because I have config here
-		// and it seems like the host recreates the writer
-		// for each print job
-		String filename = config.loadString("Port(name)");
-		if (filename.equals("stdout")) {
-			file = System.out;
-		} else {
-			try {
-				OutputStream out = new FileOutputStream(filename);
-				file = new PrintStream(out);
-			} catch (FileNotFoundException e) {
-				System.err.println("Problem with filename, printing to stdout");
-				file = System.out;
-			}
-		}
+
+		String portname = config.loadString("Port(name)");
+		boolean useSerialPort = config.loadBool("GCodeUseSerial");
+
+		gcode = new GCodeWriter();
+		if (useSerialPort)
+			gcode.openSerialConnection(portname);
+		else
+			gcode.openFile();
 	}
 
 	/* (non-Javadoc)
@@ -71,8 +64,7 @@ public class CartesianGCode extends GenericCartesianPrinter {
 
 		super.moveTo(x, y, z, startUp, endUp);
 		
-		file.print("G0 X" + x + " Y" + y + " Z" + z);
-		file.println();
+		gcode.queue("G0 X" + x + " Y" + y + " Z" + z);
 	}
 
 	/* (non-Javadoc)
@@ -92,9 +84,7 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		totalDistanceExtruded += distance;
 		totalDistanceMoved += distance;
 
-		file.print("G1 X" + x + " Y" + y + " Z" + z );
-		file.print(" F" + getFeedrate());
-		file.println();
+		gcode.queue("G1 X" + x + " Y" + y + " Z" + z + " F" + getFeedrate());
 
 		currentX = x;
 		currentY = y;
@@ -102,7 +92,7 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	}
 	
 	public void stopExtruding() {
-		file.println("M103");
+		gcode.queue("M103");
 	}
 
 	/**
@@ -134,17 +124,16 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		// TODO: fix this to be more flexible
 		
 		// Fan off
-		file.println("M9");
+		gcode.queue("M9");
 		
 		// Extruder off
-		file.println("M103");
+		gcode.queue("M103");
 		
 		// heater off
-		file.println("M104 P0");
+		gcode.queue("M104 P0");
 		
-		if (!file.equals(System.out)) {
-			file.close();
-		}
+		//write/close our file/serial port
+		gcode.dispose();
 	}
 
 
@@ -157,22 +146,22 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		
 		// TODO: Fix this to be more flexible
 		// TODO: check if RapRap uses mm as scale
-		file.println("G21");
+		gcode.queue("G21");
 		
 		// Set incremental positioning, so you can
 		// decide where to print in the beginning
 		// without messing up the rest of the Gcode
-		file.println("G91");
+		gcode.queue("G91");
 		
 		// Tell it to start warming up.
-		file.println("M104 P" + getExtruder().getTemperatureTarget());
+		gcode.queue("M104 P" + getExtruder().getTemperatureTarget());
 	}
 
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#setCooling(boolean)
 	 */
 	public void setCooling(boolean enable) {
-		file.println("RR: set cooling: " + enable);
+		Debug.d("RR: set cooling: " + enable);
 	}
 
 
@@ -181,7 +170,7 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	 */
 	public void printStartDelay(long msDelay) {
 		// This would extrude for the given interval to ensure polymer flow.
-		file.println("M101");
+		gcode.queue("M101");
 		
 		//TODO: add dwell command.
 	}
@@ -190,13 +179,13 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	 * @see org.reprap.Printer#homeToZeroX()
 	 */
 	public void homeToZeroX() throws ReprapException, IOException {
-		file.println("G0 X-999");
+		gcode.queue("G0 X-999");
 	}
 
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#homeToZeroY()
 	 */
 	public void homeToZeroY() throws ReprapException, IOException {
-		file.println("G0 Y-999");
+		gcode.queue("G0 Y-999");
 	}
 }
