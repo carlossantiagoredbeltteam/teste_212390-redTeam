@@ -100,11 +100,11 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 			
 		//load extruder prefs
 		extruderCount = config.loadInt("NumberOfExtruders");
-		extruders = new Extruder[extruderCount];
 		if (extruderCount < 1)
 			throw new Exception("A Reprap printer must contain at least one extruder");
 		
 		//load our actual extruders.
+		extruders = new NullExtruder[extruderCount];
 		loadExtruders(config);
 			
 		// TODO This should be from calibration
@@ -169,11 +169,6 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 	
 	public void loadExtruders(Preferences config)
 	{
-		//instantiate extruders
-		extruderCount = config.loadInt("NumberOfExtruders");
-
-		//use our factory.
-		extruders = new Extruder[extruderCount];
 		for(int i = 0; i < extruderCount; i++)
 			extruders[i] = extruderFactory(config, i);
 

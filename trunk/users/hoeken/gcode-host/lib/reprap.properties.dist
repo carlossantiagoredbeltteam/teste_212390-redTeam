@@ -1,5 +1,14 @@
 #Mon Sep 10 15:07:13 BST 2007
 #Reprap properties http://reprap.org/
+#
+#new config options:
+# GCodeUseSerial
+# MaximumFeedrateX(mm/minute)
+# MaximumFeedrateY(mm/minute)
+# MaximumFeedrateZ(mm/minute)
+# Extruder0_XYFeedrate(mm/minute)
+#
+#
 AxisCount=3
 BackColourB(0..1)=0.9
 BackColourG(0..1)=0.9
@@ -88,6 +97,7 @@ Extruder1_t0(0..255)=0
 FastSpeed(0..255)=200
 FrontFactor=0.001
 Geometry=nullcartesian
+GCodeUseSerial=false
 IdleZAxis=true
 MachineColourB(0..1)=0.3
 MachineColourG(0..1)=0.4

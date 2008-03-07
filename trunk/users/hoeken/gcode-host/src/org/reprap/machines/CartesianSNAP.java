@@ -113,14 +113,11 @@ public class CartesianSNAP extends GenericCartesianPrinter {
 		}
 	}
 	
-	public void loadExtruders(Preferences prefs)
+	public void loadExtruders(Preferences config)
 	{
-		for(int i = 0; i < extruderCount; i++)
-		{
-			String prefix = "Extruder" + i + "_";
-			extruders[i] = new SNAPExtruder(communicator,
-				new SNAPAddress(prefs.loadInt(prefix + "Address")), prefs, i);
-		}
+		extruders = new SNAPExtruder[extruderCount];
+		
+		super.loadExtruders(config);
 	}
 
 	/* (non-Javadoc)
