@@ -52,6 +52,8 @@ public class CartesianGCode extends GenericCartesianPrinter {
 			gcode.openSerialConnection(portname);
 		else
 			gcode.openFile();
+			
+		loadExtruders(config);
 	}
 	
 	public void loadExtruders(Preferences config)
@@ -112,17 +114,6 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		currentZ = z;
 	}
 	
-	public void stopExtruding() {
-		gcode.queue("M103");
-	}
-
-	/**
-	 * @return speed of the extruder
-	 */
-	public int getSpeed() {
-		return 200;
-	}
-
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#getSpeedZ()
 	 */
@@ -135,7 +126,7 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	 */
 	public void setSpeedZ(int speed) {
 		// TODO: MiniMug prints this, but I don't know what to do with it
-		//file.println("RR: set speed Z: " + speed);
+		Debug.d("RR: set speed Z: " + speed);
 	}
 
 	/* (non-Javadoc)
@@ -144,14 +135,19 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	public void dispose() {
 		// TODO: fix this to be more flexible
 		
-		// Fan off
-		gcode.queue("M9");
-		
-		// Extruder off
-		gcode.queue("M103");
-		
-		// heater off
-		gcode.queue("M104 P0");
+		try
+		{
+			// Fan off
+			getExtruder().setCooler(false);
+
+			// Extruder off
+			getExtruder().setExtrusion(0);
+
+			// heater off
+			getExtruder().heatOff();
+		} catch(Exception e){
+			//oops
+		}
 		
 		//write/close our file/serial port
 		gcode.finish();
@@ -163,11 +159,7 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	 */
 	public void initialise() {
 		
-		if (previewer != null)
-			previewer.reset();
-		
-		// TODO: Fix this to be more flexible
-		// TODO: check if RapRap uses mm as scale
+		// TODO: Fix this to be more flexible - howso?
 		gcode.queue("G21");
 		
 		// Set incremental positioning, so you can
@@ -175,32 +167,35 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		// without messing up the rest of the Gcode
 		gcode.queue("G91");
 		
-		// Tell it to start warming up.
-		gcode.queue("M104 P" + getExtruder().getTemperatureTarget());
+		try	{
+			super.initialise();
+		} catch (Exception E) {
+			Debug.d("Initialization error.");
+		}
 	}
-
-	/* (non-Javadoc)
-	 * @see org.reprap.Printer#setCooling(boolean)
-	 */
-	public void setCooling(boolean enable) {
-		Debug.d("RR: set cooling: " + enable);
-	}
-
 
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#printStartDelay(long)
 	 */
 	public void printStartDelay(long msDelay) {
 		// This would extrude for the given interval to ensure polymer flow.
-		gcode.queue("M101");
+		getExtruder().startExtruding();
+		gcode.queue("G4 P" + msDelay);
+	}
+
+	public void home() {
+		super.home();
 		
-		//TODO: add dwell command.
+		gcode.queue("G0 X-999 Y-999");
+		gcode.queue("G0 Z-999");
+		gcode.queue("G92");
 	}
 
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#homeToZeroX()
 	 */
 	public void homeToZeroX() throws ReprapException, IOException {
+		super.homeToZeroX();
 		gcode.queue("G0 X-999");
 	}
 
@@ -208,7 +203,16 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	 * @see org.reprap.Printer#homeToZeroY()
 	 */
 	public void homeToZeroY() throws ReprapException, IOException {
+		super.homeToZeroY();
 		gcode.queue("G0 Y-999");
+	}
+
+	/* (non-Javadoc)
+	 * @see org.reprap.Printer#homeToZeroY()
+	 */
+	public void homeToZeroZ() throws ReprapException, IOException {
+		super.homeToZeroZ();
+		gcode.queue("G0 Z-999");
 	}
 	
 	public double round(double c, double d)

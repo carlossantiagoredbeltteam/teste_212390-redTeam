@@ -489,14 +489,22 @@ public class CartesianSNAP extends GenericCartesianPrinter {
 	 */
 	public void initialise() throws Exception {
 		super.initialise();
+	}
+	
+	public void home()
+	{
+		try
+		{
+			motorX.homeReset(fastSpeedXY);
+			motorY.homeReset(fastSpeedXY);
+		
+			if (!excludeZ)
+				motorZ.homeReset(speedZ);
 
-		motorX.homeReset(fastSpeedXY);
-		motorY.homeReset(fastSpeedXY);
-		
-		if (!excludeZ)
-			motorZ.homeReset(speedZ);
-		
-		currentX = currentY = currentZ = 0.0;
+			super.home();
+		} catch (Exception e) {
+			Debug.d("Error homing");
+		}
 	}
 	
 	/* (non-Javadoc)

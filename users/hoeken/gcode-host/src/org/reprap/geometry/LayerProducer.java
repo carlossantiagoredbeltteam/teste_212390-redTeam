@@ -223,7 +223,7 @@ public class LayerProducer {
 		Rr2Point a = Rr2Point.sub(posNow(), p);
 		double amod = a.mod();
 		if(amod > shortLen) {
-			Debug.d("Long segment.  Current speed is: " + currentFeedrate);
+//			Debug.d("Long segment.  Current speed is: " + currentFeedrate);
 			return false;
 		}
 
@@ -233,7 +233,7 @@ public class LayerProducer {
 		//switch back now.
 		printer.setFeedrate(currentFeedrate);
 		
-		Debug.d("Short segment at speed " + printer.getExtruder().getShortLineFeedrate() + " derived from feedrate: " + printer.getExtruder().getXYFeedrate());
+//		Debug.d("Short segment at speed " + printer.getExtruder().getShortLineFeedrate() + " derived from feedrate: " + printer.getExtruder().getXYFeedrate());
 		return true;	
 	}
 	
@@ -278,7 +278,7 @@ public class LayerProducer {
 			}
 
 			//TODO: not entirely sure how to code this.
-			printer.setFeedrate(ss.speed(currentFeedrate, printer.getExtruder().getAngleSpeedFactor()));
+			printer.setFeedrate(printer.getExtruder().getAngleFeedrate());
 			printer.printTo(ss.p3.x(), ss.p3.y(), z, true);
 			pos = ss.p3;
 			// Leave speed set for the start of the next line.
@@ -405,14 +405,14 @@ public class LayerProducer {
 				
 				if (printer.isCancelled())
 				{
-					printer.stopExtruding();
+					printer.getExtruder().stopExtruding();
 					move(posNow(), posNow(), true, true);
 					return;
 				}
 				
 				if(j > stopExtruding)
 				{
-					printer.stopExtruding();
+					printer.getExtruder().stopExtruding();
 					move(p.point(i), next, false, false);
 				} else
 					plot(p.point(i), next, false);
@@ -425,14 +425,14 @@ public class LayerProducer {
 				
 				if (printer.isCancelled())
 				{
-					printer.stopExtruding();
+					printer.getExtruder().stopExtruding();
 					move(posNow(), posNow(), true, true);
 					return;
 				}
 				
 				if(i > stopExtruding)
 				{
-					printer.stopExtruding();
+					printer.getExtruder().stopExtruding();
 					move(p.point(i), next, false, false);
 				} else
 					plot(p.point(i), next, false);
@@ -453,7 +453,7 @@ public class LayerProducer {
 //				plot(p.point(i), next, false);
 //			else
 //			{
-//				printer.stopExtruding();
+//				printer.getExtruder().stopExtruding();
 //				if(f == gapMaterial)
 //				{
 //					if(j == leng)
