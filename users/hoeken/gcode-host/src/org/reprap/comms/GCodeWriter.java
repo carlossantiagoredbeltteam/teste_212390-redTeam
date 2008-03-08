@@ -64,7 +64,7 @@ public class GCodeWriter
 	/**
 	* the size of the buffer on the GCode host
 	*/
-	private int maxBufferSize = 256;
+	private int maxBufferSize = 128;
 	
 	/**
 	* the amount of data we've sent and is in the buffer.
@@ -124,11 +124,32 @@ public class GCodeWriter
 			//will it fit into our buffer?
 			if (bufferSize + next.length() < maxBufferSize)
 			{
-				//send it
-				outStream.println(next);
+				//send it a byte at a time.
+				for (int i=0; i<next.length(); i++)
+				{
+					outStream.print(next.charAt(i));
+					outStream.flush();					
+
+					//wait 5us between bytes.
+					try{
+						Thread.sleep(5);
+					} catch (Exception e){}
+				}
+
+				//newline is our delimiter.
+				outStream.print('\n');
+				outStream.flush();					
+				
+				//wait between commands.
+				try{
+					Thread.sleep(10);
+				} catch (Exception e){}
 				
 				//record it in our buffer tracker.
 				nextCommandToSend++;
+
+				Debug.d("Buffer: " + next + "(" + bufferSize + " + " + (next.length()+1) + " = " + (bufferSize + next.length() + 1) + ")");
+
 				bufferSize += next.length() + 1;
 			}
 		}
@@ -156,17 +177,22 @@ public class GCodeWriter
 					result += c;
 				
 					//is it a done command?
-					if (result.startsWith("done"))
+					if (c == '\n')
 					{
-						cmd = (String)commands.get(currentCommand);
-						bufferSize -= cmd.length() - 1;
-						currentCommand++;
+						if (result.startsWith("ok:"))
+						{
+							cmd = (String)commands.get(currentCommand);
+
+							Debug.d("Got: " + result + "(" + bufferSize + " - " + (cmd.length() + 1) + " = " + (bufferSize - (cmd.length() + 1)) + ")");
+
+							bufferSize -= cmd.length() + 1;
+							currentCommand++;
+						}
+						else
+							Debug.d(result);
+							
 						result = "";
 					}
-					
-					//if its a newline, restart.
-					if (c == '\n')
-						result = "";
 				}					
 			} catch (IOException e) {
 				break;
