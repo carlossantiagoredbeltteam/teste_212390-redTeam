@@ -243,6 +243,15 @@ public class CartesianSNAP extends GenericCartesianPrinter {
 	{
 		layerPrinter.stopExtruding();
 	}
+	
+	public void delay(long millis)
+	{
+		try{
+			Thread.sleep(millis);
+		} catch (Exception e) {
+			
+		}
+	}
 
 	/* Move to zero stop on X axis.
 	 * (non-Javadoc)

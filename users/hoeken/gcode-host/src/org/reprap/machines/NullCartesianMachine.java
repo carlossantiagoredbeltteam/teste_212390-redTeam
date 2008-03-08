@@ -66,4 +66,8 @@ public class NullCartesianMachine extends GenericCartesianPrinter {
 		// intentionally do nothing.
 		// This would extrude for the given interval to ensure polymer flow.
 	}
+	
+	public void delay(long millis) {
+		
+	}
 }

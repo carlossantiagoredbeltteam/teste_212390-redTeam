@@ -55,6 +55,8 @@ public interface Printer {
 	
 	public void home();
 	
+	public void delay(long millis);
+	
 	/**
 	 * Select a specific material to print with
 	 * @param attributes with name of the material

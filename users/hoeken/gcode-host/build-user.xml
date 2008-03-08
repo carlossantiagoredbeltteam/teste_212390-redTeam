@@ -23,7 +23,7 @@
 </target>
 
 <target name="run" depends="jar">
-    <java fork="true" classname="${main-class}">
+    <java fork="true" classname="${main-class}" maxmemory="512m">
         <classpath>
             <path refid="project.classpath"/>
             <path location="${jar.dir}/reprap.jar"/>

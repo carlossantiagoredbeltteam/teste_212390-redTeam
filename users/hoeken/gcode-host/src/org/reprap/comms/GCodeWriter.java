@@ -59,7 +59,7 @@ public class GCodeWriter
 	/**
 	* what was the last command we sent? (we may send commands faster than it can process)
 	*/
-	private int lastSentCommand = 0;
+	private int nextCommandToSend = 0;
 	
 	/**
 	* the size of the buffer on the GCode host
@@ -83,7 +83,11 @@ public class GCodeWriter
 	{
 		Debug.d("disposing of gcodewriter.");
 		
-		//outStream.flush();
+		if (!printToFile)
+		{
+			Debug.d("Sending serial commands.");
+			fillSerialBuffer();
+		}
 		
 		try
 		{
@@ -101,73 +105,73 @@ public class GCodeWriter
 		commands.add(cmd);
 		
 		if (printToFile)
-		{
-			//not really needed, but why not.
-			//currentCommand = cmd.size() - 1;
-			//lastSentCommand = cmd.size() - 1;
-			
 			outStream.println(cmd);
-		}
-		else
-			fillSerialBuffer();
 		
-		Debug.d(cmd);
-		
-		//make sure it gets written right now.
-		//outStream.flush();
+		//Debug.d(cmd);
 	}
 	
 	public void fillSerialBuffer()
 	{
-		try {
-			port.enableReceiveTimeout(10);
-		} catch (UnsupportedCommOperationException e) {
-			Debug.d("Read timeouts unsupported on this platform");
-		}
-		
-		while(lastSentCommand < commands.size()-1)
+		//keep trying until we send all commands.
+		while(nextCommandToSend < commands.size())
 		{
-			String cmd = "";
-			//read for any results.
-			for (;;)
-			{
-				try
-				{
-					int c = inStream.read();
-					if (c == -1)
-						break;
-					else
-					{
-						result += c;
-					
-						if (result.startsWith("done"))
-						{
-							cmd = (String)commands.get(currentCommand);
-							bufferSize -= cmd.length() - 1;
-							currentCommand++;
-							result = "";
-						}
-					}					
-				} catch (IOException e) {
-					break;
-				}
-			}
-						
+			//check to see if we got a response.
+			readResponse();
+			
 			//whats our next command?
-			String next = (String)commands.get(lastSentCommand+1);
+			String next = (String)commands.get(nextCommandToSend);
 			
 			//will it fit into our buffer?
 			if (bufferSize + next.length() < maxBufferSize)
 			{
-				//send it and record it in our buffer tracker.
+				//send it
 				outStream.println(next);
-				lastSentCommand++;
+				
+				//record it in our buffer tracker.
+				nextCommandToSend++;
 				bufferSize += next.length() + 1;
 			}
-			//no room... bounce.
-			else
-				break;
 		}
+	}
+	
+	public void readResponse()
+	{
+		String cmd = "";
+		
+		//read for any results.
+		for (;;)
+		{
+			try
+			{
+				//read a byte.
+				int i = inStream.read();
+
+				//nothing found.
+				if (i == -1)
+					break;
+				else
+				{
+					//get it as ascii.
+					char c = (char)i;
+					result += c;
+				
+					//is it a done command?
+					if (result.startsWith("done"))
+					{
+						cmd = (String)commands.get(currentCommand);
+						bufferSize -= cmd.length() - 1;
+						currentCommand++;
+						result = "";
+					}
+					
+					//if its a newline, restart.
+					if (c == '\n')
+						result = "";
+				}					
+			} catch (IOException e) {
+				break;
+			}
+		}	
 	}
 	
 	public void openSerialConnection(String portName)
@@ -220,6 +224,12 @@ public class GCodeWriter
 			port.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
 		} catch (Exception e) {
 			// Um, Linux USB ports don't do this. What can I do about it?
+		}
+		
+		try {
+			port.enableReceiveTimeout(10);
+		} catch (UnsupportedCommOperationException e) {
+			Debug.d("Read timeouts unsupported on this platform");
 		}
 
 		//create our steams
