@@ -180,7 +180,8 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	public void printStartDelay(long msDelay) {
 		// This would extrude for the given interval to ensure polymer flow.
 		getExtruder().startExtruding();
-		gcode.queue("G4 P" + msDelay);
+		
+		delay(msDelay);
 	}
 
 	public void home() {
@@ -189,6 +190,11 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		gcode.queue("G0 X-999 Y-999");
 		gcode.queue("G0 Z-999");
 		gcode.queue("G92");
+	}
+	
+	public void delay(long millis)
+	{
+		gcode.queue("G4 P" + millis);
 	}
 
 	/* (non-Javadoc)

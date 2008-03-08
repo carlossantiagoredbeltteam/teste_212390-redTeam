@@ -278,10 +278,10 @@ public class Producer {
 				//reprap.homeToZeroY();
 				reprap.setFeedrate(reprap.getFastFeedrateXY());
 				reprap.moveTo(0, 0, z, true, true);
-				Thread.sleep(1000 * reprap.getExtruder().getCoolingPeriod());
+				reprap.delay(1000 * reprap.getExtruder().getCoolingPeriod());
 				reprap.getExtruder().setCooler(false);
 				Debug.d("Brief delay for head to warm up.");
-				Thread.sleep(200 * reprap.getExtruder().getCoolingPeriod());
+				reprap.delay(200 * reprap.getExtruder().getCoolingPeriod());
 				Debug.d("End of cooling period");
 				// TODO: BUG! Strangely, this only restores Y axis!
 				//System.out.println("stored X and Y: " + storedX + "   " + storedY);

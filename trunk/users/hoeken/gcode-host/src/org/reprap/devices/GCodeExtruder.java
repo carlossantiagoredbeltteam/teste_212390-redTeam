@@ -31,17 +31,13 @@ public class GCodeExtruder extends GenericExtruder
 	
 	public void setTemperature(double temperature) throws Exception
 	{
-		Debug.d("22setting temp to " + temperature);
-		
 		gcode.queue("M104 P" + temperature);
 	}
 	
 	public void setExtrusion(int speed, boolean reverse) throws IOException
 	{
 		if (speed == 0)
-		{
 			gcode.queue("M103");
-		}
 		else
 		{
 			gcode.queue("M104 P" + speed);
