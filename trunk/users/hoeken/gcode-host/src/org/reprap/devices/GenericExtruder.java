@@ -255,6 +255,11 @@ public abstract class GenericExtruder implements Extruder
 		setTemperature(extrusionTemp);
 	}
 	
+	public void heatOff() throws Exception 
+	{
+		setTemperature(0);
+	}
+	
 	/**
 	 * Start the extruder motor at a given speed.  This ranges from 0
 	 * to 255 but is scaled by maxSpeed and t0, so that 255 corresponds to the
@@ -268,20 +273,29 @@ public abstract class GenericExtruder implements Extruder
 		setExtrusion(speed, false);
 	}
 	
-	public void setExtrusion(int speed, boolean reverse) throws IOException
+	public void startExtruding()
 	{
-		
+		try
+		{
+			setExtrusion(0);
+		} catch (Exception e) {
+			//hmm.
+		}
 	}
+	
+	
+	public void stopExtruding()
+	{
+		try
+		{
+			setExtrusion(0);
+		} catch (Exception e) {
+			//hmm.
+		}
+	}
+
 	
 	public void setHeater(int heat, double maxTemp) throws IOException
-	{
-	}
-	
-	
-	/* (non-Javadoc)
-	 * @see org.reprap.Extruder#setTemperature(double)
-	 */
-	public void setTemperature(double temperature) throws Exception
 	{
 	}	
 	

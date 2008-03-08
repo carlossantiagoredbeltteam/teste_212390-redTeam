@@ -137,6 +137,8 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 		
 		Debug.d("Setting temperature");
 		getExtruder().heatOn();
+		
+		home();
 	}
 	
 	/* (non-Javadoc)
@@ -218,11 +220,6 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 			}
 		}
 		System.err.println("selectExtruder() - extruder not found for: " + att.getMaterial());
-	}
-	
-	
-	public void stopExtruding() throws IOException {
-		
 	}
 	
 	/**
@@ -541,11 +538,21 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 	 * @see org.reprap.Printer#homeToZeroX()
 	 */
 	public void homeToZeroX() throws ReprapException, IOException {
+		currentX = 0.0;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#homeToZeroY()
 	 */
 	public void homeToZeroY() throws ReprapException, IOException {
+		currentY = 0.0;
+	}
+	
+	public void homeToZeroZ() throws ReprapException, IOException {
+		currentZ = 0.0;
+	}
+	
+	public void home(){
+		currentX = currentY = currentZ = 0.0;
 	}
 }

@@ -53,19 +53,7 @@ public interface Printer {
 	 */
 	public void printStartDelay(long msDelay);	
 	
-	/**
-	 * Sync to zero X location.
-	 * @throws ReprapException
-	 * @throws IOException
-	 */
-	public void homeToZeroX() throws ReprapException, IOException;
-	
-	/**
-	 * Sync to zero Y location.
-	 * @throws ReprapException
-	 * @throws IOException
-	 */
-	public void homeToZeroY() throws ReprapException, IOException; 
+	public void home();
 	
 	/**
 	 * Select a specific material to print with
@@ -120,9 +108,6 @@ public interface Printer {
 	 */
 	public void setSpeedZ(int speed);
 	
-//	public int getExtruderSpeed();
-//	public void setExtruderSpeed(int speed);
-	
 	/**
 	 * @param previewer
 	 */
@@ -165,9 +150,6 @@ public interface Printer {
 	 */
 	public Extruder getExtruder();
 	
-	
-	public void stopExtruding() throws IOException;
-
 	/**
 	 * Allow the user to manually calibrate the Z axis position to deal
 	 * with special circumstances like different extruder sizes, platform

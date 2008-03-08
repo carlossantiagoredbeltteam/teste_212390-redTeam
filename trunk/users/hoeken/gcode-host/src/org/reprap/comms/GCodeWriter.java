@@ -40,12 +40,12 @@ public class GCodeWriter
 	/**
 	* are we printing to a file, or serial?
 	*/
-	boolean printToFile = false;
+	private boolean printToFile = false;
 	
 	/**
 	* our array of gcode commands
 	*/
-	Vector commands;
+	private Vector commands;
 	
 	/***********************************************************************
 	* These will be used when we want to buffer commands to the arduino.
@@ -54,22 +54,25 @@ public class GCodeWriter
 	/**
 	* our pointer to the currently executing command
 	*/
-	int currentCommand = 0;
+	private int currentCommand = 0;
 	
 	/**
 	* what was the last command we sent? (we may send commands faster than it can process)
 	*/
-	int lastSentCommand = 0;
+	private int lastSentCommand = 0;
 	
 	/**
 	* the size of the buffer on the GCode host
 	*/
-	int maxBufferSize = 256;
+	private int maxBufferSize = 256;
 	
 	/**
 	* the amount of data we've sent and is in the buffer.
 	*/
-	int bufferSize = 0;
+	private int bufferSize = 0;
+	
+	private String result = "";
+	
 		
 	public GCodeWriter()
 	{
@@ -94,7 +97,7 @@ public class GCodeWriter
 	
 	public void queue(String cmd)
 	{
-		//cmd = "N" + cmd.size().toString() + " " + cmd;
+		cmd = "N" + commands.size() + " " + cmd;
 		commands.add(cmd);
 		
 		if (printToFile)
@@ -106,21 +109,71 @@ public class GCodeWriter
 			outStream.println(cmd);
 		}
 		else
-		{
-			//read until we get a 'done'
-			
-			//then send the new command.
-			outStream.println(cmd);
-		}
+			fillSerialBuffer();
 		
-		//Debug.d(cmd);
+		Debug.d(cmd);
 		
 		//make sure it gets written right now.
 		//outStream.flush();
 	}
 	
+	public void fillSerialBuffer()
+	{
+		try {
+			port.enableReceiveTimeout(10);
+		} catch (UnsupportedCommOperationException e) {
+			Debug.d("Read timeouts unsupported on this platform");
+		}
+		
+		while(lastSentCommand < commands.size()-1)
+		{
+			String cmd = "";
+			//read for any results.
+			for (;;)
+			{
+				try
+				{
+					int c = inStream.read();
+					if (c == -1)
+						break;
+					else
+					{
+						result += c;
+					
+						if (result.startsWith("done"))
+						{
+							cmd = (String)commands.get(currentCommand);
+							bufferSize -= cmd.length() - 1;
+							currentCommand++;
+							result = "";
+						}
+					}					
+				} catch (IOException e) {
+					break;
+				}
+			}
+						
+			//whats our next command?
+			String next = (String)commands.get(lastSentCommand+1);
+			
+			//will it fit into our buffer?
+			if (bufferSize + next.length() < maxBufferSize)
+			{
+				//send it and record it in our buffer tracker.
+				outStream.println(next);
+				lastSentCommand++;
+				bufferSize += next.length() + 1;
+			}
+			//no room... bounce.
+			else
+				break;
+		}
+	}
+	
 	public void openSerialConnection(String portName)
 	{
+		printToFile = false;
+		
 		int baudRate = 19200;
 		
 		//open our port.
@@ -188,6 +241,8 @@ public class GCodeWriter
 	
 	public void openFile(String filename)
 	{
+		printToFile = true;
+		
 		Debug.d("Opening file for GCode output: " + filename);
 		if (filename.equals("stdout"))
 		{

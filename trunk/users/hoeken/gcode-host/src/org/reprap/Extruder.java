@@ -32,11 +32,17 @@ public interface Extruder
 	 */
 	public void setExtrusion(int speed, boolean reverse) throws IOException; 
 	
+	public void startExtruding();
+	public void stopExtruding();
+	
 	/**
 	 * Turn the heater of the extruder on. Inital temperature is defined by ???
 	 * @throws Exception
 	 */
-	public void heatOn() throws Exception; 
+	public void heatOn() throws Exception;
+	
+	public void heatOff() throws Exception;
+	
 
 	/**
 	 * Set the temperature of the extruder at a given height. This height is given
