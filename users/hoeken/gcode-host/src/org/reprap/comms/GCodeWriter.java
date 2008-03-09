@@ -47,10 +47,6 @@ public class GCodeWriter
 	*/
 	private Vector commands;
 	
-	/***********************************************************************
-	* These will be used when we want to buffer commands to the arduino.
-	************************************************************************/
-	
 	/**
 	* our pointer to the currently executing command
 	*/
@@ -70,6 +66,11 @@ public class GCodeWriter
 	* the amount of data we've sent and is in the buffer.
 	*/
 	private int bufferSize = 0;
+	
+	/**
+	* how many commands do we have in the buffer?
+	*/
+	private int bufferLength = 0;
 	
 	private String result = "";
 	
@@ -101,7 +102,7 @@ public class GCodeWriter
 	
 	public void queue(String cmd)
 	{
-		cmd = "N" + commands.size() + " " + cmd;
+		//cmd = "N" + commands.size() + " " + cmd;
 		commands.add(cmd);
 		
 		if (printToFile)
@@ -122,14 +123,14 @@ public class GCodeWriter
 			String next = (String)commands.get(nextCommandToSend);
 			
 			//will it fit into our buffer?
-			if (bufferSize + next.length() < maxBufferSize)
+			while (bufferSize + next.length() < maxBufferSize)
 			{
 				//send it a byte at a time.
 				for (int i=0; i<next.length(); i++)
 				{
-					outStream.print(next.charAt(i));
-					outStream.flush();					
-
+					outStream.write(next.charAt(i));
+					outStream.flush();
+										
 					//wait 5us between bytes.
 					try{
 						Thread.sleep(5);
@@ -137,20 +138,28 @@ public class GCodeWriter
 				}
 
 				//newline is our delimiter.
-				outStream.print('\n');
-				outStream.flush();					
+				outStream.write('\n');
+				outStream.flush();
 				
 				//wait between commands.
 				try{
-					Thread.sleep(10);
+					Thread.sleep(5);
 				} catch (Exception e){}
 				
 				//record it in our buffer tracker.
 				nextCommandToSend++;
 
-				Debug.d("Buffer: " + next + "(" + bufferSize + " + " + (next.length()+1) + " = " + (bufferSize + next.length() + 1) + ")");
+				//Debug.d("Buffer: " + next + "(" + bufferSize + " + " + (next.length()+1) + " = " + (bufferSize + next.length() + 1) + ")");
 
 				bufferSize += next.length() + 1;
+				bufferLength++;
+				
+				Debug.d("Buffer: " + bufferSize + " (" + bufferLength + " commands)");
+				
+				if (nextCommandToSend == commands.size())
+					break;
+				
+				next = (String)commands.get(nextCommandToSend);
 			}
 		}
 	}
@@ -183,13 +192,26 @@ public class GCodeWriter
 						{
 							cmd = (String)commands.get(currentCommand);
 
-							Debug.d("Got: " + result + "(" + bufferSize + " - " + (cmd.length() + 1) + " = " + (bufferSize - (cmd.length() + 1)) + ")");
+							Debug.c(result.substring(0, result.length()-2) + "(" + bufferSize + " - " + (cmd.length() + 1) + " = " + (bufferSize - (cmd.length() + 1)) + ")");
 
 							bufferSize -= cmd.length() + 1;
+							bufferLength--;
+							
 							currentCommand++;
+							result = "";
+							
+							Debug.d("Buffer: " + bufferSize + " (" + bufferLength + " commands)");
+
+							//bail, buffer is almost empty.  fill it!
+							if (bufferLength < 2)
+								break;
+							
+							//we'll never get here.. for testing.
+							if (bufferLength == 0)
+								Debug.d("Empy buffer!! :(");
 						}
 						else
-							Debug.d(result);
+							Debug.c(result.substring(0, result.length()-2));
 							
 						result = "";
 					}
@@ -253,7 +275,7 @@ public class GCodeWriter
 		}
 		
 		try {
-			port.enableReceiveTimeout(10);
+			port.enableReceiveTimeout(1);
 		} catch (UnsupportedCommOperationException e) {
 			Debug.d("Read timeouts unsupported on this platform");
 		}
