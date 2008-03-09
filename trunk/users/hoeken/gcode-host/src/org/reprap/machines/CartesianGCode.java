@@ -76,13 +76,26 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		if (isCancelled())
 			return;
 
-		super.moveTo(x, y, z, startUp, endUp);
-		
 		double gx = round(x, 4);
 		double gy = round(y, 4);
 		double gz = round(z, 4);
+
+		double dx = currentX - x;
+		double dy = currentY - y;
+		double dz = currentZ - z;
 		
-		gcode.queue("G0 X" +gx + " Y" + gy + " Z" + gz);
+		String code = "G0";
+		
+		if (dx != 0)
+			code += " X" + gx;
+		if (dy != 0)
+			code += " Y" + gy;
+		if (dz != 0)
+			code += " Z" + gz;
+		
+		gcode.queue(code);
+
+		super.moveTo(x, y, z, startUp, endUp);
 	}
 
 	/* (non-Javadoc)
@@ -107,7 +120,21 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		double gz = round(z, 4);
 		double feed = round(getFeedrate(), 4);
 
-		gcode.queue("G1 X" + gx + " Y" + gy + " Z" + gz + " F" + feed);
+		double dx = currentX - x;
+		double dy = currentY - y;
+		double dz = currentZ - z;
+
+		String code = "G1";
+		
+		if (dx != 0)
+			code += " X" + gx;
+		if (dy != 0)
+			code += " Y" + gy;
+		if (dz != 0)
+			code += " Z" + gz;
+		code += " F" + feed;
+		
+		gcode.queue(code);
 
 		currentX = x;
 		currentY = y;
@@ -160,12 +187,12 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	public void initialise() {
 		
 		// TODO: Fix this to be more flexible - howso?
+		
+		//take us to fun, safe metric land.
 		gcode.queue("G21");
 		
-		// Set incremental positioning, so you can
-		// decide where to print in the beginning
-		// without messing up the rest of the Gcode
-		gcode.queue("G91");
+		// Set absolute positioning, which is what we use.
+		gcode.queue("G90");
 		
 		try	{
 			super.initialise();
