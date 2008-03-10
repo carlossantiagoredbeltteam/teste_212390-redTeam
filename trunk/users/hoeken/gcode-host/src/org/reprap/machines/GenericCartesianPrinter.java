@@ -453,9 +453,11 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 	 */
 	public void wipeNozzle() throws ReprapException, IOException {
 		
-		if (getExtruder().getNozzleWipeEnabled() == false) return;
-		
-		else {
+		if (getExtruder().getNozzleWipeEnabled() == false)
+			return;
+		else
+		{
+			Debug.d("Wiping nozzle");
 			
 			int freq = getExtruder().getNozzleWipeFreq();
 			int datumX = getExtruder().getNozzleWipeDatumX();
