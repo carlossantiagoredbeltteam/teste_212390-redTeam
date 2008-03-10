@@ -298,7 +298,6 @@ public class Producer {
 
 			Preferences prefs;
 			
-			Debug.d("Attempting to wiping nozzle");
 			reprap.wipeNozzle(); // Wipes current active extruder, if wipe function enabled
 					
 			

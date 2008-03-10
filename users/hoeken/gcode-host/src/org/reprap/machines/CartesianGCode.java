@@ -84,16 +84,32 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		double dy = currentY - y;
 		double dz = currentZ - z;
 		
-		String code = "G0";
+		if (dx == 0.0 && dy == 0.0 && dz == 0.0)
+			return;
 		
+		double liftedZ = round(currentZ + (extruders[extruder].getExtrusionHeight()/2), 4);
+
+		//go up first?
+		if (startUp)
+		{
+			gcode.queue("G0 Z" + liftedZ);
+			currentZ = liftedZ;
+			dz = 0;
+		}
+		
+		//our real command
+		String code = "G0";
 		if (dx != 0)
 			code += " X" + gx;
 		if (dy != 0)
 			code += " Y" + gy;
 		if (dz != 0)
 			code += " Z" + gz;
-		
 		gcode.queue(code);
+		
+		//go back down?
+		if (!endUp && z != currentZ)
+			gcode.queue("G0 Z" + gz);
 
 		super.moveTo(x, y, z, startUp, endUp);
 	}
@@ -108,6 +124,8 @@ public class CartesianGCode extends GenericCartesianPrinter {
 			
 		if (isCancelled())
 			return;
+			
+		getExtruder().startExtruding();		
 
 		double distance = segmentLength(x - currentX, y - currentY);
 		if (z != currentZ)
@@ -124,6 +142,9 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		double dy = currentY - y;
 		double dz = currentZ - z;
 
+		if (dx == 0.0 && dy == 0.0 && dz == 0.0)
+			return;
+
 		String code = "G1";
 		
 		if (dx != 0)
@@ -135,6 +156,9 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		code += " F" + feed;
 		
 		gcode.queue(code);
+		
+		if(turnOff)
+			getExtruder().stopExtruding();
 
 		currentX = x;
 		currentY = y;
@@ -194,6 +218,9 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		// Set absolute positioning, which is what we use.
 		gcode.queue("G90");
 		
+		// set our extruder speed.
+		gcode.queue("M104 P" + getExtruder().getExtruderSpeed());		
+		
 		try	{
 			super.initialise();
 		} catch (Exception E) {
@@ -215,7 +242,7 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		super.home();
 		
 		gcode.queue("G0 X-999 Y-999");
-		gcode.queue("G0 Z-999");
+		//gcode.queue("G0 Z-999");
 		gcode.queue("G92");
 	}
 	

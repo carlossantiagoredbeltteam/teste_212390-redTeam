@@ -188,7 +188,7 @@ public class GCodeWriter
 					//is it a done command?
 					if (c == '\n')
 					{
-						if (result.startsWith("ok:"))
+						if (result.startsWith("ok"))
 						{
 							cmd = (String)commands.get(currentCommand);
 
@@ -210,6 +210,8 @@ public class GCodeWriter
 							if (bufferLength == 0)
 								Debug.d("Empy buffer!! :(");
 						}
+						else if (result.startsWith("T:"))
+							Debug.d(result.substring(0, result.length()-2));
 						else
 							Debug.c(result.substring(0, result.length()-2));
 							

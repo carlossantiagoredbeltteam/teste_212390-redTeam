@@ -234,6 +234,11 @@ public class SNAPExtruder extends GenericExtruder
 		}
 	}
 	
+	public void setTemperature(double temperature) throws Exception
+	{
+		setTemperature(temperature, true);
+	}
+	
 	/**
 	 * @param temperature
 	 * @param lock

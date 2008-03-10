@@ -277,7 +277,7 @@ public abstract class GenericExtruder implements Extruder
 	{
 		try
 		{
-			setExtrusion(0);
+			setExtrusion(getExtruderSpeed());
 		} catch (Exception e) {
 			//hmm.
 		}
