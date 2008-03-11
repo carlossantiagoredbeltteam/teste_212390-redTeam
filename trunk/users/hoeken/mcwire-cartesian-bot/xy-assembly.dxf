@@ -59,7 +59,7 @@ Standard
   9
 $CLAYER
   8
-Y Measurements
+Y Drawings
   9
 $DIMEXO
  40
@@ -935,9 +935,9 @@ AcDbLayerTableRecord
   2
 0
  70
-1
+0
  62
--7
+7
   6
 CONTINUOUS
 370
@@ -955,9 +955,9 @@ AcDbLayerTableRecord
   2
 Base Drawings
  70
-1
+0
  62
--4
+4
   6
 CONTINUOUS
 370
@@ -975,9 +975,9 @@ AcDbLayerTableRecord
   2
 Base
  70
-1
+0
  62
--1
+1
   6
 CONTINUOUS
 370
@@ -995,9 +995,9 @@ AcDbLayerTableRecord
   2
 X Rails
  70
-1
+0
  62
--81
+81
   6
 CONTINUOUS
 370
@@ -1015,9 +1015,9 @@ AcDbLayerTableRecord
   2
 X Stage
  70
-1
+0
  62
--3
+3
   6
 CONTINUOUS
 370
@@ -1035,9 +1035,9 @@ AcDbLayerTableRecord
   2
 Y Rails
  70
-1
+0
  62
--171
+171
   6
 CONTINUOUS
 370
@@ -1075,9 +1075,9 @@ AcDbLayerTableRecord
   2
 Y Drawings
  70
-1
+0
  62
--4
+4
   6
 CONTINUOUS
 370
@@ -1095,9 +1095,9 @@ AcDbLayerTableRecord
   2
 X Drive
  70
-1
+0
  62
--76
+76
   6
 CONTINUOUS
 370
@@ -1115,9 +1115,9 @@ AcDbLayerTableRecord
   2
 Y Drive
  70
-1
+0
  62
--166
+166
   6
 CONTINUOUS
 370
@@ -1135,9 +1135,9 @@ AcDbLayerTableRecord
   2
 X Text
  70
-1
+0
  62
--81
+81
   6
 CONTINUOUS
 370
@@ -1175,9 +1175,9 @@ AcDbLayerTableRecord
   2
 Base Measurements
  70
-1
+0
  62
--2
+2
   6
 CONTINUOUS
 370
@@ -1195,9 +1195,9 @@ AcDbLayerTableRecord
   2
 X Measurements
  70
-1
+0
  62
--2
+2
   6
 CONTINUOUS
 370
@@ -1215,9 +1215,9 @@ AcDbLayerTableRecord
   2
 X Drawings
  70
-1
+0
  62
--4
+4
   6
 CONTINUOUS
 370
@@ -1235,9 +1235,9 @@ AcDbLayerTableRecord
   2
 Y Measurements
  70
-1
+0
  62
--2
+2
   6
 CONTINUOUS
 370
@@ -1255,9 +1255,9 @@ AcDbLayerTableRecord
   2
 Steel Pipes
  70
-1
+0
  62
--6
+6
   6
 CONTINUOUS
 370
@@ -1275,9 +1275,9 @@ AcDbLayerTableRecord
   2
 Drawings
  70
-1
+0
  62
--2
+2
   6
 CONTINUOUS
 370
@@ -1295,9 +1295,9 @@ AcDbLayerTableRecord
   2
 Rails
  70
-1
+0
  62
--3
+3
   6
 CONTINUOUS
 370
@@ -1315,9 +1315,9 @@ AcDbLayerTableRecord
   2
 Y Rail Support
  70
-1
+0
  62
--183
+183
   6
 CONTINUOUS
 370
@@ -1335,9 +1335,9 @@ AcDbLayerTableRecord
   2
 X Rail Support
  70
-1
+0
  62
--103
+103
   6
 CONTINUOUS
 370
@@ -1355,9 +1355,9 @@ AcDbLayerTableRecord
   2
 Acrylic
  70
-1
+0
  62
--1
+1
   6
 CONTINUOUS
 370
@@ -1375,9 +1375,9 @@ AcDbLayerTableRecord
   2
 Text
  70
-1
+0
  62
--6
+6
   6
 CONTINUOUS
 370
@@ -1395,9 +1395,9 @@ AcDbLayerTableRecord
   2
 X Endstops
  70
-1
+0
  62
--7
+7
   6
 CONTINUOUS
 370
@@ -1415,9 +1415,9 @@ AcDbLayerTableRecord
   2
 Y Endstops
  70
-1
+0
  62
--7
+7
   6
 CONTINUOUS
 370
@@ -5187,7 +5187,7 @@ standard
  50
 0.0
  73
-1
+0
  44
 1.0
   0
@@ -5227,7 +5227,7 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
@@ -6687,7 +6687,7 @@ standard
  50
 90.0
  73
-1
+0
  44
 1.0
   0
@@ -6891,7 +6891,7 @@ AcDbDimension
  71
 5
  72
-0
+1
  41
 1.0
  42
@@ -7747,7 +7747,7 @@ AcDbDimension
  71
 5
  72
-1
+0
  41
 1.0
  42
@@ -7807,7 +7807,7 @@ AcDbDimension
  71
 5
  72
-1
+0
  41
 1.0
  42
@@ -7867,7 +7867,7 @@ AcDbDimension
  71
 5
  72
-1
+0
  41
 1.0
  42
@@ -8827,7 +8827,7 @@ standard
  50
 270.0
  73
-1
+0
  44
 1.0
   0
@@ -10419,7 +10419,7 @@ standard
  50
 0.0
  73
-1
+0
  44
 1.0
   0
@@ -11355,7 +11355,7 @@ standard
  50
 180.0
  73
-1
+0
  44
 1.0
   0
@@ -11671,7 +11671,7 @@ AcDbDimension
  71
 5
  72
-1
+0
  41
 1.0
  42
