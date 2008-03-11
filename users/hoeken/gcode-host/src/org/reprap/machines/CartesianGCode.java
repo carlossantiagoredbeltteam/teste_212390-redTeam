@@ -79,6 +79,8 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		double gx = round(x, 4);
 		double gy = round(y, 4);
 		double gz = round(z, 4);
+		double zFeedrate = round(getMaxFeedrateZ(), 3);
+		double xyFeedrate = round(getFastFeedrateXY(), 3);
 
 		double dx = currentX - x;
 		double dy = currentY - y;
@@ -92,24 +94,25 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		//go up first?
 		if (startUp)
 		{
-			gcode.queue("G0 Z" + liftedZ);
+			gcode.queue("G1 Z" + liftedZ + " F" + zFeedrate);
 			currentZ = liftedZ;
 			dz = 0;
 		}
 		
 		//our real command
-		String code = "G0";
+		String code = "G1";
 		if (dx != 0)
 			code += " X" + gx;
 		if (dy != 0)
 			code += " Y" + gy;
 		if (dz != 0)
 			code += " Z" + gz;
+		code += " F" + xyFeedrate;
 		gcode.queue(code);
 		
 		//go back down?
 		if (!endUp && z != currentZ)
-			gcode.queue("G0 Z" + gz);
+			gcode.queue("G1 Z" + gz + " F" + zFeedrate);
 
 		super.moveTo(x, y, z, startUp, endUp);
 	}
@@ -241,7 +244,9 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	public void home() {
 		super.home();
 		
-		gcode.queue("G0 X-999 Y-999");
+		double xyFeedrate = round(getFastFeedrateXY(), 4);
+		
+		gcode.queue("G1 X-999 Y-999 F" + xyFeedrate);
 		//gcode.queue("G0 Z-999");
 		gcode.queue("G92");
 	}
@@ -256,7 +261,9 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	 */
 	public void homeToZeroX() throws ReprapException, IOException {
 		super.homeToZeroX();
-		gcode.queue("G0 X-999");
+		
+		double feedrate = round(getMaxFeedrateX(), 4);
+		gcode.queue("G0 X-999 F" + feedrate);
 	}
 
 	/* (non-Javadoc)
@@ -264,7 +271,9 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	 */
 	public void homeToZeroY() throws ReprapException, IOException {
 		super.homeToZeroY();
-		gcode.queue("G0 Y-999");
+
+		double feedrate = round(getMaxFeedrateY(), 4);
+		gcode.queue("G0 Y-999 F" + feedrate);
 	}
 
 	/* (non-Javadoc)
@@ -272,7 +281,9 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	 */
 	public void homeToZeroZ() throws ReprapException, IOException {
 		super.homeToZeroZ();
-		gcode.queue("G0 Z-999");
+
+		double feedrate = round(getMaxFeedrateZ(), 4);
+		gcode.queue("G0 Z-999 F" + feedrate);
 	}
 	
 	public double round(double c, double d)

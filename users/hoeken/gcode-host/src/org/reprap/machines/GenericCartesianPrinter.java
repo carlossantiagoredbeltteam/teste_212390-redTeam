@@ -117,6 +117,9 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 		maxFeedrateY = config.loadDouble("MaximumFeedrateY(mm/minute)");
 		maxFeedrateZ = config.loadDouble("MaximumFeedrateZ(mm/minute)");
 		
+		//set our fastest feedrate.
+		fastFeedrateXY = Math.min(maxFeedrateX, maxFeedrateY);
+		
 		//init our stuff.
 		currentX = 0;
 		currentY = 0;
@@ -360,7 +363,7 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 		{
 			extruders[extruder].setExtrusion(extruders[extruder].getExtruderSpeed());
 			Thread.sleep(msDelay);
-			extruders[extruder].setExtrusion(0);  // What's this for?  - AB
+//			extruders[extruder].setExtrusion(0);  // What's this for?  - AB
 		} catch(Exception e)
 		{
 			// If anything goes wrong, we'll let someone else catch it.
@@ -483,12 +486,7 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 	{
 		currentFeedrate = feedrate;
 	}
-	
-	public void setFastFeedrate(double feedrate)
-	{
-		fastFeedrateXY = feedrate;
-	}
-	
+		
 	public double getFeedrate()
 	{
 		return currentFeedrate;
@@ -557,4 +555,20 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 	public void home(){
 		currentX = currentY = currentZ = 0.0;
 	}
+	
+	public double getMaxFeedrateX()
+	{
+		return maxFeedrateX;
+	}
+
+	public double getMaxFeedrateY()
+	{
+		return maxFeedrateY;
+	}
+
+	public double getMaxFeedrateZ()
+	{
+		return maxFeedrateZ;
+	}
+
 }
