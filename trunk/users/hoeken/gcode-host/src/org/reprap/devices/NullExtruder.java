@@ -65,4 +65,10 @@ public class NullExtruder extends GenericExtruder
 	public void setCooler(boolean f) throws IOException {
 
 	}
+	
+	public void setTemperature(double temperature) throws Exception
+	{
+		currentTemperature = temperature;
+		requestedTemperature = temperature;
+	}
 }

@@ -197,6 +197,11 @@ public abstract class GenericExtruder implements Extruder
 	* name of our extruder
 	*/
 	String prefName;
+	
+	/**
+	* are we currently extruding?
+	*/
+	boolean isExtruding;
 
 	public GenericExtruder(Preferences prefs, int extruderId)
 	{
@@ -237,6 +242,8 @@ public abstract class GenericExtruder implements Extruder
 				(float)prefs.loadDouble(prefName + "ColourB(0..1)"));
 		materialColour = new Appearance();
 		materialColour.setMaterial(new Material(col, black, col, black, 101f));
+		
+		isExtruding = false;
 	}
 	
 	/* (non-Javadoc)
@@ -270,27 +277,41 @@ public abstract class GenericExtruder implements Extruder
 	 */
 	public void setExtrusion(int speed) throws IOException
 	{
+		if (speed > 0)
+			isExtruding = true;
+		else
+			isExtruding = false;
+			
 		setExtrusion(speed, false);
 	}
 	
 	public void startExtruding()
 	{
-		try
+		if (!isExtruding)
 		{
-			setExtrusion(getExtruderSpeed());
-		} catch (Exception e) {
-			//hmm.
+			isExtruding = true;
+			try
+			{
+				setExtrusion(getExtruderSpeed());
+			} catch (Exception e) {
+				//hmm.
+			}
 		}
 	}
 	
 	
 	public void stopExtruding()
 	{
-		try
+		if (isExtruding)
 		{
-			setExtrusion(0);
-		} catch (Exception e) {
-			//hmm.
+			isExtruding = false;
+			
+			try
+			{
+				setExtrusion(0);
+			} catch (Exception e) {
+				//hmm.
+			}
 		}
 	}
 

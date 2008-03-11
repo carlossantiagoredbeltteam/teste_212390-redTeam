@@ -149,11 +149,11 @@ public class GCodeWriter
 				//record it in our buffer tracker.
 				nextCommandToSend++;
 
-				//Debug.d("Buffer: " + next + "(" + bufferSize + " + " + (next.length()+1) + " = " + (bufferSize + next.length() + 1) + ")");
-
 				bufferSize += next.length() + 1;
 				bufferLength++;
 				
+				//debug... let us know whts up!
+				Debug.c("Sent: " + next);
 				Debug.d("Buffer: " + bufferSize + " (" + bufferLength + " commands)");
 				
 				if (nextCommandToSend == commands.size())

@@ -86,11 +86,6 @@ public interface Printer {
 	public void setFeedrate(double feedrate);
 	
 	/**
-	 * @param speed
-	 */
-	public void setFastFeedrate(double feedrate);
-	
-	/**
 	 * @return the extrider fast speed
 	 */
 	public double getFeedrate();

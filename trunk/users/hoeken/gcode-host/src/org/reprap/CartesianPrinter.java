@@ -27,4 +27,8 @@ public interface CartesianPrinter extends Printer {
 	 * @throws IOException
 	 */
 	public void homeToZeroZ() throws ReprapException, IOException;
+	
+	public double getMaxFeedrateX();
+	public double getMaxFeedrateY();
+	public double getMaxFeedrateZ();
 }
