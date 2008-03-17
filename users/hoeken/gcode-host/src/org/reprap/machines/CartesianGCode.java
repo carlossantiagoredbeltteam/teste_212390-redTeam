@@ -76,16 +76,16 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		if (isCancelled())
 			return;
 
-		double gx = round(x, 4);
-		double gy = round(y, 4);
+		double gx = round(x, 1);
+		double gy = round(y, 1);
 		double gz = round(z, 4);
-		double zFeedrate = round(getMaxFeedrateZ(), 3);
-		double xyFeedrate = round(getFastFeedrateXY(), 3);
+		double zFeedrate = round(getMaxFeedrateZ(), 4);
+		double xyFeedrate = round(getFeedrate(), 1);
 
 		double dx = currentX - x;
 		double dy = currentY - y;
 		double dz = currentZ - z;
-		
+
 		if (dx == 0.0 && dy == 0.0 && dz == 0.0)
 			return;
 		
@@ -105,10 +105,16 @@ public class CartesianGCode extends GenericCartesianPrinter {
 			code += " X" + gx;
 		if (dy != 0)
 			code += " Y" + gy;
-		if (dz != 0)
-			code += " Z" + gz;
 		code += " F" + xyFeedrate;
 		gcode.queue(code);
+
+		if (dz != 0)
+		{
+			code = "G1";
+			code += " Z" + gz;
+			code += " F" + zFeedrate;
+			gcode.queue(code);
+		}
 		
 		//go back down?
 		if (!endUp && z != currentZ)
@@ -136,10 +142,10 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		totalDistanceExtruded += distance;
 		totalDistanceMoved += distance;
 
-		double gx = round(x, 4);
-		double gy = round(y, 4);
+		double gx = round(x, 1);
+		double gy = round(y, 1);
 		double gz = round(z, 4);
-		double feed = round(getFeedrate(), 4);
+		double feed = round(getFeedrate(), 1);
 
 		double dx = currentX - x;
 		double dy = currentY - y;

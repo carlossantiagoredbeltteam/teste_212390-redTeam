@@ -108,7 +108,7 @@ public class GCodeWriter
 		if (printToFile)
 			outStream.println(cmd);
 		
-		//Debug.d(cmd);
+		Debug.d("Queued: " + cmd);
 	}
 	
 	public void fillSerialBuffer()

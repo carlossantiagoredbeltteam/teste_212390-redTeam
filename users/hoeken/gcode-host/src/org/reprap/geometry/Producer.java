@@ -268,7 +268,7 @@ public class Producer {
 
 			// Layer cooling phase - after we've just raised the head.
 			//Only if we're not a null device.
-			if ((z != startZ && reprap.getExtruder().getCoolingPeriod() > 0)&&!(reprap instanceof NullCartesianMachine)) {
+			if ((z != startZ && reprap.getExtruder().getCoolingPeriod() > 0) && !(reprap instanceof NullCartesianMachine)) {
 				Debug.d("Starting a cooling period");
 				// Save where we are. We'll come back after we've cooled off.
 				double storedX=reprap.getX();

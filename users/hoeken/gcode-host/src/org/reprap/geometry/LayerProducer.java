@@ -228,7 +228,9 @@ public class LayerProducer {
 		}
 
 		printer.setFeedrate(printer.getExtruder().getShortLineFeedrate());
-		printer.printTo(p.x(), p.y(), z, true);
+// for some reason it was turning the extruder off at the end of a short line? - zach
+//		printer.printTo(p.x(), p.y(), z, true);
+		printer.printTo(p.x(), p.y(), z, false);
 
 		//switch back now.
 		printer.setFeedrate(currentFeedrate);
@@ -279,12 +281,16 @@ public class LayerProducer {
 
 			//TODO: not entirely sure how to code this.
 			printer.setFeedrate(printer.getExtruder().getAngleFeedrate());
-			printer.printTo(ss.p3.x(), ss.p3.y(), z, true);
+			printer.printTo(ss.p3.x(), ss.p3.y(), z, turnOff);
+//			printer.printTo(ss.p3.x(), ss.p3.y(), z, true);
+// this was not respecting the turnOff variable - zach
 			pos = ss.p3;
 			// Leave speed set for the start of the next line.
 		}
 		else
-			printer.printTo(first.x(), first.y(), z, true);
+			printer.printTo(first.x(), first.y(), z, turnOff);
+//			printer.printTo(first.x(), first.y(), z, true);
+// this was not respecting the turnOff variable - zach
 	}
 
 	/**
@@ -300,12 +306,18 @@ public class LayerProducer {
 	{
 		if (printer.isCancelled()) return;
 		
+		//save our original feedrate.
+		double feedrate = printer.getFeedrate();
+
 		if(startUp)
 		{
 			printer.setFeedrate(printer.getFastFeedrateXY());
 			printer.moveTo(first.x(), first.y(), z, startUp, endUp);
 			return;
 		}
+
+		//use our normal rate.
+		printer.setFeedrate(feedrate);
 		
 		double speedUpLength = printer.getExtruder().getAngleSpeedUpLength();
 		if(speedUpLength > 0)
@@ -319,12 +331,12 @@ public class LayerProducer {
 
 			if(ss.plotMiddle)
 			{
-				printer.setFeedrate(currentFeedrate);
+				//printer.setFeedrate(currentFeedrate);
 				printer.moveTo(ss.p2.x(), ss.p2.y(), z, startUp, startUp);
 			}
 
 			//TODO: not sure exactly how to do this either.
-			printer.setFeedrate(ss.speed(currentFeedrate, printer.getExtruder().getAngleSpeedFactor()));
+			//printer.setFeedrate(ss.speed(currentFeedrate, printer.getExtruder().getAngleSpeedFactor()));
 			printer.moveTo(ss.p3.x(), ss.p3.y(), z, startUp, endUp);
 			pos = ss.p3;
 			// Leave speed set for the start of the next movement.
@@ -417,7 +429,8 @@ public class LayerProducer {
 				} else
 					plot(p.point(i), next, false);
 			}
-		} else
+		}
+		else
 		{
 			for(int i = 1; i < leng; i++)
 			{
