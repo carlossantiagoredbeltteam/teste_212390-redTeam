@@ -192,7 +192,8 @@ public class GCodeWriter
 						{
 							cmd = (String)commands.get(currentCommand);
 
-							Debug.c(result.substring(0, result.length()-2) + "(" + bufferSize + " - " + (cmd.length() + 1) + " = " + (bufferSize - (cmd.length() + 1)) + ")");
+							if (result.length() > 2)
+								Debug.c("got: " + result.substring(0, result.length()-2) + "(" + bufferSize + " - " + (cmd.length() + 1) + " = " + (bufferSize - (cmd.length() + 1)) + ")");
 
 							bufferSize -= cmd.length() + 1;
 							bufferLength--;
