@@ -47,7 +47,7 @@ Standard
   9
 $CLAYER
   8
-Z Drawing
+Vertical Base Drawings
   9
 $DIMEXO
  40
@@ -59,7 +59,7 @@ $DIMTXT
   9
 $CLAYER
   8
-Vertical Base
+Vertical Base Drawings
   0
 ENDSEC
   0
@@ -923,9 +923,9 @@ AcDbLayerTableRecord
   2
 0
  70
-1
+0
  62
--7
+7
   6
 CONTINUOUS
 370
@@ -1023,9 +1023,9 @@ AcDbLayerTableRecord
   2
 Vertical Base Text
  70
-0
+1
  62
-34
+-34
   6
 CONTINUOUS
 370
@@ -1083,9 +1083,9 @@ AcDbLayerTableRecord
   2
 Opto Endstop
  70
-0
+1
  62
-7
+-7
   6
 CONTINUOUS
 370
@@ -1103,9 +1103,9 @@ AcDbLayerTableRecord
   2
 Flange Mount
  70
-0
+1
  62
-7
+-7
   6
 CONTINUOUS
 370
@@ -1143,9 +1143,9 @@ AcDbLayerTableRecord
   2
 Vertical Base Measurements
  70
-0
+1
  62
-7
+-7
   6
 CONTINUOUS
 370
@@ -1203,9 +1203,9 @@ AcDbLayerTableRecord
   2
 Drawings
  70
-0
+1
  62
-4
+-4
   6
 CONTINUOUS
 370
@@ -1223,9 +1223,9 @@ AcDbLayerTableRecord
   2
 Acrylic
  70
-0
- 62
 1
+ 62
+-1
   6
 CONTINUOUS
 370
@@ -1243,9 +1243,9 @@ AcDbLayerTableRecord
   2
 Text
  70
-0
+1
  62
-6
+-6
   6
 CONTINUOUS
 370
@@ -8157,6 +8157,230 @@ ByLayer
  40
 15.0
   0
+LINE
+  5
+13C
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Vertical Base Drawings
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+95.0
+ 20
+115.0
+ 30
+0.0
+ 11
+94.9999999999999716
+ 21
+-115.0
+ 31
+0.0
+  0
+LINE
+  5
+13D
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Vertical Base Drawings
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+56.9000000000000057
+ 20
+115.0
+ 30
+0.0
+ 11
+56.8999999999999631
+ 21
+-115.0
+ 31
+0.0
+  0
+LINE
+  5
+13E
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Vertical Base Drawings
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+-61.8999999999999986
+ 20
+115.0
+ 30
+0.0
+ 11
+-61.8999999999999986
+ 21
+-115.0
+ 31
+0.0
+  0
+LINE
+  5
+13F
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Vertical Base Drawings
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+-100.0
+ 20
+115.0
+ 30
+0.0
+ 11
+-100.0
+ 21
+-115.0
+ 31
+0.0
+  0
+LINE
+  5
+140
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Vertical Base Drawings
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+-61.8999999999999986
+ 20
+115.0
+ 30
+0.0
+ 11
+-100.0
+ 21
+115.0
+ 31
+0.0
+  0
+LINE
+  5
+141
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Vertical Base Drawings
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+56.9000000000000057
+ 20
+115.0
+ 30
+0.0
+ 11
+95.0
+ 21
+115.0
+ 31
+0.0
+  0
+LINE
+  5
+142
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Vertical Base Drawings
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+94.9999999999999716
+ 20
+-115.0
+ 30
+0.0
+ 11
+56.8999999999999631
+ 21
+-115.0
+ 31
+0.0
+  0
+LINE
+  5
+143
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Vertical Base Drawings
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+-61.8999999999999986
+ 20
+-115.0
+ 30
+0.0
+ 11
+-100.0
+ 21
+-115.0
+ 31
+0.0
+  0
 ENDSEC
   0
 SECTION
@@ -8195,7 +8419,7 @@ E
   3
 AcDbVariableDictionary
 350
-13C
+144
   0
 DICTIONARY
   5
@@ -8659,7 +8883,7 @@ Layout2
   0
 DICTIONARY
   5
-13C
+144
 100
 AcDbDictionary
 281
@@ -8667,15 +8891,15 @@ AcDbDictionary
   3
 DIMASSOC
 350
-13E
+146
   3
 HIDETEXT
 350
-13D
+145
   0
 DICTIONARYVAR
   5
-13D
+145
 100
 DictionaryVariables
 280
@@ -8685,7 +8909,7 @@ DictionaryVariables
   0
 DICTIONARYVAR
   5
-13E
+146
 100
 DictionaryVariables
 280
