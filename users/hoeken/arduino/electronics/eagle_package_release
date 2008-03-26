@@ -10,7 +10,7 @@ FILELIST=""
 echo "Making Files..."
 mkdir -p "$TO_DIR"
 mkdir -p "$TO_DIR/gerber"
-mkdir -p "$TO_DIR/pdf"
+mkdir -p "$TO_DIR/ps"
 mkdir -p "$TO_DIR/eagle"
 mkdir -p "$TO_DIR/renders"
 
@@ -32,20 +32,33 @@ rm -rf $TO_DIR/gerber/*.gpi
 rm -rf $TO_DIR/gerber/*.dri 
 
 echo "Creating PS Files..."
-eagle -X -N -d PS -o "$TO_DIR/pdf/Schematic.ps" $BOARD/*.sch Nets Busses Symbols Names Values
-eagle -X -N -d PS -o "$TO_DIR/pdf/ComponentTraces.ps" $BOARD/*.brd Top Pad Via Dimension
-eagle -X -N -d PS -o "$TO_DIR/pdf/ComponentSilkscreen.ps" $BOARD/*.brd Pad Via Dimension tPlace tNames tDocu tValues
-eagle -X -N -d PS -o "$TO_DIR/pdf/CopperTraces.ps" $BOARD/*.brd Bottom Pad Via Dimension 
-eagle -X -N -d PS -o "$TO_DIR/pdf/CopperSilkscreen.ps" $BOARD/*.brd Pad Via Dimension bPlace bNames bDocu
+eagle -X -N -d PS -o "$TO_DIR/ps/Schematic.ps" $BOARD/*.sch Nets Busses Symbols Names Values
+eagle -X -N -d PS -o "$TO_DIR/ps/ComponentTraces.ps" $BOARD/*.brd Top Pad Via Dimension
+eagle -X -N -d PS -o "$TO_DIR/ps/ComponentSilkscreen.ps" $BOARD/*.brd Pad Via Dimension tPlace tNames tDocu tValues
+eagle -X -N -d PS -o "$TO_DIR/ps/CopperTraces.ps" $BOARD/*.brd Bottom Pad Via Dimension 
+eagle -X -N -d PS -o "$TO_DIR/ps/CopperSilkscreen.ps" $BOARD/*.brd Pad Via Dimension bPlace bNames bDocu
 
 #convert to pdf...
 echo "Converting to PDF..."
+cp -a "$TO_DIR/ps" "$TO_DIR/pdf"
 for PS in $TO_DIR/pdf/*.ps
 do
 	TO_FILE=`basename $PS .ps`.pdf
 	ps2pdf $PS $TO_DIR/pdf/$TO_FILE
 done
 rm $TO_DIR/pdf/*.ps
+
+#convert to png...
+echo "Converting to PDF..."
+cp -a "$TO_DIR/ps" "$TO_DIR/png"
+for PS in $TO_DIR/png/*.ps
+do
+	TO_FILE=`basename $PS .ps`.png
+	echo "gs -dNOPAUSE -dBATCH -sDEVICE=png256 -sOutputFile=$TO_DIR/png/$TO_FILE $PS"
+	gs -dNOPAUSE -dBATCH -sDEVICE=png256 -sOutputFile=$TO_DIR/png/$TO_FILE $PS
+done
+rm $TO_DIR/png/*.ps
+
 
 #render our board with POVRay and eagle3d - high quality
 if [ -f ${BOARD}/${BOARD}.pov ]
