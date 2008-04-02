@@ -49,6 +49,12 @@
 						));				
 						break;
 
+					case 'digikey':
+						echo Controller::byName('supplier')->renderView('digikey_parts_list', array(
+							'supplier' => $supplier,
+							'parts' => $parts
+						));				
+						break;
 					
 					default:
 						echo Controller::byName('supplier')->renderView('generic_parts_list', array(

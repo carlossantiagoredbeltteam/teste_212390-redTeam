@@ -31,6 +31,11 @@
 		{
 			$this->generic_parts_list();
 		}
+
+		public function digikey_parts_list()
+		{
+			$this->generic_parts_list();
+		}
 		
 		public function mouser_parts_list()
 		{
