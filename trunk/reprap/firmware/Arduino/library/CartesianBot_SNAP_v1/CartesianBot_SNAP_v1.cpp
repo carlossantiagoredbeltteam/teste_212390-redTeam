@@ -350,25 +350,22 @@ void process_cartesian_bot_snap_commands_v1()
 			//okay, set our speed.
 			if (dest == X_ADDRESS)
 			{
-				bot.x.stepper.setRPM(snap.getByte(1));
 				bot.x.stepper.setDirection(RS_FORWARD);
 				x_mode = func_forward;
-				bot.setTimer(bot.x.stepper.step_delay);
 			}
 			else if (dest == Y_ADDRESS)
 			{
-				bot.y.stepper.setRPM(snap.getByte(1));
 				bot.y.stepper.setDirection(RS_FORWARD);
 				y_mode = func_forward;
-				bot.setTimer(bot.y.stepper.step_delay);
 			}
 			else if (dest == Z_ADDRESS)
 			{
-				bot.z.stepper.setRPM(snap.getByte(1));
 				bot.z.stepper.setDirection(RS_FORWARD);
 				z_mode = func_forward;
-				bot.setTimer(bot.z.stepper.step_delay);
 			}
+
+			//emulate PIC timer
+			bot.setTimer((256 - snap.getByte(1)) * 4096);
 			*/
 		break;
 
@@ -376,25 +373,23 @@ void process_cartesian_bot_snap_commands_v1()
 			/*
 			if (dest == X_ADDRESS)
 			{
-				bot.x.stepper.setRPM(snap.getByte(1));
 				bot.x.stepper.setDirection(RS_REVERSE);
 				x_mode = func_reverse;
-				bot.setTimer(bot.x.stepper.step_delay);
 			}
 			else if (dest == Y_ADDRESS)
 			{
-				bot.y.stepper.setRPM(snap.getByte(1));
 				bot.y.stepper.setDirection(RS_REVERSE);
 				y_mode = func_reverse;
-				bot.setTimer(bot.y.stepper.step_delay);
 			}
 			else if (dest == Z_ADDRESS)
 			{
-				bot.z.stepper.setRPM(snap.getByte(1));
 				bot.z.stepper.setDirection(RS_REVERSE);
 				z_mode = func_reverse;
-				bot.setTimer(bot.z.stepper.step_delay);
 			}
+
+			//emulate PIC timer
+			bot.setTimer((256 - snap.getByte(1)) * 4096);
+
 			*/
 		break;
 
@@ -441,23 +436,20 @@ void process_cartesian_bot_snap_commands_v1()
 			{
 				x_mode = MODE_SEEK;
 				bot.x.setTarget(position);
-				bot.x.stepper.setRPM(snap.getByte(1));
-				bot.setTimer(bot.x.stepper.step_delay);
 			}
 			else if (dest == Y_ADDRESS)
 			{
 				y_mode = MODE_SEEK;
 				bot.y.setTarget(position);
-				bot.y.stepper.setRPM(snap.getByte(1));
-				bot.setTimer(bot.y.stepper.step_delay);
 			}
 			else if (dest == Z_ADDRESS)
 			{
 				z_mode = MODE_SEEK;
 				bot.z.setTarget(position);
-				bot.z.stepper.setRPM(snap.getByte(1));
-				bot.setTimer(bot.z.stepper.step_delay);
 			}
+
+			//emulate the PIC timer speeds
+			bot.setTimer((256 - snap.getByte(1)) * 4096);
 
 			//get everything current.
 			bot.readState();
@@ -507,27 +499,19 @@ void process_cartesian_bot_snap_commands_v1()
 		case CMD_CALIBRATE:
 			// Request calibration (search at given speed)
 			if (dest == X_ADDRESS)
-			{
-				bot.x.stepper.setRPM(snap.getByte(1));
-				bot.setTimer(bot.x.stepper.step_delay);
 				x_mode = MODE_FIND_MIN;
-			}
 			else if (dest == Y_ADDRESS)
-			{
-				bot.y.stepper.setRPM(snap.getByte(1));
-				bot.setTimer(bot.y.stepper.step_delay);
 				y_mode = MODE_FIND_MIN;
-			}
 			else if (dest == Z_ADDRESS)
-			{
-				bot.z.stepper.setRPM(snap.getByte(1));
-				bot.setTimer(bot.z.stepper.step_delay);
 				z_mode = MODE_FIND_MIN;
-			}
+			
+			//emulate PIC speeds
+			bot.setTimer((256 - snap.getByte(1)) * 4096);
 			
 			//start our calibration.
 			bot_mode = MODE_FIND_MIN;		
 			bot.enableTimerInterrupt();
+
 		break;
 
 		case CMD_GETRANGE:
@@ -582,9 +566,8 @@ void process_cartesian_bot_snap_commands_v1()
 			bot.z.setTarget(bot.z.current);
 			
 			//set our speed.
-			bot.x.stepper.setRPM(snap.getByte(1));
-			bot.setTimer(bot.x.stepper.step_delay);
-
+			bot.setTimer((256 - snap.getByte(1)) * 4096);
+			
 			//init our DDA stuff!
 			bot.calculateDDA();
 			
@@ -633,8 +616,6 @@ void process_cartesian_bot_snap_commands_v1()
 			{
 				//configure our axis
 				bot.x.stepper.setDirection(RS_REVERSE);
-				bot.x.stepper.setRPM(snap.getByte(1));
-				bot.setTimer(bot.x.stepper.step_delay);
 
 				//tell our axis to go home.
 				x_mode = MODE_HOMERESET;
@@ -643,8 +624,6 @@ void process_cartesian_bot_snap_commands_v1()
 			{
 				//configure our axis
 				bot.y.stepper.setDirection(RS_REVERSE);
-				bot.y.stepper.setRPM(snap.getByte(1));
-				bot.setTimer(bot.y.stepper.step_delay);
 
 				//tell our axis to go home.
 				y_mode = MODE_HOMERESET;
@@ -653,12 +632,13 @@ void process_cartesian_bot_snap_commands_v1()
 			{
 				//configure our axis
 				bot.z.stepper.setDirection(RS_REVERSE);
-				bot.z.stepper.setRPM(snap.getByte(1));
-				bot.setTimer(bot.z.stepper.step_delay);
 
 				//tell our axis to go home.
 				z_mode = MODE_HOMERESET;
 			}
+
+			//emulate PIC timer stuff
+			bot.setTimer((256 - snap.getByte(1)) * 4096);
 
 			//starts our home reset mode.
 			bot_mode = MODE_HOMERESET;
