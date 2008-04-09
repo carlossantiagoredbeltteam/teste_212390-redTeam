@@ -36,6 +36,8 @@ or the Executive Committee.
 Section 3: Notice. Notice of each meeting shall be given to each voting
 member, by electronic mail, not less than ten days before the meeting.
 
+Section 4: Meeting Format. Due to the highly distributed nature of the board, meetings shall generally be conducted via email, IRC, and Skype.  Voting shall take place via email, or by using online polling software.  All members shall be allowed 3 days from the initial announcement email to cast their votes.
+
 ARTICLE IV - BOARD OF DIRECTORS
 
 Section 1: Board Role, Size, Compensation. The Board is responsible for
@@ -133,4 +135,4 @@ Section 1: These Bylaws may be amended when necessary by a two-thirds
 majority of the Board of Directors. Proposed amendments must be submitted
 to the Secretary to be sent out with regular Board announcements.
 
-These Bylaws were approved at a meeting of the Board of Directors of RepRap Research Foundation on _______________________, 19XX.
+These Bylaws were approved at a meeting of the Board of Directors of RepRap Research Foundation on _______________________, 2008.
