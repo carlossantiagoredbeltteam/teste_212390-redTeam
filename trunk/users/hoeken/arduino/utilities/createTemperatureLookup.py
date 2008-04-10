@@ -98,8 +98,16 @@ def main(argv):
 #	adcs = [1, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 130, 150, 190, 220,  250, 300]
 	first = 1
 
+	print "// thermistor lookup table"
+	print "// made with createTemperatureLookup.py"
+	print "// r0: ", r0
+	print "// t0: ", t0
+	print "// r1: ", r1
+	print "// r2: ", r2
+	print "// beta: ", beta
+	print "// max adc: ", max_adc
+	print;
 	print "#define NUMTEMPS ", len(adcs)
-
 	print "short temptable[NUMTEMPS][2] = {"
 	print "// { adc ,  temp }"    
 	for adc in adcs:
