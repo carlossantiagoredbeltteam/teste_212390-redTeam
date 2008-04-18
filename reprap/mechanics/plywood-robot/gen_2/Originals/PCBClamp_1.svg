@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" baseProfile="full" id="body" width="8in" height="8in" viewBox="0 0 1 1" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+<title>SVG drawing</title>
+<desc>This was produced by version 4.2 of GNU libplot, a free library for exporting 2-D vector graphics.</desc>
+<rect id="background" x="0" y="0" width="1" height="1" stroke="none" fill="white"/>
+<g id="content" transform="translate(-0.03125,1.1875) scale(1,-1) scale(0.0017361) " xml:space="preserve" stroke="black" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10.433" stroke-dasharray="none" stroke-dashoffset="0" stroke-opacity="1" fill="none" fill-rule="even-odd" fill-opacity="1" font-style="normal" font-variant="normal" font-weight="normal" font-stretch="normal" font-size-adjust="none" letter-spacing="normal" word-spacing="normal" text-anchor="start">
+<line x1="186.8" y1="190.88" x2="209.36" y2="190.88" stroke-width="0" />
+<line x1="209.36" y1="198.56" x2="186.8" y2="198.56" stroke-width="0" />
+<polygon points="146.18,184.43 216.88,184.43 216.88,205.22 146.18,205.22 " stroke-width="0" />
+<line x1="186.8" y1="198.56" x2="186.8" y2="190.88" stroke-width="0" />
+<line x1="209.36" y1="198.56" x2="209.36" y2="190.88" stroke-width="0" />
+<path d="M146.18,161.86 C148.92,153.97,156.37,148.68,164.73,148.68 " stroke-width="0" />
+<line x1="216.8" y1="148.64" x2="216.8" y2="176.72" stroke-width="0" />
+<path d="M159,161.86 L159.3,161.61 L159.61,161.37 L159.93,161.14 L160.26,160.93 L160.6,160.74 L160.95,160.56 L161.3,160.4 L161.66,160.25 L162.03,160.12 L162.4,160.01 L162.78,159.91 L163.16,159.83 L163.55,159.77 L163.94,159.72 L164.33,159.7 L164.73,159.69 C169.49,159.69,173.35,163.55,173.35,168.31 H173.35 " stroke-width="0" />
+<line x1="194.48" y1="159.44" x2="194.48" y2="169.76" stroke-width="0" />
+<line x1="201.68" y1="159.44" x2="201.68" y2="169.76" stroke-width="0" />
+<line x1="164.72" y1="148.64" x2="216.8" y2="148.64" stroke-width="0" />
+<line x1="201.68" y1="159.44" x2="194.48" y2="159.44" stroke-width="0" />
+<line x1="216.8" y1="148.64" x2="216.8" y2="148.64" stroke-width="0" />
+<line x1="146" y1="161.84" x2="158.96" y2="161.84" stroke-width="0" />
+<line x1="194.48" y1="176.72" x2="194.48" y2="184.4" stroke-width="0" />
+<line x1="186.8" y1="176.72" x2="186.8" y2="184.4" stroke-width="0" />
+<line x1="173.12" y1="176.72" x2="186.8" y2="176.72" stroke-width="0" />
+<line x1="173.12" y1="168.08" x2="173.12" y2="176.72" stroke-width="0" />
+<line x1="191.84" y1="169.76" x2="191.84" y2="176.72" stroke-width="0" />
+<line x1="194.48" y1="176.72" x2="191.84" y2="176.72" stroke-width="0" />
+<line x1="194.48" y1="169.76" x2="191.84" y2="169.76" stroke-width="0" />
+<line x1="194.48" y1="184.4" x2="186.8" y2="184.4" stroke-width="0" />
+<line x1="209.36" y1="176.72" x2="209.36" y2="184.4" stroke-width="0" />
+<line x1="201.68" y1="176.72" x2="201.68" y2="184.4" stroke-width="0" />
+<line x1="216.8" y1="176.72" x2="209.36" y2="176.72" stroke-width="0" />
+<line x1="201.68" y1="176.72" x2="204.32" y2="176.72" stroke-width="0" />
+<polyline points="201.68,169.76 204.32,169.76 204.32,176.72 " stroke-width="0" />
+<line x1="209.36" y1="184.4" x2="201.68" y2="184.4" stroke-width="0" />
+</g>
+</svg>

@@ -1,0 +1,42 @@
+These files are derrived from Toby Borland's original designs for 4mm
+plywood RepRap parts - see http://reprap.org for details. It'll be
+there somewhere. Try "Search".
+
+Some of these parts are interchangeable with Darwin 1.0 components.
+However, we encourage you to manufacture your own RepRap components as
+soon as possible so that you have spare parts - there are none in these
+files. You will also need around 10 x 8mm centre skate bearings. These
+are 22mm outside diameter and come from your local sporting goods
+store.
+
+Named for no other reason than the order in which they came up are
+"gen2" and "gen3". Gen2 is the first attempt to turn Toby's files into
+the system used by Ponoko http://ponoko.com who are kindly sponsoring
+development. They print out on 4.4mm thick material. We use ply as
+it is easy to cut and forms a strong bond with PVA glue.
+
+Gen3 stems from the realisation that a few cuts in MDF cost less than
+a lot of cuts in plywood. Great slabs of the frame are made from 9mm
+MDF. This makes it cheaper and uses less steel, but looks cool when
+cut in clear acrylic. Sadly, these parts are not all compatible with 
+the parts RepRap makes, so please replace them at the earliest
+opportunity to avoid upgrade hassles.
+
+Neither are finished yet.
+
+This directory also includes an archive of photos of Toby's original
+design, and many original 4mm data files as DXFs as well as SVG. You
+will find Inkscape to be an excellent editor for the SVG files, and
+Vik uses qcad for printing DXFs to PostScript files, which can then
+be turned into SVGs with pstoedit:
+
+pstoedit -f plot-svg /tmp/print.ps /tmp/x.svg 
+
+This design is released in the spirit of the GPL, pending a similar
+hardware licence to Open Source hardware designs. If you do not have a
+copy of the GPL it can be obtained from http://fsf.org, though a file
+should be present in this directory. Our intentions are clearly
+explained at http://reprap.org
+
+vik@diamondage.co.nz
+18-Apr-2008
