@@ -16,6 +16,8 @@
     This is the main user imported module containing all end user functions    
 """
 
+# add commands to switch to gcode mode to allow any script using this library to write gcode too.
+
 import snap, time, serial
 
 printDebug = False	# print debug info
@@ -74,7 +76,11 @@ snap.localAddress = 0		# local address of host PC. This will always be 0.
 
 def openSerial( port, rate, tout ):
 	global serialPort
-	serialPort = serial.Serial( port, rate, timeout = tout )
+	try:
+		serialPort = serial.Serial( port, rate, timeout = tout )
+		return True
+	except 13:
+		print "You do not have permissions to use the serial port, try running as root"
 
 def closeSerial():
 	serialPort.close()
@@ -277,7 +283,7 @@ class axisClass:
 		return False
 
 	#seek to axis location. When waitArrival is True, funtion does not return until seek is compete
-	def seek(self, pos, speed, waitArrival):
+	def seek(self, pos, speed, waitArrival = True):
 		if self.active and pos <= self.limit:
 			posMSB ,posLSB = int2bytes( pos )
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_SEEK, int(speed), posMSB ,posLSB] ) 
@@ -294,7 +300,7 @@ class axisClass:
 		return False
 	
 	#goto 0 position. When waitArrival is True, funtion does not return until reset is compete
-	def homeReset(self, speed, waitArrival):
+	def homeReset(self, speed, waitArrival = True):
 		if self.active:
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_HOMERESET, int(speed)] ) 
 			if p.send():
@@ -324,7 +330,7 @@ class axisClass:
 				return True
 		return False
 
-	def DDA( self, speed, seekTo, slaveDelta, waitArrival):
+	def DDA( self, speed, seekTo, slaveDelta, waitArrival = True):
 		if self.active and seekTo <= self.limit:
 			masterPosMSB, masterPosLSB = int2bytes( seekTo )
 			slaveDeltaMSB, slaveDeltaLSB = int2bytes( slaveDelta )
@@ -367,7 +373,7 @@ class cartesianClass:
 		self.z = axisClass(4)
 
 	# goto home position (all axies)
-	def homeReset(self, speed, waitArrival):
+	def homeReset(self, speed, waitArrival = True):
 		if self.x.homeReset( speed, waitArrival ):		#setting these to true breaks waitArrival convention. need to rework waitArrival and possibly have each axis storing it's arrival flag and pos as variables?
 			print "X Reset"		
 		if self.y.homeReset( speed, waitArrival ):
@@ -378,7 +384,7 @@ class cartesianClass:
 
 	# seek to location (all axies). When waitArrival is True, funtion does not return until all seeks are compete
 	# seek will automatically use syncSeek when it is required. Always use the seek function
-	def seek(self, pos, speed, waitArrival):
+	def seek(self, pos, speed, waitArrival = True):
 		curX, curY, curZ = self.x.getPos(), self.y.getPos(), self.z.getPos()
 		x, y, z = pos
 		if x <= self.x.limit and y <= self.y.limit and z <= self.z.limit:
@@ -396,7 +402,7 @@ class cartesianClass:
 			print "Trying to print outside of limit, aborting seek"
 	
 	# perform syncronised x/y movement. This is called by seek when needed.
-	def syncSeek(self, pos, speed, waitArrival):
+	def syncSeek(self, pos, speed, waitArrival = True):
 		curX, curY = self.x.getPos(), self.y.getPos()
 		newX, newY, nullZ = pos
 		deltaX = abs( curX - newX )		# calc delta movements
@@ -438,6 +444,8 @@ class cartesianClass:
 		self.x.setPower( power )
 		self.y.setPower( power )
 		self.z.setPower( power )
+	#def lockout():
+	#keep sending power down commands to all board every second
 
 	
 cartesian = cartesianClass()

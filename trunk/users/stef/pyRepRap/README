@@ -7,6 +7,19 @@ How to Install :
 python setup.py build
 sudo python setup.py install
 
+What's included:
+   python libraries:
+      reprap            General control of reprap
+      reprap.extrude    
+      reprap.fillet     Plot gcode
+   scripts:
+      reprapcontrol     Handy command line control program for RepRap
+      rrplotdxf         Plot dxf CAD files on RepRap
+      rrplotgerber      Plot gerber PCB files on RepRap
+
+Once the package is installed you can run the scripts from the command line at any time
+
+
 Licence :
 pyRepRap is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
