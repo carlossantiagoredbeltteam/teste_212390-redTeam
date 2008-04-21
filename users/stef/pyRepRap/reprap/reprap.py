@@ -16,7 +16,7 @@
     This is the main user imported module containing all end user functions    
 """
 
-import snap, time
+import snap, time, serial
 
 printDebug = False	# print debug info
 
@@ -69,16 +69,24 @@ sync_inc	= 2	# inc motor on each pulse
 sync_dec	= 3	# dec motor on each pulse
 
 snap.localAddress = 0		# local address of host PC. This will always be 0.
+#global serialPort
+#serialPort = False
 
+def openSerial( port, rate, tout ):
+	global serialPort
+	serialPort = serial.Serial( port, rate, timeout = tout )
+
+def closeSerial():
+	serialPort.close()
 
 # Convert two 8 bit bytes to one integer
 def bytes2int(LSB, MSB):		
-	return int( (0x100 * MSB) | LSB )
+	return int( (0x100 * int(MSB) ) | int(LSB) )
 
 # Convert integer to two 8 bit bytes
 def int2bytes(val):
-	MSB = int( (val & 0xFF00) / 0x100 )
-	LSB = int( val  & 0xFF )
+	MSB = int( ( int(val) & 0xFF00) / 0x100 )
+	LSB = int( int(val) & 0xFF )
 	return LSB, MSB
 
 #def loopTest():
@@ -89,8 +97,8 @@ def scanNetwork():
 	devices = []
 	for remoteAddress in range(1, 10):									# For every address in range. full range will be 255
 		print "Trying address " + str(remoteAddress)
-		p = snap.SNAPPacket( serial, remoteAddress, snap.localAddress, 0, 1, [CMD_GETMODULETYPE] )	# Create snap packet requesting module type
-		#p = snap.SNAPPacket( serial, remoteAddress, snap.localAddress, 0, 1, [CMD_VERSION] )
+		p = snap.SNAPPacket( serialPort, remoteAddress, snap.localAddress, 0, 1, [CMD_GETMODULETYPE] )	# Create snap packet requesting module type
+		#p = snap.SNAPPacket( serialPort, remoteAddress, snap.localAddress, 0, 1, [CMD_VERSION] )
 		if p.send():											# Send snap packet, if sent ok then await reply
 			rep = p.getReply()
 			if rep:
@@ -105,8 +113,8 @@ def scanNetwork():
 		#now get versions
 		print "device", d
 
-def getNotification(serial):
-	return snap.getPacket(serial)
+def getNotification(serialPort):
+	return snap.getPacket(serialPort)
 
 class extruderClass:
 	def __init__(self):
@@ -115,7 +123,7 @@ class extruderClass:
 
 	def getModuleType(self):	#note: do pics not support this yet? I can't see it in code and get no reply from pic
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_GETMODULETYPE] )	# Create SNAP packet requesting module type
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_GETMODULETYPE] )	# Create SNAP packet requesting module type
 			if p.send():
 				rep = p.getReply()
 				data = checkReplyPacket( rep, 2, CMD_GETMODULETYPE )						# If packet sent ok and was acknoledged then await reply, otherwise return False
@@ -125,7 +133,7 @@ class extruderClass:
 
 	def getVersion(self):
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_VERSION] )
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_VERSION] )
 			if p.send():
 				rep = p.getReply()
 				data = checkReplyPacket( rep, 3, CMD_VERSION )
@@ -135,14 +143,14 @@ class extruderClass:
 
 	def setMotor(self, direction, speed):
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [int(direction), int(speed)] ) ##no command being sent, whats going on?
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [int(direction), int(speed)] ) ##no command being sent, whats going on?
 			if p.send():
 				return True
 		return False
 
 	def getTemp(self):
 		if self.active:		
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_GETTEMP] )
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_GETTEMP] )
 			if p.send():
 				rep = p.getReply()
 				data = checkReplyPacket( rep, 2, CMD_GETTEMP )
@@ -152,7 +160,7 @@ class extruderClass:
 
 	def setVoltateReference(self, val):
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SETVREF, int(val)] )
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_SETVREF, int(val)] )
 			if p.send():
 				return True
 		return False
@@ -161,21 +169,21 @@ class extruderClass:
 		if self.active:	
 			tempTargetMSB, tempTargetLSB = int2bytes( tempTarget )
 			tempMaxMSB ,tempMaxLSB = int2bytes( tempMax )
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SETHEAT, int(lowHeat), int(highHeat), tempTargetMSB, tempTargetLSB, tempMaxMSB, tempMaxLSB] )	# assumes MSB first (don't know this!)
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_SETHEAT, int(lowHeat), int(highHeat), tempTargetMSB, tempTargetLSB, tempMaxMSB, tempMaxLSB] )	# assumes MSB first (don't know this!)
 			if p.send():
 				return True
 		return False
 
 	def setCooler(self, speed):
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SETCOOLER, int(speed)] )
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_SETCOOLER, int(speed)] )
 			if p.send():
 				return True
 		return False
 
 	def freeMotor(self):
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_FREE] )
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_FREE] )
 			if p.send():
 				return True
 		return False
@@ -199,7 +207,7 @@ class axisClass:
 	#move axis one step forward
 	def forward1(self):
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_FORWARD1] ) 
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_FORWARD1] ) 
 			if p.send():
 				return True
 		return False
@@ -207,7 +215,7 @@ class axisClass:
 	#move axis one step backward
 	def backward1(self):
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_BACKWARD1] ) 
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_BACKWARD1] ) 
 			if p.send():
 				return True
 		return False
@@ -215,7 +223,7 @@ class axisClass:
 	#spin axis forward at given speed
 	def forward(self, speed):
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_FORWARD, int(speed)] ) 
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_FORWARD, int(speed)] ) 
 			if p.send():
 				return True
 		return False
@@ -223,7 +231,7 @@ class axisClass:
 	#spin axis backward at given speed
 	def backward(self, speed):
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_REVERSE, int(speed)] ) 
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_REVERSE, int(speed)] ) 
 			if p.send():
 				return True
 		return False
@@ -231,7 +239,7 @@ class axisClass:
 	#debug only
 	def getSensors(self):
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_GETSENSOR] )
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_GETSENSOR] )
 			if p.send():
 				rep = p.getReply()
 				data = checkReplyPacket( rep, 3, CMD_GETSENSOR )		# replace this with a proper object in SNAP module?
@@ -242,7 +250,7 @@ class axisClass:
 	#get current axis position
 	def getPos(self):
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_GETPOS] )
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_GETPOS] )
 			if p.send():
 				rep = p.getReply()
 				data = checkReplyPacket( rep, 3, CMD_GETPOS )
@@ -255,7 +263,7 @@ class axisClass:
 	def setPos(self, pos):
 		if self.active:
 			posMSB ,posLSB = int2bytes( pos )
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SETPOS, posMSB, posLSB] )
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_SETPOS, posMSB, posLSB] )
 			if p.send():
 				return True
 		return False
@@ -263,7 +271,7 @@ class axisClass:
 	#power off coils on stepper
 	def free(self):
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_FREE] ) 
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_FREE] ) 
 			if p.send():
 				return True
 		return False
@@ -272,11 +280,11 @@ class axisClass:
 	def seek(self, pos, speed, waitArrival):
 		if self.active and pos <= self.limit:
 			posMSB ,posLSB = int2bytes( pos )
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SEEK, int(speed), posMSB ,posLSB] ) 
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_SEEK, int(speed), posMSB ,posLSB] ) 
 			if p.send():
 				if waitArrival:
 					if printDebug: print "    wait notify"
-					notif = getNotification( serial )
+					notif = getNotification( serialPort )
 					if notif.dataBytes[0] == CMD_SEEK:
 						if printDebug: print "    valid notification for seek"
 					else:
@@ -288,11 +296,11 @@ class axisClass:
 	#goto 0 position. When waitArrival is True, funtion does not return until reset is compete
 	def homeReset(self, speed, waitArrival):
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_HOMERESET, int(speed)] ) 
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_HOMERESET, int(speed)] ) 
 			if p.send():
 				if waitArrival:
 					if printDebug: print "reset wait"
-					notif = getNotification( serial )
+					notif = getNotification( serialPort )
 					if notif.dataBytes[0] == CMD_HOMERESET:
 						if printDebug: print "    valid notification for reset"
 					else:
@@ -302,15 +310,16 @@ class axisClass:
 		return False
 
 	def setNotify(self):
+		#global serialPort
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_NOTIFY, snap.localAddress] ) 	# set notifications to be sent to host
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_NOTIFY, snap.localAddress] ) 	# set notifications to be sent to host
 			if p.send():
 				return True
 		return False
 
 	def setSync( self, syncMode ):
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SYNC, int(syncMode)] )
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_SYNC, int(syncMode)] )
 			if p.send():
 				return True
 		return False
@@ -319,10 +328,10 @@ class axisClass:
 		if self.active and seekTo <= self.limit:
 			masterPosMSB, masterPosLSB = int2bytes( seekTo )
 			slaveDeltaMSB, slaveDeltaLSB = int2bytes( slaveDelta )
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_DDA, int(speed), masterPosMSB ,masterPosLSB, slaveDeltaMSB, slaveDeltaLSB] ) 	#start sync
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_DDA, int(speed), masterPosMSB ,masterPosLSB, slaveDeltaMSB, slaveDeltaLSB] ) 	#start sync
 			if p.send():
 				if waitArrival:
-					notif = getNotification( serial )
+					notif = getNotification( serialPort )
 					if notif.dataBytes[0] == CMD_DDA:
 						if printDebug: print "    valid notification for DDA"	# todo: add actual enforement on wrong notification
 					else:
@@ -332,7 +341,7 @@ class axisClass:
 	
 	def setPower( self, power ):
 		if self.active:
-			p = snap.SNAPPacket( serial, self.address, snap.localAddress, 0, 1, [CMD_SETPOWER, int( power * 0.63 )] ) # This is a value from 0 to 63 (6 bits)
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_SETPOWER, int( power * 0.63 )] ) # This is a value from 0 to 63 (6 bits)
 			if p.send():
 				return True
 		return False
