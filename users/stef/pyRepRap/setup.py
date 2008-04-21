@@ -9,5 +9,5 @@ setup(
 	author_email='greenarrow@users.sourceforge.net',
 	description='Python library to control RepRap firmware using the SNAP protocol.',
 	packages=['reprap'],
-	scripts=['scripts/rrplotdxf']
+	scripts=['scripts/rrplotdxf', 'scripts/reprapcontrol', 'scripts/rrplotgerber']
 )
