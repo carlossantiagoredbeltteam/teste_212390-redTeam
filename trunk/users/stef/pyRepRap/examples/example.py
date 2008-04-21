@@ -8,8 +8,10 @@ import serial, reprap, time, sys
 
 #work surface approx x 2523, y 2743
 
-#reprap.serial = serial.Serial(0, 19200, timeout = reprap.snap.messageTimeout)
-reprap.serial = serial.Serial(0, 19200, timeout = 60)
+#reprap.serialPort = serial.Serial(0, 19200, timeout = reprap.snap.messageTimeout)
+#reprap.serial = serial.Serial()
+reprap.openSerial( 0, 19200, 60 )
+#print reprap.serialPort
 
 reprap.cartesian.x.active = True	# these devices are present in network
 reprap.cartesian.y.active = True
