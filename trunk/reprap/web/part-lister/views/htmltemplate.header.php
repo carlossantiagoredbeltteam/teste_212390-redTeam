@@ -2,9 +2,9 @@
 <html>
 	<head>
 		<? if ($title): ?>
-			<title><?=$title?> - RepRap Parts Lister</title>
+			<title><?=$title?> - <?=RR_PROJECT_NAME?></title>
 		<? else: ?>
-			<title>RepRap Parts Lister</title>
+			<title><?=RR_PROJECT_NAME?></title>
 		<? endif ?>
 		<link rel="stylesheet" type="text/css" href="/css/style.css" />
 		<link rel="stylesheet" type="text/css" href="/dtree/dtree.css" />
@@ -25,8 +25,8 @@
 		<div id="main">
 			<a name="top" class="nodisplay"></a>
 			<div id="header">
-				<h1 class="shad"><em>RepRap Parts Lister</em></h1>
-				<h1><em>RepRap Parts Lister</em></h1>
+				<h1 class="shad"><em><?=RR_PROJECT_NAME?></em></h1>
+				<h1><em><?=RR_PROJECT_NAME?></em></h1>
 				<div class="gear"> </div>
 			</div>
 
