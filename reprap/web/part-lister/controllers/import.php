@@ -24,11 +24,10 @@
 			echo "Database structure created.<br/><br/>";
 			
 			//import our data!  order is important here.
-			$legend = loadLegend();
-			loadCountries($legend);
-			loadSuppliers($legend);
-			loadUniqueParts($legend);
-			loadRawSheets($legend);
+			loadCountries();
+			loadSuppliers();
+			loadUniqueParts();
+			loadRawSheets();
 			
 			//dump our database to the file for others
 			dumpDatabaseToFile();
@@ -38,9 +37,9 @@
 	}
 	
 	
-	function getRawSheetData($id)
+	function getRawSheetData($key, $id)
 	{
-		$url = "http://spreadsheets.google.com/pub?key=pmEMxYRcQzzATwbOb71BmGA&output=csv&gid=$id";
+		$url = "http://spreadsheets.google.com/pub?key={$key}&output=csv&gid={$id}";
 	
 		echo "<!-- getting $url -->\n";
 
@@ -52,127 +51,125 @@
 	
 		return $data;
 	}
-	
-	function loadLegend()
+
+	function loadCountries()
 	{
-		$legend = array();
-		$legend['countries'] = 21;
-		$legend['suppliers'] = 12;
-		$legend['unique_parts'] = 15;
-		$legend['legend'] = 8;
-		
-		//open our legend page with info on what sheets to use.
-		$data = getRawSheetData($legend['legend']);
-		
-		//discard the first two human rows.
-		array_shift($data);
-		array_shift($data);
-		
-		//get the data!
-		foreach ($data AS $row)
+		global $SOURCE_DATA;
+
+		//load all our country arrays.
+		foreach ($SOURCE_DATA['countries'] AS $legend_row)
 		{
-			//only add it if it has a name and number.
-			if ($row[0] && $row[1])
+			$data = getRawSheetData($legend_row[0], $legend_row[1]);
+		
+			array_shift($data);
+			array_shift($data);
+		
+			foreach ($data AS $row)
 			{
-				//the first one is our 'main sheet'
-				if (!$legend['main_sheet'])
-					$legend['main_sheet'] = $row[1];
-				
-				//load up our keyed array.	
-				$karr = array();
-				$legend['raw_keys'][$row[0]] = $row[1];
+				$country = new Country();
+				$country->set('name', $row[0]);
+				$country->set('code', $row[1]);
+				$country->set('group', $row[2]);
+				$country->save();
+
+				$count++;
 			}
 		}
-	
-		return $legend;
+		
+		echo "Loaded {$count} countries.<br/><br/>\n";
 	}
 	
-	function loadCountries($legend)
+	function loadSuppliers()
 	{
-		$data = getRawSheetData($legend['countries']);
-		array_shift($data);
-		array_shift($data);
-		
-		foreach ($data AS $row)
+		global $SOURCE_DATA;
+
+		//load all our supplier arrays.
+		foreach ($SOURCE_DATA['suppliers'] AS $legend_row)
 		{
-			$country = new Country();
-			$country->set('name', $row[0]);
-			$country->set('code', $row[1]);
-			$country->set('group', $row[2]);
-			$country->save();
+			$data = getRawSheetData($legend_row[0], $legend_row[1]);
+		
+			#get rid of the first two lines of human text
+			array_shift($data);
+			array_shift($data);
+
+			foreach ($data AS $row)
+			{
+				//create our supplier
+				$supplier = new Supplier();
+				$supplier->set('name', $row[0]);
+				$supplier->set('prefix', $row[1]);
+				$supplier->set('website', $row[2]);
+				$supplier->set('description', $row[3]);
+				$supplier->set('buy_link', $row[5]);
+				$supplier->save();
+			
+				//add in our country relations
+				/*
+				$countries = explode(",", $row[4]);
+				if (count($countries))
+				{
+					foreach ($countries AS $short)
+					{
+						$country = Country::lookupShort($short);
+					
+						$sc = new SupplierCountry();
+						$sc->set('supplier_id', $supplier->id);
+						$sc->set('country_id', $country->id);
+						$sc->save();
+					}
+				}
+				*/
+			
+				$count++;
+				
+				echo "Added supplier " . $supplier->get('name') . "<br/>\n";
+			}
 		}
 		
-		echo "Loaded " . count($data) . " countries.<br/><br/>\n";
+		echo "<b>Added {$count} total suppliers.</b><br/><br/>\n";
 	}
 	
-	function loadSuppliers($legend)
+	function loadUniqueParts()
 	{
-		$data = getRawSheetData($legend['suppliers']);
-		
-		#get rid of the first two lines of human text
-		array_shift($data);
-		array_shift($data);
+		global $SOURCE_DATA;
 
-		foreach ($data AS $row)
+		//load all our supplier arrays.
+		foreach ($SOURCE_DATA['unique_parts'] AS $legend_row)
 		{
-			//create our supplier
-			$supplier = new Supplier();
-			$supplier->set('name', $row[0]);
-			$supplier->set('prefix', $row[1]);
-			$supplier->set('website', $row[2]);
-			$supplier->set('description', $row[3]);
-			$supplier->set('buy_link', $row[5]);
-			$supplier->save();
+			$data = getRawSheetData($legend_row[0], $legend_row[1]);
 			
-			//add in our country relations
-			/*
-			$countries = explode(",", $row[4]);
-			if (count($countries))
+			//junk.
+			if (!empty($data))
 			{
-				foreach ($countries AS $short)
+				array_shift($data);
+				array_shift($data);
+			}
+		
+			if (!empty($data))
+			{
+				foreach ($data AS $row)
 				{
-					$country = Country::lookupShort($short);
-					
-					$sc = new SupplierCountry();
-					$sc->set('supplier_id', $supplier->id);
-					$sc->set('country_id', $country->id);
-					$sc->save();
+					if ($row[1])
+					{
+						$count++;
+						
+						$part = new UniquePart();
+						$part->set('name', $row[0]);
+						$part->set('type', $row[1]);
+						$part->set('description', $row[2]);
+						$part->set('url', $row[3]);
+						$part->set('units', $row[4]);
+						$part->save();
+
+						echo "Added unique part '" . $part->get('name') . "'<br/>\n";
+
+						loadSuppliedParts($part, array_slice($row, 5));
+					}
 				}
 			}
-			*/
-			
-			echo "Added supplier " . $supplier->get('name') . "<br/>\n";
 		}
-		//echo "<b>Added " . count($data) . " total suppliers.</b><br/><br/>\n";
-	}
-	
-	function loadUniqueParts($legend)
-	{
-		$data = getRawSheetData($legend['unique_parts']);
 		
-		//junk.
-		array_shift($data);
-		array_shift($data);
-		
-		foreach ($data AS $row)
-		{
-			if ($row[1])
-			{
-				$part = new UniquePart();
-				$part->set('name', $row[0]);
-				$part->set('type', $row[1]);
-				$part->set('description', $row[2]);
-				$part->set('url', $row[3]);
-				$part->set('units', $row[4]);
-				$part->save();
-				
-				//echo "Added unique part '" . $part->get('name') . "'<br/>\n";
-				
-				loadSuppliedParts($part, array_slice($row, 5));
-			}
-		}
-
-		echo "<b>Added " . count($data) . " total unique parts.</b><br/><br/>\n";
+		echo "<b>Added {$count} total unique parts.</b><br/><br/>\n";
 	}
 	
 	function loadSuppliedParts($part, $data)
@@ -217,14 +214,50 @@
 		//echo "<br/>\n";
 	}
 	
-	function loadRawSheets($legend)
+	function loadLegend()
 	{
+		global $SOURCE_DATA;
+		
+		$legend = array();
+
+		//open our legend page with info on what sheets to use.
+		foreach ($SOURCE_DATA['legend'] AS $legend_row)
+		{
+			$data = getRawSheetData($legend_row[0], $legend_row[1]);
+			
+			//discard the first two human rows.
+			//array_shift($data);
+			//array_shift($data);
+
+			//get the data!
+			foreach ($data AS $row)
+			{
+				//only add it if it has a name and number.
+				if ($row[0] && (int)$row[1])
+				{
+					//the first one is our 'main sheet'
+					if (!$legend['main_sheet'])
+						$legend['main_sheet'] = $row[1];
+
+					//load up our keyed array.	
+					$legend['raw_keys'][$row[0]] = array($legend_row[0], $row[1]);
+				}
+			}
+		}
+
+		return $legend;
+	}
+	
+	function loadRawSheets()
+	{
+		$legend = loadLegend();
+		
 		if (!empty($legend['raw_keys']))
 		{
-			foreach ($legend['raw_keys'] AS $name => $id)
+			foreach ($legend['raw_keys'] AS $name => $legend_row)
 			{
 				//get our initial data.
-				$data = getRawSheetData($id);
+				$data = getRawSheetData($legend_row[0], $legend_row[1]);
 
 				//create our root node.
 				$root = new RawPart();
