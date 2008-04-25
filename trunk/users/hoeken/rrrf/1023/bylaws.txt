@@ -1,13 +1,17 @@
 BYLAWS OF RepRap Research Foundation
 
-ARTICLE I - NAME, PURPOSE
+ARTICLE I - NAME AND PURPOSE
 
-Section 1: The name of the organization shall be RepRap Research Foundation, abbreviated RRRF
+Section 1: The name of the organization shall be the RepRap Research
+Foundation, which can be abbreviated to RRRF
 
-Section 2: The RepRap Research Foundation is organized exclusively
-for charitable, scientific and educational purposes, more specifically to promote research in self-replicating manufacturing systems
-and to distribute the results of that research freely to everybody using open-source licensing. Due to the physical nature of the project
-this means we will buy and sell research materials at a low cost to researchers.
+Section 2: The RepRap Research Foundation is organized exclusively for
+charitable, scientific and educational purposes, more specifically to
+promote research in self-replicating manufacturing systems and to
+distribute the results of that research freely to everybody using
+open-source licensing. Owing to the physical nature of the project
+this means we will buy and sell research materials at a low cost to
+researchers.
 
 ARTICLE II - MEMBERSHIP
 
@@ -15,124 +19,153 @@ Section 1: Membership of the RRRF shall be free.
 
 Section 2: All members of the RRRF shall abide by all the rules of the RRRF.
 
-Section 3: Membership of the RRRF shall be open to any person who does not break the RRRF’s rules.
+Section 3: Membership of the RRRF shall be open to any person who does
+not break the RRRF's rules.
 
-Section 4: All members of the RRRF are encouraged to publish all the results of their research on self-replicating manufacturing systems in such a way as to make them freely available to everyone under an open-source licence, for example at objects.reprap.org.
+Section 4: All members of the RRRF are encouraged to publish all the
+results of their research on self-replicating manufacturing systems in
+such a way as to make them freely available to everyone under an
+open-source licence, for example at objects.reprap.org.
 
-Section 5: There shall be no corporate or organizational membership of the RRRF. However, as many people who are members of any corporation or organization and who wish may join as individual members of the RRRF.
+Section 5: There shall be no corporate or organizational membership of
+the RRRF. However, as many people who are members of any corporation
+or organization and who wish may join as individual members of the
+RRRF.
 
-Section 6: People who are minors in their country of residence must obtain permission from their parent or guardian to become members of the RRRF, and that parent or guardian must agree that the minor will abide by all the rules of the RRRF.
+Section 6: People who are minors in their country of residence must
+obtain permission from their parent or guardian to become members of
+the RRRF, and that parent or guardian must agree that the minor will
+abide by all the rules of the RRRF.
 
-Section 7: Members of the RRRF shall be entitled to place the letters MRRRF after their name.
+Section 7: Members of the RRRF shall be entitled to place the letters
+MRRRF after their name.
 
 ARTICLE III - ANNUAL MEETING
 
-Section 1: Annual Meeting. The date of the regular annual meeting shall
-be set by the Board of Directors who shall also set the time and place.
+Section 1: Annual Meeting. The date of the regular annual meeting
+shall be set by the Board of Directors who shall also set the time.
 
-Section 2: Special Meetings. Special meetings may be called by the Chair
-or the Executive Committee.
+Section 2: Special Meetings. Special meetings may be called by the
+Chair or the Executive Committee.
 
-Section 3: Notice. Notice of each meeting shall be given to each voting
-member, by electronic mail, not less than ten days before the meeting.
+Section 3: Notice. Notice of each meeting shall be given to each
+voting member, by electronic mail, not less than ten days before the
+meeting.
 
-Section 4: Meeting Format. Due to the highly distributed nature of the board, meetings shall generally be conducted via email, IRC, and Skype.  Voting shall take place via email, or by using online polling software.  All members shall be allowed 3 days from the initial announcement email to cast their votes.
+Section 4: Meeting Format. Owing to the highly distributed nature of
+the board, meetings shall generally be conducted via email, IRC, and
+Skype.  Voting shall take place via email, or by using online polling
+software.  All members shall be allowed 3 days from the initial
+announcement email to cast their votes.
 
 ARTICLE IV - BOARD OF DIRECTORS
 
-Section 1: Board Role, Size, Compensation. The Board is responsible for
-overall policy and direction of the Council, and delegates responsibility
-for day-to-day operations to the Council Director and committees. The Board
-shall have up to 9 and not fewer than 4 members. The board
-receives no compensation other than reasonable expenses.
+Section 1: Board Role, Size, Compensation. The Board is responsible
+for overall policy and direction of the Council, and delegates
+responsibility for day-to-day operations to the Council Director and
+committees. The Board shall have up to 9 and not fewer than 4
+members. The board shall receive no compensation other than reasonable
+expenses.
 
 Section 2: Meetings. The Board shall meet at least once a year, at an
 agreed upon time and place.
 
 Section 3: Board Elections. Election of new directors or election of
-current directors to a second term will occur as the first item of business
-at the annual meeting of the corporation. Directors will be elected by a
-majority vote of the current directors.
+current directors to a second term will occur as the first item of
+business at the annual meeting of the corporation. Directors will be
+elected by a majority vote of the current directors.
 
-Section 4: Terms. All Board members shall serve 2 year terms, but
-are eligible for re-election.
+Section 4: Terms. All Board members shall serve 2 year terms, but are
+eligible for re-election.
 
-Section 5: Quorum. A quorum must be attended by at least 50 percent
-of the Board members before business can be transacted or motions made or
+Section 5: Quorum. A quorum must be attended by at least 50 percent of
+the Board members before business can be transacted or motions made or
 passed.
 
 Section 6: Notice. An official Board meeting requires that each Board
-member have written notice 10 days in advance.
+member have written or email notice 10 days in advance.
 
-Section 7. Officers and Duties. There shall be five officers of the Board
-consisting of a Chair, Vice Chair, Secretary and Treasurer. Their duties
-are as follows:
+Section 7. Officers and Duties. There shall be five officers of the
+Board consisting of a Chair, Vice Chair, Secretary and
+Treasurer. Their duties are as follows:
 
-The Chair shall convene regularly scheduled Board meetings, shall preside
-or arrange for other members of the executive committee to preside at each
-meeting in the following order: Vice-Chair, Secretary and Treasurer.
+The Chair shall convene regularly scheduled Board meetings, shall
+preside or arrange for other members of the executive committee to
+preside at each meeting in the following order: Vice-Chair, Secretary
+and Treasurer.
 
-The Vice-Chair will chair committees on special subjects as designated
-by the board.
+The Vice-Chair shall chair committees on special subjects as
+designated by the board.
 
-The Secretary shall be responsible for keeping records of Board actions,
-including overseeing the taking of minutes at all board meetings, sending
-out meeting announcements, distributing copies of minutes and the agenda
-to each Board members, and assuring that corporate records are maintained.
+The Secretary shall be responsible for keeping records of Board
+actions, including overseeing the taking of minutes at all board
+meetings, sending out meeting announcements, distributing copies of
+minutes and the agenda to each Board members, and assuring that
+corporate records are maintained.
 
-The Treasurer shall make a report at each Board meeting. Treasurer shall
-chair the finance committee, assist in the preparation of the budget, help
-develop fundraising plans, and make financial information available to Board
-members and the public.
+The Treasurer shall make a report at each Board meeting. The Treasurer
+shall chair the finance committee, assist in the preparation of the
+budget, help develop fundraising plans, and make financial information
+available to Board members and the public.
 
 Section 8: Vacancies. When a vacancy on the Board exists, nominations
-for new members may be received from present Board members by the Secretary
-two weeks in advance of a Board meeting. These nominations shall be send
-out to Board members with the regular Board meeting announcement, to be
-voted upon at the next Board meeting. These vacancies will be filled only
-to the end of the particular Board member's term.
+for new members may be received from present Board members by the
+Secretary two weeks in advance of a Board meeting. These nominations
+shall be send out to Board members with the regular Board meeting
+announcement, to be voted upon at the next Board meeting. These
+vacancies will be filled only to the end of the particular Board
+member's term.
 
 Section 9: Resignation, Termination and Absences. Resignation from the
-Board must be in writing and received by the Secretary. A Board member shall
-be dropped for excess absences from the Board if s/he has three unexcused
-absences from Board meetings in a year. A Board member may be removed for
-other reasons by a three-fourths vote of the remaining directors.
+Board must be in writing or email and received by the Secretary. A
+Board member shall be dropped for excess absences from the Board if
+s/he has three unexcused absences from Board meetings in a year. A
+Board member may be removed for other reasons by a three-fourths vote
+of the remaining directors.
 
 Section 10: Special Meetings. Special meetings of the Board shall be
-called upon the request of the Chair or one-third of the Board. Notices
-of special meetings shall be send out by the Secretary to each Board member
-postmarked two weeks in advance.
+called upon the request of the Chair or one-third of the
+Board. Notices of special meetings shall be send out by the Secretary
+to each Board member postmarked two weeks in advance.
 
 ARTICLE V - COMMITTEES
 
-Section 1: The Board may create committees as needed, such as fundraising,
-housing, etc. The Board Chair appoints all committee chairs.
+Section 1: The Board may create committees as needed, such as
+fundraising, housing, etc. The Board Chair appoints all committee
+chairs.
 
-Section 2: The five officers serve as the members of the Executive Committee.
-Except for the power to amend the Articles of Incorporation and Bylaws,
-the Executive Committee shall have all of the powers and authority of the
-Board of Directors in the intervals between meetings of the Board of Directors,
-subject to the direction and control of the Board of Directors.
+Section 2: The five officers serve as the members of the Executive
+Committee.  Except for the power to amend the Articles of
+Incorporation and Bylaws, the Executive Committee shall have all of
+the powers and authority of the Board of Directors in the intervals
+between meetings of the Board of Directors, subject to the direction
+and control of the Board of Directors.
 
-Section 3: Finance Committee. The Treasurer is chair of the Finance Committee,
-which includes three other Board members. The Finance Committee is responsible
-for developing and reviewing fiscal procedures, a fundraising plan, and
-annual budget with staff and other Board members. The Board must approve
-the budget, and all expenditures must be within the budget. Any major change
-in the budget must be approved by the Board or the Executive Committee.
-The fiscal year shall be the calendar year. Annual reports are required
-to be submitted to the Board showing income, expenditures and pending income.
-The financial records of the organization are public information and shall
-be made available to the membership, Board members and the public.
+Section 3: Finance Committee. The Treasurer is chair of the Finance
+Committee, which includes three other Board members. The Finance
+Committee is responsible for developing and reviewing fiscal
+procedures, a fundraising plan, and annual budget with staff and other
+Board members. The Board must approve the budget, and all expenditures
+must be within the budget. Any major change in the budget must be
+approved by the Board or the Executive Committee.  The fiscal year
+shall be the calendar year. Annual reports are required to be
+submitted to the Board showing income, expenditures and pending
+income.  The financial records of the organization are public
+information and shall be made available to the membership, Board
+members and the public.
 
 ARTICLE VI - DISSOLUTION
 
-Section 1: Upon dissolution of RepRap Research Foundation, remaining assets must be donated to leading researchers in the RepRap project, to be determined by a vote of the Board.
+Section 1: Upon dissolution of the RepRap Research Foundation,
+remaining assets must be donated to leading researchers in the RepRap
+project, to be determined by a vote of the Board.
 
 ARTICLE VII - AMENDMENTS
-	
-Section 1: These Bylaws may be amended when necessary by a two-thirds
-majority of the Board of Directors. Proposed amendments must be submitted
-to the Secretary to be sent out with regular Board announcements.
 
-These Bylaws were approved at a meeting of the Board of Directors of RepRap Research Foundation on _______________________, 2008.
+Section 1: These Bylaws may be amended when necessary by a two-thirds
+majority of the Board of Directors. Proposed amendments must be
+submitted to the Secretary to be sent out with regular Board
+announcements.
+
+These Bylaws were approved at a meeting of the Board of Directors of
+RepRap Research Foundation on _______________________, 2008.
