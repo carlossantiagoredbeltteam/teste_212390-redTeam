@@ -6,152 +6,173 @@ import serial, reprap, time, sys
 #reprap.snap.printFailedPackets = True
 #reprap.printDebug = True
 
-reprap.openSerial( 0, 19200, 60 )
-#print reprap.serialPort
+if reprap.openSerial( 0, 19200, 60 ):
 
-reprap.cartesian.x.active = True	# these devices are present in network
-reprap.cartesian.y.active = True
-reprap.cartesian.z.active = True
-reprap.extruder.active = True
+	#print reprap.serialPort
 
-reprap.cartesian.x.setNotify()						
-reprap.cartesian.y.setNotify()
-reprap.cartesian.z.setNotify()
-reprap.cartesian.x.limit = 2523
-#reprap.cartesian.y.limit = 2743
-reprap.cartesian.y.limit = 2000
-#work surface approx x 2523, y 2743
+	reprap.cartesian.x.active = True	# these devices are present in network
+	reprap.cartesian.y.active = True
+	reprap.cartesian.z.active = True
+	reprap.extruder.active = True
 
-def printHelp():
-	print "\nreprapcontrol command [args]"
-	print "    Commands:"
-	print "        stop                 Stop all axies"
-	print "        reset                Send all axies to home"
-	print "        pos                  Print current position"
-	print "        goto [x] [y]         Go to specified position"
-	print "        power [0 to 63]      Set power level"
-	print "        go                   Test routine"
-	print "        free                 Power off steper motors"
-	print "        run [x/y] [speed]    Spin motor forwards"
-	print "        runb [x/y] [speed]   Spin motor backwards"
-	print "        step [x/y]           Step motor forward"
+	reprap.cartesian.x.setNotify()						
+	reprap.cartesian.y.setNotify()
+	reprap.cartesian.z.setNotify()
+	reprap.cartesian.x.limit = 2523
+	#reprap.cartesian.y.limit = 2743
+	reprap.cartesian.y.limit = 2000
+	#work surface approx x 2523, y 2743
 
-def printPos():
-	x, y, z = reprap.cartesian.getPos()
-	print "Location [" + str(x) + ", " + str(y) + ", " + str(z) + "]"
+	def printHelp():
+		print "\nreprapcontrol command [args]"
+		print "    Commands:"
+		print "        stop                 Stop all axies"
+		print "        reset                Send all axies to home"
+		print "        pos                  Print current position"
+		print "        goto [x] [y]         Go to specified position"
+		print "        power [0 to 63]      Set power level"
+		print "        speed [0 to 255]     Set steper speed"
+		print "        go                   Test routine"
+		print "        free                 Power off steper motors"
+		print "        run [x/y] [speed]    Spin motor forwards"
+		print "        runb [x/y] [speed]   Spin motor backwards"
+		print "        step [x/y/z]         Step motor forward"
+		print "        stepb [x/y/z]         Step motor backwards"
+
+	def printPos():
+		x, y, z = reprap.cartesian.getPos()
+		print "Location [" + str(x) + ", " + str(y) + ", " + str(z) + "]"
 
 
-print "================================================================"
+	print "================================================================"
 
 
-if len(sys.argv) < 2:
-	printHelp()
+	if len(sys.argv) < 2:
+		printHelp()
 	
 
-########### control of cartesian frame as a whole #########
+	########### control of cartesian frame as a whole #########
 
-#stop all steppers
-if sys.argv[1] == "stop":
-	reprap.cartesian.stop()
+	#stop all steppers
+	if sys.argv[1] == "stop":
+		reprap.cartesian.stop()
 
-#goto 0,0
-elif sys.argv[1] == "reset":
-	reprap.cartesian.homeReset( 200, True )
-	#time.sleep(2)
-	printPos()
+	#goto 0,0
+	elif sys.argv[1] == "reset":
+		reprap.cartesian.homeReset( waitArrival = False )
+		#time.sleep(2)
+		printPos()
 
-#print current positon
-elif sys.argv[1] == "pos":
-	printPos()
+	#print current positon
+	elif sys.argv[1] == "pos":
+		printPos()
 
-#goto a specific location
-elif sys.argv[1] == "goto":
-	reprap.cartesian.seek( ( int(sys.argv[2]), int(sys.argv[3]), 0 ), 200, False)
-	printPos()
+	#goto a specific location
+	elif sys.argv[1] == "goto":
+		#reprap.cartesian.seek( ( int(sys.argv[2]), int(sys.argv[3]), 0 ), waitArrival = False)
+		reprap.cartesian.seek( ( int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]) ), waitArrival = False)
+		printPos()
 
-#goto a specific location (use sync)
-elif sys.argv[1] == "gotos":
-	reprap.cartesian.syncSeek( ( int(sys.argv[2]), int(sys.argv[3]), 0 ), 200, False)
-	printPos()
+	#goto a specific location (use sync)
+	elif sys.argv[1] == "gotos":
+		reprap.cartesian.syncSeek( ( int(sys.argv[2]), int(sys.argv[3]), 0 ), waitArrival = False)
+		printPos()
 
-elif sys.argv[1] == "power":
-	reprap.cartesian.setPower( int( sys.argv[2] ) )	# This is a value from 0 to 63 (6 bits)
+	elif sys.argv[1] == "power":
+		reprap.cartesian.setPower( int( sys.argv[2] ) )	# This is a value from 0 to 63 (6 bits)
 
-
-#test routine
-elif sys.argv[1] == "go":	#stepper test
-	reprap.cartesian.seek( (1000, 1000, 0), 200, True )	
-	time.sleep(2)
-	reprap.cartesian.seek( (500, 1000, 0), 200, True )
-	time.sleep(2)
-	reprap.cartesian.seek( (500, 500, 0), 200, True )
-	time.sleep(2)
-	reprap.cartesian.seek( (10, 10, 0), 200, True )
-
-#free motors (switch off all coils)
-elif sys.argv[1] == "free":
-	reprap.cartesian.free()
-
-############## control of individual steppers #############
-
-#spin stepper
-elif sys.argv[1] == "run":	# run axis
-	if sys.argv[2] == "x":
-		reprap.cartesian.x.forward( int(sys.argv[3]) )
-	elif sys.argv[2] == "y":
-		reprap.cartesian.y.forward( int(sys.argv[3]) )
-
-#spin stepper in reverse
-elif sys.argv[1] == "runb":	#runb axis
-	if sys.argv[2] == "x":
-		reprap.axies.backward( reprap.axisX, int(sys.argv[3]) )
-	elif sys.argv[2] == "y":
-		reprap.axies.backward( reprap.axisY, int(sys.argv[3]) )
-
-elif sys.argv[1] == "step":
-	if sys.argv[2] == "x":
-		reprap.cartesian.x.forward1()
-	elif sys.argv[2] == "y":
-		reprap.cartesian.y.forward1()	
-
-################# control of extruder #####################
-
-#test extrder motor
-elif sys.argv[1] == "motor":
-	nn = 0
-	while 1:
-		if nn > 0:
-			nn = 0
-		else:
-			nn = 150
-		reprap.extruder.setMotor(reprap.CMD_REVERSE, nn)
-		time.sleep(1)
-
-elif sys.argv[1] == "getinfo":
-	mtype = reprap.extruder.getModuleType()
-	version = reprap.extruder.getVersion()
-	print "module", mtype, "version", version
-
-elif sys.argv[1] == "heat":
-	reprap.extruder.setHeat(255, 255, 255, 255)
-
-#setHeat(self, lowHeat, highHeat, tempTarget, tempMax
-
-elif sys.argv[1] == "temp":
-	print "Temp is ", reprap.extruder.getTemp()
-
-elif sys.argv[1] == "setref":
-	reprap.extruder.setVoltateReference( int(sys.argv[2]) )
+	elif sys.argv[1] == "speed":
+		reprap.cartesian.setMoveSpeed( int( sys.argv[2] ) )	# This is a value from 0 to 255
 
 
+	#test routine
+	elif sys.argv[1] == "go":	#stepper test
+		reprap.cartesian.seek( (1000, 1000, 0), 200, True )	
+		time.sleep(2)
+		reprap.cartesian.seek( (500, 1000, 0), 200, True )
+		time.sleep(2)
+		reprap.cartesian.seek( (500, 500, 0), 200, True )
+		time.sleep(2)
+		reprap.cartesian.seek( (10, 10, 0), 200, True )
+
+	#free motors (switch off all coils)
+	elif sys.argv[1] == "free":
+		reprap.cartesian.free()
+
+	############## control of individual steppers #############
+
+	#spin stepper
+	elif sys.argv[1] == "run":	# run axis
+		if sys.argv[2] == "x":
+			reprap.cartesian.x.forward( int(sys.argv[3]) )
+		elif sys.argv[2] == "y":
+			reprap.cartesian.y.forward( int(sys.argv[3]) )
+		elif sys.argv[2] == "z":
+			reprap.cartesian.z.forward( int(sys.argv[3]) )
+
+	#spin stepper in reverse
+	elif sys.argv[1] == "runb":	#runb axis
+		if sys.argv[2] == "x":
+			reprap.cartesian.x.backward( int(sys.argv[3]) )
+		elif sys.argv[2] == "y":
+			reprap.cartesian.y.backward( int(sys.argv[3]) )
+		elif sys.argv[2] == "z":
+			reprap.cartesian.z.backward( int(sys.argv[3]) )
+
+	elif sys.argv[1] == "step":
+		if sys.argv[2] == "x":
+			reprap.cartesian.x.forward1()
+		elif sys.argv[2] == "y":
+			reprap.cartesian.y.forward1()	
+		elif sys.argv[2] == "z":
+			reprap.cartesian.z.forward1()	
+
+	elif sys.argv[1] == "stepb":
+		if sys.argv[2] == "x":
+			reprap.cartesian.x.backward1()
+		elif sys.argv[2] == "y":
+			reprap.cartesian.y.backward1()	
+		elif sys.argv[2] == "z":
+			reprap.cartesian.z.backward1()	
+
+	################# control of extruder #####################
+
+	#test extrder motor
+	elif sys.argv[1] == "motor":
+		nn = 0
+		while 1:
+			if nn > 0:
+				nn = 0
+			else:
+				nn = 150
+			reprap.extruder.setMotor(reprap.CMD_REVERSE, nn)
+			time.sleep(1)
+
+	elif sys.argv[1] == "getinfo":
+		mtype = reprap.extruder.getModuleType()
+		version = reprap.extruder.getVersion()
+		print "module", mtype, "version", version
+
+	elif sys.argv[1] == "heat":
+		reprap.extruder.setHeat(255, 255, 255, 255)
+
+	#setHeat(self, lowHeat, highHeat, tempTarget, tempMax
+
+	elif sys.argv[1] == "temp":
+		print "Temp is ", reprap.extruder.getTemp()
+
+	elif sys.argv[1] == "setref":
+		reprap.extruder.setVoltateReference( int(sys.argv[2]) )
 
 
-############### scan network for devices ###################
 
-#scan snap network
-elif sys.argv[1] == "scan":
-	reprap.scanNetwork()
 
-else:
-	printHelp()
+	############### scan network for devices ###################
+
+	#scan snap network
+	elif sys.argv[1] == "scan":
+		reprap.scanNetwork()
+
+	else:
+		printHelp()
 
