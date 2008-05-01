@@ -1,5 +1,6 @@
-#!/usr/bin/python
-
+#######################################################################################################################################################
+# This module reads a gerber file is turns it into objects (flashes and traces).                                                                      #
+#######################################################################################################################################################
 """
 Licenced under GNU v2 and the 'I'm not going to help you kill people licence'. The latter overrules the former.
         
@@ -21,17 +22,11 @@ the GNU General Public License along with File Hunter; if not, write to
 the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 """
 
-import reprap, pygame, thread, time, math, sys, threading
-import plotter
-
-
-units = "MM"		# Default. Value set by gerber file, TODO put this into class
+# Define constants
+FS_ABSOLUTE = 1			# coordinate modes
+FS_INCREMENTAL = 2		#
 const_mmPerInch = 25.4
 
-FS_ABSOLUTE = 1		# coordinate modes
-FS_INCREMENTAL = 2
-
-keepGraphicsOpen = True
 
 # Class for gerber aperture. Reads line from gerber file and extracts code, type & modifiers
 class aperture:
@@ -61,48 +56,38 @@ class aperture:
 				self.width = self.width * const_mmPerInch
 				self.height = self.height * const_mmPerInch
 
-# merge lineplot? TODO
-# Class to plot gerber file to screen and / or reprap
-class gerberPlotter(threading.Thread):
-	def run(self):
-		self.stayRunning = True
-		f = open( self.fileName, 'r' )
-		lines = f.readlines()
-		self.parseLines(lines)
+# Class for a gerber flash (move and flash aperture)
+class gerberFlash:
+	def __init__(self, x, y, aperture):
+		self.x, self.y, self.aperture = x, y, aperture
+		#self.radius = self.aperture.radius
+	def printFlash(self):
+		print "FLASH", self.x, self.y, self.aperture
 
-	def terminate(self):
-		self.stayRunning = False
-		self.linePlot.reprapEnable = False
+# Class for a gerber trace (aperture open move)
+class gerberTrace:
+	def __init__(self, x1, y1, x2, y2, aperture):
+		self.x1, self.y1, self.x2, self.y2, self.aperture = x1, y1, x2, y2, aperture
+	def printTrace(self):
+		print "TRACE", self.x1, self.y1, self.x2, self.y2, self.aperture
 
-	#def setup( self, fileName, offset = (0, 0), fillDensity = 4, debug = False, stepsPerMillimeter = (30, 30), speed = 220, lineDump = False ):
-	def setup( self, fileName, offset = (0, 0), fillDensity = 4, debug = False, stepsPerMillimeter = (30, 30), speed = 220 ):
+
+class gerber:
+	def __init__(self, fileName):
+		self.fileName = fileName
+		
 		self.apertures = {}
 		self.currentAperture = False
 		self.currentX, self.currentY = 0, 0
+		# All flash and trace objects stored here
+		self.flashes = []
+		self.traces = []
+		self.debug = False # TODO pass this in
 		
-		self.offsetX, self.offsetY = offset
-		self.fillDensity = fillDensity
-		self.fileName = fileName
-		self.debug = debug
-
-		self.linePlot = plotter.linePlotter()
-		self.linePlot.setSpeed(speed)
-		spmX, spmY = stepsPerMillimeter
-		self.linePlot.setStepsPerMM(spmX, spmY)
-		self.linePlot.setDebug(debug)
-		
-
-	def setReprap( self, enabled ):
-		self.linePlot.setReprap(enabled)
-
-	def setLineDump(self, lineDump):
-		self.linePlot.setLineDump(lineDump)
-		
-	def setPenDownPos(self, pos):
-		self.linePlot.setPenDownPos(pos)
-		
-	def setLineDelay(self, delay):
-		self.linePlot.setLineDelay(delay)
+		f = open( self.fileName, 'r' )
+		lines = f.readlines()
+		# Do actual parsing of file
+		self.parseLines(lines)
 
 	# Parse all lines of the gerber file
 	def parseLines( self, lines ):
@@ -120,8 +105,6 @@ class gerberPlotter(threading.Thread):
 				self.cmdMisc( l[ 1 : -2 ] )
 			else:
 				print "Line error!"
-			if not self.stayRunning:
-				break
 
 	# Handle an M code
 	def cmdMisc( self, mstring ):
@@ -156,7 +139,7 @@ class gerberPlotter(threading.Thread):
 		elif code == 37:
 			print "Turn off Polygon Area Fill", "[COMMAND UNSUPORTED!]"
 		elif code == 54:
-			#if self.debug: print "Tool prepare"
+			if self.debug: print "Tool prepare"
 			if remains[ : 1 ] == "D":
 				#if self.debug: print "    Selecting aperture", int( remains[ 1 : ] )
 				self.currentAperture = self.apertures[ int( remains[ 1 : ] ) ]
@@ -186,9 +169,11 @@ class gerberPlotter(threading.Thread):
 	def cmdParameter( self, paramString ):
 		#print "Parameter", paramString, paramString[ : 2]
 		if paramString[ : 3 ] == "ADD" and paramString[ -1 : ] == "*":
+			# Add a new aperture
 			newAperture = aperture( paramString, self.units )
 			self.apertures[ newAperture.code ] = newAperture
 		elif paramString[ : 2 ] == "MO" and paramString[ -1 : ] == "*":
+			# Set units
 			self.units = paramString[ 2 : -1 ]
 		else:
 			print "PARAMETER UNKNOWN"
@@ -197,54 +182,24 @@ class gerberPlotter(threading.Thread):
 	def cmdMove( self, moveString ):
 		yPos = moveString.find( 'Y' )
 		dPos = moveString.find( 'D' )
-		x = float( moveString[ 1 : yPos ] ) / float(10000)	# need to read this value from the file? or work out dp
+		x = float( moveString[ 1 : yPos ] ) / float(10000)				# need to read this value from the file? or work out dp TODO this is very important, we are still scaling eveything down 'cos it works'
 		y = float( moveString[ yPos + 1 : dPos ] ) / -float(10000)
+		# If inches convert to mm
 		if self.units == "IN":
-			#print "CONV"
-			# convert to mm
 			x = x * const_mmPerInch
 			y = y * const_mmPerInch
+		# Get move type (aperture open, aperture closed, flash)
 		d = int( moveString[ dPos + 1 : ] )
-		x, y = x + self.offsetX, y + self.offsetY
 		if self.debug: print "Move [", x, "mm,", y, "mm],", d
 		if d == 1:
-			# Move is aperture open (pen down) type
-			if self.currentAperture.apertureType == "C":
-				# Using circular aperture
-				self.linePlot.penUp()
-				self.linePlot.reprapMoveTo( x, y )
-				self.linePlot.penDown()
-				radius = self.currentAperture.radius
-				if self.debug: print "aperture radius", radius, "mm"
-				self.linePlot.plotMoveWithCircle( self.currentX, self.currentY, x, y, radius, self.fillDensity )
-				self.linePlot.penUp()
-			elif self.currentAperture.apertureType == "R":
-				# Using rectangular aperture
-				print "TODO - rectangle transition"
+			self.traces.append( gerberTrace( self.currentX, self.currentY, x, y, self.currentAperture ) )
 		elif d == 2:
+			pass	# no entity information required
 			# Move is aperture closed (pen up) type
-			self.linePlot.penUp()
-			self.linePlot.reprapMoveTo( x, y )
 		elif d == 3:
-			# Move is static flash type
-			if self.currentAperture.apertureType == "C":
-				# Using circular aperture
-				self.linePlot.penUp()
-				self.linePlot.reprapMoveTo( x, y )
-				self.linePlot.penDown()
-				radius = self.currentAperture.radius
-				if self.debug: print "aperture radius", radius, "mm"
-				self.linePlot.plotCircle( x, y, radius, self.fillDensity )
-				self.linePlot.penUp()
-			if self.currentAperture.apertureType == "R":
-				# Using rectangular aperture
-				self.linePlot.penUp()
-				self.linePlot.reprapMoveTo( x, y )
-				self.linePlot.penDown()
-				self.linePlot.plotRectangle( x, y, self.currentAperture.width, self.currentAperture.height, self.fillDensity )
-				self.linePlot.penUp()
+			self.flashes.append( gerberFlash( x, y, self.currentAperture ) )
+			
 		self.currentX, self.currentY = x, y
-
 
 
 
