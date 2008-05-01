@@ -72,11 +72,9 @@ sync_inc	= 2	# inc motor on each pulse
 sync_dec	= 3	# dec motor on each pulse
 
 snap.localAddress = 0		# local address of host PC. This will always be 0.
-#global serialPort
-#serialPort = False
 
 defaultSpeed = 220
-moveSpeed = 221
+#moveSpeed = 221
 
 def openSerial( port = 0, rate = 19200, tout = 60 ):
 	global serialPort
@@ -163,7 +161,7 @@ class extruderClass:
 					return data[1], data[2]
 		return False
 
-	def setMotor(self, direction, speed = moveSpeed):
+	def setMotor(self, direction, speed):
 		if self.active:
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [int(direction), int(speed)] ) ##no command being sent, whats going on?
 			if p.send():
@@ -227,6 +225,7 @@ class axisClass:
 		self.active = False	# when scanning network, set this, then in each func below, check alive before doing anything
 		self.limit = 100000	# limit effectively disabled unless set
 		#self.turnArroundSteps = False
+		self.speed = defaultSpeed
 	#move axis one step forward
 	def forward1(self):
 		if self.active:
@@ -244,16 +243,20 @@ class axisClass:
 		return False
 
 	#spin axis forward at given speed
-	def forward(self, speed = moveSpeed):
-		if self.active:
+	def forward(self, speed = False):
+		if not speed:
+			speed = self.speed
+		if self.active and speed >=0 and speed <=255:
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_FORWARD, int(speed)] ) 
 			if p.send():
 				return True
 		return False
 
 	#spin axis backward at given speed
-	def backward(self, speed = moveSpeed):
-		if self.active:
+	def backward(self, speed = False):
+		if not speed:					# If speed is not specified use stored (or default)
+			speed = self.speed
+		if self.active and speed >=0 and speed <=255:
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_REVERSE, int(speed)] ) 
 			if p.send():
 				return True
@@ -284,7 +287,7 @@ class axisClass:
 
 	#set current position (set variable not robot position)
 	def setPos(self, pos):
-		if self.active:
+		if self.active and pos >=0 and pos <= 0xFFFF:
 			posMSB ,posLSB = int2bytes( pos )
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_SETPOS, posMSB, posLSB] )
 			if p.send():
@@ -300,8 +303,10 @@ class axisClass:
 		return False
 
 	#seek to axis location. When waitArrival is True, funtion does not return until seek is compete
-	def seek(self, pos, speed = moveSpeed, waitArrival = True):
-		if self.active and pos <= self.limit:
+	def seek(self, pos, speed = False, waitArrival = True):
+		if not speed:
+			speed = self.speed
+		if self.active and pos <= self.limit and pos >=0 and pos <= 0xFFFF and speed >=0 and speed <=255:
 			posMSB ,posLSB = int2bytes( pos )
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_SEEK, int(speed), posMSB ,posLSB] ) 
 			if p.send():
@@ -317,8 +322,10 @@ class axisClass:
 		return False
 	
 	#goto 0 position. When waitArrival is True, funtion does not return until reset is compete
-	def homeReset(self, speed = moveSpeed, waitArrival = True):
-		if self.active:
+	def homeReset(self, speed = False, waitArrival = True):
+		if not speed:
+			speed = self.speed
+		if self.active and speed >=0 and speed <=255:
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_HOMERESET, int(speed)] ) 
 			if p.send():
 				if waitArrival:
@@ -341,14 +348,16 @@ class axisClass:
 		return False
 
 	def setSync( self, syncMode ):
-		if self.active:
+		if self.active and syncMode >=0 and syncMode <=255:
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_SYNC, int(syncMode)] )
 			if p.send():
 				return True
 		return False
 
-	def DDA( self, speed, seekTo, slaveDelta, waitArrival = True):
-		if self.active and seekTo <= self.limit:
+	def DDA( self, seekTo, slaveDelta, speed = False, waitArrival = True):
+		if not speed:
+			speed = self.speed
+		if self.active and seekTo <= self.limit and seekTo >=0 and seekTo <= 0xFFFF and slaveDelta >=0 and slaveDelta <= 0xFFFF and speed >=0 and speed <=255:
 			masterPosMSB, masterPosLSB = int2bytes( seekTo )
 			slaveDeltaMSB, slaveDeltaLSB = int2bytes( slaveDelta )
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_DDA, int(speed), masterPosMSB ,masterPosLSB, slaveDeltaMSB, slaveDeltaLSB] ) 	#start sync
@@ -363,14 +372,14 @@ class axisClass:
 		return False
 
 	def setPower( self, power ):
-		if self.active:
+		if self.active and power >=0 and power <=63:
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_SETPOWER, int( power * 0.63 )] ) # This is a value from 0 to 63 (6 bits)
 			if p.send():
 				return True
 		return False
 		
 	def setMoveSpeed(self, speed):
-		self.moveSpeed = speed
+		self.speed = speed
 
 	#def setTurnaroundSteps(self, steps):
 	#	self.turnArroundSteps = steps
@@ -398,18 +407,22 @@ class cartesianClass:
 		self.z = axisClass(4)
 
 	# goto home position (all axies)
-	def homeReset(self, speed = moveSpeed, waitArrival = True):
+	def homeReset(self, speed = False, waitArrival = True):
+		#z is done first so we don't break anything we just made
+		if self.z.homeReset( speed = speed, waitArrival = waitArrival ):
+			print "Z Reset"
 		if self.x.homeReset( speed = speed, waitArrival = waitArrival ):		#setting these to true breaks waitArrival convention. need to rework waitArrival and possibly have each axis storing it's arrival flag and pos as variables?
 			print "X Reset"		
 		if self.y.homeReset( speed = speed, waitArrival = waitArrival ):
 			print "Y Reset"
-		if self.z.homeReset( speed = speed, waitArrival = waitArrival ):
-			print "Z Reset"
+		
 		# add a way to collect all three notifications (in whatever order) then check they are all there. this will allow symultanious axis movement and use of waitArrival
 
 	# seek to location (all axies). When waitArrival is True, funtion does not return until all seeks are compete
 	# seek will automatically use syncSeek when it is required. Always use the seek function
-	def seek(self, pos, speed = moveSpeed, waitArrival = True):
+	def seek(self, pos, speed = False, waitArrival = True):
+		if not speed:
+			speed = self.speed
 		curX, curY, curZ = self.x.getPos(), self.y.getPos(), self.z.getPos()
 		x, y, z = pos
 		if x <= self.x.limit and y <= self.y.limit and z <= self.z.limit:
@@ -429,7 +442,9 @@ class cartesianClass:
 			print "Trying to print outside of limit, aborting seek"
 	
 	# perform syncronised x/y movement. This is called by seek when needed.
-	def syncSeek(self, pos, speed = moveSpeed, waitArrival = True):
+	def syncSeek(self, pos, speed = False, waitArrival = True):
+		if not speed:
+			speed = self.speed
 		curX, curY = self.x.getPos(), self.y.getPos()
 		newX, newY, nullZ = pos
 		deltaX = abs( curX - newX )		# calc delta movements
@@ -447,7 +462,7 @@ class cartesianClass:
 			if printDebug: print "    switching to y master"
 		if printDebug: print "    masterPos", master.seekTo, "slaveDelta", slave.delta
 		slave.axis.setSync( slave.syncMode )
-		master.axis.DDA( speed, master.seekTo, slave.delta, True )
+		master.axis.DDA( master.seekTo, slave.delta, speed, True )
 		time.sleep(0.1)
 		slave.axis.setSync( sync_none )
 		if printDebug: print "    sync seek complete"
@@ -474,7 +489,7 @@ class cartesianClass:
 	#def lockout():
 	#keep sending power down commands to all board every second
 	def setMoveSpeed(self, speed):
-		self.moveSpeed = speed
+		self.speed = speed
 		self.x.setMoveSpeed(speed)
 		self.y.setMoveSpeed(speed)
 		self.z.setMoveSpeed(speed)

@@ -1,5 +1,5 @@
 """
-Code derived from a combination of :
+Code derived from a vague combination of :
 
 BufferedCanvas -- Double-buffered, flicker-free canvas widget
 Copyright (C) 2005, 2006 Daniel Keep
@@ -103,6 +103,10 @@ class wxSDLPanel(wx.Panel):
 
     def getSurface(self):
         return self._surface
+        
+    def update(self):
+        self.Refresh()
+        print "r"
         
     def MouseMove(self, event):
         raise NotImplementedError('please define a .MouseMove() method!')  
