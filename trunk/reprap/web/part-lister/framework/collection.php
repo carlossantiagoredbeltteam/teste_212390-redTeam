@@ -7,7 +7,7 @@
 		private $key;
 		private $map;
 	
-		public function __construct($query, $obj_types, $expiration = Cache::TIME_NEVER, $key = null)
+		public function __construct($query, $obj_types, $expiration = 0, $key = null)
 		{
 			$this->query = $query;
 			$this->obj_types = $obj_types;

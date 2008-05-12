@@ -39,7 +39,7 @@
 		}
 
 	
-		public function renderView($view_name, $args = array(), $cache_time = CacheBot::TIME_NEVER, $key = null)
+		public function renderView($view_name, $args = array(), $cache_time = 0, $key = null)
 		{
 			// Check the cache
 			/*
