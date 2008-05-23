@@ -24,7 +24,7 @@ echo "Making new filesystem.squashfs - takes a looooooong time"
 mksquashfs source cd/casper/filesystem.squashfs
 
 echo "Removing old md5sum"
-rm cd/md5sum.txt
+sudo rm cd/md5sum.txt
 
 echo "Finally create the iso image."
 echo "You currently have the following ReprapLiveCD images:"
