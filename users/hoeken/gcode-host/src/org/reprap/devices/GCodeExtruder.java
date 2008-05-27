@@ -38,10 +38,14 @@ public class GCodeExtruder extends GenericExtruder
 	{
 		if (speed == 0)
 			gcode.queue("M103");
-		else if (reverse)
-			gcode.queue("M102");
 		else
-			gcode.queue("M101");
+		{
+			gcode.queue("M100 P" + speed);
+			if (reverse)
+				gcode.queue("M102");
+			else
+				gcode.queue("M101");
+		}
 	}
 	
 	public void setCooler(boolean f) throws IOException
