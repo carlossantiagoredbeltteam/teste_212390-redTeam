@@ -21,11 +21,11 @@ FloatPoint delta_steps;
 
 boolean abs_mode = false;   //0 = incremental; 1 = absolute
 
-//default to inches for units
-float x_units = X_STEPS_PER_INCH;
-float y_units = Y_STEPS_PER_INCH;
-float z_units = Z_STEPS_PER_INCH;
-float curve_section = CURVE_SECTION_INCHES;
+//default to mm for units
+float x_units = X_STEPS_PER_MM;
+float y_units = Y_STEPS_PER_MM;
+float z_units = Z_STEPS_PER_MM;
+float curve_section = CURVE_SECTION_MM;
 
 //our direction vars
 byte x_direction = 1;
@@ -334,13 +334,6 @@ void process_string(char instruction[], int size)
 				//todo: program end
 			break;
 	*/		
-			//set max extruder speed, 0-255 PWM
-			case 100:
-				extruder_rpm = (int)search_string('P', instruction, size);
-				extruder_delay = (960000000UL / EXTRUDER_ENCODER_STEPS) / extruder_rpm;
-				setTimer1Ticks(extruder_delay);
-			break;
-
 			//turn extruder on, forward
 			case 101:
 				extruder_set_direction(1);
@@ -356,11 +349,12 @@ void process_string(char instruction[], int size)
 			//turn extruder off
 			case 103:
 				disableTimer1Interrupt();
+				extruder_error = 0;
 			break;
 
 			//custom code for temperature control
 			case 104:
-				extruder_set_temperature((int)search_string('P', instruction, size));
+				extruder_set_temperature((int)search_string('S', instruction, size));
 
 				//warmup if we're too cold.
 				while (extruder_get_temperature() < extruder_target_celsius)
@@ -388,7 +382,14 @@ void process_string(char instruction[], int size)
 			case 107:
 				extruder_set_cooler(0);
 			break;
-
+			
+			//set max extruder speed, 0-255 PWM
+			case 108:
+				extruder_rpm = (int)search_string('S', instruction, size);
+				extruder_delay = (960000000UL / EXTRUDER_ENCODER_STEPS) / extruder_rpm;
+				setTimer1Ticks(extruder_delay);
+			break;
+			
 			default:
 				Serial.print("Huh? M");
 				Serial.println(code);
