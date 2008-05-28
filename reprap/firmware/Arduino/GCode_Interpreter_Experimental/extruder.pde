@@ -242,6 +242,14 @@ void extruder_manage_speed()
 	//do some bounds checking.
 	speed = max(speed, EXTRUDER_MIN_SPEED);
 	speed = min(speed, EXTRUDER_MAX_SPEED);
+	
+	//if our error is too high, it means we cant keep up.  bail to protect the extruder motor
+	if (extruder_error > 1000)
+	{
+		disableTimer1Interrupt();
+		speed = 0;
+		extruder_error = 0;
+	}
 
 	//temporary debug stuff.
 	if (false && random(500) == 1)
