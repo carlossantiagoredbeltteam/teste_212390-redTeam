@@ -47,17 +47,19 @@ byte extruder_heater_low = 64;
 byte extruder_heater_high = 255;
 
 //this is for doing encoder based extruder control
-volatile bool extruder_direction = EXTRUDER_FORWARD;
-volatile int extruder_error = 0;
-
-//these keep track of extruder speed, etc.
 int extruder_rpm = 0;
 long extruder_delay = 0;
 
-//for our closed loop control
-int last_extruder_error = 0;
-int last_extruder_delta = 0;
-int last_extruder_speed = 0;
+//these are for the extruder PID
+volatile bool extruder_direction = EXTRUDER_FORWARD;
+volatile int extruder_error = 0;
+volatile float extruder_pGain = 1.0;	// Proportional gain
+volatile float extruder_iGain = 0.001;	// Integral gain
+volatile float extruder_dGain = 100.0;	// Derivative gain
+volatile float iMax = 100.0;			// Integrator max
+volatile float iMin = 0.0;				// Integrator min
+volatile int iState = 0;				// Integrator state
+volatile int dState = 0;				// Last position input
 
 void extruder_read_quadrature()
 {  
@@ -106,17 +108,21 @@ void init_extruder()
 	//default to room temp.
 	extruder_set_temperature(21);
 	
-	//setup our pins
+	//setup our motor dir pin
 	pinMode(EXTRUDER_MOTOR_DIR_PIN, OUTPUT);
-	pinMode(EXTRUDER_MOTOR_SPEED_PIN, OUTPUT);
-	pinMode(EXTRUDER_HEATER_PIN, OUTPUT);
-	pinMode(EXTRUDER_FAN_PIN, OUTPUT);
-	
-	//initialize values
 	digitalWrite(EXTRUDER_MOTOR_DIR_PIN, EXTRUDER_FORWARD);
-	analogWrite(EXTRUDER_FAN_PIN, 0);
-	analogWrite(EXTRUDER_HEATER_PIN, 0);
+
+	//setup our motor speed pin
+	pinMode(EXTRUDER_MOTOR_SPEED_PIN, OUTPUT);
 	analogWrite(EXTRUDER_MOTOR_SPEED_PIN, 0);
+
+	//set up our header pin
+	pinMode(EXTRUDER_HEATER_PIN, OUTPUT);
+	analogWrite(EXTRUDER_HEATER_PIN, 0);
+
+	//setup our fan pin
+	pinMode(EXTRUDER_FAN_PIN, OUTPUT);
+	analogWrite(EXTRUDER_FAN_PIN, 0);
 	
 	//setup our encoder interrupt stuff.
 	//these pins are inputs
@@ -127,12 +133,12 @@ void init_extruder()
 	digitalWrite(EXTRUDER_ENCODER_A_PIN, HIGH);
 	digitalWrite(EXTRUDER_ENCODER_A_PIN, HIGH);
 	
-	//attach our interrupt handlers
+	//attach our interrupt handler
 	attachInterrupt(0, extruder_read_quadrature, CHANGE);
 
 	//setup our timer interrupt stuff
 	setupTimer1Interrupt();
-	disableTimer1Interrupt();
+	setupTimer2Interrupt();
 }
 
 void extruder_set_direction(bool direction)

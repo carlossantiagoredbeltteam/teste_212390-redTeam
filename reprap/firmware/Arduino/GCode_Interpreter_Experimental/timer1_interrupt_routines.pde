@@ -167,4 +167,5 @@ void setupTimer1Interrupt()
 	//start off with a slow frequency.
 	setTimer1Resolution(4);
 	setTimer1Ceiling(65535);
+	disableTimer1Interrupt();
 }
