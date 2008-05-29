@@ -338,17 +338,21 @@ void process_string(char instruction[], int size)
 			case 101:
 				extruder_set_direction(1);
 				enableTimer1Interrupt();
+				enableTimer2Interrupt();
 			break;
 
 			//turn extruder on, reverse
 			case 102:
 				extruder_set_direction(0);
 				enableTimer1Interrupt();
+				enableTimer2Interrupt();
 			break;
 
 			//turn extruder off
 			case 103:
 				disableTimer1Interrupt();
+				disableTimer2Interrupt();
+				analogWrite(EXTRUDER_MOTOR_SPEED_PIN, 0);
 				extruder_error = 0;
 			break;
 
@@ -383,11 +387,36 @@ void process_string(char instruction[], int size)
 				extruder_set_cooler(0);
 			break;
 			
-			//set max extruder speed, 0-255 PWM
+			//set max extruder speed, in RPM
 			case 108:
 				extruder_rpm = (int)search_string('S', instruction, size);
 				extruder_delay = (960000000UL / EXTRUDER_ENCODER_STEPS) / extruder_rpm;
 				setTimer1Ticks(extruder_delay);
+			break;
+			
+			//set extruder P gain
+			case 109:
+				extruder_pGain = (float)search_string('S', instruction, size);
+			break;
+
+			//set extruder I gain
+			case 110:
+				extruder_iGain = (float)search_string('S', instruction, size);
+			break;
+
+			//set extruder D gain
+			case 111:
+				extruder_dGain = (float)search_string('S', instruction, size);
+			break;
+
+			//set extruder iMax
+			case 112:
+				iMax = (float)search_string('S', instruction, size);
+			break;
+
+			//set extruder iMin
+			case 113:
+				iMin = (float)search_string('S', instruction, size);
 			break;
 			
 			default:
