@@ -249,6 +249,7 @@ void extruder_manage_speed()
 		disableTimer1Interrupt();
 		speed = 0;
 		extruder_error = 0;
+		Serial.println("Extruder Fail.");
 	}
 
 	//temporary debug stuff.
