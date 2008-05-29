@@ -25,52 +25,19 @@ void disableTimer1Interrupt()
 
 void setTimer1Resolution(byte r)
 {
-	//here's how you figure out the tick size:
-	// 1000000 / ((16000000 / prescaler))
-	// 1000000 = microseconds in 1 second
-	// 16000000 = cycles in 1 second
-	// prescaler = your prescaler
-
-	// no prescaler == 0.0625 usec tick
-	if (r == 0)
-	{
-		// 001 = clk/1
-		TCCR1B &= ~(1<<CS12);
-		TCCR1B &= ~(1<<CS11);
-		TCCR1B |=  (1<<CS10);
-	}	
-	// prescale of /8 == 0.5 usec tick
-	else if (r == 1)
-	{
-		// 010 = clk/8
-		TCCR1B &= ~(1<<CS12);
-		TCCR1B |=  (1<<CS11);
-		TCCR1B &= ~(1<<CS10);
-	}
-	// prescale of /64 == 4 usec tick
-	else if (r == 2)
-	{
-		// 011 = clk/64
-		TCCR1B &= ~(1<<CS12);
-		TCCR1B |=  (1<<CS11);
-		TCCR1B |=  (1<<CS10);
-	}
-	// prescale of /256 == 16 usec tick
-	else if (r == 3)
-	{
-		// 100 = clk/256
-		TCCR1B |=  (1<<CS12);
-		TCCR1B &= ~(1<<CS11);
-		TCCR1B &= ~(1<<CS10);
-	}
-	// prescale of /1024 == 64 usec tick
-	else
-	{
-		// 101 = clk/1024
-		TCCR1B |=  (1<<CS12);
-		TCCR1B &= ~(1<<CS11);
-		TCCR1B |=  (1<<CS10);
-	}
+	//from table 15-5 in that atmega168 datasheet:
+	// we're setting CS12 - CS10 which correspond to the binary numbers 0-5
+	// 0 = no timer
+	// 1 = no prescaler
+	// 2 = clock/8
+	// 3 = clock/64
+	// 4 = clock/256
+	// 5 = clock/1024
+	
+	if (r > 5)
+		r = 5;
+		
+	TCCR1B &= (B11111000 | r);
 }
 
 void setTimer1Ceiling(unsigned int c)
@@ -108,26 +75,26 @@ byte getTimer1Resolution(unsigned long ticks)
 	// our slowest speed at our highest resolution ( (2^16-1) * 0.0625 usecs = 4095 usecs (4 millisecond max))
 	// range: 8Mhz max - 122hz min
 	if (ticks <= 65535L)
-		return 0;
+		return 1;
 	// our slowest speed at our next highest resolution ( (2^16-1) * 0.5 usecs = 32767 usecs (32 millisecond max))
 	// range:1Mhz max - 15.26hz min
 	else if (ticks <= 524280L)
-		return 1;
+		return 2;
 	// our slowest speed at our medium resolution ( (2^16-1) * 4 usecs = 262140 usecs (0.26 seconds max))
 	// range: 125Khz max - 1.9hz min
 	else if (ticks <= 4194240L)
-		return 2;
+		return 3;
 	// our slowest speed at our medium-low resolution ( (2^16-1) * 16 usecs = 1048560 usecs (1.04 seconds max))
 	// range: 31.25Khz max - 0.475hz min
 	else if (ticks <= 16776960L)
-		return 3;
+		return 4;
 	// our slowest speed at our lowest resolution ((2^16-1) * 64 usecs = 4194240 usecs (4.19 seconds max))
 	// range: 7.812Khz max - 0.119hz min
 	else if (ticks <= 67107840L)
-		return 4;
+		return 5;
 	//its really slow... hopefully we can just get by with super slow.
 	else
-		return 4;
+		return 5;
 }
 
 void setTimer1Ticks(unsigned long ticks)
