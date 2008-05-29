@@ -6,27 +6,28 @@ SIGNAL(SIG_OUTPUT_COMPARE2A)
 	// straight-forward implementation of a PID algorithm as described at:
 	// http://www.embedded.com/2000/0010/0010feat3.htm - PID Without a PhD, Tim Wescott 
 
-	float pTerm = 0.0;
-	float iTerm = 0.0;
-	float dTerm = 0.0;
-	int speed = 0.0;
+	float pTerm;
+	float iTerm;
+	float dTerm;
+	int speed;
+	int abs_error = abs(extruder_error);
 
 	//if our error is too high, it means we cant keep up.  bail to protect the extruder motor
-	if (extruder_error > 1000)
+	if (abs_error > 1000)
 	{
 		disableTimer1Interrupt();
 		disableTimer2Interrupt();
 		speed = 0;
 		extruder_error = 0;
-		Serial.println("Extruder Fail.");
+		Serial.println("Extruder Fail");
 	}
 	else
 	{
 		//calculate our P term
-		pTerm = extruder_pGain * (float)extruder_error;
+		pTerm = extruder_pGain * (float)abs_error;
 	
 		//calculate our I term
-		iState += extruder_error;
+		iState += abs_error;
 		if (iState > iMax)
 			iState = iMax;
 		else if (iState < iMin)
@@ -34,8 +35,8 @@ SIGNAL(SIG_OUTPUT_COMPARE2A)
 		iTerm = extruder_iGain * (float)iState;
 	
 		//calculate our D term
-		dTerm = extruder_dGain * (float)(extruder_error - dState);
-		dState = extruder_error;
+		dTerm = extruder_dGain * (float)(abs_error - dState);
+		dState = abs_error;
 
 		//calculate our PWM
 		int speed = ceil(pTerm + iTerm - dTerm);
@@ -44,8 +45,18 @@ SIGNAL(SIG_OUTPUT_COMPARE2A)
 		speed = max(speed, EXTRUDER_MIN_SPEED);
 		speed = min(speed, EXTRUDER_MAX_SPEED);
 	}
+	
+	//figure out which direction to move the motor
+	if (extruder_error > 0)
+		digitalWrite(EXTRUDER_MOTOR_DIR_PIN, EXTRUDER_REVERSE);
+	else
+		digitalWrite(EXTRUDER_MOTOR_DIR_PIN, EXTRUDER_FORWARD);
 
-	analogWrite(EXTRUDER_MOTOR_SPEED_PIN, speed);
+	//send us off at that speed!
+	if (abs_error > EXTRUDER_ERROR_MARGIN)
+		analogWrite(EXTRUDER_MOTOR_SPEED_PIN, speed);
+	else
+		analogWrite(EXTRUDER_MOTOR_SPEED_PIN, 0);
 }
 
 void enableTimer2Interrupt()
@@ -72,7 +83,10 @@ void setTimer2Resolution(byte r)
 	// 6 = clock/256
 	// 7 = clock/1024
 	
-	TCCR1B &= (B11111000 | r);
+	if (r > 7)
+		r = 7;
+		
+	TCCR2B &= (B11111000 | r);
 }
 
 void setTimer2Ceiling(byte c)
