@@ -87,7 +87,7 @@ void init1()
 // RB3 is PWM output to L298                                                                                       
 // RB4 is L298 2 (Extrude)
 // RB5 is L298 1 (Extrude)
-// RB6 is not used
+// RB6 is the cooling fan
 // RB7 is not used
   RBIE = 1;  // Enable RB port change interrupt 
              //(should not occur in UNIVERSAL_PCB, except if connector 11 is used)
@@ -95,9 +95,10 @@ void init1()
 #ifdef UNIVERSAL_PCB
   TRISA = BIN(11000010) | PORTATRIS;  // Turn off A/D lines,
                                       // but set others as required  
-  TRISB = BIN(11000111);
+  //TRISB = BIN(11000111);
+  TRISB = BIN(10000111);
   PORTA = 0;
-  PORTB = BIN(11000001);
+  PORTB = BIN(10000001);   // Fan off; pullup on RB7
 #else
   TRISA = BIN(11000010) | PORTATRIS;  // Turn off A/D lines,
                                       // but set others as required  

@@ -35,6 +35,11 @@
 #include "extruder.h"
 #include "serial.h"
 
+#define PC1 100
+#define PC2 20
+
+void pwmSet(byte fastOverRide);
+
 //initialization does not work!
 byte PWMPeriod;
 volatile static byte currentDirection;
@@ -48,6 +53,10 @@ volatile static byte lastPortB;
 volatile static byte lastPortA;
 volatile static byte extrude_click;
 volatile static byte material_click;
+
+volatile static byte pulseCounter1 = PC1;
+volatile static byte pulseCounter2 = PC2;
+volatile static byte solenoid_on = 0;
 
 volatile static byte requestedHeat0;
 volatile static byte requestedHeat1;
@@ -87,6 +96,8 @@ volatile static addressableInt currentPosition, seekPosition;
 #define CMD_SETHEAT       9
 #define CMD_GETTEMP       10
 #define CMD_SETCOOLER     11
+#define CMD_VALVEOPEN     12
+#define CMD_VALVECLOSED   13
 #define CMD_PWMPERIOD     50
 #define CMD_PRESCALER     51
 #define CMD_SETVREF       52
@@ -99,6 +110,11 @@ volatile static addressableInt currentPosition, seekPosition;
 #define HEATER_PWM_PERIOD 255
 
 #ifdef UNIVERSAL_PCB
+
+/*
+ * ************************************************************************
+ *  New circuit design
+ */
 
 void extruder_stop()
 {
@@ -161,13 +177,49 @@ void change_log()
 void set_cooler(byte b)
 {
     if (b)
-      portaval |= BIN(00000001);
+      RB6 = 1;
+      //portaval |= BIN(00000001);
     else
-	  portaval &= BIN(11111110);
-    PORTA = portaval;
+      RB6 = 0;
+	  //portaval &= BIN(11111110);
+    //PORTA = portaval;
 }
 #pragma restore
 
+
+
+#pragma save
+#pragma nooverlay
+
+void solenoid_delay()
+{
+  pwmSet(1);
+  pulseCounter1 = PC1;
+  pulseCounter2 = PC2; 
+  solenoid_on = 1;
+}
+
+#pragma restore
+
+#pragma save
+#pragma nooverlay
+
+void solenoid(byte on)
+{
+    portaval &= BIN(11111010);
+	if(on)
+		portaval |= BIN(00000001);
+	else
+		portaval |= BIN(00000100);
+	PORTA = portaval;	
+	solenoid_delay();
+}
+#pragma restore
+
+/*
+ * ********************************************************************
+ *  Old circuit design
+ */
 
 #else
 void extruder_stop()
@@ -224,15 +276,22 @@ void change_log()
 void set_cooler(byte b)
 {
     if (b)
-      portaval |= BIN(00000100);
+      //portaval |= BIN(00000100);
+      PORTB6 = 1;
     else
-      portaval &= BIN(11111011);
-    PORTA = portaval;
+      PORTB6 = 0;
+      //portaval &= BIN(11111011);
+    //PORTA = portaval;
 }
 #pragma restore
 
 
 #endif
+
+/*
+ *  End of old circuit design
+ * *******************************************************************
+ */
 
 void init2()
 {
@@ -264,11 +323,11 @@ void init2()
 
 #pragma save
 #pragma nooverlay
-void pwmSet()
+void pwmSet(byte fastOverRide)
 {
     CCP1CON = BIN(00111100);
     CCPR1L = seekSpeed;
-  	if (seekSpeed == 255)
+  	if (fastOverRide || seekSpeed == 255)
     	PR2 = 0;
   	else
     	PR2 = PWMPeriod;
@@ -305,7 +364,7 @@ void setSpeed(byte direction)
     else 
       extruder_reverse();
   }
-  pwmSet();    
+  pwmSet(0);    
   currentDirection = direction;
  _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _currentPosition
@@ -345,6 +404,24 @@ void timerTick()
   heatCounter++;
   TMR1H = HEATER_PWM_PERIOD;
   TMR1L = 0;
+  
+  if(solenoid_on)
+  {
+  	if(pulseCounter2 == 0)
+  	{
+    	if(pulseCounter1 == 0)
+  		{
+  			portaval &= BIN(11111010);
+  			PORTA = portaval;
+  			solenoid_on = 0;
+  		} else
+  		{
+  	  		pulseCounter1--;
+  	  		pulseCounter2 = PC2;
+  		}
+  	} else
+  	  pulseCounter2--;
+  }
 
 _asm  /// @todo Remove when sdcc bug fixed
   BANKSEL _currentPosition
@@ -610,13 +687,13 @@ void processCommand()
 
   case CMD_SETCOOLER:
   	set_cooler(buffer[1]);
-#ifdef UNIVERSAL_PCB
-	if(buffer[1] && !seekSpeed)
-	{
-		seekSpeed = buffer[1];
-    	pwmSet();
-    }
-#endif
+//#ifdef UNIVERSAL_PCB
+//	if(buffer[1] && !seekSpeed)
+//	{
+//		seekSpeed = buffer[1];
+//   	pwmSet(0);
+//    }
+//#endif
     break;
 
 // "Hidden" low level commands
@@ -665,6 +742,14 @@ void processCommand()
     sendDataByte(temperatureNotUpdatedCounter);
     endMessage();
     break;
+    
+  case CMD_VALVEOPEN:
+    solenoid(1);
+  	break;
+  	
+  case CMD_VALVECLOSED:
+    solenoid(0);
+  	break;
 											
   }
 
