@@ -224,63 +224,7 @@ int extruder_sample_temperature(byte pin)
 
 void extruder_manage_speed()
 {
-	//is our speed changing?
-	int extruder_error_delta = abs(last_extruder_error) - abs(extruder_error);
-	int extruder_delta_delta = last_extruder_delta - extruder_error_delta;
-	int extruder_error_factor = abs(extruder_error) / 2;
-	
-	//calculate our speed.
-	int speed = 0;
-	speed += extruder_error_factor;
-        speed += last_extruder_speed / 2;
-	speed += extruder_error_delta * 2;
-	speed += extruder_delta_delta * 2;
-       
-        //why not average speeds?
-        speed = (speed + last_extruder_speed) / 2;
 
-	//do some bounds checking.
-	speed = max(speed, EXTRUDER_MIN_SPEED);
-	speed = min(speed, EXTRUDER_MAX_SPEED);
-	
-	//if our error is too high, it means we cant keep up.  bail to protect the extruder motor
-	if (extruder_error > 1000)
-	{
-		disableTimer1Interrupt();
-		speed = 0;
-		extruder_error = 0;
-		Serial.println("Extruder Fail.");
-	}
-
-	//temporary debug stuff.
-	if (false && random(500) == 1)
-	{
-		Serial.print("e:");
-		Serial.print(extruder_error, DEC);
-		Serial.print(" d:");
-		Serial.print(extruder_error_delta, DEC);
-		Serial.print(" dd:");
-		Serial.print(extruder_delta_delta, DEC);
-		Serial.print(" s:");
-		Serial.println(speed);
-	}
-
-	//figure out which direction to move the motor
-	if (extruder_error > 0)
-		digitalWrite(EXTRUDER_MOTOR_DIR_PIN, EXTRUDER_REVERSE);
-	else if (extruder_error < 0)
-		digitalWrite(EXTRUDER_MOTOR_DIR_PIN, EXTRUDER_FORWARD);
-
-	//send us off at that speed!
-	if (abs(extruder_error) > EXTRUDER_ERROR_MARGIN)
-		analogWrite(EXTRUDER_MOTOR_SPEED_PIN, speed);
-	else
-		analogWrite(EXTRUDER_MOTOR_SPEED_PIN, 0);
-		
-	//save our last error.
-	last_extruder_error = extruder_error;
-	last_extruder_delta = extruder_error_delta;
-	last_extruder_speed = speed;
 }
 
 
