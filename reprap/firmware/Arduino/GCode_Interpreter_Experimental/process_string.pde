@@ -389,33 +389,37 @@ void process_string(char instruction[], int size)
 			
 			//set max extruder speed, in RPM
 			case 108:
-				extruder_rpm = (int)search_string('S', instruction, size);
-				extruder_delay = (960000000UL / EXTRUDER_ENCODER_STEPS) / extruder_rpm;
-				setTimer1Ticks(extruder_delay);
+				extruder_rpm = (int)search_string('R', instruction, size);
+
+				if (extruder_rpm)
+				{
+					extruder_delay = (960000000UL / EXTRUDER_ENCODER_STEPS) / extruder_rpm;
+					setTimer1Ticks(extruder_delay);
+				}
 			break;
 			
 			//set extruder P gain
-			case 109:
+			case 120:
 				extruder_pGain = (float)search_string('S', instruction, size);
 			break;
 
 			//set extruder I gain
-			case 110:
+			case 121:
 				extruder_iGain = (float)search_string('S', instruction, size);
 			break;
 
 			//set extruder D gain
-			case 111:
+			case 122:
 				extruder_dGain = (float)search_string('S', instruction, size);
 			break;
 
 			//set extruder iMax
-			case 112:
+			case 123:
 				iMax = (float)search_string('S', instruction, size);
 			break;
 
 			//set extruder iMin
-			case 113:
+			case 124:
 				iMin = (float)search_string('S', instruction, size);
 			break;
 			
