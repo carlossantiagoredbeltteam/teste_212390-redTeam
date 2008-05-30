@@ -52,7 +52,7 @@ long extruder_delay = 0;
 
 //these are for the extruder PID
 volatile bool extruder_direction = EXTRUDER_FORWARD;
-volatile int extruder_error = 0;
+volatile int extruder_error = 0;		// extruder position / error variable.
 volatile float extruder_pGain = 1.0;	// Proportional gain
 volatile float extruder_iGain = 0.001;	// Integral gain
 volatile float extruder_dGain = 100.0;	// Derivative gain
