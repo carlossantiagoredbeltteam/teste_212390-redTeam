@@ -37,8 +37,8 @@ short temptable[NUMTEMPS][2] = {
 // End of temperature lookup table
 //
 
-#define EXTRUDER_FORWARD true
-#define EXTRUDER_REVERSE false
+#define EXTRUDER_FORWARD 1
+#define EXTRUDER_REVERSE 0
 
 //these our the default values for the extruder.
 int extruder_target_celsius = 0;
@@ -51,13 +51,12 @@ int extruder_rpm = 0;
 long extruder_delay = 0;
 
 //these are for the extruder PID
-volatile bool extruder_direction = EXTRUDER_FORWARD;
 volatile int extruder_error = 0;						// extruder position / error variable.
-volatile float extruder_pGain = EXTRUDER_INITIAL_PGAIN;	// Proportional gain
-volatile float extruder_iGain = EXTRUDER_INITIAL_IGAIN;	// Integral gain
-volatile float extruder_dGain = EXTRUDER_INITIAL_DGAIN;	// Derivative gain
-volatile float iMax = 500.0;							// Integrator max
-volatile float iMin = -500.0;							// Integrator min
+volatile int extruder_pGain = EXTRUDER_INITIAL_PGAIN;	// Proportional gain
+volatile int extruder_iGain = EXTRUDER_INITIAL_IGAIN;	// Integral gain
+volatile int extruder_dGain = EXTRUDER_INITIAL_DGAIN;	// Derivative gain
+volatile int iMax = 500;								// Integrator max
+volatile int iMin = -500;								// Integrator min
 volatile int iState = 0;								// Integrator state
 volatile int dState = 0;								// Last position input
 
@@ -68,38 +67,18 @@ void extruder_read_quadrature()
   {   
     // check channel B to see which way
     if (digitalRead(EXTRUDER_ENCODER_B_PIN) == LOW)
-    {
-      if (INVERT_QUADRATURE)
-        extruder_error--; 
-      else
         extruder_error++;
-    }
     else
-    {
-      if (INVERT_QUADRATURE)
-        extruder_error++;
-      else
         extruder_error--;
-    }  
   }
   // found a high-to-low on channel A
   else                                        
   {
     // check channel B to see which way
     if (digitalRead(EXTRUDER_ENCODER_B_PIN) == LOW)
-    {
-      if (INVERT_QUADRATURE)
-        extruder_error++;
-      else
         extruder_error--;
-    }
     else
-    {
-      if (INVERT_QUADRATURE)
-        extruder_error--;
-      else
         extruder_error++;
-    }  
   }
 }
 
@@ -142,11 +121,6 @@ void init_extruder()
 	
 	//our default speed for the PID is every millisecond (16000 ticks)
 	setTimer2Ticks(16000);
-}
-
-void extruder_set_direction(bool direction)
-{
-	extruder_direction = direction;
 }
 
 void extruder_set_cooler(byte speed)
@@ -231,11 +205,6 @@ int extruder_sample_temperature(byte pin)
 	return raw;
 }
 
-void extruder_manage_speed()
-{
-
-}
-
 
 /*!
   Manages motor and heater based on measured temperature:
@@ -256,7 +225,4 @@ void extruder_manage_temperature()
 	//turn the heater off if we're above our max.
 	else
 		analogWrite(EXTRUDER_HEATER_PIN, 0);
-
-	extruder_manage_speed();
 }
-
