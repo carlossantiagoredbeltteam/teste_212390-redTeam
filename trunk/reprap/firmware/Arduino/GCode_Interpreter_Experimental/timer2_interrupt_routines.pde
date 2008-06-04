@@ -1,4 +1,5 @@
 //these routines provide an easy interface for controlling Timer2 interrupts
+volatile int cnt = 0;
 
 //this handles the timer interrupt event
 SIGNAL(SIG_OUTPUT_COMPARE2A)
@@ -17,8 +18,8 @@ SIGNAL(SIG_OUTPUT_COMPARE2A)
 	{
 		disableTimer1Interrupt();
 		disableTimer2Interrupt();
-		speed = 0;
 		extruder_error = 0;
+		analogWrite(EXTRUDER_MOTOR_SPEED_PIN, 0);
 		Serial.println("Extruder Fail");
 	}
 	else
@@ -27,7 +28,7 @@ SIGNAL(SIG_OUTPUT_COMPARE2A)
 		pTerm = extruder_pGain * (float)abs_error;
 	
 		//calculate our I term
-		iState += abs_error;
+		iState += -extruder_error;
 		if (iState > iMax)
 			iState = iMax;
 		else if (iState < iMin)
@@ -44,19 +45,21 @@ SIGNAL(SIG_OUTPUT_COMPARE2A)
 		//do some bounds checking.
 		speed = max(speed, EXTRUDER_MIN_SPEED);
 		speed = min(speed, EXTRUDER_MAX_SPEED);
-	}
-	
-	//figure out which direction to move the motor
-	if (extruder_error > 0)
-		digitalWrite(EXTRUDER_MOTOR_DIR_PIN, EXTRUDER_REVERSE);
-	else
-		digitalWrite(EXTRUDER_MOTOR_DIR_PIN, EXTRUDER_FORWARD);
 
-	//send us off at that speed!
-	if (abs_error > EXTRUDER_ERROR_MARGIN)
+		//our debug loop.
+		cnt++;
+		if (cnt > 250)
+		{
+			Serial.print("e:");
+			Serial.println(extruder_error);
+			Serial.print("spd:");
+			Serial.println(speed);
+			cnt = 0;
+		}
+
+		digitalWrite(EXTRUDER_MOTOR_DIR_PIN, EXTRUDER_FORWARD);
 		analogWrite(EXTRUDER_MOTOR_SPEED_PIN, speed);
-	else
-		analogWrite(EXTRUDER_MOTOR_SPEED_PIN, 0);
+	}
 }
 
 void enableTimer2Interrupt()
@@ -86,7 +89,8 @@ void setTimer2Resolution(byte r)
 	if (r > 7)
 		r = 7;
 		
-	TCCR2B &= (B11111000 | r);
+	TCCR2B &= B11111000;
+	TCCR2B |= r;
 }
 
 void setTimer2Ceiling(byte c)

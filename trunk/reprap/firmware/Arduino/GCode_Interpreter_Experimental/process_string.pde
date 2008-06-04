@@ -162,61 +162,6 @@ void process_string(char instruction[], int size)
 				//finally move.
 				dda_move(feedrate_micros);
 			break;
-			
-			//Clockwise arc
-			case 2:
-			//Counterclockwise arc
-			case 3:
-				FloatPoint cent;
-
-				// Centre coordinates are always relative
-				cent.x = search_string('I', instruction, size) + current_units.x;
-				cent.y = search_string('J', instruction, size) + current_units.y;
-				float angleA, angleB, angle, radius, length, aX, aY, bX, bY;
-
-				aX = (current_units.x - cent.x);
-				aY = (current_units.y - cent.y);
-				bX = (fp.x - cent.x);
-				bY = (fp.y - cent.y);
-				
-				if (code == 2) { // Clockwise
-					angleA = atan2(bY, bX);
-					angleB = atan2(aY, aX);
-				} else { // Counterclockwise
-					angleA = atan2(aY, aX);
-					angleB = atan2(bY, bX);
-				}
-
-				// Make sure angleB is always greater than angleA
-				// and if not add 2PI so that it is (this also takes
-				// care of the special case of angleA == angleB,
-				// ie we want a complete circle)
-				if (angleB <= angleA) angleB += 2 * M_PI;
-				angle = angleB - angleA;
-
-				radius = sqrt(aX * aX + aY * aY);
-				length = radius * angle;
-				int steps, s, step;
-				steps = (int) ceil(length / curve_section);
-
-				FloatPoint newPoint;
-				for (s = 1; s <= steps; s++) {
-					step = (code == 3) ? s : steps - s; // Work backwards for CW
-					newPoint.x = cent.x + radius * cos(angleA + angle * ((float) step / steps));
-					newPoint.y = cent.y + radius * sin(angleA + angle * ((float) step / steps));
-					set_target(newPoint.x, newPoint.y, fp.z);
-
-					// Need to calculate rate for each section of curve
-					if (feedrate > 0)
-						feedrate_micros = calculate_feedrate_delay(feedrate);
-					else
-						feedrate_micros = getMaxSpeed();
-
-					// Make step
-					dda_move(feedrate_micros);
-				}
-	
-			break;
 
 			//Dwell
 			case 4:
@@ -336,16 +281,15 @@ void process_string(char instruction[], int size)
 	*/		
 			//turn extruder on, forward
 			case 101:
-				extruder_set_direction(1);
 				enableTimer1Interrupt();
 				enableTimer2Interrupt();
 			break;
 
 			//turn extruder on, reverse
 			case 102:
-				extruder_set_direction(0);
-				enableTimer1Interrupt();
-				enableTimer2Interrupt();
+				//extruder_set_direction(0);
+				//enableTimer1Interrupt();
+				//enableTimer2Interrupt();
 			break;
 
 			//turn extruder off
@@ -395,6 +339,7 @@ void process_string(char instruction[], int size)
 				{
 					extruder_delay = (960000000UL / EXTRUDER_ENCODER_STEPS) / extruder_rpm;
 					setTimer1Ticks(extruder_delay);
+Serial.println(extruder_rpm);
 				}
 			break;
 			
@@ -421,6 +366,16 @@ void process_string(char instruction[], int size)
 			//set extruder iMin
 			case 124:
 				iMin = (float)search_string('S', instruction, size);
+			break;
+			
+			//set extruder iMin
+			case 125:
+				Serial.print("pGain:");
+				Serial.println((int)(extruder_pGain * 1000));
+				Serial.print("iGain:");
+				Serial.println((int)(extruder_iGain * 1000));
+				Serial.print("dGain:");
+				Serial.println((int)(extruder_dGain * 1000));
 			break;
 			
 			default:
