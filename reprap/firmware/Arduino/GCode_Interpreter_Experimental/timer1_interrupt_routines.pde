@@ -37,7 +37,8 @@ void setTimer1Resolution(byte r)
 	if (r > 5)
 		r = 5;
 		
-	TCCR1B &= (B11111000 | r);
+	TCCR1B &= B11111000;
+	TCCR1B |= r;
 }
 
 void setTimer1Ceiling(unsigned int c)
@@ -106,7 +107,6 @@ void setTimer1Ticks(unsigned long ticks)
 	// we also then calculate the timer ceiling required. (ie what the counter counts to)
 	// the result is the timer counts up to the appropriate time and then fires an interrupt.
 
-	//disableTimer1Interrupt();
 	setTimer1Ceiling(getTimer1Ceiling(ticks));
 	setTimer1Resolution(getTimer1Resolution(ticks));
 }
@@ -132,7 +132,7 @@ void setupTimer1Interrupt()
 	TCCR1A &= ~(1<<COM1B0);
 
 	//start off with a slow frequency.
-	setTimer1Resolution(4);
+	setTimer1Resolution(5);
 	setTimer1Ceiling(65535);
 	disableTimer1Interrupt();
 }

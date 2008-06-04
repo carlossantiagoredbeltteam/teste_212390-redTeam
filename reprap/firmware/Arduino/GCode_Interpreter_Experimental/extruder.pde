@@ -52,14 +52,14 @@ long extruder_delay = 0;
 
 //these are for the extruder PID
 volatile bool extruder_direction = EXTRUDER_FORWARD;
-volatile int extruder_error = 0;		// extruder position / error variable.
-volatile float extruder_pGain = 1.0;	// Proportional gain
-volatile float extruder_iGain = 0.001;	// Integral gain
-volatile float extruder_dGain = 100.0;	// Derivative gain
-volatile float iMax = 100.0;			// Integrator max
-volatile float iMin = 0.0;				// Integrator min
-volatile int iState = 0;				// Integrator state
-volatile int dState = 0;				// Last position input
+volatile int extruder_error = 0;						// extruder position / error variable.
+volatile float extruder_pGain = EXTRUDER_INITIAL_PGAIN;	// Proportional gain
+volatile float extruder_iGain = EXTRUDER_INITIAL_IGAIN;	// Integral gain
+volatile float extruder_dGain = EXTRUDER_INITIAL_DGAIN;	// Derivative gain
+volatile float iMax = 500.0;							// Integrator max
+volatile float iMin = -500.0;							// Integrator min
+volatile int iState = 0;								// Integrator state
+volatile int dState = 0;								// Last position input
 
 void extruder_read_quadrature()
 {  
@@ -139,6 +139,9 @@ void init_extruder()
 	//setup our timer interrupt stuff
 	setupTimer1Interrupt();
 	setupTimer2Interrupt();
+	
+	//our default speed for the PID is every millisecond (16000 ticks)
+	setTimer2Ticks(16000);
 }
 
 void extruder_set_direction(bool direction)
