@@ -287,9 +287,7 @@ void process_string(char instruction[], int size)
 
 			//turn extruder on, reverse
 			case 102:
-				//extruder_set_direction(0);
-				//enableTimer1Interrupt();
-				//enableTimer2Interrupt();
+				//this is not implemented, nor supported
 			break;
 
 			//turn extruder off
@@ -297,7 +295,7 @@ void process_string(char instruction[], int size)
 				disableTimer1Interrupt();
 				disableTimer2Interrupt();
 				analogWrite(EXTRUDER_MOTOR_SPEED_PIN, 0);
-				extruder_error = 0;
+				//extruder_error = 0;
 			break;
 
 			//custom code for temperature control
@@ -339,43 +337,42 @@ void process_string(char instruction[], int size)
 				{
 					extruder_delay = (960000000UL / EXTRUDER_ENCODER_STEPS) / extruder_rpm;
 					setTimer1Ticks(extruder_delay);
-Serial.println(extruder_rpm);
 				}
 			break;
 			
 			//set extruder P gain
 			case 120:
-				extruder_pGain = (float)search_string('S', instruction, size);
+				extruder_pGain = (int)search_string('S', instruction, size);
 			break;
 
 			//set extruder I gain
 			case 121:
-				extruder_iGain = (float)search_string('S', instruction, size);
+				extruder_iGain = (int)search_string('S', instruction, size);
 			break;
 
 			//set extruder D gain
 			case 122:
-				extruder_dGain = (float)search_string('S', instruction, size);
+				extruder_dGain = (int)search_string('S', instruction, size);
 			break;
 
 			//set extruder iMax
 			case 123:
-				iMax = (float)search_string('S', instruction, size);
+				iMax = (int)search_string('S', instruction, size);
 			break;
 
 			//set extruder iMin
 			case 124:
-				iMin = (float)search_string('S', instruction, size);
+				iMin = (int)search_string('S', instruction, size);
 			break;
 			
 			//set extruder iMin
 			case 125:
-				Serial.print("pGain:");
-				Serial.println((int)(extruder_pGain * 1000));
-				Serial.print("iGain:");
-				Serial.println((int)(extruder_iGain * 1000));
-				Serial.print("dGain:");
-				Serial.println((int)(extruder_dGain * 1000));
+				Serial.print("P:");
+				Serial.println(extruder_pGain, DEC);
+				Serial.print("I:");
+				Serial.println(extruder_iGain, DEC);
+				Serial.print("D:");
+				Serial.println(extruder_dGain, DEC);
 			break;
 			
 			default:
@@ -386,7 +383,6 @@ Serial.println(extruder_rpm);
 	
 	//tell our host we're done.
 	Serial.println("ok");
-//	Serial.println(line, DEC);
 }
 
 //look for the number that appears after the char key and return it

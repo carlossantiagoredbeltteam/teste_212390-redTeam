@@ -146,7 +146,7 @@ void dda_move(long micro_delay)
 		if (milli_delay > 0)
 			delay(milli_delay);			
 		else
-			delayMicroseconds(micro_delay);
+			delayMicrosecondsInterruptible(micro_delay);
 	}
 	while (x_can_step || y_can_step || z_can_step);
 	
@@ -176,7 +176,7 @@ bool can_step(byte min_pin, byte max_pin, long current, long target, byte direct
 void do_step(byte step_pin)
 {
 	digitalWrite(step_pin, HIGH);
-	delayMicroseconds(5);
+	delayMicrosecondsInterruptible(5);
 	digitalWrite(step_pin, LOW);
 }
 

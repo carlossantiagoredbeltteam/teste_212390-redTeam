@@ -4,6 +4,64 @@ volatile int cnt = 0;
 //this handles the timer interrupt event
 SIGNAL(SIG_OUTPUT_COMPARE2A)
 {
+	// somewhat hacked implementation of a PID algorithm as described at:
+	// http://www.embedded.com/2000/0010/0010feat3.htm - PID Without a PhD, Tim Wescott 
+	
+	int abs_error = abs(extruder_error);
+	int pTerm = 0;
+	int iTerm = 0;
+	int dTerm = 0;
+	int speed = 0;
+
+	//if our error is too high, it means we cant keep up.  bail to protect the extruder motor
+	if (abs_error > 1000)
+	{
+		disableTimer1Interrupt();
+		disableTimer2Interrupt();
+		extruder_error = 0;
+		analogWrite(EXTRUDER_MOTOR_SPEED_PIN, 0);
+		Serial.println("Extruder Fail");
+	}
+	else
+	{
+		//if we're good, drop her down to minimum. (maybe a bad idea?)
+		if (extruder_error < 0)
+		{
+			//calculate our P term
+			pTerm = abs_error / extruder_pGain;
+	
+			//calculate our I term
+			iState += abs_error;
+			iState = constrain(iState, iMin, iMax);
+			iTerm = iState / extruder_iGain;
+	
+			//calculate our D term
+			dTerm = (abs_error - dState) * extruder_dGain;
+			dState = abs_error;
+
+			//calculate our PWM, within bounds.
+			speed = pTerm + iTerm - dTerm;
+		}
+
+		//our debug loop checker thingie
+		cnt++;
+		if (cnt > 250)
+		{
+			Serial.print("e:");
+			Serial.println(extruder_error);
+			Serial.print("spd:");
+			Serial.println(speed);
+			cnt = 0;
+		}
+
+		//figure out our real speed and use it.
+		speed = constrain(speed, EXTRUDER_MIN_SPEED, EXTRUDER_MAX_SPEED);
+		analogWrite(EXTRUDER_MOTOR_SPEED_PIN, speed);
+	}
+}
+/*
+SIGNAL(SIG_OUTPUT_COMPARE2A)
+{
 	// straight-forward implementation of a PID algorithm as described at:
 	// http://www.embedded.com/2000/0010/0010feat3.htm - PID Without a PhD, Tim Wescott 
 
@@ -61,6 +119,7 @@ SIGNAL(SIG_OUTPUT_COMPARE2A)
 		analogWrite(EXTRUDER_MOTOR_SPEED_PIN, speed);
 	}
 }
+*/
 
 void enableTimer2Interrupt()
 {
@@ -175,57 +234,4 @@ void setupTimer2Interrupt()
 	setTimer2Ceiling(255);
 	disableTimer2Interrupt();
 }
-
-	/*
-	//is our speed changing?
-	int extruder_error_delta = abs(last_extruder_error) - abs(extruder_error);
-	int extruder_delta_delta = last_extruder_delta - extruder_error_delta;
-	int extruder_error_factor = abs(extruder_error) / 2;
-	
-	//calculate our speed.
-	int speed = 0;
-	speed += extruder_error_factor;
-        speed += last_extruder_speed / 2;
-	speed += extruder_error_delta * 2;
-	speed += extruder_delta_delta * 2;
-       
-        //why not average speeds?
-        speed = (speed + last_extruder_speed) / 2;
-
-	//do some bounds checking.
-	speed = max(speed, EXTRUDER_MIN_SPEED);
-	speed = min(speed, EXTRUDER_MAX_SPEED);
-	
-
-
-	//temporary debug stuff.
-	if (false && random(500) == 1)
-	{
-		Serial.print("e:");
-		Serial.print(extruder_error, DEC);
-		Serial.print(" d:");
-		Serial.print(extruder_error_delta, DEC);
-		Serial.print(" dd:");
-		Serial.print(extruder_delta_delta, DEC);
-		Serial.print(" s:");
-		Serial.println(speed);
-	}
-
-	//figure out which direction to move the motor
-	if (extruder_error > 0)
-		digitalWrite(EXTRUDER_MOTOR_DIR_PIN, EXTRUDER_REVERSE);
-	else if (extruder_error < 0)
-		digitalWrite(EXTRUDER_MOTOR_DIR_PIN, EXTRUDER_FORWARD);
-
-	//send us off at that speed!
-	if (abs(extruder_error) > EXTRUDER_ERROR_MARGIN)
-		analogWrite(EXTRUDER_MOTOR_SPEED_PIN, speed);
-	else
-		analogWrite(EXTRUDER_MOTOR_SPEED_PIN, 0);
-		
-	//save our last error.
-	last_extruder_error = extruder_error;
-	last_extruder_delta = extruder_error_delta;
-	last_extruder_speed = speed;
-	*/
 

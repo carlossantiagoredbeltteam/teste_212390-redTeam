@@ -32,12 +32,11 @@
 #define EXTRUDER_MIN_SPEED 50			//minimum PWM speed to use
 #define EXTRUDER_MAX_SPEED 255			//maximum PWM speed to use
 #define EXTRUDER_ERROR_MARGIN 10		//our error margin (to prevent constant seeking)
-#define INVERT_QUADRATURE			0 // 1 = inverted, 0 = not inverted
 
 //here are our defines for default extruder PID values
-#define EXTRUDER_INITIAL_PGAIN 0.75
-#define EXTRUDER_INITIAL_IGAIN 0.005
-#define EXTRUDER_INITIAL_DGAIN 1.0
+#define EXTRUDER_INITIAL_PGAIN 1
+#define EXTRUDER_INITIAL_IGAIN 100
+#define EXTRUDER_INITIAL_DGAIN 10
 
 /****************************************************************************************
 * digital i/o pin assignment
