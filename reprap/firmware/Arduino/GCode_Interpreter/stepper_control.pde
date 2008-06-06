@@ -46,10 +46,37 @@ void init_steppers()
 
 void dda_move(long micro_delay)
 {
-	//enable our steppers
-	digitalWrite(X_ENABLE_PIN, HIGH);
-	digitalWrite(Y_ENABLE_PIN, HIGH);
-	digitalWrite(Z_ENABLE_PIN, HIGH);
+	// Enable steppers only for axes which are moving
+	// taking account of the fact that some or all axes
+	// may share an enable line (check using macros at
+        // compile time to avoid needless code)
+	if ( target_units.x == current_units.x
+#if X_ENABLE_PIN == Y_ENABLE_PIN
+	     && target_units.y == current_units.y
+#endif
+#if X_ENABLE_PIN == Z_ENABLE_PIN
+	     && target_units.z == current_units.z
+#endif
+	     ) digitalWrite(X_ENABLE_PIN, LOW);
+	else digitalWrite(X_ENABLE_PIN, HIGH);
+	if ( target_units.y == current_units.y
+#if Y_ENABLE_PIN == X_ENABLE_PIN
+	     && target_units.x == current_units.x
+#endif
+#if Y_ENABLE_PIN == Z_ENABLE_PIN
+	     && target_units.z == current_units.z
+#endif
+	     ) digitalWrite(Y_ENABLE_PIN, LOW);
+        else digitalWrite(Y_ENABLE_PIN, HIGH);
+	if ( target_units.z == current_units.z
+#if Z_ENABLE_PIN == X_ENABLE_PIN
+	     && target_units.x == current_units.x
+#endif
+#if Z_ENABLE_PIN == Y_ENABLE_PIN
+	     && target_units.y == current_units.y
+#endif
+	     ) digitalWrite(Z_ENABLE_PIN, LOW);
+	else digitalWrite(Z_ENABLE_PIN, HIGH);
 	
 	//figure out our deltas
 	max_delta = max(delta_steps.x, delta_steps.y);
@@ -168,11 +195,11 @@ void do_step(byte step_pin)
 bool read_switch(byte pin)
 {
 	//dual read as crude debounce
-	
-	if ( SENSORS_INVERTING )
-		return !digitalRead(pin) && !digitalRead(pin);
-	else
-		return digitalRead(pin) && digitalRead(pin);
+#if SENSORS_INVERTING == 1
+	return !digitalRead(pin) && !digitalRead(pin);
+#else
+	return digitalRead(pin) && digitalRead(pin);
+#endif
 }
 
 long to_steps(float steps_per_unit, float units)
@@ -270,7 +297,7 @@ long getMaxSpeed()
 
 void disable_steppers()
 {
-	//enable our steppers
+	//disable our steppers
 	digitalWrite(X_ENABLE_PIN, LOW);
 	digitalWrite(Y_ENABLE_PIN, LOW);
 	digitalWrite(Z_ENABLE_PIN, LOW);
