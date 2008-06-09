@@ -1,18 +1,21 @@
 // our point structure to make things nice.
-struct LongPoint {
+struct LongPoint
+{
 	long x;
 	long y;
 	long z;
 };
 
-struct FloatPoint {
+struct FloatPoint
+{
 	float x;
 	float y;
 	float z;
 };
 
 /* gcode line parse results */
-struct GcodeParser {
+struct GcodeParser
+{
     unsigned int seen;
     int G;
     int M;
@@ -53,7 +56,8 @@ int scan_int(char *str, int *valp);
 int scan_float(char *str, float *valp);
 
 //init our string processing
-void init_process_string() {
+void init_process_string()
+{
 	//init our command
 	for (byte i=0; i<COMMAND_SIZE; i++)
 		word[i] = 0;
@@ -112,9 +116,11 @@ int parse_string(struct GcodeParser * gc, char instruction[], int size)
 	/* scan the string for commands and parameters, recording the arguments for each,
 	 * and setting the seen flag for each that is seen
 	 */
-	for (ind=0; ind<size; ind += (1+len)) {
+	for (ind=0; ind<size; ind += (1+len))
+	{
 		len = 0;
-		switch (instruction[ind]) {
+		switch (instruction[ind])
+		{
 			PARSE_INT('G', instruction, &instruction[ind+1], size-ind, len, gc->G, gc->seen, GCODE_G);
 			PARSE_INT('M', instruction, &instruction[ind+1], size-ind, len, gc->M, gc->seen, GCODE_M);
 			PARSE_FLOAT('P', instruction, &instruction[ind+1], size-ind, len, gc->P, gc->seen, GCODE_P);
@@ -133,12 +139,14 @@ int parse_string(struct GcodeParser * gc, char instruction[], int size)
 
 
 //Read the string and execute instructions
-void process_string(char instruction[], int size) {
-  
-        GcodeParser gc;	/* string parse result */
-  
+void process_string(char instruction[], int size)
+{
+
+	GcodeParser gc;	/* string parse result */
+
 	//the character / means delete block... used for comments and stuff.
-	if (instruction[0] == '/') {
+	if (instruction[0] == '/')
+	{
 		Serial.println("ok");
 		return;
 	}
@@ -149,29 +157,38 @@ void process_string(char instruction[], int size) {
 	fp.y = 0.0;
 	fp.z = 0.0;
 
-        parse_string(&gc, instruction, size);
+	//get all our parameters!
+	parse_string(&gc, instruction, size);
+
 	/* if no command was seen, but parameters were, then use the last G code as 
 	 * the current command
 	 */
 	if ((!gc.seen & (GCODE_G | GCODE_M)) && 
-	    ((gc.seen != 0) && (last_gcode_g >= 0))) {
+	    ((gc.seen != 0) &&
+		(last_gcode_g >= 0))
+	)
+	{
 		/* yes - so use the previous command with the new parameters */
 		gc.G = last_gcode_g;
 		gc.seen |= GCODE_G;
 	}
 
 	//did we get a gcode?
-	if (gc.seen & GCODE_G) {
-	    	last_gcode_g = gc.G;	/* remember this for future instructions */
+	if (gc.seen & GCODE_G)
+	{
+		last_gcode_g = gc.G;	/* remember this for future instructions */
 		fp = current_units;
-		if (abs_mode) {
+		if (abs_mode)
+		{
 			if (gc.seen & GCODE_X)
 				fp.x = gc.X;
 			if (gc.seen & GCODE_Y)
 				fp.y = gc.Y;
 			if (gc.seen & GCODE_Z)
 				fp.z = gc.Z;
-		} else {
+		}
+		else
+		{
 			if (gc.seen & GCODE_X)
 				fp.x += gc.X;
 			if (gc.seen & GCODE_Y)
@@ -180,217 +197,235 @@ void process_string(char instruction[], int size) {
 				fp.z += gc.Z;
 		}
 
-                // Get feedrate if supplied
-                if ( gc.seen & GCODE_F ) feedrate = gc.F;
+		// Get feedrate if supplied
+		if ( gc.seen & GCODE_F )
+			feedrate = gc.F;
 
 		//do something!
-		switch (gc.G) {
-		//Rapid Positioning
-		//Linear Interpolation
-		//these are basically the same thing.
-		case 0:
-		case 1:
-			//set our target.
-			set_target(fp.x, fp.y, fp.z);
-
-			// Use currently set feedrate if doing a G1
-			if (gc.G == 1) feedrate_micros = calculate_feedrate_delay(feedrate);
-
-			// Use our max for G0
-			else feedrate_micros = getMaxSpeed();
-
-			//finally move.
-			dda_move(feedrate_micros);
-			break;
-
-			//Clockwise arc
-		case 2:
-			//Counterclockwise arc
-		case 3: {
-			FloatPoint cent;
-
-			// Centre coordinates are always relative
-			if (gc.seen & GCODE_I) cent.x = current_units.x + gc.I;
-			else cent.x = current_units.x;
-			if (gc.seen & GCODE_J) cent.y = current_units.y + gc.J;
-
-			float angleA, angleB, angle, radius, length, aX, aY, bX, bY;
-
-			aX = (current_units.x - cent.x);
-			aY = (current_units.y - cent.y);
-			bX = (fp.x - cent.x);
-			bY = (fp.y - cent.y);
-
-			if (gc.G == 2) { // Clockwise
-				angleA = atan2(bY, bX);
-				angleB = atan2(aY, aX);
-			} else { // Counterclockwise
-				angleA = atan2(aY, aX);
-				angleB = atan2(bY, bX);
-			}
-
-			// Make sure angleB is always greater than angleA
-			// and if not add 2PI so that it is (this also takes
-			// care of the special case of angleA == angleB,
-			// ie we want a complete circle)
-			if (angleB <= angleA)
-				angleB += 2 * M_PI;
-			angle = angleB - angleA;
-
-			radius = sqrt(aX * aX + aY * aY);
-			length = radius * angle;
-			int steps, s, step;
-
-			// Maximum of either 2.4 times the angle in radians or the length of the curve divided by the constant specified in _init.pde
-			steps = (int) ceil(max(angle * 2.4, length / curve_section));
-
-			FloatPoint newPoint;
-			float arc_start_z = current_units.z;
-			for (s = 1; s <= steps; s++) {
-				step = (gc.G == 3) ? s : steps - s; // Work backwards for CW
-				newPoint.x = cent.x + radius * cos(angleA + angle
-						* ((float) step / steps));
-				newPoint.y = cent.y + radius * sin(angleA + angle
-						* ((float) step / steps));
-				set_target(newPoint.x, newPoint.y, arc_start_z + (fp.z
-						- arc_start_z) * s / steps);
-
-				// Need to calculate rate for each section of curve
-				if (feedrate > 0) feedrate_micros = calculate_feedrate_delay(feedrate);
-				else feedrate_micros = getMaxSpeed();
-
-				// Make step
-				dda_move(feedrate_micros);
-			}
-		}
-		break;
-
-			
-		case 4: //Dwell
-			delay((int)(gc.P * 1000));
-			break;
-
-			//Inches for Units
-		case 20:
-			x_units = X_STEPS_PER_INCH;
-			y_units = Y_STEPS_PER_INCH;
-			z_units = Z_STEPS_PER_INCH;
-			curve_section = CURVE_SECTION_INCHES;
-
-			calculate_deltas();
-			break;
-
-			//mm for Units
-		case 21:
-			x_units = X_STEPS_PER_MM;
-			y_units = Y_STEPS_PER_MM;
-			z_units = Z_STEPS_PER_MM;
-			curve_section = CURVE_SECTION_MM;
-
-			calculate_deltas();
-			break;
-
-			//go home.
-		case 28:
-			set_target(0.0, 0.0, 0.0);
-			dda_move(getMaxSpeed());
-			break;
-
-			//go home via an intermediate point.
-		case 30:
-			//set our target.
-			set_target(fp.x, fp.y, fp.z);
-
-			//go there.
-			dda_move(getMaxSpeed());
-
-			//go home.
-			set_target(0.0, 0.0, 0.0);
-			dda_move(getMaxSpeed());
-			break;
-
-			// Drilling canned cycles
-		case 81: // Without dwell
-		case 82: // With dwell
-		case 83: // Peck drilling
+		switch (gc.G)
 		{
-			float retract = gc.R;
-			if (!abs_mode) retract += current_units.z;
+			//Rapid Positioning
+			//Linear Interpolation
+			//these are basically the same thing.
+			case 0:
+			case 1:
+				//set our target.
+				set_target(fp.x, fp.y, fp.z);
 
-			// Retract to R position if Z is currently below this
-			if (current_units.z < retract) {
-				set_target(current_units.x, current_units.y, retract);
-				dda_move(getMaxSpeed());
-			}
-
-			// Move to start XY
-			set_target(fp.x, fp.y, current_units.z);
-			dda_move(getMaxSpeed());
-
-			// Do the actual drilling
-			float target_z = retract;
-			float delta_z;
-
-			// For G83 move in increments specified by Q code, otherwise do in one pass
-			if (gc.G == 83) delta_z = gc.Q;
-			else delta_z = retract - fp.z;
-
-			do {
-				// Move rapidly to bottom of hole drilled so far (target Z if starting hole)
-				set_target(fp.x, fp.y, target_z);
-				dda_move(getMaxSpeed());
-
-				// Move with controlled feed rate by delta z (or to bottom of hole if less)
-				target_z -= delta_z;
-				if (target_z < fp.z)
-					target_z = fp.z;
-				set_target(fp.x, fp.y, target_z);
-				if (feedrate > 0)
+				// Use currently set feedrate if doing a G1
+				if (gc.G == 1)
 					feedrate_micros = calculate_feedrate_delay(feedrate);
+				// Use our max for G0
 				else
 					feedrate_micros = getMaxSpeed();
+
+				//finally move.
 				dda_move(feedrate_micros);
+				break;
 
-				// Dwell if doing a G82
-				if (gc.G == 82) delay((int)(gc.P * 1000));
+			//Clockwise arc
+			case 2:
+			//Counterclockwise arc
+			case 3:
+			{
+				FloatPoint cent;
 
-				// Retract
-				set_target(fp.x, fp.y, retract);
+				// Centre coordinates are always relative
+				if (gc.seen & GCODE_I) cent.x = current_units.x + gc.I;
+				else cent.x = current_units.x;
+				if (gc.seen & GCODE_J) cent.y = current_units.y + gc.J;
+
+				float angleA, angleB, angle, radius, length, aX, aY, bX, bY;
+
+				aX = (current_units.x - cent.x);
+				aY = (current_units.y - cent.y);
+				bX = (fp.x - cent.x);
+				bY = (fp.y - cent.y);
+
+				// Clockwise
+				if (gc.G == 2)
+				{
+					angleA = atan2(bY, bX);
+					angleB = atan2(aY, aX);
+				}
+				// Counterclockwise
+				else
+				{
+					angleA = atan2(aY, aX);
+					angleB = atan2(bY, bX);
+				}
+
+				// Make sure angleB is always greater than angleA
+				// and if not add 2PI so that it is (this also takes
+				// care of the special case of angleA == angleB,
+				// ie we want a complete circle)
+				if (angleB <= angleA)
+					angleB += 2 * M_PI;
+				angle = angleB - angleA;
+
+				radius = sqrt(aX * aX + aY * aY);
+				length = radius * angle;
+				int steps, s, step;
+
+				// Maximum of either 2.4 times the angle in radians or the length of the curve divided by the constant specified in _init.pde
+				steps = (int) ceil(max(angle * 2.4, length / curve_section));
+
+				FloatPoint newPoint;
+				float arc_start_z = current_units.z;
+				for (s = 1; s <= steps; s++)
+				{
+					step = (gc.G == 3) ? s : steps - s; // Work backwards for CW
+					newPoint.x = cent.x + radius * cos(angleA + angle
+							* ((float) step / steps));
+					newPoint.y = cent.y + radius * sin(angleA + angle
+							* ((float) step / steps));
+					set_target(newPoint.x, newPoint.y, arc_start_z + (fp.z
+							- arc_start_z) * s / steps);
+
+					// Need to calculate rate for each section of curve
+					if (feedrate > 0)
+						feedrate_micros = calculate_feedrate_delay(feedrate);
+					else
+						feedrate_micros = getMaxSpeed();
+
+					// Make step
+					dda_move(feedrate_micros);
+				}
+			}
+			break;
+
+			
+			case 4: //Dwell
+				delay((int)(gc.P * 1000));
+				break;
+
+				//Inches for Units
+			case 20:
+				x_units = X_STEPS_PER_INCH;
+				y_units = Y_STEPS_PER_INCH;
+				z_units = Z_STEPS_PER_INCH;
+				curve_section = CURVE_SECTION_INCHES;
+
+				calculate_deltas();
+				break;
+
+				//mm for Units
+			case 21:
+				x_units = X_STEPS_PER_MM;
+				y_units = Y_STEPS_PER_MM;
+				z_units = Z_STEPS_PER_MM;
+				curve_section = CURVE_SECTION_MM;
+
+				calculate_deltas();
+				break;
+
+				//go home.
+			case 28:
+				set_target(0.0, 0.0, 0.0);
 				dda_move(getMaxSpeed());
-			} while (target_z > fp.z);
-		}
-		break;
+				break;
 
-			
-		case 90: //Absolute Positioning
-			abs_mode = true;
+				//go home via an intermediate point.
+			case 30:
+				//set our target.
+				set_target(fp.x, fp.y, fp.z);
+
+				//go there.
+				dda_move(getMaxSpeed());
+
+				//go home.
+				set_target(0.0, 0.0, 0.0);
+				dda_move(getMaxSpeed());
+				break;
+
+			// Drilling canned cycles
+			case 81: // Without dwell
+			case 82: // With dwell
+			case 83: // Peck drilling
+			{
+				float retract = gc.R;
+				
+				if (!abs_mode)
+					retract += current_units.z;
+
+				// Retract to R position if Z is currently below this
+				if (current_units.z < retract)
+				{
+					set_target(current_units.x, current_units.y, retract);
+					dda_move(getMaxSpeed());
+				}
+
+				// Move to start XY
+				set_target(fp.x, fp.y, current_units.z);
+				dda_move(getMaxSpeed());
+
+				// Do the actual drilling
+				float target_z = retract;
+				float delta_z;
+
+				// For G83 move in increments specified by Q code, otherwise do in one pass
+				if (gc.G == 83)
+					delta_z = gc.Q;
+				else
+					delta_z = retract - fp.z;
+
+				do {
+					// Move rapidly to bottom of hole drilled so far (target Z if starting hole)
+					set_target(fp.x, fp.y, target_z);
+					dda_move(getMaxSpeed());
+
+					// Move with controlled feed rate by delta z (or to bottom of hole if less)
+					target_z -= delta_z;
+					if (target_z < fp.z)
+						target_z = fp.z;
+					set_target(fp.x, fp.y, target_z);
+					if (feedrate > 0)
+						feedrate_micros = calculate_feedrate_delay(feedrate);
+					else
+						feedrate_micros = getMaxSpeed();
+					dda_move(feedrate_micros);
+
+					// Dwell if doing a G82
+					if (gc.G == 82)
+						delay((int)(gc.P * 1000));
+
+					// Retract
+					set_target(fp.x, fp.y, retract);
+					dda_move(getMaxSpeed());
+				} while (target_z > fp.z);
+			}
 			break;
 
 			
-		case 91: //Incremental Positioning
-			abs_mode = false;
-			break;
+			case 90: //Absolute Positioning
+				abs_mode = true;
+				break;
 
 			
-		case 92: //Set as home
-			set_position(0.0, 0.0, 0.0);
-			break;
+			case 91: //Incremental Positioning
+				abs_mode = false;
+				break;
 
-			/*
-			 //Inverse Time Feed Mode
-			 case 93:
+			
+			case 92: //Set as home
+				set_position(0.0, 0.0, 0.0);
+				break;
 
-			 break;  //TODO: add this
+				/*
+				 //Inverse Time Feed Mode
+				 case 93:
 
-			 //Feed per Minute Mode
-			 case 94:
+				 break;  //TODO: add this
 
-			 break;  //TODO: add this
-			 */
+				 //Feed per Minute Mode
+				 case 94:
 
-		default:
-			Serial.print("huh? G");
-			Serial.println(gc.G, DEC);
+				 break;  //TODO: add this
+				 */
+
+			default:
+				Serial.print("huh? G");
+				Serial.println(gc.G, DEC);
 		}
 	}
 
@@ -399,79 +434,82 @@ void process_string(char instruction[], int size) {
 	{
 		switch (gc.M)
 		{
-		//TODO: this is a bug because search_string returns 0.  gotta fix that.
-		case 0:
-			true;
-			break;
-			/*
-			 case 0:
-			 //todo: stop program
-			 break;
+			//TODO: this is a bug because search_string returns 0.  gotta fix that.
+			case 0:
+				true;
+				break;
+				/*
+				 case 0:
+				 //todo: stop program
+				 break;
 
-			 case 1:
-			 //todo: optional stop
-			 break;
+				 case 1:
+				 //todo: optional stop
+				 break;
 
-			 case 2:
-			 //todo: program end
-			 break;
-			 */
-			//turn extruder on, forward
-		case 101:
-			extruder_set_direction(1);
-			extruder_set_speed(extruder_speed);
-			break;
+				 case 2:
+				 //todo: program end
+				 break;
+				 */
+				//turn extruder on, forward
+			case 101:
+				extruder_set_direction(1);
+				extruder_set_speed(extruder_speed);
+				break;
 
-			//turn extruder on, reverse
-		case 102:
-			extruder_set_direction(0);
-			extruder_set_speed(extruder_speed);
-			break;
+				//turn extruder on, reverse
+			case 102:
+				extruder_set_direction(0);
+				extruder_set_speed(extruder_speed);
+				break;
 
-			//turn extruder off
-		case 103:
-			extruder_set_speed(0);
-			break;
+				//turn extruder off
+			case 103:
+				extruder_set_speed(0);
+				break;
 
-			//custom code for temperature control
-		case 104:
-                        if (gc.seen & GCODE_S) {
-			        extruder_set_temperature((int)gc.S);
+				//custom code for temperature control
+			case 104:
+				if (gc.seen & GCODE_S)
+				{
+					extruder_set_temperature((int)gc.S);
 
-			        //warmup if we're too cold.
-			        while (extruder_get_temperature() < extruder_target_celsius) {
-				        extruder_manage_temperature();
-				        Serial.print("T:");
-				        Serial.println(extruder_get_temperature());
-				        delay(1000);
-			        }
-                        }
-			break;
+					//warmup if we're too cold.
+					while (extruder_get_temperature() < extruder_target_celsius)
+					{
+						extruder_manage_temperature();
+						Serial.print("T:");
+						Serial.println(extruder_get_temperature());
+						delay(1000);
+					}
+				}
+				break;
 
-			//custom code for temperature reading
-		case 105:
-			Serial.print("T:");
-			Serial.println(extruder_get_temperature());
-			break;
+				//custom code for temperature reading
+			case 105:
+				Serial.print("T:");
+				Serial.println(extruder_get_temperature());
+				break;
 
-			//turn fan on
-		case 106:
-			extruder_set_cooler(255);
-			break;
+				//turn fan on
+			case 106:
+				extruder_set_cooler(255);
+				break;
 
-			//turn fan off
-		case 107:
-			extruder_set_cooler(0);
-			break;
+				//turn fan off
+			case 107:
+				extruder_set_cooler(0);
+				break;
 
-			//set max extruder speed, 0-255 PWM
-		case 108:
-                        if (gc.seen & GCODE_S) extruder_speed = (int)gc.S;
-			break;
+				//set max extruder speed, 0-255 PWM
+			case 108:
+				if (gc.seen & GCODE_S)
+					extruder_speed = (int)gc.S;
+				break;
 
-		default:
-			Serial.print("Huh? M");
-			Serial.println(gc.M, DEC);
+			default:
+				Serial.print("Huh? M");
+				Serial.println(gc.M, DEC);
 		}
 	}
 
@@ -488,12 +526,13 @@ int scan_float(char *str, float *valp, unsigned int *seen, unsigned int flag)
 	res = (float)strtod(str, &end);
 	len = end - str;
 
-	if (len > 0) {
+	if (len > 0)
+	{
 		*valp = res;
-                *seen |= flag;
-	} else {
-		*valp = 0;
+		*seen |= flag;
 	}
+	else
+		*valp = 0;
 
 	return len;	/* length of number */
 }
@@ -507,12 +546,13 @@ int scan_int(char *str, int *valp, unsigned int *seen, unsigned int flag)
 	res = (int)strtol(str, &end, 10);
 	len = end - str;
 
-	if (len > 0) {
+	if (len > 0)
+	{
 		*valp = res;
-                *seen |= flag;
-	} else {
-		*valp = 0;
+		*seen |= flag;
 	}
+	else
+		*valp = 0;
 
 	return len;	/* length of number */
 }
