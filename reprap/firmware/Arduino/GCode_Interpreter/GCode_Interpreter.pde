@@ -26,50 +26,59 @@ void setup()
 	init_extruder();
 }
 
-void loop() {
-  char c;
+void loop()
+{
+	char c;
 
-  //keep it hot!
-  extruder_manage_temperature();
+	//keep it hot!
+	extruder_manage_temperature();
 
-  //read in characters if we got them.
-  if (Serial.available() > 0) {
-    c = Serial.read();
-    no_data = 0;
+	//read in characters if we got them.
+	if (Serial.available() > 0)
+	{
+		c = Serial.read();
+		no_data = 0;
 
-    //newlines are ends of commands.
-    if (c != '\n') {
-      if (c == '(')
-        comment = true; // Start of comment - ignore any bytes received from now on
-      if ( !comment) {
-        word[serial_count] = c;
-        serial_count++;
-      }
-      if (c == ')')
-        comment = false; // End of comment - start listening again
-    }
+		//newlines are ends of commands.
+		if (c != '\n')
+		{
+			// Start of comment - ignore any bytes received from now on
+			if (c == '(')
+				comment = true;
+				
+			// If we're not in comment mode, add it to our array.
+			if (!comment)
+			{
+				word[serial_count] = c;
+				serial_count++;
+			}
+			if (c == ')')
+			comment = false; // End of comment - start listening again
+		}
 
-    bytes_received = true;
-  }
+		bytes_received = true;
+	}
+	//mark no data if nothing heard for 10 milliseconds
+	else
+	{
+		if ((millis() - idle_time) >= 100)
+		{
+			no_data++;
+			idle_time = millis();
+		}
+	}
 
-  //mark no data if nothing heard for 10 milliseconds
-  else {
-    if ( (millis() - idle_time ) >= 100) {
-      no_data++;
-      idle_time = millis();
-    }
-  }
+	//if theres a pause or we got a real command, do it
+	if (bytes_received && (c == '\n' || no_data ))
+	{
+		//process our command!
+		process_string(word, serial_count);
 
-  //if theres a pause or we got a real command, do it
-  if (bytes_received && (c == '\n' || no_data )) {
-    //process our command!
-    process_string(word, serial_count);
+		//clear command.
+		init_process_string();
+	}
 
-    //clear command.
-    init_process_string();
-  }
-
-  //no data?  turn off steppers
-  if (no_data > 10 )
-    disable_steppers();
+	//no data?  turn off steppers
+	if (no_data > 10 )
+		disable_steppers();
 }
