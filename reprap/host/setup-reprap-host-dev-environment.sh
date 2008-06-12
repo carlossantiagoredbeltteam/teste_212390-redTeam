@@ -155,10 +155,6 @@ popd
 # FIXUP #1: Copy strange java3d STL loader file to where Java will find it
 sudo cp -p Reprap/lib/j3d-org-java3d-all.jar $JREDIR/lib/ext
 
-# FIXUP #2: Hack SNAPCommunicator.java to use rxtx libs, if needed
-SNAPFILE="Reprap/src/org/reprap/comms/snap/SNAPCommunicator.java"
-fgrep -sq javax.comm. $SNAPFILE && perl -p -i.bak -e 's/javax.comm./gnu.io./' $SNAPFILE
-
 ### Compile the Reprap host software into a .jar file
 cd Reprap
 ant clean jar && echo -e "\n\nReprap host software compiled successfully.\n\n"
