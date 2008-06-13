@@ -1,5 +1,5 @@
 EESchema Schematic File Version 1
-LIBS:power,/home/ensab/workspace/electronics/kicad_library/reprap,device,conn,linear,regul,74xx,cmos4000,adc-dac,memory,xilinx,special,microcontrollers,microchip,analog_switches,motorola,intel,audio,interface,digital-audio,philips,display,cypress,siliconi,contrib,./universal.cache
+LIBS:power,device,conn,linear,regul,74xx,cmos4000,adc-dac,memory,xilinx,special,microcontrollers,microchip,analog_switches,motorola,intel,audio,interface,digital-audio,philips,display,cypress,siliconi,contrib,./universal.cache
 EELAYER 23  0
 EELAYER END
 $Descr A4 11700 8267
@@ -13,6 +13,14 @@ Comment2 ""
 Comment3 ""
 Comment4 ""
 $EndDescr
+Text Notes 7600 4150 0    60   ~
+and solenoid
+Text Notes 7600 4000 0    60   ~
+RA0 to RB6 here instead to drive fan 
+Text Notes 7600 3850 0    60   ~
+Connect the end of R9 that goes to
+Text Notes 10250 6300 0    60   ~
+/ solenoid
 Kmarq B 2150 4500 "Warning Pin power_in not driven (Net 30)" F=1
 Kmarq B 1600 1100 "Warning Pin power_in not driven (Net 5)" F=1
 Wire Wire Line
