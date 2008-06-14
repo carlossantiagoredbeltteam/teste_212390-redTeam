@@ -163,7 +163,7 @@ void process_string(char instruction[], int size)
 	/* if no command was seen, but parameters were, then use the last G code as 
 	 * the current command
 	 */
-	if ((!gc.seen & (GCODE_G | GCODE_M)) && 
+	if ((!(gc.seen & (GCODE_G | GCODE_M))) && 
 	    ((gc.seen != 0) &&
 		(last_gcode_g >= 0))
 	)
