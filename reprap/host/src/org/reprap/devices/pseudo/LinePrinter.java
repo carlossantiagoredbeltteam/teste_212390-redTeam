@@ -166,24 +166,25 @@ public class LinePrinter {
 	 * @param endY
 	 * @param movementSpeed
 	 * @param extruderSpeed
-	 * @param turnOff True if extruder should be turned off after this segment is printed.
+	 * @param lastOne True if extruder should be turned off after this segment is printed.
 	 * @throws IOException
 	 */
 	public void printTo(int endX, int endY, int movementSpeed, 
-			int extruderSpeed, boolean turnOff) throws IOException {
+			int extruderSpeed, boolean lastOne) throws IOException {
 		// Determine the extruder speed, based on the geometry of the line
 		// to be printed
 		double dx = endX - currentX;
 		double dy = endY - currentY;
-		extruder.setExtrusion(extruderSpeed);
+		if(extruder.getPauseBetweenSegments())
+			extruder.setMotor(true);
 		moveTo(endX, endY, angleSpeed(movementSpeed, dx, dy));
-		if(turnOff)
-			extruder.setExtrusion(0);
+		if(lastOne || extruder.getPauseBetweenSegments())
+			extruder.setMotor(false);
 	}
 	
-	public void stopExtruding() throws IOException
+	public void stopMotor() throws IOException
 	{
-		extruder.setExtrusion(0);
+		extruder.setMotor(false);
 	}
 	
 	public void stopValve() throws IOException
@@ -198,13 +199,13 @@ public class LinePrinter {
 	 * @param endY
 	 * @param movementSpeed
 	 * @param extruderSpeed
-	 * @param turnOff True if the extruder should be turned off at the end of this segment.
+	 * @param lastOne True if the extruder should be turned off at the end of this segment.
 	 * @throws IOException
 	 */
 	public void printLine(int startX, int startY, int endX, int endY, 
-			int movementSpeed, int extruderSpeed, boolean turnOff) throws IOException {
+			int movementSpeed, int extruderSpeed, boolean lastOne) throws IOException {
 		moveTo(startX, startY, movementSpeed);
-		printTo(endX, endY, movementSpeed, extruderSpeed, turnOff);
+		printTo(endX, endY, movementSpeed, extruderSpeed, lastOne);
 	}
 
 	/**

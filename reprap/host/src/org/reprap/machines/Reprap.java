@@ -304,13 +304,13 @@ public class Reprap implements CartesianPrinter {
 		} 
 	}
 	
-//	double totalDistanceMoved = 0.0;
-//	double totalDistanceExtruded = 0.0;
-//	double xYReZeroInterval = -1;
-//	double distanceFromLastZero = 0;
-//	double distanceAtLastCall = 0;	
-	
-	private void maybeReZero() throws ReprapException, IOException 
+
+	/**
+	 * Occasionally re-zero X and Y if that option is selected (i.e. xYReZeroInterval > 0)
+	 * @throws ReprapException
+	 * @throws IOException
+	 */
+	private void maybeReZero() throws ReprapException, IOException
 	{
 		if(xYReZeroInterval <= 0)
 			return;
@@ -323,7 +323,7 @@ public class Reprap implements CartesianPrinter {
 		double liftedZ = currentZ + (extruders[extruder].getMinLiftedZ());
 		int stepperZ = convertToStepZ(liftedZ);
 		extruders[extruder].setValve(false);
-		extruders[extruder].setExtrusion(0);
+		extruders[extruder].setMotor(false);
 		if (!excludeZ) motorZ.seekBlocking(speedZ, stepperZ);
 		
 		double x = currentX;
@@ -350,7 +350,7 @@ public class Reprap implements CartesianPrinter {
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#printTo(double, double, double, boolean)
 	 */
-	public void printTo(double x, double y, double z, boolean turnOff) 
+	public void printTo(double x, double y, double z, boolean lastOne) 
 		throws ReprapException, IOException {
 		if (isCancelled()) return;
 		EnsureNotEmpty();
@@ -382,9 +382,9 @@ public class Reprap implements CartesianPrinter {
 			double distance = Math.abs(currentZ - z);
 			totalDistanceExtruded += distance;
 			totalDistanceMoved += distance;
-			extruders[extruder].setExtrusion(extruders[extruder].getExtruderSpeed());
+			extruders[extruder].setMotor(true);
 			if (!excludeZ) motorZ.seekBlocking(speedZ, stepperZ);
-			extruders[extruder].setExtrusion(0);
+			extruders[extruder].setMotor(false);
 			currentZ = z;
 			return;
 		}
@@ -400,14 +400,14 @@ public class Reprap implements CartesianPrinter {
 		if (segmentPauseCheckbox != null && distance > 0)
 			if(segmentPauseCheckbox.isSelected())
 				segmentPause();		
-		layerPrinter.printTo(stepperX, stepperY, currentSpeedXY, extruders[extruder].getExtruderSpeed(), turnOff);
+		layerPrinter.printTo(stepperX, stepperY, currentSpeedXY, extruders[extruder].getExtruderSpeed(), lastOne);
 		currentX = x;
 		currentY = y;
 	}
 	
-	public void stopExtruding() throws IOException
+	public void stopMotor() throws IOException
 	{
-		layerPrinter.stopExtruding();
+		layerPrinter.stopMotor();
 	}
 	
 	public void stopValve() throws IOException
@@ -526,7 +526,8 @@ public class Reprap implements CartesianPrinter {
 		motorX.setIdle();
 		motorY.setIdle();
 		if (!excludeZ) motorZ.setIdle();
-		extruders[extruder].setExtrusion(0);
+		extruders[extruder].setMotor(false);
+		extruders[extruder].setValve(false);
 		extruders[extruder].setTemperature(0);
 	}
 	
@@ -681,7 +682,7 @@ public class Reprap implements CartesianPrinter {
 		
 		// Ensure the extruder is off
 		
-		extruders[extruder].setExtrusion(0);
+		extruders[extruder].setMotor(false);
 				
 		moveToHeatingZone();
 		while(extruders[extruder].getTemperature() < threshold && !isCancelled()) {
@@ -862,7 +863,7 @@ public class Reprap implements CartesianPrinter {
 		{
 			if(eDelay >= vDelay)
 			{
-				extruders[extruder].setExtrusion(extruders[extruder].getExtruderSpeed());
+				extruders[extruder].setMotor(true);
 				Thread.sleep(eDelay - vDelay);
 				extruders[extruder].setValve(true);
 				Thread.sleep(vDelay);
@@ -870,10 +871,10 @@ public class Reprap implements CartesianPrinter {
 			{
 				extruders[extruder].setValve(true);
 				Thread.sleep(vDelay - eDelay);
-				extruders[extruder].setExtrusion(extruders[extruder].getExtruderSpeed());
+				extruders[extruder].setMotor(true);
 				Thread.sleep(eDelay);
 			}
-			extruders[extruder].setExtrusion(0);  // What's this for?  - AB
+			//extruders[extruder].setMotor(false);  // What's this for?  - AB
 		} catch(Exception e)
 		{
 			// If anything goes wrong, we'll let someone else catch it.
@@ -1057,9 +1058,11 @@ public class Reprap implements CartesianPrinter {
 		{
 			if(clearTime > 0)
 			{
-				getExtruder().setExtrusion(extruders[extruder].getExtruderSpeed());
+				getExtruder().setValve(true);
+				getExtruder().setMotor(true);
 				Thread.sleep((long)(500*clearTime));
-				getExtruder().setExtrusion(0); 
+				getExtruder().setMotor(false);
+				getExtruder().setValve(false);
 			}
 		}
 		
@@ -1128,9 +1131,11 @@ public class Reprap implements CartesianPrinter {
 		{
 			if(clearTime > 0)
 			{
-				getExtruder().setExtrusion(extruders[extruder].getExtruderSpeed());
+				getExtruder().setValve(true);
+				getExtruder().setMotor(true);
 				Thread.sleep((long)(500*clearTime));
-				getExtruder().setExtrusion(0); 
+				getExtruder().setMotor(false);
+				getExtruder().setValve(false);
 				Thread.sleep((long)(1000*waitTime));
 			}
 			setSpeed(LinePrinter.speedFix(getExtruder().getXYSpeed(), 

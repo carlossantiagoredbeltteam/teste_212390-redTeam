@@ -23,6 +23,11 @@ public interface Extruder {
 	public void setExtrusion(int speed) throws IOException; 
 	
 	/**
+	 * Start/stop the extruder motor
+	 */
+	public void setMotor(boolean motorOn) throws IOException;
+	
+	/**
 	 * Start the extruder motor at a given speed.  This ranges from 0
 	 * to 255 but is scaled by maxSpeed and t0, so that 255 corresponds to the
 	 * highest permitted speed.  It is also scaled so that 0 would correspond
@@ -306,9 +311,21 @@ public interface Extruder {
      */
     public double getMinLiftedZ();
     
-	public void finishedLayer(int layerNumber, Printer printer) throws Exception;
-	public void betweenLayers(int layerNumber, Printer printer) throws Exception;
-	public void startingLayer(int layerNumber, Printer printer) throws Exception;
+    /**
+     * Stop the extrude motor between segments?
+     * @return
+     */
+    public boolean getPauseBetweenSegments();
+    
+    /**
+     * Deal with waht needs to be done between layers
+     * @param layerNumber
+     * @param printer
+     * @throws Exception
+     */
+	//public void finishedLayer(int layerNumber, Printer printer) throws Exception;
+	//public void betweenLayers(int layerNumber, Printer printer) throws Exception;
+	//public void startingLayer(int layerNumber, Printer printer) throws Exception;
 	
     
 }

@@ -397,7 +397,11 @@ public class GenericExtruder extends Device implements Extruder{
 	 * The number of outlines to plot
 	 */
 	int shells = 1;
-
+	
+	/**
+	 * Stop the extrude motor between segments?
+	 */
+	private boolean pauseBetweenSegments = true;
 	
 	public GenericExtruder(Communicator communicator, Address address, Preferences prefs, int extruderId) {
 		
@@ -457,13 +461,14 @@ public class GenericExtruder extends Device implements Extruder{
 		// NB - store as 2ms ticks to allow longer pulses
 		valvePulseTime = 0.5*prefs.loadDouble(prefName + "ValvePulseTime(ms)");
 		shells = prefs.loadInt(prefName + "NumberOfShells(0..N)");
+		pauseBetweenSegments = prefs.loadBool(prefName + "PauseBetweenSegments");
 		
 		Color3f col = new Color3f((float)prefs.loadDouble(prefName + "ColourR(0..1)"), 
 				(float)prefs.loadDouble(prefName + "ColourG(0..1)"), 
 				(float)prefs.loadDouble(prefName + "ColourB(0..1)"));
 		materialColour = new Appearance();
 		materialColour.setMaterial(new Material(col, black, col, black, 101f));
-		
+
 		wipeX = getNozzleWipeDatumX();
 		
 		//Anyone home?
@@ -531,6 +536,17 @@ public class GenericExtruder extends Device implements Extruder{
 			return;
 		}
 		setExtrusion(speed, false);
+	}
+	
+	public void setMotor(boolean motorOn) throws IOException
+	{
+		if(extrusionSpeed < 0)
+			return;
+		
+		if(motorOn)
+			setExtrusion(extrusionSpeed, false);
+		else
+			setExtrusion(0, false);
 	}
 	
 	/**
@@ -1517,78 +1533,87 @@ public class GenericExtruder extends Device implements Extruder{
     	return shells;
     }
     
-	public void finishedLayer(int layerNumber, Printer printer) throws Exception
-	{
-
-		if(getCoolingPeriod() > 0 && (layerNumber != 0))
-			setCooler(true);
-		
-		// Lift up if too close to the bed
-
-		double rememberZ = printer.getZ();
-		double minLiftedZ = getMinLiftedZ();
-		if(rememberZ < minLiftedZ)
-		{
-			printer.moveTo(printer.getX(), printer.getY(), minLiftedZ, false, false);
-		}
-		
-		printer.setSpeed(printer.getFastSpeed());
-			
-		// Go home
-			
-		printer.moveTo(wipeX, getNozzleWipeDatumY(), minLiftedZ, false, false);
-		printer.moveTo(wipeX, getNozzleWipeDatumY(), rememberZ, false, false);
-	}
-	
-	/**
-	 * Deals with all the actions that need to be done between one layer
-	 * and the next.
-	 */
-	public void betweenLayers(int layerNumber, Printer printer) throws Exception
-	{	
-		// Now is a good time to garbage collect
-		
-		System.gc();
-		
-		// Cooling period
-		
-		if(getCoolingPeriod() > 0 && (layerNumber != 0))
-		{	
-			Debug.d("Start of cooling period");
-			// Wait for cooling time
-			
-			Thread.sleep((long)(1000*getCoolingPeriod()));
-			setCooler(false);
-			Thread.sleep((long)(200 * getCoolingPeriod()));			
-			Debug.d("End of cooling period");
-		}
-	}
-	
-	/**
-	 * Just about to start the next layer
-	 * @param layerNumber
-	 */
-	public void startingLayer(int layerNumber, Printer printer) throws Exception
-	{
-
-		if (getNozzleWipeEnabled())
-		{
-			printer.setSpeed(LinePrinter.speedFix(getXYSpeed(), 
-					getOutlineSpeed()));
-			
-			printer.moveTo(wipeX, getNozzleWipeDatumY() + 8, printer.getZ(), false, false);	
-			setExtrusion(getExtruderSpeed());
-			if(getExtrusionDelayForLayer() > 0)
-				Thread.sleep((long)getExtrusionDelayForLayer());
-			printer.moveTo(wipeX, getNozzleWipeDatumY() + getNozzleWipeStrokeY()*0.5, printer.getZ(), false, false);
-			setExtrusion(0);
-			printer.moveTo(wipeX, getNozzleWipeDatumY() + getNozzleWipeStrokeY(), printer.getZ(), false, false);
-			wipeX += getExtrusionInfillWidth(0, 1); // Z value not important for this
-			if(wipeX > getNozzleWipeDatumX() + getNozzleWipeStrokeX())
-				wipeX = getNozzleWipeDatumX();
-		}
-		
-		printer.setSpeed(printer.getFastSpeed());
-	}
+    /**
+     * Stop the extrude motor between segments?
+     * @return
+     */
+    public boolean getPauseBetweenSegments()
+    {
+    	return pauseBetweenSegments;
+    }
+    
+//	public void finishedLayer(int layerNumber, Printer printer) throws Exception
+//	{
+//
+//		if(getCoolingPeriod() > 0 && (layerNumber != 0))
+//			setCooler(true);
+//		
+//		// Lift up if too close to the bed
+//
+//		double rememberZ = printer.getZ();
+//		double minLiftedZ = getMinLiftedZ();
+//		if(rememberZ < minLiftedZ)
+//		{
+//			printer.moveTo(printer.getX(), printer.getY(), minLiftedZ, false, false);
+//		}
+//		
+//		printer.setSpeed(printer.getFastSpeed());
+//			
+//		// Go home
+//			
+//		printer.moveTo(wipeX, getNozzleWipeDatumY(), minLiftedZ, false, false);
+//		printer.moveTo(wipeX, getNozzleWipeDatumY(), rememberZ, false, false);
+//	}
+//	
+//	/**
+//	 * Deals with all the actions that need to be done between one layer
+//	 * and the next.
+//	 */
+//	public void betweenLayers(int layerNumber, Printer printer) throws Exception
+//	{	
+//		// Now is a good time to garbage collect
+//		
+//		System.gc();
+//		
+//		// Cooling period
+//		
+//		if(getCoolingPeriod() > 0 && (layerNumber != 0))
+//		{	
+//			Debug.d("Start of cooling period");
+//			// Wait for cooling time
+//			
+//			Thread.sleep((long)(1000*getCoolingPeriod()));
+//			setCooler(false);
+//			Thread.sleep((long)(200 * getCoolingPeriod()));			
+//			Debug.d("End of cooling period");
+//		}
+//	}
+//	
+//	/**
+//	 * Just about to start the next layer
+//	 * @param layerNumber
+//	 */
+//	public void startingLayer(int layerNumber, Printer printer) throws Exception
+//	{
+//
+//		if (getNozzleWipeEnabled())
+//		{
+//			printer.setSpeed(LinePrinter.speedFix(getXYSpeed(), 
+//					getOutlineSpeed()));
+//			
+//			printer.moveTo(wipeX, getNozzleWipeDatumY() + 8, printer.getZ(), false, false);	
+//			setExtrusion(getExtruderSpeed());
+//			if(getExtrusionDelayForLayer() > 0)
+//				Thread.sleep((long)getExtrusionDelayForLayer());
+//			printer.moveTo(wipeX, getNozzleWipeDatumY() + getNozzleWipeStrokeY()*0.5, printer.getZ(), false, false);
+//			setExtrusion(0);
+//			printer.moveTo(wipeX, getNozzleWipeDatumY() + getNozzleWipeStrokeY(), printer.getZ(), false, false);
+//			wipeX += getExtrusionInfillWidth(0, 1); // Z value not important for this
+//			if(wipeX > getNozzleWipeDatumX() + getNozzleWipeStrokeX())
+//				wipeX = getNozzleWipeDatumX();
+//		}
+//		
+//		printer.setSpeed(printer.getFastSpeed());
+//	}
     
 }
