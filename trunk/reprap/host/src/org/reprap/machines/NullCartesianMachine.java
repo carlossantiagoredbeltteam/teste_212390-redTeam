@@ -204,7 +204,7 @@ public class NullCartesianMachine implements CartesianPrinter {
 	public void terminate() throws IOException {
 	}
 	
-	public void stopExtruding() {}
+	public void stopMotor() {}
 	
 	public void stopValve() {}
 

@@ -42,11 +42,11 @@ public interface Printer {
 	 * Range betwen [0..???]
 	 * @param z absolute z position in millimters relative to the home position.
 	 * Range between [0..???]
-	 * @param turnOff True if extruder should be turned off at end of this segment.
+	 * @param lastOne True if extruder should be turned off at end of this segment.
 	 * @throws ReprapException
 	 * @throws IOException 
 	 */
-	public void printTo(double x, double y, double z, boolean turnOff) throws ReprapException, IOException;
+	public void printTo(double x, double y, double z, boolean lastOne) throws ReprapException, IOException;
 	
 	/**
 	 * Fire up the extruder for a lead-in
@@ -163,7 +163,7 @@ public interface Printer {
 	 * @return the extruder for the printer
 	 */
 	public Extruder getExtruder();
-	public void stopExtruding() throws IOException;
+	public void stopMotor() throws IOException;
 	public void stopValve() throws IOException;
 
 	/**

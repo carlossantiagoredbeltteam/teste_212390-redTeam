@@ -313,7 +313,12 @@ public class NullExtruder implements Extruder{
 	/**
 	 * The number of outlines to plot
 	 */
-	int shells = 1;
+	private int shells = 1;
+	
+	/**
+	 * Stop the extrude motor between segments?
+	 */
+	private boolean pauseBetweenSegments = true;
 	
 	/**
 	 * @param prefs
@@ -371,6 +376,7 @@ public class NullExtruder implements Extruder{
 		// NB - store as 2ms ticks to allow longer pulses
 		valvePulseTime = 0.5*prefs.loadDouble(prefName + "ValvePulseTime(ms)");
 		shells = prefs.loadInt(prefName + "NumberOfShells(0..N)");
+		pauseBetweenSegments = prefs.loadBool(prefName + "PauseBetweenSegments");
 		
 		materialColour = getAppearanceFromNumber(extruderId);		
 			
@@ -403,6 +409,17 @@ public class NullExtruder implements Extruder{
 	 */
 	public void setExtrusion(int speed) throws IOException {
 		setExtrusion(speed, false);
+	}
+	
+	public void setMotor(boolean motorOn) throws IOException
+	{
+		if(extrusionSpeed < 0)
+			return;
+		
+		if(motorOn)
+			setExtrusion(extrusionSpeed, false);
+		else
+			setExtrusion(0, false);
 	}
 	
 	/**
@@ -851,6 +868,15 @@ public class NullExtruder implements Extruder{
     public int getShells()
     {
     	return shells;
+    }
+    
+    /**
+     * Stop the extrude motor between segments?
+     * @return
+     */
+    public boolean getPauseBetweenSegments()
+    {
+    	return pauseBetweenSegments;
     }
     
 	public void finishedLayer(int layerNumber, Printer printer) throws Exception {}

@@ -276,7 +276,7 @@ public class LayerProducer {
 	 * @throws ReprapException
 	 * @throws IOException
 	 */
-	private boolean shortLine(Rr2Point p) throws ReprapException, IOException
+	private boolean shortLine(Rr2Point p, boolean lastOne) throws ReprapException, IOException
 	{
 		double shortLen = printer.getExtruder().getShortLength();
 		if(shortLen < 0)
@@ -289,7 +289,7 @@ public class LayerProducer {
 		}
 		printer.setSpeed(LinePrinter.speedFix(printer.getExtruder().getXYSpeed(), 
 				printer.getExtruder().getShortSpeed()));
-		printer.printTo(p.x(), p.y(), z, true);
+		printer.printTo(p.x(), p.y(), z, lastOne);
 		printer.setSpeed(currentSpeed);
 		Debug.d("Short segment at speed " +
 				LinePrinter.speedFix(currentSpeed, printer.getExtruder().getShortSpeed())
@@ -298,17 +298,17 @@ public class LayerProducer {
 	}
 	
 	/**
-	 * @param first First point, the start of the line segment to be plotted.
-	 * @param second Second point, the end of the line segment to be plotted.
+	 * @param first First point, the end of the line segment to be plotted to from the current position.
+	 * @param second Second point, the end of the next line segment; used for angle calculations
 	 * @param turnOff True if the extruder should be turned off at the end of this segment.
 	 * @throws ReprapException
 	 * @throws IOException
 	 */
-	private void plot(Rr2Point first, Rr2Point second, boolean turnOff) throws ReprapException, IOException
+	private void plot(Rr2Point first, Rr2Point second, boolean lastOne) throws ReprapException, IOException
 	{
 		if (printer.isCancelled()) return;
 		
-		if(shortLine(first))
+		if(shortLine(first, lastOne))
 			return;
 		
 		double speedUpLength = printer.getExtruder().getAngleSpeedUpLength();
@@ -330,11 +330,11 @@ public class LayerProducer {
 			}
 
 			printer.setSpeed(ss.speed(currentSpeed, printer.getExtruder().getAngleSpeedFactor()));
-			printer.printTo(ss.p3.x(), ss.p3.y(), z, true);
+			printer.printTo(ss.p3.x(), ss.p3.y(), z, lastOne);
 			//pos = ss.p3;
 		// Leave speed set for the start of the next line.
 		} else
-			printer.printTo(first.x(), first.y(), z, true);
+			printer.printTo(first.x(), first.y(), z, lastOne);
 	}
 
 	/**
@@ -460,6 +460,7 @@ public class LayerProducer {
 		printer.setSpeed(printer.getFastSpeed());
 		move(p.point(0), p.point(1), true, false);
 
+		printer.getExtruder().setMotor(true);
 		plot(p.point(0), p.point(1), false);
 		
 		// Print any lead-in.
@@ -484,24 +485,24 @@ public class LayerProducer {
 				
 				if (printer.isCancelled())
 				{
-					printer.stopExtruding();
+					printer.stopMotor();
 					move(posNow(), posNow(), true, true);
 					return;
 				}
 				
 				if(j > stopExtruding)
 				{
-					printer.stopExtruding();
+					printer.stopMotor();
 					move(p.point(i), next, false, false);
 				} else
-					plot(p.point(i), next, false);
+					plot(p.point(i), next, j == p.size());
 				
 				if(j > stopValve)
 				{
 					printer.stopValve();
 					move(p.point(i), next, false, false);
 				} else
-					plot(p.point(i), next, false);
+					plot(p.point(i), next, j == p.size());
 			}
 		} else
 		{
@@ -511,24 +512,24 @@ public class LayerProducer {
 				
 				if (printer.isCancelled())
 				{
-					printer.stopExtruding();
+					printer.stopMotor();
 					move(posNow(), posNow(), true, true);
 					return;
 				}
 				
 				if(i > stopExtruding)
 				{
-					printer.stopExtruding();
+					printer.stopMotor();
 					move(p.point(i), next, false, false);
 				} else
-					plot(p.point(i), next, false);
+					plot(p.point(i), next, i == p.size()-1);
 				
 				if(i > stopValve)
 				{
 					printer.stopValve();
 					move(p.point(i), next, false, false);
 				} else
-					plot(p.point(i), next, false);
+					plot(p.point(i), next, i == p.size()-1);
 			}
 		}
 		

@@ -249,7 +249,7 @@ public class GCodeWriter implements CartesianPrinter {
 	public void terminate() throws IOException {
 	}
 	
-	public void stopExtruding() {
+	public void stopMotor() {
 		file.println("M103");
 	}
 	
@@ -661,9 +661,12 @@ public class GCodeWriter implements CartesianPrinter {
 		{
 			if(clearTime > 0)
 			{
-				getExtruder().setExtrusion(extruders[extruder].getExtruderSpeed());
+				
+				getExtruder().setValve(true);
+				getExtruder().setMotor(true);
 				Thread.sleep((long)(500*clearTime));
-				getExtruder().setExtrusion(0); 
+				getExtruder().setMotor(false);
+				getExtruder().setValve(false);
 			}
 		}
 		
@@ -706,9 +709,11 @@ public class GCodeWriter implements CartesianPrinter {
 		{
 			if(clearTime > 0)
 			{
-				getExtruder().setExtrusion(extruders[extruder].getExtruderSpeed());
+				getExtruder().setValve(true);
+				getExtruder().setMotor(true);
 				Thread.sleep((long)(500*clearTime));
-				getExtruder().setExtrusion(0); 
+				getExtruder().setMotor(false);
+				getExtruder().setValve(false);
 				Thread.sleep((long)(1000*waitTime));
 			}
 			moveTo(datumX, datumY + strokeY, currentZ, false, false);
