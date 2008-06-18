@@ -51,8 +51,8 @@ int calculatePicTempForCelsius(int temperature);
 //
 // Version information
 //
-#define VERSION_MAJOR 1
-#define VERSION_MINOR 0
+#include <../version.h>
+
 #define EXTRUDER_ADDRESS 8
 #define DEVICE_TYPE 1
 

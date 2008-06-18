@@ -23,13 +23,14 @@
 #include "WConstants.h"
 
 // how big do we want our point queue?
-#define POINT_QUEUE_SIZE 16
+#define POINT_QUEUE_SIZE 4
 
 // our point structure to make things nice.
 struct Point {
 	int x;
 	int y;
  	int z;
+ 	unsigned char speed;
 };
 
 // library interface description
@@ -47,9 +48,9 @@ class CartesianBot {
 	bool queuePoint(Point &point);
 	struct Point unqueuePoint();
 	void clearQueue();
-	bool isQueueFull();
-	bool isQueueEmpty();
 	byte getQueueSize();
+	bool isQueueEmpty();
+	bool isQueueFull();	
 	
 	//cartesian bot specific.
 	void setTargetPoint(Point &point);
@@ -83,6 +84,7 @@ class CartesianBot {
 	//this is the mode we're currently in... started/stopped
 	byte mode;
 	
+	
   private:
 
 	//this is for our queue of points.
@@ -92,5 +94,20 @@ class CartesianBot {
 
 	Point point_queue[POINT_QUEUE_SIZE];
 };
+
+inline byte CartesianBot::getQueueSize()
+{
+	return this->size;
+}
+
+inline bool CartesianBot::isQueueEmpty()
+{
+	return (this->size == 0);
+}
+
+inline bool CartesianBot::isQueueFull()
+{
+	return (this->size == POINT_QUEUE_SIZE);
+}
 
 #endif

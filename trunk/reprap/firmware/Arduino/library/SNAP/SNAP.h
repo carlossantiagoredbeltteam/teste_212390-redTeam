@@ -131,6 +131,71 @@ class SNAP
 		byte deviceCount;
 };
 
+inline void SNAP::begin(long baud)
+{
+	Serial.begin(baud);
+}
+
+inline void SNAP::sendDataInt(int i)
+{
+	this->sendDataByte(i & 0xff);
+	this->sendDataByte(i >> 8);
+}
+
+inline void SNAP::sendDataLong(long i)
+{
+	this->sendDataByte(i & 0xff);
+	this->sendDataByte(i >> 8);
+	this->sendDataByte(i >> 16);
+	this->sendDataByte(i >> 24);
+}
+
+inline bool SNAP::packetReady()
+{	
+	return (this->rxFlags & processingLockBit);
+}
+
+inline void SNAP::debug()
+{
+	Serial.print('d');
+}
+
+inline void SNAP::transmit(byte c)
+{
+  Serial.print(c, BYTE);
+}
+
+inline byte SNAP::computeRxCRC(byte b)
+{
+	this->rxCRC = this->computeCRC(b, this->rxCRC);
+	
+	return b;
+}
+
+inline byte SNAP::computeTxCRC(byte b)
+{
+	this->txCRC = this->computeCRC(b, this->txCRC);
+
+	return b;
+}
+
+inline byte SNAP::getDestination()
+{
+	return this->rxDestAddress;
+}
+
+inline byte SNAP::getByte(byte index)
+{
+	return this->rxBuffer[index];
+}
+
+inline int SNAP::getInt(byte index)
+{
+	return (this->rxBuffer[index+1] << 8) + this->rxBuffer[index];
+}
+
+
+
 //global variable declaration.
 extern SNAP snap;
 

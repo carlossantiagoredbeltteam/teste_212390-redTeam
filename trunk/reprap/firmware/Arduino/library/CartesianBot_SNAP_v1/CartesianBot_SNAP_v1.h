@@ -41,6 +41,10 @@ void interruptFindMin();
 void interruptFindMax();
 void interruptRun();
 
+// Get the next point from the buffer (if any)
+
+void getNextFromQueue();
+
 //notification functions to let the host know whats up.
 void notifyHomeReset(byte to, byte from);
 void notifyCalibrate(byte to, byte from, int position);
@@ -52,8 +56,8 @@ extern CartesianBot bot;
 //
 // Version information
 //
-#define VERSION_MAJOR 1
-#define VERSION_MINOR 0
+#include <../version.h>
+
 #define HOST_ADDRESS 0
 #define DEVICE_TYPE 0
 
@@ -77,6 +81,8 @@ extern CartesianBot bot;
 #define CMD_SETPOWER  14
 #define CMD_GETSENSOR 15
 #define CMD_HOMERESET 16
+#define CMD_QUEUEPOINT 17
+#define CMD_GETSTATUS 18
 #define CMD_DEVICE_TYPE 255
 
 
@@ -93,6 +99,7 @@ extern CartesianBot bot;
 #define MODE_FIND_MIN 4
 #define MODE_FIND_MAX 5
 #define MODE_RUN 6
+#define MODE_QUEUE 7
 
 // sync mode declarations
 #define sync_none 0

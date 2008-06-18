@@ -6,26 +6,14 @@ CartesianBot::CartesianBot(
 	char x_id, int x_steps, byte x_dir_pin, byte x_step_pin, byte x_min_pin, byte x_max_pin, byte x_enable_pin,
 	char y_id, int y_steps, byte y_dir_pin, byte y_step_pin, byte y_min_pin, byte y_max_pin, byte y_enable_pin,
 	char z_id, int z_steps, byte z_dir_pin, byte z_step_pin, byte z_min_pin, byte z_max_pin, byte z_enable_pin
-) : x(x_id, x_steps, x_dir_pin, x_step_pin, x_min_pin, x_max_pin, x_enable_pin), y(y_id, y_steps, y_dir_pin, y_step_pin, y_min_pin, y_max_pin, y_enable_pin), z(z_id, z_steps, z_dir_pin, z_step_pin, z_min_pin, z_max_pin, z_enable_pin)
+) : x(x_id, x_steps, x_dir_pin, x_step_pin, x_min_pin, x_max_pin, x_enable_pin), y(y_id, y_steps, y_dir_pin, 
+	y_step_pin, y_min_pin, y_max_pin, y_enable_pin), z(z_id, z_steps, z_dir_pin, z_step_pin, z_min_pin, z_max_pin, z_enable_pin)
 {
 	this->setupTimerInterrupt();
 	this->disableTimerInterrupt();
-	this->clearQueue();
-}
-
-byte CartesianBot::getQueueSize()
-{
-	return this->size;
-}
-
-bool CartesianBot::isQueueEmpty()
-{
-	return (this->size == 0);
-}
-
-bool CartesianBot::isQueueFull()
-{
-	return (this->size == POINT_QUEUE_SIZE);
+	this->head = 0;
+	this->tail = 0;
+	this->size = 0;
 }
 
 bool CartesianBot::queuePoint(Point &point)
@@ -41,7 +29,7 @@ bool CartesianBot::queuePoint(Point &point)
 
 	//move our tail to the next tail location
 	this->tail++;
-	if (this->tail == POINT_QUEUE_SIZE)
+	if (this->tail >= POINT_QUEUE_SIZE)
 		this->tail = 0;
 	
 	return true;
@@ -54,7 +42,7 @@ struct Point CartesianBot::unqueuePoint()
 	
 	//move our head to the head for next time.
 	this->head++;
-	if (this->head == POINT_QUEUE_SIZE)
+	if (this->head >= POINT_QUEUE_SIZE)
 		this->head = 0;
 
 	//keep track.
@@ -63,32 +51,6 @@ struct Point CartesianBot::unqueuePoint()
 	return this->point_queue[oldHead];
 }
 
-void CartesianBot::clearQueue()
-{
-	this->head = 0;
-	this->tail = 0;
-	this->size = 0;
-}
-
-void CartesianBot::getNextPoint()
-{
-	Point p;
-	
-	if (!this->isQueueEmpty())
-	{
-		p = this->unqueuePoint();
-
-		x.setTarget(p.x);
-		y.setTarget(p.y);
-		z.setTarget(p.z);
-	}
-	else
-	{
-		x.setTarget(x.current);
-		y.setTarget(y.current);
-		z.setTarget(z.current);
-	}
-}
 
 void CartesianBot::calculateDDA()
 {
