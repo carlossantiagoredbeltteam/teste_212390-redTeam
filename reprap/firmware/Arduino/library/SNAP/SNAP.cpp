@@ -34,10 +34,10 @@ SNAP::SNAP()
 	this->deviceCount = 0;
 }
 
-void SNAP::begin(long baud)
+/*void SNAP::begin(long baud)
 {
 	Serial.begin(baud);
-}
+}*/
 
 void SNAP::receivePacket()
 {
@@ -379,6 +379,7 @@ void SNAP::sendDataByte(byte c)
 	this->txLength++;
 }
 
+/*
 void SNAP::sendDataInt(int i)
 {
 	this->sendDataByte(i & 0xff);
@@ -392,7 +393,7 @@ void SNAP::sendDataLong(long i)
 	this->sendDataByte(i >> 16);
 	this->sendDataByte(i >> 24);
 }
-
+*/
 
 /*!
   Create headers and synchronously transmit the message.
@@ -421,12 +422,12 @@ void SNAP::sendMessage()
 
 	this->transmit(this->txCRC);
 }
-
+/*
 bool SNAP::packetReady()
 {	
 	return (this->rxFlags & processingLockBit);
 }
-
+*/
 /*!
   Must be manually called by the main loop when the message payload
   has been consumed.
@@ -460,6 +461,7 @@ bool SNAP::hasDevice(byte c)
 	return false;
 }
 
+/*
 void SNAP::debug()
 {
 	Serial.print('d');
@@ -469,6 +471,7 @@ void SNAP::transmit(byte c)
 {
   Serial.print(c, BYTE);
 }
+*/
 
 /*!
   Incrementally adds b to crc computation and updates crc.
@@ -492,6 +495,7 @@ byte SNAP::computeCRC(byte b, byte crc)
 	return crc;
 }
 
+/*
 byte SNAP::computeRxCRC(byte b)
 {
 	this->rxCRC = this->computeCRC(b, this->rxCRC);
@@ -520,6 +524,7 @@ int SNAP::getInt(byte index)
 {
 	return (this->rxBuffer[index+1] << 8) + this->rxBuffer[index];
 }
+*/
 
 // Preinstantiate Objects
 SNAP snap = SNAP();

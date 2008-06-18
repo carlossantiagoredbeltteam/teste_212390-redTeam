@@ -3,35 +3,35 @@
 
 // Thermistor lookup table for RepRap Temperature Sensor Boards (http://make.rrrf.org/ts)
 // Made with createTemperatureLookup.py (http://svn.reprap.org/trunk/reprap/firmware/Arduino/utilities/createTemperatureLookup.py)
-// ./createTemperatureLookup.py --r0=100000 --t0=25 --r1=0 --r2=4700 --beta=4066 --max-adc=1023
-// r0: 100000
+// ./createTemperatureLookup.py --r0=10000 --t0=25 --r1=680 --r2=1600 --beta=3480 --max-adc=315
+// r0: 10000
 // t0: 25
-// r1: 0
-// r2: 4700
-// beta: 4066
-// max adc: 1023
+// r1: 680
+// r2: 1600
+// beta: 3480
+// max adc: 315
 #define NUMTEMPS 20
 short temptable[NUMTEMPS][2] = {
-   {1, 841},
-   {54, 255},
-   {107, 209},
-   {160, 184},
-   {213, 166},
-   {266, 153},
-   {319, 142},
-   {372, 132},
-   {425, 124},
-   {478, 116},
-   {531, 108},
-   {584, 101},
-   {637, 93},
-   {690, 86},
-   {743, 78},
-   {796, 70},
-   {849, 61},
-   {902, 50},
-   {955, 34},
-   {1008, 3}
+   {1, 922},
+   {17, 327},
+   {33, 260},
+   {49, 225},
+   {65, 202},
+   {81, 184},
+   {97, 169},
+   {113, 156},
+   {129, 145},
+   {145, 134},
+   {161, 125},
+   {177, 115},
+   {193, 106},
+   {209, 96},
+   {225, 87},
+   {241, 76},
+   {257, 64},
+   {273, 50},
+   {289, 29},
+   {305, -45}
 };
 
 #endif

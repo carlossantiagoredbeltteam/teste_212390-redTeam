@@ -33,6 +33,8 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
 		interruptFindMax();
 	else if (bot_mode == MODE_RUN)
 		interruptRun();
+	else if (bot_mode == MODE_QUEUE)
+		interruptDDA();		
 	else
 	{
 		bot.mode = MODE_PAUSE;
@@ -155,21 +157,25 @@ void cartesian_bot_snap_v1_loop()
 		
 		return;
 	}
-	else if (bot_mode == MODE_DDA)
+	else if (bot_mode == MODE_DDA || bot_mode == MODE_QUEUE)
 	{
 		if (bot.atTarget())
 		{
 			//stop us.
-			bot_mode = MODE_PAUSE;
+			bot.disableTimerInterrupt();
+
 			x_mode = MODE_PAUSE;
 			y_mode = MODE_PAUSE;
 			z_mode = MODE_PAUSE;
-			bot.disableTimerInterrupt();
-
-			if (x_notify != 255)
-				notifyDDA(x_notify, X_ADDRESS, bot.x.current);
-			if (y_notify != 255)
-				notifyDDA(y_notify, Y_ADDRESS, bot.y.current);
+			if(bot_mode == MODE_DDA)
+			{
+				bot_mode = MODE_PAUSE;
+				if (x_notify != 255)
+					notifyDDA(x_notify, X_ADDRESS, bot.x.current);
+				if (y_notify != 255)
+					notifyDDA(y_notify, Y_ADDRESS, bot.y.current);
+			} else
+				getNextFromQueue();
 		}
 	}
 	else if (bot_mode == MODE_HOMERESET)
@@ -346,10 +352,19 @@ void cartesian_bot_snap_v1_loop()
 
 void process_cartesian_bot_snap_commands_v1()
 {
+    Point p;
 	byte cmd = snap.getByte(0);
 	byte dest = snap.getDestination();
 	int position = 0;
-
+	int target;
+	
+	// If we're processing the point queue, the only thing we
+	// can do is to add more points to it and wait until it's 
+	// exhausted by the DDA.
+	// All other commands must wait.  It is up to the host to
+	// poll to check this, using CMD_GETSTATUS.
+	
+	
 	switch (cmd)
 	{
 		case CMD_VERSION:
@@ -359,6 +374,24 @@ void process_cartesian_bot_snap_commands_v1()
 			snap.sendDataByte(VERSION_MINOR);
 			snap.sendMessage();
 		break;
+		
+		case CMD_QUEUEPOINT:
+			p.x = snap.getInt(2);
+			p.y = snap.getInt(4);
+			p.z = bot.z.current;
+			p.speed = snap.getByte(1);
+			bot.queuePoint(p);
+			if(bot_mode != MODE_QUEUE)
+				getNextFromQueue();
+		break;
+		
+		case CMD_GETSTATUS:
+			snap.startMessage(0, dest);
+			snap.sendDataByte(CMD_GETSTATUS);
+			snap.sendDataByte(bot_mode);          // == MODE_QUEUE if we're busy
+			snap.sendDataByte(bot.isQueueFull()); // true -> don't send me more points
+			snap.sendMessage();
+		break;				
 
 		case CMD_FORWARD:
 			//okay, set our speed.
@@ -542,7 +575,6 @@ void process_cartesian_bot_snap_commands_v1()
 		break;
 
 		case CMD_DDA:
-			int target;
 
 			//get our coords.
 			position = snap.getInt(2);
@@ -664,6 +696,36 @@ void process_cartesian_bot_snap_commands_v1()
 			snap.sendMessage();
 		break;
 	}
+}
+
+void getNextFromQueue()
+{
+	Point p;
+	
+	if(bot.isQueueEmpty())
+	{
+		bot_mode = MODE_PAUSE;
+		return;
+	}
+
+	p = bot.unqueuePoint();
+
+	bot.x.setTarget(p.x);
+	bot.y.setTarget(p.y);
+	bot.z.setTarget(p.z);	
+	
+	bot.setTimer(picTimerSimulate(p.speed));
+			
+	//init our DDA stuff!
+	bot.calculateDDA();
+			
+	//start the dda!
+
+	x_mode = MODE_DDA;
+	y_mode = MODE_DDA;
+	z_mode = MODE_DDA;
+	bot_mode = MODE_QUEUE;				
+	bot.enableTimerInterrupt();
 }
 
 void notifyHomeReset(byte to, byte from)
