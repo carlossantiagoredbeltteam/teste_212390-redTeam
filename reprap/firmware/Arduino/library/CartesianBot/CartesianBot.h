@@ -23,7 +23,7 @@
 #include "WConstants.h"
 
 // how big do we want our point queue?
-#define POINT_QUEUE_SIZE 4
+#define POINT_QUEUE_SIZE 15
 
 // our point structure to make things nice.
 struct Point {
@@ -92,7 +92,7 @@ class CartesianBot {
 	byte tail;
 	byte size;
 
-	Point point_queue[POINT_QUEUE_SIZE];
+	Point point_queue[POINT_QUEUE_SIZE]; // +1 for luck... AB
 };
 
 inline byte CartesianBot::getQueueSize()
