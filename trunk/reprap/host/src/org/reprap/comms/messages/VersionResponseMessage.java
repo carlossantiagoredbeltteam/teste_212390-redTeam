@@ -26,7 +26,10 @@ public class VersionResponseMessage extends IncomingMessage {
 	    byte [] reply = getPayload();
 	    if (reply == null || reply.length != 3)
 	    	throw new InvalidPayloadException();
-	    return reply[1] + reply[2] << 8;
+//	    System.out.println("ver: " + reply[0] + ", "
+//	    		+ reply[1] + ", "
+//	    		+ reply[2]);
+	    return reply[2] + (reply[1] << 8);
 	}
 
 	/* (non-Javadoc)

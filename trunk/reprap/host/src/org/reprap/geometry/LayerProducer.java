@@ -291,9 +291,9 @@ public class LayerProducer {
 				printer.getExtruder().getShortSpeed()));
 		printer.printTo(p.x(), p.y(), z, lastOne);
 		printer.setSpeed(currentSpeed);
-		Debug.d("Short segment at speed " +
-				LinePrinter.speedFix(currentSpeed, printer.getExtruder().getShortSpeed())
-				+" derived from speed: " + currentSpeed);
+//		Debug.d("Short segment at speed " +
+//				LinePrinter.speedFix(currentSpeed, printer.getExtruder().getShortSpeed())
+//				+" derived from speed: " + currentSpeed);
 		return true;	
 	}
 	

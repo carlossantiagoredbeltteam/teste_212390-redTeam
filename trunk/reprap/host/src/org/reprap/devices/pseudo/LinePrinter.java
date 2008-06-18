@@ -1,9 +1,9 @@
 package org.reprap.devices.pseudo;
 
 import java.io.IOException;
-
 import org.reprap.Extruder;
 import org.reprap.devices.GenericStepperMotor;
+import org.reprap.utilities.Debug;
 
 /**
  * This is a pseudo device that provides an apparent single device
@@ -36,7 +36,7 @@ public class LinePrinter {
 	 */
 	public LinePrinter(GenericStepperMotor motorX, GenericStepperMotor motorY, Extruder extruder) {
 		this.motorX = motorX;
-		this.motorY = motorY;
+		this.motorY = motorY;		
 		this.extruder = extruder;
 	}
 	
@@ -81,6 +81,16 @@ public class LinePrinter {
 
 		if (currentX == endX && currentY == endY)
 			return;
+		
+		// If the firmware can queue polylines in a buffer, just send it,
+		// record it, and go home.
+
+		if(motorX.queuePoint(endX, endY, movementSpeed))
+		{
+			currentX = endX;
+			currentY = endY;
+			return;
+		}
 		
 		GenericStepperMotor master, slave;
 
