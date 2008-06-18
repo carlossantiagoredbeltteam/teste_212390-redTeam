@@ -129,6 +129,9 @@ public class GCodeWriter implements CartesianPrinter {
 		temperature = config.loadInt("Extruder0_ExtrusionTemp(C)");
 	}
 	
+	public void waitTillNotBusy()
+	{}
+	
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#calibrate()
 	 */

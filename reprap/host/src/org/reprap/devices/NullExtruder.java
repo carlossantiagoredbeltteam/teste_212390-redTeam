@@ -321,6 +321,14 @@ public class NullExtruder implements Extruder{
 	private boolean pauseBetweenSegments = true;
 	
 	/**
+	 * To whom (grammar) do I belong?
+	 * if null, device is a brain in a bottle 
+	 * (i.e. just working alone on the bench).
+	 */
+	private Printer printer = null;
+	
+	
+	/**
 	 * @param prefs
 	 * @param extruderId
 	 */
@@ -383,6 +391,15 @@ public class NullExtruder implements Extruder{
 		isCommsAvailable = true;
 	
 	}
+	
+	public void setPrinter(Printer p)
+	{
+		printer = p;
+	}
+	public Printer getPrinter()
+	{
+		return printer;
+	}	
 	
 	/**
 	 * @return the material type

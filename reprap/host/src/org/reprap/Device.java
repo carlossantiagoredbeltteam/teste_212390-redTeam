@@ -2,6 +2,7 @@ package org.reprap;
 
 import java.io.IOException;
 
+import org.reprap.Printer;
 import org.reprap.comms.Address;
 import org.reprap.comms.Communicator;
 import org.reprap.comms.IncomingContext;
@@ -33,6 +34,13 @@ public abstract class Device {
 	 * 
 	 */
 	private Communicator communicator = org.reprap.Main.getCommunicator();
+	
+	/**
+	 * To whom (grammar) do I belong?
+	 * if null, device is a brain in a bottle 
+	 * (i.e. just working alone on the bench).
+	 */
+	public Printer printer = null;
 
 	/**
 	 * Basic constructor for a device.
@@ -122,4 +130,12 @@ public abstract class Device {
 		communicator.unlock();
 	}
 	
+	public void setPrinter(Printer p)
+	{
+		printer = p;
+	}
+	public Printer getPrinter()
+	{
+		return printer;
+	}	
 }

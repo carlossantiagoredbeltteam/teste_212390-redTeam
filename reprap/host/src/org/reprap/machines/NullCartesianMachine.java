@@ -104,6 +104,9 @@ public class NullCartesianMachine implements CartesianPrinter {
 
 	}
 	
+	public void waitTillNotBusy()
+	{}
+	
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#calibrate()
 	 */

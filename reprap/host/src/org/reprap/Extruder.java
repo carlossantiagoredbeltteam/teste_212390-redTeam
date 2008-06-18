@@ -4,7 +4,7 @@ import javax.media.j3d.Appearance;
 
 import org.reprap.Device;
 
-public interface Extruder {
+public interface Extruder{
 
 	
 	/**
@@ -316,6 +316,18 @@ public interface Extruder {
      * @return
      */
     public boolean getPauseBetweenSegments();
+    
+    /**
+     * 
+     * @param p
+     */
+	public void setPrinter(Printer p);
+
+	/**
+	 * 
+	 * @return
+	 */
+	public Printer getPrinter();
     
     /**
      * Deal with waht needs to be done between layers

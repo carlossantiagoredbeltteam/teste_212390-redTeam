@@ -186,9 +186,12 @@ public class Reprap implements CartesianPrinter {
 		motorZ = new GenericStepperMotor(communicator,
 				new SNAPAddress(prefs.loadInt("ZAxisAddress")), prefs, 3);
 		
+		motorX.setPrinter(this);
+		motorY.setPrinter(this);
+		motorZ.setPrinter(this);
 		
 		extruderCount = prefs.loadInt("NumberOfExtruders");
-		extruders = new GenericExtruder[extruderCount];
+		extruders = new Extruder[extruderCount];
 		if (extruderCount < 1)
 			throw new Exception("A Reprap printer must contain at least one extruder");
 		
@@ -197,6 +200,7 @@ public class Reprap implements CartesianPrinter {
 			String prefix = "Extruder" + i + "_";
 			extruders[i] = new GenericExtruder(communicator,
 				new SNAPAddress(prefs.loadInt(prefix + "Address")), prefs, i);
+			extruders[i].setPrinter(this);
 		}
 		
 		extruder=0;
@@ -227,6 +231,15 @@ public class Reprap implements CartesianPrinter {
 			excludeZ = true;
 		}
 
+	}
+	
+	/**
+	 * Wait while the motors move about
+	 * @throws IOException
+	 */
+	public void waitTillNotBusy() throws IOException
+	{
+		motorX.waitTillNotBusy();
 	}
 	
 	/* (non-Javadoc)
