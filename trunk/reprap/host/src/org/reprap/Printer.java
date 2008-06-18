@@ -297,6 +297,16 @@ public interface Printer {
 	 */
 	public void setLayerPause(JCheckBoxMenuItem layerPause);
 	
+	/**
+	 * 
+	 * @param c
+	 */
 	public void setCancelled(boolean c);
+	
+	/**
+	 * Wait while the motors move about
+	 * @throws IOException
+	 */
+	public void waitTillNotBusy() throws IOException;
          
 }

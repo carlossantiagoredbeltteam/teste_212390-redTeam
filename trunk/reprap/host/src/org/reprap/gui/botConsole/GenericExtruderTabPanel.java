@@ -39,23 +39,29 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
 
         initComponents();
         
-        pollThread = new Thread() {
-        public void run() {
-                Thread.currentThread().setName("GUI Poll");
-                while(!pollThreadExiting) {
-                        try {
-                                Thread.sleep(500);
-                                refreshTemperature();
-                                
-                        }
-                        catch (InterruptedException ex) {
-                                // This is normal when shutting down, so ignore
-                        }
-                }
-            }
-        };
+        // Next bit removed by Adrian.  This code currently creates
+        // instances of steppers and extruders for itself.  Then, when you
+        // hit Print, a whole new duplicate set are created, with these 
+        // ones staying live and still trying to talk to their hardware.
+        // Nasty!
         
-        pollThread.start(); 
+//        pollThread = new Thread() {
+//        public void run() {
+//                Thread.currentThread().setName("GUI Poll");
+//                while(!pollThreadExiting) {
+//                        try {
+//                                Thread.sleep(500);
+//                                refreshTemperature();
+//                                
+//                        }
+//                        catch (InterruptedException ex) {
+//                                // This is normal when shutting down, so ignore
+//                        }
+//                }
+//            }
+//        };
+//        
+//        pollThread.start(); 
         
     }
     

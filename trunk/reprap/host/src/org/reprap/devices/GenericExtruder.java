@@ -304,13 +304,6 @@ public class GenericExtruder extends Device implements Extruder{
 	private Appearance materialColour;
 	
 	/**
-	 * @param communicator
-	 * @param address
-	 * @param prefs
-	 * @param extruderId
-	 */
-	
-	/**
 	 * Enable wiping procedure for nozzle
 	 */
 	private boolean nozzleWipeEnabled;
@@ -403,12 +396,17 @@ public class GenericExtruder extends Device implements Extruder{
 	 */
 	private boolean pauseBetweenSegments = true;
 	
-	
 	/**
 	 * What firmware are we running?
 	 */
 	private int firmwareVersion = 0;
-	
+		
+	/**
+	 * @param communicator
+	 * @param address
+	 * @param prefs
+	 * @param extruderId
+	 */
 	public GenericExtruder(Communicator communicator, Address address, Preferences prefs, int extruderId) {
 		
 		super(communicator, address);
@@ -532,6 +530,27 @@ public class GenericExtruder extends Device implements Extruder{
 			pollThread.interrupt();
 		}
 	}
+	
+	/**
+	 * Wait while the motors move about
+	 * @throws IOException
+	 */
+	public void waitTillNotBusy() throws IOException
+	{
+		if(printer == null)
+			return;
+		printer.waitTillNotBusy();
+	}
+	
+	
+	public void setPrinter(Printer p)
+	{
+		printer = p;
+	}
+	public Printer getPrinter()
+	{
+		return printer;
+	}	
 
 	/**
 	 * Start the extruder motor at a given speed.  This ranges from 0
@@ -583,7 +602,7 @@ public class GenericExtruder extends Device implements Extruder{
 			scaledSpeed = (int)Math.round((maxExtruderSpeed - t0) * speed / 255.0 + t0);
 		else
 			scaledSpeed = 0;
-		
+		waitTillNotBusy();
 		lock();
 		try {
 			OutgoingMessage request =
@@ -612,7 +631,7 @@ public class GenericExtruder extends Device implements Extruder{
 			Debug.d("Attempting to control or interrogate non-existent extruder for " + material);
 			return;
 		}
-		
+		waitTillNotBusy();
 		lock();
 		try {
 			OutgoingMessage request =
@@ -752,7 +771,12 @@ public class GenericExtruder extends Device implements Extruder{
 	 */
 	private void setHeater(int heat, int safetyCutoff, boolean lock) throws IOException {
 		//System.out.println(material + " extruder heater set to " + heat + " limit " + safetyCutoff);
-		if (lock) lock();
+		
+		if (lock) 
+		{
+			waitTillNotBusy();
+			lock();
+		}
 		try {
 			sendMessage(new RequestSetHeat((byte)heat, (byte)safetyCutoff));
 		}
@@ -774,7 +798,12 @@ public class GenericExtruder extends Device implements Extruder{
 	 */
 	private void setHeater(int heat0, int heat1, int t0, int t1, boolean lock) throws IOException {
 		Debug.d(material + " extruder heater set to " + heat0 + "/" + heat1 + " limit " + t0 + "/" + t1);
-		if (lock) lock();
+		
+		if (lock)
+		{
+			waitTillNotBusy();
+			lock();
+		}
 		try {
 			sendMessage(new RequestSetHeat((byte)heat0,
 										   (byte)heat1,
@@ -840,7 +869,7 @@ public class GenericExtruder extends Device implements Extruder{
 	 */
 	private void RefreshEmptySensor() throws IOException {
 		// TODO in future, this should use the notification mechanism rather than polling (when fully working)
-		
+		waitTillNotBusy();
 		lock();
 		try {
 			//System.out.println(material + " extruder refreshing sensor");
@@ -971,6 +1000,7 @@ public class GenericExtruder extends Device implements Extruder{
 			Debug.d("Attempting to control or interrogate non-existent extruder for " + material);
 			return;
 		}
+		waitTillNotBusy();
 		lock();
 		try {
 			OutgoingMessage request =
@@ -1017,6 +1047,7 @@ public class GenericExtruder extends Device implements Extruder{
 	 * @throws Exception
 	 */
 	private void getDeviceTemperature() throws Exception {
+		waitTillNotBusy();
 		lock();
 		try {
 			int rawHeat = 0;

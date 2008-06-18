@@ -3,6 +3,7 @@ package org.reprap.devices;
 import java.io.IOException;
 import org.reprap.utilities.Debug;
 import org.reprap.Device;
+import org.reprap.Printer;
 import org.reprap.Preferences;
 import org.reprap.ReprapException;
 import org.reprap.comms.Address;
@@ -229,7 +230,7 @@ public class GenericStepperMotor extends Device {
 		finally {
 			unlock();
 		}
-		System.out.println("status: " + (byte)(value >> 8) + ", " + (byte)(value & 0xff));
+		//System.out.println("status: " + (byte)(value >> 8) + ", " + (byte)(value & 0xff));
 		return value;
 	}
 	
@@ -259,7 +260,7 @@ public class GenericStepperMotor extends Device {
 	 * 
 	 *
 	 */
-	private void waitTillNotBusy() throws IOException
+	public void waitTillNotBusy() throws IOException
 	{
 		if(firmwareVersion < firmwareVersionForBuffering)
 			return;	
@@ -268,7 +269,7 @@ public class GenericStepperMotor extends Device {
 		
 		while((value & 0xff) == modeQueue)
 		{
-			System.out.println("busy: " + value);
+			//System.out.println("busy: " + value);
 			try
 			{
 				Thread.sleep(500);
