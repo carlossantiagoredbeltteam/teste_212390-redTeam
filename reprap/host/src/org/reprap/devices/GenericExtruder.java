@@ -403,6 +403,12 @@ public class GenericExtruder extends Device implements Extruder{
 	 */
 	private boolean pauseBetweenSegments = true;
 	
+	
+	/**
+	 * What firmware are we running?
+	 */
+	private int firmwareVersion = 0;
+	
 	public GenericExtruder(Communicator communicator, Address address, Preferences prefs, int extruderId) {
 		
 		super(communicator, address);
@@ -474,6 +480,12 @@ public class GenericExtruder extends Device implements Extruder{
 		//Anyone home?
 		if(!isAvailable())
 			return;
+		
+		try
+		{
+			firmwareVersion = getVersion();
+		} catch (Exception ex)
+		{}
 		
 		// Set up thermometer
 		try {

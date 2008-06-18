@@ -97,6 +97,21 @@ public class GenericStepperMotor extends Device {
 	 * Homereset(?? 
 	 */
 	public static final byte MSG_HomeReset = 16;
+	
+	/**
+	 * Stick a point in the input buffer (firmware v1.4 and greater)
+	 */
+	public static final byte MSG_QueuePoint = 17;
+	
+	/**
+	 * What's the thing up to?
+	 */
+	public static final byte MSG_GetStatus = 18;
+	
+	/**
+	 * What the firmware sends when the queue is active
+	 */
+	public static final byte modeQueue = 7;	
 
 
 	/**
@@ -126,6 +141,14 @@ public class GenericStepperMotor extends Device {
 	 * Power output limiting (0-100 percent)
 	 */
 	private int maxTorque;
+	
+	
+	/**
+	 * 
+	 */
+	private int firmwareVersion = 0;
+	
+	private static final int firmwareVersionForBuffering = (1 << 8) + 4; // Version 1.4
 	
 	/**
 	 * @param communicator
@@ -158,6 +181,16 @@ public class GenericStepperMotor extends Device {
 		
 		if(!isAvailable())
 			return;
+		
+		try
+		{
+			firmwareVersion = getVersion();
+		} catch (Exception ex)
+		{}
+
+		Debug.d("Stepper " + axis + " firmware is version: " + 
+				((firmwareVersion >> 8) & 0xff) + "." + (firmwareVersion & 0xff));
+
 	}
 
 	/**
@@ -176,6 +209,113 @@ public class GenericStepperMotor extends Device {
 	public void dispose() {
 	}
 	
+	
+	private int getStatus() throws IOException
+	{
+		int value;
+		lock();
+		try {
+			IncomingContext replyContext = sendMessage(
+					new OutgoingBlankMessage(MSG_GetStatus));
+			
+			IncomingIntMessage reply = new RequestStatusResponse(replyContext);
+			try {
+				value = reply.getValue();
+			}
+			catch (IncomingMessage.InvalidPayloadException ex) {
+				throw new IOException(ex.getMessage());
+			}
+		}
+		finally {
+			unlock();
+		}
+		System.out.println("status: " + (byte)(value >> 8) + ", " + (byte)(value & 0xff));
+		return value;
+	}
+	
+	/**
+	 * 
+	 *
+	 */
+	private void waitTillQueueNotFull() throws IOException
+	{
+		if(firmwareVersion < firmwareVersionForBuffering)
+			return;
+		
+		int value = getStatus();
+		
+		while((value >> 8) != 0)
+		{
+			try
+			{
+				Thread.sleep(500);
+			}catch (Exception ex)
+			{}
+			value = getStatus();
+		}
+	}
+	
+	/**
+	 * 
+	 *
+	 */
+	private void waitTillNotBusy() throws IOException
+	{
+		if(firmwareVersion < firmwareVersionForBuffering)
+			return;	
+		
+		int value = getStatus();
+		
+		while((value & 0xff) == modeQueue)
+		{
+			System.out.println("busy: " + value);
+			try
+			{
+				Thread.sleep(500);
+			}catch (Exception ex)
+			{}
+			value = getStatus();
+		}
+	}	
+	
+	/**
+	 * Add an XY point to the firmware buffer for plotting
+	 * Only works for recent firmware.
+	 * 
+	 * @param endX
+	 * @param endY
+	 * @param movementSpeed
+	 * @return
+	 */
+	public boolean queuePoint(int endX, int endY, int movementSpeed) throws IOException 
+	{
+		// Firmware clever enough?
+		if(firmwareVersion < firmwareVersionForBuffering)
+			return false;
+		
+		if(!wasAvailable())
+		{
+			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
+			return false;
+		}
+		
+		initialiseIfNeeded();
+		
+		waitTillQueueNotFull();
+		
+		lock();
+		Debug.d(axis + " axis - queuing point at speed " + movementSpeed + ". endX = " + endX + ", endY = " + endY);
+		try {
+			OutgoingMessage request = new RequestQueue(endX, endY, movementSpeed);
+			sendMessage(request);
+		}
+		finally {
+			unlock();
+		}
+		
+		return true;
+	}
+	
 	/**
 	 * Set the motor speed (or turn it off) 
 	 * @param speed A value between -255 and 255.
@@ -189,6 +329,7 @@ public class GenericStepperMotor extends Device {
 			return;
 		}
 		initialiseIfNeeded();
+		waitTillNotBusy();
 		lock();
 		Debug.d(axis + " axis - setting speed: " + speed);
 		try {
@@ -210,6 +351,7 @@ public class GenericStepperMotor extends Device {
 			return;
 		}
 		initialiseIfNeeded();
+		waitTillNotBusy();
 		lock();
 		Debug.d(axis + " axis - going idle.");
 		try {
@@ -231,6 +373,7 @@ public class GenericStepperMotor extends Device {
 			return;
 		}
 		initialiseIfNeeded();
+		waitTillNotBusy();
 		lock();
 		Debug.d(axis + " axis - stepping forward.");		
 		try {
@@ -252,6 +395,7 @@ public class GenericStepperMotor extends Device {
 			return;
 		}
 		initialiseIfNeeded();
+		waitTillNotBusy();
 		lock();
 		Debug.d(axis + " axis - stepping backward.");	
 		try {
@@ -286,6 +430,7 @@ public class GenericStepperMotor extends Device {
 			return;
 		}
 		initialiseIfNeeded();
+		waitTillNotBusy();
 		lock();
 		Debug.d(axis + " axis - setting position to: " + position);	
 		try {
@@ -308,6 +453,7 @@ public class GenericStepperMotor extends Device {
 		}
 		int value;
 		initialiseIfNeeded();
+		waitTillNotBusy();
 		lock();
 		Debug.d(axis + " axis - getting position.  It is... ");
 		try {
@@ -340,7 +486,8 @@ public class GenericStepperMotor extends Device {
 			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
 			return;
 		}
-		initialiseIfNeeded()	;
+		initialiseIfNeeded();
+		waitTillNotBusy();
 		lock();
 		Debug.d(axis + " axis - seeking position " + position + " at speed " + speed);
 		try {
@@ -363,6 +510,7 @@ public class GenericStepperMotor extends Device {
 			return;
 		}
 		initialiseIfNeeded();
+		waitTillNotBusy();
 		lock();
 		Debug.d(axis + " axis - seeking-blocking position " + position + " at speed " + speed);
 		try {
@@ -389,7 +537,8 @@ public class GenericStepperMotor extends Device {
 			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
 			return new Range();
 		}
-		initialiseIfNeeded()	;
+		initialiseIfNeeded();
+		waitTillNotBusy();
 		lock();
 		Debug.d(axis + " axis - getting range.");
 		try {
@@ -423,7 +572,8 @@ public class GenericStepperMotor extends Device {
 			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
 			return;
 		}
-		initialiseIfNeeded()	;
+		initialiseIfNeeded();
+		waitTillNotBusy();
 		lock();
 		Debug.d(axis + " axis - home reset at speed " + speed);
 		try {
@@ -445,7 +595,8 @@ public class GenericStepperMotor extends Device {
 			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
 			return;
 		}
-		initialiseIfNeeded()	;
+		initialiseIfNeeded();
+		waitTillNotBusy();
 		lock();
 		Debug.d(axis + " axis - setting sync to " + syncType);
 		try {
@@ -470,7 +621,8 @@ public class GenericStepperMotor extends Device {
 			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
 			return;
 		}
-		initialiseIfNeeded()	;
+		initialiseIfNeeded();
+		waitTillNotBusy();
 		lock();
 		Debug.d(axis + " axis - dda at speed " + speed + ". x1 = " + x1 + ", deltaY = " + deltaY);
 		try {
@@ -490,7 +642,7 @@ public class GenericStepperMotor extends Device {
 	 */
 	private void setNotification() throws IOException {
 		
-		initialiseIfNeeded()	;
+		initialiseIfNeeded();
 		Debug.d(axis + " axis - setting notification on.");
 		if (!haveSetNotification) {
 			sendMessage(new OutgoingAddressMessage(MSG_SetNotification,
@@ -522,7 +674,8 @@ public class GenericStepperMotor extends Device {
 			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
 			return;
 		}
-		initialiseIfNeeded()	;
+		initialiseIfNeeded();
+		waitTillNotBusy();
 		if (maxTorque > 100) maxTorque = 100;
 		double power = maxTorque * 68.0 / 100.0;
 		byte scaledPower = (byte)power;
@@ -557,6 +710,27 @@ public class GenericStepperMotor extends Device {
 		 */
 		protected boolean isExpectedPacketType(byte packetType) {
 			return packetType == MSG_GetPosition; 
+		}
+	}
+	
+	/**
+	 *
+	 */
+	protected class RequestStatusResponse extends IncomingIntMessage {
+		
+		/**
+		 * @param incomingContext
+		 * @throws IOException
+		 */
+		public RequestStatusResponse(IncomingContext incomingContext) throws IOException {
+			super(incomingContext);
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.reprap.comms.messages.IncomingIntMessage#isExpectedPacketType(byte)
+		 */
+		protected boolean isExpectedPacketType(byte packetType) {
+			return packetType == MSG_GetStatus; 
 		}
 	}
 
@@ -750,6 +924,63 @@ public class GenericStepperMotor extends Device {
 			return packetType == MSG_DDAMaster;
 		}
 	}
+	
+	
+	/**
+	 *
+	 */
+	protected class RequestQueue extends OutgoingMessage {
+		byte [] message;
+		
+		/**
+		 * @param speed
+		 * @param x1
+		 * @param deltaY
+		 */
+		RequestQueue(int endX, int endY, int movementSpeed) {
+			message = new byte[] { MSG_QueuePoint,
+					(byte)movementSpeed,
+					(byte)(endX & 0xff),
+					(byte)((endX >> 8) & 0xff),
+					(byte)(endY & 0xff),
+					(byte)((endY >> 8) & 0xff)
+				};
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.reprap.comms.OutgoingMessage#getBinary()
+		 */
+		public byte[] getBinary() {
+			return message;
+		}
+		
+	}
+
+	/**
+	 *
+	 */
+	protected class RequestQueueResponse extends IncomingIntMessage {
+		
+		/**
+		 * @param device
+		 * @param message
+		 * @param timeout
+		 * @throws IOException
+		 */
+		public RequestQueueResponse(Device device, OutgoingMessage message, long timeout) throws IOException {
+			super(device, message, timeout);
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.reprap.comms.messages.IncomingIntMessage#isExpectedPacketType(byte)
+		 */
+		protected boolean isExpectedPacketType(byte packetType) {
+			return packetType == MSG_QueuePoint;
+		}
+	}
+	
+	
+	
 	
 	/**
 	 *
