@@ -1,6 +1,6 @@
 Index: reprap/firmware/Arduino/Single_Arduino_SNAP/Single_Arduino_SNAP.pde
 ===================================================================
---- reprap/firmware/Arduino/Single_Arduino_SNAP/Single_Arduino_SNAP.pde	(revision 1639)
+--- reprap/firmware/Arduino/Single_Arduino_SNAP/Single_Arduino_SNAP.pde	(revision 1642)
 +++ reprap/firmware/Arduino/Single_Arduino_SNAP/Single_Arduino_SNAP.pde	(working copy)
 @@ -42,9 +42,9 @@
  #define VALVE_ENABLE_PIN          16  //NB: Conflicts with Max Z!!!!
@@ -26,7 +26,7 @@ Index: reprap/firmware/Arduino/Single_Arduino_SNAP/Single_Arduino_SNAP.pde
  		
 Index: reprap/firmware/Arduino/library/ThermoplastExtruder/ThermoplastExtruder.cpp
 ===================================================================
---- reprap/firmware/Arduino/library/ThermoplastExtruder/ThermoplastExtruder.cpp	(revision 1639)
+--- reprap/firmware/Arduino/library/ThermoplastExtruder/ThermoplastExtruder.cpp	(revision 1642)
 +++ reprap/firmware/Arduino/library/ThermoplastExtruder/ThermoplastExtruder.cpp	(working copy)
 @@ -111,16 +111,15 @@
  				(temptable[i][1] - temptable[i-1][1]) /
@@ -52,7 +52,7 @@ Index: reprap/firmware/Arduino/library/ThermoplastExtruder/ThermoplastExtruder.c
  }
 Index: reprap/firmware/Arduino/library/ThermoplastExtruder/ThermistorTable.h
 ===================================================================
---- reprap/firmware/Arduino/library/ThermoplastExtruder/ThermistorTable.h	(revision 1639)
+--- reprap/firmware/Arduino/library/ThermoplastExtruder/ThermistorTable.h	(revision 1642)
 +++ reprap/firmware/Arduino/library/ThermoplastExtruder/ThermistorTable.h	(working copy)
 @@ -10,6 +10,7 @@
  // r2: 1600
@@ -108,7 +108,7 @@ Index: reprap/firmware/Arduino/library/ThermoplastExtruder/ThermistorTable.h
  #endif
 Index: reprap/firmware/Arduino/library/ThermoplastExtruder_SNAP_v1/ThermoplastExtruder_SNAP_v1.cpp
 ===================================================================
---- reprap/firmware/Arduino/library/ThermoplastExtruder_SNAP_v1/ThermoplastExtruder_SNAP_v1.cpp	(revision 1639)
+--- reprap/firmware/Arduino/library/ThermoplastExtruder_SNAP_v1/ThermoplastExtruder_SNAP_v1.cpp	(revision 1642)
 +++ reprap/firmware/Arduino/library/ThermoplastExtruder_SNAP_v1/ThermoplastExtruder_SNAP_v1.cpp	(working copy)
 @@ -100,8 +100,10 @@
  			//extruder.heater_high = snap.getByte(2);
@@ -125,9 +125,9 @@ Index: reprap/firmware/Arduino/library/ThermoplastExtruder_SNAP_v1/ThermoplastEx
  		// tell the host software how hot we are.
 Index: reprap/host/src/org/reprap/devices/GenericExtruder.java
 ===================================================================
---- reprap/host/src/org/reprap/devices/GenericExtruder.java	(revision 1639)
+--- reprap/host/src/org/reprap/devices/GenericExtruder.java	(revision 1642)
 +++ reprap/host/src/org/reprap/devices/GenericExtruder.java	(working copy)
-@@ -708,7 +708,8 @@
+@@ -727,7 +727,8 @@
  		if (temperature == 0)
  			setHeater(0, 0, lock);
  		else {
@@ -137,7 +137,7 @@ Index: reprap/host/src/org/reprap/devices/GenericExtruder.java
  		}
  	}
  	
-@@ -1038,7 +1039,8 @@
+@@ -1069,7 +1070,8 @@
  			
  			double resistance = calculateResistance(rawHeat, calibration);
  			
@@ -147,7 +147,7 @@ Index: reprap/host/src/org/reprap/devices/GenericExtruder.java
  			Debug.d(material + " extruder current temp " + currentTemperature);
  			
  			lastTemperatureUpdate = System.currentTimeMillis();
-@@ -1175,7 +1177,8 @@
+@@ -1206,7 +1208,8 @@
  		    byte [] reply = getPayload();
  		    if (reply == null || reply.length != 3)
  		    		throw new InvalidPayloadException();
