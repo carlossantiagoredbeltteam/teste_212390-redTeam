@@ -905,8 +905,8 @@ public class GenericExtruder extends Device implements Extruder{
 			try {
 				RefreshEmptySensor();
 				RefreshTemperature();
-				tH[tHi] = currentTemperature;
-				currentTemperature = tempVote();
+				//tH[tHi] = currentTemperature;
+				//currentTemperature = tempVote();
 			} catch (Exception ex) {
 				Debug.d(material + " extruder exception during temperature/material update ignored");
 				ex.printStackTrace();
@@ -914,26 +914,26 @@ public class GenericExtruder extends Device implements Extruder{
 		}
 	}
 	
-	/**
-	 * Take a vote among the last three temperatures
-	 * @return
-	 */
-	private double tempVote()
-	{
-		int ip = (tHi + 1)%3;
-		int ipp = (tHi + 2)%3;
-		double dp = Math.abs(tH[tHi] - tH[ip]);
-		double dpp = Math.abs(tH[tHi] - tH[ipp]);
-		double d = Math.abs(tH[ip] - tH[ipp]);
-		if(dp <= d || dpp <= d)
-			d = tH[tHi];
-		else
-			d = 0.5*(tH[ip] + tH[ipp]);
-		//Debug.d("tempVote() - t0: " + tH[0] + ", t1: " + tH[1] + ", t2: " + tH[2] +
-				//", current: " + tH[tHi] + ", returning: " + d);
-		tHi = (tHi + 1)%3;
-		return d;
-	}
+//	/**
+//	 * Take a vote among the last three temperatures
+//	 * @return
+//	 */
+//	private double tempVote()
+//	{
+//		int ip = (tHi + 1)%3;
+//		int ipp = (tHi + 2)%3;
+//		double dp = Math.abs(tH[tHi] - tH[ip]);
+//		double dpp = Math.abs(tH[tHi] - tH[ipp]);
+//		double d = Math.abs(tH[ip] - tH[ipp]);
+//		if(dp <= d || dpp <= d)
+//			d = tH[tHi];
+//		else
+//			d = 0.5*(tH[ip] + tH[ipp]);
+//		//Debug.d("tempVote() - t0: " + tH[0] + ", t1: " + tH[1] + ", t2: " + tH[2] +
+//				//", current: " + tH[tHi] + ", returning: " + d);
+//		tHi = (tHi + 1)%3;
+//		return d;
+//	}
 	
 	/* (non-Javadoc)
 	 * @see org.reprap.Extruder#getTemperature()

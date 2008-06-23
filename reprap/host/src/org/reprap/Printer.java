@@ -6,6 +6,7 @@ import javax.media.j3d.*;
 import javax.swing.JCheckBoxMenuItem;
 import org.reprap.gui.Previewer;
 import org.reprap.devices.GenericExtruder;
+import org.reprap.devices.GenericStepperMotor;
 
 public interface Printer {
 
@@ -163,7 +164,17 @@ public interface Printer {
 	 * @return the extruder for the printer
 	 */
 	public Extruder getExtruder();
+	
+	/**
+	 * Stop the extrude motor (if any)
+	 * @throws IOException
+	 */
 	public void stopMotor() throws IOException;
+	
+	/**
+	 * Close the extrude valve (if any)
+	 * @throws IOException
+	 */
 	public void stopValve() throws IOException;
 
 	/**
@@ -258,6 +269,21 @@ public interface Printer {
 	 * @return
 	 */
 	public Extruder[] getExtruders();
+	
+	/**
+	 * @return the X stepper
+	 */
+	public GenericStepperMotor getXMotor();
+	
+	/**
+	 * @return the Y stepper
+	 */
+	public GenericStepperMotor getYMotor();
+	
+	/**
+	 * @return the Z stepper
+	 */	
+	public GenericStepperMotor getZMotor();
 	
 	/**
 	 * Just finished a layer

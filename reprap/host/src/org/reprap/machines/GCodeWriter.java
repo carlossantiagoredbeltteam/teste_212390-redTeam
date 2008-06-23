@@ -26,6 +26,7 @@ import org.reprap.Extruder;
 import org.reprap.ReprapException;
 import org.reprap.gui.Previewer;
 import org.reprap.devices.NullExtruder;
+import org.reprap.devices.GenericStepperMotor;
 
 /**
  *
@@ -565,6 +566,32 @@ public class GCodeWriter implements CartesianPrinter {
 	{
 		return extruders;
 	}
+	
+	//FIXME: Need a NullStepperMotor class like NullExtruder...
+	
+	/**
+	 * @return the X stepper
+	 */
+	public GenericStepperMotor getXMotor()
+	{
+		return null;
+	}
+	
+	/**
+	 * @return the Y stepper
+	 */
+	public GenericStepperMotor getYMotor()
+	{
+		return null;
+	}
+	
+	/**
+	 * @return the Z stepper
+	 */	
+	public GenericStepperMotor getZMotor()
+	{
+		return null;
+	}	
 	
 //	/**
 //	 * Moves nozzle back and forth over wiper
