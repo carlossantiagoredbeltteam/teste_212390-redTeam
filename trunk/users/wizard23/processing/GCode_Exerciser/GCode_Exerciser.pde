@@ -29,7 +29,7 @@ void setup()
   myPort = new Serial(this, Serial.list()[0], 19200);
 
   //load our gcode lines
-  gcode = loadStrings("/home/wizard23/projects/reprap/downloads/gcodestuff/cooled_rings.gcode");
+//  gcode = loadStrings("/home/wizard23/projects/reprap/downloads/gcodestuff/cooled_rings.gcode");
   //println(gcode);
 }
 
@@ -133,18 +133,18 @@ String getNextCommand()
     }
     
     // Z axsis
-    if (key == 'q' || kez == 'Q')
+    if (key == 'q' || key == 'Q')
     {
-      c = "G1 X0 Y0 Z10 F200";
+      c = "G0 X0 Y0 Z2 F50";
     }    
     
     if (key == 'z')
     {
-      c = "G1 X0 Y0 Z-2 F100";
+      c = "G0 X0 Y0 Z-2 F50";
     }
     if (key == 'Z')
     {
-      c = "G1 X0 Y0 Z-0.2 F100";
+      c = "G0 X0 Y0 Z-2 F50";
     }
     
     return c;
