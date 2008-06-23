@@ -148,12 +148,16 @@ bool can_step(byte min_pin, byte max_pin, long current, long target, byte direct
 	//stop us if we're on target
 	if (target == current)
 		return false;
+#if ENDSTOPS_MIN_ENABLED == 1
 	//stop us if we're at home and still going 
 	else if (read_switch(min_pin) && !direction)
 		return false;
+#endif
+#if ENDSTOPS_MAX_ENABLED == 1
 	//stop us if we're at max and still going
-	else if (read_switch(max_pin) && direction)
-		return false;
+ 	else if (read_switch(max_pin) && direction)
+ 		return false;
+#endif
 
 	//default to being able to step
 	return true;
@@ -169,7 +173,7 @@ void do_step(byte step_pin)
 bool read_switch(byte pin)
 {
 	//dual read as crude debounce
-	#if SENSORS_INVERTING == 1
+	#if ENDSTOPS_INVERTING == 1
 		return !digitalRead(pin) && !digitalRead(pin);
 	#else
 		return digitalRead(pin) && digitalRead(pin);
