@@ -44,7 +44,7 @@ void draw()
     {
       println("Got: " + serialLine);
 
-      String m[] = match(serialLine, "^Temp:([0-9]+)");
+      String m[] = match(serialLine, "^T:([0-9]+)");
       ;
       if (m != null)
         temperature = m[0];
@@ -52,7 +52,7 @@ void draw()
       if (match(serialLine, "^start") != null)
         started = true;
 
-      if (match(serialLine, "^done") != null)
+      if (match(serialLine, "^ok") != null)
       {
         commandComplete = true;
 
