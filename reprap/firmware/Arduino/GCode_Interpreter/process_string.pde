@@ -1,3 +1,5 @@
+// Yep, this is actually -*- c++ -*-
+
 // our point structure to make things nice.
 struct LongPoint
 {
@@ -123,6 +125,7 @@ int parse_string(struct GcodeParser * gc, char instruction[], int size)
 		{
 			PARSE_INT('G', instruction, &instruction[ind+1], size-ind, len, gc->G, gc->seen, GCODE_G);
 			PARSE_INT('M', instruction, &instruction[ind+1], size-ind, len, gc->M, gc->seen, GCODE_M);
+			PARSE_FLOAT('S', instruction, &instruction[ind+1], size-ind, len, gc->S, gc->seen, GCODE_S);
 			PARSE_FLOAT('P', instruction, &instruction[ind+1], size-ind, len, gc->P, gc->seen, GCODE_P);
 			PARSE_FLOAT('X', instruction, &instruction[ind+1], size-ind, len, gc->X, gc->seen, GCODE_X);
 			PARSE_FLOAT('Y', instruction, &instruction[ind+1], size-ind, len, gc->Y, gc->seen, GCODE_Y);
