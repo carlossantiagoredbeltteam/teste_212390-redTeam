@@ -19,7 +19,7 @@ public class EstimationProducer extends Producer {
 	 * @throws Exception
 	 */
 	public EstimationProducer(RepRapBuild builder) throws Exception {
-		super(null, builder);
+		super(null, null, builder);
 		
 		reprap = new NullCartesianMachine(Preferences.getGlobalPreferences()); 
 

@@ -945,6 +945,30 @@ public class Reprap implements CartesianPrinter {
 		return extruders;
 	}
 	
+	/**
+	 * @return the X stepper
+	 */
+	public GenericStepperMotor getXMotor()
+	{
+		return motorX;
+	}
+	
+	/**
+	 * @return the Y stepper
+	 */
+	public GenericStepperMotor getYMotor()
+	{
+		return motorY;
+	}
+	
+	/**
+	 * @return the Z stepper
+	 */	
+	public GenericStepperMotor getZMotor()
+	{
+		return motorZ;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#getExtruder(String)
 	 */

@@ -14,7 +14,8 @@ package org.reprap.gui.botConsole;
 
 import org.reprap.Preferences;
 import javax.swing.JOptionPane;
-import org.reprap.machines.Reprap;
+//import org.reprap.machines.Reprap;
+import org.reprap.machines.MachineFactory;
 
 /**
  *
@@ -24,6 +25,9 @@ import org.reprap.machines.Reprap;
  * 
  */
 public class BotConsoleFrame extends javax.swing.JFrame {
+	
+    private Thread pollThread = null;
+    private boolean pollThreadExiting = false;
     
     /** Creates new form BotConsoleFrame */
     public BotConsoleFrame() {
@@ -39,12 +43,42 @@ public class BotConsoleFrame extends javax.swing.JFrame {
         initComponents();
         xYZTabPanel1.setBedPanelDimensions();
         this.setTitle("Bot Console");
+        
+        /*
+         * Fork off a thread to keep the panels up-to-date
+         */
+        pollThread = new Thread() {
+            public void run() {
+                    Thread.currentThread().setName("GUI Poll");
+                    while(!pollThreadExiting) {
+                            try {
+                                    Thread.sleep(5000);
+                                    updatePanels();   
+                            }
+                            catch (InterruptedException ex) {
+                                    // This is normal when shutting down, so ignore
+                            }
+                    }
+                }
+            };
+            
+            pollThread.start(); 
     }
     
-    // Comms variables
+    private GenericExtruderTabPanel[] extruderPanels;
+    
+    /**
+     * The update thread calls this to update everything
+     *
+     */
+    private void updatePanels()
+    {
+    	for(int i = 0; i < extruderPanels.length; i++)
+    		extruderPanels[i].refreshTemperature();
+    }
 
-    private GenericExtruderTabPanel[] extruderPanel;
-    private static Reprap reprap;
+
+ 
     
     private void checkPrefs() throws Exception {
         
@@ -134,11 +168,11 @@ public class BotConsoleFrame extends javax.swing.JFrame {
     
     private void initialiseExtruderPanels() {
 
-        extruderPanel = new GenericExtruderTabPanel[extruderCount];
+        extruderPanels = new GenericExtruderTabPanel[extruderCount];
         for (int i = 0; i < extruderCount; i++) {
-            extruderPanel[i] = new GenericExtruderTabPanel();
+            extruderPanels[i] = new GenericExtruderTabPanel();
             try {
-                extruderPanel[i].initialiseExtruders(i);
+                extruderPanels[i].initialiseExtruders(i);
             }
             catch (Exception e) {
                 System.out.println("Failure trying to initialise extruders in botConsole: " + e);
@@ -146,7 +180,7 @@ public class BotConsoleFrame extends javax.swing.JFrame {
                 return;
             }            
             try {
-                extruderPanel[i].setPrefs();
+                extruderPanels[i].setPrefs();
             }
             catch (Exception e) {
                 System.out.println("Problem loading prefs for Extruder " + i);
@@ -158,7 +192,7 @@ public class BotConsoleFrame extends javax.swing.JFrame {
     private void addExtruderPanels() {
         
         for (int i = 0; i < extruderCount; i++) {
-            jTabbedPane1.addTab("Extruder " + i, extruderPanel[i]);
+            jTabbedPane1.addTab("Extruder " + i, extruderPanels[i]);
         }
     }
     

@@ -45,7 +45,7 @@ public class PrintTabPanel extends javax.swing.JPanel {
             System.err.println("Warning: could not load InterLayerCooling flag for check box");
             return;
         }
-
+        
     }
     
     /** This method is called from within the constructor to

@@ -20,6 +20,7 @@ package org.reprap.gui.botConsole;
 import java.io.IOException;
 import javax.swing.JOptionPane;
 import org.reprap.Preferences;
+import org.reprap.Printer;
 import org.reprap.comms.Communicator;
 import org.reprap.comms.snap.SNAPAddress;
 import org.reprap.devices.GenericStepperMotor;
@@ -75,29 +76,34 @@ public class GenericStepperPositionPanel extends javax.swing.JPanel {
         
         communicator = org.reprap.Main.getCommunicator();
         motorID = BotConsoleFrame.getMotorID();
+        Printer p = org.reprap.Main.gui.getPrinter();
 
         switch(motorID)
         {
         case 1:
                 axis = "X";
+                motor = p.getXMotor();
                 axisLength = 160; // TODO: Replace with Prefs when Java3D parameters work for small wv's.
                 break;
         case 2:
                 axis = "Y";
+                motor = p.getYMotor();
                 axisLength = 160; // TODO: Replace with Prefs when Java3D parameters work for small wv's.
                 break;
         case 3:
                 axis = "Z";
+                motor = p.getZMotor();
                 axisLength = 80; // TODO: Replace with Prefs when Java3D parameters work for small wv's.
                 break;
         default:
                 axis = "X";
+        		motor = p.getXMotor();
                 System.err.println("StepperPanel - dud axis id:" + motorID);
         }
         
         int address = Preferences.loadGlobalInt(axis + "Axis" + "Address");
         
-        motor = new GenericStepperMotor(communicator, new SNAPAddress(address), Preferences.getGlobalPreferences(), motorID);
+        //motor = new GenericStepperMotor(communicator, new SNAPAddress(address), Preferences.getGlobalPreferences(), motorID);
 
         motorStepsPerMM = Preferences.loadGlobalDouble(axis + "AxisScale(steps/mm)");
 	

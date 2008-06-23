@@ -30,6 +30,7 @@ import javax.vecmath.*;
 
 import org.reprap.geometry.EstimationProducer;
 import org.reprap.geometry.Producer;
+import org.reprap.machines.MachineFactory;
 import org.reprap.gui.Preferences;
 import org.reprap.gui.PreviewPanel;
 import org.reprap.gui.RepRapBuild;
@@ -100,6 +101,8 @@ public class Main {
     
     private Producer producer = null;
     
+    private Printer printer = null;
+    
     // Window to walk the file tree
     
     private JFileChooser chooser;
@@ -135,7 +138,15 @@ public class Main {
         // If all, comment out the next two lines
         
         FileFilter filter = new ExtensionFileFilter("STL", new String[] { "STL" });
-        chooser.setFileFilter(filter);   
+        chooser.setFileFilter(filter);
+        try
+        {
+        	printer = MachineFactory.create();
+        } catch (Exception ex)
+        {
+        	System.err.println("MachineFactory.create() failed.\n" +
+        			ex.toString());
+        }
 	}
 
 	private void createAndShowGUI() throws Exception {
@@ -471,7 +482,7 @@ public class Main {
 //						preview.setLayerPause(layerPause);
 //					}
 					
-					producer = new Producer(preview, builder);
+					producer = new Producer(printer, preview, builder);
 					producer.setSegmentPause(segmentPause);
 					producer.setLayerPause(layerPause);
 					producer.produce();
@@ -490,6 +501,11 @@ public class Main {
 			}
 		};
 		t.start();
+	}
+	
+	public Printer getPrinter()
+	{
+		return printer;
 	}
 	
 	public void onProduceB() {
@@ -512,7 +528,9 @@ public class Main {
 //						preview.setLayerPause(layerPause);
 //					}
 					
-					producer = new Producer(preview, builder);
+					if(printer == null)
+						System.err.println("Production attempted with null printer.");
+					producer = new Producer(printer, preview, builder);
 					producer.setSegmentPause(segmentPause);
 					producer.setLayerPause(layerPause);
 					producer.produce();

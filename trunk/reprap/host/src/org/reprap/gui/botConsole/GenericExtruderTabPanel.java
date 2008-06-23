@@ -17,7 +17,9 @@ import javax.swing.JOptionPane;
 import javax.swing.*;
 import org.reprap.comms.snap.SNAPAddress;
 import org.reprap.comms.snap.SNAPCommunicator;
-import org.reprap.devices.GenericExtruder;
+import org.reprap.Printer;
+//import org.reprap.devices.GenericExtruder;
+import org.reprap.Extruder;
 import java.awt.Color;
 /**
  *
@@ -25,11 +27,9 @@ import java.awt.Color;
  */
 public class GenericExtruderTabPanel extends javax.swing.JPanel {
     
-    private int extruderID;
+    private int extruderID = 0;
     
-    private Thread pollThread = null;
-    private boolean pollThreadExiting = false;
-    private GenericExtruder extruder;
+    private Extruder extruder;
  
     /** Creates new form GenericExtruderTabPanel */
     public GenericExtruderTabPanel() {
@@ -37,31 +37,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
         UIManager.put("ProgressBar.background", Color.WHITE);
         UIManager.put("ProgressBar.foreground", Color.BLUE);
 
-        initComponents();
-        
-        // Next bit removed by Adrian.  This code currently creates
-        // instances of steppers and extruders for itself.  Then, when you
-        // hit Print, a whole new duplicate set are created, with these 
-        // ones staying live and still trying to talk to their hardware.
-        // Nasty!
-        
-//        pollThread = new Thread() {
-//        public void run() {
-//                Thread.currentThread().setName("GUI Poll");
-//                while(!pollThreadExiting) {
-//                        try {
-//                                Thread.sleep(500);
-//                                refreshTemperature();
-//                                
-//                        }
-//                        catch (InterruptedException ex) {
-//                                // This is normal when shutting down, so ignore
-//                        }
-//                }
-//            }
-//        };
-//        
-//        pollThread.start(); 
+        initComponents(); 
         
     }
     
@@ -102,9 +78,14 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
         extruderID = id;
         prefix = "Extruder" + id + "_";
                 
-        extruder = new GenericExtruder(org.reprap.Main.getCommunicator(),
-                    new SNAPAddress(Preferences.loadGlobalInt(prefix + "Address")), 
-                    Preferences.getGlobalPreferences(), extruderID);
+//        extruder = new GenericExtruder(org.reprap.Main.getCommunicator(),
+//                    new SNAPAddress(Preferences.loadGlobalInt(prefix + "Address")), 
+//                    Preferences.getGlobalPreferences(), extruderID);
+        
+
+        Printer p = org.reprap.Main.gui.getPrinter();
+        Extruder extruders[] = p.getExtruders();
+        extruder = extruders[extruderID];
         
         if(!extruder.isAvailable()) 
         {
@@ -516,7 +497,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
     private double colorFactor = 0;
     private Color c;
     
-    private void refreshTemperature() {
+    public void refreshTemperature() {
         currentTemp = (int)Math.round(extruder.getTemperature());
         currentTempLabel.setText("" + currentTemp);
         tempProgress.setMinimum(0);

@@ -35,14 +35,24 @@ public class Producer {
 	protected RepRapBuild bld;
 
 	
+//	/**
+//	 * @param preview
+//	 * @param builder
+//	 * @throws Exception
+//	 */
+//	private Producer(PreviewPanel preview, RepRapBuild builder) throws Exception 
+//	{
+//		this(MachineFactory.create(), preview, builder);
+//	}
+	
 	/**
 	 * @param preview
 	 * @param builder
 	 * @throws Exception
 	 */
-	public Producer(PreviewPanel preview, RepRapBuild builder) throws Exception {
+	public Producer(Printer pr, PreviewPanel preview, RepRapBuild builder) throws Exception {
 		
-		reprap = MachineFactory.create();
+		reprap = pr;
 		reprap.setPreviewer(preview);
 		if(preview != null)
 			preview.setMachine(reprap);
