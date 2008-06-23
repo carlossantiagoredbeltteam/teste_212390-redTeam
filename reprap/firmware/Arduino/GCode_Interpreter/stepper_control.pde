@@ -1,3 +1,4 @@
+// Yep, this is actually -*- c++ -*-
 
 //init our variables
 long max_delta;
@@ -233,7 +234,9 @@ void calculate_deltas()
 long calculate_feedrate_delay(float feedrate)
 {
 	//how long is our line length?
-	float distance = sqrt(delta_units.x*delta_units.x + delta_units.y*delta_units.y + delta_units.z*delta_units.z);
+	float distance = sqrt(delta_units.x*delta_units.x + 
+                              delta_units.y*delta_units.y + 
+                              delta_units.z*delta_units.z);
 	long master_steps = 0;
 	
 	//find the dominant axis.
@@ -254,6 +257,7 @@ long calculate_feedrate_delay(float feedrate)
 
 	//calculate delay between steps in microseconds.  this is sort of tricky, but not too bad.
 	//the formula has been condensed to save space.  here it is in english:
+        // (feedrate is in mm/minute)
 	// distance / feedrate * 60000000.0 = move duration in microseconds
 	// move duration / master_steps = time between steps for master axis.
 
