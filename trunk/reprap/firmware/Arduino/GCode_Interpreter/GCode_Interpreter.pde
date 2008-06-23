@@ -1,3 +1,5 @@
+// Yep, this is actually -*- c++ -*-
+
 // Arduino G-code Interpreter
 // v1.0 by Mike Ellery - initial software (mellery@gmail.com)
 // v1.1 by Zach Hoeken - cleaned up and did lots of tweaks (hoeken@gmail.com)
@@ -53,12 +55,12 @@ void loop()
 				serial_count++;
 			}
 			if (c == ')')
-			comment = false; // End of comment - start listening again
+			        comment = false; // End of comment - start listening again
 		}
 
 		bytes_received = true;
 	}
-	//mark no data if nothing heard for 10 milliseconds
+	//mark no data if nothing heard for 100 milliseconds
 	else
 	{
 		if ((millis() - idle_time) >= 100)
