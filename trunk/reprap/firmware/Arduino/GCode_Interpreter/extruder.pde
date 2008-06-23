@@ -1,41 +1,6 @@
-//
-// Start of temperature lookup table
-//
-// Thermistor lookup table for RepRap Temperature Sensor Boards (http://make.rrrf.org/ts)
-// Made with createTemperatureLookup.py (http://svn.reprap.org/trunk/reprap/firmware/Arduino/utilities/createTemperatureLookup.py)
-// ./createTemperatureLookup.py --r0=100000 --t0=25 --r1=0 --r2=4700 --beta=4066 --max-adc=1023
-// r0: 100000
-// t0: 25
-// r1: 0
-// r2: 4700
-// beta: 4066
-// max adc: 1023
-#define NUMTEMPS 20
-short temptable[NUMTEMPS][2] = {
-   {1, 841},
-   {54, 255},
-   {107, 209},
-   {160, 184},
-   {213, 166},
-   {266, 153},
-   {319, 142},
-   {372, 132},
-   {425, 124},
-   {478, 116},
-   {531, 108},
-   {584, 101},
-   {637, 93},
-   {690, 86},
-   {743, 78},
-   {796, 70},
-   {849, 61},
-   {902, 50},
-   {955, 34},
-   {1008, 3}
-};
-//
-// End of temperature lookup table
-//
+// Yep, this is actually -*- c++ -*-
+
+#include "ThermistorTable.h"
 
 #define EXTRUDER_FORWARD true
 #define EXTRUDER_REVERSE false
@@ -46,6 +11,7 @@ int extruder_target_celsius = 0;
 int extruder_max_celsius = 0;
 byte extruder_heater_low = 64;
 byte extruder_heater_high = 255;
+byte extruder_heater_current = 0;
 
 //this is for doing encoder based extruder control
 int extruder_rpm = 0;
@@ -126,16 +92,15 @@ int extruder_read_thermistor()
 				(temptable[i][1] - temptable[i-1][1]) /
 				(temptable[i][0] - temptable[i-1][0]);
 
-			if (celsius > 255)
-				celsius = 255; 
-
 			break;
 		}
 	}
 
-	// Overflow: We just clamp to 0 degrees celsius
-	if (i == NUMTEMPS)
-		celsius = 0;
+        // Overflow: Set to last value in the table
+        if (i == NUMTEMPS) celsius = temptable[i-1][1];
+        // Clamp to byte
+        if (celsius > 255) celsius = 255; 
+        else if (celsius < 0) celsius = 0; 
 
 	return celsius;
 }
@@ -175,15 +140,19 @@ void extruder_manage_temperature()
 {
 	//make sure we know what our temp is.
 	int current_celsius = extruder_get_temperature();
-
-	//put the heater into high mode if we're not at our target.
-	if (current_celsius < extruder_target_celsius)
-		analogWrite(EXTRUDER_HEATER_PIN, extruder_heater_high);
-	//put the heater on low if we're at our target.
-	else if (current_celsius < extruder_max_celsius)
-		analogWrite(EXTRUDER_HEATER_PIN, extruder_heater_low);
-	//turn the heater off if we're above our max.
-	else
-		analogWrite(EXTRUDER_HEATER_PIN, 0);
+        byte newheat = 0;
+  
+        //put the heater into high mode if we're not at our target.
+        if (current_celsius < extruder_target_celsius)
+                newheat = extruder_heater_high;
+        //put the heater on low if we're at our target.
+        else if (current_celsius < extruder_max_celsius)
+                newheat = extruder_heater_low;
+        
+        // Only update heat if it changed
+        if (extruder_heater_current != newheat) {
+                extruder_heater_current = newheat;
+                analogWrite(EXTRUDER_HEATER_PIN, extruder_heater_current);
+        }
 }
 
