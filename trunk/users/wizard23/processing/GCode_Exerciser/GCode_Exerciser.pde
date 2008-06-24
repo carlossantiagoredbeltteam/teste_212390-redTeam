@@ -106,8 +106,13 @@ void draw()
   font = loadFont("ArialMT-48.vlw"); 
   textFont(font, 16);
   String temp = "Temperature: " + temperature + "C";
+  temp += "\nTarget: " + targetTemp + "C";
+  temp += "\nDC Speed: " + motorSpeed + "C";
   text(temp, 10, 20);
 }
+
+int targetTemp = 20;
+int motorSpeed = 0;
 
 String getNextCommand()
 {
@@ -147,6 +152,51 @@ String getNextCommand()
       c = "G0 X0 Y0 Z-2 F50";
     }
     
+    if (key == 'u')
+    {
+      targetTemp = 185;
+      c = "M104 S" + targetTemp;
+    }
+    
+     if (key == 'p')
+    {
+      targetTemp += 5;
+      c = "M104 S" + targetTemp;
+    }
+    
+    if (key == 'l')
+    {
+      targetTemp -= 10;
+      c = "M104 S" + targetTemp;
+    }
+    
+
+    if (key == 'i')
+    {
+      motorSpeed += 5;
+      c = "M108 S" + motorSpeed;
+    }
+    
+    if (key == 'j')
+    {
+      motorSpeed -= 5;
+      c = "M108 S" + motorSpeed;
+    }
+    
+    
+    if (key == 'm')
+    {
+      c = "M101 (extruder on)";
+    }
+    
+    if (key == 'n' || key == ' ')
+    {
+      c = "M103 (extruder off)";
+    }
+    
+    
+    
+
     return c;
   }
   else
