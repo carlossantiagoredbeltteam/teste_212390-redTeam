@@ -736,7 +736,7 @@ public class Main {
 
                     org.reprap.Preferences.setGlobalString("Geometry", "nullcartesian");
 
-                    throw new Exception(err);
+                    //throw new Exception(err); // Removed by AB.  We told them already...
                 }
             catch (gnu.io.PortInUseException e)
                 {

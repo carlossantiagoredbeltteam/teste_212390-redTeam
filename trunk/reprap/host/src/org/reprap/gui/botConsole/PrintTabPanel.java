@@ -25,6 +25,8 @@ import org.reprap.Preferences;
  * @author  en0es
  */
 public class PrintTabPanel extends javax.swing.JPanel {
+	
+	private BotConsoleFrame parentBotConsoleFrame = null;
     
     /** Creates new form PrintPanel */
     public PrintTabPanel() {
@@ -46,6 +48,15 @@ public class PrintTabPanel extends javax.swing.JPanel {
             return;
         }
         
+    }
+    
+    /**
+     * So the BotConsoleFrame can let us know who it is
+     * @param b
+     */
+    public void setBotConsoleFrame(BotConsoleFrame b)
+    {
+    	parentBotConsoleFrame = b;
     }
     
     /** This method is called from within the constructor to
@@ -274,6 +285,7 @@ public class PrintTabPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
+    	parentBotConsoleFrame.suspendPolling();
         org.reprap.Main.gui.onProduceB();
     }//GEN-LAST:event_printButtonActionPerformed
 

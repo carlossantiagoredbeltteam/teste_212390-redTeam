@@ -21,6 +21,7 @@ import java.io.IOException;
 import javax.swing.JOptionPane;
 import org.reprap.Preferences;
 import org.reprap.Printer;
+import org.reprap.AxisMotor;
 import org.reprap.comms.Communicator;
 import org.reprap.comms.snap.SNAPAddress;
 import org.reprap.devices.GenericStepperMotor;
@@ -65,7 +66,7 @@ public class GenericStepperPositionPanel extends javax.swing.JPanel {
     private Communicator communicator;
     private int motorID;
     private String axis;
-    private GenericStepperMotor motor;
+    private AxisMotor motor;
 
     private int fastSpeed;
     private double motorStepsPerMM;

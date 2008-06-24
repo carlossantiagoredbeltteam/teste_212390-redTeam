@@ -28,6 +28,7 @@ public class BotConsoleFrame extends javax.swing.JFrame {
 	
     private Thread pollThread = null;
     private boolean pollThreadExiting = false;
+    private boolean carryOnPolling = true;
     
     /** Creates new form BotConsoleFrame */
     public BotConsoleFrame() {
@@ -41,6 +42,7 @@ public class BotConsoleFrame extends javax.swing.JFrame {
         }
 
         initComponents();
+        printTabPanel1.setBotConsoleFrame(this);
         xYZTabPanel1.setBedPanelDimensions();
         this.setTitle("Bot Console");
         
@@ -53,7 +55,8 @@ public class BotConsoleFrame extends javax.swing.JFrame {
                     while(!pollThreadExiting) {
                             try {
                                     Thread.sleep(5000);
-                                    updatePanels();   
+                                    if(carryOnPolling)
+                                    	updatePanels();   
                             }
                             catch (InterruptedException ex) {
                                     // This is normal when shutting down, so ignore
@@ -77,7 +80,20 @@ public class BotConsoleFrame extends javax.swing.JFrame {
     		extruderPanels[i].refreshTemperature();
     }
 
-
+    /**
+     * "Suspend" and "resume" the poll thread.
+     * We don't use the actual suspend call (depricated anyway) to
+     * prevent resource locking.
+     *
+     */
+    public void suspendPolling()
+    {
+    	carryOnPolling = false;
+    }
+    public void resumePolling()
+    {
+    	carryOnPolling = true;
+    }
  
     
     private void checkPrefs() throws Exception {

@@ -273,17 +273,17 @@ public interface Printer {
 	/**
 	 * @return the X stepper
 	 */
-	public GenericStepperMotor getXMotor();
+	public AxisMotor getXMotor();
 	
 	/**
 	 * @return the Y stepper
 	 */
-	public GenericStepperMotor getYMotor();
+	public AxisMotor getYMotor();
 	
 	/**
 	 * @return the Z stepper
 	 */	
-	public GenericStepperMotor getZMotor();
+	public AxisMotor getZMotor();
 	
 	/**
 	 * Just finished a layer
