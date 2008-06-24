@@ -35,6 +35,12 @@ public interface AxisMotor {
 	 *
 	 */
 	public void waitTillNotBusy() throws IOException;
+	
+	/**
+	 * Reload the preferences
+	 *
+	 */
+	public void refreshPreferences();
 
 	
 	/**

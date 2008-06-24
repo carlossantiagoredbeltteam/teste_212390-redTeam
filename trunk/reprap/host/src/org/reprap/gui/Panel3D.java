@@ -105,15 +105,15 @@ abstract public class Panel3D extends JPanel {
 
 	abstract protected BranchGroup createViewBranchGroup(
 			TransformGroup[] tgArray, ViewPlatform vp);
-
-
-	protected void initialise() throws Exception {
-		
+	
+	public void refreshPreferences()
+	{
 		// -----------------------
 		
 		// Set everything up from the properties file
 		// All this needs to go into Preferences.java
-
+		try
+		{
 		wv_location = Preferences.loadGlobalString("WorkingLocation");
 
 		// Translate and zoom scaling factors
@@ -154,10 +154,20 @@ abstract public class Panel3D extends JPanel {
 		unselectedColour = new Color3f((float)Preferences.loadGlobalDouble("UnselectedColourR(0..1)"), 
 				(float)Preferences.loadGlobalDouble("UnselectedColourG(0..1)"), 
 				(float)Preferences.loadGlobalDouble("UnselectedColourB(0..1)"));
+		} catch (Exception ex)
+		{
+			System.err.println("Refresh Panel3D preferences: " + ex.toString());
+		}
 				
 		// End of stuff from the preferences file
 		
 		// ----------------------
+	}
+
+
+	protected void initialise() throws Exception {
+		
+		refreshPreferences();
 		
 //		default_app = new Appearance();
 //		default_app.setMaterial(new Material(unselectedColour, black, unselectedColour, black, 0f));

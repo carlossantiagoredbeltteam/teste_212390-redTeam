@@ -181,6 +181,7 @@ public class Preferences {
 		
 		OutputStream output = new FileOutputStream(f);
 		mainPreferences.store(output, "Reprap properties http://reprap.org/");
+		org.reprap.Main.gui.getPrinter().refreshPreferences();
 	}
 		
 	public String loadString(String name) {

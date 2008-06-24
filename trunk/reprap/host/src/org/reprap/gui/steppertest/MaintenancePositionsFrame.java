@@ -82,8 +82,8 @@ public class MaintenancePositionsFrame  extends JFrame {
 		
 		//Establish motors
 		try { 
-			motorX = new GenericStepperMotor(communicator, new SNAPAddress(Preferences.loadGlobalInt("XAxisAddress")), Preferences.getGlobalPreferences(), 1);
-			motorY = new GenericStepperMotor(communicator, new SNAPAddress(Preferences.loadGlobalInt("YAxisAddress")), Preferences.getGlobalPreferences(), 2);
+			motorX = new GenericStepperMotor(communicator, new SNAPAddress(Preferences.loadGlobalInt("XAxisAddress")),  1);
+			motorY = new GenericStepperMotor(communicator, new SNAPAddress(Preferences.loadGlobalInt("YAxisAddress")),  2);
 		}
 		catch (Exception e){
 			JOptionPane.showMessageDialog(null, "Couldn't initialise motors" + e);

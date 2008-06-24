@@ -20,6 +20,11 @@ import javax.media.j3d.Material;
 public class NullExtruder implements Extruder{
 	
 	/**
+	 * Who am i?
+	 */
+	int myextruderId;
+	
+	/**
 	 * Offset of 0 degrees celcius from absolute zero
 	 */
 	private static final double absZero = 273.15;
@@ -332,64 +337,75 @@ public class NullExtruder implements Extruder{
 	 * @param prefs
 	 * @param extruderId
 	 */
-	public NullExtruder(Preferences prefs, int extruderId) {
+	public NullExtruder(int extruderId) {
 
-		String prefName = "Extruder" + extruderId + "_";
-		
-		beta = prefs.loadDouble(prefName + "Beta(K)");
-		rz = prefs.loadDouble(prefName + "Rz(ohms)");
-		cap = prefs.loadDouble(prefName + "Capacitor(F)");
-		hm = prefs.loadDouble(prefName + "hm(C/pwr)");
-		hb = prefs.loadDouble(prefName + "hb(C)");
-		maxExtruderSpeed = prefs.loadInt(prefName + "MaxSpeed(0..255)");
-		extrusionSpeed = prefs.loadInt(prefName + "ExtrusionSpeed(0..255)");
-		extrusionTemp = prefs.loadDouble(prefName + "ExtrusionTemp(C)");
-		extrusionSize = prefs.loadDouble(prefName + "ExtrusionSize(mm)");
-		extrusionHeight = prefs.loadDouble(prefName + "ExtrusionHeight(mm)");
-		extrusionInfillWidth = prefs.loadDouble(prefName + "ExtrusionInfillWidth(mm)");
-		lowerFineThickness = prefs.loadDouble(prefName + "LowerFineThickness(mm)");
-		upperFineThickness = prefs.loadDouble(prefName + "UpperFineThickness(mm)");
-		extrusionBroadWidth = prefs.loadDouble(prefName + "ExtrusionBroadWidth(mm)");	
-		coolingPeriod = prefs.loadInt(prefName + "CoolingPeriod(s)");
-		xySpeed = prefs.loadInt(prefName + "XYSpeed(0..255)");
-		t0 = prefs.loadInt(prefName + "t0(0..255)");
-		iSpeed = prefs.loadDouble(prefName + "InfillSpeed(0..1)");
-		oSpeed = prefs.loadDouble(prefName + "OutlineSpeed(0..1)");
-		asLength = prefs.loadDouble(prefName + "AngleSpeedLength(mm)");
-		asFactor = prefs.loadDouble(prefName + "AngleSpeedFactor(0..1)");
-		materialType = prefs.loadString(prefName + "MaterialType(name)");
-		offsetX = prefs.loadDouble(prefName + "OffsetX(mm)");
-		offsetY = prefs.loadDouble(prefName + "OffsetY(mm)");
-		offsetZ = prefs.loadDouble(prefName + "OffsetZ(mm)");
-		nozzleWipeEnabled = prefs.loadBool(prefName + "NozzleWipeEnabled");
-		nozzleWipeDatumX = prefs.loadDouble(prefName + "NozzleWipeDatumX(mm)");
-		nozzleWipeDatumY = prefs.loadDouble(prefName + "NozzleWipeDatumY(mm)");
-		nozzleWipeStrokeX = prefs.loadDouble(prefName + "NozzleWipeStrokeX(mm)");
-		nozzleWipeStrokeY = prefs.loadDouble(prefName + "NozzleWipeStrokeY(mm)");
-		nozzleWipeFreq = prefs.loadInt(prefName + "NozzleWipeFreq");
-		nozzleClearTime = prefs.loadDouble(prefName + "NozzleClearTime(s)");
-		nozzleWaitTime = prefs.loadDouble(prefName + "NozzleWaitTime(s)");
-		randSt = prefs.loadBool(prefName + "RandomStart");
-		incrementedSt = prefs.loadBool(prefName + "IncrementedStart");
-		shortLength = prefs.loadDouble(prefName + "ShortLength(mm)");
-		shortSpeed = prefs.loadDouble(prefName + "ShortSpeed(0..1)");
-		infillOverlap = prefs.loadDouble(prefName + "InfillOverlap(mm)");
-		extrusionDelayForLayer = prefs.loadDouble(prefName + "ExtrusionDelayForLayer(ms)");
-		extrusionDelayForPolygon = prefs.loadDouble(prefName + "ExtrusionDelayForPolygon(ms)");
-		extrusionOverRun = prefs.loadDouble(prefName + "ExtrusionOverRun(mm)");
-		valveDelayForLayer = prefs.loadDouble(prefName + "ValveDelayForLayer(ms)");
-		valveDelayForPolygon = prefs.loadDouble(prefName + "ValveDelayForPolygon(ms)");
-		valveOverRun = prefs.loadDouble(prefName + "ValveOverRun(mm)");		
-		minLiftedZ = prefs.loadDouble(prefName + "MinimumZClearance(mm)");
-		// NB - store as 2ms ticks to allow longer pulses
-		valvePulseTime = 0.5*prefs.loadDouble(prefName + "ValvePulseTime(ms)");
-		shells = prefs.loadInt(prefName + "NumberOfShells(0..N)");
-		pauseBetweenSegments = prefs.loadBool(prefName + "PauseBetweenSegments");
-		
-		materialColour = getAppearanceFromNumber(extruderId);		
+		myextruderId = extruderId;
+		refreshPreferences();
+		materialColour = getAppearanceFromNumber(myextruderId);		
 			
 		isCommsAvailable = true;
 	
+	}
+	
+	public void refreshPreferences()
+	{
+		String prefName = "Extruder" + myextruderId + "_";
+		
+		try
+		{
+			beta = Preferences.loadGlobalDouble(prefName + "Beta(K)");
+			rz = Preferences.loadGlobalDouble(prefName + "Rz(ohms)");
+			cap = Preferences.loadGlobalDouble(prefName + "Capacitor(F)");
+			hm = Preferences.loadGlobalDouble(prefName + "hm(C/pwr)");
+			hb = Preferences.loadGlobalDouble(prefName + "hb(C)");
+			maxExtruderSpeed = Preferences.loadGlobalInt(prefName + "MaxSpeed(0..255)");
+			extrusionSpeed = Preferences.loadGlobalInt(prefName + "ExtrusionSpeed(0..255)");
+			extrusionTemp = Preferences.loadGlobalDouble(prefName + "ExtrusionTemp(C)");
+			extrusionSize = Preferences.loadGlobalDouble(prefName + "ExtrusionSize(mm)");
+			extrusionHeight = Preferences.loadGlobalDouble(prefName + "ExtrusionHeight(mm)");
+			extrusionInfillWidth = Preferences.loadGlobalDouble(prefName + "ExtrusionInfillWidth(mm)");
+			lowerFineThickness = Preferences.loadGlobalDouble(prefName + "LowerFineThickness(mm)");
+			upperFineThickness = Preferences.loadGlobalDouble(prefName + "UpperFineThickness(mm)");
+			extrusionBroadWidth = Preferences.loadGlobalDouble(prefName + "ExtrusionBroadWidth(mm)");	
+			coolingPeriod = Preferences.loadGlobalInt(prefName + "CoolingPeriod(s)");
+			xySpeed = Preferences.loadGlobalInt(prefName + "XYSpeed(0..255)");
+			t0 = Preferences.loadGlobalInt(prefName + "t0(0..255)");
+			iSpeed = Preferences.loadGlobalDouble(prefName + "InfillSpeed(0..1)");
+			oSpeed = Preferences.loadGlobalDouble(prefName + "OutlineSpeed(0..1)");
+			asLength = Preferences.loadGlobalDouble(prefName + "AngleSpeedLength(mm)");
+			asFactor = Preferences.loadGlobalDouble(prefName + "AngleSpeedFactor(0..1)");
+			materialType = Preferences.loadGlobalString(prefName + "MaterialType(name)");
+			offsetX = Preferences.loadGlobalDouble(prefName + "OffsetX(mm)");
+			offsetY = Preferences.loadGlobalDouble(prefName + "OffsetY(mm)");
+			offsetZ = Preferences.loadGlobalDouble(prefName + "OffsetZ(mm)");
+			nozzleWipeEnabled = Preferences.loadGlobalBool(prefName + "NozzleWipeEnabled");
+			nozzleWipeDatumX = Preferences.loadGlobalDouble(prefName + "NozzleWipeDatumX(mm)");
+			nozzleWipeDatumY = Preferences.loadGlobalDouble(prefName + "NozzleWipeDatumY(mm)");
+			nozzleWipeStrokeX = Preferences.loadGlobalDouble(prefName + "NozzleWipeStrokeX(mm)");
+			nozzleWipeStrokeY = Preferences.loadGlobalDouble(prefName + "NozzleWipeStrokeY(mm)");
+			nozzleWipeFreq = Preferences.loadGlobalInt(prefName + "NozzleWipeFreq");
+			nozzleClearTime = Preferences.loadGlobalDouble(prefName + "NozzleClearTime(s)");
+			nozzleWaitTime = Preferences.loadGlobalDouble(prefName + "NozzleWaitTime(s)");
+			randSt = Preferences.loadGlobalBool(prefName + "RandomStart");
+			incrementedSt = Preferences.loadGlobalBool(prefName + "IncrementedStart");
+			shortLength = Preferences.loadGlobalDouble(prefName + "ShortLength(mm)");
+			shortSpeed = Preferences.loadGlobalDouble(prefName + "ShortSpeed(0..1)");
+			infillOverlap = Preferences.loadGlobalDouble(prefName + "InfillOverlap(mm)");
+			extrusionDelayForLayer = Preferences.loadGlobalDouble(prefName + "ExtrusionDelayForLayer(ms)");
+			extrusionDelayForPolygon = Preferences.loadGlobalDouble(prefName + "ExtrusionDelayForPolygon(ms)");
+			extrusionOverRun = Preferences.loadGlobalDouble(prefName + "ExtrusionOverRun(mm)");
+			valveDelayForLayer = Preferences.loadGlobalDouble(prefName + "ValveDelayForLayer(ms)");
+			valveDelayForPolygon = Preferences.loadGlobalDouble(prefName + "ValveDelayForPolygon(ms)");
+			valveOverRun = Preferences.loadGlobalDouble(prefName + "ValveOverRun(mm)");		
+			minLiftedZ = Preferences.loadGlobalDouble(prefName + "MinimumZClearance(mm)");
+			// NB - store as 2ms ticks to allow longer pulses
+			valvePulseTime = 0.5*Preferences.loadGlobalDouble(prefName + "ValvePulseTime(ms)");
+			shells = Preferences.loadGlobalInt(prefName + "NumberOfShells(0..N)");
+			pauseBetweenSegments = Preferences.loadGlobalBool(prefName + "PauseBetweenSegments");
+		} catch (Exception ex)
+		{
+			System.err.println("Refresh extruder preferences: " + ex.toString());
+		}
 	}
 	
 	public void setPrinter(Printer p)

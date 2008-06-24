@@ -88,17 +88,25 @@ public class NullCartesianMachine implements CartesianPrinter {
 	/**
 	 * @param config
 	 */
-	public NullCartesianMachine(Preferences config) {
+	public NullCartesianMachine() {
 		statusWindow = new StatusMessage(new JFrame());
 		
 		startTime = System.currentTimeMillis();
 		
-		extruderCount = config.loadInt("NumberOfExtruders");
+		refreshPreferences();
+		
+		try
+		{
+			extruderCount = Preferences.loadGlobalInt("NumberOfExtruders");
+		} catch (Exception ex)
+		{
+			System.err.println(ex.toString());
+		}
 		extruders = new NullExtruder[extruderCount];
 		for(int i = 0; i < extruderCount; i++)
 		{
 			String prefix = "Extruder" + i + "_";
-			extruders[i] = new NullExtruder(config, i);
+			extruders[i] = new NullExtruder(i);
 		}
 		extruder = 1;
 
@@ -109,6 +117,11 @@ public class NullCartesianMachine implements CartesianPrinter {
 		yMotor = new NullStepperMotor(2);
 		zMotor = new NullStepperMotor(3);
 
+	}
+	
+	public void refreshPreferences()
+	{
+		
 	}
 	
 	public void waitTillNotBusy()

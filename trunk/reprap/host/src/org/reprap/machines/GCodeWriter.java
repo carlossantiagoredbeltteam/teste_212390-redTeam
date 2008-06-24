@@ -94,40 +94,57 @@ public class GCodeWriter implements CartesianPrinter {
 	/**
 	 * @param config
 	 */
-	public GCodeWriter(Preferences config) {
+	public GCodeWriter() 
+	{
 		startTime = System.currentTimeMillis();
 		
-		extruderCount = config.loadInt("NumberOfExtruders");
-		extruders = new NullExtruder[extruderCount];
-		for(int i = 0; i < extruderCount; i++)
-		{
-			String prefix = "Extruder" + i + "_";
-			extruders[i] = new NullExtruder(config, i);
-		}
-		extruder = 1;
-
-		currentX = 0;
-		currentY = 0;
-		currentZ = 0;
+		refreshPreferences();
 		
-		// I open the file here because I have config here
-		// and it seems like the host recreates the writer
-		// for each print job
-		String filename = config.loadString("Port(name)");
-		if (filename.equals("stdout")) {
-			file = System.out;
-		} else {
-			try {
-				OutputStream out = new FileOutputStream(filename);
-				file = new PrintStream(out);
-			} catch (FileNotFoundException e) {
-				System.err.println("Problem with filename, printing to stdout");
-				file = System.out;
+		try
+		{
+			extruderCount = Preferences.loadGlobalInt("NumberOfExtruders"); // Can't change this mid stream
+			extruders = new NullExtruder[extruderCount];
+			for(int i = 0; i < extruderCount; i++)
+			{
+				String prefix = "Extruder" + i + "_";
+				extruders[i] = new NullExtruder(i);
 			}
+			extruder = 1;
+
+			currentX = 0;
+			currentY = 0;
+			currentZ = 0;
+
+			// I open the file here because I have config here
+			// and it seems like the host recreates the writer
+			// for each print job
+			String filename = Preferences.loadGlobalString("Port(name)");  // Can't change this mid stream
+			if (filename.equals("stdout")) {
+				file = System.out;
+			} else {
+				try {
+					OutputStream out = new FileOutputStream(filename);
+					file = new PrintStream(out);
+				} catch (FileNotFoundException e) {
+					System.err.println("Problem with filename, printing to stdout");
+					file = System.out;
+				}
+			}
+			requestedSpeed = 0;
+			currentSpeed = 0;
+		} catch (Exception ex)
+		{
+			System.err.println("Refresh GCodeWriter preferences: " + ex.toString());
 		}
-		requestedSpeed = 0;
-		currentSpeed = 0;
-		temperature = config.loadInt("Extruder0_ExtrusionTemp(C)");
+	}
+	
+	public void refreshPreferences()
+	{
+		try
+		{
+			temperature = Preferences.loadGlobalInt("Extruder0_ExtrusionTemp(C)");
+		} catch (Exception ex)
+		{}
 	}
 	
 	public void waitTillNotBusy()

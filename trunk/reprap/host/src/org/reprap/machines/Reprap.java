@@ -159,38 +159,42 @@ public class Reprap implements CartesianPrinter {
 	 */
 	private boolean idleZ;
 	
+	int axes;
+	
 	
 	/**
 	 * @param prefs
 	 * @throws Exception
 	 */
-	public Reprap(Preferences prefs) throws Exception {
+	public Reprap() throws Exception {
 		
 		statusWindow = new StatusMessage(new JFrame());
 		
 		startTime = System.currentTimeMillis();
-		
-		int axes = prefs.loadInt("AxisCount");
+				
+		axes = Preferences.loadGlobalInt("AxisCount");
 		if (axes != 3)
 			throw new Exception("A Reprap printer must contain 3 axes");
 		
-		String commPortName = prefs.loadString("Port(name)");
+		String commPortName = Preferences.loadGlobalString("Port(name)");
 		
 //		SNAPAddress myAddress = new SNAPAddress(localNodeNumber); 
 //		communicator = new SNAPCommunicator(commPortName, myAddress);
 		
+
 		motorX = new GenericStepperMotor(communicator,
-				new SNAPAddress(prefs.loadInt("XAxisAddress")), prefs, 1);
+				new SNAPAddress(Preferences.loadGlobalInt("XAxisAddress")), 1);
 		motorY = new GenericStepperMotor(communicator,
-				new SNAPAddress(prefs.loadInt("YAxisAddress")), prefs, 2);
+				new SNAPAddress(Preferences.loadGlobalInt("YAxisAddress")), 2);
 		motorZ = new GenericStepperMotor(communicator,
-				new SNAPAddress(prefs.loadInt("ZAxisAddress")), prefs, 3);
+				new SNAPAddress(Preferences.loadGlobalInt("ZAxisAddress")), 3);
+
 		
 		motorX.setPrinter(this);
 		motorY.setPrinter(this);
 		motorZ.setPrinter(this);
 		
-		extruderCount = prefs.loadInt("NumberOfExtruders");
+		extruderCount = Preferences.loadGlobalInt("NumberOfExtruders");
 		extruders = new Extruder[extruderCount];
 		if (extruderCount < 1)
 			throw new Exception("A Reprap printer must contain at least one extruder");
@@ -199,24 +203,15 @@ public class Reprap implements CartesianPrinter {
 		{
 			String prefix = "Extruder" + i + "_";
 			extruders[i] = new GenericExtruder(communicator,
-				new SNAPAddress(prefs.loadInt(prefix + "Address")), prefs, i);
+				new SNAPAddress(Preferences.loadGlobalInt(prefix + "Address")), i);
 			extruders[i].setPrinter(this);
 		}
 		
+		refreshPreferences();
+		
 		extruder=0;
 		
-		xYReZeroInterval =  prefs.loadDouble("XYReZeroInterval(mm)");
-		
 		layerPrinter = new LinePrinter(motorX, motorY, extruders[extruder]);
-
-		// TODO This should be from calibration
-		scaleX = prefs.loadDouble("XAxisScale(steps/mm)");
-		scaleY = prefs.loadDouble("YAxisScale(steps/mm)");
-		scaleZ = prefs.loadDouble("ZAxisScale(steps/mm)");
-	
-		idleZ = prefs.loadBool("IdleZAxis");
-		
-		fastSpeedXY = prefs.loadInt("FastSpeed(0..255)");
 		
 		try {
 			currentX = convertToPositionZ(motorX.getPosition());
@@ -231,6 +226,35 @@ public class Reprap implements CartesianPrinter {
 			excludeZ = true;
 		}
 
+	}
+	
+	public void refreshPreferences()
+	{
+		try
+		{
+			xYReZeroInterval =  Preferences.loadGlobalDouble("XYReZeroInterval(mm)");
+
+			// TODO This should be from calibration
+			scaleX = Preferences.loadGlobalDouble("XAxisScale(steps/mm)");
+			scaleY = Preferences.loadGlobalDouble("YAxisScale(steps/mm)");
+			scaleZ = Preferences.loadGlobalDouble("ZAxisScale(steps/mm)");
+
+			idleZ = Preferences.loadGlobalBool("IdleZAxis");
+
+			fastSpeedXY = Preferences.loadGlobalInt("FastSpeed(0..255)");
+		} catch (Exception ex)
+		{
+			System.err.println("Refresh Reprap preferences: " + ex.toString());
+		}
+		
+		motorX.refreshPreferences();
+		motorY.refreshPreferences();
+		motorZ.refreshPreferences();
+		for(int i = 0; i < extruderCount; i++)
+		{
+			extruders[i].refreshPreferences();
+		}
+		Debug.refreshPreferences();
 	}
 	
 	/**

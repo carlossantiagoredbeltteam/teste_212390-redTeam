@@ -11,6 +11,12 @@ public interface Extruder{
 	 * Dispose of the extruder object 
 	 */
 	public void dispose(); 
+	
+	/**
+	 * Reload the preferences from the preferences file
+	 *
+	 */
+	public void refreshPreferences();
 
 	/**
 	 * Start the extruder motor at a given speed.  This ranges from 0

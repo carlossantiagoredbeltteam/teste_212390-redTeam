@@ -182,7 +182,7 @@ public class WorkingVolumeFrame  extends JFrame {
 		
 		final double stepsPerMM = Preferences.loadGlobalDouble(axis + "AxisScale(steps/mm)");
 		
-		motor = new GenericStepperMotor(communicator, new SNAPAddress(address), Preferences.getGlobalPreferences(), motorId);
+		motor = new GenericStepperMotor(communicator, new SNAPAddress(address),  motorId);
 		
 		JButton home = new JButton("Home");
 		home.addActionListener(new ActionListener() {

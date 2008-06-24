@@ -62,7 +62,7 @@ public class AxisRepeatabilityTest {
 		try
 		{			
 			motor = new GenericStepperMotor(communicator, 
-				new SNAPAddress(address), Preferences.getGlobalPreferences(), motorId);
+				new SNAPAddress(address),  motorId);
 		}catch(Exception ex)
 		{
 			System.err.println("Argh 3!");

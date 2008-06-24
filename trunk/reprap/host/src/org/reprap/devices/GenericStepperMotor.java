@@ -158,7 +158,7 @@ public class GenericStepperMotor extends Device implements AxisMotor {
 	 * @param prefs
 	 * @param motorId
 	 */
-	public GenericStepperMotor(Communicator communicator, Address address, Preferences prefs, int motorId) {
+	public GenericStepperMotor(Communicator communicator, Address address, int motorId) {
 		
 		//Address address, int maxTorque
 		super(communicator, address);
@@ -179,7 +179,8 @@ public class GenericStepperMotor extends Device implements AxisMotor {
 			System.err.println("GenericStepperMotor - dud axis id: " + motorId);
 				
 		}
-		this.maxTorque = prefs.loadInt(axis + "Axis" + "Torque(%)");
+		
+		refreshPreferences();
 		
 		if(!isAvailable())
 			return;
@@ -193,6 +194,18 @@ public class GenericStepperMotor extends Device implements AxisMotor {
 		Debug.d("Stepper " + axis + " firmware is version: " + 
 				((firmwareVersion >> 8) & 0xff) + "." + (firmwareVersion & 0xff));
 
+	}
+	
+	public void refreshPreferences()
+	{
+		try
+		{
+			this.maxTorque = Preferences.loadGlobalInt(axis + "AxisTorque(%)");
+		} catch (Exception ex)
+		{
+			System.err.println("Refresh motor preferences: " + ex.toString());
+		}
+		
 	}
 
 	/**

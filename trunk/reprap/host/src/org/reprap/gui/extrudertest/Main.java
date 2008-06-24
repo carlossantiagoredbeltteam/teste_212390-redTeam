@@ -95,7 +95,7 @@ public class Main extends javax.swing.JDialog {
 			String prefix = "Extruder" + i + "_";
 			extruders[i] = new GenericExtruder(communicator,
 				new SNAPAddress(Preferences.loadGlobalInt(prefix + "Address")), 
-				Preferences.getGlobalPreferences(), i);
+				 i);
 		}
 		
 		extruder = -1;
