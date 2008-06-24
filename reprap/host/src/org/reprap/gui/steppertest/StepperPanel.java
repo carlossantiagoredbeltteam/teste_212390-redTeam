@@ -98,7 +98,7 @@ public class StepperPanel extends JPanel implements ChangeListener {
 		
 		updateTimer = new Timer();
 		
-		motor = new GenericStepperMotor(communicator, new SNAPAddress(address), Preferences.getGlobalPreferences(), motorId);
+		motor = new GenericStepperMotor(communicator, new SNAPAddress(address), motorId);
 		
 		this.externalSpeedSlider = externalSpeedSlider;
 		

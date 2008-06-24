@@ -24,15 +24,13 @@ public class MachineFactory {
 	 */
 	static public Printer create() throws Exception {
 		
-		
-		Preferences prefs = Preferences.getGlobalPreferences();
 
-		String geometry = prefs.loadString("Geometry");
+		String geometry = Preferences.loadGlobalString("Geometry");
 		
 		if (geometry.compareToIgnoreCase("cartesian") == 0)
-		  	return new Reprap(prefs);
+		  	return new Reprap();
 		else if (geometry.compareToIgnoreCase("nullcartesian") == 0)
-		    return new NullCartesianMachine(prefs);		
+		    return new NullCartesianMachine();		
 		else
 			throw new ReprapException("Invalid geometry in properties file");
 		

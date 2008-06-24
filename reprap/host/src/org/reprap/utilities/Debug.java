@@ -20,11 +20,10 @@ public class Debug {
 	
 	private Debug() {}
 	
-	static private void initialiseIfNeedBe()
+	public static void refreshPreferences()
 	{
-		if(db != null) return;
-		db = new Debug();
-		
+		if(db == null)
+			db = new Debug();
 		try {
 			// Try to load debug setting from properties file
 			db.debug = Preferences.loadGlobalBool("Debug");
@@ -39,7 +38,13 @@ public class Debug {
 		} catch (Exception ex) {
 			// Fall back to non-debug mode if no setting is available
 			db.commsDebug = false;
-		}				
+		}			
+	}
+	
+	static private void initialiseIfNeedBe()
+	{
+		if(db != null) return;
+		refreshPreferences();	
 	}
 	
 	static public void d(String s)

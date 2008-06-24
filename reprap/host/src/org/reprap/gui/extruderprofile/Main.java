@@ -76,8 +76,7 @@ public class Main extends javax.swing.JDialog {
 //				myAddress);
 
 		extruder = new GenericExtruder(communicator,
-				new SNAPAddress(Preferences.loadGlobalString("Extruder0_Address")),
-				Preferences.getGlobalPreferences(), 0);
+				new SNAPAddress(Preferences.loadGlobalString("Extruder0_Address")), 0);
 		
 		initGUI();
 		

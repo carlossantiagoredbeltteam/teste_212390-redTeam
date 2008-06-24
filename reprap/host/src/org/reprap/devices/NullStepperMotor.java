@@ -62,13 +62,15 @@ public class NullStepperMotor implements AxisMotor {
 			break;
 		default:
 			axis = "X";
-			System.err.println("GenericStepperMotor - dud axis id: " + motorId);
-				
+			System.err.println("GenericStepperMotor - dud axis id: " + motorId);	
 		}
-
+		refreshPreferences();
 	}
 
-
+	public void refreshPreferences()
+	{
+		
+	}
 	
 	/**
 	 * Dispose of this object

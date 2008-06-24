@@ -9,6 +9,12 @@ import org.reprap.devices.GenericExtruder;
 import org.reprap.devices.GenericStepperMotor;
 
 public interface Printer {
+	
+	/**
+	 * (Re)load the preferences
+	 *
+	 */
+	public void refreshPreferences();
 
 	/**
 	 * Method to calibrate the printer.

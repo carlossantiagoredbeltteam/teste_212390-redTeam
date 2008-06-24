@@ -21,7 +21,7 @@ public class EstimationProducer extends Producer {
 	public EstimationProducer(RepRapBuild builder) throws Exception {
 		super(null, null, builder);
 		
-		reprap = new NullCartesianMachine(Preferences.getGlobalPreferences()); 
+		reprap = new NullCartesianMachine(); 
 
 	}
 
