@@ -173,13 +173,13 @@ String getNextCommand()
 
     if (key == 'i')
     {
-      motorSpeed += 5;
+      motorSpeed += 1;
       c = "M108 S" + motorSpeed;
     }
     
     if (key == 'j')
     {
-      motorSpeed -= 5;
+      motorSpeed -= 1;
       c = "M108 S" + motorSpeed;
     }
     
