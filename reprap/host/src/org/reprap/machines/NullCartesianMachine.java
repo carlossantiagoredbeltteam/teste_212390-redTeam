@@ -9,6 +9,8 @@ import org.reprap.Attributes;
 import org.reprap.CartesianPrinter;
 import org.reprap.Preferences;
 import org.reprap.Extruder;
+import org.reprap.AxisMotor;
+import org.reprap.devices.NullStepperMotor;
 import org.reprap.ReprapException;
 import org.reprap.gui.*;
 import org.reprap.devices.NullExtruder;
@@ -80,6 +82,8 @@ public class NullCartesianMachine implements CartesianPrinter {
 	 * 
 	 */
 	private int extruderCount;
+	
+	private AxisMotor xMotor, yMotor, zMotor;
 
 	/**
 	 * @param config
@@ -101,7 +105,9 @@ public class NullCartesianMachine implements CartesianPrinter {
 		currentX = 0;
 		currentY = 0;
 		currentZ = 0;
-		
+		xMotor = new NullStepperMotor(1);
+		yMotor = new NullStepperMotor(2);
+		zMotor = new NullStepperMotor(3);
 
 	}
 	
@@ -494,25 +500,25 @@ public class NullCartesianMachine implements CartesianPrinter {
 	/**
 	 * @return the X stepper
 	 */
-	public GenericStepperMotor getXMotor()
+	public AxisMotor getXMotor()
 	{
-		return null;
+		return xMotor;
 	}
 	
 	/**
 	 * @return the Y stepper
 	 */
-	public GenericStepperMotor getYMotor()
+	public AxisMotor getYMotor()
 	{
-		return null;
+		return yMotor;
 	}
 	
 	/**
 	 * @return the Z stepper
 	 */	
-	public GenericStepperMotor getZMotor()
+	public AxisMotor getZMotor()
 	{
-		return null;
+		return zMotor;
 	}
 	
 //	/**

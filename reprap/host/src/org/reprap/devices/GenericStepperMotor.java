@@ -5,6 +5,7 @@ import org.reprap.utilities.Debug;
 import org.reprap.Device;
 import org.reprap.Printer;
 import org.reprap.Preferences;
+import org.reprap.AxisMotor;
 import org.reprap.ReprapException;
 import org.reprap.comms.Address;
 import org.reprap.comms.Communicator;
@@ -21,7 +22,7 @@ import org.reprap.comms.messages.OutgoingIntMessage;
 /**
  *
  */
-public class GenericStepperMotor extends Device {
+public class GenericStepperMotor extends Device implements AxisMotor {
 	
 	/**
 	 * API for firmware
@@ -532,11 +533,11 @@ public class GenericStepperMotor extends Device {
 	 * @throws IOException
 	 * @throws InvalidPayloadException
 	 */
-	public Range getRange(int speed) throws IOException, InvalidPayloadException {
+	public AxisMotor.Range getRange(int speed) throws IOException, InvalidPayloadException {
 		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
-			return new Range();
+			return new AxisMotor.Range();
 		}
 		initialiseIfNeeded();
 		waitTillNotBusy();
@@ -1009,11 +1010,11 @@ public class GenericStepperMotor extends Device {
 		 * @return
 		 * @throws InvalidPayloadException
 		 */
-		public Range getRange() throws InvalidPayloadException {
+		public AxisMotor.Range getRange() throws InvalidPayloadException {
 		    byte [] reply = getPayload();
 		    if (reply == null || reply.length != 3)
 		    	throw new InvalidPayloadException("Unexpected payload getting range");
-		    Range r = new Range();
+		    Range r = new AxisMotor.Range();
 		    r.minimum = 0;
 		    r.maximum = IncomingIntMessage.ConvertBytesToInt(reply[1], reply[2]);
 		    return r;
@@ -1044,20 +1045,6 @@ public class GenericStepperMotor extends Device {
 		}
 	}
 	
-	/**
-	 *
-	 */
-	public class Range {
-		
-		/**
-		 * 
-		 */
-		public int minimum;
-		
-		/**
-		 * 
-		 */
-		public int maximum;
-	}
+
 
 }

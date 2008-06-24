@@ -28,7 +28,7 @@ public class SNAPCommunicator implements Communicator {
 	 * Timeout in milliseconds before a timeout exception is thrown
 	 * when waiting for an ACK from a device
 	 */
-	private final static int ackTimeout = 300;
+	private final static int ackTimeout = 800; // Seems long, but the Arduino likes it...
 	
 	/**
 	 * 
