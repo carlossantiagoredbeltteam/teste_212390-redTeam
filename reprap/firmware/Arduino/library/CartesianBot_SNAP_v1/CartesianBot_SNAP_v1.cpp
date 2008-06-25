@@ -19,6 +19,8 @@ byte x_mode = MODE_PAUSE;
 byte y_mode = MODE_PAUSE;
 byte z_mode = MODE_PAUSE;
 
+byte current_control = 0;
+
 SIGNAL(SIG_OUTPUT_COMPARE1A)
 {
 	if (bot_mode == MODE_DDA)
@@ -376,10 +378,11 @@ void process_cartesian_bot_snap_commands_v1()
 		break;
 		
 		case CMD_QUEUEPOINT:
-			p.x = snap.getInt(2);
-			p.y = snap.getInt(4);
+			p.x = snap.getInt(3);
+			p.y = snap.getInt(5);
 			p.z = bot.z.current;
 			p.speed = snap.getByte(1);
+			p.control = snap.getByte(2);
 			bot.queuePoint(p);
 			if(bot_mode != MODE_QUEUE)
 				getNextFromQueue();
@@ -702,8 +705,14 @@ void getNextFromQueue()
 {
 	Point p;
 	
+	if(current_control & STOP_EXTRUDE)
+		extruder.setSpeed(0);
+	if(current_control & CLOSE_VALVE)
+		extruder.setValve(0, 250);    //FIXME: this gives 500 ms; should be a parameter
+		
 	if(bot.isQueueEmpty())
 	{
+	    current_control = 0;
 		bot_mode = MODE_PAUSE;
 		return;
 	}
@@ -715,6 +724,7 @@ void getNextFromQueue()
 	bot.z.setTarget(p.z);	
 	
 	bot.setTimer(picTimerSimulate(p.speed));
+	current_control = p.control;
 			
 	//init our DDA stuff!
 	bot.calculateDDA();
