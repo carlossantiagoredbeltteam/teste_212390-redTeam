@@ -53,7 +53,7 @@ public interface Printer {
 	 * @throws ReprapException
 	 * @throws IOException 
 	 */
-	public void printTo(double x, double y, double z, boolean lastOne) throws ReprapException, IOException;
+	public void printTo(double x, double y, double z, boolean stopExtruder, boolean closeValve) throws ReprapException, IOException;
 	
 	/**
 	 * Fire up the extruder for a lead-in

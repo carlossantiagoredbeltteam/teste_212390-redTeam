@@ -96,7 +96,7 @@ public class ShapePanel extends JPanel {
 					//motorX.monitor(true);
 					//motorY.monitor(true);
 					lp.printLine(x0val, y0val, x1val, y1val, speed.getValue(), 
-							speed.getValue(), true);
+							speed.getValue(), true, true);
 				}
 				catch (Exception ex) {
 					ex.printStackTrace();

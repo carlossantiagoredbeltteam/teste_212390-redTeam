@@ -142,7 +142,7 @@ public class Producer {
 			reprap.moveTo(1, 1, 0, false, false);
 			
 			// Workaround to get the thing to start heating up
-			reprap.printTo(1, 1, 0, false);
+			reprap.printTo(1, 1, 0, false, false);
 			
 			
 			if(reprap.getExtruder().getNozzleClearTime() <= 0)
@@ -154,11 +154,11 @@ public class Producer {
 				reprap.moveTo(1, 25, 0, false, false);
 				reprap.setSpeed(LinePrinter.speedFix(reprap.getExtruder().getXYSpeed(), 
 						reprap.getExtruder().getOutlineSpeed()));
-				reprap.printTo(1, 60, 0, false);
+				reprap.printTo(1, 60, 0, false, false);
 				Debug.d("Printing warmup segments, printing to (3,60)");
-				reprap.printTo(3, 60, 0, false);
+				reprap.printTo(3, 60, 0, false, false);
 				Debug.d("Printing warmup segments, printing to (3,25)");
-				reprap.printTo(3, 25, 0, true);
+				reprap.printTo(3, 25, 0, true, true);
 				Debug.d("Warmup complete");
 				reprap.getExtruder().setMotor(false);
 			}

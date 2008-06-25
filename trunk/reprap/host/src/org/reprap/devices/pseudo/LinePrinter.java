@@ -11,6 +11,8 @@ import org.reprap.utilities.Debug;
  */
 public class LinePrinter {
 
+	public static final int stopExtruder = 1;
+	public static final int closeValve = 1;
 	
 	/**
 	 * Stepper motors
@@ -76,16 +78,22 @@ public class LinePrinter {
 	 * @param movementSpeed
 	 * @throws IOException
 	 */
-	public void moveTo(int endX, int endY, int movementSpeed) throws IOException {
+	public void moveTo(int endX, int endY, int movementSpeed, boolean stopExt, boolean closeV) throws IOException {
 		initialiseXY();
 
 		if (currentX == endX && currentY == endY)
 			return;
 		
+		int control = 0;
+		if (stopExt)
+			control |= stopExtruder;
+		if(closeV)
+			control |= closeValve;
+		
 		// If the firmware can queue polylines in a buffer, just send it,
 		// record it, and go home.
 
-		if(motorX.queuePoint(endX, endY, movementSpeed))
+		if(motorX.queuePoint(endX, endY, movementSpeed, control))
 		{
 			currentX = endX;
 			currentY = endY;
@@ -131,6 +139,11 @@ public class LinePrinter {
 
 		currentX = endX;
 		currentY = endY;
+		
+		if(stopExt)
+			extruder.setMotor(false);
+		if(closeV)
+			extruder.setValve(false);		
 	}
 	
 	/**
@@ -180,16 +193,17 @@ public class LinePrinter {
 	 * @throws IOException
 	 */
 	public void printTo(int endX, int endY, int movementSpeed, 
-			int extruderSpeed, boolean lastOne) throws IOException {
+			int extruderSpeed, boolean stopExt, boolean closeV) throws IOException {
 		// Determine the extruder speed, based on the geometry of the line
 		// to be printed
 		double dx = endX - currentX;
 		double dy = endY - currentY;
 		if(extruder.getPauseBetweenSegments())
+		{
 			extruder.setMotor(true);
-		moveTo(endX, endY, angleSpeed(movementSpeed, dx, dy));
-		if(lastOne || extruder.getPauseBetweenSegments())
-			extruder.setMotor(false);
+			moveTo(endX, endY, angleSpeed(movementSpeed, dx, dy), true, closeV);
+		} else
+			moveTo(endX, endY, angleSpeed(movementSpeed, dx, dy), stopExt, closeV);
 	}
 	
 	public void stopMotor() throws IOException
@@ -213,9 +227,9 @@ public class LinePrinter {
 	 * @throws IOException
 	 */
 	public void printLine(int startX, int startY, int endX, int endY, 
-			int movementSpeed, int extruderSpeed, boolean lastOne) throws IOException {
-		moveTo(startX, startY, movementSpeed);
-		printTo(endX, endY, movementSpeed, extruderSpeed, lastOne);
+			int movementSpeed, int extruderSpeed, boolean stopExt, boolean closeV) throws IOException {
+		moveTo(startX, startY, movementSpeed, false, false);
+		printTo(endX, endY, movementSpeed, extruderSpeed, stopExt, closeV);
 	}
 
 	/**

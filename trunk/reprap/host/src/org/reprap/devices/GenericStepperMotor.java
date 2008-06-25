@@ -302,7 +302,7 @@ public class GenericStepperMotor extends Device implements AxisMotor {
 	 * @param movementSpeed
 	 * @return
 	 */
-	public boolean queuePoint(int endX, int endY, int movementSpeed) throws IOException 
+	public boolean queuePoint(int endX, int endY, int movementSpeed, int control) throws IOException 
 	{
 		// Firmware clever enough?
 		if(firmwareVersion < firmwareVersionForBuffering)
@@ -319,9 +319,9 @@ public class GenericStepperMotor extends Device implements AxisMotor {
 		waitTillQueueNotFull();
 		
 		lock();
-		Debug.d(axis + " axis - queuing point at speed " + movementSpeed + ". endX = " + endX + ", endY = " + endY);
+		Debug.d(axis + " axis - queuing point at speed " + movementSpeed + ", control = " + control + ", endX = " + endX + ", endY = " + endY);
 		try {
-			OutgoingMessage request = new RequestQueue(endX, endY, movementSpeed);
+			OutgoingMessage request = new RequestQueue(endX, endY, movementSpeed, control);
 			sendMessage(request);
 		}
 		finally {
@@ -952,9 +952,10 @@ public class GenericStepperMotor extends Device implements AxisMotor {
 		 * @param x1
 		 * @param deltaY
 		 */
-		RequestQueue(int endX, int endY, int movementSpeed) {
+		RequestQueue(int endX, int endY, int movementSpeed, int control) {
 			message = new byte[] { MSG_QueuePoint,
 					(byte)movementSpeed,
+					(byte)control,
 					(byte)(endX & 0xff),
 					(byte)((endX >> 8) & 0xff),
 					(byte)(endY & 0xff),

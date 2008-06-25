@@ -316,7 +316,7 @@ public class Reprap implements CartesianPrinter {
 			currentStepperZ = targetZ;
 		}
 		
-		layerPrinter.moveTo(stepperX, stepperY, currentSpeedXY);
+		layerPrinter.moveTo(stepperX, stepperY, currentSpeedXY, false, false);
 		totalDistanceMoved += segmentLength(x - currentX, y - currentY);
 		currentX = x;
 		currentY = y;
@@ -373,7 +373,7 @@ public class Reprap implements CartesianPrinter {
 		homeToZeroY();
 		totalDistanceMoved += segmentLength(0, currentY);
 		
-		layerPrinter.moveTo(stepperX, stepperY, fastSpeedXY);
+		layerPrinter.moveTo(stepperX, stepperY, fastSpeedXY, false, false);
 		totalDistanceMoved += segmentLength(x, y);
 		currentX = x;
 		currentY = y;		
@@ -387,7 +387,7 @@ public class Reprap implements CartesianPrinter {
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#printTo(double, double, double, boolean)
 	 */
-	public void printTo(double x, double y, double z, boolean lastOne) 
+	public void printTo(double x, double y, double z, boolean stopExtruder, boolean closeValve) 
 		throws ReprapException, IOException {
 		if (isCancelled()) return;
 		EnsureNotEmpty();
@@ -414,7 +414,7 @@ public class Reprap implements CartesianPrinter {
 		
 		if (z != currentZ) 
 		{
-			System.out.println("Printing a vertical extrusion.  Should we do that?");
+			Debug.d("Printing a vertical extrusion.  Should we do that?");
 			// Print a simple vertical extrusion
 			double distance = Math.abs(currentZ - z);
 			totalDistanceExtruded += distance;
@@ -437,7 +437,7 @@ public class Reprap implements CartesianPrinter {
 		if (segmentPauseCheckbox != null && distance > 0)
 			if(segmentPauseCheckbox.isSelected())
 				segmentPause();		
-		layerPrinter.printTo(stepperX, stepperY, currentSpeedXY, extruders[extruder].getExtruderSpeed(), lastOne);
+		layerPrinter.printTo(stepperX, stepperY, currentSpeedXY, extruders[extruder].getExtruderSpeed(), stopExtruder, closeValve);
 		currentX = x;
 		currentY = y;
 	}

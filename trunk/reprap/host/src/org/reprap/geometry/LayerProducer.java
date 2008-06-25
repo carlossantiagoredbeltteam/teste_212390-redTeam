@@ -276,7 +276,7 @@ public class LayerProducer {
 	 * @throws ReprapException
 	 * @throws IOException
 	 */
-	private boolean shortLine(Rr2Point p, boolean lastOne) throws ReprapException, IOException
+	private boolean shortLine(Rr2Point p, boolean stopExtruder, boolean closeValve) throws ReprapException, IOException
 	{
 		double shortLen = printer.getExtruder().getShortLength();
 		if(shortLen < 0)
@@ -289,7 +289,7 @@ public class LayerProducer {
 		}
 		printer.setSpeed(LinePrinter.speedFix(printer.getExtruder().getXYSpeed(), 
 				printer.getExtruder().getShortSpeed()));
-		printer.printTo(p.x(), p.y(), z, lastOne);
+		printer.printTo(p.x(), p.y(), z, stopExtruder, closeValve);
 		printer.setSpeed(currentSpeed);
 //		Debug.d("Short segment at speed " +
 //				LinePrinter.speedFix(currentSpeed, printer.getExtruder().getShortSpeed())
@@ -304,11 +304,11 @@ public class LayerProducer {
 	 * @throws ReprapException
 	 * @throws IOException
 	 */
-	private void plot(Rr2Point first, Rr2Point second, boolean lastOne) throws ReprapException, IOException
+	private void plot(Rr2Point first, Rr2Point second, boolean stopExtruder, boolean closeValve) throws ReprapException, IOException
 	{
 		if (printer.isCancelled()) return;
 		
-		if(shortLine(first, lastOne))
+		if(shortLine(first, stopExtruder, closeValve))
 			return;
 		
 		double speedUpLength = printer.getExtruder().getAngleSpeedUpLength();
@@ -319,22 +319,22 @@ public class LayerProducer {
 			if(ss.abandon)
 				return;
 
-			printer.printTo(ss.p1.x(), ss.p1.y(), z, false);
+			printer.printTo(ss.p1.x(), ss.p1.y(), z, false, false);
 
 			if(ss.plotMiddle)
 			{
 				int straightSpeed = LinePrinter.speedFix(currentSpeed, (1 - 
 						printer.getExtruder().getAngleSpeedFactor()));
 				printer.setSpeed(straightSpeed);
-				printer.printTo(ss.p2.x(), ss.p2.y(), z, false);
+				printer.printTo(ss.p2.x(), ss.p2.y(), z, false, false);
 			}
 
 			printer.setSpeed(ss.speed(currentSpeed, printer.getExtruder().getAngleSpeedFactor()));
-			printer.printTo(ss.p3.x(), ss.p3.y(), z, lastOne);
+			printer.printTo(ss.p3.x(), ss.p3.y(), z, stopExtruder, closeValve);
 			//pos = ss.p3;
 		// Leave speed set for the start of the next line.
 		} else
-			printer.printTo(first.x(), first.y(), z, lastOne);
+			printer.printTo(first.x(), first.y(), z, stopExtruder, closeValve);
 	}
 
 	/**
@@ -461,7 +461,7 @@ public class LayerProducer {
 		move(p.point(0), p.point(1), true, false);
 
 		printer.getExtruder().setMotor(true);
-		plot(p.point(0), p.point(1), false);
+		plot(p.point(0), p.point(1), false, false);
 		
 		// Print any lead-in.
 		printer.printStartDelay(firstOneInLayer);
@@ -490,19 +490,15 @@ public class LayerProducer {
 					return;
 				}
 				
-				if(j > stopExtruding)
-				{
-					printer.stopMotor();
-					move(p.point(i), next, false, false);
-				} else
-					plot(p.point(i), next, j == p.size());
+				if(j > stopExtruding || j == p.size())
+					plot(p.point(i), next, true, j == p.size());
+				else
+					plot(p.point(i), next, false, false);
 				
-				if(j > stopValve)
-				{
-					printer.stopValve();
-					move(p.point(i), next, false, false);
-				} else
-					plot(p.point(i), next, j == p.size());
+				if(j > stopValve || j == p.size())
+					plot(p.point(i), next, j == p.size(), true);
+				else
+					plot(p.point(i), next, false, false);
 			}
 		} else
 		{
@@ -517,19 +513,15 @@ public class LayerProducer {
 					return;
 				}
 				
-				if(i > stopExtruding)
-				{
-					printer.stopMotor();
-					move(p.point(i), next, false, false);
-				} else
-					plot(p.point(i), next, i == p.size()-1);
+				if(i > stopExtruding || i == p.size()-1)
+					plot(p.point(i), next, true, i == p.size()-1);
+				else
+					plot(p.point(i), next, false, false);
 				
-				if(i > stopValve)
-				{
-					printer.stopValve();
-					move(p.point(i), next, false, false);
-				} else
-					plot(p.point(i), next, i == p.size()-1);
+				if(i > stopValve || i == p.size()-1)
+					plot(p.point(i), next, i == p.size()-1, true);
+				else
+					plot(p.point(i), next, false, false);
 			}
 		}
 		
