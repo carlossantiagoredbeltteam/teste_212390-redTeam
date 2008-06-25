@@ -16,6 +16,8 @@ String gcode[] = {
 };
 int gcodeIndex = 0;
 
+PFont font;
+
 void setup()
 {
   //init stuff
@@ -30,6 +32,8 @@ void setup()
   //load our gcode lines
   gcode = loadStrings("job.gcode");
   //println(gcode);
+
+  font = loadFont("ArialMT-48.vlw"); 
 }
 
 void draw()
@@ -95,8 +99,7 @@ void draw()
     finished = false;
   }
 
-  PFont font;
-  font = loadFont("ArialMT-48.vlw"); 
+  
   textFont(font, 16);
   String temp = "Temperature: " + temperature + "C";
   text(temp, 10, 20);
