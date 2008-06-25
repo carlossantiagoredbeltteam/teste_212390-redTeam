@@ -50,7 +50,7 @@ import org.reprap.comms.snap.SNAPCommunicator;
  *  
  */
 
-class ExtensionFileFilter extends FileFilter {
+class ExtensionFileFilter  extends FileFilter {
 	  String description;
 
 	  String extensions[];
