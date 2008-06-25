@@ -52,7 +52,7 @@ public interface AxisMotor {
 	 * @param movementSpeed
 	 * @return
 	 */
-	public boolean queuePoint(int endX, int endY, int movementSpeed) throws IOException; 
+	public boolean queuePoint(int endX, int endY, int movementSpeed, int control) throws IOException; 
 
 	
 	/**

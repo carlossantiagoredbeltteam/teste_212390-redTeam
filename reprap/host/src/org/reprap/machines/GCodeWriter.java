@@ -169,7 +169,7 @@ public class GCodeWriter implements CartesianPrinter {
 	public void printSegment(double startX, double startY, double startZ, 
 			double endX, double endY, double endZ, boolean turnOff) throws ReprapException, IOException {
 		moveTo(startX, startY, startZ, true, true);
-		printTo(endX, endY, endZ, turnOff);
+		printTo(endX, endY, endZ, turnOff, turnOff);
 	}
 
 	/* (non-Javadoc)
@@ -202,7 +202,7 @@ public class GCodeWriter implements CartesianPrinter {
 	 * @see org.reprap.Printer#printTo(double, double, double)
 	 */
 	public void printTo(double x, double y, double z, 
-			boolean turnOff) throws ReprapException, IOException {
+			boolean stopExtruder, boolean closeValve) throws ReprapException, IOException {
 		if (previewer != null)
 			previewer.addSegment(currentX, currentY, currentZ, x, y, z);
 		if (isCancelled()) return;
