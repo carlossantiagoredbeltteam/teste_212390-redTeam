@@ -27,6 +27,12 @@
 #include <RepStepper.h>
 #include <LinearAxis.h>
 #include <CartesianBot.h>
+#include <ThermoplastExtruder.h>
+
+// Control bytes in the queue
+#define STOP_EXTRUDE 1
+#define CLOSE_VALVE 2
+
 
 //this guy actually processes the v1 SNAP commands.
 void setup_cartesian_bot_snap_v1();
@@ -52,6 +58,7 @@ void notifySeek(byte to, byte from, int position);
 void notifyDDA(byte to, byte from, int position);
 
 extern CartesianBot bot;
+extern ThermoplastExtruder extruder;
 
 //
 // Version information

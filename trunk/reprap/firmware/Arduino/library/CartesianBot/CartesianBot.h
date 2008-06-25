@@ -23,7 +23,7 @@
 #include "WConstants.h"
 
 // how big do we want our point queue?
-#define POINT_QUEUE_SIZE 15
+#define POINT_QUEUE_SIZE 31
 
 // our point structure to make things nice.
 struct Point {
@@ -31,6 +31,7 @@ struct Point {
 	int y;
  	int z;
  	unsigned char speed;
+ 	unsigned char control;
 };
 
 // library interface description
