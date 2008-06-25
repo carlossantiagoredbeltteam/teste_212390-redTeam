@@ -1,5 +1,5 @@
 /*
-	CartesianBot.h - RepRap Cartesian Bot library for Arduino
+	CartesianBot.h -  RepRap Cartesian Bot library for Arduino
 
 	This library is used to interface with a RepRap Cartesian Bot (3 axis X/Y/Z machine)
 
