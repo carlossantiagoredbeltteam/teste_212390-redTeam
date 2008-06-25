@@ -26,20 +26,23 @@ void init_steppers()
 	pinMode(X_STEP_PIN, OUTPUT);
 	pinMode(X_DIR_PIN, OUTPUT);
 	pinMode(X_ENABLE_PIN, OUTPUT);
-	pinMode(X_MIN_PIN, INPUT);
-	pinMode(X_MAX_PIN, INPUT);
-	
 	pinMode(Y_STEP_PIN, OUTPUT);
 	pinMode(Y_DIR_PIN, OUTPUT);
 	pinMode(Y_ENABLE_PIN, OUTPUT);
-	pinMode(Y_MIN_PIN, INPUT);
-	pinMode(Y_MAX_PIN, INPUT);
-	
 	pinMode(Z_STEP_PIN, OUTPUT);
 	pinMode(Z_DIR_PIN, OUTPUT);
 	pinMode(Z_ENABLE_PIN, OUTPUT);
+
+#if ENDSTOPS_MIN_ENABLED == 1
+	pinMode(X_MIN_PIN, INPUT);
+	pinMode(Y_MIN_PIN, INPUT);
 	pinMode(Z_MIN_PIN, INPUT);
+#endif
+#if ENDSTOPS_MAX_ENABLED == 1
+	pinMode(X_MAX_PIN, INPUT);
+	pinMode(Y_MAX_PIN, INPUT);
 	pinMode(Z_MAX_PIN, INPUT);
+#endif
 	
 	//figure our stuff.
 	calculate_deltas();
