@@ -140,16 +140,16 @@ String getNextCommand()
     // Z axsis
     if (key == 'q' || key == 'Q')
     {
-      c = "G0 X0 Y0 Z2 F50";
+      c = "G0 X0 Y0 Z2 F150";
     }    
     
     if (key == 'z')
     {
-      c = "G0 X0 Y0 Z-2 F50";
+      c = "G0 X0 Y0 Z-2 F150";
     }
     if (key == 'Z')
     {
-      c = "G0 X0 Y0 Z-2 F50";
+      c = "G0 X0 Y0 Z-0.2 F150";
     }
     
     if (key == 'u')
@@ -192,6 +192,31 @@ String getNextCommand()
     if (key == 'n' || key == ' ')
     {
       c = "M103 (extruder off)";
+    }
+    
+    if (key == 'b')
+    {
+      c = "M102 (extruder reverse)";
+    }
+    
+    if (key == 't' || key == 'T')
+    {
+      c = "M105 (get current temp)";
+    }
+    
+    if (key == 'f')
+    {
+      c = "M106 (cooling on)";
+    }
+    
+    if (key == 'f')
+    {
+      c = "M106 (cooling on)";
+    }
+    
+    if (key == 'F')
+    {
+      c = "M107 (cooling off)";
     }
     
     
