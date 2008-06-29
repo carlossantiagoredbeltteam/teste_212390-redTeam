@@ -122,34 +122,34 @@ String getNextCommand()
     
     if (key == 'a')
     {
-      c = "G1 X10 Y0 Z0 F200";
+      c = "G1 X10 Y0 Z0 F450";
     }
     if (key == 'd')
     {
-      c = "G1 X-10 Y0 Z0 F200";
+      c = "G1 X-10 Y0 Z0 F450";
     }
     if (key == 'w')
     {
-      c = "G1 X0 Y10 Z0 F200";
+      c = "G1 X0 Y10 Z0 F450";
     }
     if (key == 's')
     {
-      c = "G1 X0 Y-10 Z0 F200";
+      c = "G1 X0 Y-10 Z0 F450";
     }
     
     // Z axsis
     if (key == 'q' || key == 'Q')
     {
-      c = "G0 X0 Y0 Z2 F150";
+      c = "G0 X0 Y0 Z2 F200";
     }    
     
     if (key == 'z')
     {
-      c = "G0 X0 Y0 Z-2 F150";
+      c = "G0 X0 Y0 Z-2 F200";
     }
     if (key == 'Z')
     {
-      c = "G0 X0 Y0 Z-0.2 F150";
+      c = "G0 X0 Y0 Z-0.2 F200";
     }
     
     if (key == 'u')
