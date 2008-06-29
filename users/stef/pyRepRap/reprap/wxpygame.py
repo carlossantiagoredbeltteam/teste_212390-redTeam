@@ -88,6 +88,7 @@ class wxSDLPanel(wx.Panel):
                 self._resized = 0
             x,y = self.GetSizeTuple()
             self._surface = pygame.display.set_mode((x,y))
+            #self.
 
         if self.__needsDrawing:
             self.draw()
@@ -107,6 +108,9 @@ class wxSDLPanel(wx.Panel):
     def update(self):
         self.Refresh()
         print "r"
+        
+    #def getSize(self):
+    #    return self.w, self.h
         
     def MouseMove(self, event):
         raise NotImplementedError('please define a .MouseMove() method!')  

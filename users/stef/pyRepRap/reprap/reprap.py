@@ -18,7 +18,7 @@
 
 # add commands to switch to gcode mode to allow any script using this library to write gcode too.
 
-import snap, time, serial
+import snap, time, serial, math
 
 printDebug = False	# print debug info
 #printDebug = True	# print debug info
@@ -46,18 +46,18 @@ CMD_GETDEBUGINFO  = 54
 CMD_GETTEMPINFO   = 55
 
 # stepper commands #
-CMD_VERSION		=   0
-CMD_FORWARD		=   1
-CMD_REVERSE		=   2
-CMD_SETPOS		=   3
-CMD_GETPOS		=   4
-CMD_SEEK		=   5
-CMD_FREE		=   6
-CMD_NOTIFY		=   7
-CMD_SYNC		=   8
+CMD_VERSION			=   0
+CMD_FORWARD			=   1
+CMD_REVERSE			=   2
+CMD_SETPOS			=   3
+CMD_GETPOS			=   4
+CMD_SEEK			=   5
+CMD_FREE			=   6
+CMD_NOTIFY			=   7
+CMD_SYNC			=   8
 CMD_CALIBRATE		=   9
 CMD_GETRANGE		=  10
-CMD_DDA			=  11
+CMD_DDA				=  11
 CMD_FORWARD1		=  12
 CMD_BACKWARD1		=  13
 CMD_SETPOWER		=  14
@@ -66,12 +66,18 @@ CMD_HOMERESET		=  16
 CMD_GETMODULETYPE	= 255
 
 # sync modes #
-sync_none	= 0	# no sync (default)
-sync_seek	= 1	# synchronised seeking
-sync_inc	= 2	# inc motor on each pulse
-sync_dec	= 3	# dec motor on each pulse
+sync_none	= 0		# no sync (default)
+sync_seek	= 1		# synchronised seeking
+sync_inc	= 2		# inc motor on each pulse
+sync_dec	= 3		# dec motor on each pulse
+
+MOTOR_FORWARD = 1
+MOTOR_BACKWARD = 2
 
 snap.localAddress = 0		# local address of host PC. This will always be 0.
+
+UNITS_MM = 1
+UNITS_STEPS = 2
 
 defaultSpeed = 220
 #moveSpeed = 221
@@ -136,10 +142,20 @@ def testComms():
 def getNotification(serialPort):
 	return snap.getPacket(serialPort)
 
+
 class extruderClass:
 	def __init__(self):
 		self.address = 8
 		self.active = False
+		self.requestedTemperature = 0
+		self.vRefFactor = 7			# Default in java (middle)
+		self.hb = 20				# Variable Preference
+		self.hm = 1.66667			# Variable Preference
+		self.absZero = 273.15		# Static, K
+		self.rz = 29000				# Variable Preference
+		self.beta = 3480			# Variable Preference
+		self.vdd = 5.0				# Static, volts
+		self.cap = 0.0000001		# Variable Preference
 
 	def getModuleType(self):	#note: do pics not support this yet? I can't see it in code and get no reply from pic
 		if self.active:
@@ -162,31 +178,171 @@ class extruderClass:
 		return False
 
 	def setMotor(self, direction, speed):
-		if self.active:
+		if self.active and int(direction) > 0 and int(direction) < 3 and int(speed) >= 0 and int(speed <= 255):
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [int(direction), int(speed)] ) ##no command being sent, whats going on?
 			if p.send():
 				return True
 		return False
+		
+	def calculateResistance(self, picTemp, calibrationPicTemp):
+		#// TODO remove hard coded constants
+		#// TODO should use calibration value instead of first principles
+		#//double resistor = 10000;                   // ohms
+		#//double c = 1e-6;                           // farads - now cap from prefs(AB)
+		scale = 1 << (self.tempScaler+1)
+		clock = 4000000.0 / (4.0 * scale) #  // hertz		
+		
+	
+		vRef = 0.25 * self.vdd + self.vdd * self.vRefFactor / 32.0 #  // volts
+	
+		T = picTemp / clock # // seconds
+		resistance = -T / (math.log(1 - vRef / self.vdd) * self.cap)#  // ohms
+		return resistance
 
-	def getTemp(self):
+	def calculateTemperature(self, resistance):
+		return (1.0 / (1.0 / self.absZero + math.log(resistance/self.rz) / self.beta)) - self.absZero;
+	
+	def rerangeTemperature(self, rawHeat):
+		notDone = False
+		#print "from", self.vRefFactor
+		if (rawHeat == 255 and self.vRefFactor > 0):
+			self.vRefFactor -= 1
+			#Debug.d(material + " extruder re-ranging temperature (faster): ")
+			self.setTempRange()
+		elif (rawHeat < 64 and self.vRefFactor < 15):
+			self.vRefFactor += 1
+			#Debug.d(material + " extruder re-ranging temperature (slower): ")
+			self.setTempRange()
+		else:
+			notDone = True
+		#print "to", self.vRefFactor
+		return notDone
+
+	def setTempRange(self):
+		#// We will send the vRefFactor to the PIC.  At the same
+		#// time we will send a suitable temperature scale as well.
+		#// To maximize the range, when vRefFactor is high (15) then
+		#// the scale is minimum (0).
+		#Debug.d(material + " extruder vRefFactor set to " + vRefFactor);
+		self.tempScaler = 7 - (self.vRefFactor >> 1);
+		self.setVoltageReference(self.vRefFactor)
+		#print "vr", self.vRefFactor
+		self.setTempScaler(self.tempScaler)
+		#print "ts", self.tempScaler
+		if (self.requestedTemperature != 0):
+			self.setTemp(self.requestedTemperature, False)			# should we be re-calling this function to make sure temp request is updated (rather than just calling it once. are we?)
+
+	def getRawTemp(self):
 		if self.active:		
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_GETTEMP] )
 			if p.send():
 				rep = p.getReply()
-				data = checkReplyPacket( rep, 2, CMD_GETTEMP )
+				data = checkReplyPacket( rep, 3, CMD_GETTEMP )
 				if data:
-					return data[1]
+					#rawTemp = data[1]
+					#calibration = data[2]
+					return data[1], data[2]
 		return False
+		
+	def getTemp(self):
+		self.autoTempRange()
+		rawHeat, calibration = self.getRawTemp()
+		while rawHeat == 255 or rawHeat == 0:
+			time.sleep(0.1)
+			self.autoTempRange()
+		res = self.calculateResistance( rawHeat, calibration )
+		temp = self.calculateTemperature(res)
+		#print rawHeat, res, temp
+		return round(temp, 1)	#there is no point returning more points than this
+		
+	def setTemp(self, temperature, lock = False):
+		self.requestedTemperature = temperature
+		#if(math.abs(self.requestedTemperature - extrusionTemp) > 5):
+		#	print " extruder temperature set to " + self.requestedTemperature + "C, which is not the standard temperature (" + extrusionTemp + "C).")
+		#// Aim for 10% above our target to ensure we reach it.  It doesn't matter
+		#// if we go over because the power will be adjusted when we get there.  At
+		#// the same time, if we aim too high, we'll overshoot a bit before we
+		#// can react.
+		
+		#// Tighter temp constraints under test 10% -> 3% (10-1-8)
+		temperature0 = temperature * 1.03
+		
+		#// A safety cutoff will be set at 20% above requested setting
+		#// Tighter temp constraints added by eD 20% -> 6% (10-1-8)
+		temperatureSafety = temperature * 1.06
+		
+		#// Calculate power output from hm, hb.  In general, the temperature
+		#// we achieve is power * hm + hb.  So to achieve a given temperature
+		#// we need a power of (temperature - hb) / hm
+		
+		#// If we reach our temperature, rather than switching completely off
+		#// go to a reduced power level.
+		power0 = int( round(((0.9 * temperature0) - self.hb) / self.hm) )
+		if power0 < 0: power0 = 0
+		if power0 > 255: power0 = 255
 
-	def setVoltateReference(self, val):
+		#// Otherwise, this is the normal power level we will maintain
+		power1 = int( round((temperature0 - self.hb) / self.hm) )
+		if power1 < 0: power1 = 0
+		if power1 > 255: power1 = 255
+
+		#// Now convert temperatures to equivalent raw PIC temperature resistance value
+		#// Here we use the original specified temperature, not the slight overshoot
+		resistance0 = self.calculateResistanceForTemperature(temperature)				#ADD THIS FUNCTION!
+		resistanceSafety = self.calculateResistanceForTemperature(temperatureSafety)
+
+		#// Determine equivalent raw value
+		t0 = self.calculatePicTempForResistance(resistance0)								#ADD THIS FUNCTION!
+		if t0 < 0: t0 = 0
+		if t0 > 255: t0 = 255
+		t1 = self.calculatePicTempForResistance(resistanceSafety)
+		if t1 < 0: t1 = 0
+		if t1 > 255: t1 = 255
+		
+		if (temperature == 0):
+			#self.setHeat( 0, 0 )#, lock )
+			self.setHeat( 0, 0, 0, 0 )#, lock )
+		else:
+			self.setHeat( power0, power1, t0, t1 )#, lock )
+
+	def calculateResistanceForTemperature(self, temperature):
+		return self.rz * math.exp(self.beta * (1/(temperature + self.absZero) - 1/self.absZero))
+
+	def calculatePicTempForResistance(self, resistance):
+		scale = 1 << (self.tempScaler+1)
+		clock = 4000000.0 / (4.0 * scale)	#// hertz		
+		vRef = 0.25 * self.vdd + self.vdd * self.vRefFactor / 32.0	#// volts
+		T = -resistance * (math.log(1 - vRef / self.vdd) * self.cap)
+		picTemp = T * clock
+		return int( round(picTemp) )
+
+		
+	def autoTempRange(self):
+		rawHeat, calibration = self.getRawTemp()
+		unChanged = self.rerangeTemperature(rawHeat)
+		while not unChanged:
+			rawHeat, calibration = self.getRawTemp()
+			unChanged = self.rerangeTemperature(rawHeat)
+			#print "rh", rawHeat, "uc", unChanged
+			time.sleep(0.1)
+
+	def setVoltageReference(self, val):
 		if self.active:
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_SETVREF, int(val)] )
 			if p.send():
 				return True
 		return False
+		
+	def setTempScaler(self, val):
+		if self.active:
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_SETTEMPSCALER, int(val)] )
+			if p.send():
+				return True
+		return False
 
 	def setHeat(self, lowHeat, highHeat, tempTarget, tempMax):
-		if self.active:	
+		if self.active:
+			print "Setting heater with params, ", "lowHeat", lowHeat, "highHeat", highHeat, "tempTarget", tempTarget, "tempMax", tempMax
 			tempTargetMSB, tempTargetLSB = int2bytes( tempTarget )
 			tempMaxMSB ,tempMaxLSB = int2bytes( tempMax )
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_SETHEAT, int(lowHeat), int(highHeat), tempTargetMSB, tempTargetLSB, tempMaxMSB, tempMaxLSB] )	# assumes MSB first (don't know this!)
@@ -196,7 +352,7 @@ class extruderClass:
 
 	def setCooler(self, speed):
 		if self.active:
-			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_SETCOOLER, int(speed = moveSpeed)] )
+			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_SETCOOLER, int(speed)] )
 			if p.send():
 				return True
 		return False
@@ -219,14 +375,15 @@ def checkReplyPacket (packet, numExpectedBytes, command):
 	return False
 				
 
+
 class axisClass:
 	def __init__(self, address):
 		self.address = address
 		self.active = False	# when scanning network, set this, then in each func below, check alive before doing anything
 		self.limit = 100000	# limit effectively disabled unless set
-		#self.turnArroundSteps = False
 		self.speed = defaultSpeed
-	#move axis one step forward
+	
+	# Move axis one step forward
 	def forward1(self):
 		if self.active:
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_FORWARD1] ) 
@@ -234,7 +391,7 @@ class axisClass:
 				return True
 		return False
 
-	#move axis one step backward
+	# Move axis one step backward
 	def backward1(self):
 		if self.active:
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_BACKWARD1] ) 
@@ -242,7 +399,7 @@ class axisClass:
 				return True
 		return False
 
-	#spin axis forward at given speed
+	# Spin axis forward at given speed
 	def forward(self, speed = False):
 		if not speed:
 			speed = self.speed
@@ -252,9 +409,10 @@ class axisClass:
 				return True
 		return False
 
-	#spin axis backward at given speed
+	# Spin axis backward at given speed
 	def backward(self, speed = False):
-		if not speed:					# If speed is not specified use stored (or default)
+		# If speed is not specified use stored (or default)
+		if not speed:
 			speed = self.speed
 		if self.active and speed >=0 and speed <=255:
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_REVERSE, int(speed)] ) 
@@ -262,7 +420,7 @@ class axisClass:
 				return True
 		return False
 
-	#debug only
+	# Debug only (raw PIC info)
 	def getSensors(self):
 		if self.active:
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_GETSENSOR] )
@@ -273,7 +431,7 @@ class axisClass:
 					print data[1], data[2]
 		return False
 
-	#get current axis position
+	# Get current axis position
 	def getPos(self):
 		if self.active:
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_GETPOS] )
@@ -372,6 +530,7 @@ class axisClass:
 		return False
 
 	def setPower( self, power ):
+		power = int( float(power) * 0.63 )
 		if self.active and power >=0 and power <=63:
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_SETPOWER, int( power * 0.63 )] ) # This is a value from 0 to 63 (6 bits)
 			if p.send():
@@ -398,7 +557,7 @@ class syncAxis:
 		else:
 			self.syncMode = sync_dec
 
-
+# Main cartesian robot class
 class cartesianClass:
 	def __init__(self):
 		# initiate axies with addresses
@@ -406,7 +565,7 @@ class cartesianClass:
 		self.y = axisClass(3)
 		self.z = axisClass(4)
 
-	# goto home position (all axies)
+	# Goto home position (all axies)
 	def homeReset(self, speed = False, waitArrival = True):
 		#z is done first so we don't break anything we just made
 		if self.z.homeReset( speed = speed, waitArrival = waitArrival ):
@@ -421,39 +580,46 @@ class cartesianClass:
 	# seek to location (all axies). When waitArrival is True, funtion does not return until all seeks are compete
 	# seek will automatically use syncSeek when it is required. Always use the seek function
 	def seek(self, pos, speed = False, waitArrival = True):
+		#printDebug = True
 		if not speed:
 			speed = self.speed
 		curX, curY, curZ = self.x.getPos(), self.y.getPos(), self.z.getPos()
 		x, y, z = pos
+		print "seek from", curX, curY, curZ, "to", x, y, z
+		# Check that we are moving withing limits, and 
 		if x <= self.x.limit and y <= self.y.limit and z <= self.z.limit:
 			if printDebug: print "seek from [", curX, curY, curZ, "] to [", x, y, z, "]"
+			# Check if we need to do a standard seek or a DDA seek
 			if x == curX or y == curY:
 				if printDebug: print "    standard seek"
-				if x:				
-					self.x.seek( x, speed, True )			#setting these to true breaks waitArrival convention. need to rework waitArrival and possibly have each axis storing it's arrival flag and pos as variables?
-				if y:
-					self.y.seek( y, speed, True )
-			else:
+				if x and x != curX:				
+					self.x.seek( x, speed, waitArrival )			#setting these to true breaks waitArrival convention. need to rework waitArrival and possibly have each axis storing it's arrival flag and pos as variables?
+				if y and y != curY:
+					self.y.seek( y, speed, waitArrival )
+			elif x and y:
 				if printDebug: print "    sync seek"
-				self.syncSeek( pos, speed, waitArrival )
+				self._syncSeek( pos, curX, curY, speed, waitArrival )
 			if z and z != curZ:
-				self.z.seek( z, speed, True )
+				#self.z.seek( z, speed, True ) # why was this forced?
+				self.z.seek( z, speed, waitArrival )
+			return True
 		else:
 			print "Trying to print outside of limit, aborting seek"
+			return False
 	
 	# perform syncronised x/y movement. This is called by seek when needed.
-	def syncSeek(self, pos, speed = False, waitArrival = True):
+	def _syncSeek(self, pos, curX, curY, speed = False, waitArrival = True):
+		#printDebug = True
 		if not speed:
 			speed = self.speed
-		curX, curY = self.x.getPos(), self.y.getPos()
+		#curX, curY = self.x.getPos(), self.y.getPos()
 		newX, newY, nullZ = pos
 		deltaX = abs( curX - newX )		# calc delta movements
 		deltaY = abs( curY - newY )
+		print "syncseek deltas", deltaX, deltaY
 		directionX = ( curX - newX ) / -deltaX	# gives direction -1 or 1
 		directionY = ( curY - newY ) / -deltaY	
-		if printDebug: print "    dx", deltaX, "dy", deltaY, "dirX", directionX, "dirY", directionY
-		if printDebug: print "    using x master"
-
+		
 		master = syncAxis( self.x, newX, deltaX, directionX )	# create two swapable data structures, set x as master, y as slave
 		slave = syncAxis( self.y, newY, deltaY, directionY )
 		
@@ -462,8 +628,9 @@ class cartesianClass:
 			if printDebug: print "    switching to y master"
 		if printDebug: print "    masterPos", master.seekTo, "slaveDelta", slave.delta
 		slave.axis.setSync( slave.syncMode )
-		master.axis.DDA( master.seekTo, slave.delta, speed, True )
-		time.sleep(0.1)
+		master.axis.DDA( master.seekTo, slave.delta, speed, True )	#why was this forced? # because we have to wait before we tell the slave axis to leave sync mode!
+		#master.axis.DDA( master.seekTo, slave.delta, speed, waitArrival )
+		time.sleep(0.01)	# TODO this is really bad, can we remove?
 		slave.axis.setSync( sync_none )
 		if printDebug: print "    sync seek complete"
 	
@@ -471,41 +638,36 @@ class cartesianClass:
 	def getPos(self):
 		return self.x.getPos(), self.y.getPos(), self.z.getPos()
 	
-	# stop all motors
+	# Stop all motors (but retain current)
 	def stop(self):
-		self.x.forward( 0 )
-		self.y.forward( 0 )
-		self.z.forward( 0 )
+		self.x.forward(0)
+		self.y.forward(0)
+		self.z.forward(0)
 
-	# free all motors (no current on coils)
+	# Free all motors (no current on coils)
 	def free(self):
 		self.x.free()
 		self.y.free()
 		self.z.free()
+	
+	# Set stepper power 0% to 100%
 	def setPower(self, power):
-		self.x.setPower( power )
-		self.y.setPower( power )
-		self.z.setPower( power )
-	#def lockout():
+		self.x.setPower(power)
+		self.y.setPower(power)
+		self.z.setPower(power)
+	
 	#keep sending power down commands to all board every second
+	#def lockout():
+	
+	# Set stepper speed (0 - 255)
 	def setMoveSpeed(self, speed):
 		self.speed = speed
 		self.x.setMoveSpeed(speed)
 		self.y.setMoveSpeed(speed)
 		self.z.setMoveSpeed(speed)
-	
-	# By looking at the number of steps the motors move when the axis changes direction, before the table starts moving we can put these steps in extra to give instant movement
-	#def setTurnaroundSteps(self, steps):
-	#	self.x.setTurnaroundSteps(steps)
-	#	self.y.setTurnaroundSteps(steps)
 
 
 cartesian = cartesianClass()
-
-#wait on serial only when after somthing? or do pics send messages without pc request?
-
-
-
 
 
 
