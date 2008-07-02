@@ -14,6 +14,14 @@ import org.reprap.devices.pseudo.LinePrinter;
 
 public class Producer {
 	
+	private boolean paused = false;
+	
+	int layerNumber = 0;
+	
+	int layers = 0;
+	
+	private LayerProducer layer = null;
+	
 	/**
 	 * The machine doing the making
 	 */
@@ -102,6 +110,41 @@ public class Producer {
 		reprap.setCancelled(c);
 	}
 	
+	public void pause()
+	{
+		paused = true;
+		if(layer != null)
+			layer.pause();
+	}
+	
+	public void resume()
+	{
+		paused = false;
+		if(layer != null)
+			layer.resume();
+	}
+	
+	private void waitWhilePaused()
+	{
+		while(paused)
+		{
+			try
+			{
+				Thread.sleep(200);
+			} catch (Exception ex) {}
+		}
+	}
+	
+	public int getLayers()
+	{
+		return layers;
+	}
+	
+	public int getLayer()
+	{
+		return layerNumber;
+	}	
+	
 	/**
 	 * @throws Exception
 	 */
@@ -138,6 +181,8 @@ public class Producer {
 		// A "warmup" segment to get things in working order
 		if (!subtractive) 
 		{
+			waitWhilePaused();
+			
 			reprap.setSpeed(reprap.getExtruder().getXYSpeed());
 			reprap.moveTo(1, 1, 0, false, false);
 			
@@ -198,12 +243,16 @@ public class Producer {
 		
 		}
 		
-		int layerNumber = 0;
+		layerNumber = 0;
+		layers = (int)((subtractive ? startZ - endZ : endZ - startZ)/stepZ);
 		
 		for(double z = startZ; subtractive ? z > endZ : z < endZ; z += stepZ) {
 			
 			if (reprap.isCancelled())
 				break;
+			
+			waitWhilePaused();
+			
 			Debug.d("Commencing layer at " + z);
 
 			// Change Z height
@@ -211,6 +260,8 @@ public class Producer {
 			
 			if (reprap.isCancelled())
 				break;
+			
+			waitWhilePaused();
 			
 			// Pretend we've just finished a layer first time;
 			// All other times we really will have.
@@ -223,7 +274,7 @@ public class Producer {
 			RrCSGPolygonList slice = stlc.slice(z+reprap.getExtruder().getExtrusionHeight()*0.5); 
 			BranchGroup lowerShell = stlc.getBelow();
 			
-			LayerProducer layer = null;
+			layer = null;
 			if(slice.size() > 0)
 				layer = new LayerProducer(reprap, z, slice, lowerShell,
 						isEvenLayer?evenHatchDirection:oddHatchDirection, 
@@ -235,6 +286,8 @@ public class Producer {
 						
 			if (reprap.isCancelled())
 				break;
+			
+			waitWhilePaused();
 			
 			if(layer != null)
 			{

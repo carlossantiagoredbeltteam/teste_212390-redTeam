@@ -15,7 +15,7 @@ package org.reprap.gui.botConsole;
 import org.reprap.Preferences;
 import javax.swing.JOptionPane;
 //import org.reprap.machines.Reprap;
-import org.reprap.machines.MachineFactory;
+//import org.reprap.machines.MachineFactory;
 
 /**
  *
@@ -29,6 +29,7 @@ public class BotConsoleFrame extends javax.swing.JFrame {
     private Thread pollThread = null;
     private boolean pollThreadExiting = false;
     private boolean carryOnPolling = true;
+    private GenericExtruderTabPanel[] extruderPanels;
     
     /** Creates new form BotConsoleFrame */
     public BotConsoleFrame() {
@@ -36,14 +37,14 @@ public class BotConsoleFrame extends javax.swing.JFrame {
             checkPrefs();
         }
         catch (Exception e) {
-            System.out.println("Failure trying to initialise comms in botConsole: " + e);
+            System.err.println("Failure trying to initialise comms in botConsole: " + e);
             JOptionPane.showMessageDialog(null, e.getMessage());
             return;
         }
 
         initComponents();
-        printTabPanel1.setBotConsoleFrame(this);
-        xYZTabPanel1.setBedPanelDimensions();
+        printTabFrame1.setFrames(this, xYZTabPanel);
+        //xYZTabPanel.setBedPanelDimensions();
         this.setTitle("Bot Console");
         
         /*
@@ -55,6 +56,7 @@ public class BotConsoleFrame extends javax.swing.JFrame {
                     while(!pollThreadExiting) {
                             try {
                                     Thread.sleep(5000);
+                                    updateProgress();
                                     if(carryOnPolling)
                                     	updatePanels();   
                             }
@@ -68,16 +70,25 @@ public class BotConsoleFrame extends javax.swing.JFrame {
             pollThread.start(); 
     }
     
-    private GenericExtruderTabPanel[] extruderPanels;
+
     
     /**
      * The update thread calls this to update everything
-     *
+     * that relies on information from the RepRap machine.
      */
     private void updatePanels()
     {
     	for(int i = 0; i < extruderPanels.length; i++)
     		extruderPanels[i].refreshTemperature();
+    }
+    
+    /**
+     * The update thread calls this to update everything
+     * that is independent of the RepRap machine.
+     */
+    private void updateProgress()
+    {
+    	printTabFrame1.updateProgress();
     }
 
     /**
@@ -104,20 +115,6 @@ public class BotConsoleFrame extends javax.swing.JFrame {
             throw new Exception("A Reprap printer must contain at least one extruder");
     }
     
-//    	public void dispose() {
-//
-//		super.dispose();
-//		if (extruder != null)
-//			extruder.dispose();
-//		if (motorX != null)
-//			motorX.dispose();
-//		if (motorY != null)
-//			motorY.dispose();
-//		if (motorZ != null)
-//			motorZ.dispose();
-//		if (communicator != null)
-//			communicator.dispose();
-//	}
     
     /** This method is called from within the constructor to
      * initialize the form.
@@ -129,28 +126,28 @@ public class BotConsoleFrame extends javax.swing.JFrame {
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
         initialiseExtruderPanels();
-        printTabPanel1 = new org.reprap.gui.botConsole.PrintTabPanel();
-        xYZTabPanel1 = new org.reprap.gui.botConsole.XYZTabPanel();
+        printTabFrame1 = new org.reprap.gui.botConsole.PrintTabFrame();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jTabbedPane1.setRequestFocusEnabled(false);
-
-        printTabPanel1.setEnabled(false);
-        jTabbedPane1.addTab("Print", printTabPanel1);
-        jTabbedPane1.addTab("XYZ", xYZTabPanel1);
+        jTabbedPane1.addTab("Print", printTabFrame1);
 
         addExtruderPanels();
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 750, javax.swing.GroupLayout.PREFERRED_SIZE)
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(layout.createSequentialGroup()
+                .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 750, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(17, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(layout.createSequentialGroup()
+                .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 400, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(160, Short.MAX_VALUE))
         );
 
         pack();
@@ -170,17 +167,18 @@ public class BotConsoleFrame extends javax.swing.JFrame {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTabbedPane jTabbedPane1;
-    private org.reprap.gui.botConsole.PrintTabPanel printTabPanel1;
-    public static org.reprap.gui.botConsole.XYZTabPanel xYZTabPanel1;
+    private org.reprap.gui.botConsole.PrintTabFrame printTabFrame1;
     // End of variables declaration//GEN-END:variables
     
-    private static int motorID = 0;
+    private org.reprap.gui.botConsole.XYZTabPanel xYZTabPanel;
+    
+ //   private static int motorID = 0;
 
     
-    public static int getMotorID() {
-        motorID++;
-        return motorID;
-    }
+//    public static int getMotorID() {
+//        motorID++;
+//        return motorID;
+//    }
     
     private void initialiseExtruderPanels() {
 
@@ -207,18 +205,22 @@ public class BotConsoleFrame extends javax.swing.JFrame {
     
     private void addExtruderPanels() {
         
+        xYZTabPanel = new org.reprap.gui.botConsole.XYZTabPanel();
+
+        jTabbedPane1.addTab("XYZ", xYZTabPanel);
         for (int i = 0; i < extruderCount; i++) {
             jTabbedPane1.addTab("Extruder " + i, extruderPanels[i]);
         }
+        pack();
     }
     
 
 
 
     private int extruderCount;
-    private int currentExtruder;
+    //private int currentExtruder;
     
- 
-    		
+
+		
     
 }
