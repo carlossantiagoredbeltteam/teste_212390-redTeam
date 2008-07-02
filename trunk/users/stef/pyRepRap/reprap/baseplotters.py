@@ -76,6 +76,10 @@ class ExportPlotter(threading.Thread):
 		
 		self.loadPreferences()
 	
+	# Tell thread to terminate ASAP (result of GUI 'Stop' button)
+	def terminate(self):
+		self.alive = False
+	
 	def run(self):
 		raise NotImplementedError('Export plotter plugin must define a .run() method!')
 	

@@ -3,9 +3,6 @@ from pen_prefpanel import PreferencesPanel
 
 Title = "Pen"
 
-def getPreferencePanel(parent):
-	return PreferencesPanel(parent, -1)
-
 class tool:
 	def __init__(self):
 		self.pref_penDownPos = 0

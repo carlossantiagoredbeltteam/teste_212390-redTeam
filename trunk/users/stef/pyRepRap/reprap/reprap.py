@@ -585,21 +585,21 @@ class cartesianClass:
 			speed = self.speed
 		curX, curY, curZ = self.x.getPos(), self.y.getPos(), self.z.getPos()
 		x, y, z = pos
-		print "seek from", curX, curY, curZ, "to", x, y, z
+		#print "seek from", curX, curY, curZ, "to", x, y, z
 		# Check that we are moving withing limits, and 
-		if (x <= self.x.limit or self.x.limit == 0) and (y <= self.y.limit or self.y.limit == 0) and (z <= self.z.limit or self.z.limit == 0):
+		if (x == None or x <= self.x.limit or self.x.limit == 0) and (y == None or y <= self.y.limit or self.y.limit == 0) and (z == None or z <= self.z.limit or self.z.limit == 0):
 			if printDebug: print "seek from [", curX, curY, curZ, "] to [", x, y, z, "]"
 			# Check if we need to do a standard seek or a DDA seek
 			if x == curX or y == curY:
 				if printDebug: print "    standard seek"
-				if x and x != curX:				
+				if x != None and x != curX:				
 					self.x.seek( x, speed, waitArrival )			#setting these to true breaks waitArrival convention. need to rework waitArrival and possibly have each axis storing it's arrival flag and pos as variables?
-				if y and y != curY:
+				if y != None and y != curY:
 					self.y.seek( y, speed, waitArrival )
-			elif x and y:
+			elif x != None and y != None:
 				if printDebug: print "    sync seek"
 				self._syncSeek( pos, curX, curY, speed, waitArrival )
-			if z and z != curZ:
+			if z != None and z != curZ:
 				#self.z.seek( z, speed, True ) # why was this forced?
 				self.z.seek( z, speed, waitArrival )
 			return True

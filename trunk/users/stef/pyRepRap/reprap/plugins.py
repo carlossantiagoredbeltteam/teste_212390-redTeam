@@ -1,11 +1,11 @@
 import os, sys
 
-PLUGIN_PLOTTER	= 1
+PLUGIN_IMPORT	= 1
 PLUGIN_OUTPUT	= 2
 PLUGIN_TOOLHEAD	= 3
 
 pluginsPath = "/usr/share/reprap/plugins"
-pluginsFolders = {PLUGIN_PLOTTER:"plotter", PLUGIN_OUTPUT:"output", PLUGIN_TOOLHEAD:"toolhead"}
+pluginsFolders = {PLUGIN_IMPORT:"import", PLUGIN_OUTPUT:"output", PLUGIN_TOOLHEAD:"toolhead"}
 
 def loadPlugins(pluginsFolder, suffix):
 	oldDir = os.getcwd()

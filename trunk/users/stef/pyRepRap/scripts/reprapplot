@@ -29,7 +29,7 @@ import reprap.shapeplotter, reprap.plugins
 
 appTitle = "RepRap Plot"
 
-plotterPlugins = reprap.plugins.getPlugins(reprap.plugins.PLUGIN_PLOTTER)
+plotterPlugins = reprap.plugins.getPlugins(reprap.plugins.PLUGIN_IMPORT)
 outputPlugins = reprap.plugins.getPlugins(reprap.plugins.PLUGIN_OUTPUT)
 toolheadPlugins = reprap.plugins.getPlugins(reprap.plugins.PLUGIN_TOOLHEAD)
 plotterList = reprap.plugins.listTitles(plotterPlugins)
@@ -174,13 +174,13 @@ class PreferencesDialog(wx.Dialog):
         sizer_9 = wx.StaticBoxSizer(self.sizer_9_staticbox, wx.VERTICAL)
         grid_sizer_2 = wx.FlexGridSizer(6, 3, 4, 0)
         grid_sizer_1 = wx.FlexGridSizer(4, 11, 4, 0)
-        grid_sizer_1.Add(self.label_8, 0, wx.ADJUST_MINSIZE, 0)
+        grid_sizer_1.Add(self.label_8, 0, wx.ALIGN_CENTER_VERTICAL|wx.ADJUST_MINSIZE, 0)
         grid_sizer_1.Add((20, 20), 0, wx.ADJUST_MINSIZE, 0)
-        grid_sizer_1.Add(self.label_9, 0, wx.ALIGN_RIGHT|wx.ADJUST_MINSIZE, 0)
+        grid_sizer_1.Add(self.label_9, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ADJUST_MINSIZE, 0)
         grid_sizer_1.Add((10, 20), 0, wx.ADJUST_MINSIZE, 0)
         grid_sizer_1.Add(self.text_offsetX, 0, wx.EXPAND|wx.ADJUST_MINSIZE, 0)
         grid_sizer_1.Add((20, 20), 0, wx.ADJUST_MINSIZE, 0)
-        grid_sizer_1.Add(self.label_10, 0, wx.ALIGN_RIGHT|wx.ADJUST_MINSIZE, 0)
+        grid_sizer_1.Add(self.label_10, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ADJUST_MINSIZE, 0)
         grid_sizer_1.Add((10, 20), 0, wx.ADJUST_MINSIZE, 0)
         grid_sizer_1.Add(self.text_offsetY, 1, wx.EXPAND|wx.ADJUST_MINSIZE, 0)
         grid_sizer_1.Add((20, 20), 0, wx.ADJUST_MINSIZE, 0)
@@ -188,13 +188,13 @@ class PreferencesDialog(wx.Dialog):
         grid_sizer_1.AddGrowableCol(4)
         grid_sizer_1.AddGrowableCol(8)
         sizer_9.Add(grid_sizer_1, 0, wx.ALL|wx.EXPAND, 10)
-        grid_sizer_2.Add(self.label_11, 0, wx.ADJUST_MINSIZE, 0)
+        grid_sizer_2.Add(self.label_11, 0, wx.ALIGN_CENTER_VERTICAL|wx.ADJUST_MINSIZE, 0)
         grid_sizer_2.Add((10, 20), 0, wx.ADJUST_MINSIZE, 0)
         grid_sizer_2.Add(self.text_fillDensity, 1, wx.EXPAND|wx.ADJUST_MINSIZE, 0)
-        grid_sizer_2.Add(self.label_16, 0, wx.ADJUST_MINSIZE, 0)
+        grid_sizer_2.Add(self.label_16, 0, wx.ALIGN_CENTER_VERTICAL|wx.ADJUST_MINSIZE, 0)
         grid_sizer_2.Add((10, 20), 0, wx.ADJUST_MINSIZE, 0)
         grid_sizer_2.Add(self.text_circleResolution, 1, wx.EXPAND|wx.ADJUST_MINSIZE, 0)
-        grid_sizer_2.Add(self.label_1, 0, wx.ADJUST_MINSIZE, 0)
+        grid_sizer_2.Add(self.label_1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ADJUST_MINSIZE, 0)
         grid_sizer_2.Add((10, 20), 0, wx.ADJUST_MINSIZE, 0)
         grid_sizer_2.Add(self.text_lineDelay, 1, wx.EXPAND|wx.ADJUST_MINSIZE, 0)
         grid_sizer_2.Add(self.checkbox_debug, 0, wx.ADJUST_MINSIZE, 0)
@@ -462,11 +462,15 @@ class MyFrame(wx.Frame):
         self.mnuFile = wx.Menu()
         self.mnuOpen = wx.MenuItem(self.mnuFile, 0, "&Open\tCtrl+O", "", wx.ITEM_NORMAL)
         self.mnuFile.AppendItem(self.mnuOpen)
+        self.mnuFile.AppendSeparator()
+        self.mnuPlot = wx.MenuItem(self.mnuFile, 2, "&Plot\tCtrl+P", "", wx.ITEM_NORMAL)
+        self.mnuFile.AppendItem(self.mnuPlot)
+        self.mnuFile.AppendSeparator()
         self.mnuQuit = wx.MenuItem(self.mnuFile, 1, "&Quit\tCtrl+Q", "", wx.ITEM_NORMAL)
         self.mnuFile.AppendItem(self.mnuQuit)
         self.frmMain_menubar.Append(self.mnuFile, "&File")
         wxglade_tmp_menu = wx.Menu()
-        wxglade_tmp_menu.Append(10, "Pr&eferences\tCtrl+P", "", wx.ITEM_NORMAL)
+        wxglade_tmp_menu.Append(10, "Pr&eferences", "", wx.ITEM_NORMAL)
         self.frmMain_menubar.Append(wxglade_tmp_menu, "&Edit")
         wxglade_tmp_menu = wx.Menu()
         self.mnuAbout = wx.MenuItem(wxglade_tmp_menu, 40, "&About", "", wx.ITEM_NORMAL)
@@ -479,11 +483,11 @@ class MyFrame(wx.Frame):
         # Tool Bar
         self.frmMain_toolbar = wx.ToolBar(self, -1, style=wx.TB_HORIZONTAL|wx.TB_TEXT)
         self.SetToolBar(self.frmMain_toolbar)
-        self.frmMain_toolbar.AddLabelTool(100, "Open", wx.Bitmap("/usr/share/reprap/icons/document-open.png", wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, "Open Gerber File", "")
+        self.frmMain_toolbar.AddLabelTool(100, "Open", wx.Bitmap("/usr/share/reprap/icons/document-open.png", wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, "Open file", "")
         self.frmMain_toolbar.AddSeparator()
-        self.frmMain_toolbar.AddLabelTool(112, "Stop", wx.Bitmap("/usr/share/reprap/icons/media-playback-stop.png", wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, "", "")
+        self.frmMain_toolbar.AddLabelTool(112, "Stop", wx.Bitmap("/usr/share/reprap/icons/media-playback-stop.png", wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, "Stop current plotting action", "")
         self.frmMain_toolbar.AddSeparator()
-        self.frmMain_toolbar.AddLabelTool(120, "Plot", wx.Bitmap("/usr/share/reprap/icons/media-playback-start.png", wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, "Plot to screen or RepRap", "")
+        self.frmMain_toolbar.AddLabelTool(120, "Plot", wx.Bitmap("/usr/share/reprap/icons/media-playback-start.png", wx.BITMAP_TYPE_ANY), wx.NullBitmap, wx.ITEM_NORMAL, "Plot to output plugin", "")
         self.frmMain_toolbar.AddSeparator()
         # Tool Bar end
         self.static_line_1 = wx.StaticLine(self, -1)
@@ -498,6 +502,7 @@ class MyFrame(wx.Frame):
         self.__do_layout()
 
         self.Bind(wx.EVT_MENU, self.onClickOpen, self.mnuOpen)
+        self.Bind(wx.EVT_MENU, self.onClickPlot, self.mnuPlot)
         self.Bind(wx.EVT_MENU, self.onClickQuit, self.mnuQuit)
         self.Bind(wx.EVT_MENU, self.onClickPreferences, id=10)
         self.Bind(wx.EVT_MENU, self.onClickAbout, self.mnuAbout)
@@ -675,7 +680,11 @@ class MyFrame(wx.Frame):
         self.frmMain_statusbar.SetStatusText( text, 0 )
  
     def onClickOpen(self, event): # wxGlade: MyFrame.<event_handler>
-        self.importPlot()
+        if self.currentPlotter:
+            dlg = wx.MessageDialog(self, "Current action must be stopped before opening a file.\n", caption = appTitle, style = wx.OK)
+            dlg.ShowModal()
+        else:
+            self.importPlot()
 
     def onClickQuit(self, event): # wxGlade: MyFrame.<event_handler>
         wx.Exit()
@@ -728,9 +737,16 @@ the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  0211
         # tell plotter thread to quit
         if self.currentPlotter:
             self.currentPlotter.terminate()
+        else:
+            dlg = wx.MessageDialog(self, "Nothing is currently being plotted.\n", caption = appTitle, style = wx.OK)
+            dlg.ShowModal()
 
     def onClickPlot(self, event): # wxGlade: MyFrame.<event_handler>
-        self.exportPlot()
+        if self.currentPlotter:
+            dlg = wx.MessageDialog(self, "Current action must be stopped before plotting.\n", caption = appTitle, style = wx.OK)
+            dlg.ShowModal()
+        else:
+            self.exportPlot()
 
 
 # end of class MyFrame

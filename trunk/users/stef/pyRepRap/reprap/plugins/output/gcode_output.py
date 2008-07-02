@@ -24,8 +24,8 @@ the GNU General Public License along with File Hunter; if not, write to
 the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 """
 
-import reprap.preferences
-from gcode_prefpanel import PreferencesPanel
+import reprap.preferences, reprap.baseplotters
+#from gcode_prefpanel import PreferencesPanel
 
 Title = "GCode File"
 FileOutput = True
@@ -43,6 +43,9 @@ class output(reprap.baseplotters.ExportPlotter):
 		self.curZ = 0
 		x2, y2 = 0, 0
 		for poly in self.polygons:
+			if not self.alive:
+				self.feedbackHandler.aborted()
+				break
 			x1, y1 = poly.points[0]
 			# If we are not in the polygon start place, switch off tool and move there
 			if (x1 != x2) or (y1 != y2):
@@ -60,6 +63,10 @@ class output(reprap.baseplotters.ExportPlotter):
 		# Stop tool and write file
 		self.toolhead.stop()
 		self.gcode.writeFile(self.outputFilename)
+		
+		if self.alive:
+			# Tell gui that plot is complete (redraw screen)
+			self.feedbackHandler.plotComplete()
 	
 	# Translate a cartesian movement into whatever the output plugin does with it (called locally and by toolhead)
 	def cartesianMove(self, x, y, z, units = reprap.UNITS_MM):

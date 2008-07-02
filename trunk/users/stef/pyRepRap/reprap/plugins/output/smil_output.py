@@ -25,7 +25,7 @@ the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  0211
 """
 
 import threading, reprap.preferences
-from smil_prefpanel import PreferencesPanel	#temp
+#from smil_prefpanel import PreferencesPanel
 
 Title = "SMIL File"
 FileOutput = True
@@ -43,6 +43,9 @@ class output(reprap.baseplotters.ExportPlotter):
 		self.smil = SMIL()
 		self.curZ = 0
 		for poly in self.polygons:
+			if not self.alive:
+				self.feedbackHandler.aborted()
+				break
 			#print "plot poly", poly.points, "pc", poly.closed
 			x1, y1 = poly.points[0]
 			self.cartesianMove(x1, y1, False)
@@ -56,6 +59,9 @@ class output(reprap.baseplotters.ExportPlotter):
 			self.smil.finishPolygon(poly.closed)
 		self.smil.writeFile(self.outputFilename)
 		
+		if self.alive:
+			# Tell gui that plot is complete (redraw screen)
+			self.feedbackHandler.plotComplete()
 	
 	# Translate a cartesian movement into whatever the output plugin does with it (called locally and by toolhead)
 	def cartesianMove(self, x, y, z, units = reprap.UNITS_MM):
