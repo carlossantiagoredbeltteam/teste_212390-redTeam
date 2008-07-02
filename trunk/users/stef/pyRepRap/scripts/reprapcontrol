@@ -18,9 +18,11 @@ if reprap.openSerial( 0, 19200, 60 ):
 	reprap.cartesian.x.setNotify()						
 	reprap.cartesian.y.setNotify()
 	reprap.cartesian.z.setNotify()
-	reprap.cartesian.x.limit = 2523
+	#reprap.cartesian.x.limit = 2523
 	#reprap.cartesian.y.limit = 2743
-	reprap.cartesian.y.limit = 2000
+	#reprap.cartesian.y.limit = 2000
+	reprap.cartesian.x.limit = 2700
+	reprap.cartesian.y.limit = 2500
 	#work surface approx x 2523, y 2743
 
 	def printHelp():
@@ -70,7 +72,7 @@ if reprap.openSerial( 0, 19200, 60 ):
 	#goto a specific location
 	elif sys.argv[1] == "goto":
 		#reprap.cartesian.seek( ( int(sys.argv[2]), int(sys.argv[3]), 0 ), waitArrival = False)
-		reprap.cartesian.seek( ( int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]) ), waitArrival = False)
+		reprap.cartesian.seek( ( int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]) ), speed = 200, waitArrival = False)
 		printPos()
 
 	#goto a specific location (use sync)
