@@ -82,6 +82,11 @@ class segmentSpeeds
  *
  */
 public class LayerProducer {
+	
+	/**
+	 * 
+	 */
+	private boolean paused = false;
 
 	/**
 	 * The shape of the object built so far under the current layer
@@ -262,6 +267,24 @@ public class LayerProducer {
 	}
 	
 	/**
+	 * Stop printing
+	 *
+	 */
+	public void pause()
+	{
+		paused = true;
+	}
+	
+	/**
+	 * Start printing
+	 *
+	 */
+	public void resume()
+	{
+		paused = false;
+	}
+	
+	/**
 	 * @return current X and Y position of the printer
 	 */
 	private Rr2Point posNow()
@@ -308,6 +331,14 @@ public class LayerProducer {
 	{
 		if (printer.isCancelled()) return;
 		
+		while(paused)
+		{
+			try
+			{
+				Thread.sleep(200);
+			} catch (Exception ex) {}
+		}
+		
 		if(shortLine(first, stopExtruder, closeValve))
 			return;
 		
@@ -349,6 +380,14 @@ public class LayerProducer {
 		throws ReprapException, IOException
 	{
 		if (printer.isCancelled()) return;
+		
+		while(paused)
+		{
+			try
+			{
+				Thread.sleep(200);
+			} catch (Exception ex) {}
+		}
 		
 		if(startUp)
 		{

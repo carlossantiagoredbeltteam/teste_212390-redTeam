@@ -462,50 +462,91 @@ public class Main {
 		return pane;
 	}
 	
-	private void onProduceT() {
-        cancelMenuItem.setEnabled(true);
-        produceProduceT.setEnabled(false);
-		Thread t = new Thread() {
-			public void run() {
-				Thread.currentThread().setName("Producer");
-				try {
-					// TODO Some kind of progress indicator would be good
-					
-					if (!viewPreview.isSelected()) {
-						viewPreview.setSelected(true);
-						updateView();
-					}
-
-//					if(preview != null)
-//					{
-//						preview.setSegmentPause(segmentPause);
-//						preview.setLayerPause(layerPause);
+//	private void onProduceT() {
+//        cancelMenuItem.setEnabled(true);
+//        produceProduceT.setEnabled(false);
+//		Thread t = new Thread() {
+//			public void run() {
+//				Thread.currentThread().setName("Producer");
+//				try {
+//					// TODO Some kind of progress indicator would be good
+//					
+//					if (!viewPreview.isSelected()) {
+//						viewPreview.setSelected(true);
+//						updateView();
 //					}
-					
-					producer = new Producer(printer, preview, builder);
-					producer.setSegmentPause(segmentPause);
-					producer.setLayerPause(layerPause);
-					producer.produce();
-					String usage = getResourceMessage(producer);
-					producer.dispose();
-					producer = null;
-			        cancelMenuItem.setEnabled(false);
-			        produceProduceT.setEnabled(true);
-					JOptionPane.showMessageDialog(mainFrame, "Production complete.  " +
-							usage);
-				}
-				catch (Exception ex) {
-					JOptionPane.showMessageDialog(mainFrame, "Production exception: " + ex);
-					ex.printStackTrace();
-				}
-			}
-		};
-		t.start();
-	}
+//
+////					if(preview != null)
+////					{
+////						preview.setSegmentPause(segmentPause);
+////						preview.setLayerPause(layerPause);
+////					}
+//					
+//					producer = new Producer(printer, preview, builder);
+//					producer.setSegmentPause(segmentPause);
+//					producer.setLayerPause(layerPause);
+//					producer.produce();
+//					String usage = getResourceMessage(producer);
+//					producer.dispose();
+//					producer = null;
+//			        cancelMenuItem.setEnabled(false);
+//			        produceProduceT.setEnabled(true);
+//					JOptionPane.showMessageDialog(mainFrame, "Production complete.  " +
+//							usage);
+//				}
+//				catch (Exception ex) {
+//					JOptionPane.showMessageDialog(mainFrame, "Production exception: " + ex);
+//					ex.printStackTrace();
+//				}
+//			}
+//		};
+//		t.start();
+//	}
 	
+	/**
+	 * Return the printer being used
+	 */
 	public Printer getPrinter()
 	{
 		return printer;
+	}
+	
+	/**
+	 * Stop production
+	 *
+	 */
+	public void pause()
+	{
+		producer.pause();
+		try
+		{
+			printer.stopMotor();
+			printer.stopValve();
+		} catch (Exception ex) {}
+	}
+	
+	/**
+	 * Resume production
+	 * NB: does not re-start the extruder
+	 *
+	 */
+	public void resume()
+	{
+		producer.resume();
+	}
+	
+	public int getLayers()
+	{
+		if(producer == null)
+			return 0;
+		return producer.getLayers();
+	}
+	
+	public int getLayer()
+	{
+		if(producer == null)
+			return 0;
+		return producer.getLayer();
 	}
 	
 	public void onProduceB() {

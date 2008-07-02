@@ -1213,6 +1213,11 @@ public class Reprap implements CartesianPrinter {
 	 * printed and wait for the user to acknowledge
 	 */
 	private void segmentPause() {
+		try
+		{
+			extruders[extruder].setValve(false);
+			extruders[extruder].setExtrusion(0);
+		} catch (Exception ex) {}
 		ContinuationMesage msg =
 			new ContinuationMesage(null, "A new segment is about to be produced");
 					//,segmentPauseCheckbox, layerPauseCheckbox);
@@ -1225,6 +1230,14 @@ public class Reprap implements CartesianPrinter {
 		}
 		if (msg.getResult() == false)
 			setCancelled(true);
+		else
+		{
+			try
+			{
+				extruders[extruder].setExtrusion(extruders[extruder].getExtruderSpeed());
+				extruders[extruder].setValve(false);
+			} catch (Exception ex) {}
+		}
 		msg.dispose();
 	}
 
