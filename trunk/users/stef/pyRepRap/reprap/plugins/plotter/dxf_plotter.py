@@ -1,5 +1,5 @@
 #######################################################################################################################################################
-# This module plots dxf entities to reprap and / or a lineSet object (for pygame plotting). The dxf file is turned into entities in dxf_lib.           #
+# This module plots dxf entities to reprap and / or a lineSet object (for pygame plotting). The dxf file is turned into entities in dxflib.           #
 #######################################################################################################################################################
 """
 Licenced under GNU v2 and the 'I'm not going to help you kill people licence'. The latter overrules the former.
@@ -22,100 +22,89 @@ the GNU General Public License along with File Hunter; if not, write to
 the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 """
 
-import time, math, sys, threading
-import reprap.shapeplotter
-import dxf_lib
-from dxf_prefpanel import PreferencesPanel #temp
+import math, threading
+import reprap.preferences
+import reprap.shapeplotter as shapeplotter
+import reprap.baseplotters
+
+import dxf_lib as dxflib
+#from dxf_prefpanel import PreferencesPanel
 
 Title = "DXF Cad"
+SupportedFileExtensions = ['.dxf']
+FileTitle = Title + " Files"
 
-def getPreferencePanel(parent):
-	return PreferencesPanel(parent, -1)
 
-# Returns file formats supported by module (for use in gui file filters)
-def getSupportedFileExtensions():
-	return ['.dxf']
-
-# Returns general name of supported files (for use in gui file filters)
-def getFileTitle():
-	return Title + " Files"
-
-# Class to plot dxf file to screen and / or reprap
-class plotter(threading.Thread):
-	def __init__(	self,
-					fileName,
-					outputs = [],
-					toolhead = 0,
-					feedbackHandler = False,
-					offsetX = 0,
-					offsetY = 0,
-					lineDump = False,
-					stepsPerMM = (30, 30),
-					circleResolution = False,
-					fillDensity = 4,
-					debug = False,
-					lineDelay = 0 ):
-					
-		threading.Thread.__init__(self)
-
-		self.shapePlot = reprap.shapeplotter.plotter(	outputs = outputs,
-														toolhead = toolhead,
-														lineDump = lineDump,
-														stepsPerMM = stepsPerMM,
-														circleResolution = circleResolution,
-														fillMode = reprap.shapeplotter.FILL_LOCUS,
-														debug = debug,
-														lineDelay = lineDelay )
-		
-		self.fileName = fileName
-		self.offsetX, self.offsetY = offsetX, offsetY
-		self.fillDensity = fillDensity
-		self.debug = debug
-		self.feedbackHandler = feedbackHandler
-		
-		self.dxfFile = dxf_lib.dxf( self.fileName )
-		self.dxfFile.printEnts()
+# Class to plot dxf files to polygon list
+class plotter(reprap.baseplotters.ImportPlotter):
+	# Load plotter preferences
+	def loadPreferences(self):
+		# Load preferences from file
+		self.prefHandler = reprap.preferences.PreferenceHandler(self,  "plotter_dxf.conf")
+		self.prefHandler.load()
 	
 	# Run is executed when thread is started (in new thread)
 	def run(self):
 		self.alive = True
-		scale = 1
+		
+		self.feedbackHandler.setStatus("Opening file...")
+		self.dxfFile = dxflib.dxf( self.fileName )
+		#self.dxfFile.printEnts()
+		
+		self.feedbackHandler.setStatus("Removing file offset...")
+		# Remove file offset
+		minX, minY, maxX, maxY = self.getFileLimitsXY()
+		print "dxf m&ms", minX, minY, maxX, maxY
 		for e in self.dxfFile.entities:
-			# Break if thread has been told to termiate
-			if not self.alive: return False
 			if e.type == "LINE":
-				line = (e.startX * scale) + self.offsetX, (e.startY * scale) + self.offsetY, (e.endX * scale) + self.offsetX, (e.endY * scale) + self.offsetY
-				self.shapePlot.plotLine( line )
+				e.startX -= minX
+				e.startY -= minY
+				e.endX -= minX
+				e.endY -= minY
+			elif e.type == "CIRCLE" or e.type == "ARC":
+				e.centreX -= minX
+				e.centreY -= minY
+		
+		# Start plot of entities
+		for i, e in enumerate(self.dxfFile.entities):
+			progress = int( float(i) / float( len(self.dxfFile.entities) ) * 100 )
+			self.feedbackHandler.setStatus("Drawing entities..." + str(progress) + "%")
+			# Break if thread has been told to termiate
+			if not self.alive:
+				self.feedbackHandler.aborted()
+				break
+			if e.type == "LINE":
+				self.polygons.append( shapeplotter.line( (e.startX, e.startY, e.endX, e.endY) ) )
+				print "line makes", shapeplotter.line( (e.startX, e.startY, e.endX, e.endY) ), len(shapeplotter.line( (e.startX, e.startY, e.endX, e.endY) ).points)
 			elif e.type == "CIRCLE":
-				self.shapePlot.plotCircle( (e.centreX * scale) + self.offsetX, (e.centreY * scale) + self.offsetY, e.radius * scale, filled = False )
+				self.polygons.append( shapeplotter.circle( e.centreX, e.centreY, e.radius, self.arcResolution ) )
 			elif e.type == "ARC":
-				self.shapePlot.plotArc( (e.centreX * scale) + self.offsetX, (e.centreY * scale) + self.offsetY, e.radius * scale, math.radians(e.startAngle), math.radians(e.endAngle) )
-		for o in self.shapePlot.outputs:
-			o.finish()
-
+				self.polygons.append( shapeplotter.arc( e.centreX, e.centreY, e.radius, math.radians(e.startAngle), math.radians(e.endAngle), resolution = self.arcResolution ) )
+		
+		if self.alive:
+			# Tell gui that plot is complete (redraw screen)
+			self.feedbackHandler.plotComplete()
+	
+	# Return bounding limits of file (used for zeroing position)
 	def getFileLimitsXY(self):
 		minX, minY = 1000000, 1000000
-		maxX, maxY = 0, 0
-		# Calc limits
-		return minX, minY, maxX, maxY
+		maxX, maxY = -1000000, -1000000
+		for e in self.dxfFile.entities:
+			if e.type == "LINE":
+				minX = min(minX, e.startX, e.endX)
+				minY = min(minY, e.startY, e.endY)
+				maxX = max(maxX, e.startX, e.endX)
+				maxY = max(maxY, e.startY, e.endY)
+			elif e.type == "CIRCLE" or e.type == "ARC":
+				minX = min(minX, e.centreX - e.radius)
+				minY = min(minY, e.centreY - e.radius)
+				maxX = max(maxX, e.centreX + e.radius)
+				maxY = max(maxY, e.centreY + e.radius)
 		
-
+		return minX, minY, maxX, maxY
+	
 	# Tell thread to terminate ASAP (result of GUI 'Stop' button)
 	def terminate(self):
 		self.alive = False
-		self.shapePlot.penUp()
-		self.shapePlot.reprapEnable = False
-
-	# Set plotter so send command to reprap
-	def setReprapEnable( self, enabled ):
-		self.shapePlot.setReprap(enabled)
-
-	# Set calibrated pen up and pen down positions
-	def setPenPositions(self, upPos, downPos):
-		self.shapePlot.setPenPositions(upPos, downPos)
-
-	def setOffset(self, offset):
-		self.offsetX, self.offsetY = offset
-
 
 

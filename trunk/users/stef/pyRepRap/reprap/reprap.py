@@ -380,7 +380,7 @@ class axisClass:
 	def __init__(self, address):
 		self.address = address
 		self.active = False	# when scanning network, set this, then in each func below, check alive before doing anything
-		self.limit = 100000	# limit effectively disabled unless set
+		self.limit = 0
 		self.speed = defaultSpeed
 	
 	# Move axis one step forward
@@ -464,7 +464,7 @@ class axisClass:
 	def seek(self, pos, speed = False, waitArrival = True):
 		if not speed:
 			speed = self.speed
-		if self.active and pos <= self.limit and pos >=0 and pos <= 0xFFFF and speed >=0 and speed <=255:
+		if self.active and (pos <= self.limit or self.limit == 0) and pos >=0 and pos <= 0xFFFF and speed >=0 and speed <=255:
 			posMSB ,posLSB = int2bytes( pos )
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_SEEK, int(speed), posMSB ,posLSB] ) 
 			if p.send():
@@ -515,7 +515,7 @@ class axisClass:
 	def DDA( self, seekTo, slaveDelta, speed = False, waitArrival = True):
 		if not speed:
 			speed = self.speed
-		if self.active and seekTo <= self.limit and seekTo >=0 and seekTo <= 0xFFFF and slaveDelta >=0 and slaveDelta <= 0xFFFF and speed >=0 and speed <=255:
+		if self.active and (seekTo <= self.limit or self.limit == 0) and seekTo >=0 and seekTo <= 0xFFFF and slaveDelta >=0 and slaveDelta <= 0xFFFF and speed >=0 and speed <=255:
 			masterPosMSB, masterPosLSB = int2bytes( seekTo )
 			slaveDeltaMSB, slaveDeltaLSB = int2bytes( slaveDelta )
 			p = snap.SNAPPacket( serialPort, self.address, snap.localAddress, 0, 1, [CMD_DDA, int(speed), masterPosMSB ,masterPosLSB, slaveDeltaMSB, slaveDeltaLSB] ) 	#start sync
@@ -587,7 +587,7 @@ class cartesianClass:
 		x, y, z = pos
 		print "seek from", curX, curY, curZ, "to", x, y, z
 		# Check that we are moving withing limits, and 
-		if x <= self.x.limit and y <= self.y.limit and z <= self.z.limit:
+		if (x <= self.x.limit or self.x.limit == 0) and (y <= self.y.limit or self.y.limit == 0) and (z <= self.z.limit or self.z.limit == 0):
 			if printDebug: print "seek from [", curX, curY, curZ, "] to [", x, y, z, "]"
 			# Check if we need to do a standard seek or a DDA seek
 			if x == curX or y == curY:

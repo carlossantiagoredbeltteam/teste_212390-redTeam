@@ -22,86 +22,49 @@ the GNU General Public License along with File Hunter; if not, write to
 the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 """
 
-import svg_lib, reprap.shapeplotter, threading
+import threading
+import reprap.preferences
+import reprap.shapeplotter as shapeplotter
+import reprap.baseplotters
+
 import smil_lib as smillib
-from smil_prefpanel import PreferencesPanel #temp
+#from smil_prefpanel import PreferencesPanel
 
 Title = "SMIL"
+SupportedFileExtensions = ['.smil']
+FileTitle = Title + " Files"
 
-def getPreferencePanel(parent):
-	return PreferencesPanel(parent, -1)
 
-# Returns file formats supported by module (for use in gui file filters)
-def getSupportedFileExtensions():
-	return ['.smil']
-
-# Returns general name of supported files (for use in gui file filters)
-def getFileTitle():
-	return Title + " Files"
-
-# Class to plot gerber file to screen and / or reprap
-class plotter(threading.Thread):
-	def __init__(	self,
-					fileName,
-					outputs = [],
-					toolhead = 0,
-					feedbackHandler = False,
-					offsetX = 0,
-					offsetY = 0,
-					lineDump = False,
-					stepsPerMM = (30, 30),
-					circleResolution = False,
-					fillDensity = 4,
-					debug = False,
-					lineDelay = 0 ):
-					
-		threading.Thread.__init__(self)
-		
-		self.shapePlot = reprap.shapeplotter.plotter(	outputs = outputs,
-														toolhead = toolhead,
-														lineDump = lineDump,
-														stepsPerMM = stepsPerMM,
-														circleResolution = circleResolution,
-														fillMode = reprap.shapeplotter.FILL_LOCUS,
-														debug = debug,
-														lineDelay = lineDelay )
-		
-		self.fileName = fileName
-		self.offsetX, self.offsetY = offsetX, offsetY
-		self.fillDensity = fillDensity
-		self.debug = debug
-		self.feedbackHandler = feedbackHandler
-		self.smilFile = smillib.SMIL(self.fileName)
-		print "Version", self.smilFile.version, "Layers", self.smilFile.layerCount, "Units", self.smilFile.units
-
+# Class to plot gerber file to polygon list
+class plotter(reprap.baseplotters.ImportPlotter):
+	# Load plotter preferences
+	def loadPreferences(self):
+		# Load preferences from file
+		self.prefHandler = reprap.preferences.PreferenceHandler(self,  "plotter_smil.conf")
+		self.prefHandler.load()
+	
 	# Run is executed when thread is started (in new thread)
 	def run(self):
 		self.alive = True
-		self.terminated = False
+		self.feedbackHandler.setStatus("Opening file...")
+		self.smilFile = smillib.SMIL(self.fileName)
+		print "SMIL Version", self.smilFile.version, "Layers", self.smilFile.layerCount, "Units", self.smilFile.units
 		
-		polygons = self.smilFile.layers[0]
-		for p in polygons:
-			self.shapePlot.plotPolygon(p, self.offsetX, self.offsetY)
-		# Plot using self.shapePlot here #
-				
-		for o in self.shapePlot.outputs:
-			o.finish()
+		self.polygons += self.smilFile.layers[0]
+		
+		if self.alive:
+			# Tell gui that plot is complete (redraw screen)
+			self.feedbackHandler.plotComplete()
 	
 	def getFileLimitsXY(self):
 		minX, minY = 1000000, 1000000
-		maxX, maxY = 0, 0
+		maxX, maxY = -1000000, -1000000
 		# Calc limits
 		return minX, minY, maxX, maxY
 	
 	# Tell thread to terminate ASAP (result of GUI 'Stop' button)
 	def terminate(self):
 		self.alive = False
-	
-	# Set plot offset
-	def setOffset(self, offset):
-		self.offsetX, self.offsetY = offset
-
-
 
 
 
