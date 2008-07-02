@@ -2,6 +2,7 @@
 
 import xml.dom.minidom
 from xml.dom.minidom import Node
+import reprap.polygon
 
 
 class SMIL:
@@ -28,8 +29,9 @@ class SMIL:
 					if self.debug: print "Tool name",name , "index", index
 					for polygonNode in toolNode.getElementsByTagName("POLYGON"):
 						index = polygonNode.getAttribute("index")
+						closed = polygonNode.getAttribute("closed")
 						if self.debug: print "Polygon index", index
-						polygon = []
+						polygon = reprap.polygon.Polygon(closed = closed)
 						for d in polygonNode.childNodes:
 							if d.nodeType == Node.TEXT_NODE:
 								lines = d.data.splitlines()
@@ -40,8 +42,8 @@ class SMIL:
 									if len(parts) > 0:
 										if self.debug: print parts
 										if parts[0][0] == "X" and parts[1][0] == "Y":
-											polygon.append( ( float(parts[0][ 1: ]), float(parts[1][ 1: ]) ) )
-						if len(polygon):
+											polygon.addPoint( ( float(parts[0][ 1: ]), float(parts[1][ 1: ]) ) )
+						if len(polygon.points):
 							currentLayer.append(polygon)
 				self.layers.append(currentLayer)
 
