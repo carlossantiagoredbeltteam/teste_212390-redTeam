@@ -3,9 +3,11 @@ import os, sys
 PLUGIN_IMPORT	= 1
 PLUGIN_OUTPUT	= 2
 PLUGIN_TOOLHEAD	= 3
+print "OSP='" + os.platform + "'"
 
-if os.platform=="win32":
+if os.platform == "win32":
 	# Windows
+	print "winp"
 	pluginsPath = sys.path[0] + "/plugins"
 else:
 	# Linux
