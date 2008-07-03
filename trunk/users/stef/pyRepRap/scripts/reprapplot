@@ -39,7 +39,7 @@ toolheadList = reprap.plugins.listTitles(toolheadPlugins)
 if sys.platform=="win32":
 	# Windows (taking path of this script)
 	#iconPath = sys.path[0] + "/graphics"
-	iconPath = "C:\Documents and Settings\stef\Desktop\reprap\reprap\graphics"
+	iconPath = "C:\Documents and Settings\stef\Desktop\reprap\reprap\graphics"  #temp TODO
 else:
 	# Linux
 	iconPath = "/usr/share/reprap/icons/"
@@ -320,6 +320,7 @@ class DrawCanvas(wxpygame.wxSDLPanel):
         self.refresh()
         self.polygons = []
         self.black = 0, 0, 0
+        self.white = 255, 255, 255
         self.grey = 160, 160, 160
         self.greyGreen = 170, 195, 170
         self.darkGrey = 140, 140, 140
@@ -382,22 +383,26 @@ class DrawCanvas(wxpygame.wxSDLPanel):
         w, h = self.GetSizeTuple()
         width, height = int(maxX * self.previewScale) + (2 * border), int(maxY * self.previewScale) + (2 *border)
         self.drawSurface = pygame.Surface( ( width, height ) )
-
-        # Draw background
         self.drawRect = 0, 0, width, height
-        pygame.draw.rect( self.drawSurface, self.baseColour, self.drawRect, 0)
         
-        # Draw grid
-        for x in range( 0, int(maxX), self.parent.preferences.pref_gridDivision ):
-            pygame.draw.line( self.drawSurface, self.gridColour, ( int( float(x) * self.previewScale ) + border , border ), ( int( float(x) * self.previewScale ) + border , height - border ) )
-        for y in range( 0, int(maxY), self.parent.preferences.pref_gridDivision ):
-            pygame.draw.line( self.drawSurface, self.gridColour, ( border, height - border - int( float(y) * self.previewScale ) ), ( width - border, height - border - int( float(y) * self.previewScale ) ) )
-        
-        # Draw axis labels
-        pygame.draw.line( self.drawSurface, self.black, (border, height - border), (border + 50, height - border) )
-        pygame.draw.line( self.drawSurface, self.black, (border, height - border), (border, height - 50 - border ) )
-        self.drawText( self.drawSurface, border + 25, height - border , "X", self.font )
-        self.drawText( self.drawSurface, border, height - border - 25, "Y", self.font )
+        # Only draw if we have something to show
+        if len(self.polygons) > 0:
+            # Draw background
+            pygame.draw.rect( self.drawSurface, self.baseColour, self.drawRect, 0)
+            # Draw grid
+            for x in range( 0, int(maxX), self.parent.preferences.pref_gridDivision ):
+                pygame.draw.line( self.drawSurface, self.gridColour, ( int( float(x) * self.previewScale ) + border , border ), ( int( float(x) * self.previewScale ) + border , height - border ) )
+            for y in range( 0, int(maxY), self.parent.preferences.pref_gridDivision ):
+                pygame.draw.line( self.drawSurface, self.gridColour, ( border, height - border - int( float(y) * self.previewScale ) ), ( width - border, height - border - int( float(y) * self.previewScale ) ) )
+            
+            # Draw axis labels
+            pygame.draw.line( self.drawSurface, self.black, (border, height - border), (border + 50, height - border) )
+            pygame.draw.line( self.drawSurface, self.black, (border, height - border), (border, height - 50 - border ) )
+            self.drawText( self.drawSurface, border + 25, height - border , "X", self.font )
+            self.drawText( self.drawSurface, border, height - border - 25, "Y", self.font )
+        else:
+            # Draw blank white box
+            pygame.draw.rect( self.drawSurface, self.white, self.drawRect, 0)
         
         # Draw polygons
         for poly in self.polygons:
