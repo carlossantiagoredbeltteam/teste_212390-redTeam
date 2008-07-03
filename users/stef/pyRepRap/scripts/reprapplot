@@ -472,12 +472,14 @@ class MyFrame(wx.Frame):
         # Create preference handler that stores preferences on itself
         self.preferences = reprap.preferences.PreferenceHandler( False, "pyRepRap.conf" )
         # default values for preferences
-        self.preferences.pref_plotOffsetX = float(10)
-        self.preferences.pref_plotOffsetY = float(10)
+        self.preferences.pref_plotOffsetX = 10.0
+        self.preferences.pref_plotOffsetY = 10.0
+        #self.preferences.pref_limitX = 0
+        #self.preferences.pref_limitY = 0
         self.preferences.pref_fillDensity = 5
-        self.preferences.pref_lineDelay = float(0)
+        self.preferences.pref_lineDelay = 0.0
         self.preferences.pref_debug = False
-        self.preferences.pref_circleResolution = float(3)
+        self.preferences.pref_circleResolution = 3.0
         self.preferences.pref_gridDivision = 5
         self.preferences.pref_zoomStep = 1
         
@@ -545,8 +547,8 @@ class MyFrame(wx.Frame):
         self.setStatusBar("RepRap Plot")
         
         self.preferences.load()
-        reprap.cartesian.x.limit = self.preferences.pref_limitX        
-        reprap.cartesian.y.limit = self.preferences.pref_limitY
+        #reprap.cartesian.x.limit = self.preferences.pref_limitX
+        #reprap.cartesian.y.limit = self.preferences.pref_limitY
         self.pygameCanvas.refresh()
 
     def __set_properties(self):
