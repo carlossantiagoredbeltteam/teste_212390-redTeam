@@ -38,7 +38,8 @@ toolheadList = reprap.plugins.listTitles(toolheadPlugins)
 
 if sys.platform=="win32":
 	# Windows (taking path of this script)
-	iconPath = sys.path[0] + "/graphics"
+	#iconPath = sys.path[0] + "/graphics"
+	iconPath = "C:\Documents and Settings\stef\Desktop\reprap\reprap\graphics"
 else:
 	# Linux
 	iconPath = "/usr/share/reprap/icons/"
