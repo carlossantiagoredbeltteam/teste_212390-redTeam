@@ -8,7 +8,8 @@ print "OSP='" + sys.platform + "'"
 if sys.platform == "win32":
 	# Windows
 	print "winp"
-	pluginsPath = sys.path[0] + "/plugins"
+	#pluginsPath = sys.path[0] + "/plugins"
+	pluginsPath = "C:\Documents and Settings\stef\Desktop\reprap\reprap\plugins"
 else:
 	# Linux
 	pluginsPath = "/usr/share/reprap/plugins"
