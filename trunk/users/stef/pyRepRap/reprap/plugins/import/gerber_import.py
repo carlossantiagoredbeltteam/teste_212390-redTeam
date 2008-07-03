@@ -49,7 +49,6 @@ class plotter(reprap.baseplotters.ImportPlotter):
 	# Run is executed when thread is started (in new thread)
 	def run(self):
 		self.alive = True
-		
 		self.feedbackHandler.setStatus("Opening file...")
 		self.gerberFile = gerberlib.gerber(self.fileName)
 		
@@ -66,17 +65,19 @@ class plotter(reprap.baseplotters.ImportPlotter):
 				e.y1 -= minY
 				e.y2 -= minY
 		
-		# Fill plot mode ( for pen drawing )
+		# Fill plot mode ( for pen drawing )	# TODO - apply grouping to this plotter also to remove excess penup ops?
 		if self.pref_plotMode == 0:
 			# Plotting is pretty simple at the moment, plotter blindly follows gerber file and plots out each trace / flash individually.
 			# Can be impoved by re-ordering drawing, and by combining connected traces into continual events / removing overlap
 		
 			# Plot all gerber flashes
-			for f in self.gerberFile.flashes:
+			for i, f in enumerate(self.gerberFile.flashes):
 				# Break if thread has been told to termiate
 				if not self.alive:
 					self.feedbackHandler.aborted()
 					break
+				progress = int( float(i) / float( len(self.gerberFile.flashes) ) * 100 )
+				self.feedbackHandler.setStatus("Plotting flashes..." + str(progress) + "%")
 				#f.printFlash()
 				# Move is static flash type
 				if f.aperture.isMacro: print "macro", f.aperture.macroName
@@ -94,11 +95,13 @@ class plotter(reprap.baseplotters.ImportPlotter):
 					self.polygons.append( shapeplotter.ellipse( f.x, f.y, f.aperture.width / 2, f.aperture.height / 2, self.arcResolution, self.fillDensity ) )
 			
 			# Plot all gerber traces
-			for t in self.gerberFile.traces:
+			for i, t in enumerate(self.gerberFile.traces):
 				# Break if thread has been told to termiate
 				if not self.alive:
 					self.feedbackHandler.aborted()
 					break
+				progress = int( float(i) / float( len(self.gerberFile.traces) ) * 100 )
+				self.feedbackHandler.setStatus("Plotting strokes..." + str(progress) + "%")
 				#t.printTrace()
 				# Move is aperture open (pen down) type
 				if t.aperture.isMacro: print "macro", f.aperture.macroName
@@ -107,7 +110,7 @@ class plotter(reprap.baseplotters.ImportPlotter):
 					if t.aperture.code == 12 or  t.aperture.code == 13: print  t.aperture.code
 					if self.debug: print "aperture radius", t.aperture.radius, "mm"
 					#self.shapePlot.plotMoveWithCircle( t.x1 + self.offsetX, t.y1 + self.offsetY, t.x2 + self.offsetX, t.y2 + self.offsetY, t.aperture.radius, self.fillDensity )
-					self.polygons.append( shapeplotter.circleTrace( t.x1, t.y1, t.x2, t.y2, t.aperture.radius, self.fillDensity ) )
+					self.polygons.append( shapeplotter.circleTrace( t.x1, t.y1, t.x2, t.y2, t.aperture.radius, self.arcResolution, self.fillDensity ) )
 				elif t.aperture.apertureType == "R":
 					# Using rectangular aperture
 					print "TODO - rectangle transition"

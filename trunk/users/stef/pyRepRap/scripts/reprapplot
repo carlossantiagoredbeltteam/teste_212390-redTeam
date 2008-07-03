@@ -121,6 +121,10 @@ class PreferencesDialog(wx.Dialog):
         self.text_circleResolution = wx.TextCtrl(self.panel_general, -1, "")
         self.label_1 = wx.StaticText(self.panel_general, -1, "Delay between lines  (seconds) :")
         self.text_lineDelay = wx.TextCtrl(self.panel_general, -1, "")
+        self.label_2 = wx.StaticText(self.panel_general, -1, "Zoom step (factor) :")
+        self.text_zoomStep = wx.TextCtrl(self.panel_general, -1, "")
+        self.label_3 = wx.StaticText(self.panel_general, -1, "Grid division (mm) :")
+        self.text_gridDivision = wx.TextCtrl(self.panel_general, -1, "")
         self.checkbox_debug = wx.CheckBox(self.panel_general, -1, "Debug")
         self.notebook_inputs = wx.Notebook(self.panel_inputs, -1, style=wx.NB_LEFT)
         self.notebook_outputs = wx.Notebook(self.panel_outputs, -1, style=wx.NB_LEFT)
@@ -172,7 +176,7 @@ class PreferencesDialog(wx.Dialog):
         sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
         sizer_2 = wx.BoxSizer(wx.VERTICAL)
         sizer_9 = wx.StaticBoxSizer(self.sizer_9_staticbox, wx.VERTICAL)
-        grid_sizer_2 = wx.FlexGridSizer(6, 3, 4, 0)
+        grid_sizer_2 = wx.FlexGridSizer(7, 3, 4, 0)
         grid_sizer_1 = wx.FlexGridSizer(4, 11, 4, 0)
         grid_sizer_1.Add(self.label_8, 0, wx.ALIGN_CENTER_VERTICAL|wx.ADJUST_MINSIZE, 0)
         grid_sizer_1.Add((20, 20), 0, wx.ADJUST_MINSIZE, 0)
@@ -197,7 +201,13 @@ class PreferencesDialog(wx.Dialog):
         grid_sizer_2.Add(self.label_1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ADJUST_MINSIZE, 0)
         grid_sizer_2.Add((10, 20), 0, wx.ADJUST_MINSIZE, 0)
         grid_sizer_2.Add(self.text_lineDelay, 1, wx.EXPAND|wx.ADJUST_MINSIZE, 0)
-        grid_sizer_2.Add(self.checkbox_debug, 0, wx.ADJUST_MINSIZE, 0)
+        grid_sizer_2.Add(self.label_2, 0, wx.ALIGN_CENTER_VERTICAL|wx.ADJUST_MINSIZE, 0)
+        grid_sizer_2.Add((10, 20), 0, wx.ADJUST_MINSIZE, 0)
+        grid_sizer_2.Add(self.text_zoomStep, 0, wx.EXPAND|wx.ADJUST_MINSIZE, 0)
+        grid_sizer_2.Add(self.label_3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ADJUST_MINSIZE, 0)
+        grid_sizer_2.Add((10, 20), 0, wx.ADJUST_MINSIZE, 0)
+        grid_sizer_2.Add(self.text_gridDivision, 0, wx.EXPAND|wx.ADJUST_MINSIZE, 0)
+        grid_sizer_2.Add(self.checkbox_debug, 0, wx.ALIGN_CENTER_VERTICAL|wx.ADJUST_MINSIZE, 0)
         grid_sizer_2.Add((10, 20), 0, wx.ADJUST_MINSIZE, 0)
         grid_sizer_2.Add((20, 20), 0, wx.ADJUST_MINSIZE, 0)
         grid_sizer_2.AddGrowableCol(2)
@@ -239,7 +249,8 @@ class PreferencesDialog(wx.Dialog):
         self.text_lineDelay.SetValue( str(self.preferences.pref_lineDelay) )
         self.checkbox_debug.SetValue( self.preferences.pref_debug )
         self.text_circleResolution.SetValue( str(self.preferences.pref_circleResolution) )
-        # add grid division
+        self.text_gridDivision.SetValue( str(self.preferences.pref_gridDivision) )
+        self.text_zoomStep.SetValue( str(self.preferences.pref_zoomStep) )
     
     def getPreferences(self):
         return self.preferences
@@ -252,6 +263,8 @@ class PreferencesDialog(wx.Dialog):
         self.preferences.pref_lineDelay = float( self.text_lineDelay.GetValue() )
         self.preferences.pref_debug = self.checkbox_debug.GetValue()
         self.preferences.pref_circleResolution = float( self.text_circleResolution.GetValue() )
+        self.preferences.pref_gridDivision = int( self.text_gridDivision.GetValue() )
+        self.preferences.pref_zoomStep = float( self.text_zoomStep.GetValue() )
         
         for p in self.preferencePanels:
             p.savePrefValues()
@@ -310,8 +323,8 @@ class DrawCanvas(wxpygame.wxSDLPanel):
         pygame.font.init()
         self.font = pygame.font.Font(None, 17)
         
-        
         self.fullRedraw()
+    
     # Referesh
     def refresh(self):
         self.printArea = 0, 0, reprap.cartesian.x.limit, reprap.cartesian.y.limit
@@ -336,6 +349,15 @@ class DrawCanvas(wxpygame.wxSDLPanel):
         textRect.centery = y
         surface.blit(text, textRect)
     
+    def centreView(self, x, y):
+        widthV, heightV = self.GetSizeTuple()
+        null, null, widthD, heightD = self.drawRect
+        print "vs", widthV, heightV
+        print "ds", widthD, heightD
+        self.offsetX = (widthV - widthD + x) / 2
+        self.offsetY = (heightV - heightD + y) / -2
+        print "offs", self.offsetX, self.offsetY
+    
     def fullRedraw(self):
         # Find limits
         if len(self.polygons) > 0:
@@ -354,15 +376,13 @@ class DrawCanvas(wxpygame.wxSDLPanel):
         self.drawSurface = pygame.Surface( ( width, height ) )
 
         # Draw background
-        backRect = 0, 0, width, height
-        pygame.draw.rect( self.drawSurface, self.baseColour, backRect, 0)      # Table backdrop
+        self.drawRect = 0, 0, width, height
+        pygame.draw.rect( self.drawSurface, self.baseColour, self.drawRect, 0)
         
         # Draw grid
         for x in range( 0, int(maxX), self.parent.preferences.pref_gridDivision ):
-            #pygame.draw.line( self.drawSurface, self.gridColour, ( int( float(x) * self.previewScale ) + border , border ), ( int( float(x) * self.previewScale ) + border , height - border ) )
             pygame.draw.line( self.drawSurface, self.gridColour, ( int( float(x) * self.previewScale ) + border , border ), ( int( float(x) * self.previewScale ) + border , height - border ) )
         for y in range( 0, int(maxY), self.parent.preferences.pref_gridDivision ):
-            #pygame.draw.line( self.drawSurface, self.gridColour, ( border, height - border - int( float(y) * self.previewScale ) ), ( width - border, height - border - int( float(y) * self.previewScale ) ) )
             pygame.draw.line( self.drawSurface, self.gridColour, ( border, height - border - int( float(y) * self.previewScale ) ), ( width - border, height - border - int( float(y) * self.previewScale ) ) )
         
         # Draw axis labels
@@ -398,9 +418,7 @@ class DrawCanvas(wxpygame.wxSDLPanel):
                 if event.type == pygame.QUIT:
                     sys.exit()
             pygame.display.flip()
-            #if self.previewLines.hasChanged() or self.plotLines.hasChanged():
-            #    self.update()
-
+    
     # Change draw offset to allow dragging of plot              
     def MouseMove(self, event):
         w, h = self.GetSizeTuple()
@@ -408,7 +426,7 @@ class DrawCanvas(wxpygame.wxSDLPanel):
             x, y = event.GetPosition()
             if event.Dragging():
                 self.offsetX, self.offsetY = x + self.moveDeltaX, self.moveDeltaY - y
-                #self.fullRedraw()
+    
     # Record offsets for use in drag movement
     def OnMouseDown(self, event):
         w, h = self.GetSizeTuple()
@@ -417,7 +435,6 @@ class DrawCanvas(wxpygame.wxSDLPanel):
         self.moveDeltaX, self.moveDeltaY = self.offsetX - x, self.offsetY + y
         
     def OnMouseUp(self, event):
-        #self.fullRedraw()
         pass
     
     # When mouse wheel moved, zoom in or out
@@ -425,18 +442,16 @@ class DrawCanvas(wxpygame.wxSDLPanel):
         w, h = self.GetSizeTuple()
         centreX, centreY = w / 2, h / 2
         x, y = event.GetPosition()
-        deltaX, deltaY = centreX - x, y - centreY
-        #print "mouse", x, y, "centre", centreX, centreY, "deltas", deltaX, deltaY, "wh", w, h
-        #self.offsetX += deltaX
-        #self.offsetY += deltaY
-        #surface.get_rect().centerx
-        #surface.get_rect().centery
-    
+        #deltaX, deltaY = centreX - x, y - centreY
+        
         if event.GetWheelRotation() > 0:
             self.previewScale = self.previewScale + self.parent.preferences.pref_zoomStep
-        elif self.previewScale >= 0.1:
+        elif self.previewScale >= self.parent.preferences.pref_zoomStep:
             self.previewScale = self.previewScale - self.parent.preferences.pref_zoomStep
         self.fullRedraw()
+        #null, null, widthD, heightD = self.drawRect
+        #self.centreView(x - self.offsetX, h - y - self.offsetY)
+        #self.centreView(100, 100)
 
 # Main frame class
 class MyFrame(wx.Frame):
@@ -569,6 +584,7 @@ class MyFrame(wx.Frame):
     
     def plotComplete(self):
         self.pygameCanvas.fullRedraw()
+        self.pygameCanvas.centreView(0, 0)
         self.currentPlotter.join()
         self.currentPlotter = False
         self.setStatusBar("Plot Complete")
