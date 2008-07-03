@@ -39,6 +39,7 @@ class output(reprap.baseplotters.ExportPlotter):
 	
 	# Start plot (as new thread)
 	def run(self):
+		self.alive = True
 		self.gcode = GCode()
 		self.curZ = 0
 		x2, y2 = 0, 0

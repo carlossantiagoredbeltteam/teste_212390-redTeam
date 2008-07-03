@@ -40,6 +40,7 @@ class output(reprap.baseplotters.ExportPlotter):
 	
 	# Start plot (as new thread)
 	def run(self):
+		self.alive = True
 		self.smil = SMIL()
 		self.curZ = 0
 		for poly in self.polygons:
@@ -48,12 +49,12 @@ class output(reprap.baseplotters.ExportPlotter):
 				break
 			#print "plot poly", poly.points, "pc", poly.closed
 			x1, y1 = poly.points[0]
-			self.cartesianMove(x1, y1, False)
+			self.cartesianMove(x1, y1, None)
 			self.toolhead.start()
 			for p in poly.points[ 1: ]:
 				x2, y2 = p
 				if (x1 != x2) or (y1 != y2):
-					self.cartesianMove(x2, y2, False)
+					self.cartesianMove(x2, y2, None)
 			x1, y1 = x2, y2
 			self.toolhead.stop()
 			self.smil.finishPolygon(poly.closed)
@@ -65,7 +66,9 @@ class output(reprap.baseplotters.ExportPlotter):
 	
 	# Translate a cartesian movement into whatever the output plugin does with it (called locally and by toolhead)
 	def cartesianMove(self, x, y, z, units = reprap.UNITS_MM):
-		if not z:
+		#if z != None:
+		#	self.smil.addCoordinate( x, y, z )
+		if x != None and y != None:
 			self.smil.addCoordinate( x, y, z )
 		# TODO, should we round coordinates
 

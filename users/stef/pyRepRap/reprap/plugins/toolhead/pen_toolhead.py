@@ -21,12 +21,12 @@ class tool:
 	def start(self):
 		if not self.penIsDown:
 			self.penIsDown = True
-			self.output.cartesianMove(False, False, self.pref_penDownPos, units = reprap.UNITS_STEPS)
+			self.output.cartesianMove(None, None, self.pref_penDownPos, units = reprap.UNITS_STEPS)
 	
 	def stop(self):
 		if self.penIsDown:
 			self.penIsDown = False
-			self.output.cartesianMove(False, False, self.pref_penUpPos, units = reprap.UNITS_STEPS)
+			self.output.cartesianMove(None, None, self.pref_penUpPos, units = reprap.UNITS_STEPS)
 
 
 

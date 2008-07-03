@@ -60,7 +60,8 @@ def arc(x, y, radius, startAngle, endAngle, resolution, fillDensity = False):
 		endAngle += 360								
 	# make detail proportional to radius to always give good resolution
 	for theta in frange( startAngle, endAngle + angleDiv, angleDiv ):
-		poly.addPoint( calcCircle(theta, radius) )
+		cx, cy = calcCircle(theta, radius)
+		poly.addPoint( (x + cx, y + cy) )
 	return poly
 
 # Return polygon for filled circle with defined position, radius.
