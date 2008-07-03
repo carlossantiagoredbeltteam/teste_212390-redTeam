@@ -4,7 +4,7 @@ PLUGIN_IMPORT	= 1
 PLUGIN_OUTPUT	= 2
 PLUGIN_TOOLHEAD	= 3
 
-if os.system=="win32":
+if os.platform=="win32":
 	# Windows
 	pluginsPath = sys.path[0] + "/plugins"
 else:
