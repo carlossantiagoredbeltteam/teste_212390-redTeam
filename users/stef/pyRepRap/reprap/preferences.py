@@ -33,6 +33,10 @@ class PreferenceHandler:
 	def load(self):
 		if not os.path.exists(self.fileName):
 			print "Preference file '" + self.fileName + "' does not exist, creating"
+			# If preferences directory does not exist then create it
+			dirPath = os.path.join( getHomeDir(), ".pyRepRap" )
+			if not os.path.exists(dirPath):
+				os.mkdir(dirPath)
 			self.save()
 		
 		f = open(self.fileName, 'r')
