@@ -4,7 +4,15 @@ PLUGIN_IMPORT	= 1
 PLUGIN_OUTPUT	= 2
 PLUGIN_TOOLHEAD	= 3
 
-pluginsPath = "/usr/share/reprap/plugins"
+if os.system=="win32":
+	# Windows
+	pluginsPath = sys.path[0] + "/plugins"
+else:
+	# Linux
+	pluginsPath = "/usr/share/reprap/plugins"
+
+print "Plugins loading from path'" + pluginsPath + "'"
+
 pluginsFolders = {PLUGIN_IMPORT:"import", PLUGIN_OUTPUT:"output", PLUGIN_TOOLHEAD:"toolhead"}
 
 def loadPlugins(pluginsFolder, suffix):

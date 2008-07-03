@@ -36,8 +36,15 @@ plotterList = reprap.plugins.listTitles(plotterPlugins)
 outputList = reprap.plugins.listTitles(outputPlugins)
 toolheadList = reprap.plugins.listTitles(toolheadPlugins)
 
+if os.system=="win32":
+	# Windows (taking path of this script)
+	iconPath = sys.path[0] + "/graphics"
+else:
+	# Linux
+	iconPath = "/usr/share/reprap/icons/"
+
 #iconPath = reprap.__path__[0] + "/graphics/"
-#iconPath = "/usr/share/reprap/icons/"
+#iconPath = 
 
 # Feedback action definitions
 EVT_FBM_ID = wx.NewId()
