@@ -137,6 +137,23 @@ String getNextCommand()
       c = "G1 X0 Y-10 Z0 F450";
     }
     
+    if (key == 'A')
+    {
+      c = "G1 X1 Y0 Z0 F450";
+    }
+    if (key == 'D')
+    {
+      c = "G1 X-1 Y0 Z0 F450";
+    }
+    if (key == 'W')
+    {
+      c = "G1 X0 Y1 Z0 F450";
+    }
+    if (key == 'S')
+    {
+      c = "G1 X0 Y-1 Z0 F450";
+    }
+    
     // Z axsis
     if (key == 'q' || key == 'Q')
     {
