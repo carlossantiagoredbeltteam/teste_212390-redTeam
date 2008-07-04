@@ -109,6 +109,36 @@ void draw()
   temp += "\nTarget: " + targetTemp + "C";
   temp += "\nDC Speed: " + motorSpeed + "C";
   text(temp, 10, 20);
+
+  temp =
+    "Keys:\n";
+  text(temp, 10, 80);
+
+  temp = 
+    "a: +X\n" +
+    "d: -X\n" +
+    "w: +Y\n" +
+    "s: -Y\n" +
+    "q: +Z\n" +
+    "z: -Z\n";
+  text(temp, 10, 100);
+    
+  temp = 
+    "u: Set temp to 185\n" +
+    "p: Increase temp\n" +
+    "l: Decrease temp\n";
+  text(temp, 100, 100);
+
+  temp = 
+    "i: Increase motor speed\n" +
+    "j: Decrease motor speed\n";
+  text(temp, 100, 160);
+
+  temp = 
+    "m: Extruder on\n" +
+    "n: Extruder off\n" +
+    "b: Extruder reverse\n";
+  text(temp, 100,200);
 }
 
 int targetTemp = 20;
@@ -154,7 +184,7 @@ String getNextCommand()
       c = "G1 X0 Y-1 Z0 F450";
     }
     
-    // Z axsis
+    // Z axis
     if (key == 'q' || key == 'Q')
     {
       c = "G0 X0 Y0 Z2 F200";
