@@ -29,6 +29,8 @@ public class MachineFactory {
 		
 		if (geometry.compareToIgnoreCase("cartesian") == 0)
 		  	return new Reprap();
+		if (geometry.compareToIgnoreCase("gcodewriter") == 0)
+		  	return new GCodeWriter();
 		else if (geometry.compareToIgnoreCase("nullcartesian") == 0)
 		    return new NullCartesianMachine();		
 		else

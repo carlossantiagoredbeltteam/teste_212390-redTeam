@@ -16,7 +16,7 @@ public interface Extruder
 	 * Reload the preferences from the preferences file
 	 *
 	 */
-	public void refreshPreferences() throws IOException;
+	public void refreshPreferences();
 
 	/**
 	 * Start the extruder motor at a given speed.  This ranges from 0
@@ -39,8 +39,15 @@ public interface Extruder
 	 */
 	public void setExtrusion(int speed, boolean reverse) throws IOException;
 	
-//	public void startExtruding();
-//	public void stopExtruding();
+	/**
+	* start extruding at the normal rate.
+	*/
+	public void startExtruding();
+	
+	/**
+	* stop extruding
+	*/
+	public void stopExtruding();
 	
 	/**
 	* Start/stop the extruder motor
@@ -60,6 +67,11 @@ public interface Extruder
 	 * @throws Exception
 	 */
 	public void heatOn() throws Exception; 
+
+	/**
+	* Turns the heater for the extruder off.
+	*/
+	public void heatOff() throws Exception; 
 
 	/**
 	 * Set the temperature of the extruder at a given height. This height is given

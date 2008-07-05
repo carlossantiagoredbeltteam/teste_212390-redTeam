@@ -99,52 +99,40 @@ public interface Printer {
 	public void dispose();
 	
 	
-//	public int getSpeed();
+	/**
+	 * @param feedrate in mm/minute
+	 */
+	public void setFeedrate(double feedrate);
 	
 	/**
-	 * @param speed
+	 * @param feedrate in mm/minute
 	 */
-	public void setSpeed(int speed);
+	public void setFastFeedrateXY(double feedrate);
 	
 	/**
-	 * @param speed
+	 * @return fast XY movement feedrate in mm/minute
 	 */
-	public void setFastSpeed(int speed);
+	public double getFastFeedrateXY();
 	
 	/**
-	 * @return the extruder speed
+	 * @param feedrate in mm/minute
 	 */
-	public int getSpeedZ();
+	public void setFastFeedrateZ(double feedrate);
 	
 	/**
-	 * @param speed
+	 * @return the extruder feedrate in mm/minute
 	 */
-	public void setSpeedZ(int speed);
-	
-//	public int getExtruderSpeed();
-//	public void setExtruderSpeed(int speed);
+	public double getFastFeedrateZ();
 	
 	/**
 	 * @param previewer
 	 */
 	public void setPreviewer(Previewer previewer);
 	
-//	public void setTemperature(int temperature) throws Exception;
-//	public double getInfillSpeed();
-//	public double getOutlineSpeed();
-	
 	/**
 	 * @return is cancelled when ...?
 	 */
 	public boolean isCancelled();
-	
-//	public double getAngleSpeedUpLength();
-//	public double getAngleSpeedFactor();
-	
-	/**
-	 * @return the extrider fast speed
-	 */
-	public int getFastSpeed();
 	
 	/**
 	 * @throws Exception
@@ -275,21 +263,6 @@ public interface Printer {
 	 * @return
 	 */
 	public Extruder[] getExtruders();
-	
-	/**
-	 * @return the X stepper
-	 */
-	public AxisMotor getXMotor();
-	
-	/**
-	 * @return the Y stepper
-	 */
-	public AxisMotor getYMotor();
-	
-	/**
-	 * @return the Z stepper
-	 */	
-	public AxisMotor getZMotor();
 	
 	/**
 	 * Just finished a layer
