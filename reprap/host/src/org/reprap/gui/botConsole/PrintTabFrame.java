@@ -7,6 +7,7 @@
 package org.reprap.gui.botConsole;
 
 import java.util.*;
+import java.text.SimpleDateFormat;
 import java.net.URI;
 //import java.awt.Desktop; //***AB
 //import java.io.IOException;
@@ -26,6 +27,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
     private Printer printer;
     private boolean paused = false;
     private long startTime = -1;
+    private int oldLayer = -1;
     
     /** Creates new form PrintTabFrame */
     public PrintTabFrame() {
@@ -55,6 +57,13 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
     		return;
     	
     	int layer = org.reprap.Main.gui.getLayer();
+    	
+    	// Only bother if the layer has just changed
+    	
+    	if(layer == oldLayer)
+    		return;
+    	
+    	oldLayer = layer;
 
     	currentLayerOutOfN.setText("" + layer + "/" + layers);
  
@@ -62,8 +71,10 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
     	progressBar.setMaximum(layers);
     	progressBar.setValue(layer);
     	
-    	Date d = new Date();
-		long e = d.getTime();
+    	GregorianCalendar cal = new GregorianCalendar();
+    	SimpleDateFormat dateFormat = new SimpleDateFormat("EE HH:mm");
+    	Date d = cal.getTime();
+		long e = d.getTime() + cal.getTimeZone().getOffset(d.getTime());
     	if(startTime < 0)
     	{
     		startTime = e;
@@ -77,8 +88,14 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
     	int h = (int)(f/60000)/60;
     	int m = (int)(f/60000)%60;
     	
+    	// No idea why this next bit doesn't work...
+    	//if(cal.getTimeZone().inDaylightTime(d))
+    	//{
+    		f = f + 3600000;
+    		//System.out.println("DST");
+    	//}
        	expectedBuildTime.setText("" + h + ":" + m);
-    	expectedFinishTime.setText(new Date(e + f).toString());
+    	expectedFinishTime.setText(dateFormat.format(new Date(startTime + f)));
     }
     
     /**
@@ -312,6 +329,7 @@ public void pauseAction()
     paused = !paused;
     if(paused)
     {
+    	pauseButton.setLabel("Pausing...");
     	org.reprap.Main.gui.pause();
         pauseButton.setLabel("Resume");
         parentBotConsoleFrame.resumePolling();
