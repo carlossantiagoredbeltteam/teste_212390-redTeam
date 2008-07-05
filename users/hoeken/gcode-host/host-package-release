@@ -1,0 +1,100 @@
+#!/bin/bash
+# host-package-release -- Packages Reprap host software into a .zip file
+
+# init
+RELEASE=${1:-`date -u +%Y%m%d`}
+
+LINUXFILENAME="reprap-host-linux-$RELEASE"
+LINUXFILELIST="jar/reprap.jar lib/reprap-wv.stl \
+    reprap-host.sh reprap-host reprap-host.bat LICENSE"
+
+MACFILENAME="reprap-host-mac-$RELEASE"
+MACFILELIST="jar/reprap.jar lib/reprap-wv.stl \
+    reprap-host.sh reprap-host reprap-host.bat LICENSE"
+
+WINDOWSFILENAME="reprap-host-windows-$RELEASE"
+WINDOWSFILELIST="jar/reprap.jar lib/reprap-wv.stl \
+    reprap-host.sh reprap-host reprap-host.bat LICENSE"
+
+SRCFILENAME="reprap-host-src-$RELEASE"
+SRCFILELIST="src/* LICENSE build.xml build-user.xml .classpath .project \
+	host-package-release README"
+LIBFILES="lib/*"
+
+# Remove any old jar directory
+[ -d jar ] && rm -rf jar
+
+# Recompile java files and create Reprap.jar
+ant clean jar || exit 1
+
+# Delete and then create temporary package directories
+rm -rf "release"
+mkdir "release"
+mkdir "release/$LINUXFILENAME" "release/$MACFILENAME" "release/$WINDOWSFILENAME" "release/$SRCFILENAME"
+
+# Copy linux files into binary package directory
+for F in $LINUXFILELIST
+do
+  cp -p $F "release/$LINUXFILENAME"
+done
+
+# Copy windows files into binary package directory
+for F in $WINDOWSFILELIST
+do
+  cp -p $F "release/$WINDOWSFILENAME"
+done
+
+# Copy mac files into binary package directory
+for F in $MACFILELIST
+do
+  cp -p $F "release/$MACFILENAME"
+done
+
+# Copy README into package dir, substituting release string for RELEASE
+#   and the current UTC date for DATE
+NOW=`date -u +'%d %B %Y'`
+sed -e "s/RELEASE/$RELEASE/g" -e "s/DATE/$NOW/g" README > "release/$LINUXFILENAME/README"
+sed -e "s/RELEASE/$RELEASE/g" -e "s/DATE/$NOW/g" README > "release/$MACFILENAME/README"
+
+# Create README.txt for Windows people
+sed -e 's/$/\r/' README > "release/$WINDOWSFILENAME/README.txt"
+
+# Copy Main class file, so we can use java -cp to run software
+mkdir -p "release/$MACFILENAME/org/reprap"
+cp -p bin/org/reprap/Main.class "release/$MACFILENAME/org/reprap/"
+
+mkdir -p "release/$LINUXFILENAME/org/reprap"
+cp -p bin/org/reprap/Main.class "release/$LINUXFILENAME/org/reprap/"
+
+mkdir -p "release/$WINDOWSFILENAME/org/reprap"
+cp -p bin/org/reprap/Main.class "release/$WINDOWSFILENAME/org/reprap/"
+
+# Now create the src archive
+for F in $SRCFILELIST
+do
+  cp -rp $F "release/$SRCFILENAME"
+done
+
+mkdir -p "$SRCFILENAME"/lib
+for F in $LIBFILES
+do
+  cp -pr $F "$SRCFILENAME"/lib
+done
+
+# Omit all .svn subdirs
+find $SRCFILENAME -type d -name .svn |xargs rm -rf
+
+# Create zip archive
+cd release
+[ -f "$MACFILENAME".zip ] && rm "$MACFILENAME".zip
+zip -qr "$MACFILENAME.zip" "$MACFILENAME"
+[ -f "$LINUXFILENAME".zip ] && rm "$LINUXFILENAME".zip
+zip -qr "$LINUXFILENAME.zip" "$LINUXFILENAME"
+[ -f "$WINDOWSFILENAME".zip ] && rm "$WINDOWSFILENAME".zip
+zip -qr "$WINDOWSFILENAME.zip" "$WINDOWSFILENAME"
+# Create src zip archive
+[ -f "$SRCFILENAME".zip ] && rm "$SRCFILENAME".zip
+zip -qr "$SRCFILENAME.zip" "$SRCFILENAME"
+cd ..
+
+echo "RepRap Host Software Release $RELEASE created."
