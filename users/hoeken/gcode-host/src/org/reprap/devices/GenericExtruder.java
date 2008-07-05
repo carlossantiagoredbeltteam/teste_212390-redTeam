@@ -283,6 +283,11 @@ public abstract class GenericExtruder implements Extruder
 	protected boolean pauseBetweenSegments = true;
 	
 	/**
+	* Are we currently extruding?
+	*/
+	protected boolean isExtruding = false;
+	
+	/**
 	* Our printer object.
 	*/
 	Printer printer = null;
@@ -296,9 +301,10 @@ public abstract class GenericExtruder implements Extruder
 	public GenericExtruder(int extruderId)
 	{
 		myExtruderID = extruderId;
-
 		refreshPreferences();
 	}
+
+	
 	
 	public void refreshPreferences()
 	{
@@ -400,7 +406,41 @@ public abstract class GenericExtruder implements Extruder
 	 */
 	public void setExtrusion(int speed) throws IOException
 	{
+		if (speed > 0)
+			isExtruding = true;
+		else
+			isExtruding = false;
+			
 		setExtrusion(speed, false);
+	}
+	
+	public void startExtruding()
+	{
+		if (!isExtruding)
+		{
+			isExtruding = true;
+			try
+			{
+				setExtrusion(getExtruderSpeed());
+			} catch (Exception e) {
+				//hmm.
+			}
+		}
+	}
+	
+	public void stopExtruding()
+	{
+		if (isExtruding)
+		{
+			isExtruding = false;
+			
+			try
+			{
+				setExtrusion(0);
+			} catch (Exception e) {
+				//hmm.
+			}
+		}
 	}
 	
 	public void setMotor(boolean motorOn) throws IOException
@@ -414,23 +454,15 @@ public abstract class GenericExtruder implements Extruder
 			setExtrusion(0, false);
 	}
 
-	/**
-	 * Turn the extruder on using the extrusionTemp property
-	 * @throws Exception
-	 */
-	
 	public void heatOn() throws Exception 
 	{
 		setTemperature(extrusionTemp);
 	}
 	
-	/**
-	* empty function.  you should make it your own class.
-	*/
-	public void setHeater(int heat, double maxTemp) throws IOException
+	public void heatOff() throws Exception 
 	{
-	} 
-
+		setTemperature(0);
+	}
 	
 	/* (non-Javadoc)
 	 * @see org.reprap.Extruder#getTemperatureTarget()

@@ -35,6 +35,8 @@ public class GCodeExtruder extends GenericExtruder
 		gcode.queue("M104 S" + temperature);
 	}
 	
+	public void setHeater(int heat, double maxTemp) {}
+	
 	public double getTemperature()
 	{
 		return getTemperatureTarget();
@@ -59,17 +61,21 @@ public class GCodeExtruder extends GenericExtruder
 	}
 	
 	//TODO: make these real G codes.
-	public void setCooler(boolean f) throws IOException
+	public void setCooler(boolean coolerOn) throws IOException
 	{
-		if (f)
+		if (coolerOn)
 			gcode.queue("M120");
 		else
 			gcode.queue("M121");
 	}
 	
+	//TODO: actually implement this one.
 	public void setValve(boolean valveOpen) throws IOException
 	{
-		
+		if (valveOpen)
+			gcode.queue("M120");
+		else
+			gcode.queue("M121");
 	}
 	
 	public boolean isEmpty()
