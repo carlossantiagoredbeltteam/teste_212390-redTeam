@@ -4,8 +4,8 @@ import javax.media.j3d.Appearance;
 
 import org.reprap.Device;
 
-public interface Extruder{
-
+public interface Extruder
+{
 	
 	/**
 	 * Dispose of the extruder object 
@@ -16,7 +16,7 @@ public interface Extruder{
 	 * Reload the preferences from the preferences file
 	 *
 	 */
-	public void refreshPreferences();
+	public void refreshPreferences() throws IOException;
 
 	/**
 	 * Start the extruder motor at a given speed.  This ranges from 0
@@ -26,12 +26,7 @@ public interface Extruder{
 	 * @param speed The speed to drive the motor at (0-255)
 	 * @throws IOException
 	 */
-	public void setExtrusion(int speed) throws IOException; 
-	
-	/**
-	 * Start/stop the extruder motor
-	 */
-	public void setMotor(boolean motorOn) throws IOException;
+	public void setExtrusion(int speed) throws IOException;
 	
 	/**
 	 * Start the extruder motor at a given speed.  This ranges from 0
@@ -42,8 +37,16 @@ public interface Extruder{
 	 * @param reverse If set, run extruder in reverse
 	 * @throws IOException
 	 */
-	public void setExtrusion(int speed, boolean reverse) throws IOException; 
+	public void setExtrusion(int speed, boolean reverse) throws IOException;
 	
+//	public void startExtruding();
+//	public void stopExtruding();
+	
+	/**
+	* Start/stop the extruder motor
+	*/
+	public void setMotor(boolean motorOn) throws IOException;
+		
 	/**
 	 * Open and close the valve (if any).
 	 * @param pulseTime
@@ -100,12 +103,22 @@ public interface Extruder{
 	/**
 	 * @return the infill speed as a value between [0,1]
 	 */
-	public double getInfillSpeed();
+	public double getInfillSpeedFactor();
+	
+	/**
+	* @return the infill feedrate as a value in mm/minute
+	*/
+	public double getInfillFeedrate();
 
 	/**
 	 * @return the outline speed as a avlue between [0,1]
 	 */
-	public double getOutlineSpeed();
+	public double getOutlineSpeedFactor();
+
+	/**
+	* @return the infill feedrate as a value in mm/minute
+	*/
+	public double getOutlineFeedrate();
 	
 	/**
 	 * @return The length in mm to speed up when going round corners
@@ -122,6 +135,10 @@ public interface Extruder{
 	 */
 	public double getAngleSpeedFactor();
 	
+	/**
+	* @return the angle feedrate as a value in mm/minute
+	*/
+	public double getAngleFeedrate();
 	
 	/**
 	 * Turn the cooler (fan?) on or off
@@ -138,9 +155,9 @@ public interface Extruder{
 
     /**
      * The speed of X and Y movement
-     * @return the XY speed
+     * @return the XY feedrate in mm/minute
      */
-    public int getXYSpeed();
+    public double getXYFeedrate();
  
     /**
      * @return the extruder speeds
@@ -256,7 +273,13 @@ public interface Extruder{
      * short lines.
      * @return
      */
-    public double getShortSpeed();
+    public double getShortLineSpeedFactor();
+
+	/**
+	* Feedrate for short lines in mm/minute
+	* @return
+	*/
+	public double getShortLineFeedrate();
     
     /**
      * Number of mm to overlap the hatching infill with the outline.  0 gives none; -ve will 
@@ -341,9 +364,8 @@ public interface Extruder{
      * @param printer
      * @throws Exception
      */
+
 	//public void finishedLayer(int layerNumber, Printer printer) throws Exception;
 	//public void betweenLayers(int layerNumber, Printer printer) throws Exception;
 	//public void startingLayer(int layerNumber, Printer printer) throws Exception;
-	
-    
 }
