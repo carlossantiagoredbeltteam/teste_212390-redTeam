@@ -37,6 +37,11 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	GCodeWriter gcode;
 	
 	/**
+	* what is our current feedrate?
+	*/
+	double currentFeedrate = 0.0;
+	
+	/**
 	 * @param prefs
 	 * @throws Exception
 	 */
@@ -85,6 +90,8 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		double dx = currentX - x;
 		double dy = currentY - y;
 		double dz = currentZ - z;
+		
+		String code;
 
 		if (dx == 0.0 && dy == 0.0 && dz == 0.0)
 			return;
@@ -94,32 +101,64 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		//go up first?
 		if (startUp)
 		{
-			gcode.queue("G1 Z" + liftedZ + " F" + zFeedrate);
+			code = "G1 Z" + liftedZ;
+
+			if (zFeedrate != currentFeedrate)
+			{
+				code += "F" + zFeedrate;
+				currentFeedrate = zFeedrate;
+			}
+
+			gcode.queue(code);
 			currentZ = liftedZ;
 			dz = 0;
 		}
 		
 		//our real command
-		String code = "G1";
+		code = "";
+		if (currentFeedrate != xyFeedrate)
+			code = "G1 ";
+		
 		if (dx != 0)
-			code += " X" + gx;
+			code += "X" + gx;
 		if (dy != 0)
-			code += " Y" + gy;
-		code += " F" + xyFeedrate;
+			code += "Y" + gy;
+		if (currentFeedrate != xyFeedrate)
+		{
+			code += "F" + xyFeedrate;
+			currentFeedrate = xyFeedrate;
+		}
+		
 		gcode.queue(code);
 
 		if (dz != 0)
 		{
-			code = "G1";
-			code += " Z" + gz;
-			code += " F" + zFeedrate;
+			code = "G1 ";
+			code += "Z" + gz;
+			
+			if (zFeedrate != currentFeedrate)
+			{
+				code += "F" + zFeedrate;
+				currentFeedrate = zFeedrate;
+			}
+
 			gcode.queue(code);
 		}
 		
 		//go back down?
 		if (!endUp && z != currentZ)
-			gcode.queue("G1 Z" + gz + " F" + zFeedrate);
+		{
+			code = "G1 Z" + gz;
+			
+			if (zFeedrate != currentFeedrate)
+			{
+				code += "F" + zFeedrate;
+				currentFeedrate = zFeedrate;
+			}
 
+			gcode.queue(code);
+		}
+		
 		super.moveTo(x, y, z, startUp, endUp);
 	}
 
@@ -154,15 +193,22 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		if (dx == 0.0 && dy == 0.0 && dz == 0.0)
 			return;
 
-		String code = "G1";
+		String code = "";
+		
+		if (feed != currentFeedrate)
+			code += "G1 ";
 		
 		if (dx != 0)
-			code += " X" + gx;
+			code += "X" + gx;
 		if (dy != 0)
-			code += " Y" + gy;
+			code += "Y" + gy;
 		if (dz != 0)
-			code += " Z" + gz;
-		code += " F" + feed;
+			code += "Z" + gz;
+		if (feed != currentFeedrate)
+		{
+			code += "F" + feed;
+			currentFeedrate = feed;
+		}
 		
 		gcode.queue(code);
 		
@@ -227,9 +273,6 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		// Set absolute positioning, which is what we use.
 		gcode.queue("G90");
 		
-		// set our extruder speed.
-		gcode.queue("M104 P" + getExtruder().getExtruderSpeed());		
-		
 		try	{
 			super.initialise();
 		} catch (Exception E) {
@@ -253,6 +296,8 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		double xyFeedrate = round(getFastFeedrateXY(), 4);
 		
 		gcode.queue("G1 X-999 Y-999 F" + xyFeedrate);
+		currentFeedrate = xyFeedrate;
+		
 		//gcode.queue("G0 Z-999");
 		gcode.queue("G92");
 	}
@@ -269,7 +314,8 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		super.homeToZeroX();
 		
 		double feedrate = round(getMaxFeedrateX(), 4);
-		gcode.queue("G0 X-999 F" + feedrate);
+		gcode.queue("G1 X-999 F" + feedrate);
+		currentFeedrate = feedrate;
 	}
 
 	/* (non-Javadoc)
@@ -279,7 +325,8 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		super.homeToZeroY();
 
 		double feedrate = round(getMaxFeedrateY(), 4);
-		gcode.queue("G0 Y-999 F" + feedrate);
+		gcode.queue("G1 Y-999 F" + feedrate);
+		currentFeedrate = feedrate;
 	}
 
 	/* (non-Javadoc)
@@ -289,7 +336,8 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		super.homeToZeroZ();
 
 		double feedrate = round(getMaxFeedrateZ(), 4);
-		gcode.queue("G0 Z-999 F" + feedrate);
+		gcode.queue("G1 Z-999 F" + feedrate);
+		currentFeedrate = feedrate;
 	}
 	
 	public double round(double c, double d)

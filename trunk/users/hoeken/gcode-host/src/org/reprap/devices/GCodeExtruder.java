@@ -17,6 +17,8 @@ public class GCodeExtruder extends GenericExtruder
 {
 	GCodeWriter gcode;
 	
+	int currentSpeed = 0;
+	
 	/**
 	 * @param prefs
 	 * @param extruderId
@@ -31,7 +33,7 @@ public class GCodeExtruder extends GenericExtruder
 	
 	public void setTemperature(double temperature) throws Exception
 	{
-		gcode.queue("M104 P" + temperature);
+		gcode.queue("M104 S" + temperature);
 	}
 	
 	public void setExtrusion(int speed, boolean reverse) throws IOException
@@ -40,7 +42,11 @@ public class GCodeExtruder extends GenericExtruder
 			gcode.queue("M103");
 		else
 		{
-			gcode.queue("M100 P" + speed);
+			if (speed != currentSpeed)
+			{
+				gcode.queue("M108 R" + speed);
+				currentSpeed = speed;
+			}
 			if (reverse)
 				gcode.queue("M102");
 			else

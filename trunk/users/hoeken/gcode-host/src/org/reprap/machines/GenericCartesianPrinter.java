@@ -138,10 +138,11 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 		Debug.d("Selecting material 0");
 		selectExtruder(0);
 		
+		Debug.d("Homing machine");
+		home();
+
 		Debug.d("Setting temperature");
 		getExtruder().heatOn();
-		
-		home();
 	}
 	
 	/* (non-Javadoc)
