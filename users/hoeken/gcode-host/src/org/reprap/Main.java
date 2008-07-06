@@ -146,6 +146,7 @@ public class Main {
         {
         	System.err.println("MachineFactory.create() failed.\n" +
         			ex.toString());
+			ex.printStackTrace();
         }
 	}
 
@@ -773,35 +774,32 @@ public class Main {
 			}
 			catch (Exception e)	{}
 
-			if (geometry.equals("nullcartesian"))
+			if (geometry.equals("cartesian"))
 			{
-				if (!geometry.equals("gcodewriter") || (geometry.equals("gcodewriter") && use_serial))
+				try
 				{
-					try
-					{
-						communicator = new SNAPCommunicator(port, myAddress);
-					}
-					catch (gnu.io.NoSuchPortException e)
-					{
-						err = "\nCould not connect at " + port + ".\n\n";
-						err += "Check to make sure that is the right path.\n";
-						err += "Check that you have your serial connector plugged in.\n\n";
-						err += "The program will continue but your geometry preference has been set to 'nullcartesian' for this session.";
+					communicator = new SNAPCommunicator(port, myAddress);
+				}
+				catch (gnu.io.NoSuchPortException e)
+				{
+					err = "\nCould not connect at " + port + ".\n\n";
+					err += "Check to make sure that is the right path.\n";
+					err += "Check that you have your serial connector plugged in.\n\n";
+					err += "The program will continue but your geometry preference has been set to 'nullcartesian' for this session.";
 
-						org.reprap.Preferences.setGlobalString("Geometry", "nullcartesian");
+					org.reprap.Preferences.setGlobalString("Geometry", "nullcartesian");
 
-						//throw new Exception(err); // Removed by AB.  We told them already...
-					}
-					catch (gnu.io.PortInUseException e)
-					{
-						err = "\nThe " + port + " port is already in use by another program, or your bot isn't plugged in.\n";
-						err += "The program will continue but your geometry preference has been set to 'nullcartesian' for this session.";
+					//throw new Exception(err); // Removed by AB.  We told them already...
+				}
+				catch (gnu.io.PortInUseException e)
+				{
+					err = "\nThe " + port + " port is already in use by another program, or your bot isn't plugged in.\n";
+					err += "The program will continue but your geometry preference has been set to 'nullcartesian' for this session.";
 
-						org.reprap.Preferences.setGlobalString("Geometry", "nullcartesian");
+					org.reprap.Preferences.setGlobalString("Geometry", "nullcartesian");
 
-						throw new Exception(err);
-					}
-				}				
+					throw new Exception(err);
+				}
 			}
 		}
 

@@ -111,8 +111,38 @@ public class GCodeWriter
 		Debug.d("Queued: " + cmd);
 	}
 	
+	public void cleanSerialBuffer()
+	{
+		for (currentCommand = 0; currentCommand < commands.size(); currentCommand++)
+		{
+			String next = (String)commands.get(currentCommand);
+			String oldString = next;
+			
+			//strip comments
+			int commentIndex = next.indexOf(';');
+			if (commentIndex >= -1)
+				next = next.substring(0, commentIndex);
+			
+			//trim whitespace
+			next = next.trim();	
+			
+			//remove spaces
+			next = next.replaceAll(" ", "");
+			
+			//save it back.
+			commands.set(currentCommand, next);
+			
+			Debug.d(oldString + " converted to: " + next);
+		}
+	}
+	
 	public void fillSerialBuffer()
 	{
+		cleanSerialBuffer();
+		
+		currentCommand = 0;
+		nextCommandToSend = 0;
+		
 		//keep trying until we send all commands.
 		while(nextCommandToSend < commands.size())
 		{
@@ -121,6 +151,13 @@ public class GCodeWriter
 			
 			//whats our next command?
 			String next = (String)commands.get(nextCommandToSend);
+			
+			//skip empty commands.
+			if (next.length() == 0)
+			{
+				nextCommandToSend++;
+				continue;
+			}
 			
 			//will it fit into our buffer?
 			while (bufferSize + next.length() < maxBufferSize)
@@ -232,16 +269,16 @@ public class GCodeWriter
 		int baudRate = 19200;
 		
 		//open our port.
-		Debug.d("Opening port " + portName);
+		Debug.d("GCode opening port " + portName);
 		try 
 		{
 			CommPortIdentifier commId = CommPortIdentifier.getPortIdentifier(portName);
 			port = (SerialPort)commId.open(portName, 30000);
 		} catch (NoSuchPortException e) {
-			Debug.d("Error opening port: " + port);
+			Debug.d("Error opening port: " + portName);
 		}
 		catch (PortInUseException e){
-			Debug.d("Port '" + port + "' is already in use.");
+			Debug.d("Port '" + portName + "' is already in use.");
 		}
 		
 		//get our baudrate
