@@ -104,7 +104,7 @@ public class CartesianGCode extends GenericCartesianPrinter {
 
 			if (zFeedrate != currentFeedrate)
 			{
-				code += "F" + zFeedrate;
+				code += " F" + zFeedrate;
 				currentFeedrate = zFeedrate;
 			}
 
@@ -116,31 +116,35 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		}
 		
 		//our real command
-		code = "";
-		if (currentFeedrate != xyFeedrate)
-			code = "G1 ";
-		
-		if (dx != 0)
-			code += "X" + gx;
-		if (dy != 0)
-			code += "Y" + gy;
-		if (currentFeedrate != xyFeedrate)
+		if (dx != 0 | dy != 0)
 		{
-			code += "F" + xyFeedrate;
-			currentFeedrate = xyFeedrate;
+			code = "";
+			if (currentFeedrate != xyFeedrate)
+				code = "G1 ";
+
+			if (dx != 0)
+				code += "X" + gx;
+			if (dy != 0)
+				code += " Y" + gy;
+			if (currentFeedrate != xyFeedrate)
+			{
+				code += " F" + xyFeedrate;
+				currentFeedrate = xyFeedrate;
+			}
+
+			code += " ;xy move";
+			gcode.queue(code);
 		}
 		
-		code += " ;xy move";
-		gcode.queue(code);
 
 		if (dz != 0)
 		{
 			code = "G1 ";
-			code += "Z" + gz;
+			code += " Z" + gz;
 			
 			if (zFeedrate != currentFeedrate)
 			{
-				code += "F" + zFeedrate;
+				code += " F" + zFeedrate;
 				currentFeedrate = zFeedrate;
 			}
 			
@@ -155,7 +159,7 @@ public class CartesianGCode extends GenericCartesianPrinter {
 			
 			if (zFeedrate != currentFeedrate)
 			{
-				code += "F" + zFeedrate;
+				code += " F" + zFeedrate;
 				currentFeedrate = zFeedrate;
 			}
 
@@ -179,8 +183,6 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		
 		maybeReZero();
 		
-		getExtruder().startExtruding();		
-
 		double distance = segmentLength(x - currentX, y - currentY);
 		if (z != currentZ)
 			distance += Math.abs(currentZ - z);
@@ -205,11 +207,11 @@ public class CartesianGCode extends GenericCartesianPrinter {
 			code += "G1 ";
 		
 		if (dx != 0)
-			code += "X" + gx;
+			code += " X" + gx;
 		if (dy != 0)
-			code += "Y" + gy;
+			code += " Y" + gy;
 		if (dz != 0)
-			code += "Z" + gz;
+			code += " Z" + gz;
 		if (feed != currentFeedrate)
 		{
 			code += " F" + feed;

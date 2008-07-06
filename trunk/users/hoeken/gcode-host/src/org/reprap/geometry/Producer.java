@@ -287,12 +287,16 @@ public class Producer {
 			
 			if(layer != null)
 			{
+				Debug.d("Plotting layer");
 				layer.plot();
+				Debug.d("Finished... destroying");
 				layer.destroy();
 			}
 			layer = null;
 			
+			Debug.d("destroy slice");
 			slice.destroy();
+			Debug.d("destroy layer");
 			stlc.destroyLayer();
 
 			isEvenLayer = !isEvenLayer;

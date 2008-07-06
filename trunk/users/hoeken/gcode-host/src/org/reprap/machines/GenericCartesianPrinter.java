@@ -606,7 +606,8 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 	 */
 	public void setLowerShell(BranchGroup ls)
 	{
-		previewer.setLowerShell(ls);
+		if (previewer != null)
+			previewer.setLowerShell(ls);
 	}
 	
 	/* (non-Javadoc)
@@ -710,6 +711,8 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 		double waitTime = getExtruder().getNozzleWaitTime();
 		double coolTime = getExtruder().getCoolingPeriod();
 		
+		Debug.d("Starting layer " + layerNumber);
+		
 		if (layerPauseCheckbox != null && layerPauseCheckbox.isSelected())
 			layerPause();
 		
@@ -782,6 +785,8 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 	 */
 	public void betweenLayers(int layerNumber) throws Exception
 	{
+		Debug.d("Between layer " + layerNumber);
+		
 		double clearTime = getExtruder().getNozzleClearTime();
 				
 		// Do half the extrusion between layers now
@@ -809,6 +814,8 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 	 */
 	public void finishedLayer(int layerNumber) throws Exception
 	{
+		Debug.d("Finished layer " + layerNumber);
+		
 		double datumX = getExtruder().getNozzleWipeDatumX();
 		double datumY = getExtruder().getNozzleWipeDatumY();
 		double strokeX = getExtruder().getNozzleWipeStrokeX();
