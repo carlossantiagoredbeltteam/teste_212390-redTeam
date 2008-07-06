@@ -22,10 +22,11 @@ public class MachineFactory {
 	 * @return new machine
 	 * @throws Exception
 	 */
-	static public Printer create() throws Exception {
-		
-
+	static public Printer create() throws Exception
+	{
 		String geometry = Preferences.loadGlobalString("Geometry");
+
+		System.err.println(geometry);
 		
 		if (geometry.compareToIgnoreCase("cartesian") == 0)
 		  	return new Reprap();

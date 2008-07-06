@@ -150,17 +150,14 @@ public class Producer {
 	 */
 	public void produce() throws Exception 
 	{
-		int movementSpeedZ;
 		boolean subtractive;
 		boolean interLayerCooling;
 		
 		try {
 			subtractive = Preferences.loadGlobalBool("Subtractive");
-			movementSpeedZ = Preferences.loadGlobalInt("MovementSpeedZ(0..255)");
 		} catch (Exception ex) {
-			movementSpeedZ = 212;
 			subtractive = false;
-			System.err.println("Warning: could not load Z MovementSpeed and/or subtractive flag, using default");
+			System.err.println("Warning: could not load subtractive flag, using default");
 		}
 		
 		try {
@@ -170,7 +167,6 @@ public class Producer {
 			System.err.println("Warning: could not load InterLayerCooling flag, using default");
 		}
 		
-		reprap.setSpeedZ(movementSpeedZ);
 		Debug.d("Intialising reprap");
 		reprap.initialise();
 		Debug.d("Selecting material 0");
@@ -183,7 +179,7 @@ public class Producer {
 		{
 			waitWhilePaused();
 			
-			reprap.setSpeed(reprap.getExtruder().getXYSpeed());
+			reprap.setFeedrate(reprap.getExtruder().getXYFeedrate());
 			reprap.moveTo(1, 1, 0, false, false);
 			
 			// Workaround to get the thing to start heating up
@@ -197,8 +193,10 @@ public class Producer {
 				// Take it slow and easy.
 				Debug.d("Printing warmup segments, printing to (1,60)");
 				reprap.moveTo(1, 25, 0, false, false);
-				reprap.setSpeed(LinePrinter.speedFix(reprap.getExtruder().getXYSpeed(), 
-						reprap.getExtruder().getOutlineSpeed()));
+				reprap.setFeedrate(reprap.getExtruder().getOutlineFeedrate());
+				//TODO: FIX THIS
+				//reprap.setSpeed(LinePrinter.speedFix(reprap.getExtruder().getXYSpeed(), 
+				//		reprap.getExtruder().getOutlineSpeed()));
 				reprap.printTo(1, 60, 0, false, false);
 				Debug.d("Printing warmup segments, printing to (3,60)");
 				reprap.printTo(3, 60, 0, false, false);
@@ -207,8 +205,7 @@ public class Producer {
 				Debug.d("Warmup complete");
 				reprap.getExtruder().setMotor(false);
 			}
-			reprap.setSpeed(reprap.getFastSpeed());
-			
+			reprap.setFeedrate(reprap.getFastFeedrateXY());
 		}
 		
 		// This should now split off layers one at a time
