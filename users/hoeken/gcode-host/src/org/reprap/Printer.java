@@ -313,5 +313,9 @@ public interface Printer {
 	 * @throws IOException
 	 */
 	public void waitTillNotBusy() throws IOException;
+	
+	public GenericStepperMotor getXMotor();
+	public GenericStepperMotor getYMotor();
+	public GenericStepperMotor getZMotor();
          
 }

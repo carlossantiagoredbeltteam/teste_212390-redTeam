@@ -7,6 +7,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 
 import org.reprap.Attributes;
+import org.reprap.AxisMotor;
 import org.reprap.CartesianPrinter;
 import org.reprap.Preferences;
 import org.reprap.ReprapException;
@@ -16,6 +17,7 @@ import org.reprap.comms.snap.SNAPCommunicator;
 import org.reprap.devices.NullExtruder;
 import org.reprap.devices.GenericExtruder;
 import org.reprap.devices.GenericStepperMotor;
+import org.reprap.devices.NullStepperMotor;
 import org.reprap.devices.pseudo.LinePrinter;
 import org.reprap.gui.CalibrateZAxis;
 import org.reprap.gui.Previewer;
@@ -140,6 +142,13 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 	 */
 	private long delay;
 	
+	/**
+	 * Stepper motors for the 3 axis 
+	 */
+	public GenericStepperMotor motorX;
+	public GenericStepperMotor motorY;
+	public GenericStepperMotor motorZ;
+	
 	public GenericCartesianPrinter() throws Exception
 	{
 		startTime = System.currentTimeMillis();
@@ -148,18 +157,22 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 		extruderCount = Preferences.loadGlobalInt("NumberOfExtruders");
 		if (extruderCount < 1)
 			throw new Exception("A Reprap printer must contain at least one extruder");
-		
-		//load our prefs
-		refreshPreferences();
-		
+
 		//load our actual extruders.
 		extruders = new GenericExtruder[extruderCount];
 		loadExtruders();
 		
+		//load our prefs
+		refreshPreferences();
+
 		//init our stuff.
 		currentX = 0;
 		currentY = 0;
 		currentZ = 0;
+		
+		motorX = new NullStepperMotor('X');
+		motorY = new NullStepperMotor('Y');
+		motorZ = new NullStepperMotor('Z');
 	}
 	
 	public void refreshPreferences()
@@ -191,10 +204,8 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 		}
 		
 		for(int i = 0; i < extruderCount; i++)
-		{
 			extruders[i].refreshPreferences();
-		}
-
+		
 		Debug.refreshPreferences();
 	}
 	
@@ -914,5 +925,29 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 
 	public void setCancelled(boolean isCancelled) {
 		statusWindow.setCancelled(isCancelled);
+	}
+	
+	/**
+	 * @return the X stepper
+	 */
+	public GenericStepperMotor getXMotor()
+	{
+		return motorX;
+	}
+	
+	/**
+	 * @return the Y stepper
+	 */
+	public GenericStepperMotor getYMotor()
+	{
+		return motorY;
+	}
+	
+	/**
+	 * @return the Z stepper
+	 */	
+	public GenericStepperMotor getZMotor()
+	{
+		return motorZ;
 	}
 }

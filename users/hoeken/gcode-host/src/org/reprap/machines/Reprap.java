@@ -16,6 +16,7 @@ import org.reprap.comms.snap.SNAPCommunicator;
 import org.reprap.devices.NullExtruder;
 import org.reprap.devices.SNAPExtruder;
 import org.reprap.devices.GenericStepperMotor;
+import org.reprap.devices.SNAPStepperMotor;
 import org.reprap.devices.pseudo.LinePrinter;
 import org.reprap.gui.CalibrateZAxis;
 import org.reprap.gui.Previewer;
@@ -44,13 +45,6 @@ public class Reprap extends GenericCartesianPrinter
 	private Communicator communicator = org.reprap.Main.getCommunicator();
 	
 	/**
-	 * Stepper motors for the 3 axis 
-	 */
-	private GenericStepperMotor motorX;
-	private GenericStepperMotor motorY;
-	private GenericStepperMotor motorZ;
-	
-	/**
 	* our line printer object.
 	*/
 	private LinePrinter layerPrinter;
@@ -68,11 +62,11 @@ public class Reprap extends GenericCartesianPrinter
 //		SNAPAddress myAddress = new SNAPAddress(localNodeNumber); 
 //		communicator = new SNAPCommunicator(commPortName, myAddress);
 
-		motorX = new GenericStepperMotor(communicator,
+		motorX = new SNAPStepperMotor(communicator,
 				new SNAPAddress(Preferences.loadGlobalInt("XAxisAddress")), 1);
-		motorY = new GenericStepperMotor(communicator,
+		motorY = new SNAPStepperMotor(communicator,
 				new SNAPAddress(Preferences.loadGlobalInt("YAxisAddress")), 2);
-		motorZ = new GenericStepperMotor(communicator,
+		motorZ = new SNAPStepperMotor(communicator,
 				new SNAPAddress(Preferences.loadGlobalInt("ZAxisAddress")), 3);
 
 		
@@ -486,30 +480,6 @@ public class Reprap extends GenericCartesianPrinter
 		motorZ.setPosition(convertToStepZ(zeroPoint));
 	}
 	
-	/**
-	 * @return the X stepper
-	 */
-	public GenericStepperMotor getXMotor()
-	{
-		return motorX;
-	}
-	
-	/**
-	 * @return the Y stepper
-	 */
-	public GenericStepperMotor getYMotor()
-	{
-		return motorY;
-	}
-	
-	/**
-	 * @return the Z stepper
-	 */	
-	public GenericStepperMotor getZMotor()
-	{
-		return motorZ;
-	}
-
 	//TODO: MAKE THIS WORK!
 	public int convertFeedrateToSpeedXY(double feedrate)
 	{

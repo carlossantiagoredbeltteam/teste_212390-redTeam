@@ -61,7 +61,7 @@ import com.sun.j3d.utils.geometry.NormalGenerator;
 import org.reprap.gui.STLObject;
 import org.reprap.Attributes;
 import org.reprap.Preferences;
-import org.reprap.devices.NullExtruder;
+import org.reprap.devices.GenericExtruder;
 import org.reprap.utilities.*;
 
 // Small class to hold line segments and the quads in which their ends lie
@@ -355,7 +355,7 @@ class MaterialLists
 	
 	public void add(Attributes a, Transform3D t)
 	{
-		int i = NullExtruder.getNumberFromMaterial(a.getMaterial());
+		int i = GenericExtruder.getNumberFromMaterial(a.getMaterial());
 		if(i < 0 || i >= extruderCount)
 			System.err.println("MaterialLists.add() - dud material: " + a.getMaterial());
 		else

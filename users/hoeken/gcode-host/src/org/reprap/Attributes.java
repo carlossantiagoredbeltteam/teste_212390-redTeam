@@ -1,7 +1,7 @@
 package org.reprap;
 
 import javax.media.j3d.*;
-import org.reprap.devices.NullExtruder;
+import org.reprap.devices.GenericExtruder;
 import org.reprap.gui.STLObject;
 
 /**
@@ -96,7 +96,7 @@ public class Attributes {
 	public Extruder getExtruder(Extruder[] es)
 	{
 		if(e == null)
-			e = es[NullExtruder.getNumberFromMaterial(material)];
+			e = es[GenericExtruder.getNumberFromMaterial(material)];
 		return e;
 	}
 	
@@ -108,7 +108,7 @@ public class Attributes {
 	{ 
 		material = s;
 		e = null;
-		app = NullExtruder.getAppearanceFromMaterial(material);
+		app = GenericExtruder.getAppearanceFromMaterial(material);
 		if(parent != null)
 			parent.restoreAppearance();
 	}
