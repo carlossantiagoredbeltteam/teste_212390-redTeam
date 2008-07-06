@@ -307,7 +307,7 @@ public class LayerProducer {
 		Rr2Point a = Rr2Point.sub(posNow(), p);
 		double amod = a.mod();
 		if(amod > shortLen) {
-			Debug.d("Long segment.  Current feedrate is: " + currentFeedrate);
+//			Debug.d("Long segment.  Current feedrate is: " + currentFeedrate);
 			return false;
 		}
 

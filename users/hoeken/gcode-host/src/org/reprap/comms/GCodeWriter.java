@@ -102,7 +102,11 @@ public class GCodeWriter
 	
 	public void queue(String cmd)
 	{
-		//cmd = "N" + commands.size() + " " + cmd;
+		//trim it and cleanup.
+		cmd = cmd.trim();
+		cmd = cmd.replaceAll("  ", " ");
+		
+		//add to list.
 		commands.add(cmd);
 		
 		if (printToFile)
