@@ -32,7 +32,7 @@ public class GCodeExtruder extends GenericExtruder
 	
 	public void setTemperature(double temperature) throws Exception
 	{
-		gcode.queue("M104 S" + temperature);
+		gcode.queue("M104 S" + temperature + " ;set temperature");
 	}
 	
 	public void setHeater(int heat, double maxTemp) {}
@@ -44,19 +44,35 @@ public class GCodeExtruder extends GenericExtruder
 	
 	public void setExtrusion(int speed, boolean reverse) throws IOException
 	{
-		if (speed == 0)
-			gcode.queue("M103");
+		if (speed == 0 && currentSpeed != 0)
+		{
+			gcode.queue("M103" + " ;extruder off");
+			isExtruding = false;
+		}
 		else
 		{
 			if (speed != currentSpeed)
 			{
-				gcode.queue("M108 R" + speed);
+				gcode.queue("M108 R" + speed + " ;extruder speed in RPM");
 				currentSpeed = speed;
 			}
+
 			if (reverse)
-				gcode.queue("M102");
+				gcode.queue("M102" + " ;extruder on, reverse");
 			else
-				gcode.queue("M101");
+			{
+				try
+				{
+					gcode.queue("M101" + " ;extruder on, forward");
+					Thread.dumpStack();
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+
+			isExtruding = true;
 		}
 	}
 	
@@ -64,18 +80,18 @@ public class GCodeExtruder extends GenericExtruder
 	public void setCooler(boolean coolerOn) throws IOException
 	{
 		if (coolerOn)
-			gcode.queue("M120");
+			gcode.queue("M106 ;cooler on");
 		else
-			gcode.queue("M121");
+			gcode.queue("M107 ;cooler off");
 	}
 	
 	//TODO: actually implement this one.
 	public void setValve(boolean valveOpen) throws IOException
 	{
 		if (valveOpen)
-			gcode.queue("M120");
+			gcode.queue("M126 ;valve open");
 		else
-			gcode.queue("M121");
+			gcode.queue("M127 ;valve closed");
 	}
 	
 	public boolean isEmpty()

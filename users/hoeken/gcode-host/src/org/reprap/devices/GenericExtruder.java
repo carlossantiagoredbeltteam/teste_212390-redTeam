@@ -418,13 +418,13 @@ public abstract class GenericExtruder implements Extruder
 	{
 		if (!isExtruding)
 		{
-			isExtruding = true;
 			try
 			{
 				setExtrusion(getExtruderSpeed());
 			} catch (Exception e) {
 				//hmm.
 			}
+			isExtruding = true;
 		}
 	}
 	
@@ -432,14 +432,13 @@ public abstract class GenericExtruder implements Extruder
 	{
 		if (isExtruding)
 		{
-			isExtruding = false;
-			
 			try
 			{
 				setExtrusion(0);
 			} catch (Exception e) {
 				//hmm.
 			}
+			isExtruding = false;
 		}
 	}
 	
