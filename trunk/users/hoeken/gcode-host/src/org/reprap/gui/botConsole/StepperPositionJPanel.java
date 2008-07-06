@@ -12,7 +12,7 @@ import org.reprap.Printer;
 import org.reprap.AxisMotor;
 import org.reprap.comms.Communicator;
 //import org.reprap.comms.snap.SNAPAddress;
-//import org.reprap.devices.GenericStepperMotor;
+import org.reprap.devices.GenericStepperMotor;
 
 /**
  *
@@ -23,7 +23,7 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
     private Communicator communicator;
     private int motorID;
     private String axis;
-    private AxisMotor motor;
+    private GenericStepperMotor motor;
     private Printer printer;
 
     private int fastSpeed;

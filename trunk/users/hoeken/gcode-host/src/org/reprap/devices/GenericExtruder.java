@@ -920,5 +920,47 @@ public abstract class GenericExtruder implements Extruder
 //		
 //		printer.setSpeed(printer.getFastSpeed());
 //	}
+	
+    public static int getNumberFromMaterial(String material)
+    {
+    	String[] names;
+		try
+		{
+			names = Preferences.allMaterials();
+			for(int i = 0; i < names.length; i++)
+			{
+				if(names[i].equals(material))
+					return i;
+			}
+
+		} catch (Exception ex)
+		{
+			System.err.println(ex.toString());
+		}
+		return -1;
+    }
+    
+    public static Appearance getAppearanceFromNumber(int n)
+    {
+    	String prefName = "Extruder" + n + "_";
+    	Color3f col = null;
+		try
+		{
+			col = new Color3f((float)Preferences.loadGlobalDouble(prefName + "ColourR(0..1)"), 
+				(float)Preferences.loadGlobalDouble(prefName + "ColourG(0..1)"), 
+				(float)Preferences.loadGlobalDouble(prefName + "ColourB(0..1)"));
+		} catch (Exception ex)
+		{
+			System.err.println(ex.toString());
+		}
+		Appearance a = new Appearance();
+		a.setMaterial(new Material(col, black, col, black, 101f));
+		return a;
+    }
+    
+    public static Appearance getAppearanceFromMaterial(String material)
+    {
+    	return(getAppearanceFromNumber(getNumberFromMaterial(material)));
+    }
     
 }

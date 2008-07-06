@@ -45,12 +45,12 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	 * @param prefs
 	 * @throws Exception
 	 */
-	public CartesianGCode(Preferences config) throws Exception {
+	public CartesianGCode() throws Exception {
 		
-		super(config);
+		super();
 
-		String portname = config.loadString("Port(name)");
-		boolean useSerialPort = config.loadBool("GCodeUseSerial");
+		String portname = Preferences.loadGlobalString("Port(name)");
+		boolean useSerialPort = Preferences.loadGlobalBool("GCodeUseSerial");
 
 		gcode = new GCodeWriter();
 		if (useSerialPort)
