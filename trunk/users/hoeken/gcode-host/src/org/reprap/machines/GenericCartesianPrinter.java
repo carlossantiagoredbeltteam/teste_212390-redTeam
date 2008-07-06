@@ -153,6 +153,8 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 	{
 		startTime = System.currentTimeMillis();
 		
+		statusWindow = new StatusMessage(new JFrame());
+		
 		//load extruder prefs
 		extruderCount = Preferences.loadGlobalInt("NumberOfExtruders");
 		if (extruderCount < 1)

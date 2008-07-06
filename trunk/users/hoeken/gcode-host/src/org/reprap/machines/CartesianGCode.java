@@ -41,6 +41,8 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	*/
 	double currentFeedrate = 0.0;
 	
+	boolean useSerialPort = false;
+	
 	/**
 	 * @param prefs
 	 * @throws Exception
@@ -50,13 +52,11 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		super();
 
 		String portname = Preferences.loadGlobalString("Port(name)");
-		boolean useSerialPort = Preferences.loadGlobalBool("GCodeUseSerial");
+		useSerialPort = Preferences.loadGlobalBool("GCodeUseSerial");
 
 		gcode = new GCodeWriter();
 		if (useSerialPort)
 			gcode.openSerialConnection(portname);
-		else
-			gcode.openFile();
 			
 		loadExtruders();
 	}
@@ -225,23 +225,6 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.reprap.Printer#getSpeedZ()
-	 */
-	//TODO: nuke this
-	public int getSpeedZ() {
-		return 200;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.reprap.Printer#setSpeedZ(int)
-	 */
-	//TODO: NUKE THIS
-	public void setSpeedZ(int speed) {
-		// TODO: MiniMug prints this, but I don't know what to do with it
-		Debug.d("RR: set speed Z: " + speed);
-	}
-
-	/* (non-Javadoc)
 	 * @see org.reprap.Printer#dispose()
 	 */
 	public void dispose() {
@@ -269,10 +252,11 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#initialise()
 	 */
-	public void initialise() {
-		
-		// TODO: Fix this to be more flexible - howso?
-		
+	public void initialise()
+	{
+		if (!useSerialPort)
+			gcode.openFile();
+
 		//take us to fun, safe metric land.
 		gcode.queue("G21");
 		
