@@ -38,7 +38,7 @@ public class NullCartesianMachine extends GenericCartesianPrinter {
 	public void betweenLayers(int layerNumber) throws Exception{}
 	public void startingLayer(int layerNumber) throws Exception {}
 	public void printTo(double x, double y, double z, boolean stopExtruder, boolean closeValve) {}
-	
+	public void delay(long millis) {}
 	
 	//TODO: make this work normally.
 	public void stopValve() throws IOException

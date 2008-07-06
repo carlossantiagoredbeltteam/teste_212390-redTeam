@@ -185,7 +185,6 @@ public class Producer {
 			// Workaround to get the thing to start heating up
 			reprap.printTo(1, 1, 0, false, false);
 			
-			
 			if(reprap.getExtruder().getNozzleClearTime() <= 0)
 			{
 				Debug.d("Printing warmup segments, moving to (1,1)");

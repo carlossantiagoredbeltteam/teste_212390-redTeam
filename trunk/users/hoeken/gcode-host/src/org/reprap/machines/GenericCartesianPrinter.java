@@ -439,6 +439,13 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 		return extruders;
 	}
 	
+	public void delay(long millis)
+	{
+		try {
+			Thread.sleep(millis);
+		} catch (Exception e) {}
+	}
+	
 	/**
 	 * Extrude for the given time in milliseconds, so that polymer is flowing
 	 * before we try to move the extruder.
@@ -464,15 +471,15 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 			if(eDelay >= vDelay)
 			{
 				extruders[extruder].setMotor(true);
-				Thread.sleep(eDelay - vDelay);
+				delay(eDelay - vDelay);
 				extruders[extruder].setValve(true);
-				Thread.sleep(vDelay);
+				delay(vDelay);
 			} else
 			{
 				extruders[extruder].setValve(true);
-				Thread.sleep(vDelay - eDelay);
+				delay(vDelay - eDelay);
 				extruders[extruder].setMotor(true);
-				Thread.sleep(eDelay);
+				delay(eDelay);
 			}
 			//extruders[extruder].setMotor(false);  // What's this for?  - AB
 		} catch(Exception e)
@@ -727,7 +734,7 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 		if(coolTime > cool && (layerNumber != 0))
 		{	
 			cool = coolTime - cool;
-			Thread.sleep((long)(1000*cool));
+			delay((long)(1000*cool));
 		}
 		
 		// Fan off
@@ -738,7 +745,7 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 		
 		if(coolTime > 0 && (layerNumber != 0))
 		{
-			Thread.sleep((long)(200 * coolTime));			
+			delay((long)(200 * coolTime));			
 			Debug.d("End of cooling period");			
 		}
 		
@@ -752,10 +759,10 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 			{
 				getExtruder().setValve(true);
 				getExtruder().setMotor(true);
-				Thread.sleep((long)(500*clearTime));
+				delay((long)(500*clearTime));
 				getExtruder().setMotor(false);
 				getExtruder().setValve(false);
-				Thread.sleep((long)(1000*waitTime));
+				delay((long)(1000*waitTime));
 			}
 
 //TODO: fix this to work properly for SNAP.
@@ -785,7 +792,7 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 			{
 				getExtruder().setValve(true);
 				getExtruder().setMotor(true);
-				Thread.sleep((long)(500*clearTime));
+				delay((long)(500*clearTime));
 				getExtruder().setMotor(false);
 				getExtruder().setValve(false);
 			}
@@ -843,7 +850,7 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 		try
 		{
 			extruders[extruder].setValve(false);
-			extruders[extruder].setExtrusion(0);
+			extruders[extruder].setMotor(false);
 		} catch (Exception ex) {}
 		ContinuationMesage msg =
 			new ContinuationMesage(null, "A new segment is about to be produced");
