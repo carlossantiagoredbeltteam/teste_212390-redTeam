@@ -26,8 +26,6 @@ public class MachineFactory {
 	{
 		String geometry = Preferences.loadGlobalString("Geometry");
 
-		System.err.println(geometry);
-		
 		if (geometry.compareToIgnoreCase("cartesian") == 0)
 		  	return new Reprap();
 		if (geometry.compareToIgnoreCase("gcodewriter") == 0)

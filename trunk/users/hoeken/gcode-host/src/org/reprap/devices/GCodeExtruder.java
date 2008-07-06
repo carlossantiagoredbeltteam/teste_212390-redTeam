@@ -64,7 +64,6 @@ public class GCodeExtruder extends GenericExtruder
 				try
 				{
 					gcode.queue("M101" + " ;extruder on, forward");
-					Thread.dumpStack();
 				}
 				catch (Exception e)
 				{
