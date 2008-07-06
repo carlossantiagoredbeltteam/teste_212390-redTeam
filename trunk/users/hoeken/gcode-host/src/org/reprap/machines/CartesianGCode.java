@@ -19,6 +19,7 @@ import org.reprap.Extruder;
 import org.reprap.comms.GCodeWriter;
 import org.reprap.utilities.Debug;
 import org.reprap.devices.GCodeExtruder;
+import org.reprap.devices.GCodeStepperMotor;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -52,6 +53,10 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		
 		super();
 
+		motorX = new GCodeStepperMotor('X');
+		motorY = new GCodeStepperMotor('Y');
+		motorZ = new GCodeStepperMotor('Z');
+		
 		portName = Preferences.loadGlobalString("Port(name)");
 		useSerialPort = Preferences.loadGlobalBool("GCodeUseSerial");
 
