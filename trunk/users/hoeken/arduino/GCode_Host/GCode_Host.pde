@@ -23,26 +23,35 @@ void setup()
   //init stuff
   size(1024, 600);
   //smooth();
-
+           
   // List all the available serial ports
   println(Serial.list());
   //open the first port...
   myPort = new Serial(this, Serial.list()[0], 19200);
+ 
 
   //load our gcode lines
+  
   gcode = loadStrings("job.gcode");
-  //println(gcode);
 
   font = loadFont("ArialMT-48.vlw"); 
 }
 
+int queueLength = 2;
+int commandsInQueue = 0;
+
+
+
 void draw()
 {
   background(20, 20, 20);
+  
 
   while (myPort.available() > 0)
   {
-    int inByte = myPort.read();
+    int inByte;
+    
+    inByte = myPort.read();
 
     if (inByte == '\n')
     {
@@ -54,11 +63,12 @@ void draw()
         temperature = m[0];
 
       if (match(serialLine, "^start") != null)
+      {
         started = true;
-
+      }
       if (match(serialLine, "^ok") != null)
       {
-        commandComplete = true;
+        commandsInQueue--;
 
         if (gcodeIndex == gcode.length)
           println("Job's done!");
@@ -74,10 +84,14 @@ void draw()
 
   if (started)
   {
-    if (commandComplete)
+    if (commandsInQueue < queueLength)
     {
       String cmd = getNextCommand();
-      commandComplete = false;
+      print("next command: ");
+      println(cmd);
+      
+      print("queue length:  ");
+      println(commandsInQueue);
 
       if (gcodeIndex == gcode.length)
       {
@@ -86,8 +100,10 @@ void draw()
       
       if (cmd != null)
       {
+        commandsInQueue++;
         println("Sent: " +cmd);
         myPort.write(cmd);
+        myPort.write("\n");
       }
     }
   }
