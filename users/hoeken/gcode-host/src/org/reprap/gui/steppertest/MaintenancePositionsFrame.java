@@ -29,7 +29,9 @@ import org.reprap.comms.Communicator;
 import org.reprap.comms.snap.SNAPAddress;
 import org.reprap.comms.snap.SNAPCommunicator;
 import org.reprap.devices.GenericExtruder;
+import org.reprap.devices.SNAPExtruder;
 import org.reprap.devices.GenericStepperMotor;
+import org.reprap.devices.SNAPStepperMotor;
 import org.reprap.gui.Utility;
 
 import java.awt.Color;
@@ -48,7 +50,7 @@ public class MaintenancePositionsFrame  extends JFrame {
 	Communicator communicator = org.reprap.Main.getCommunicator();
 	
 	// Operation globals
-	GenericStepperMotor motorX, motorY;
+	SNAPStepperMotor motorX, motorY;
 	boolean homePositionAlreadyFound = false;
 	
 	
@@ -82,8 +84,8 @@ public class MaintenancePositionsFrame  extends JFrame {
 		
 		//Establish motors
 		try { 
-			motorX = new GenericStepperMotor(communicator, new SNAPAddress(Preferences.loadGlobalInt("XAxisAddress")),  1);
-			motorY = new GenericStepperMotor(communicator, new SNAPAddress(Preferences.loadGlobalInt("YAxisAddress")),  2);
+			motorX = new SNAPStepperMotor(communicator, new SNAPAddress(Preferences.loadGlobalInt("XAxisAddress")),  1);
+			motorY = new SNAPStepperMotor(communicator, new SNAPAddress(Preferences.loadGlobalInt("YAxisAddress")),  2);
 		}
 		catch (Exception e){
 			JOptionPane.showMessageDialog(null, "Couldn't initialise motors" + e);

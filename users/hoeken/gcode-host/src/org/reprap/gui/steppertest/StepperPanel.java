@@ -22,6 +22,7 @@ import org.reprap.Preferences;
 import org.reprap.comms.Communicator;
 import org.reprap.comms.snap.SNAPAddress;
 import org.reprap.devices.GenericStepperMotor;
+import org.reprap.devices.SNAPStepperMotor;
 
 /// TODO There is a bug in this app that can cause the stepper to skip some steps
 /// and lose its place.  This can occur if you slowly drag the position slider.  Multiple
@@ -51,7 +52,7 @@ public class StepperPanel extends JPanel implements ChangeListener {
 	
 	private JLabel rangeLabel;
 	private JLabel posRequest, posActual;		
-	private GenericStepperMotor motor; 
+	private SNAPStepperMotor motor; 
 	private boolean moving = false;   // True if (as far as we know) the motor is seeking
 	private boolean waiting = false;  // True if already waiting for a timer to complete (so we don't start another one)
 
@@ -98,7 +99,7 @@ public class StepperPanel extends JPanel implements ChangeListener {
 		
 		updateTimer = new Timer();
 		
-		motor = new GenericStepperMotor(communicator, new SNAPAddress(address), motorId);
+		motor = new SNAPStepperMotor(communicator, new SNAPAddress(address), motorId);
 		
 		this.externalSpeedSlider = externalSpeedSlider;
 		
@@ -260,7 +261,7 @@ public class StepperPanel extends JPanel implements ChangeListener {
 	 */
 	protected void onCalibrate() {
 		try {
-			GenericStepperMotor.Range range = motor.getRange(externalSpeedSlider.getValue());
+			SNAPStepperMotor.Range range = motor.getRange(externalSpeedSlider.getValue());
 			minValue = range.minimum;
 			maxValue = range.maximum;
 			// We could re-request current position, but for now we know
@@ -414,7 +415,7 @@ public class StepperPanel extends JPanel implements ChangeListener {
 	/**
 	 * @return Returns the motor.
 	 */
-	public GenericStepperMotor getMotor() {
+	public SNAPStepperMotor getMotor() {
 		return motor;
 	}
 

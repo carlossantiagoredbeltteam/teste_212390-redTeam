@@ -45,6 +45,7 @@ import org.reprap.comms.snap.SNAPAddress;
 import org.reprap.comms.snap.SNAPCommunicator;
 import org.reprap.devices.GenericExtruder;
 import org.reprap.devices.GenericStepperMotor;
+import org.reprap.devices.SNAPStepperMotor;
 import org.reprap.gui.Utility;
 
 import javax.swing.event.ChangeListener;
@@ -159,7 +160,7 @@ public class WorkingVolumeFrame  extends JFrame {
 	    int maxValue = 30000;
 		int startingPosition = 5000;
 		Timer updateTimer;
-		final GenericStepperMotor motor;
+		final SNAPStepperMotor motor;
 		
 		final String axis;
 		switch(motorId)
@@ -182,7 +183,7 @@ public class WorkingVolumeFrame  extends JFrame {
 		
 		final double stepsPerMM = Preferences.loadGlobalDouble(axis + "AxisScale(steps/mm)");
 		
-		motor = new GenericStepperMotor(communicator, new SNAPAddress(address),  motorId);
+		motor = new SNAPStepperMotor(communicator, new SNAPAddress(address),  motorId);
 		
 		JButton home = new JButton("Home");
 		home.addActionListener(new ActionListener() {
