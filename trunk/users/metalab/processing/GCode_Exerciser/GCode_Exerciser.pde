@@ -1,3 +1,5 @@
+// Yep, this is actually -*- Java -*-
+
 import processing.serial.*;
 
 
@@ -146,131 +148,100 @@ int motorSpeed = 0;
 
 String getNextCommand()
 {
-  if (keyPressed)
-  { 
-    String c = null;
-    
-    if (key == 'a')
-    {
+  String c = null;
+  if (keyPressed) { 
+    switch (key) { 
+      // X axis
+    case 'a':
       c = "G1 X10 Y0 Z0 F450";
-    }
-    if (key == 'd')
-    {
+      break;
+    case 'd':
       c = "G1 X-10 Y0 Z0 F450";
-    }
-    if (key == 'w')
-    {
-      c = "G1 X0 Y10 Z0 F450";
-    }
-    if (key == 's')
-    {
-      c = "G1 X0 Y-10 Z0 F450";
-    }
-    
-    if (key == 'A')
-    {
+      break;
+    case 'A':
       c = "G1 X1 Y0 Z0 F450";
-    }
-    if (key == 'D')
-    {
+      break;
+    case 'D':
       c = "G1 X-1 Y0 Z0 F450";
-    }
-    if (key == 'W')
-    {
+      break;
+      // Y axis
+    case 'w':
+      c = "G1 X0 Y10 Z0 F450";
+      break;
+    case 's':
+      c = "G1 X0 Y-10 Z0 F450";
+      break;
+    case 'W':
       c = "G1 X0 Y1 Z0 F450";
-    }
-    if (key == 'S')
-    {
+      break;
+    case 'S':
       c = "G1 X0 Y-1 Z0 F450";
-    }
-    
+      break;
     // Z axis
-    if (key == 'q' || key == 'Q')
-    {
-      c = "G0 X0 Y0 Z2 F200";
-    }    
-    
-    if (key == 'z')
-    {
-      c = "G0 X0 Y0 Z-2 F200";
-    }
-    if (key == 'Z')
-    {
-      c = "G0 X0 Y0 Z-0.2 F200";
-    }
-    
-    if (key == 'u')
-    {
+    case 'q':
+      c = "G1 X0 Y0 Z2 F100";
+      break;
+    case 'Q':
+      c = "G1 X0 Y0 Z0.2 F10";
+      break;
+    case 'z':
+      c = "G1 X0 Y0 Z-2 F100";
+      break;
+    case 'Z':
+      c = "G1 X0 Y0 Z-0.2 F10";
+      break;
+
+      // Temp    
+    case 'u':
       targetTemp = 185;
       c = "M104 S" + targetTemp;
-    }
-    
-     if (key == 'p')
-    {
+      break;
+    case 'p':
       targetTemp += 5;
       c = "M104 S" + targetTemp;
-    }
-    
-    if (key == 'l')
-    {
+      break;
+    case 'l':
       targetTemp -= 10;
       c = "M104 S" + targetTemp;
-    }
+      break;    
+    case 't':
+    case 'T':
+      c = "M105 (get current temp)";
+    break;
     
-
-    if (key == 'i')
-    {
+      // Motor
+    case 'i':
       motorSpeed += 1;
       c = "M108 S" + motorSpeed;
-    }
-    
-    if (key == 'j')
-    {
+    break;
+    case 'j':
       motorSpeed -= 1;
       c = "M108 S" + motorSpeed;
-    }
+    break;
     
-    
-    if (key == 'm')
-    {
+    // Extruder    
+    case 'm':
       c = "M101 (extruder on)";
-    }
-    
-    if (key == 'n' || key == ' ')
-    {
+    break;
+    case 'n':
+    case ' ':
       c = "M103 (extruder off)";
-    }
-    
-    if (key == 'b')
-    {
+    break;
+    case 'b':
       c = "M102 (extruder reverse)";
-    }
-    
-    if (key == 't' || key == 'T')
-    {
-      c = "M105 (get current temp)";
-    }
-    
-    if (key == 'f')
-    {
-      c = "M106 (cooling on)";
-    }
-    
-    if (key == 'f')
-    {
-      c = "M106 (cooling on)";
-    }
-    
-    if (key == 'F')
-    {
-      c = "M107 (cooling off)";
-    }
-    
-    
-    
+    break;
 
-    return c;
+    // Cooling
+    case 'f':
+      c = "M106 (cooling on)";
+    break;
+    
+    case 'F':
+      c = "M107 (cooling off)";
+    break;
+    }
+
   }
-  else
-    return null;
+
+  return c;
 }
