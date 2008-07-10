@@ -30,6 +30,9 @@
 ## stl2gcode includes some code from image-to-gcode.py.  That code is
 ## Copyright (C) 2005 Chris Radek (chris@timeguy.com)
 
+## TODO: adjust the scale so that the png represents 1 step per bit in the bitmap
+## TODO: decide whether this is a module or a class
+
 import os
 import sys
 import getopt
@@ -39,15 +42,14 @@ import povray
 from miscellaneous import *
 
 ## Defaults
-step = 0.002 # this is the x and y step length, I think
+step = 0.002 # this is the x and y step length for the gcode conversion
 depth = 0.008 # I think this is color depth
-x, y = 0, 0 # starting offset for x and y
+x, y = 0, 0 # starting offset for x and y for gcode
 
 #tolerance = 0.000000001
 inside_vector = [-0.5, 0.68, 0.5] # TODO: calculate this
 inside_vector = [0, 0, 0]
 delta_y = 1
-verbose = False
 target = 'gcode'  # target format should be one of inc, pov, png, gcode
 
 filename=''
@@ -59,27 +61,29 @@ def help():
 initial steps.  And by using the --target option, you can end the
 processing at whatever step you need.  If intermediary files are what
 you're looking for, there's no need to keep processing all the way to
-gcode.'''
+gcode.
+
+Example: 'stl2gcode -f object.inc -t png' generates the pov and png
+files but not the inc or gcode files.'''
 
 def usage():
     print '''Slices 3D stl models into layers and generates gcode for each layer.
 
-stl2gcode [dstvxy] --file
-    -d --depth d\t\t\tdepth
+stl2gcode [dstxy] --file
+    -d --depth d\t\t\tcolor depth (not implemented)
     -f --file f\t\t\t\tfilename (required)
     -h --help\t\t\thelp
-    -s --step s\t\t\t\tstep
+    -s --step s\t\t\t\tx/y step size of your fab machine (not implemented)
     -t --target [inc|pov|png|gcode]\ttarget format
-    -v --verbose\t\t\tverbose
-    -x --x x\t\t\t\tinitial x value
-    -y --y y\t\t\t\tinitial y value'''
+    -x --x x\t\t\t\tinitial x value (not implemented)
+    -y --y y\t\t\t\tinitial y value (not implemented)'''
 
 def do_args(argv):
     if len(argv) == 0: usage(); sys.exit()
     try:
-        opts, args = getopt.getopt(argv, "hd:f:s:t:vx:y:",
+        opts, args = getopt.getopt(argv, "hd:f:s:t:x:y:",
                                    ["help", "file=", "depth=", "step=", "target=",
-                                    "verbose", "x=", "y="])
+                                    "x=", "y="])
     except getopt.GetoptError, err:
         print str(err); usage(); sys.exit(2)
     global filename
@@ -89,7 +93,6 @@ def do_args(argv):
         elif o in ("-f", "--filename"): global filename; filename = a; 
         elif o in ("-s", "--step"): global step; step = float(a);
         elif o in ("-t", "--target"): global target; target = a;
-        elif o in ("-v", "--verbose"): global verbose; verbose = True
         elif o in ("-x", "--x"): global x; x = float(a)
         elif o in ("-y", "--y"): global y; y = float(a)
         else: assert False, "unhandled option"
@@ -110,19 +113,15 @@ def povray_include (base_fname, inside_vector):
     stdout_handle = os.popen("stl2pov -s " + base_fname + '.stl', "r")
     inc = stdout_handle.read()
 
-    vec_string = 'inside_vector <' + \
-        str(inside_vector[0]) + ', ' + \
-        str(inside_vector[1]) + ', ' + \
-        str(inside_vector[2]) + '>'
+    vec_string = 'inside_vector <%f, %f, %f>' % (
+        inside_vector[0],inside_vector[1],inside_vector[2])
 
-    inc = inc.rpartition('} //')[0] + vec_string + "\n}\n"
-
+    ## write out include file with inside vector added
     out = open(base_fname+'.inc', 'w')
-    out.write(inc)
+    out.write(inc.rpartition('} //')[0] + vec_string + "\n}\n")
     out.close
 
     return povray.object(inc);
-
 
 def make_pov(fname, include):
     'Write a povray file that calls our included object'
@@ -134,24 +133,34 @@ def make_pov(fname, include):
     min_z = include.min_z()
     max_z = include.max_z()
 
+    max_dimension = max(max_x, max_z)
+
+    ## TODO: do we really want to center the object?
+
     pov = '''
 #include "%s"
 background {color rgb 1 }
 camera {
   orthographic
-  location <0, 10, 0>
-  look_at <0, 0, 0>
+  up <0, %f, 0>
+  right <%f, 0, 0>
+  location <%f, %f, %f>
+  look_at <%f, %f, %f>
 }
 #declare overview = 0;
 #if (overview) 
  object { %s }
 #else 
   intersection {
-    object {  %s rotate 90*x }
+    object {  %s }
     box { <%f, %f, %f>, <%f, %f, %f>
 	  translate y * frame_number * %f}
   }
-#end''' % (fname+'.inc', obj_name, obj_name,
+#end''' % (fname+'.inc',
+           max_dimension, max_dimension,
+           (max_x - min_x) / 2, max_y, (max_z - min_z) / 2,
+           (max_x - min_x) / 2, min_y, (max_z - min_z) /2, 
+           obj_name, obj_name,
            min_x, min_y, min_z,
            max_x, min_y + delta_y, max_z,
            delta_y)
@@ -160,10 +169,20 @@ camera {
     out.write(pov)
     out.close
 
+def make_png(fname, frames):
+    'Takes a pov file and generates png files that are slices of that pov scene
+    TODO: lower png color depth'
+    cmd = 'povray +Q0 -D0 +KFF'+ str(frames) + ' ' + fname + '.pov'
+    stdout_handle = os.popen(cmd, 'r')
+    povray_output = stdout_handle.read()
+
 def image_to_gcode(in_file, step, depth, x, y, out_file):
-    'Take a bitmapped image and generate gcode for cutting that image out'
-    # x and y are offsets for the initial x and y position
-    # TODO: figure out how to use step and depth
+    'Take a bitmapped image and generate gcode for cutting that image out.
+
+     x and y are offsets for the initial x and y position
+     step is the minimum distance you can move in the x or y directions.
+     TODO: figure out how to use color depth'
+
     im = Image.open(in_file)
     size = im.size
     im = im.convert("L") #grayscale
@@ -193,24 +212,16 @@ def image_to_gcode(in_file, step, depth, x, y, out_file):
     out.write(g.end())
     out.close
 
-def make_png(fname, frames):
-    'Takes a pov file and generates png files that are slices of that pov scene'
-    cmd = 'povray +Q0 -D0 +KFF'+ str(frames) + ' ' + fname + '.pov'
-    if verbose: print cmd
-    stdout_handle = os.popen(cmd, 'r')
-    povray_output = stdout_handle.read()
-
-def make_gcode(fname, frames, step, depth):
+def png_to_gcode(fname, frames, step, depth):
     'Given a range of png files, convert each to gcode'
     for i in range(1, frames):
         image_to_gcode('%s%02d.png' % (fname, i), step, depth, 0, 0, '%s%02d.gcode' % (fname, i))
-        ## TODO: calculate the x and y offsets to center the object?
 
 def main():
     do_args(sys.argv[1:])
     convert_object = stl2gcode({
             'delta_y': delta_y, 'depth': depth, 'filename': filename, 
-            'target': target, 'step': step, 'verbose': verbose, 'x': x, 'y': y})
+            'target': target, 'step': step, 'x': x, 'y': y})
     convert_object.convert()
 
 if __name__ == "__main__":
@@ -224,7 +235,6 @@ class stl2gcode:
     #tolerance = 0.000000001
     inside_vector = [-0.5, 0.68, 0.5] # TODO: calculate this
     delta_y = 0.1
-    verbose = False
     target = 'gcode'  # target format should be one of inc, pov, png, gcode
 
     filename=''
@@ -241,26 +251,23 @@ class stl2gcode:
         if extension != 'stl':
             povray_inc = povray.object(self.base_fname + '.inc') # pull object from file
         else:
-            if verbose: print 'Generating ' + self.base_fname + '.inc'
             povray_inc = povray_include(self.base_fname, self.inside_vector)
             if self.target == 'inc': return povray_inc
 
         ## Generate pov file from stl
         if extension in (['stl', 'inc']):
-            if verbose: print 'Generating ' + self.base_fname + '.pov'
             make_pov(self.base_fname, povray_inc)
             if self.target == 'pov': return
 
         frames = int((povray_inc.max_y() - povray_inc.min_y()) / delta_y) + 1
-        if verbose: print frames, 'layers'
 
         ## Generate png files from pov and inc
         if extension in (['stl', 'inc', 'pov']):
-            if verbose: print 'Generating ' + self.base_fname + 'NN.png'
             make_png(self.base_fname, frames)
             if self.target == 'png': return
 
         ## Generate gcode files from png
         if extension in (['stl', 'inc', 'pov', 'png']):
-            if verbose: print 'Generating ' + self.base_fname + 'NN.gcode'
-            make_gcode(self.base_fname, frames, self.step, self.depth)
+            png_to_gcode(self.base_fname, frames, self.step, self.depth)
+
+
