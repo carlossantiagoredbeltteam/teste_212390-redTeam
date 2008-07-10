@@ -34,78 +34,10 @@
 ## TODO: decide whether this is a module or a class
 
 import os
-import sys
-import getopt
 import Image
 import gcode
 import povray
 from miscellaneous import *
-
-## Defaults
-step = 0.002 # this is the x and y step length for the gcode conversion
-depth = 0.008 # I think this is color depth
-x, y = 0, 0 # starting offset for x and y for gcode
-
-#tolerance = 0.000000001
-inside_vector = [-0.5, 0.68, 0.5] # TODO: calculate this
-inside_vector = [0, 0, 0]
-delta_y = 1
-target = 'gcode'  # target format should be one of inc, pov, png, gcode
-
-filename=''
-
-VERSION = 0.1
-
-def help():
-    print '''\nBy specifying a file with [inc|pov|png] extension, you can skip
-initial steps.  And by using the --target option, you can end the
-processing at whatever step you need.  If intermediary files are what
-you're looking for, there's no need to keep processing all the way to
-gcode.
-
-Example: 'stl2gcode -f object.inc -t png' generates the pov and png
-files but not the inc or gcode files.'''
-
-def usage():
-    print '''Slices 3D stl models into layers and generates gcode for each layer.
-
-stl2gcode [dstxy] --file
-    -d --depth d\t\t\tcolor depth (not implemented)
-    -f --file f\t\t\t\tfilename (required)
-    -h --help\t\t\thelp
-    -s --step s\t\t\t\tx/y step size of your fab machine (not implemented)
-    -t --target [inc|pov|png|gcode]\ttarget format
-    -x --x x\t\t\t\tinitial x value (not implemented)
-    -y --y y\t\t\t\tinitial y value (not implemented)'''
-
-def do_args(argv):
-    if len(argv) == 0: usage(); sys.exit()
-    try:
-        opts, args = getopt.getopt(argv, "hd:f:s:t:x:y:",
-                                   ["help", "file=", "depth=", "step=", "target=",
-                                    "x=", "y="])
-    except getopt.GetoptError, err:
-        print str(err); usage(); sys.exit(2)
-    global filename
-    for o, a in opts:
-        if o in ("-h", "--help"): usage(); help(); sys.exit()
-        elif o in ("-d", "--depth"): global depth; depth = float(a)
-        elif o in ("-f", "--filename"): global filename; filename = a; 
-        elif o in ("-s", "--step"): global step; step = float(a);
-        elif o in ("-t", "--target"): global target; target = a;
-        elif o in ("-x", "--x"): global x; x = float(a)
-        elif o in ("-y", "--y"): global y; y = float(a)
-        else: assert False, "unhandled option"
-    if filename == "":
-        print "Must specify filename.  Use -f option."
-        usage()
-        sys.exit(2)
-    if target not in (['inc', 'pov', 'png', 'gcode']):
-        print "Target must be inc|pov|png|gcode."
-        usage()
-        sys.exit(2)
-
-###############################################################################
 
 def povray_include (base_fname, inside_vector):
     'Convert an stl file into a POVRAY include object'
@@ -123,7 +55,7 @@ def povray_include (base_fname, inside_vector):
 
     return povray.object(inc);
 
-def make_pov(fname, include):
+def make_pov(fname, include, delta_y):
     'Write a povray file that calls our included object'
     obj_name = include.name()
     min_x = include.min_x()
@@ -170,18 +102,18 @@ camera {
     out.close
 
 def make_png(fname, frames):
-    'Takes a pov file and generates png files that are slices of that pov scene
-    TODO: lower png color depth'
+    '''Takes a pov file and generates png files that are slices of that pov scene
+    TODO: lower png color depth'''
     cmd = 'povray +Q0 -D0 +KFF'+ str(frames) + ' ' + fname + '.pov'
     stdout_handle = os.popen(cmd, 'r')
     povray_output = stdout_handle.read()
 
 def image_to_gcode(in_file, step, depth, x, y, out_file):
-    'Take a bitmapped image and generate gcode for cutting that image out.
+    '''Take a bitmapped image and generate gcode for cutting that image out.
 
-     x and y are offsets for the initial x and y position
-     step is the minimum distance you can move in the x or y directions.
-     TODO: figure out how to use color depth'
+    x and y are offsets for the initial x and y position
+    step is the minimum distance you can move in the x or y directions.
+    TODO: figure out how to use color depth'''
 
     im = Image.open(in_file)
     size = im.size
@@ -217,16 +149,6 @@ def png_to_gcode(fname, frames, step, depth):
     for i in range(1, frames):
         image_to_gcode('%s%02d.png' % (fname, i), step, depth, 0, 0, '%s%02d.gcode' % (fname, i))
 
-def main():
-    do_args(sys.argv[1:])
-    convert_object = stl2gcode({
-            'delta_y': delta_y, 'depth': depth, 'filename': filename, 
-            'target': target, 'step': step, 'x': x, 'y': y})
-    convert_object.convert()
-
-if __name__ == "__main__":
-    main()
-
 class stl2gcode:
     step = 1
     depth = 0.008
@@ -256,10 +178,10 @@ class stl2gcode:
 
         ## Generate pov file from stl
         if extension in (['stl', 'inc']):
-            make_pov(self.base_fname, povray_inc)
+            make_pov(self.base_fname, povray_inc, self.delta_y)
             if self.target == 'pov': return
 
-        frames = int((povray_inc.max_y() - povray_inc.min_y()) / delta_y) + 1
+        frames = int((povray_inc.max_y() - povray_inc.min_y()) / self.delta_y) + 1
 
         ## Generate png files from pov and inc
         if extension in (['stl', 'inc', 'pov']):

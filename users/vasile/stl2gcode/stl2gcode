@@ -27,6 +27,83 @@
 ## stl2gcode includes some code from image-to-gcode.py.  That code is
 ## Copyright (C) 2005 Chris Radek (chris@timeguy.com)
 
+## TODO: Handle file globs for -f
 
+import sys
+import getopt
 import stl2gcode
-stl2gcode.main()
+
+## Defaults
+step = 0.002 # this is the x and y step length for the gcode conversion
+depth = 0.008 # I think this is color depth
+x, y = 0, 0 # starting offset for x and y for gcode
+
+#tolerance = 0.000000001
+inside_vector = [-0.5, 0.68, 0.5] # TODO: calculate this
+inside_vector = [0, 0, 0]
+delta_y = 1
+target = 'gcode'  # target format should be one of inc, pov, png, gcode
+
+filename=''
+
+VERSION = 0.1
+
+def help():
+    print '''\nBy specifying a file with [inc|pov|png] extension, you can skip
+initial steps.  And by using the --target option, you can end the
+processing at whatever step you need.  If intermediary files are what
+you're looking for, there's no need to keep processing all the way to
+gcode.
+
+Example: 'stl2gcode -f object.inc -t png' generates the pov and png
+files but not the inc or gcode files.'''
+
+def usage():
+    print '''Slices 3D stl models into layers and generates gcode for each layer.
+
+stl2gcode [dstxy] --file
+    -d --depth d\t\t\tcolor depth (not implemented)
+    -f --file f\t\t\t\tfilename (required)
+    -h --help\t\t\thelp
+    -s --step s\t\t\t\tx/y step size of your fab machine (not implemented)
+    -t --target [inc|pov|png|gcode]\ttarget format
+    -x --x x\t\t\t\tinitial x value (not implemented)
+    -y --y y\t\t\t\tinitial y value (not implemented)'''
+
+def do_args(argv):
+    if len(argv) == 0: usage(); sys.exit()
+    try:
+        opts, args = getopt.getopt(argv, "hd:f:s:t:x:y:",
+                                   ["help", "file=", "depth=", "step=", "target=",
+                                    "x=", "y="])
+    except getopt.GetoptError, err:
+        print str(err); usage(); sys.exit(2)
+    global filename
+    for o, a in opts:
+        if o in ("-h", "--help"): usage(); help(); sys.exit()
+        elif o in ("-d", "--depth"): global depth; depth = float(a)
+        elif o in ("-f", "--filename"): global filename; filename = a; 
+        elif o in ("-s", "--step"): global step; step = float(a);
+        elif o in ("-t", "--target"): global target; target = a;
+        elif o in ("-x", "--x"): global x; x = float(a)
+        elif o in ("-y", "--y"): global y; y = float(a)
+        else: assert False, "unhandled option"
+    if filename == "":
+        print "Must specify filename.  Use -f option."
+        usage()
+        sys.exit(2)
+    if target not in (['inc', 'pov', 'png', 'gcode']):
+        print "Target must be inc|pov|png|gcode."
+        usage()
+        sys.exit(2)
+
+###############################################################################
+
+if __name__ == "__main__":
+    do_args(sys.argv[1:])
+    convert_object = stl2gcode.stl2gcode({
+            'delta_y': delta_y, 'depth': depth, 'filename': filename, 
+            'target': target, 'step': step, 'x': x, 'y': y})
+    convert_object.convert()
+
+
