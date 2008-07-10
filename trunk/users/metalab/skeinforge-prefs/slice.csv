@@ -1,15 +1,14 @@
 Format is tab separated preferences.
-Extrusion Diameter (mm):	0.8
-Extrusion Density (ratio):	0.62
-Extrusion Width Over Thickness (ratio):	1.778
-Open File to be Sliced	
+Extrusion Diameter (mm):	0.58
+Extrusion Perimeter Width Over Diameter (ratio):	1.23
+Extrusion Height Over Diameter (ratio):	0.78
+Extrusion Width Over Diameter (ratio):	1.23
+Open File to be Sliced	/Users/kintel/code/metalab/checkout/reprap/users/metalab/models/cylinder.gts
 Import Coarseness (ratio):	1.0
 Correct Mesh	True
 Unproven Mesh	False
 Infill Bridge Width Over Thickness (ratio):	1.0
 Infill in Direction of Bridges	True
-Slice All GNU Triangulated Surface Files in a Directory	False
-Slice File	True
-Extrusion Temperature (C):	190
-Extrusion Speed (PWM):	55
-Assume being home on startup	True
+Infill Perimeter Overlap (ratio):	0.1
+Calculate Overlap from Perimeter and Infill	True
+Calculate Overlap from Perimeter Only	False
