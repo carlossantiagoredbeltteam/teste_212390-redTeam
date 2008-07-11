@@ -45,10 +45,11 @@ class object:
 
     def min_max(self):
         '''Calculates the min and max for x, y, and z.
-        Assumes the object is a mesh of triangles.
+        Assumes the object is a mesh of triangles
+        or that the inc file contains #declares tellings us the min and max
         TODO: DTRT if the object is an SDL object'''
 
-        ## if inc file has #declares tellins us the min max, read it and use it
+        ## if inc file has #declares telling us the min max, read it and use it
         ret = 0;
         regex = re.compile('\s*#declare\s*(m..)_([x|y|z])\s*=\s*([-\.0123456789]*)')
         for declare in re.finditer(regex, self.code):
@@ -58,6 +59,7 @@ class object:
             ret = 1
         if ret: return
 
+        ## otherwise, calculate min and max from the mesh
         self.x = self.y = self.z = 9999999999
         self.X = self.Y = self.Z = -9999999999
 
