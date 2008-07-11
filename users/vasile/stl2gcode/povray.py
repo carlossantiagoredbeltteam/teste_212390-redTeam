@@ -17,6 +17,7 @@ from miscellaneous import *
 import re
 
 class object:
+    '''POVRAY include object'''
     x = X = y = Y = z = Z = None
     code = None
     __name = None
@@ -34,7 +35,7 @@ class object:
 
     def name(self):
         if self.__name: return self.__name
-        p = re.compile('\#declare\s*(\w*)')
+        p = re.compile('\#declare\s*(\w*)\s*=\s*[object|mesh]')
         m = re.search(p, self.code)
         if not m:
             print fname+".inc improperly formatted.  Can't find object name.\n"
@@ -43,6 +44,20 @@ class object:
         return self.__name
 
     def min_max(self):
+        '''Calculates the min and max for x, y, and z.
+        Assumes the object is a mesh of triangles.
+        TODO: DTRT if the object is an SDL object'''
+
+        ## if inc file has #declares tellins us the min max, read it and use it
+        ret = 0;
+        regex = re.compile('\s*#declare\s*(m..)_([x|y|z])\s*=\s*([-\.0123456789]*)')
+        for declare in re.finditer(regex, self.code):
+            var = declare.group(2)
+            if declare.group(1) == 'max': var = var.capitalize()
+            exec('self.' + var + ' = float(' + str(declare.group(3)) + ')')
+            ret = 1
+        if ret: return
+
         self.x = self.y = self.z = 9999999999
         self.X = self.Y = self.Z = -9999999999
 

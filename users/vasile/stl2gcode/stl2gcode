@@ -41,10 +41,11 @@ x, y = 0, 0 # starting offset for x and y for gcode
 #tolerance = 0.000000001
 inside_vector = [-0.5, 0.68, 0.5] # TODO: calculate this
 inside_vector = [0, 0, 0]
-delta_y = 1
 target = 'gcode'  # target format should be one of inc, pov, png, gcode
 
 filename=''
+
+step_x = step_y = step_z = 1 # crude resolution, but we need a default
 
 VERSION = 0.1
 
@@ -102,8 +103,9 @@ def do_args(argv):
 if __name__ == "__main__":
     do_args(sys.argv[1:])
     convert_object = stl2gcode.stl2gcode({
-            'delta_y': delta_y, 'depth': depth, 'filename': filename, 
-            'target': target, 'step': step, 'x': x, 'y': y})
+            'depth': depth, 'filename': filename, 
+            'target': target, 'step_x': step_x, 'step_y': step_y, 'step_z': step_z,
+            'x': x, 'y': y})
     convert_object.convert()
 
 
