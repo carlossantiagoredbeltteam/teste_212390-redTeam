@@ -1,0 +1,2 @@
+G92 (define current as home)
+
