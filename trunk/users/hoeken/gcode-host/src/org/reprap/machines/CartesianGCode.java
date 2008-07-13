@@ -52,10 +52,6 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	public CartesianGCode() throws Exception {
 		
 		super();
-
-		motorX = new GCodeStepperMotor('X');
-		motorY = new GCodeStepperMotor('Y');
-		motorZ = new GCodeStepperMotor('Z');
 		
 		portName = Preferences.loadGlobalString("Port(name)");
 		useSerialPort = Preferences.loadGlobalBool("GCodeUseSerial");
@@ -63,6 +59,13 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		gcode = new GCodeWriter();
 			
 		loadExtruders();
+	}
+	
+	public void loadMotors()
+	{
+		motorX = new GCodeStepperMotor('X');
+		motorY = new GCodeStepperMotor('Y');
+		motorZ = new GCodeStepperMotor('Z');
 	}
 	
 	public void loadExtruders()

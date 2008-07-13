@@ -28,6 +28,13 @@ public class NullCartesianMachine extends GenericCartesianPrinter {
 		super();
 	}
 	
+	public void loadMotors()
+	{
+		motorX = new NullStepperMotor('X');
+		motorY = new NullStepperMotor('Y');
+		motorZ = new NullStepperMotor('Z');
+	}
+	
 	public Extruder extruderFactory(int count)
 	{
 		return new NullExtruder(count);

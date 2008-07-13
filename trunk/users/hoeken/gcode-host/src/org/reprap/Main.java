@@ -39,6 +39,7 @@ import org.reprap.gui.botConsole.BotConsoleFrame;
 import org.reprap.comms.Communicator;
 import org.reprap.comms.snap.SNAPAddress;
 import org.reprap.comms.snap.SNAPCommunicator;
+import org.reprap.utilities.Debug;
 
 /**
  *
@@ -146,7 +147,6 @@ public class Main {
         {
         	System.err.println("MachineFactory.create() failed.\n" +
         			ex.toString());
-			ex.printStackTrace();
         }
 	}
 
@@ -799,6 +799,10 @@ public class Main {
 					org.reprap.Preferences.setGlobalString("Geometry", "nullcartesian");
 
 					throw new Exception(err);
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
 				}
 			}
 		}
