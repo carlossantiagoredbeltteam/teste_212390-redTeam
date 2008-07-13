@@ -12,18 +12,12 @@
 	License: GPL v2.0
 */
 
+#include "init.h"
 #include <ThermoplastExtruder.h>
 #include <SNAP.h>
 #include <ThermoplastExtruder_SNAP_v1.h>
 
-#define EXTRUDER_MOTOR_SPEED_PIN  3
-#define EXTRUDER_MOTOR_DIR_PIN    4
-#define EXTRUDER_HEATER_PIN       5
-#define EXTRUDER_COOLER_PIN       6
-#define EXTRUDER_THERMISTOR_PIN   0
-
-ThermoplastExtruder extruder(EXTRUDER_MOTOR_DIR_PIN, EXTRUDER_MOTOR_SPEED_PIN, EXTRUDER_HEATER_PIN, EXTRUDER_COOLER_PIN, EXTRUDER_THERMISTOR_PIN);
-
+ThermoplastExtruder extruder(EXTRUDER_MOTOR_DIR_PIN, EXTRUDER_MOTOR_SPEED_PIN, EXTRUDER_HEATER_PIN, EXTRUDER_COOLER_PIN, EXTRUDER_THERMISTOR_PIN, EXTRUDER_VALVE_DIR_PIN, EXTRUDER_VALVE_ENABLE_PIN);
 #include <SoftwareSerial.h>
 
 void setup()
