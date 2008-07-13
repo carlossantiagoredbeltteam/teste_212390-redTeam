@@ -482,18 +482,18 @@ public class Reprap extends GenericCartesianPrinter
 	//TODO: MAKE THIS WORK!
 	public int convertFeedrateToSpeedXY(double feedrate)
 	{
-		Debug.d("feedrate: " + feedrate);
+		//Debug.d("feedrate: " + feedrate);
 		
 		//pretty straightforward
 		double stepsPerMinute = feedrate * scaleX;
-		Debug.d("steps/min: " + stepsPerMinute);
+		//Debug.d("steps/min: " + stepsPerMinute);
 		
 		//ticks per minute divided by the steps we need to take.
 		double ticksBetweenSteps = 60000000 / 256 / stepsPerMinute;
-		Debug.d("ticks between steps: " + ticksBetweenSteps);
+		//Debug.d("ticks between steps: " + ticksBetweenSteps);
 
 		int picTimer = (256 - (int)ticksBetweenSteps);
-		Debug.d("pic timer: " + picTimer);
+		//Debug.d("pic timer: " + picTimer);
 		
 		//bounds checking.
 		picTimer = Math.min(255, picTimer);
