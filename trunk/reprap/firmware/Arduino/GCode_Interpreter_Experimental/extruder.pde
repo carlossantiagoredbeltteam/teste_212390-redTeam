@@ -60,6 +60,14 @@ volatile int iMin = -500;								// Integrator min
 volatile int iState = 0;								// Integrator state
 volatile int dState = 0;								// Last position input
 
+#ifdef INVERT_EXTRUDER_QUADRATURE
+#define EXTRUDER_QUADRATURE_INCREMENT extruder_error--;
+#define EXTRUDER_QUADRATURE_DECREMENT extruder_error++;
+#else
+#define EXTRUDER_QUADRATURE_INCREMENT extruder_error++;
+#define EXTRUDER_QUADRATURE_DECREMENT extruder_error--;
+#endif
+
 void extruder_read_quadrature()
 {  
   // found a low-to-high on channel A
@@ -67,18 +75,18 @@ void extruder_read_quadrature()
   {   
     // check channel B to see which way
     if (digitalRead(EXTRUDER_ENCODER_B_PIN) == LOW)
-        extruder_error++;
+        EXTRUDER_QUADRATURE_INCREMENT
     else
-        extruder_error--;
+        EXTRUDER_QUADRATURE_DECREMENT
   }
   // found a high-to-low on channel A
   else                                        
   {
     // check channel B to see which way
     if (digitalRead(EXTRUDER_ENCODER_B_PIN) == LOW)
-        extruder_error--;
+        EXTRUDER_QUADRATURE_DECREMENT
     else
-        extruder_error++;
+        EXTRUDER_QUADRATURE_INCREMENT
   }
 }
 
@@ -121,11 +129,6 @@ void init_extruder()
 	
 	//our default speed for the PID is every millisecond (16000 ticks)
 	setTimer2Ticks(16000);
-}
-
-void extruder_set_cooler(byte speed)
-{
-	analogWrite(EXTRUDER_FAN_PIN, speed);
 }
 
 void extruder_set_temperature(int temp)

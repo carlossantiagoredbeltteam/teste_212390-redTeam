@@ -44,6 +44,7 @@ SIGNAL(SIG_OUTPUT_COMPARE2A)
 		}
 
 		//our debug loop checker thingie
+		/*
 		cnt++;
 		if (cnt > 250)
 		{
@@ -53,7 +54,8 @@ SIGNAL(SIG_OUTPUT_COMPARE2A)
 			Serial.println(speed);
 			cnt = 0;
 		}
-
+		*/
+		
 		//figure out our real speed and use it.
 		speed = constrain(speed, EXTRUDER_MIN_SPEED, EXTRUDER_MAX_SPEED);
 		analogWrite(EXTRUDER_MOTOR_SPEED_PIN, speed);
