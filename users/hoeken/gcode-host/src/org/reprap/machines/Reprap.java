@@ -5,6 +5,7 @@ import javax.vecmath.Color3f;
 import javax.media.j3d.*;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
+import java.lang.Math;
 
 import org.reprap.Attributes;
 import org.reprap.CartesianPrinter;
@@ -57,30 +58,9 @@ public class Reprap extends GenericCartesianPrinter
 	{
 		super();
 		
-		String commPortName = Preferences.loadGlobalString("Port(name)");
-		
-//		SNAPAddress myAddress = new SNAPAddress(localNodeNumber); 
-//		communicator = new SNAPCommunicator(commPortName, myAddress);
-
-		motorX = new SNAPStepperMotor(communicator,
-				new SNAPAddress(Preferences.loadGlobalInt("XAxisAddress")), 1);
-		motorY = new SNAPStepperMotor(communicator,
-				new SNAPAddress(Preferences.loadGlobalInt("YAxisAddress")), 2);
-		motorZ = new SNAPStepperMotor(communicator,
-				new SNAPAddress(Preferences.loadGlobalInt("ZAxisAddress")), 3);
-
-		
-		motorX.setPrinter(this);
-		motorY.setPrinter(this);
-		motorZ.setPrinter(this);
-		
-		refreshPreferences();
-		
-		extruder=0;
-		
 		layerPrinter = new LinePrinter(motorX, motorY, extruders[extruder]);
 		
-		try {
+		try {			
 			currentX = convertToPositionZ(motorX.getPosition());
 			currentY = convertToPositionZ(motorY.getPosition());
 		} catch (Exception ex) {
@@ -93,6 +73,25 @@ public class Reprap extends GenericCartesianPrinter
 			excludeZ = true;
 		}
 
+	}
+	
+	public void loadMotors()
+	{
+		try
+		{
+			motorX = new SNAPStepperMotor(communicator,
+					new SNAPAddress(Preferences.loadGlobalInt("XAxisAddress")), 1);
+			motorY = new SNAPStepperMotor(communicator,
+					new SNAPAddress(Preferences.loadGlobalInt("YAxisAddress")), 2);
+			motorZ = new SNAPStepperMotor(communicator,
+					new SNAPAddress(Preferences.loadGlobalInt("ZAxisAddress")), 3);
+
+			motorX.setPrinter(this);
+			motorY.setPrinter(this);
+			motorZ.setPrinter(this);	
+		} catch (Exception ex){
+			ex.printStackTrace();
+		}
 	}
 	
 	public void loadExtruders()
@@ -483,14 +482,36 @@ public class Reprap extends GenericCartesianPrinter
 	//TODO: MAKE THIS WORK!
 	public int convertFeedrateToSpeedXY(double feedrate)
 	{
-		return 0;
+		//pretty straightforward
+		double stepsPerMinute = feedrate * scaleX;
+		
+		//ticks per minute divided by the steps we need to take.
+		long ticksBetweenSteps = Math.round(60000000 / 256 / stepsPerMinute);
+		int picTimer = (256 - (int)ticksBetweenSteps);
+		
+		//bounds checking.
+		picTimer = Math.min(255, picTimer);
+		picTimer = Math.max(0, picTimer);
+		
+		return picTimer;
 	}
 
 	
 	//TODO: MAKE THIS WORK!
 	public int convertFeedrateToSpeedZ(double feedrate)
 	{
-		return 0;
+		//pretty straightforward
+		double stepsPerMinute = feedrate * scaleZ;
+		
+		//ticks per minute divided by the steps we need to take.
+		long ticksBetweenSteps = Math.round(60000000 / 256 / stepsPerMinute);
+		int picTimer = (256 - (int)ticksBetweenSteps);
+		
+		//bounds checking.
+		picTimer = Math.min(255, picTimer);
+		picTimer = Math.max(0, picTimer);
+
+		return picTimer;
 	}
 }
 

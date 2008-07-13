@@ -10,6 +10,7 @@ import org.reprap.comms.OutgoingMessage;
 import org.reprap.comms.IncomingMessage.InvalidPayloadException;
 import org.reprap.comms.messages.VersionRequestMessage;
 import org.reprap.comms.messages.VersionResponseMessage;
+import org.reprap.utilities.Debug;
 
 /**
  * Class implements an abstract device containing the basic properties and methods.
@@ -48,8 +49,9 @@ public class Device {
 	 * @param address address of the device
 	 */
 	public Device(Communicator communicator, Address address) {
-		this.communicator = communicator;
+		//this.communicator = communicator;
 		this.address = address;
+		isAvailable();
 	}
 
 	/**
@@ -83,7 +85,7 @@ public class Device {
 	 * @return
 	 */
 	public boolean isAvailable()
-	{
+	{		
 	       try {
 	            getVersion();
 	        } catch (Exception ex) {
@@ -100,7 +102,7 @@ public class Device {
 	 * @return
 	 */
 	public boolean wasAvailable()
-	{
+	{		
 		return wasAlive;
 	}
 	

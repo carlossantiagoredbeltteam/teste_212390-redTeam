@@ -11,9 +11,6 @@ import org.reprap.AxisMotor;
 import org.reprap.CartesianPrinter;
 import org.reprap.Preferences;
 import org.reprap.ReprapException;
-import org.reprap.comms.Communicator;
-import org.reprap.comms.snap.SNAPAddress;
-import org.reprap.comms.snap.SNAPCommunicator;
 import org.reprap.devices.NullExtruder;
 import org.reprap.devices.GenericExtruder;
 import org.reprap.devices.GenericStepperMotor;
@@ -163,6 +160,7 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 		//load our actual extruders.
 		extruders = new GenericExtruder[extruderCount];
 		loadExtruders();
+		loadMotors();
 		
 		//load our prefs
 		refreshPreferences();
@@ -171,10 +169,6 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 		currentX = 0;
 		currentY = 0;
 		currentZ = 0;
-		
-		motorX = new NullStepperMotor('X');
-		motorY = new NullStepperMotor('Y');
-		motorZ = new NullStepperMotor('Z');
 	}
 	
 	public void refreshPreferences()
@@ -252,6 +246,13 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 		extruders[extruder].setMotor(false);
 		extruders[extruder].setValve(false);
 		extruders[extruder].setTemperature(0);
+	}
+	
+	public void loadMotors()
+	{
+		motorX = new NullStepperMotor('X');
+		motorY = new NullStepperMotor('Y');
+		motorZ = new NullStepperMotor('Z');
 	}
 	
 	public void loadExtruders()
