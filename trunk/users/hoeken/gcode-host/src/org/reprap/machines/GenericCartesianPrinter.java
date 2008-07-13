@@ -192,6 +192,10 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 			maxFeedrateY = Preferences.loadGlobalDouble("MaximumFeedrateY(mm/minute)");
 			maxFeedrateZ = Preferences.loadGlobalDouble("MaximumFeedrateZ(mm/minute)");
 			
+			//set our standard feedrates.
+			setFastFeedrateXY(Math.min(maxFeedrateX, maxFeedrateY));
+			setFastFeedrateZ(maxFeedrateZ);
+			
 			idleZ = Preferences.loadGlobalBool("IdleZAxis");
 		}
 		catch (Exception ex)
