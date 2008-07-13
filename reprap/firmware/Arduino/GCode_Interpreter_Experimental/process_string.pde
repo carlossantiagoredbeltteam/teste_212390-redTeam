@@ -293,8 +293,8 @@ void process_string(char instruction[], int size)
 			//turn extruder off
 			case 103:
 				disableTimer1Interrupt();
-				disableTimer2Interrupt();
-				analogWrite(EXTRUDER_MOTOR_SPEED_PIN, 0);
+				//disableTimer2Interrupt();
+				//analogWrite(EXTRUDER_MOTOR_SPEED_PIN, 0);
 				//extruder_error = 0;
 			break;
 
@@ -321,12 +321,12 @@ void process_string(char instruction[], int size)
 			
 			//turn fan on
 			case 106:
-				extruder_set_cooler(255);
+				digitalWrite(EXTRUDER_FAN_PIN, HIGH);
 			break;
 
 			//turn fan off
 			case 107:
-				extruder_set_cooler(0);
+				digitalWrite(EXTRUDER_FAN_PIN, LOW);
 			break;
 			
 			//set max extruder speed, in RPM
@@ -373,6 +373,16 @@ void process_string(char instruction[], int size)
 				Serial.println(extruder_iGain, DEC);
 				Serial.print("D:");
 				Serial.println(extruder_dGain, DEC);
+			break;
+			
+			//open the valve
+			case 126:
+				digitalWrite(EXTRUDER_VALVE_PIN, LOW);
+			break;
+
+			//open the valve
+			case 127:
+				digitalWrite(EXTRUDER_VALVE_PIN, HIGH);
 			break;
 			
 			default:
