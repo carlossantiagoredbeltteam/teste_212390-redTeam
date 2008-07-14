@@ -1,11 +1,12 @@
 #!/usr/bin/python
 
+import sys
+sys.path.append('/home/vasile/personal/reprap/users/vasile/brlcad/')
+
 from brlcad import *
 
 def slater_base (vertex=(0,0,0), height=(0, 1.5, 0), radius=0.5):
-    '''Thanks, Jamie!
-
-    TODO: little nubs for the threads to bite
+    '''TODO: little nubs for the threads to bite?
     TODO: a way to keep the pestle in'''
 
     x, y, z = vertex
@@ -55,6 +56,4 @@ print Title('slater')
 print Units('inch')
 print 'killall *' ## This deletes all objects in the db!  Careful with it!
 print slater((-1,0,0), (0,2,0), 0.5)
-
-
 
