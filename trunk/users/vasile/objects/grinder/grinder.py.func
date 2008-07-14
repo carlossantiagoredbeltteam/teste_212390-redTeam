@@ -1,0 +1,56 @@
+#!/usr/bin/python
+
+import brlcad
+print brlcad.Statement('test', ('me', 'now'))
+
+b = brlcad.Brlcad()
+
+def slater_base (height=1.5, radius=0.5):
+    '''Thanks, Jamie!
+
+    TODO: little nubs for the threads to bite
+    TODO: a way to keep the pestle in'''
+
+    height = float(height)
+    radius = float(radius)
+    return ('\n'.join([
+        '\n## Slater Mortar',
+        b.cylinder('shell_cyl.s', (0, 2*height/3, 0), (0, height/3, 0), radius),
+        b.cone('shell_cone.s', (0,0,0), (0, 2*height / 3, 0), 0.25 ,radius),
+        b.group( 'shell.g', 'shell_cyl.s shell_cone.s'),
+        b.cylinder('mortar.s', (0, 2 * height / 3, 0), (0, height / 3 + 0.001, 0), radius * .75),
+        b.cone('funnel.s', 
+             (0, 2 * height / 3, 0), 
+             (0, height / 3 * -1,0), 
+             radius * .75 - .025, 0.125),
+        b.cylinder('threads.s', (0, 0, 0), (0, height / 3, 0), 0.25),
+        b.region ('base.r', 'u shell.g - mortar.s - funnel.s - threads.s')]))
+
+def slater_pestle (height=1.0, radius=0.5):
+    height = float(height)
+    radius = float(radius)
+    x = radius * 4
+    return ('\n'.join([
+        '\n## Slater Pestle',
+        b.cylinder('pestle.s', (x, 0, 0), (0, height, 0), radius * .75),
+        b.cylinder('cap.s', (x, 0, 0), (0, height/2, 0), radius),
+        b.group('pestle.g', 'pestle.s cap.s')
+        ]))
+
+def slater(height=2, radius=0.5):
+    height = float(height)
+    radius = float(radius)
+    base = slater_base(height * 3 /4, radius)
+    pestle = slater_pestle(height / 2, radius)
+
+    return '%s\n%s\n' % (base, pestle)
+        
+    
+
+print b.title('slater')
+print b.units('inch')
+print 'killall *'
+print slater(2, 0.5)
+
+
+

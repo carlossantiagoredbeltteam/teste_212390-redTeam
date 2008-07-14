@@ -1,0 +1,1 @@
+./grinder.py | mged -c slater.g

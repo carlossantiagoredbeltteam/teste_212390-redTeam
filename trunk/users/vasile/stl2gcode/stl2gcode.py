@@ -16,7 +16,7 @@
 ## or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
 ## License for more details.  You should have received a copy of the
 ## GNU General Public License along with the work; if not, write to
-## the Free Software Foundation, Inc., 51 Franklin Street 5th Floor,
+## the Free Software Foundation, Inc., 51 Franklin Street, 5th Floor,
 ## Boston, MA 02110-1301 USA
 ##
 ## See http://www.evilmadscientist.com/article.php/slicingstl
