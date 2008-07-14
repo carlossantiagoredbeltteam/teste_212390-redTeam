@@ -50,7 +50,7 @@ def slater(vertex=(0,0,0), height=(0,2,0), radius=0.5):
 
     return '%s%s' % (base, pestle)    
 
-#print '\n'.join([warning, copyright, license]), '\n'
+print '\n'.join([warning, copyright, license]), '\n'
 print Title('slater')
 print Units('inch')
 print 'killall *' ## This deletes all objects in the db!  Careful with it!

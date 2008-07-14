@@ -1,1 +1,1 @@
-./grinder.py | mged -c slater.g
+./geegaw.py | mged -c geegaw.g
