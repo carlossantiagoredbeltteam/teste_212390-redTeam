@@ -13,14 +13,17 @@
 ## to the Free Software Foundation, Inc., 51 Franklin Street, 5th
 ## Floor, Boston, MA 02110-1301 USA
 
-SRC= geegaw.py
-TARGET=geegaw.g
-MGEDBIN= /usr/brlcad/bin/mged
-PYTHONBIN= /usr/bin/python
+BASE= geegaw
 LIBDIR= /home/vasile/personal/reprap/users/vasile/brlcad/
 
-$(TARGET): Makefile $(SRC) $(LIBDIR)/brlcad.py
-	$(PYTHONBIN) $(SRC) | $(MGEDBIN) -c $(TARGET)
+SRC= $(BASE).py
+TARGET= $(BASE).g
+MGEDBIN= /usr/brlcad/bin/mged
+PYTHONBIN= /usr/bin/python
+
+
+$(TARGET): Makefile $(SRC) $(LIBDIR)/brlcad.py $(LIBDIR)/brlcad_mechanical.py
+	$(PYTHONBIN) $(SRC) > $(BASE).brlcad
 
 clean:
 	rm $(TARGET)
