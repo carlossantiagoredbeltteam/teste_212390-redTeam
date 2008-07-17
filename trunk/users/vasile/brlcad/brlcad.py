@@ -122,7 +122,7 @@ class Shape():
         TODO: Every shape needs a default vertex for translation and
         rotation purposes.  '''
 
-        self.name = build_name('shape', 's', **kwargs)
+        self.name = build_name('shape', '', **kwargs)
 
         if not hasattr(self, 'statements'):
             self.statements = []
@@ -141,7 +141,7 @@ class Shape():
                 print >>sys.stderr, self.name, 'contains ', type(a)
                 sys.exit(2)
 
-        Shape.guess_vertex(self)
+        Shape.guess_vertex(self)  ## called this way because we don't want this overridden.
 
         if not hasattr(self, 'vertex'):
             sys.stderr.write('Shape (%s) needs vertex\n' % (self.name))
@@ -164,6 +164,9 @@ class Shape():
                 print >>sys.stderr, '%s: rotate takes 1 or 2 tuples/lists.' % (self.name)
                 sys.exit(2)
 
+        if 'combination' in kwargs:
+            self.combination(kwargs['combination'])
+
     def __str__(self):
         '''Accessing an Object as a string will yield all the statements and
         the children's statements.'''
@@ -171,18 +174,45 @@ class Shape():
         return ''.join([str(c) for c in self.children]) + \
             ''.join([str(s) for s in self.statements])
 
-    def combination(self, command):
-        '''Unimplemented and/or Untested: Add a statement to the stack making this
-        a combination.  Populate self.name with the name of that
-        combination.'''
+    def _sub_add_union(self, other, op):
+        if type(other)==str:
+            return ' '.join([self.name, op, other])
+        if hasattr(other, 'isshape') and other.isshape:
+            return ' '.join([self.name, op, other.name])
 
-        self.statements.append(Statement('c', (command,)))
+        print >>sys.stderr, 'Shape +/-/union  a string or a Shape, but not a ', type(other)
+        sys.exit(2)
+    def __sub__(self, other): return self._sub_add_union(other, '-')
+    def __add__(self, other): return self._sub_add_union(other, '+')
+    def __mul__ (self, other):  return self._sub_add_union(other, 'u')
+    def union (self, other):  return self._sub_add_union(other, 'u')
+
+    def _combo_region(self, command, cr):
+        if hasattr(self, 'hasgrc'):
+            print >>sys.stderr, self.name, 'already has a region/combination/group!'
+            sys.exit(2)
+        self.statements.append(Kill(self.name))
+        self.statements.append(Statement(cr, (self.name, command)))
+        self.hasgrc = 1
+        return self.name
+
+    def region(self, command):
+        '''Add a region statement to this Shape.'''
+        return self._combo_region(command, 'r')
+            
+    def combination(self, command):
+        '''Add a combination statement to this Shape.'''
+        return self._combo_region(command, 'c')
 
     def group(self):
         '''Take all the Shapes that comprise this item, and make a group of
         self.name.  Append the group statement to self.
 
         If kwargs['group']==True, this will be done as part of __init__'''
+
+        if hasattr(self, 'hasgrc'):
+            print >>sys.stderr, self.name, 'already has a region/combination/group!'
+            sys.exit(2)
 
         self.statements.append(Kill(self.name))
 
@@ -196,6 +226,7 @@ class Shape():
             sys.exit(2)
 
         self.statements.append(Statement('g', args))
+        self.hasgrc = 1
         return self.name
 
     def guess_vertex(self):
@@ -223,7 +254,10 @@ class Shape():
         '''translate is a tuple containing the amount to move along each axis.
         vertex is the point from which we move.  All other Shapes and
         Shapes that make up this Shape are moved relative to the
-        vertex.'''
+        vertex.
+
+        Not implemented yet.  And maybe translate should be more like
+        the mged translate.'''
 
         if vertex == None:
             vertex = self.vertex
@@ -232,74 +266,13 @@ class Shape():
             if hasattr(c, 'rotate'):
                 c.translate(translate, vertex)
 
+############################################
+## Grab the primitive classes
+for p in sys.path:
+    if os.path.exists(p + 'primitive.py') and p[-7:-1] == 'brlcad':
+            exec(file(p + 'primitive.py').read())
 
-class Primitive(Shape):
-    "Primitive shapes executed in one or more statements."
-    isprimitive=True
-    def __init__(self, shape, args=[], **kwargs):
-        self.name = build_name(shape, 's', **kwargs)
-        self.statements = []
-
-        self.guess_vertex(args)
-
-        Shape.__init__(self, ( Kill(self.name), 
-                               Statement('in %s %s' % (self.name, shape),args),), 
-                       name=self.name, **kwargs)
-
-    def guess_vertex(self, args):
-        ## Guess at the vertex.  If this won't find the right vertex,
-        ## you'll have to set it manually.
-        i = 0
-        while not hasattr(self, 'vertex') and i < len(args):
-            if type(args[i]) == tuple and len(args[i]) == 3:
-                self.vertex = args[i]
-            i += 1
-
-    def rotate(self, rotation, vertex=None):
-        if vertex == None:
-            vertex = self.vertex
-
-        xrot, yrot, zrot = rotation
-        xvert, yvert, zvert = vertex
-
-        self.statements.append('sed %s\nkeypoint %f %f %f\nrot %f %f %f\naccept\n' % (
-                self.name, xvert, yvert, zvert, xrot, yrot, zrot))
-
-    def translate(self, xtra, ytra=None, ztra=None):
-        '''Translate shape to new coordinates.
-
-        Note that this is different from MGED's internal translate
-        statement.  MGED moves the shape to the indicated coordinates.
-        This function moves the shape relative to the current
-        coordinates.  translate(1, 2, -3) moves the shape 1 to the
-        right, 2 up and 3 back.'''
-
-        if type(xtra) == tuple:
-            xtra, ytra, ztra = xtra
-
-        self.statements.append('sed %s\ntra %f %f %f\naccept' % (
-                self.name, xtra, ytra, ztra))
-
-class Cone(Primitive):
-    def __init__(self, vertex, height_vector, base_radius, top_radius, **kwargs):
-        Primitive.__init__(self, "trc", (vertex, height_vector, base_radius, top_radius), **kwargs)
-
-class Cylinder(Primitive):
-    def __init__(self, vertex, height_vector, radius, **kwargs):
-        Primitive.__init__(self, "rcc", (vertex, height_vector, radius), **kwargs)
-
-class Box(Primitive):
-    def __init__(self, xmin, xmax, ymin, ymax, zmin, zmax, **kwargs):
-        self.vertex = (xmin, ymin, zmin)
-        if not 'basename' in kwargs:
-            kwargs['basename'] = 'box'
-        Primitive.__init__(self, "rpp", (xmin, xmax, ymin, ymax, zmin, zmax), **kwargs)
-
-class Arb8(Primitive):
-    def __init__(self, v1, v2, v3, v4, v5, v6, v7, v8, **kwargs):
-        Primitive.__init__(self, "arb8", (v1, v2, v3, v4, v5, v6, v7, v8), **kwargs)
-
-
+######################
 ## Implement some simplistic commands
 from string import Template
 commands = {
