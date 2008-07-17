@@ -266,12 +266,6 @@ class Shape():
             if hasattr(c, 'rotate'):
                 c.translate(translate, vertex)
 
-############################################
-## Grab the primitive classes
-for p in sys.path:
-    if os.path.exists(p + 'primitive.py') and p[-7:-1] == 'brlcad':
-            exec(file(p + 'primitive.py').read())
-
 ######################
 ## Implement some simplistic commands
 from string import Template
@@ -349,3 +343,5 @@ class Box_rounded_edge_corners(Shape):
             Cylinder((xmax-step, ymin, zmax-step), (0, ymax-ymin, 0), radius)
             ], group=True, basename='brec', suffix='t')
 
+
+from primitive import *

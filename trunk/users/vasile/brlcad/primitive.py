@@ -13,11 +13,7 @@
 ## to the Free Software Foundation, Inc., 51 Franklin Street, 5th
 ## Floor, Boston, MA 02110-1301 USA
 
-## No need to import this file.  It gets included in brlcad.py with
-## this snippet:
-## for p in sys.path:
-##     if os.path.exists(p + 'primitive.py') and p[-7:-1] == 'brlcad':
-##             exec(file(p + 'primitive.py').read())
+from brlcad import *
 
 class Primitive(Shape):
     "Primitive shapes executed in one or more statements."
@@ -72,48 +68,10 @@ class Box(Primitive):
         if not 'basename' in kwargs:
             kwargs['basename'] = 'box'
         Primitive.__init__(self, "rpp", (xmin, xmax, ymin, ymax, zmin, zmax), **kwargs)
-class Cone(Primitive):
-    def __init__(self, vertex, height_vector, base_radius, top_radius, **kwargs):
-        Primitive.__init__(self, "trc", (vertex, height_vector, base_radius, top_radius), **kwargs)
-class Cone_elliptical(Primitive):
-    'Truncated elliptical cone'
-    def __init__(self):
-        pass
-class Cone_general(Primitive):
-    def __init__(self):
-        pass
-class Cylinder_elliptical(Primitive):
-    'This is a right elliptical cylinder'
-    def __init__(self):
-        pass
-class Cylinder_hyperbolic(Primitive):
-    def __init__(self):
-        pass
-class Cylinder_parabolic(Primitive):
-    def __init__(self):
-        pass
 class Ellipsoid_foci(Primitive):
     def __init__(self, focus_1, focus_2, chord_length, **kwargs):
-        'chord_length must be > distance between foci'
+        'TODO: test chord_length must be > distance between foci'
         Primitive.__init__(self, "ellg", (focus_1, focus_2, chord_length), **kwargs)
-class Hyperboloid(Primitive):
-    def __init__(self):
-        pass
-class Paraboloid(Primitive):
-    def __init__(self):
-        pass
-class Particle(Primitive):
-    def __init__(self):
-        pass
-class Sphere(Primitive):
-    def __init__(self):
-        pass
-class Torus(Primitive):
-    def __init__(self):
-        pass
-class Torus_elliptical(Primitive):
-    def __init__(self):
-        pass
 
 ## Implement some primitive shapes
 from string import Template
@@ -123,9 +81,21 @@ primitives = {
 'Arb6':['arb6', 'v1, v2, v3, v4, v5, v'],
 'Arb7':['arb7', 'v1, v2, v3, v4, v5, v6, v7'],
 'Arb8':['arb8', 'v1, v2, v3, v4, v5, v6, v7, v8'],
+'Cone':['trc', 'vertex, height_vector, base_radius, top_radius'],
+'Cone_elliptical':['tec', 'vertex, height_vector, major_axis, minor_axis, ratio'],
+'Cone_general':['tgc', 'vertex, height_vector, avector, bvector, cscalar, dscalar'],
+'Cylinder':['rcc', 'vertex, height_vector, radius'],
+'Cylinder_elliptical':['rec', 'vertex, height_vector, major_axis, minor_axis'],
+'Cylinder_hyperbolic':['rhc','vertex, height_vector, bvector, half_width, apex_to_asymptote'],
+'Cylinder_parabolic':['rpc', 'vertex, height_vector, bvector, half_width'],
 'Ellipsoid':['ell', 'vertex, avector, bvector, cvector'],
+'Hyperboloid_elliptical': ['ehy', 'vertex, height_vector, avector, bscalar, apex_to_asymptote'],
+'Paraboloid_elliptical': ['epa', 'vertex, height_vector, avector, bscalar'],
 'Ellipsoid_radius':['ell1', 'vertex, radius'],
-'Cylinder':['rcc', 'vertex, height_vector, radius']
+'Particle':['part', 'vertex, height_vector, radius_at_v_end, radius_at_h_end'],
+'Sphere':['sph', 'vertex, radius'],
+'Torus':['tor', 'vertex, normal, radius_1, radius_2'],
+'Torus_elliptical':['eto', 'vertex, normal_vector, radius, cvector, axis'],
 }
 for p in primitives:
     exec Template('''class $classname(Primitive):
