@@ -1,17 +1,6 @@
 #!/usr/bin/python
 
-import sys, os
-
-def path_munge():
-    found = False
-    for p in sys.path:
-        if os.path.exists(p + 'primitive.py') and p[-7:-1] == 'brlcad':
-            found = True
-
-    if not found:
-        sys.path.insert(1,'/home/vasile/personal/reprap/users/vasile/brlcad/')
-
-path_munge()
+import sys
 
 from brlcad import *
 
