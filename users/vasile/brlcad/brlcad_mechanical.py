@@ -13,7 +13,34 @@
 ## to the Free Software Foundation, Inc., 51 Franklin Street, 5th
 ## Floor, Boston, MA 02110-1301 USA
 
-import brlcad
+from brlcad import *
+
+class stepper_motor(Shape):
+    '''Vertex is center point box, along the center of the cylinder.
+
+    TODO: implement mounting holes'''
+
+    def __init__(self, vertex, base_height, base_width,
+                 mount_hole_rad,
+                 motor_height, motor_rad,
+                 spindle_height, spindle_rad, **kwargs):
+
+        x, y, z = vertex
+        by = base_height
+        my = motor_height
+
+        bw = float(base_width) / 2
+
+        self.vertex = vertex
+
+        Shape.__init__(self, [
+            Comment('Stepper Motor'),
+
+            Cylinder((x, y+by, z), (0,motor_height,0), motor_rad),
+            Cylinder((x, y+by+my, z), (0,spindle_height,0), spindle_rad),
+            Box_rounded_edge_corners(x-bw,x+bw, y,y+by, z-bw,z+bw, bw/10),
+            ], basename='stepper', suffix='', group=True, **kwargs)
+
 
 class Threaded_rod():
     '''Threaded rod.  Horrible detail right now'''

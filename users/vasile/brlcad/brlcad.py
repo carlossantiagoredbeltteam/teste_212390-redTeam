@@ -15,6 +15,8 @@ license = '''## This is a freed work; you can redistribute it and/or modify it
 
 import sys, os
 
+VERSION = 0.2
+
 class Vector:
     def __init__(self,*args):
         if len(args) == 1:
@@ -40,80 +42,279 @@ def unique_name(stub, suffix):
     unique_names[full] += 1
     return stub + '.' + str(unique_names[full]) + suffix
 
-def build_name(stub, suffix, **kwargs):
-    if 'suffix' in kwargs:
-        suffix = kwargs['suffix']
-    if suffix: suffix = '.' + suffix
+def build_name(stub, ending, **kwargs):
+    '''There are a lot of kwargs options to control how objects are named.
+
+    If you specify a name with 'name', the object will bear that exact
+    name, with no suffix or unique number.  You are responsible for
+    making sure the name is unique.
+
+    'suffix' is added to names.  It's usually a single letter
+    indicating s for shape or r for region.
+
+    'basename' overrides the stub.  To this, a unique number and the
+    suffix will be added.
+
+    'unique_name' can be set to False, and that will turn off the numbering.'''
 
     if 'name' in kwargs:
+        return kwargs['name']
+
+    if 'suffix' in kwargs:
+        suffix = kwargs['suffix']
+    else:
+        suffix = ending
+    if suffix: suffix = '.' + suffix
+
+
+    if 'basename' in kwargs:
         if 'unique_name' in kwargs and kwargs['unique_name']==False:
-            return kwargs['name'] + suffix
+            return kwargs['basename'] + suffix
         else:
-            return unique_name(kwargs['name'], suffix)
+            return unique_name(kwargs['basename'], suffix)
     else:
         return unique_name(stub, suffix)
 
-class Statement:
+class Statement():
+    isstatement = True
+    name='' # statements don't have names, but this keeps group from complaining
     def __init__(self, statement, args=[]):
-        args = list(args)
-        for i in range(len(args)):
-            if type(args[i]) == tuple or type(args[i]) == list:
-                args[i] = Vector(args[i])
-        self.args = args
+
+        self.args=[]
+        if type(args) == str:
+            self.args.append(args)
+        else:
+            for i in range(len(args)):
+                if type(args[i]) == tuple or type(args[i]) == list:
+                    self.args.append(Vector(args[i]))
+                else:
+                    self.args.append(args[i])
+
         self.statement = statement
+        
 
     def __str__(self):
-        return '%s %s' % (self.statement, ' '.join([str(s) for s in self.args]))
+        return '%s %s\n' % (self.statement, ' '.join([str(s) for s in self.args]))
 
-class Script():
-    '''A script is just a list of statements to send to mged.
-    TODO: Maybe this class should derive from list?'''
 
-    def __init__(self, *statements):
-        self.statements = list(statements)
-        self.index = len(statements)
+class Shape():
+    isshape = True
+    def __init__(self, args=[], **kwargs):
+        '''A Shape is any physical item we can depict with brl-cad, from a
+        primitive to a screw to a hole to an entire machine.
+
+        Each element in args is a Statement or a Shape that makes this
+        item.
+
+        kwargs['rotate'] = rotate vector or a tuple containing rotate
+        vector and rotate vertex.
+
+        kwargs['scale'] - not implemented
+        kwargs['translate'] - not implemented
+
+        Specify the Shape by instantiating it along with the
+        statements and shapes that comprise it.  Typically, you'll use
+        rotate or translate after instantiating to move it into
+        position.
+
+        self.children stores a list of Shapes that comprise this one.
+
+        TODO: Every shape needs a default vertex for translation and
+        rotation purposes.  '''
+
+        self.name = build_name('shape', 's', **kwargs)
+
+        if not hasattr(self, 'statements'):
+            self.statements = []
+
+        if not hasattr(self, 'children'):
+            self.children = [] # an array of Shapes
+
+        for a in args:
+            if hasattr(a, 'isstatement'):
+                self.statements.append(a)
+            elif hasattr(a, 'isshape'):
+                self.children.append(a)
+            elif type(a) == type('str'):
+                self.statements.append(Statement(a))
+            else:
+                print >>sys.stderr, self.name, 'contains ', type(a)
+                sys.exit(2)
+
+        Shape.guess_vertex(self)
+
+        if not hasattr(self, 'vertex'):
+            sys.stderr.write('Shape (%s) needs vertex\n' % (self.name))
+            sys.exit(2)
+
+        if 'group' in kwargs and kwargs['group']:
+            self.group()
+
+        if 'rotate' in kwargs:
+            if type(kwargs['rotate'] == tuple) or type(kwargs['rotate'] == list):
+                if len(kwargs['rotate']) == 3:
+                    self.rotate(kwargs['rotate'])
+                elif len(kwargs['rotate']) == 2:
+                    self.rotate(kwargs['rotate'][0],kwargs['rotate'][1])
+                else:
+                    print >>sys.stderr, ('%s: rotate takes 1 vector or 2 vectors in a tuple.' % 
+                                        (self.name))
+                    sys.exit(2)
+            else:
+                print >>sys.stderr, '%s: rotate takes 1 or 2 tuples/lists.' % (self.name)
+                sys.exit(2)
+
     def __str__(self):
-        return ''.join(['%s\n' % (s) for s in self.statements])
+        '''Accessing an Object as a string will yield all the statements and
+        the children's statements.'''
 
-    def __iter__(self):
-        return self
-    def next(self):
-        if self.index == len(statements):
-            raise StopIteration
-        self.index = self.index + 1
-        return self.statements[self.index]
+        return ''.join([str(c) for c in self.children]) + \
+            ''.join([str(s) for s in self.statements])
 
-    def append(self, *statements):
-        for i in statements:
-            self.statements.append(i)
-        return self
+    def combination(self, command):
+        '''Unimplemented and/or Untested: Add a statement to the stack making this
+        a combination.  Populate self.name with the name of that
+        combination.'''
 
-class Shape(Statement):
+        self.statements.append(Statement('c', (command,)))
+
+    def group(self):
+        '''Take all the Shapes that comprise this item, and make a group of
+        self.name.  Append the group statement to self.
+
+        If kwargs['group']==True, this will be done as part of __init__'''
+
+        self.statements.append(Kill(self.name))
+
+        args = [self.name]
+        for c in self.children:
+            if hasattr(c, 'isshape'):
+                args.append(c.name)
+
+        if len(args) < 2:
+            print >>sys.stderr, self.name, 'needs more items to group'
+            sys.exit(2)
+
+        self.statements.append(Statement('g', args))
+        return self.name
+
+    def guess_vertex(self):
+        '''If vertex doesn't exist, adopt vertex of first shape in children.
+
+        If this doesn't find the right vertex, you'll have to set it
+        manually *before* you call init.  Otherwise, init will
+        complain about lack of a vertex and halt.'''
+
+        if not hasattr(self, 'vertex'):
+            for c in self.children:
+                if hasattr(c, 'vertex'):
+                    self.vertex = c.vertex
+                    return self.vertex
+
+    def rotate(self, rotation, vertex=None):
+        if vertex == None:
+            vertex = self.vertex
+
+        for c in self.children:
+            if hasattr(c, 'rotate'):
+                c.rotate(rotation, vertex)
+
+    def translate(self, translate, vertex=None):
+        '''translate is a tuple containing the amount to move along each axis.
+        vertex is the point from which we move.  All other Shapes and
+        Shapes that make up this Shape are moved relative to the
+        vertex.'''
+
+        if vertex == None:
+            vertex = self.vertex
+
+        for c in self.children:
+            if hasattr(c, 'rotate'):
+                c.translate(translate, vertex)
+
+
+class Primitive(Shape):
+    "Primitive shapes executed in one or more statements."
+    isprimitive=True
     def __init__(self, shape, args=[], **kwargs):
-        "Primitive shapes"
         self.name = build_name(shape, 's', **kwargs)
-        Statement.__init__(self,'in %s %s' % (self.name, shape),args)
+        self.statements = []
 
-class Region(Statement):
-    def __init__(self, region_command, **kwargs):
-        self.name = build_name('region', 'r', **kwargs)
-        Statement.__init__(self,"r", (self.name, region_command))
+        self.guess_vertex(args)
 
-class Group(Statement):
-    '''*shapes is a list of objects or object names to be added to the
-    group.  This class respects all the Statement keyword arguments,
-    such as name, suffix and unique_name.'''
-    def __init__(self, *shapes, **kwargs):
-        shapes = list(shapes)
-        self.name = build_name('group', 'g', **kwargs)
-        for i in range(len(shapes)):
-            if not isinstance(shapes[i], basestring):
-                shapes[i] = shapes[i].name
-        Statement.__init__(self, 'g', (self.name, ' '.join(shapes)))
+        Shape.__init__(self, ( Kill(self.name), 
+                               Statement('in %s %s' % (self.name, shape),args),), 
+                       name=self.name, **kwargs)
 
-class Comment(Statement):
-    def __init__(self, comment):
-        Statement.__init__(self,"\n##", (comment,))
+    def guess_vertex(self, args):
+        ## Guess at the vertex.  If this won't find the right vertex,
+        ## you'll have to set it manually.
+        i = 0
+        while not hasattr(self, 'vertex') and i < len(args):
+            if type(args[i]) == tuple and len(args[i]) == 3:
+                self.vertex = args[i]
+            i += 1
+
+    def rotate(self, rotation, vertex=None):
+        if vertex == None:
+            vertex = self.vertex
+
+        xrot, yrot, zrot = rotation
+        xvert, yvert, zvert = vertex
+
+        self.statements.append('sed %s\nkeypoint %f %f %f\nrot %f %f %f\naccept\n' % (
+                self.name, xvert, yvert, zvert, xrot, yrot, zrot))
+
+    def translate(self, xtra, ytra=None, ztra=None):
+        '''Translate shape to new coordinates.
+
+        Note that this is different from MGED's internal translate
+        statement.  MGED moves the shape to the indicated coordinates.
+        This function moves the shape relative to the current
+        coordinates.  translate(1, 2, -3) moves the shape 1 to the
+        right, 2 up and 3 back.'''
+
+        if type(xtra) == tuple:
+            xtra, ytra, ztra = xtra
+
+        self.statements.append('sed %s\ntra %f %f %f\naccept' % (
+                self.name, xtra, ytra, ztra))
+
+class Cone(Primitive):
+    def __init__(self, vertex, height_vector, base_radius, top_radius, **kwargs):
+        Primitive.__init__(self, "trc", (vertex, height_vector, base_radius, top_radius), **kwargs)
+
+class Cylinder(Primitive):
+    def __init__(self, vertex, height_vector, radius, **kwargs):
+        Primitive.__init__(self, "rcc", (vertex, height_vector, radius), **kwargs)
+
+class Box(Primitive):
+    def __init__(self, xmin, xmax, ymin, ymax, zmin, zmax, **kwargs):
+        self.vertex = (xmin, ymin, zmin)
+        if not 'basename' in kwargs:
+            kwargs['basename'] = 'box'
+        Primitive.__init__(self, "rpp", (xmin, xmax, ymin, ymax, zmin, zmax), **kwargs)
+
+class Arb8(Primitive):
+    def __init__(self, v1, v2, v3, v4, v5, v6, v7, v8, **kwargs):
+        Primitive.__init__(self, "arb8", (v1, v2, v3, v4, v5, v6, v7, v8), **kwargs)
+
+
+## Implement some simplistic commands
+from string import Template
+commands = {
+'Comment':"##", 
+'Exit':'exit',
+'Kill':'kill',
+'Killall':'killall', 
+'Killtree': 'killtree',
+'Quit':'quit',
+'Source':'source',
+}
+for c in commands:
+    exec Template('''class $command(Statement):
+    def __init__(self, arg=''):
+        Statement.__init__(self, '$brl', arg)''').substitute(command = c, brl = commands[c])
 
 class Sed(Statement):
     ## Enter editing mode
@@ -122,7 +323,7 @@ class Sed(Statement):
 class Title(Statement):
     ## TODO: escape quotes
     def __init__(self, title, args=[]):
-        Statement.__init__(self,"title", (title,))
+        Statement.__init__(self,"title", title)
 
 class Units(Statement):
     def __init__(self, units):
@@ -134,19 +335,44 @@ class Units(Statement):
         if not units in good_units:
             sys.stdout.write('Unknown units!  Ignoring units statement.  Defaulting to mm.\n')
             units = 'mm'
-        Statement.__init__(self,"units", (units,))
+        Statement.__init__(self,"units", units)
 
-class Cone(Shape):
-    def __init__(self, vertex, height_vector, base_radius, top_radius, **kwargs):
-        Shape.__init__(self, "trc", (vertex, height_vector, base_radius, top_radius), **kwargs)
+class Script():
+    '''A script is just a list of statements to send to mged.
+    TODO: Maybe this class should derive from list?'''
 
-class Cylinder(Shape):
-    def __init__(self, vertex, height_vector, radius, **kwargs):
-        Shape.__init__(self, "rcc", (vertex, height_vector, radius), **kwargs)
+    def __init__(self, *statements):
+        self.statements = list(statements)
+    def __str__(self):
+        return ''.join(['%s' % (s) for s in self.statements])
 
-class Box(Shape):
-    def __init__(self, xmin, xmax, ymin, ymax, zmin, zmax, **kwargs):
-        Shape.__init__(self, "rpp", (xmin, xmax, ymin, ymax, zmin, zmax), **kwargs)
+    def append(self, *statements):
+        for i in statements:
+            self.statements.append(i)
+        return self
 
-#class Box_rounded_edge_corners(Script):
-#    def __init__(self, vertex, height
+
+class Box_rounded_edge_corners(Shape):
+    def __init__(self, xmin, xmax, ymin, ymax, zmin, zmax, radius, **kwargs):
+        if xmin > xmax:
+            xmin, xmax = xmax, xmin
+        if ymin > ymax:
+            ymin, ymax = ymax, ymin
+        if zmin > zmax:
+            zmin, zmax = zmax, zmin
+
+        if radius > (xmax-xmin) / 2 or radius > (zmax-zmin)/2:
+            sys.stdout.write('Radius %f too large!\n' % (float(radius)))
+            sys.exit(2)
+
+        step = radius
+
+        Shape.__init__(self, [
+            Box(xmin+step, xmax-step, ymin, ymax, zmin, zmax),
+            Box(xmin, xmax, ymin, ymax, zmin+step, zmax-step),
+            Cylinder((xmin+step, ymin, zmin+step), (0, ymax-ymin, 0), radius),
+            Cylinder((xmin+step, ymin, zmax-step), (0, ymax-ymin, 0), radius),
+            Cylinder((xmax-step, ymin, zmin+step), (0, ymax-ymin, 0), radius),
+            Cylinder((xmax-step, ymin, zmax-step), (0, ymax-ymin, 0), radius)
+            ], group=True, basename='brec', suffix='t')
+
