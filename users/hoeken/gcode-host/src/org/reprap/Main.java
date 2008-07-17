@@ -178,7 +178,7 @@ public class Main {
         JMenuItem filePrefs = new JMenuItem("Preferences...", KeyEvent.VK_R);
         filePrefs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Preferences prefs = new Preferences(mainFrame);
+				Preferences prefs = new Preferences();
 				prefs.setVisible(true);	// prefs.show();
 			}});
         fileMenu.add(filePrefs);

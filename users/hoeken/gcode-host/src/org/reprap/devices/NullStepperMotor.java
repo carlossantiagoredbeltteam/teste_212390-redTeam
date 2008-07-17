@@ -15,7 +15,7 @@ public class NullStepperMotor extends GenericStepperMotor {
 	 * @param motorId
 	 */
 	public NullStepperMotor(int motorId) {
-		super(motorId);
+		super(null, motorId);
 	}
 
 	/**
