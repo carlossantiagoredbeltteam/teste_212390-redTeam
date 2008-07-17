@@ -22,7 +22,7 @@ import org.reprap.comms.messages.OutgoingIntMessage;
 /**
  *
  */
-public class GenericStepperMotor implements AxisMotor {
+public class GenericStepperMotor extends Device implements AxisMotor {
 	
 
 	/**
@@ -52,7 +52,8 @@ public class GenericStepperMotor implements AxisMotor {
 	 * @param prefs
 	 * @param motorId
 	 */
-	public GenericStepperMotor(int motorId) {
+	public GenericStepperMotor(Address address, int motorId) {
+		super(address);
 			
 		switch(motorId)
 		{
@@ -75,10 +76,10 @@ public class GenericStepperMotor implements AxisMotor {
 
 	}
 	
-	public boolean isAvailable()
-	{
-		return false;
-	}
+//	public boolean isAvailable()
+//	{
+//		return false;
+//	}
 	
 	public void refreshPreferences()
 	{

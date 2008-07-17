@@ -157,7 +157,7 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 	 */
 	public SNAPStepperMotor(Communicator communicator, Address address, int motorId) {
 		
-		super(motorId);
+		super(address, motorId);
 		
 		snap = new Device(communicator, address);
 			

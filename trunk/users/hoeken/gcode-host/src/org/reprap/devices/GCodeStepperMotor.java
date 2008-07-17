@@ -15,7 +15,7 @@ public class GCodeStepperMotor extends GenericStepperMotor {
 	 * @param motorId
 	 */
 	public GCodeStepperMotor(int motorId) {
-		super(motorId);
+		super(null, motorId);
 	}
 
 	/**

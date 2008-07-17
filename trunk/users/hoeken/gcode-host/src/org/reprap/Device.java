@@ -53,6 +53,12 @@ public class Device {
 		this.address = address;
 		isAvailable();
 	}
+	
+	public Device(Address address)
+	{
+		this.address = address;
+		isAvailable();		
+	}
 
 	/**
 	 * @return the adress of the device
