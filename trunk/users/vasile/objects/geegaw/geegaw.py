@@ -1,7 +1,17 @@
 #!/usr/bin/python
 
-import sys
-sys.path.insert(1,'/home/vasile/personal/reprap/users/vasile/brlcad/')
+import sys, os
+
+def path_munge():
+    found = False
+    for p in sys.path:
+        if os.path.exists(p + 'primitive.py') and p[-7:-1] == 'brlcad':
+            found = True
+
+    if not found:
+        sys.path.insert(1,'/home/vasile/personal/reprap/users/vasile/brlcad/')
+
+path_munge()
 
 from brlcad import *
 
@@ -63,7 +73,6 @@ print warning, '\n\n', copyright, '\n', license, '\n'
 print Script(
     Title('slater'),
     Units('inch'),
-    Killall('*'), ## This deletes all objects in the db!  Careful with it!
     slater((-1,0,0), (0,2,0), 0.5)
     )
 
