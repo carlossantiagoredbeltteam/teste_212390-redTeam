@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+## THIS DOESN'T WORK WITH THE NEW BRLCAD.PY (VERSION 0.2)
+
 import sys
 sys.path.append('/home/vasile/personal/reprap/users/vasile/brlcad/')
 
