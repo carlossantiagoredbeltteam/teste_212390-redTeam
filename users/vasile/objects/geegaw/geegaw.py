@@ -36,7 +36,7 @@ class base(Shape):
                 ], combination = shell - innards, basename='base')
 
 class pestle(Shape):
-    def __init__(self, vertex = (2,0,0), height=(0, 1, 0), radius=0.5):
+    def __init__(self, vertex = (2,0,0), height=(0, 1, 0), radius=0.5, **kwargs):
         radius = float(radius)
         h = height
         hy = float(height[1])
@@ -44,7 +44,7 @@ class pestle(Shape):
         Shape.__init__(self, [
                 Cylinder(vertex, (h[0], hy, h[2]), radius * .75, basename='pestle'),
                 Cylinder(vertex, (h[0], hy/2, h[2]), radius, basename='cap')
-                ], group=True)
+                ], group=True, **kwargs)
 
 
 class slater(Shape):
@@ -52,10 +52,9 @@ class slater(Shape):
         x, y, z = vertex
         h = height
         hy = float(h[1])
-
         Shape.__init__(self, [
                 base(vertex, (h[0], hy * 3 /4, h[2]), radius),
-                pestle((x,y+3,z), (h[0], hy * - 1 / 2, h[2]), radius)
+                pestle((x,y+3,z), (h[0], hy * - 1 / 2, h[2]), radius),
                 ], basename='slater', suffix='', group=True)
 
 print warning, '\n\n', copyright, '\n', license, '\n'

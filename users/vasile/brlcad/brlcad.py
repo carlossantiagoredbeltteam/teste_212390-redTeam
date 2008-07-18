@@ -106,21 +106,21 @@ class Shape():
         Each element in args is a Statement or a Shape that makes this
         item.
 
-        kwargs['rotate'] = rotate vector or a tuple containing rotate
-        vector and rotate vertex.
+        See rotate, translate and scalar functions for some keywords
+        that will let you produce a scaled, rotate or translated
+        object via keyword args to __init__.
 
         kwargs['scale'] - not implemented
-        kwargs['translate'] - not implemented
 
         Specify the Shape by instantiating it along with the
-        statements and shapes that comprise it.  Typically, you'll use
-        rotate or translate after instantiating to move it into
-        position.
+        statements and shapes that comprise it.  For many shapes, it
+        might be easiest to assemble them at the origin and then use
+        translate and rotate to move them into position.  Do this with
+        the translate, rotate and scale keywords or have the __init__
+        function of your shape just do a translate and rotate based on
+        the given vertex and height_vector.
 
-        self.children stores a list of Shapes that comprise this one.
-
-        TODO: Every shape needs a default vertex for translation and
-        rotation purposes.  '''
+        self.children stores a list of Shapes that comprise this one.'''
 
         self.name = build_name('shape', '', **kwargs)
 
@@ -147,25 +147,47 @@ class Shape():
             sys.stderr.write('Shape (%s) needs vertex\n' % (self.name))
             sys.exit(2)
 
+        ## Handle some kwarg options
         if 'group' in kwargs and kwargs['group']:
             self.group()
-
-        if 'rotate' in kwargs:
-            if type(kwargs['rotate'] == tuple) or type(kwargs['rotate'] == list):
-                if len(kwargs['rotate']) == 3:
-                    self.rotate(kwargs['rotate'])
-                elif len(kwargs['rotate']) == 2:
-                    self.rotate(kwargs['rotate'][0],kwargs['rotate'][1])
-                else:
-                    print >>sys.stderr, ('%s: rotate takes 1 vector or 2 vectors in a tuple.' % 
-                                        (self.name))
-                    sys.exit(2)
-            else:
-                print >>sys.stderr, '%s: rotate takes 1 or 2 tuples/lists.' % (self.name)
-                sys.exit(2)
-
-        if 'combination' in kwargs:
+        if 'combination' in kwargs and kwargs['combination']:
             self.combination(kwargs['combination'])
+        if 'region' in kwargs and kwargs['region']:
+            self.combination(kwargs['region'])
+        if 'rotate' in kwargs:
+            self._do_init_rst('rotate', **kwargs)
+        if 'translate' in kwargs:
+            self._do_init_rst('translate', **kwargs)
+        if 'scale' in kwargs:
+            self._do_init_rst('scale', **kwargs)
+
+
+
+    def _do_init_rst(self, arg, **kwargs):
+        '''Handle a rotate, translate, or scale kwarg passed to init by
+        checking that the params are correct and calling the
+        appropriate function.
+
+        We should probably do all this via object editing, but our
+        current model doesn't require combinations, so this is
+        easier.'''
+
+        absolute=''
+        if 'absolute' in kwargs:
+            absolute=', absolute=True'
+
+        if type(kwargs[arg] == tuple) or type(kwargs[arg] == list):
+            if len(kwargs[arg]) == 3:
+                exec('self.%s (kwargs[arg]%s)' % (arg, absolute))
+            elif len(kwargs[arg]) == 2:
+                exec('self.%s (kwargs[arg][0], kwargs[arg][1]%s)' % (arg, absolute))
+            else:
+                print >>sys.stderr, ('%s: %s takes 1 vector or 2 vectors in a tuple.' % 
+                                     (self.name, arg))
+                sys.exit(2)
+        else:
+            print >>sys.stderr, '%s: %s takes 1 or 2 tuples/lists.' % (self.name, arg)
+            sys.exit(2)
 
     def __str__(self):
         '''Accessing an Object as a string will yield all the statements and
@@ -188,6 +210,7 @@ class Shape():
     def union (self, other):  return self._sub_add_union(other, 'u')
 
     def _combo_region(self, command, cr):
+        ## Do combinatin or region
         if hasattr(self, 'hasgrc'):
             print >>sys.stderr, self.name, 'already has a region/combination/group!'
             sys.exit(2)
@@ -250,21 +273,24 @@ class Shape():
             if hasattr(c, 'rotate'):
                 c.rotate(rotation, vertex)
 
-    def translate(self, translate, vertex=None):
+    def translate(self, translate, vertex=None, **kwargs):
         '''translate is a tuple containing the amount to move along each axis.
-        vertex is the point from which we move.  All other Shapes and
-        Shapes that make up this Shape are moved relative to the
-        vertex.
+        vertex is the point from which we move (defaults to
+        self.vertex).  All other Shapes and Shapes that make up this
+        Shape are moved relative to the vertex.
 
-        Not implemented yet.  And maybe translate should be more like
-        the mged translate.'''
+        If __init__ is called with kwarg translate=(x,y,z), this will
+        be run during init.
+
+        If keyword absolute=True is present, the shape will be moved
+        relative to the origin.'''
 
         if vertex == None:
             vertex = self.vertex
 
         for c in self.children:
             if hasattr(c, 'rotate'):
-                c.translate(translate, vertex)
+                c.translate(translate, vertex, **kwargs)
 
 ######################
 ## Implement some simplistic commands

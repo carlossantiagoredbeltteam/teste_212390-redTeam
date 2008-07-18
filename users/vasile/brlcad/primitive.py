@@ -47,20 +47,29 @@ class Primitive(Shape):
         self.statements.append('sed %s\nkeypoint %f %f %f\nrot %f %f %f\naccept\n' % (
                 self.name, xvert, yvert, zvert, xrot, yrot, zrot))
 
-    def translate(self, xtra, ytra=None, ztra=None):
-        '''Translate shape to new coordinates.
+    def translate(self, translate, vertex=None, **kwargs):
+        '''Translate shape to coordinates translate.
 
-        Note that this is different from MGED's internal translate
-        statement.  MGED moves the shape to the indicated coordinates.
-        This function moves the shape relative to the current
-        coordinates.  translate(1, 2, -3) moves the shape 1 to the
-        right, 2 up and 3 back.'''
+        kwargs['absolute'] = True will move the shape relative to the
+        origin.  Default is to move the shape relative to its current
+        position.
 
-        if type(xtra) == tuple:
-            xtra, ytra, ztra = xtra
+        Untested function.  Works in theory ;)'''
 
-        self.statements.append('sed %s\ntra %f %f %f\naccept' % (
-                self.name, xtra, ytra, ztra))
+        tx, ty, tz = translate
+        sx, sy, sz = self.vertex
+
+        if vertex == None:  ## will vertex ever really be None?
+            vx, vy, vz = self.vertex
+        else:
+            vx, vy, vz = vertex
+
+        if 'absolute' in kwargs:
+            self.statements.append('sed %s\ntra %f %f %f\naccept\n' % (
+                    self.name, tx-vx, ty-vy, tz-vz))
+        else:
+            self.statements.append('sed %s\ntra %f %f %f\naccept\n' % (
+                    self.name, tx, ty, tz))
 
 class Box(Primitive):
     def __init__(self, xmin, xmax, ymin, ymax, zmin, zmax, **kwargs):
