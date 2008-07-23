@@ -10,13 +10,14 @@ import org.reprap.comms.OutgoingMessage;
 import org.reprap.comms.IncomingMessage.InvalidPayloadException;
 import org.reprap.comms.messages.VersionRequestMessage;
 import org.reprap.comms.messages.VersionResponseMessage;
+import org.reprap.utilities.Debug;
 
 /**
  * Class implements an abstract device containing the basic properties and methods.
  * An "implemented" device refers to for example a UCB/Stepper motor combination, 
  * extruder or other. 
  */
-public abstract class Device {
+public class Device {
 
 	/**
 	 * Adress of the device. Identifier returned by the firmware in the device
@@ -48,8 +49,15 @@ public abstract class Device {
 	 * @param address address of the device
 	 */
 	public Device(Communicator communicator, Address address) {
-		this.communicator = communicator;
+		//this.communicator = communicator;
 		this.address = address;
+		isAvailable();
+	}
+	
+	public Device(Address address)
+	{
+		this.address = address;
+		isAvailable();		
 	}
 
 	/**
@@ -83,7 +91,7 @@ public abstract class Device {
 	 * @return
 	 */
 	public boolean isAvailable()
-	{
+	{		
 	       try {
 	            getVersion();
 	        } catch (Exception ex) {
@@ -100,7 +108,7 @@ public abstract class Device {
 	 * @return
 	 */
 	public boolean wasAvailable()
-	{
+	{		
 		return wasAlive;
 	}
 	
@@ -117,7 +125,7 @@ public abstract class Device {
 	 * Method to lock communication to this device. 
 	 * <p>TODO: when called?</P> 
 	 */
-	protected void lock() {
+	public void lock() {
 		communicator.lock();
 	}
 	
@@ -126,7 +134,7 @@ public abstract class Device {
 	 * <p>TODO: when called?</P> 
 	 *  
 	 */
-	protected void unlock() {
+	public void unlock() {
 		communicator.unlock();
 	}
 	

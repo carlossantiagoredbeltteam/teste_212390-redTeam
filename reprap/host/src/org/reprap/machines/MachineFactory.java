@@ -22,18 +22,18 @@ public class MachineFactory {
 	 * @return new machine
 	 * @throws Exception
 	 */
-	static public Printer create() throws Exception {
-		
-
+	static public Printer create() throws Exception
+	{
 		String geometry = Preferences.loadGlobalString("Geometry");
-		
+
 		if (geometry.compareToIgnoreCase("cartesian") == 0)
 		  	return new Reprap();
+		if (geometry.compareToIgnoreCase("gcodewriter") == 0)
+		  	return new CartesianGCode();
 		else if (geometry.compareToIgnoreCase("nullcartesian") == 0)
 		    return new NullCartesianMachine();		
 		else
 			throw new ReprapException("Invalid geometry in properties file");
-		
 	}
 	
 }

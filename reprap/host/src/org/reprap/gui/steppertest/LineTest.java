@@ -12,8 +12,10 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
-import org.reprap.devices.GenericExtruder;
-import org.reprap.devices.GenericStepperMotor;
+import org.reprap.AxisMotor;
+import org.reprap.Extruder;
+import org.reprap.devices.SNAPExtruder;
+import org.reprap.devices.SNAPStepperMotor;
 import org.reprap.devices.pseudo.LinePrinter;
 
 /**
@@ -45,7 +47,7 @@ public class LineTest extends javax.swing.JDialog {
 	
 	private LinePrinter line;
 
-	public LineTest(JFrame frame, GenericStepperMotor motorX, GenericStepperMotor motorY, GenericExtruder extruder, int motorSpeed, int extruderSpeed) throws IOException {
+	public LineTest(JFrame frame, AxisMotor motorX, AxisMotor motorY, Extruder extruder, int motorSpeed, int extruderSpeed) throws IOException {
 		super(frame);
 		this.motorSpeed = motorSpeed;
 		this.extruderSpeed = extruderSpeed;

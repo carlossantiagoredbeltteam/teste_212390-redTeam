@@ -1,6 +1,10 @@
 package org.reprap.gui;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.GridLayout;
+//import java.awt.GridBagLayout;
+import java.awt.Dimension;
 import java.io.IOException;
 import java.lang.System;
 import java.util.Arrays;
@@ -42,40 +46,23 @@ enum Category
 	number, string, bool;
 }
 
-public class Preferences extends javax.swing.JDialog {
-	
-	// Pixel dimensions of boxes and things
-	
-	static private final int gx = 10;    // Horizontal gap
-	static private final int gy = 5;     // Vertical gap
-	static private final int tx = 9;     // Character X width (average)
-	static private final int ty = 20;    // Character Y height
-	static private final int bx = 80;    // Button X width
-	static private final int by = 20;    // Button Y height
-	static private final int taby = 50;  // Tab Y height
-	static private final int maxy = 700; // Maximum Y height
+public class Preferences extends JFrame {
 	
 	// Load of arrays for all the stuff...
 	
 	private int extruderCount;
-	JLabel[] globals;              // Array of JLabels for the general key names
-	JTextField[] globalValues;     // Array of JTextFields for the general variables
-	Category[] globalCats;         // What are they?
-	JLabel[][] extruders;          // Array of Arrays of JLabels for the extruders' key names
-	JTextField[][] extruderValues; // Array of Arrays of JTextFields for the extruders' variables
-	Category[][] extruderCats;     // What are they?
-	int longestGlobal;             // The longest string in the global list
-	int longestGlobalVal;          // The longest value in the global list
-	int longestExtruders[];        // The longest strings in the extuder lists
-	int longestExtruderVals[];     // The longest strings in the extuder lists
-	int columns;                   // The number of menu columns to use
+	private JLabel[] globals;              // Array of JLabels for the general key names
+	private JTextField[] globalValues;     // Array of JTextFields for the general variables
+	private Category[] globalCats;         // What are they?
+	private JLabel[][] extruders;          // Array of Arrays of JLabels for the extruders' key names
+	private JTextField[][] extruderValues; // Array of Arrays of JTextFields for the extruders' variables
+	private Category[][] extruderCats;     // What are they?
 
 	// Get the show on the road...
 	
-	public static void main(String[] args) {
-		JFrame frame = new JFrame();
-		Preferences inst = new Preferences(frame);
-		inst.setVisible(true);
+	public static void main(String[] args) 
+	{
+		new Preferences();
 	}
 	
 
@@ -141,11 +128,8 @@ public class Preferences extends javax.swing.JDialog {
 	 * 
 	 * @param frame
 	 */
-	public Preferences(JFrame frame) 
+	public Preferences() 
 	{
-		super(frame);
-		
-		columns = 1; // Default
 		
 		// Start with everything that isn't an extruder value.
 		
@@ -155,8 +139,6 @@ public class Preferences extends javax.swing.JDialog {
 			globals = makeLabels(g);
 			globalValues = makeValues(globals);
 			globalCats = categorise(globalValues);
-			longestGlobal = jLabelListLongest(globals);
-			longestGlobalVal = jTextFieldListLongest(globalValues);
 		}catch (Exception ex)
 		{
 			System.err.println("Preferences window: Can't load the globals!");
@@ -177,8 +159,6 @@ public class Preferences extends javax.swing.JDialog {
 		
 		extruders= new JLabel[extruderCount][];
 		extruderValues= new JTextField[extruderCount][];
-		longestExtruders = new int[extruderCount];
-		longestExtruderVals = new int[extruderCount];
 		extruderCats = new Category[extruderCount][];
 		try {
 			for(int i = 0; i < extruderCount; i++)
@@ -186,10 +166,8 @@ public class Preferences extends javax.swing.JDialog {
 				String[] a = org.reprap.Preferences.startsWith("Extruder" + i);
 				Arrays.sort(a);
 				extruders[i] = makeLabels(a);
-				longestExtruders[i] = jLabelListLongest(extruders[i]);
 				extruderValues[i]= makeValues(extruders[i]);
 				extruderCats[i] = categorise(extruderValues[i]);
-				longestExtruderVals[i] = jTextFieldListLongest(extruderValues[i]);
 			}
 		}catch (Exception ex)
 		{
@@ -200,8 +178,36 @@ public class Preferences extends javax.swing.JDialog {
 		// Paint the lot on the screen...
 		
 		initGUI();
-        Utility.centerWindowOnParent(this, frame);
+        //Utility.centerWindowOnParent(this, frame);
 	}
+	
+	private JButton OKButton()
+	{
+		JButton jButtonOK = new JButton();
+		jButtonOK.setText("OK");
+		jButtonOK.addMouseListener(new MouseAdapter() 
+		{
+			public void mouseClicked(MouseEvent evt) 
+			{
+				jButtonOKMouseClicked(evt);
+			}
+		});
+		return jButtonOK;
+	}
+	
+	private JButton CancelButton()
+	{
+		JButton jButtonCancel = new JButton();
+		jButtonCancel.setText("Cancel");
+		jButtonCancel.addMouseListener(new MouseAdapter() 
+		{
+			public void mouseClicked(MouseEvent evt) 
+			{
+				jButtonCancelMouseClicked(evt);
+			}
+		});
+		return jButtonCancel;
+	}	
 	
 	/**
 	 * Set up the panels with all the right boxes in
@@ -209,92 +215,63 @@ public class Preferences extends javax.swing.JDialog {
 	 */
 	private void initGUI() 
 	{
-		JButton jButtonOK;     // Save and exit
-		JButton jButtonCancel; // Exit without save
-
-		// Work out overall dimensions
-
-		int ypane = yAll();		
-		if(ypane > maxy)
-		{
-			columns = 1 + ypane/maxy;
-			ypane = yAll();
-		}
-		int xall = (xAll() + 2*gx)*columns + gx;
-		int yall = ypane + by + 3*gy + taby;
+		setSize(600, 700);
+		
+		//Dimension box = new Dimension(30, 10);
 
 		// Put it all together
 
 		try {
-			// Start with the buttons
-
-			jButtonOK = new JButton();
-			getContentPane().add(jButtonOK);
-			jButtonOK.setText("OK");
-			jButtonOK.setBounds(xall - (3*gx + bx), ypane + by + 2*gy, bx, by);
-			jButtonOK.addMouseListener(new MouseAdapter() 
-			{
-				public void mouseClicked(MouseEvent evt) 
-				{
-					jButtonOKMouseClicked(evt);
-				}
-			});
-
-
-			jButtonCancel = new JButton();
-			getContentPane().add(jButtonCancel);
-			jButtonCancel.setText("Cancel");
-			jButtonCancel.setBounds(3*gx, ypane + by + 2*gy, bx, by);
-			jButtonCancel.addMouseListener(new MouseAdapter() 
-			{
-				public void mouseClicked(MouseEvent evt) 
-				{
-					jButtonCancelMouseClicked(evt);
-				}
-			});
 
 			// We'll have a tab for the globals, then one 
 			// for each extruder
 
 			JTabbedPane jTabbedPane1 = new JTabbedPane();
-			getContentPane().add(jTabbedPane1);
-			jTabbedPane1.setBounds(gx, gy, xall, yall);
+			add(jTabbedPane1);
 
 
 			// Do the global panel
 
 			JPanel jPanelGeneral = new JPanel();
+			boolean odd = globals.length%2 != 0;
+			int rows;
+			if(odd)
+				rows = globals.length/2 + 2;
+			else
+				rows = globals.length/2 + 1;
+			jPanelGeneral.setLayout(new GridLayout(rows, 4, 5, 5));
+
 			jTabbedPane1.addTab("Globals", null, jPanelGeneral, null);
-			jPanelGeneral.setPreferredSize(new java.awt.Dimension(xall, ypane));
-			jPanelGeneral.setLayout(null);
 
-			// Start top left
-
-			int x = 0;
-			int y = gy;
-			int xw;     // X coordinate of the edit boxes
-			xw = longestGlobal*tx + 2*gx;
-			int i = 0;
-			int lim;
+			// Do it in two chunks, so they're vertically ordered, not horizontally
 			
-			for(int c = 1; c <= columns; c++)
+			int half = globals.length/2;
+			int next;
+			int i;
+			for(i = 0; i < half; i++)
 			{
-				if(c == columns)
-					lim = globals.length%(1 + globals.length/columns);
-				else
-					lim = 1 + globals.length/columns;
-				y = gy;
-				for(int d = 0; d < lim; d++)
+				jPanelGeneral.add(globals[i]);
+				jPanelGeneral.add(globalValues[i]);
+				next = i + half;
+				if(next < globals.length)
 				{
-					globals[i].setBounds(x + gx, y, longestGlobal*tx, ty);
-					jPanelGeneral.add(globals[i]);
-					globalValues[i].setBounds(x + xw, y, longestGlobalVal*tx, ty);
-					jPanelGeneral.add(globalValues[i]);
-					y = y + ty + gy;
-					i++;
+					jPanelGeneral.add(globals[next]);
+					jPanelGeneral.add(globalValues[next]);
 				}
-				x += (longestGlobal + longestGlobalVal)*tx + 3*gx;
 			}
+			
+			if(odd)
+			{
+				jPanelGeneral.add(globals[globals.length - 1]);
+				jPanelGeneral.add(globalValues[globals.length - 1]);
+				jPanelGeneral.add(new JLabel());
+				jPanelGeneral.add(new JLabel());
+			}
+			jPanelGeneral.add(OKButton());
+			jPanelGeneral.add(new JLabel());
+			jPanelGeneral.add(new JLabel());			
+			jPanelGeneral.add(CancelButton());
+			jPanelGeneral.setSize(600, 700);
 
 			// Do all the extruder panels
 
@@ -304,45 +281,53 @@ public class Preferences extends javax.swing.JDialog {
 				JTextField[] values = extruderValues[j];
 
 				JPanel jPanelExtruder = new JPanel();
-				jTabbedPane1.addTab("Extruder" + j, null, jPanelExtruder, null);
-				jPanelExtruder.setLayout(null);
-				jPanelExtruder.setPreferredSize(new java.awt.Dimension(xall, ypane));
+				odd = keys.length%2 != 0;
+				if(odd)
+					rows = keys.length/2 + 2;
+				else
+					rows = keys.length/2 + 1;
+				jPanelExtruder.setLayout(new GridLayout(rows, 4, 5, 5));
+				jTabbedPane1.addTab("Extruder " + j, null, jPanelExtruder, null);
 				
+				// Do it in two chunks, so they're vertically ordered, not horizontally
 				
-				x = 0;
-				y = gy;
-				xw = longestExtruders[j]*tx + 2*gx;
-				i = 0;
-				
-				for(int c = 1; c <= columns; c++)
+				half = keys.length/2;
+				for(i = 0; i < keys.length/2; i++)
 				{
-					if(c == columns)
-						lim = keys.length%(1 + keys.length/columns);
-					else
-						lim = 1 + keys.length/columns;
-					y = gy;
-					for(int d = 0; d < lim; d++)
+					jPanelExtruder.add(keys[i]);
+					jPanelExtruder.add(values[i]);
+					next = i + half;
+					if(next < keys.length)
 					{
-						keys[i].setBounds(x + gx, y, longestExtruders[j]*tx, ty);
-						jPanelExtruder.add(keys[i]);
-						values[i].setBounds(x + xw, y, longestExtruderVals[j]*tx, ty);
-						jPanelExtruder.add(values[i]);
-						y = y + ty + gy;
-						i++;
+						jPanelExtruder.add(keys[next]);
+						jPanelExtruder.add(values[next]);
 					}
-					x += (longestExtruders[j] + longestExtruderVals[j])*tx + 3*gx;
+				}		
+				
+				if(odd)
+				{
+					jPanelExtruder.add(keys[keys.length - 1]);
+					jPanelExtruder.add(values[keys.length - 1]);
+					jPanelExtruder.add(new JLabel());
+					jPanelExtruder.add(new JLabel());
 				}
+				jPanelExtruder.add(OKButton());
+				jPanelExtruder.add(new JLabel());
+				jPanelExtruder.add(new JLabel());
+				jPanelExtruder.add(CancelButton());
+				jPanelExtruder.setSize(600, 700);
 			}	
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		// Wrap it all up
-		getContentPane().setLayout(null);
+		//getContentPane().setLayout(null);
 		setTitle("RepRap Preferences");
-		setSize(xall, yall);
+//		setSize(xall, yall);
+		pack();
 	}
-	
+
 	/**
 	 * What to do when OK is clicked
 	 * @param evt
@@ -360,93 +345,6 @@ public class Preferences extends javax.swing.JDialog {
 	private void jButtonCancelMouseClicked(MouseEvent evt) {
 		// Close without saving
 		dispose();
-	}
-	
-	/**
-	 * Find the character count of the longest string in a label (key)
-	 * @param a
-	 * @return
-	 */
-	private int jLabelListLongest(JLabel[] a)
-	{
-		int result = 0;
-		for(int i = 0; i < a.length; i++)
-		{
-			int len = a[i].getText().length();
-			if(len > result)
-				result = len;
-		}
-		return result;
-	}
-	
-	/**
-	 * Find the character count of the longest string in a value 
-	 * @param a
-	 * @return
-	 */
-	private int jTextFieldListLongest(JTextField[] a)
-	{
-		int result = 0;
-		for(int i = 0; i < a.length; i++)
-		{
-			int len = a[i].getText().length();
-			if(len > result)
-				result = len;
-		}
-		return result;
-	}
-
-	/**
-	 * Work out the pixel width of a key + value pair
-	 * @param longestLab
-	 * @param longestVal
-	 * @return
-	 */
-	private int xSize(int longestLab, int longestVal)
-	{	
-		return tx*(longestLab + longestVal) + 3*gx;
-	}
-	
-	/**
-	 * Work out the pixel height of an array of values and keys
-	 * @param listLen
-	 * @return
-	 */
-	private int ySize(int listLen)
-	{	
-		return (gy + ty)*listLen + gy;
-	}
-	
-	/**
-	 * Work out the widest width of all the lists
-	 * @return
-	 */
-	private int xAll()
-	{
-		int result = xSize(longestGlobal, longestGlobalVal);
-		for(int i = 0; i < extruderCount; i++)
-		{
-			int x = xSize(longestExtruders[i], longestExtruderVals[i]);
-			if(x > result) 
-				result = x;
-		}
-		return result;
-	}
-	
-	/**
-	 * Work out the highest height of all the lists
-	 * @return
-	 */
-	private int yAll()
-	{
-		int result = ySize(1 + globals.length/columns);
-		for(int i = 0; i < extruderCount; i++)
-		{
-			int y = ySize(1 + extruders[i].length/columns);
-			if(y > result) 
-				result = y;
-		}		
-		return result;
 	}
 	
 	/**

@@ -2,7 +2,8 @@ package org.reprap.devices.pseudo;
 
 import java.io.IOException;
 import org.reprap.Extruder;
-import org.reprap.devices.GenericStepperMotor;
+import org.reprap.AxisMotor;
+import org.reprap.devices.SNAPStepperMotor;
 import org.reprap.utilities.Debug;
 
 /**
@@ -17,8 +18,8 @@ public class LinePrinter {
 	/**
 	 * Stepper motors
 	 */
-	private GenericStepperMotor motorX;
-	private GenericStepperMotor motorY;
+	private AxisMotor motorX;
+	private AxisMotor motorY;
 	private Extruder extruder;
 
 	/**
@@ -36,7 +37,7 @@ public class LinePrinter {
 	 * @param motorY
 	 * @param extruder
 	 */
-	public LinePrinter(GenericStepperMotor motorX, GenericStepperMotor motorY, Extruder extruder) {
+	public LinePrinter(AxisMotor motorX, AxisMotor motorY, Extruder extruder) {
 		this.motorX = motorX;
 		this.motorY = motorY;		
 		this.extruder = extruder;
@@ -100,7 +101,7 @@ public class LinePrinter {
 			return;
 		}
 		
-		GenericStepperMotor master, slave;
+		AxisMotor master, slave;
 
 		int x0, x1, y0, y1;
 		
@@ -124,18 +125,18 @@ public class LinePrinter {
 			y1 = endX;
 		}
 				
-		master.setSync(GenericStepperMotor.SYNC_NONE);
+		master.setSync(SNAPStepperMotor.SYNC_NONE);
 		if (y0 < y1)
-			slave.setSync(GenericStepperMotor.SYNC_INC);
+			slave.setSync(SNAPStepperMotor.SYNC_INC);
 		else
-			slave.setSync(GenericStepperMotor.SYNC_DEC);
+			slave.setSync(SNAPStepperMotor.SYNC_DEC);
 
 		int deltaY = Math.abs(y1 - y0); 
 		//int deltaX = Math.abs(x1 - x0); 
 				
 		master.dda(movementSpeed, x1, deltaY);
 		
-		slave.setSync(GenericStepperMotor.SYNC_NONE);
+		slave.setSync(SNAPStepperMotor.SYNC_NONE);
 
 		currentX = endX;
 		currentY = endY;

@@ -254,6 +254,9 @@ public class Preferences {
 	 */
 	public static void setGlobalString(String name, String value) throws IOException {
 		initIfNeeded();
+
+		//System.err.println("Setting global " + name + ":" + value);
+		
 		globalPrefs.setString(name, value);
 	}
 
@@ -267,6 +270,9 @@ public class Preferences {
 	 * @param value
 	 */
 	private void setString(String name, String value) {
+		
+		//System.err.println("Setting " + name + ":" + value);
+		
 		mainPreferences.setProperty(name, value);
 	}
 	

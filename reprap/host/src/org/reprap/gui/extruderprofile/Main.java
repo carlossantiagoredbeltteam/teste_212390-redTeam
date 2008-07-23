@@ -15,7 +15,9 @@ import org.reprap.Preferences;
 import org.reprap.comms.Communicator;
 import org.reprap.comms.snap.SNAPAddress;
 import org.reprap.comms.snap.SNAPCommunicator;
+import org.reprap.devices.SNAPExtruder;
 import org.reprap.devices.GenericExtruder;
+import org.reprap.Extruder;
 
 /**
 * This code was edited or generated using CloudGarden's Jigloo
@@ -48,7 +50,7 @@ public class Main extends javax.swing.JDialog {
 	private boolean pollThreadExiting = false;
 	
 	private Communicator communicator =  org.reprap.Main.getCommunicator();;
-	private GenericExtruder extruder;
+	private Extruder extruder;
 
 	private boolean profileInProgress = false;
 	private int currentHeaterOutput = -1;
@@ -75,7 +77,7 @@ public class Main extends javax.swing.JDialog {
 //		communicator = new SNAPCommunicator(Preferences.loadGlobalString("Port(name)"),
 //				myAddress);
 
-		extruder = new GenericExtruder(communicator,
+		extruder = new SNAPExtruder(communicator,
 				new SNAPAddress(Preferences.loadGlobalString("Extruder0_Address")), 0);
 		
 		initGUI();
