@@ -193,7 +193,7 @@ String getNextCommand()
 
       // Temp    
     case 'u':
-      targetTemp = 185;
+      targetTemp = 200;
       c = "M104 S" + targetTemp;
       break;
     case 'p':
