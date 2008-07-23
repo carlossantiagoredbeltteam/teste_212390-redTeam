@@ -200,8 +200,8 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
             }
         });
 
-        getWebPage.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/reprap/gui/botConsole/rr-logo-green-url.png"))); // NOI18N
-        getWebPage.addActionListener(new java.awt.event.ActionListener() {
+        getWebPage.setIcon(new javax.swing.ImageIcon("rr-logo-green-url.png")); // NOI18N
+		getWebPage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 getWebPageActionPerformed(evt);
             }

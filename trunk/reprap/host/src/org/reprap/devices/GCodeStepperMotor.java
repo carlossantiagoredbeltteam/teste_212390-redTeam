@@ -9,12 +9,12 @@ import org.reprap.AxisMotor;
 import org.reprap.ReprapException;
 import org.reprap.devices.GenericStepperMotor;
 
-public class NullStepperMotor extends GenericStepperMotor {
+public class GCodeStepperMotor extends GenericStepperMotor {
 
 	/**
 	 * @param motorId
 	 */
-	public NullStepperMotor(int motorId) {
+	public GCodeStepperMotor(int motorId) {
 		super(null, motorId);
 	}
 
@@ -24,6 +24,6 @@ public class NullStepperMotor extends GenericStepperMotor {
 	 */
 	public boolean isAvailable()
 	{
-		return true;
+		return false;
 	}
 }

@@ -7,7 +7,7 @@ import org.reprap.Preferences;
 import org.reprap.comms.snap.SNAPAddress;
 import org.reprap.comms.Communicator;
 import org.reprap.comms.snap.SNAPCommunicator;
-import org.reprap.devices.GenericStepperMotor;
+import org.reprap.devices.SNAPStepperMotor;
 import java.io.*;
 
 /**
@@ -58,10 +58,10 @@ public class AxisRepeatabilityTest {
 //			return;
 //		}
 		
-                GenericStepperMotor motor;
+                SNAPStepperMotor motor;
 		try
 		{			
-			motor = new GenericStepperMotor(communicator, 
+			motor = new SNAPStepperMotor(communicator, 
 				new SNAPAddress(address),  motorId);
 		}catch(Exception ex)
 		{

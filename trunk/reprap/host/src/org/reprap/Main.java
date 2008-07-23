@@ -39,6 +39,7 @@ import org.reprap.gui.botConsole.BotConsoleFrame;
 import org.reprap.comms.Communicator;
 import org.reprap.comms.snap.SNAPAddress;
 import org.reprap.comms.snap.SNAPCommunicator;
+import org.reprap.utilities.Debug;
 
 /**
  *
@@ -177,7 +178,7 @@ public class Main {
         JMenuItem filePrefs = new JMenuItem("Preferences...", KeyEvent.VK_R);
         filePrefs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Preferences prefs = new Preferences(mainFrame);
+				Preferences prefs = new Preferences();
 				prefs.setVisible(true);	// prefs.show();
 			}});
         fileMenu.add(filePrefs);
@@ -760,35 +761,51 @@ public class Main {
 
             SNAPAddress myAddress = new SNAPAddress(localNodeNumber);
 
-            String port = org.reprap.Preferences.loadGlobalString("Port(name)");
+            String port = "";
             String err = "";
-            String geometry = org.reprap.Preferences.loadGlobalString("Geometry");
+            String geometry = "nullcartesian";
+			Boolean use_serial = false;
 
+			try
+			{
+	            port = org.reprap.Preferences.loadGlobalString("Port(name)");
+	            geometry = org.reprap.Preferences.loadGlobalString("Geometry");
+				use_serial = org.reprap.Preferences.loadGlobalBool("GCodeUseSerial");
+			}
+			catch (Exception e)	{}
 
-            try {
-                    communicator = new SNAPCommunicator(port, myAddress);
-                }
-            catch (gnu.io.NoSuchPortException e)
-                {
-                    err = "\nCould not connect at " + port + ".\n\n";
-                    err += "Check to make sure that is the right path.\n";
-                    err += "Check that you have your serial connector plugged in.";
-                    err += "The program will continue but your geometry preference has been set to 'nullcartesian' for this session.";
+			if (geometry.equals("cartesian"))
+			{
+				try
+				{
+					communicator = new SNAPCommunicator(port, myAddress);
+				}
+				catch (gnu.io.NoSuchPortException e)
+				{
+					err = "\nCould not connect at " + port + ".\n\n";
+					err += "Check to make sure that is the right path.\n";
+					err += "Check that you have your serial connector plugged in.\n\n";
+					err += "The program will continue but your geometry preference has been set to 'nullcartesian' for this session.";
 
-                    org.reprap.Preferences.setGlobalString("Geometry", "nullcartesian");
+					org.reprap.Preferences.setGlobalString("Geometry", "nullcartesian");
 
-                    //throw new Exception(err); // Removed by AB.  We told them already...
-                }
-            catch (gnu.io.PortInUseException e)
-                {
-                    err = "\nThe " + port + " port is already in use by another program, or your bot isn't plugged in.\n";
-                    err += "The program will continue but your geometry preference has been set to 'nullcartesian' for this session.";
+					//throw new Exception(err); // Removed by AB.  We told them already...
+				}
+				catch (gnu.io.PortInUseException e)
+				{
+					err = "\nThe " + port + " port is already in use by another program, or your bot isn't plugged in.\n";
+					err += "The program will continue but your geometry preference has been set to 'nullcartesian' for this session.";
 
-                    org.reprap.Preferences.setGlobalString("Geometry", "nullcartesian");
+					org.reprap.Preferences.setGlobalString("Geometry", "nullcartesian");
 
-                    throw new Exception(err);
-                }
-            }
+					throw new Exception(err);
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
 
         
         public static Communicator getCommunicator() {
