@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CADFile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Untitled">
+  <layers>
+    <layer name="Default" color="139,0,0">
+      <mat />
+      <objects>
+        <circle id="1" d="21">
+          <mat />
+        </circle>
+        <circle id="2" c="-16.5,11,0" d="3">
+          <mat />
+        </circle>
+        <circle id="3" c="16.5,11,0" d="3">
+          <mat />
+        </circle>
+        <circle id="4" c="-16.5,3,0" d="3">
+          <mat />
+        </circle>
+        <circle id="5" c="16.5,3,0" d="3">
+          <mat />
+        </circle>
+        <circle id="7" c="0,6,0" d="43.95">
+          <mat />
+        </circle>
+        <circle id="8" d="17">
+          <mat />
+        </circle>
+      </objects>
+    </layer>
+  </layers>
+  <MachiningOptions>
+    <OutFile>D:\PEOPLE\Wizard23\reprap\extruderholder.nc</OutFile>
+    <SplineCurveSteps>12</SplineCurveSteps>
+    <TextCurveSteps>5</TextCurveSteps>
+  </MachiningOptions>
+  <machineops>
+    <mop xsi:type="MOPProfile">
+      <ToolDiameter>2.5</ToolDiameter>
+      <PlungeFeedrate>30</PlungeFeedrate>
+      <CutFeedrate>300</CutFeedrate>
+      <Name>M3</Name>
+      <ClearancePlane>1.5</ClearancePlane>
+      <primitive>
+        <prim>3</prim>
+        <prim>5</prim>
+        <prim>4</prim>
+        <prim>2</prim>
+      </primitive>
+      <mat />
+      <StockSurface>0</StockSurface>
+      <TargetDepth>-6.8</TargetDepth>
+      <DepthIncrement>3.4</DepthIncrement>
+      <FinalDepthIncrement>0</FinalDepthIncrement>
+      <CutWidth>0</CutWidth>
+      <StepOver>0.4</StepOver>
+      <InsideOutside>Inside</InsideOutside>
+    </mop>
+    <mop xsi:type="MOPProfile">
+      <ToolDiameter>2.5</ToolDiameter>
+      <PlungeFeedrate>30</PlungeFeedrate>
+      <CutFeedrate>300</CutFeedrate>
+      <Name>17mm</Name>
+      <ClearancePlane>1.5</ClearancePlane>
+      <primitive>
+        <prim>8</prim>
+      </primitive>
+      <mat />
+      <StockSurface>0</StockSurface>
+      <TargetDepth>-6.8</TargetDepth>
+      <DepthIncrement>3.4</DepthIncrement>
+      <FinalDepthIncrement>0</FinalDepthIncrement>
+      <CutWidth>0</CutWidth>
+      <StepOver>0.4</StepOver>
+      <InsideOutside>Inside</InsideOutside>
+    </mop>
+    <mop xsi:type="MOPProfile">
+      <ToolDiameter>2.5</ToolDiameter>
+      <PlungeFeedrate>30</PlungeFeedrate>
+      <CutFeedrate>300</CutFeedrate>
+      <Name>21mm</Name>
+      <ClearancePlane>1.5</ClearancePlane>
+      <primitive>
+        <prim>1</prim>
+      </primitive>
+      <mat />
+      <StockSurface>0</StockSurface>
+      <TargetDepth>-6.8</TargetDepth>
+      <DepthIncrement>3.4</DepthIncrement>
+      <FinalDepthIncrement>0</FinalDepthIncrement>
+      <CutWidth>0</CutWidth>
+      <StepOver>0.4</StepOver>
+      <InsideOutside>Inside</InsideOutside>
+    </mop>
+    <mop xsi:type="MOPProfile">
+      <ToolDiameter>2.5</ToolDiameter>
+      <PlungeFeedrate>30</PlungeFeedrate>
+      <CutFeedrate>300</CutFeedrate>
+      <Name>outer kreis</Name>
+      <ClearancePlane>1.5</ClearancePlane>
+      <primitive>
+        <prim>7</prim>
+      </primitive>
+      <mat />
+      <StockSurface>0</StockSurface>
+      <TargetDepth>-6.8</TargetDepth>
+      <DepthIncrement>3.4</DepthIncrement>
+      <FinalDepthIncrement>0</FinalDepthIncrement>
+      <CutWidth>0</CutWidth>
+      <StepOver>0.4</StepOver>
+    </mop>
+  </machineops>
+  <ActiveLayer>Default</ActiveLayer>
+</CADFile>

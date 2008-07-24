@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CADFile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="Untitled">
+  <layers>
+    <layer name="Default" color="139,0,0">
+      <mat />
+      <objects>
+        <circle id="1" d="21">
+          <mat />
+        </circle>
+        <circle id="2" c="-16.5,11,0" d="3">
+          <mat />
+        </circle>
+        <circle id="3" c="16.5,11,0" d="3">
+          <mat />
+        </circle>
+        <circle id="4" c="-16.5,3,0" d="3">
+          <mat />
+        </circle>
+        <circle id="5" c="16.5,3,0" d="3">
+          <mat />
+        </circle>
+        <pline xsi:type="PolyRectangle" id="6" Closed="true" p="-22.5,-13,0" w="45" h="28.5">
+          <mat />
+          <pts>
+            <p>-22.5,-13,0</p>
+            <p>22.5,-13,0</p>
+            <p>22.5,15.5,0</p>
+            <p>-22.5,15.5,0</p>
+          </pts>
+        </pline>
+      </objects>
+    </layer>
+  </layers>
+  <MachiningOptions>
+    <OutFile>D:\PEOPLE\Wizard23\reprap\extruderholder.nc</OutFile>
+    <SplineCurveSteps>12</SplineCurveSteps>
+    <TextCurveSteps>5</TextCurveSteps>
+  </MachiningOptions>
+  <machineops>
+    <mop xsi:type="MOPProfile">
+      <ToolDiameter>2.5</ToolDiameter>
+      <PlungeFeedrate>15</PlungeFeedrate>
+      <CutFeedrate>150</CutFeedrate>
+      <Name>kreise</Name>
+      <ClearancePlane>1.5</ClearancePlane>
+      <primitive>
+        <prim>1</prim>
+        <prim>2</prim>
+        <prim>4</prim>
+        <prim>5</prim>
+        <prim>3</prim>
+      </primitive>
+      <mat />
+      <StockSurface>0</StockSurface>
+      <TargetDepth>-6.8</TargetDepth>
+      <DepthIncrement>3.4</DepthIncrement>
+      <FinalDepthIncrement>0</FinalDepthIncrement>
+      <CutWidth>0</CutWidth>
+      <StepOver>0.4</StepOver>
+      <InsideOutside>Inside</InsideOutside>
+    </mop>
+    <mop xsi:type="MOPProfile">
+      <ToolDiameter>2.5</ToolDiameter>
+      <PlungeFeedrate>15</PlungeFeedrate>
+      <CutFeedrate>150</CutFeedrate>
+      <Name>outline</Name>
+      <ClearancePlane>1.5</ClearancePlane>
+      <primitive>
+        <prim>6</prim>
+      </primitive>
+      <mat />
+      <StockSurface>0</StockSurface>
+      <TargetDepth>-6.8</TargetDepth>
+      <DepthIncrement>3.4</DepthIncrement>
+      <FinalDepthIncrement>0</FinalDepthIncrement>
+      <CutWidth>0</CutWidth>
+      <StepOver>0.4</StepOver>
+    </mop>
+  </machineops>
+  <ActiveLayer>Default</ActiveLayer>
+</CADFile>
