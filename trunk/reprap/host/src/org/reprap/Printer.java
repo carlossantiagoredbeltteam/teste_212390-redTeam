@@ -4,6 +4,7 @@ import java.awt.print.PrinterAbortException;
 import java.io.IOException;
 import javax.media.j3d.*;
 import javax.swing.JCheckBoxMenuItem;
+import org.reprap.geometry.LayerRules;
 import org.reprap.gui.Previewer;
 import org.reprap.devices.GenericExtruder;
 import org.reprap.devices.GenericStepperMotor;
@@ -268,19 +269,19 @@ public interface Printer {
 	 * Just finished a layer
 	 * @param layerNumber
 	 */
-	public void finishedLayer(int layerNumber) throws Exception;
+	public void finishedLayer(LayerRules lc) throws Exception;
 	
 	/**
 	 * Do whatever needs to be done between one layer and the next
 	 * @param layerNumber
 	 */
-	public void betweenLayers(int layerNumber) throws Exception;
+	public void betweenLayers(LayerRules lc) throws Exception;
 	
 	/**
 	 * Just about to start the next layer
 	 * @param layerNumber
 	 */
-	public void startingLayer(int layerNumber) throws Exception;
+	public void startingLayer(LayerRules lc) throws Exception;
 	
 	/**
 	 * Set the source checkbox used to determine if there should
@@ -301,6 +302,12 @@ public interface Printer {
 	 * a boolean so it can be changed on the fly.
 	 */
 	public void setLayerPause(JCheckBoxMenuItem layerPause);
+	
+	/**
+	 * How many layers of foundation to build
+	 * @return
+	 */
+	public int getFoundationLayers();
 	
 	/**
 	 * 

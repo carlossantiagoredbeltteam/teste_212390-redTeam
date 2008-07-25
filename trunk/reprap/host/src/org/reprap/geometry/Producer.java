@@ -16,16 +16,18 @@ public class Producer {
 	
 	private boolean paused = false;
 	
-	int layerNumber = 0;
+	//int layerNumber = 0;
 	
-	int layers = 0;
+	//int layers = 0;
 	
 	private LayerProducer layer = null;
+	
+	protected LayerRules layerRules = null;
 	
 	/**
 	 * The machine doing the making
 	 */
-	protected Printer reprap;
+	//protected Printer reprap;
 	
 	/**
 	 * Line parallel to which odd-numbered layers will be hatched
@@ -41,7 +43,13 @@ public class Producer {
 	 * The list of objects to be built
 	 */
 	protected RepRapBuild bld;
-
+	
+	
+	//protected int movementSpeedZ;
+	protected boolean interLayerCooling;
+	//protected double currentZ;
+	protected STLSlice stlc;
+	//protected double stepZ;
 	
 //	/**
 //	 * @param preview
@@ -58,12 +66,12 @@ public class Producer {
 	 * @param builder
 	 * @throws Exception
 	 */
-	public Producer(Printer pr, PreviewPanel preview, RepRapBuild builder) throws Exception {
+	public Producer(Printer pr, PreviewPanel preview, RepRapBuild builder) throws Exception 
+	{
 		
-		reprap = pr;
-		reprap.setPreviewer(preview);
+		pr.setPreviewer(preview);
 		if(preview != null)
-			preview.setMachine(reprap);
+			preview.setMachine(pr);
 		bld = builder;
 
 		//		Original hatch vectors
@@ -76,9 +84,20 @@ public class Producer {
 	
 //		//		Horizontal hatch vector
 //		oddHatchDirection = new RrHalfPlane(new Rr2Point(0.0, 0.0), new Rr2Point(1.0, 0.0));
-//		evenHatchDirection = new RrHalfPlane(new Rr2Point(1.0, 0.0), new Rr2Point(0.0, 0.0));
+//		evenHatchDirection = new RrHalfPlane(new Rr2Point(1.0, 0.0), new Rr2Point(0.0, 0.0));		
 		
-
+		stlc = new STLSlice(bld.getSTLs());
+		
+		double modZMax = stlc.maxZ();
+		double stepZ = pr.getExtruders()[0].getExtrusionHeight();
+		int foundationLayers = Math.max(0, pr.getFoundationLayers());
+		
+		int modLMax = (int)(modZMax/stepZ);
+		
+		layerRules = new LayerRules(pr, 0, 0, 
+				-1, 0, modZMax, modZMax + foundationLayers*stepZ,
+				modLMax, modLMax + foundationLayers, stepZ,
+				true, evenHatchDirection, oddHatchDirection);
 	}
 	
 	/**
@@ -90,7 +109,7 @@ public class Producer {
 	 * a boolean so it can be changed on the fly. 
 	 */
 	public void setSegmentPause(JCheckBoxMenuItem segmentPause) {
-		reprap.setSegmentPause(segmentPause);
+		layerRules.getPrinter().setSegmentPause(segmentPause);
 	}
 
 	/**
@@ -102,12 +121,12 @@ public class Producer {
 	 * a boolean so it can be changed on the fly.
 	 */
 	public void setLayerPause(JCheckBoxMenuItem layerPause) {
-		reprap.setLayerPause(layerPause);
+		layerRules.getPrinter().setLayerPause(layerPause);
 	}
 	
 	public void setCancelled(boolean c)
 	{
-		reprap.setCancelled(c);
+		layerRules.getPrinter().setCancelled(c);
 	}
 	
 	public void pause()
@@ -137,28 +156,31 @@ public class Producer {
 	
 	public int getLayers()
 	{
-		return layers;
+		return layerRules.getMachineLayerMax();
 	}
 	
 	public int getLayer()
 	{
-		return layerNumber;
+		return layerRules.getMachineLayer();
 	}	
 	
-	/**
-	 * @throws Exception
-	 */
-	public void produce() throws Exception 
+	public void produce() throws Exception
 	{
-		boolean subtractive;
-		boolean interLayerCooling;
-		
-		try {
-			subtractive = Preferences.loadGlobalBool("Subtractive");
-		} catch (Exception ex) {
-			subtractive = false;
-			System.err.println("Warning: could not load subtractive flag, using default");
-		}
+		if(Preferences.loadGlobalBool("Subtractive"))
+			produceSubtractive();
+		else
+			produceAdditive();
+	}
+	
+	private void layFoundation() throws Exception
+	{
+		Printer reprap = layerRules.getPrinter();
+//		try {
+//			movementSpeedZ = Preferences.loadGlobalInt("MovementSpeedZ(0..255)");
+//		} catch (Exception ex) {
+//			movementSpeedZ = 212;
+//			System.err.println("Warning: could not load Z MovementSpeed, using default");
+//		}
 		
 		try {
 			interLayerCooling = Preferences.loadGlobalBool("InterLayerCooling");
@@ -167,92 +189,85 @@ public class Producer {
 			System.err.println("Warning: could not load InterLayerCooling flag, using default");
 		}
 		
+		//reprap.setSpeedZ(movementSpeedZ);
 		Debug.d("Intialising reprap");
 		reprap.initialise();
+		// By convention, extruder 0 has the support/foundation material
 		Debug.d("Selecting material 0");
 		reprap.selectExtruder(0);
 		Debug.d("Setting temperature");
 		reprap.getExtruder().heatOn();
 		
+		RrCSGPolygonList slice = null;
+		
+		if(layerRules.getFoundationLayers() > 0)
+		{
+			Debug.d("Building foundation.");
+
+			slice = stlc.slice(layerRules.getModelZ() + layerRules.getStep()*0.5);
+			if(slice.size() <= 0)
+				return;
+			layer = new LayerProducer(slice, stlc.getBelow(), layerRules);
+
+			if(layer == null)
+				return;
+		}
+		
 		// A "warmup" segment to get things in working order
-		if (!subtractive) 
-		{
-			waitWhilePaused();
-			
-			reprap.setFeedrate(reprap.getExtruder().getXYFeedrate());
-			reprap.moveTo(1, 1, 0, false, false);
-			
-			// Workaround to get the thing to start heating up
-			reprap.printTo(1, 1, 0, false, false);
-			
-			if(reprap.getExtruder().getNozzleClearTime() <= 0)
-			{
-				Debug.d("Printing warmup segments, moving to (1,1)");
-				reprap.getExtruder().setMotor(true);
-				// Take it slow and easy.
-				Debug.d("Printing warmup segments, printing to (1,60)");
-				reprap.moveTo(1, 25, 0, false, false);
-				reprap.setFeedrate(reprap.getExtruder().getOutlineFeedrate());
-				//TODO: FIX THIS
-				//reprap.setSpeed(LinePrinter.speedFix(reprap.getExtruder().getXYSpeed(), 
-				//		reprap.getExtruder().getOutlineSpeed()));
-				reprap.printTo(1, 60, 0, false, false);
-				Debug.d("Printing warmup segments, printing to (3,60)");
-				reprap.printTo(3, 60, 0, false, false);
-				Debug.d("Printing warmup segments, printing to (3,25)");
-				reprap.printTo(3, 25, 0, true, true);
-				Debug.d("Warmup complete");
-				reprap.getExtruder().setMotor(false);
-			}
-			reprap.setFeedrate(reprap.getFastFeedrateXY());
-		}
-		
-		// This should now split off layers one at a time
-		// and pass them to the LayerProducer.  
-		
-		boolean isEvenLayer = true;
-		STLSlice stlc;
-		double zMax;
 
-		bld.mouseToWorld();
-		stlc = new STLSlice(bld.getSTLs());
-		zMax = stlc.maxZ();
+		waitWhilePaused();
 
-		double startZ;
-		double endZ;
-		double stepZ;
-		if (subtractive) 
+		//reprap.setSpeed(reprap.getExtruder().getXYSpeed());
+		reprap.setFeedrate(reprap.getExtruder().getXYFeedrate());
+		reprap.moveTo(1, 1, 0, false, false);
+
+		// Workaround to get the thing to start heating up
+		reprap.printTo(1, 1, 0, false, false);
+
+		if(reprap.getExtruder().getNozzleClearTime() <= 0)
 		{
-			// Subtractive construction works from the top, downwards
-			startZ = zMax;
-			endZ = 0;
-			stepZ = -reprap.getExtruder().getExtrusionHeight();
-			reprap.setZManual(startZ);
-		} else 
-		{
-			// Normal constructive fabrication, start at the bottom and work up.
-			
-			startZ = 0;
-			endZ = zMax;
-			
-			stepZ = reprap.getExtruder().getExtrusionHeight();
-		
+			Debug.d("Printing warmup segments, moving to (1,1)");
+			reprap.getExtruder().setMotor(true);
+			// Take it slow and easy.
+			Debug.d("Printing warmup segments, printing to (1,60)");
+			reprap.moveTo(1, 25, 0, false, false);
+			reprap.setFeedrate(reprap.getExtruder().getOutlineFeedrate());
+			//reprap.setSpeed(LinePrinter.speedFix(reprap.getExtruder().getXYSpeed(), 
+			//		reprap.getExtruder().getOutlineSpeed(layerRules)));
+			reprap.printTo(1, 60, 0, false, false);
+			Debug.d("Printing warmup segments, printing to (3,60)");
+			reprap.printTo(3, 60, 0, false, false);
+			Debug.d("Printing warmup segments, printing to (3,25)");
+			reprap.printTo(3, 25, 0, true, true);
+			Debug.d("Warmup complete");
+			reprap.getExtruder().setMotor(false);
 		}
+		reprap.setFeedrate(reprap.getFastFeedrateXY());
+		//reprap.setSpeed(reprap.getFastSpeed());
+
+
+		if(layerRules.getFoundationLayers() <= 0)
+		{
+			layerRules.setLayingSupport(false);
+			layerRules.setModelLayer(0);
+			return;
+		} 
+
+
+	
 		
-		layerNumber = 0;
-		layers = (int)((subtractive ? startZ - endZ : endZ - startZ)/stepZ);
-		
-		for(double z = startZ; subtractive ? z > endZ : z < endZ; z += stepZ) {
+		while(layerRules.getMachineLayer() < layerRules.getFoundationLayers()) 
+		{
 			
 			if (reprap.isCancelled())
 				break;
 			
 			waitWhilePaused();
 			
-			Debug.d("Commencing layer at " + z);
+			Debug.d("Commencing foundation layer at " + layerRules.getMachineZ());
 
 			// Change Z height
-			reprap.moveTo(reprap.getX(), reprap.getY(), z, false, false);
+			reprap.moveTo(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), false, false);
 			
 			if (reprap.isCancelled())
 				break;
@@ -262,23 +277,79 @@ public class Producer {
 			// Pretend we've just finished a layer first time;
 			// All other times we really will have.
 			
-			if (layerNumber == 0 || interLayerCooling) {
-				reprap.finishedLayer(layerNumber);
-				reprap.betweenLayers(layerNumber);
+			if (layerRules.getMachineLayer() == 0 || interLayerCooling) {
+				reprap.finishedLayer(layerRules);
+				reprap.betweenLayers(layerRules);
+				reprap.startingLayer(layerRules);
+			}
+						
+			if (reprap.isCancelled())
+				break;
+			
+			waitWhilePaused();
+			
+			if(layerRules.recomputeLayer())
+				layer = new LayerProducer(slice, stlc.getBelow(), layerRules);
+			
+			layer.plot();
+
+			layerRules.stepUpMachine(reprap.getExtruder());
+		}
+		
+		layerRules.setModelLayer(0);
+		layerRules.setLayingSupport(false);
+		layer.destroy();
+		slice.destroy();
+		stlc.destroyLayer();
+	}
+	
+	/**
+	 * @throws Exception
+	 */
+	private void produceAdditive() throws Exception 
+	{		
+		bld.mouseToWorld();
+
+		layFoundation();
+		
+		Printer reprap = layerRules.getPrinter();
+		
+		while(layerRules.getMachineLayer() < layerRules.getMachineLayerMax()) 
+		{
+			
+			if (reprap.isCancelled())
+				break;
+			
+			waitWhilePaused();
+			
+			Debug.d("Commencing layer at " + layerRules.getMachineZ());
+
+			// Change Z height
+			reprap.moveTo(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), false, false);
+			
+			if (reprap.isCancelled())
+				break;
+			
+			waitWhilePaused();
+			
+			// Pretend we've just finished a layer first time;
+			// All other times we really will have.
+			
+			if (layerRules.getMachineLayer() == 0 || interLayerCooling) {
+				reprap.finishedLayer(layerRules);
+				reprap.betweenLayers(layerRules);
 			}
 			
-			RrCSGPolygonList slice = stlc.slice(z+reprap.getExtruder().getExtrusionHeight()*0.5); 
-			BranchGroup lowerShell = stlc.getBelow();
+			RrCSGPolygonList slice = stlc.slice(layerRules.getModelZ() + layerRules.getStep()*0.5); 
 			
 			layer = null;
 			if(slice.size() > 0)
-				layer = new LayerProducer(reprap, z, slice, lowerShell,
-						isEvenLayer?evenHatchDirection:oddHatchDirection, 
-								layerNumber, endZ);
+				layer = new LayerProducer(slice, stlc.getBelow(), layerRules);
+			else
+				Debug.d("Null slice at model Z = " + layerRules.getModelZ());
 			
-			if (layerNumber == 0 || interLayerCooling) {
-				reprap.startingLayer(layerNumber);
-			}
+			if (layerRules.getMachineLayer() == 0 || interLayerCooling) 
+				reprap.startingLayer(layerRules);
 						
 			if (reprap.isCancelled())
 				break;
@@ -287,30 +358,28 @@ public class Producer {
 			
 			if(layer != null)
 			{
-				Debug.d("Plotting layer");
 				layer.plot();
-				Debug.d("Finished... destroying");
 				layer.destroy();
-			}
+			} else
+				Debug.d("Null layer at model Z = " + layerRules.getModelZ());
+			
 			layer = null;
 			
-			Debug.d("destroy slice");
 			slice.destroy();
-			Debug.d("destroy layer");
 			stlc.destroyLayer();
 
-			isEvenLayer = !isEvenLayer;
-
-			layerNumber++;
+			layerRules.stepUp(reprap.getExtruder());
 		}
 
-		if (subtractive)
-			reprap.moveTo(0, 0, startZ, true, true);
-		else
-			reprap.moveTo(0, 0, reprap.getZ(), true, true);
+		reprap.moveTo(0, 0, reprap.getZ(), true, true);
 		
 		reprap.terminate();
 
+	}
+	
+	private void produceSubtractive() throws Exception 
+	{
+		System.err.println("Need to implement the Producer.produceSubtractive() function... :-)");
 	}
 
 	/**
@@ -321,14 +390,14 @@ public class Producer {
 	 * @return total distance the extruder has moved 
 	 */
 	public double getTotalDistanceMoved() {
-		return reprap.getTotalDistanceMoved();
+		return layerRules.getPrinter().getTotalDistanceMoved();
 	}
 	
 	/**
 	 * @return total distance that has been extruded in millimeters
 	 */
 	public double getTotalDistanceExtruded() {
-		return reprap.getTotalDistanceExtruded();
+		return layerRules.getPrinter().getTotalDistanceExtruded();
 	}
 	
 	/**
@@ -336,22 +405,22 @@ public class Producer {
 	 * @return total volume that has been extruded
 	 */
 	public double getTotalVolumeExtruded() {
-		return reprap.getTotalDistanceExtruded() * reprap.getExtruder().getExtrusionHeight() * 
-		reprap.getExtruder().getExtrusionSize();
+		return layerRules.getPrinter().getTotalDistanceExtruded() * layerRules.getPrinter().getExtruder().getExtrusionHeight() * 
+		layerRules.getPrinter().getExtruder().getExtrusionSize();
 	}
 	
 	/**
 	 * 
 	 */
 	public void dispose() {
-		reprap.dispose();
+		layerRules.getPrinter().dispose();
 	}
 
 	/**
 	 * @return total elapsed time in seconds between start and end of building the 3D object
 	 */
 	public double getTotalElapsedTime() {
-		return reprap.getTotalElapsedTime();
+		return layerRules.getPrinter().getTotalElapsedTime();
 	}
 	
 }

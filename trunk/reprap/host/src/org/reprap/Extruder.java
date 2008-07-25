@@ -189,7 +189,7 @@ public interface Extruder
     /**
      * @return the extrusion infill width in millimeters
      */
-    public double getExtrusionInfillWidth(double z, double zMax);
+    //public double getExtrusionInfillWidth(double z, double zMax);
 
     /**
      * @return the cooling period in seconds
@@ -369,6 +369,25 @@ public interface Extruder
 	 * @return
 	 */
 	public Printer getPrinter();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public double getExtrusionFoundationWidth();
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public double getExtrusionInfillWidth();
+	
+	/**
+	 * At the support layer before a layer is to be separated, how far up
+	 * the normal Z movement do we go to make a bigger gap to form a weak join?
+	 * @return
+	 */
+	public double getSeparationFraction();
     
     /**
      * Deal with waht needs to be done between layers

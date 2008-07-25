@@ -8,6 +8,7 @@ import org.reprap.utilities.Debug;
 import org.reprap.Extruder;
 import org.reprap.Printer;
 import org.reprap.devices.pseudo.LinePrinter;
+import org.reprap.geometry.LayerRules;
 import org.reprap.comms.Address;
 import org.reprap.comms.Communicator;
 import org.reprap.comms.IncomingMessage;
@@ -287,6 +288,10 @@ public abstract class GenericExtruder implements Extruder
 	*/
 	protected boolean isExtruding = false;
 	
+	private double extrusionFoundationWidth;
+	private double extrusionLastFoundationWidth;
+	private double separationFraction;
+	
 	/**
 	* Our printer object.
 	*/
@@ -356,7 +361,9 @@ public abstract class GenericExtruder implements Extruder
 			valvePulseTime = 0.5*Preferences.loadGlobalDouble(prefName + "ValvePulseTime(ms)");
 			shells = Preferences.loadGlobalInt(prefName + "NumberOfShells(0..N)");
 			pauseBetweenSegments = Preferences.loadGlobalBool(prefName + "PauseBetweenSegments");
-
+			extrusionFoundationWidth = Preferences.loadGlobalDouble(prefName + "ExtrusionFoundationWidth(mm)");
+			extrusionLastFoundationWidth = Preferences.loadGlobalDouble(prefName + "ExtrusionLastFoundationWidth(mm)");
+			separationFraction = Preferences.loadGlobalDouble(prefName + "SeparationFraction(0..1)");
 			Color3f col = new Color3f((float)Preferences.loadGlobalDouble(prefName + "ColourR(0..1)"), 
 					(float)Preferences.loadGlobalDouble(prefName + "ColourG(0..1)"), 
 					(float)Preferences.loadGlobalDouble(prefName + "ColourB(0..1)"));
@@ -583,15 +590,15 @@ public abstract class GenericExtruder implements Extruder
      * At the top and bottom return the fine width; in between
      * return the braod one.  If the braod one is negative, just do fine.
      */
-    public double getExtrusionInfillWidth(double z, double zMax)
+    public double getExtrusionInfillWidth()
     {
-    	if(z < lowerFineThickness)
+//    	if(z < lowerFineThickness)
+//    		return extrusionInfillWidth;
+//    	if(z > zMax - upperFineThickness)
+//    		return extrusionInfillWidth;
+//    	if(extrusionBroadWidth < 0)
     		return extrusionInfillWidth;
-    	if(z > zMax - upperFineThickness)
-    		return extrusionInfillWidth;
-    	if(extrusionBroadWidth < 0)
-    		return extrusionInfillWidth;
-    	return extrusionBroadWidth;
+//    	return extrusionBroadWidth;
     } 
   
     /* (non-Javadoc)
@@ -961,5 +968,25 @@ public abstract class GenericExtruder implements Extruder
     {
     	return(getAppearanceFromNumber(getNumberFromMaterial(material)));
     }
+    
+    public double getExtrusionFoundationWidth()
+    {
+    	return extrusionFoundationWidth;
+    }
+
+    public double getLastFoundationWidth(LayerRules lc)
+    {
+    	return extrusionLastFoundationWidth;
+    }
+    
+	/**
+	 * At the support layer before a layer is to be separated, how far up
+	 * the normal Z movement do we go to make a bigger gap to form a weak join?
+	 * @return
+	 */
+	public double getSeparationFraction()
+	{
+		return separationFraction;
+	}
     
 }
