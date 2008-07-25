@@ -1,9 +1,9 @@
 package org.reprap.geometry.polygons;
 
 import java.util.*;
-
 import org.reprap.Attributes;
 import org.reprap.Extruder;
+import org.reprap.geometry.LayerRules;
 
 /**
  * It's convenient to have lists of CSG polygons (even though they
@@ -107,8 +107,12 @@ public class RrCSGPolygonList {
 	 * @param outline
 	 * @return
 	 */
-	public RrCSGPolygonList offset(Extruder[] es, boolean outline)
+	public RrCSGPolygonList offset(LayerRules lc, boolean outline)
 	{
+		boolean foundation = lc.getLayingSupport();
+		if(outline && foundation)
+			System.err.println("Offsetting a foundation outline!");
+		
 		RrCSGPolygonList result = new RrCSGPolygonList();
 		for(int i = 0; i < size(); i++)
 		{
@@ -117,19 +121,32 @@ public class RrCSGPolygonList {
 				System.err.println("offset(): null attribute!");
 			else
 			{
-				Extruder e = att.getExtruder(es);
-				int shells = e.getShells();
+				Extruder [] es = lc.getPrinter().getExtruders();
+				Extruder e;
+				int shells;
+				if(foundation)
+				{
+					e = es[0];  // By convention extruder 0 builds the foundation
+					shells = 1;
+				} else
+				{
+					e = att.getExtruder(es);
+					shells = e.getShells();					
+				}
 				if(outline)
 				{
 					for(int shell = 0; shell < shells; shell++)
 						result.add(get(i).offset(-((double)shell + 0.5)*e.getExtrusionSize()));
 				} else
 				{
-					// Must be a hatch.  Only do it if the gap is +ve
-					
-					if (e.getExtrusionInfillWidth(0, 1) > 0)  // Z valuesn't mattere here
-						result.add(get(i).offset(-((double)shells + 0.5)*e.getExtrusionSize() + 
-							e.getInfillOverlap()));
+					// Must be a hatch.  Only do it if the gap is +ve or we're building the foundation
+					double offSize; 
+					if(foundation)
+						offSize = 3;
+					else
+						offSize = -((double)shells + 0.5)*e.getExtrusionSize() + e.getInfillOverlap();
+					if (e.getExtrusionInfillWidth() > 0 || foundation)  // Z valuesn't mattere here
+						result.add(get(i).offset(offSize));
 				}
 			}
 		}
@@ -165,13 +182,24 @@ public class RrCSGPolygonList {
 	 * @param es
 	 * @return
 	 */
-	public RrPolygonList hatch(RrHalfPlane hp, Extruder[] es, double z, double zMax) 
+	public RrPolygonList hatch(LayerRules lc) 
 	{
 		RrPolygonList result = new RrPolygonList();
+		boolean foundation = lc.getLayingSupport();
+		Extruder [] es = lc.getPrinter().getExtruders();
 		for(int i = 0; i < size(); i++)
 		{
-			Attributes att = get(i).getAttributes();
-			result.add(get(i).hatch(hp, att.getExtruder(es).getExtrusionInfillWidth(z, zMax)));
+			Extruder e;
+			if(foundation)
+				e = es[0]; // Extruder 0 is used for foundations
+			else
+				e = get(i).getAttributes().getExtruder(es);
+//			double width = lc.getHatchWidth(e);
+//			if(foundation)
+//				width = e.getExtrusionFoundationWidth();
+//			else
+//				width = e.getExtrusionInfillWidth();
+			result.add(get(i).hatch(lc.getHatchDirection(), lc.getHatchWidth(e)));
 		}
 		return result;
 	}

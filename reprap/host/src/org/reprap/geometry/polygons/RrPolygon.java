@@ -70,7 +70,7 @@ package org.reprap.geometry.polygons;
 
 import java.io.*;
 import java.util.*;
-import org.reprap.geometry.LayerProducer;
+import org.reprap.geometry.*;
 import org.reprap.Attributes;
 import org.reprap.Preferences;
 
@@ -346,10 +346,10 @@ public class RrPolygon
 	/**
 	 * @return same polygon starting at point incremented from last polgon
 	 */
-	public RrPolygon incrementedStart(int layerNumber)
+	public RrPolygon incrementedStart(LayerRules lc)
 	{
 		RrPolygon result = new RrPolygon(att);
-		int i = layerNumber % size();
+		int i = lc.getModelLayer() % size();
 		for(int j = 0; j < size(); j++)
 		{
 			result.add(new Rr2Point(point(i))); //, new Integer((flag(i))));
@@ -527,6 +527,40 @@ public class RrPolygon
 	// of course).
 	
 	/**
+	 * @return Convex hull as a polygon
+	 */
+	public RrPolygon convexHull()
+	{
+		List<Integer> ls = listConvexHull();
+		RrPolygon result = new RrPolygon(att);
+		for(int i = 0; i < ls.size(); i++)
+			result.add(listPoint(i, ls));
+		return result;
+	}
+	
+	/**
+	 * @return Convex hull as a CSG expression
+	 */
+	public RrCSG CSGConvexHull()
+	{
+		List<Integer> ls = listConvexHull();
+		return toCSGHull(ls);
+	}
+	
+	/**
+	 * @return Convex hull as a list of point indices
+	 */
+	private List<Integer> listConvexHull()
+	{
+		RrPolygon copy = new RrPolygon(this);
+		if(copy.area() < 0)
+			copy = copy.negate();
+
+		List<Integer> all = copy.allPoints();
+		return convexHull(all);
+	}
+	
+	/**
 	 * find a point from a list of polygon points
 	 * @Param i
 	 * @param a
@@ -536,17 +570,7 @@ public class RrPolygon
 	{
 		return point((a.get(i)).intValue());
 	}
-		
-	/**
-	 * find a flag from a list of polygon points
-	 * @Param i 
-	 * @param a
-	 * @return the point
-	 */
-//	private int listFlag(int i, List a)
-//	{
-//		return flag(((Integer)a.get(i)).intValue());
-//	}
+
 		
 	/**
 	 * find the top (+y) point of a polygon point list
@@ -620,7 +644,7 @@ public class RrPolygon
 	 * @param hullPoints
 	 * @return CSG representation
 	 */	
-	public RrCSG toCSGHull(List<Integer> hullPoints)
+	private RrCSG toCSGHull(List<Integer> hullPoints)
 	{
 		Rr2Point p, q;
 		RrCSG hull = RrCSG.universe();
