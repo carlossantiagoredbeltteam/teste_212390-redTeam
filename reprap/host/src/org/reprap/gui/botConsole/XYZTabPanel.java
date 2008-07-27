@@ -15,15 +15,18 @@ import org.reprap.Printer;
  * @author  ensab
  */
 public class XYZTabPanel extends javax.swing.JPanel {
-    private int XYfastSpeed;
-    private int ZfastSpeed;
+    private double XYfastSpeed;
+    private double ZfastSpeed;
     private Printer printer;
     private static double nudgeSize = 0;
     
     private void setPrefs() throws IOException {
         
-        XYfastSpeed = Preferences.loadGlobalInt("FastSpeed(0..255)");
-        ZfastSpeed = Preferences.loadGlobalInt("MovementSpeedZ(0..255)");
+        //XYfastSpeed = Preferences.loadGlobalInt("FastSpeed(0..255)");
+        //ZfastSpeed = Preferences.loadGlobalInt("MovementSpeedZ(0..255)");
+    	
+    	XYfastSpeed = printer.getFastFeedrateXY();
+    	ZfastSpeed = printer.getFastFeedrateZ();
         
         xySpeedField.setText(String.valueOf(XYfastSpeed));
         zSpeedField.setText(String.valueOf(ZfastSpeed));
