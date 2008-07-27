@@ -479,46 +479,7 @@ public class Reprap extends GenericCartesianPrinter
 		motorZ.setPosition(convertToStepZ(zeroPoint));
 	}
 	
-	//TODO: MAKE THIS WORK!
-	public int convertFeedrateToSpeedXY(double feedrate)
-	{
-		//Debug.d("feedrate: " + feedrate);
-		
-		//pretty straightforward
-		double stepsPerMinute = feedrate * scaleX;
-		//Debug.d("steps/min: " + stepsPerMinute);
-		
-		//ticks per minute divided by the steps we need to take.
-		double ticksBetweenSteps = 60000000 / 256 / stepsPerMinute;
-		//Debug.d("ticks between steps: " + ticksBetweenSteps);
 
-		int picTimer = (256 - (int)ticksBetweenSteps);
-		//Debug.d("pic timer: " + picTimer);
-		
-		//bounds checking.
-		picTimer = Math.min(255, picTimer);
-		picTimer = Math.max(0, picTimer);
-		
-		return picTimer;
-	}
-
-	
-	//TODO: MAKE THIS WORK!
-	public int convertFeedrateToSpeedZ(double feedrate)
-	{
-		//pretty straightforward
-		double stepsPerMinute = feedrate * scaleZ;
-		
-		//ticks per minute divided by the steps we need to take.
-		long ticksBetweenSteps = Math.round(60000000 / 256 / stepsPerMinute);
-		int picTimer = (256 - (int)ticksBetweenSteps);
-		
-		//bounds checking.
-		picTimer = Math.min(255, picTimer);
-		picTimer = Math.max(0, picTimer);
-
-		return picTimer;
-	}
 }
 
 

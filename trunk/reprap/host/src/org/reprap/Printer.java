@@ -324,5 +324,6 @@ public interface Printer {
 	public GenericStepperMotor getXMotor();
 	public GenericStepperMotor getYMotor();
 	public GenericStepperMotor getZMotor();
-         
+	public int convertFeedrateToSpeedXY(double feedrate);
+	public int convertFeedrateToSpeedZ(double feedrate);
 }

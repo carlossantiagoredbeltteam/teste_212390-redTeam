@@ -26,7 +26,7 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
     private GenericStepperMotor motor;
     private Printer printer;
 
-    private int fastSpeed;
+    private double fastSpeed;
     private double motorStepsPerMM;
     private double axisLength;
     private double nudgeSize;
@@ -103,10 +103,18 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
             stepUpButton.setEnabled(false);
     }
     
+    private int getSpeedFromFeed(double f)
+    {
+    	if (axis.equals("Z"))
+    		return printer.convertFeedrateToSpeedZ(f);
+    	else
+    		return printer.convertFeedrateToSpeedXY(f);
+    }
+    
     public void homeAxis() {
         try {
             setSpeed();
-            motor.homeReset(fastSpeed);
+            motor.homeReset(getSpeedFromFeed(fastSpeed));
             targetPosition.setText("0");
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Could not home motor: " + ex);
@@ -114,9 +122,10 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
     }
     
     public void setSpeed() {
-        if (axis.equals("X")) fastSpeed = Integer.parseInt(org.reprap.gui.botConsole.XYZTabPanel.xySpeedField.getText());
-        if (axis.equals("Y")) fastSpeed = Integer.parseInt(org.reprap.gui.botConsole.XYZTabPanel.xySpeedField.getText());
-        if (axis.equals("Z")) fastSpeed = Integer.parseInt(org.reprap.gui.botConsole.XYZTabPanel.zSpeedField.getText());
+        if (axis.equals("Z")) 
+        	fastSpeed = Double.parseDouble(org.reprap.gui.botConsole.XYZTabPanel.zSpeedField.getText());
+        else
+       		fastSpeed = Double.parseDouble(org.reprap.gui.botConsole.XYZTabPanel.xySpeedField.getText());
     }
     
     public double getTargetPositionInMM() {
@@ -144,7 +153,7 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
     
     public void moveToTarget() {
 	    	try {
-	        	motor.seek(fastSpeed, getTargetPositionInSteps());
+	        	motor.seek(getSpeedFromFeed(fastSpeed), getTargetPositionInSteps());
 	        } 
 	        catch (Exception ex) {
 	            JOptionPane.showMessageDialog(null, axis + " motor could not seek: " + ex);
@@ -153,7 +162,7 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
     
     public void moveToTargetBlocking() {
     		try {
-                motor.seekBlocking(fastSpeed, getTargetPositionInSteps());
+                motor.seekBlocking(getSpeedFromFeed(fastSpeed), getTargetPositionInSteps());
             } 
             catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, axis + " motor could not block: " + ex);
