@@ -94,7 +94,10 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
     		f = f + 3600000;
     		//System.out.println("DST");
     	//}
-       	expectedBuildTime.setText("" + h + ":" + m);
+    	if(m > 9)
+    		expectedBuildTime.setText("" + h + ":" + m);
+    	else
+    		expectedBuildTime.setText("" + h + ":0" + m);
     	expectedFinishTime.setText(dateFormat.format(new Date(startTime + f)));
     }
     
