@@ -10,6 +10,12 @@ bool y_can_step;
 bool z_can_step;
 int milli_delay;
 
+#if (INVERT_ENABLE_PINS == 1)
+#define ENABLE_ON LOW
+#else
+#define ENABLE_ON HIGH
+#endif
+
 void init_steppers()
 {
 	//turn them off to start.
@@ -293,9 +299,9 @@ void enable_steppers()
 		     && target_units.z == current_units.z
 		#endif
 	)
-		digitalWrite(X_ENABLE_PIN, LOW);
+		digitalWrite(X_ENABLE_PIN, !ENABLE_ON);
 	else
-		digitalWrite(X_ENABLE_PIN, HIGH);
+		digitalWrite(X_ENABLE_PIN, ENABLE_ON);
 	if ( target_units.y == current_units.y
 		#if Y_ENABLE_PIN == X_ENABLE_PIN
 		     && target_units.x == current_units.x
@@ -304,9 +310,9 @@ void enable_steppers()
 		     && target_units.z == current_units.z
 		#endif
 	)
-		digitalWrite(Y_ENABLE_PIN, LOW);
+		digitalWrite(Y_ENABLE_PIN, !ENABLE_ON);
 	else
-		digitalWrite(Y_ENABLE_PIN, HIGH);
+		digitalWrite(Y_ENABLE_PIN, ENABLE_ON);
 	if ( target_units.z == current_units.z
 		#if Z_ENABLE_PIN == X_ENABLE_PIN
 			&& target_units.x == current_units.x
@@ -315,17 +321,17 @@ void enable_steppers()
 			&& target_units.y == current_units.y
 		#endif
 	)
-		digitalWrite(Z_ENABLE_PIN, LOW);
+		digitalWrite(Z_ENABLE_PIN, !ENABLE_ON);
 	else
-		digitalWrite(Z_ENABLE_PIN, HIGH);
+		digitalWrite(Z_ENABLE_PIN, ENABLE_ON);
 }
 
 void disable_steppers()
 {
 	//disable our steppers
-	digitalWrite(X_ENABLE_PIN, LOW);
-	digitalWrite(Y_ENABLE_PIN, LOW);
-	digitalWrite(Z_ENABLE_PIN, LOW);
+	digitalWrite(X_ENABLE_PIN, !ENABLE_ON);
+	digitalWrite(Y_ENABLE_PIN, !ENABLE_ON);
+	digitalWrite(Z_ENABLE_PIN, !ENABLE_ON);
 }
 
 void delayMicrosecondsInterruptible(unsigned int us)
