@@ -30,6 +30,11 @@
 // How many temperature samples to take.  each sample takes about 100 usecs.
 #define TEMPERATURE_SAMPLES 5
 
+// The *_ENABLE_PIN signals are active high as default. Define this
+// to one if they should be active low instead (e.g. if you're using different
+// stepper boards).
+#define INVERT_ENABLE_PINS 1
+
 /****************************************************************************************
  * digital i/o pin assignment
  *  
