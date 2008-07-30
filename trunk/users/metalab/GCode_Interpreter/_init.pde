@@ -1,16 +1,16 @@
-// This  is -*- c++ -*-, no kidding
+// Yep, this is actually -*- c++ -*-
 // define the parameters of our machine.
-#define X_STEPS_PER_INCH 5080
-#define X_STEPS_PER_MM   200
-#define X_MOTOR_STEPS    200
+#define X_STEPS_PER_INCH 6773
+#define X_STEPS_PER_MM   267
+#define X_MOTOR_STEPS    1600
 
-#define Y_STEPS_PER_INCH 5080
-#define Y_STEPS_PER_MM   200
-#define Y_MOTOR_STEPS    200
+#define Y_STEPS_PER_INCH 6773
+#define Y_STEPS_PER_MM   267
+#define Y_MOTOR_STEPS    1600
 
-#define Z_STEPS_PER_INCH 1219
-#define Z_STEPS_PER_MM   48
-#define Z_MOTOR_STEPS    48
+#define Z_STEPS_PER_INCH 6773
+#define Z_STEPS_PER_MM   267
+#define Z_MOTOR_STEPS    1600
 
 //our maximum feedrates
 #define FAST_XY_FEEDRATE 1000.0
@@ -33,13 +33,14 @@
 // The *_ENABLE_PIN signals are active high as default. Define this
 // to one if they should be active low instead (e.g. if you're using different
 // stepper boards).
+// RepRap stepper boards are *not* inverting.
 #define INVERT_ENABLE_PINS 1
 
 /****************************************************************************************
- * digital i/o pin assignment
- *  
- * this uses the undocumented feature of Arduino - pins 14-19 correspond to analog 0-5
- ****************************************************************************************/
+* digital i/o pin assignment
+*  
+* this uses the undocumented feature of Arduino - pins 14-19 correspond to analog 0-5
+****************************************************************************************/
 
 //cartesian bot pins
 #define X_STEP_PIN 2
@@ -61,7 +62,7 @@
 #define Z_ENABLE_PIN 15
 
 //extruder pins
-#define EXTRUDER_MOTOR_SPEED_PIN   9
+#define EXTRUDER_MOTOR_SPEED_PIN   11
 #define EXTRUDER_MOTOR_DIR_PIN     12
 #define EXTRUDER_HEATER_PIN        6
 #define EXTRUDER_FAN_PIN           5
