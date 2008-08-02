@@ -10,7 +10,7 @@ bool y_can_step;
 bool z_can_step;
 int milli_delay;
 
-#if (INVERT_ENABLE_PINS == 1)
+#if INVERT_ENABLE_PINS == 1
 #define ENABLE_ON LOW
 #else
 #define ENABLE_ON HIGH
@@ -233,9 +233,23 @@ void calculate_deltas()
 	delta_steps.z = abs(target_steps.z - current_steps.z);
 	
 	//what is our direction
+#if INVERT_X_DIR == 1
+	x_direction = (target_units.x < current_units.x);
+#else
 	x_direction = (target_units.x >= current_units.x);
+#endif
+
+#if INVERT_X_DIR == 1
+	y_direction = (target_units.y < current_units.y);
+#else
 	y_direction = (target_units.y >= current_units.y);
+#endif
+
+#if INVERT_X_DIR == 1
+	z_direction = (target_units.z < current_units.z);
+#else
 	z_direction = (target_units.z >= current_units.z);
+#endif
 
 	//set our direction pins as well
 	digitalWrite(X_DIR_PIN, x_direction);
