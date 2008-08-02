@@ -36,6 +36,14 @@
 // RepRap stepper boards are *not* inverting.
 #define INVERT_ENABLE_PINS 0
 
+// If you use this firmware on a cartesian platform where the
+// stepper direction pins are inverted, set these defines to 1
+// for the axes which should be inverted.
+// RepRap stepper boards are *not* inverting.
+#define INVERT_X_DIR 0
+#define INVERT_Y_DIR 0
+#define INVERT_Z_DIR 0
+
 /****************************************************************************************
 * digital i/o pin assignment
 *  
