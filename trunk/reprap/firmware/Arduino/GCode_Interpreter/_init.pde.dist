@@ -34,7 +34,7 @@
 // to one if they should be active low instead (e.g. if you're using different
 // stepper boards).
 // RepRap stepper boards are *not* inverting.
-#define INVERT_ENABLE_PINS 1
+#define INVERT_ENABLE_PINS 0
 
 /****************************************************************************************
 * digital i/o pin assignment
