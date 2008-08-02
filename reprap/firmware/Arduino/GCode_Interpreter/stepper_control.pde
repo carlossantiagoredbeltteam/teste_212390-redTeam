@@ -233,28 +233,26 @@ void calculate_deltas()
 	delta_steps.z = abs(target_steps.z - current_steps.z);
 	
 	//what is our direction
-#if INVERT_X_DIR == 1
-	x_direction = (target_units.x < current_units.x);
-#else
 	x_direction = (target_units.x >= current_units.x);
-#endif
-
-#if INVERT_X_DIR == 1
-	y_direction = (target_units.y < current_units.y);
-#else
 	y_direction = (target_units.y >= current_units.y);
-#endif
-
-#if INVERT_X_DIR == 1
-	z_direction = (target_units.z < current_units.z);
-#else
 	z_direction = (target_units.z >= current_units.z);
-#endif
 
 	//set our direction pins as well
+#if INVERT_X_DIR == 1
+	digitalWrite(X_DIR_PIN, !x_direction);
+#else
 	digitalWrite(X_DIR_PIN, x_direction);
+#endif
+#if INVERT_Y_DIR == 1
+	digitalWrite(Y_DIR_PIN, !y_direction);
+#else
 	digitalWrite(Y_DIR_PIN, y_direction);
+#endif
+#if INVERT_Z_DIR == 1
+	digitalWrite(Z_DIR_PIN, !z_direction);
+#else
 	digitalWrite(Z_DIR_PIN, z_direction);
+#endif
 }
 
 
