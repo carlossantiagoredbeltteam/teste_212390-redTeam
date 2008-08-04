@@ -8,7 +8,7 @@ Serial myPort;
 String serialLine = "";
 
 boolean initialized = false;
-boolean started = false;
+boolean started = true;
 boolean finished = false;
 boolean commandComplete = true;
 int commandCount = 0;
@@ -146,49 +146,79 @@ void draw()
 int targetTemp = 20;
 int motorSpeed = 0;
 
+int feedRate = 100;
+
 String getNextCommand()
 {
   String c = null;
   if (keyPressed) { 
     switch (key) { 
+    case '+':
+      feedRate++;
+      println(feedRate);
+      break;
+      
+    
+      
+    case '-':
+      feedRate--;
+      println(feedRate);
+      break;
+      
+    case 'y':
+      c = "G1 X0 Y-0.1 Z0 F" + feedRate;
+      break;
+    
+    case 'e':
+      c = "G21 (mm)";
+      break;
+      
+    case 'r':
+      c = "G90 (abs)";
+      break;
+      
+    //case 'y':
+    //  c = "G92 (set home)";
+    //  break;
+      
       // X axis
     case 'a':
-      c = "G1 X10 Y0 Z0 F450";
+      c = "G1 X10 Y0 Z0 F950";
       break;
     case 'd':
-      c = "G1 X-10 Y0 Z0 F450";
+      c = "G1 X-10 Y0 Z0 F950";
       break;
     case 'A':
-      c = "G1 X1 Y0 Z0 F450";
+      c = "G1 X1 Y0 Z0 F950";
       break;
     case 'D':
-      c = "G1 X-1 Y0 Z0 F450";
+      c = "G1 X-1 Y0 Z0 F950";
       break;
       // Y axis
     case 'w':
-      c = "G1 X0 Y10 Z0 F450";
+      c = "G1 X0 Y10 Z0 F950";
       break;
     case 's':
-      c = "G1 X0 Y-10 Z0 F450";
+      c = "G1 X0 Y-10 Z0 F950";
       break;
     case 'W':
-      c = "G1 X0 Y1 Z0 F450";
+      c = "G1 X0 Y1 Z0 F950";
       break;
     case 'S':
-      c = "G1 X0 Y-1 Z0 F450";
+      c = "G1 X0 Y-1 Z0 F950";
       break;
     // Z axis
     case 'q':
-      c = "G1 X0 Y0 Z2 F100";
+      c = "G1 X0 Y0 Z2 F450";
       break;
     case 'Q':
-      c = "G1 X0 Y0 Z0.2 F10";
+      c = "G1 X0 Y0 Z0.15 F150";
       break;
     case 'z':
-      c = "G1 X0 Y0 Z-2 F100";
+      c = "G1 X0 Y0 Z-2 F450";
       break;
     case 'Z':
-      c = "G1 X0 Y0 Z-0.2 F10";
+      c = "G1 X0 Y0 Z-0.1 F150";
       break;
 
       // Temp    
