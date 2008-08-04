@@ -161,8 +161,6 @@ class Shape():
         if 'scale' in kwargs:
             self._do_init_rst('scale', **kwargs)
 
-
-
     def _do_init_rst(self, arg, **kwargs):
         '''Handle a rotate, translate, or scale kwarg passed to init by
         checking that the params are correct and calling the
@@ -344,30 +342,16 @@ class Script():
             self.statements.append(i)
         return self
 
+class Group(Shape):
+    '''For convenience, this will probably look cleaner than group=True.
+    OTOH, there's no equivalent for region or combination, so it's not as
+    elegant.'''
 
-class Box_rounded_edge_corners(Shape):
-    def __init__(self, xmin, xmax, ymin, ymax, zmin, zmax, radius, **kwargs):
-        if xmin > xmax:
-            xmin, xmax = xmax, xmin
-        if ymin > ymax:
-            ymin, ymax = ymax, ymin
-        if zmin > zmax:
-            zmin, zmax = zmax, zmin
+    def __init__(self, args=[], **kwargs):
+        if 'group' in kwargs:
+            del kwargs['group']
 
-        if radius > (xmax-xmin) / 2 or radius > (zmax-zmin)/2:
-            sys.stdout.write('Radius %f too large!\n' % (float(radius)))
-            sys.exit(2)
-
-        step = radius
-
-        Shape.__init__(self, [
-            Box(xmin+step, xmax-step, ymin, ymax, zmin, zmax),
-            Box(xmin, xmax, ymin, ymax, zmin+step, zmax-step),
-            Cylinder((xmin+step, ymin, zmin+step), (0, ymax-ymin, 0), radius),
-            Cylinder((xmin+step, ymin, zmax-step), (0, ymax-ymin, 0), radius),
-            Cylinder((xmax-step, ymin, zmin+step), (0, ymax-ymin, 0), radius),
-            Cylinder((xmax-step, ymin, zmax-step), (0, ymax-ymin, 0), radius)
-            ], group=True, basename='brec', suffix='t')
-
+        Shape.__init__(self, args, **kwargs)
+        self.group()
 
 from primitive import *
