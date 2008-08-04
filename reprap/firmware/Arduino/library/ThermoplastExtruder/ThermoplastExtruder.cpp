@@ -4,7 +4,7 @@
 // Pick up the thermistor table from the file - makes it easier to customise
 // the code for different thermistors.
 
-#include "ThermistorTable.h"
+#include "TemperatureSensor.h"
 
 /*!
 	motor_dir_pin must be a digital output.
@@ -99,7 +99,13 @@ int ThermoplastExtruder::getTemperature()
 */
 int ThermoplastExtruder::calculateTemperatureFromRaw(int raw)
 {
+
 	int celsius = 0;
+
+#ifdef THERMISTOR
+
+// We are using a thermistor for temperature measurement
+	
 	byte i;
 	
 	for (i=1; i<NUMTEMPS; i++)
@@ -121,7 +127,13 @@ int ThermoplastExtruder::calculateTemperatureFromRaw(int raw)
 	// Overflow: We just clamp to 0 degrees celsius
 	if (i == NUMTEMPS)
 		celsius = 0;
-		
+#else
+
+// We are using a K-type thermocouple and the AD595 chip for temperature measurement
+
+	celsius = ( 5.0 * raw * 100.0) / 1024.0;
+	
+#endif
 	return celsius;
 }
 

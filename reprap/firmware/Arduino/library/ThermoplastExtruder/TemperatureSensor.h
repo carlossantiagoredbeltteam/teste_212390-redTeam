@@ -1,5 +1,6 @@
 #ifndef THERMISTOR_TABLE
 #define THERMISTOR_TABLE
+#define THERMISTOR
 
 // Thermistor lookup table for RepRap Temperature Sensor Boards (http://make.rrrf.org/ts)
 // Made with createTemperatureLookup.py (http://svn.reprap.org/trunk/reprap/firmware/Arduino/utilities/createTemperatureLookup.py)
