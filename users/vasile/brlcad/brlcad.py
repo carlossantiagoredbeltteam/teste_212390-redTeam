@@ -14,8 +14,10 @@ license = '''## This is a freed work; you can redistribute it and/or modify it
 ## Floor, Boston, MA 02110-1301 USA '''
 
 import sys, os
+from ctypes import *
 
-VERSION = 0.2
+
+VERSION = 0.3 
 
 class Vector:
     def __init__(self,*args):
