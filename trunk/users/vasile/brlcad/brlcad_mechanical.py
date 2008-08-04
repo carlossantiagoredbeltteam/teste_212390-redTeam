@@ -14,6 +14,7 @@
 ## Floor, Boston, MA 02110-1301 USA
 
 from brlcad import *
+from brlcad_rounded_edge import *
 
 class stepper_motor(Shape):
     '''Vertex is center point box, along the center of the cylinder.
