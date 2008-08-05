@@ -388,6 +388,12 @@ public interface Extruder
 	 * @return
 	 */
 	public double getSeparationFraction();
+	
+	/**
+	 * Wait if the XY movement buffer is active in the mictrocontroller
+	 * @throws IOException
+	 */
+	public void waitTillNotBusy() throws IOException;
     
     /**
      * Deal with waht needs to be done between layers

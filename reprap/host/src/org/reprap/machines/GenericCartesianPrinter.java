@@ -439,6 +439,7 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 	 */
 	public Extruder getExtruder()
 	{
+		//System.out.println("getExtruder(), extruder: " + extruder);
 		return extruders[extruder];
 	}
 	
@@ -509,11 +510,11 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 	 * @throws ReprapException
 	 * @throws IOException
 	 */
-	public void printSegment(double startX, double startY, double startZ, 
-			double endX, double endY, double endZ, boolean turnOff) throws ReprapException, IOException {
-		moveTo(startX, startY, startZ, true, true);
-		printTo(endX, endY, endZ, turnOff);
-	}
+//	public void printSegment(double startX, double startY, double startZ, 
+//			double endX, double endY, double endZ, boolean turnOff) throws ReprapException, IOException {
+//		moveTo(startX, startY, startZ, true, true);
+//		printTo(endX, endY, endZ, turnOff);
+//	}
 	
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#moveTo(double, double, double, boolean, boolean)
@@ -741,12 +742,13 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 
 			// Now hunt down the wiper.
 			moveTo(datumX, datumY, currentZ, false, false);
+
 			
 			//setSpeed(getExtruder().getXYSpeed());
-			setFeedrate(getExtruder().getXYFeedrate());
+			//setFeedrate(getExtruder().getXYFeedrate());
 			
-			moveTo(datumX + strokeX, datumY+strokeY, currentZ, false, false);
-			moveTo(datumX, datumY, currentZ, false, false);
+			//moveTo(datumX + strokeX, datumY+strokeY, currentZ, false, false);
+			//moveTo(datumX, datumY, currentZ, false, false);
 		}
 	}
 	
@@ -760,17 +762,17 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 				
 		// Do half the extrusion between layers now
 		
-		if (getExtruder().getNozzleWipeEnabled())
-		{
-			if(clearTime > 0)
-			{
-				getExtruder().setValve(true);
-				getExtruder().setMotor(true);
-				Thread.sleep((long)(500*clearTime));
-				getExtruder().setMotor(false);
-				getExtruder().setValve(false);
-			}
-		}
+//		if (getExtruder().getNozzleWipeEnabled())
+//		{
+//			if(clearTime > 0)
+//			{
+//				getExtruder().setValve(true);
+//				getExtruder().setMotor(true);
+//				Thread.sleep((long)(500*clearTime));
+//				getExtruder().setMotor(false);
+//				getExtruder().setValve(false);
+//			}
+//		}
 		
 		// Now is a good time to garbage collect
 		
@@ -798,7 +800,6 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 			getExtruder().setCooler(false);
 			return;
 		}
-		
 		// Cooling period
 		
 		// How long has the fan been on?
@@ -816,7 +817,6 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 			cool = coolTime - cool;
 			Thread.sleep((long)(1000*cool));
 		}
-		
 		// Fan off
 		
 		getExtruder().setCooler(false);
@@ -829,8 +829,7 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 			Debug.d("End of cooling period");			
 		}
 		
-		
-		// Do the other half of the clearing extrude then
+		// Do the clearing extrude then
 		// Wipe the nozzle on the doctor blade
 
 		if (getExtruder().getNozzleWipeEnabled())
@@ -839,14 +838,14 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 			{
 				getExtruder().setValve(true);
 				getExtruder().setMotor(true);
-				Thread.sleep((long)(500*clearTime));
+				Thread.sleep((long)(1000*clearTime));
 				getExtruder().setMotor(false);
 				getExtruder().setValve(false);
 				Thread.sleep((long)(1000*waitTime));
 			}
 			//setSpeed(LinePrinter.speedFix(getExtruder().getXYSpeed(), 
 			//		getExtruder().getOutlineSpeed(lc)));
-			setFeedrate(getExtruder().getOutlineFeedrate());
+			//setFeedrate(getExtruder().getOutlineFeedrate());
 			moveTo(datumX, datumY + strokeY, currentZ, false, false);
 		}
 		
@@ -855,156 +854,7 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 	}
 
 	
-//	/**
-//	 * Just about to start the next layer
-//	 * @param layerNumber
-//	 */
-//	public void startingLayer(int layerNumber) throws Exception
-//	{
-//		double datumX = getExtruder().getNozzleWipeDatumX();
-//		double datumY = getExtruder().getNozzleWipeDatumY();
-//		double strokeY = getExtruder().getNozzleWipeStrokeY();
-//		double clearTime = getExtruder().getNozzleClearTime();
-//		double waitTime = getExtruder().getNozzleWaitTime();
-//		double coolTime = getExtruder().getCoolingPeriod();
-//		
-//		Debug.d("Starting layer " + layerNumber);
-//		
-//		if (layerPauseCheckbox != null && layerPauseCheckbox.isSelected())
-//			layerPause();
-//		
-//		if(isCancelled())
-//		{
-//			getExtruder().setCooler(false);
-//			return;
-//		}
-//		
-//		// Cooling period
-//		
-//		// How long has the fan been on?
-//		
-//		double cool = Timer.elapsed();
-//		if(startCooling >= 0)
-//			cool = cool - startCooling;
-//		else
-//			cool = 0;
-//		
-//		// Wait the remainder of the cooling period
-//		
-//		if(coolTime > cool && (layerNumber != 0))
-//		{	
-//			cool = coolTime - cool;
-//			delay((long)(1000*cool));
-//		}
-//		
-//		// Fan off
-//		
-//		getExtruder().setCooler(false);
-//		
-//		// If we were cooling, wait for warm-up
-//		
-//		if(coolTime > 0 && (layerNumber != 0))
-//		{
-//			delay((long)(200 * coolTime));			
-//			Debug.d("End of cooling period");			
-//		}
-//		
-//		
-//		// Do the other half of the clearing extrude then
-//		// Wipe the nozzle on the doctor blade
-//
-//		if (getExtruder().getNozzleWipeEnabled())
-//		{
-//			if(clearTime > 0)
-//			{
-//				getExtruder().setValve(true);
-//				getExtruder().setMotor(true);
-//				delay((long)(500*clearTime));
-//				getExtruder().setMotor(false);
-//				getExtruder().setValve(false);
-//				delay((long)(1000*waitTime));
-//			}
-//
-////TODO: fix this to work properly for SNAP.
-////			setFeedrate(LinePrinter.speedFix(getExtruder().getXYFeedrate(), 
-////					getExtruder().getOutlineFeedrate()));
-//
-//			setFeedrate(getExtruder().getOutlineFeedrate());
-//			moveTo(datumX, datumY + strokeY, currentZ, false, false);
-//		}
-//		
-//		setFeedrate(getFastFeedrateXY());
-//	}
-//	
-//	/**
-//	 * Deals with all the actions that need to be done between one layer
-//	 * and the next.
-//	 */
-//	public void betweenLayers(int layerNumber) throws Exception
-//	{
-//		Debug.d("Between layer " + layerNumber);
-//		
-//		double clearTime = getExtruder().getNozzleClearTime();
-//				
-//		// Do half the extrusion between layers now
-//		
-//		if (getExtruder().getNozzleWipeEnabled())
-//		{
-//			if(clearTime > 0)
-//			{
-//				getExtruder().setValve(true);
-//				getExtruder().setMotor(true);
-//				delay((long)(500*clearTime));
-//				getExtruder().setMotor(false);
-//				getExtruder().setValve(false);
-//			}
-//		}
-//		
-//		// Now is a good time to garbage collect
-//		
-//		System.gc();
-//	}
-//	
-//	/**
-//	 * Just finished a layer
-//	 * @param layerNumber
-//	 */
-//	public void finishedLayer(int layerNumber) throws Exception
-//	{
-//		Debug.d("Finished layer " + layerNumber);
-//		
-//		double datumX = getExtruder().getNozzleWipeDatumX();
-//		double datumY = getExtruder().getNozzleWipeDatumY();
-//		double strokeX = getExtruder().getNozzleWipeStrokeX();
-//		double strokeY = getExtruder().getNozzleWipeStrokeY();
-//		double coolTime = getExtruder().getCoolingPeriod();
-//		
-//		startCooling = -1;
-//		
-//		if(coolTime > 0 && (layerNumber != 0)) {
-//			getExtruder().setCooler(true);
-//			Debug.d("Start of cooling period");
-//			setFeedrate(getFastFeedrateXY());
-//			
-//			// Go home. Seek (0,0) then callibrate X first
-//			homeToZeroX();
-//			homeToZeroY();
-//			startCooling = Timer.elapsed();
-//		}
-//		
-//		// If wiping, nudge the clearer blade
-//		if (getExtruder().getNozzleWipeEnabled())
-//		{
-//
-//			// Now hunt down the wiper.
-//			moveTo(datumX, datumY, currentZ, false, false);
-//			
-//			setFeedrate(getExtruder().getXYFeedrate());
-//			
-//			moveTo(datumX + strokeX, datumY+strokeY, currentZ, false, false);
-//			moveTo(datumX, datumY, currentZ, false, false);
-//		}
-//	}
+
 	
 	/**
 	 * Display a message indicating a segment is about to be
