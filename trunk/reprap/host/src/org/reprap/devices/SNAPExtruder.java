@@ -587,7 +587,9 @@ public class SNAPExtruder extends GenericExtruder
 			Debug.d("Attempting to control or interrogate non-existent extruder for " + material);
 			return;
 		}
+		System.out.println("setCooler 1");
 		waitTillNotBusy();
+		System.out.println("setCooler 2");
 		snap.lock();
 		try {
 			OutgoingMessage request =

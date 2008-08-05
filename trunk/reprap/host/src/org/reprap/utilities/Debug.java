@@ -54,6 +54,16 @@ public class Debug {
 		System.out.println("DEBUG: " + s + Timer.stamp());
 	}
 	
+	/**
+	 * Just print a message anytime
+	 * @param s
+	 */
+	static public void a(String s)
+	{
+		initialiseIfNeedBe();
+		System.out.println("message: " + s + Timer.stamp());
+	}
+	
 	static public void c(String s)
 	{
 		initialiseIfNeedBe();
