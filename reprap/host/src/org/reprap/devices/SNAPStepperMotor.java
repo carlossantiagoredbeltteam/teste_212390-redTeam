@@ -264,7 +264,7 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 		
 		while((value & 0xff) == modeQueue)
 		{
-			System.out.println("busy: " + value);
+			//System.out.println("busy: " + value);
 			try
 			{
 				Thread.sleep(500);
@@ -298,7 +298,7 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 		initialiseIfNeeded();
 		
 		waitTillQueueNotFull();
-		
+		//System.out.println("control: " + control);
 		snap.lock();
 		Debug.d(axis + " axis - queuing point at speed " + movementSpeed + ", control = " + control + ", endX = " + endX + ", endY = " + endY);
 		try {
