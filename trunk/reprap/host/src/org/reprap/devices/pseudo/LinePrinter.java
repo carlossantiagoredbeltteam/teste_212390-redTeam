@@ -13,7 +13,7 @@ import org.reprap.utilities.Debug;
 public class LinePrinter {
 
 	public static final int stopExtruder = 1;
-	public static final int closeValve = 1;
+	public static final int closeValve = 2;
 	
 	/**
 	 * Stepper motors

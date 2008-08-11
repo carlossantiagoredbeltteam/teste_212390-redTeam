@@ -267,7 +267,8 @@ public class Reprap extends GenericCartesianPrinter
 			if(segmentPauseCheckbox.isSelected())
 				segmentPause();
 
-		int currentSpeedXY = convertFeedrateToSpeedXY(getExtruder().getXYFeedrate());	
+		int currentSpeedXY = convertFeedrateToSpeedXY(getExtruder().getXYFeedrate());
+		//System.out.println("close: " + closeValve + ", stop ex:" + stopExtruder);
 		layerPrinter.printTo(stepperX, stepperY, currentSpeedXY, getExtruder().getExtruderSpeed(), stopExtruder, closeValve);
 		currentX = x;
 		currentY = y;

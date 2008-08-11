@@ -12,14 +12,15 @@
 
 package org.reprap.gui.botConsole;
 
-import java.util.*;
-import java.text.SimpleDateFormat;
+//import java.util.*;
+//import java.text.SimpleDateFormat;
 import org.reprap.Preferences;
 import javax.swing.JOptionPane;
 import javax.swing.*;
-import org.reprap.comms.snap.SNAPAddress;
-import org.reprap.comms.snap.SNAPCommunicator;
+//import org.reprap.comms.snap.SNAPAddress;
+//import org.reprap.comms.snap.SNAPCommunicator;
 import org.reprap.Printer;
+import org.reprap.utilities.Timer;
 //import org.reprap.devices.GenericExtruder;
 import org.reprap.Extruder;
 import java.awt.Color;
@@ -31,7 +32,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
     
     private int extruderID = 0;
     private boolean heatPushed = false;
-    private long startTime = -1;
+    private double startTime = -1;
     private boolean ramping = false;
     private double startTemp = -1;
     
@@ -184,7 +185,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
             .add(0, 42, Short.MAX_VALUE)
         );
 
-        heatButton.setText("Heat is off");
+        heatButton.setText("Switch heat on");
         heatButton.setFocusCycleRoot(true);
         heatButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -221,57 +222,54 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(jPanel2Layout.createSequentialGroup()
-                        .add(6, 6, 6)
                         .add(jLabel8)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(RampRate, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel2Layout.createSequentialGroup()
                         .add(jLabel6)
                         .add(18, 18, 18)
                         .add(currentTempLabel))
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel2Layout.createSequentialGroup()
+                        .add(6, 6, 6)
                         .add(jLabel7)
-                        .add(18, 18, 18)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(targetTempField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 159, Short.MAX_VALUE)
+                .add(140, 140, 140)
                 .add(RampButton)
-                .add(18, 18, 18)
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .add(tempProgress, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(tempColor, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(heatButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 110, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, coolingCheck))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(tempProgress, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(tempColor, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(coolingCheck)
+                    .add(heatButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(jPanel2Layout.createSequentialGroup()
-                        .add(1, 1, 1)
-                        .add(RampButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE))
                     .add(heatButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, tempProgress, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, tempColor, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, RampButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel2Layout.createSequentialGroup()
                         .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                             .add(jLabel6)
                             .add(currentTempLabel))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(jLabel7)
-                            .add(targetTempField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
+                            .add(targetTempField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(jLabel7)))
+                    .add(tempProgress, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(coolingCheck)
                     .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                        .add(jLabel8)
-                        .add(RampRate, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                        .add(RampRate, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(jLabel8)))
                 .addContainerGap())
         );
 
@@ -295,7 +293,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
         });
 
         valveToggleButton.setSelected(true);
-        valveToggleButton.setText("Valve is Open");
+        valveToggleButton.setText("Close valve");
         valveToggleButton.setMargin(new java.awt.Insets(2, 2, 2, 2));
         valveToggleButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -451,7 +449,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
     			JOptionPane.showMessageDialog(null, "Exception setting temperature: " + ex);
     			ex.printStackTrace();
     		}
-    		heatButton.setText("Heat is off");
+    		heatButton.setText("Switch heater on");
     		heatPushed = false;
     	}
     	else {
@@ -462,7 +460,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
     			JOptionPane.showMessageDialog(null, "Exception setting temperature: " + ex);
     			ex.printStackTrace();
     		}
-    		heatButton.setText("Heat is ON");
+    		heatButton.setText("Switch heater off");
     		heatPushed = true;
     	}
     }//GEN-LAST:event_heatButtonActionPerformed
@@ -476,7 +474,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
 
         } else {
                 extruding = true;
-                extrudeButton.setText("Stop");
+                extrudeButton.setText("Stop extruding");
 
                 System.out.println("Extruding at speed: " + motorSpeedField.getText());
         }
@@ -493,14 +491,14 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
         	try
         	{
         		extruder.setValve(true);
-        		valveToggleButton.setText("Valve is open");
+        		valveToggleButton.setText("Shut valve");
         	} catch (Exception ex) {}
         }
         else {
            	try
         	{
            		extruder.setValve(false);
-           		valveToggleButton.setText("Valve is shut");
+           		valveToggleButton.setText("Open valve");
         	} catch (Exception ex) {}
         }
 }//GEN-LAST:event_valveToggleButtonActionPerformed
@@ -517,10 +515,10 @@ private void RampButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     	rampOff();
     else 
     {
-    	heatButton.setText("Heat is ON");
-    	GregorianCalendar cal = new GregorianCalendar();
-    	Date d = cal.getTime();
-		startTime = d.getTime() + cal.getTimeZone().getOffset(d.getTime());
+    	heatButton.setText("Switch heat off");
+    	//GregorianCalendar cal = new GregorianCalendar();
+    	//Date d = cal.getTime();
+		startTime = Timer.elapsed();//d.getTime() + cal.getTimeZone().getOffset(d.getTime());
 		startTemp = extruder.getTemperature() - 1; // Start a bit below where we are for safety
     	RampButton.setText("Ramping");
         ramping = true;
@@ -586,10 +584,10 @@ private void RampButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
         	return;
         }
         
-    	GregorianCalendar cal = new GregorianCalendar();
-    	Date d = cal.getTime();
-		long elapsed = d.getTime() + cal.getTimeZone().getOffset(d.getTime()) - startTime;
-		double newTarget = (double)elapsed*Double.parseDouble(RampRate.getText())*0.001 + startTemp;
+    	//GregorianCalendar cal = new GregorianCalendar();
+    	//Date d = cal.getTime();
+		double elapsed = Timer.elapsed() - startTime; //d.getTime() + cal.getTimeZone().getOffset(d.getTime()) - startTime;
+		double newTarget = elapsed*Double.parseDouble(RampRate.getText()) + startTemp;
         if(newTarget >= Integer.parseInt(targetTempField.getText()))
         {
         	rampOff();

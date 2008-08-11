@@ -587,9 +587,9 @@ public class SNAPExtruder extends GenericExtruder
 			Debug.d("Attempting to control or interrogate non-existent extruder for " + material);
 			return;
 		}
-		System.out.println("setCooler 1");
+		//System.out.println("setCooler 1");
 		waitTillNotBusy();
-		System.out.println("setCooler 2");
+		//System.out.println("setCooler 2");
 		snap.lock();
 		try {
 			OutgoingMessage request =
@@ -647,9 +647,12 @@ public class SNAPExtruder extends GenericExtruder
 				
 				rawHeat = reply.getHeat();
 				//System.out.println(material + " extruder raw temp " + rawHeat);
-
-				calibration = reply.getCalibration();
 				
+				// Note that for the Arduino reply.getCalibration(); returns the
+				// actual temperature in honest-to-god deg C.  We should probably
+				// use that...
+				calibration = reply.getCalibration();
+				//System.out.println(material + " temp byte 2: " + calibration);
 				if(rerangeTemperature(rawHeat))
 					break; // All ok
 				else
