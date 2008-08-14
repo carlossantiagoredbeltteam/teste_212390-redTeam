@@ -299,6 +299,7 @@
 					{
 						//get the normal data.
 						$raw = new RawPart();
+						$raw->set('raw_id', $row[0]);
 						$raw->set('raw_text', $row[1]);
 						$raw->set('quantity', $row[2]);
 						$raw->set('type', $row[3]);
