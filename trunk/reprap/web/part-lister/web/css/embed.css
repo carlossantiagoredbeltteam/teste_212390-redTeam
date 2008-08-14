@@ -1,0 +1,38 @@
+body
+{
+	font-family: Verdana, Helvetica, sans-serif;
+	font-size: 13px;
+	margin: 0px;
+	padding: 0px;
+}
+
+th
+{
+	text-align: left;
+	vertical-align: top;
+	padding: 3px 10px;
+}
+
+td
+{
+	padding: 1px 10px 1px 0px;
+}
+
+h2
+{
+	font-size: 18px;
+	/* 18px is the default minimum font size for which anti-aliasing will occur. */
+	margin: 20px 0px 10px 0px;
+}
+
+h3
+{
+	margin: 0px;
+	padding: 5px 0px;
+}
+
+table
+{
+	border: 0px;
+	border-spacing: 0px;
+}

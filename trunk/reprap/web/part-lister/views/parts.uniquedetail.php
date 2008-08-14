@@ -80,21 +80,21 @@
 				<th>Subassembly</th>
 			</tr>
 			<? foreach ($modules AS $row): ?>
-				<? $part = $row['UniquePart'] ?>
+				<? $upart = $row['UniquePart'] ?>
 				<? $raw = $row['RawPart'] ?>
 				<?
-					if (!$part->id):
+					if (!$upart->id):
 						$parent = new RawPart($raw->get('parent_id'));
-						$part = new UniquePart($parent->get('part_id'));
+						$upart = new UniquePart($parent->get('part_id'));
 				?>
 					<tr>
-						<td><b><a href="<?=$part->getViewUrl()?>"><?=$part->get('name')?></a></b></td>
+						<td><b><a href="<?=$upart->getViewUrl()?>"><?=$upart->get('name')?></a></b></td>
 						<td><?=$raw->get('raw_text')?></td>
 					</tr>
 				<? else: ?>
 					<tr>
-						<td><b><a href="<?=$part->getViewUrl()?>"><?=$part->get('name')?></a></b></td>
-						<td><?=$part->get('description')?></td>
+						<td><b><a href="<?=$upart->getViewUrl()?>"><?=$upart->get('name')?></a></b></td>
+						<td><?=$upart->get('description')?></td>
 					</tr>
 				<? endif ?>
 			<? endforeach ?>
@@ -102,4 +102,7 @@
 	<? else: ?>
 		<b>This part is not used anywhere.</b>
 	<? endif ?>
+	
+	<h2>Embed this part list!</h2>
+	<textarea style="width: 600px; height: 50px;"><iframe src="<?=$part->getEmbedUrl()?>" width="600" height="500" frameborder="0">Visit <?=$part->getEmbedUrl()?></iframe></textarea>
 <? endif ?>
