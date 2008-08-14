@@ -103,6 +103,9 @@
 		<b>This part is not used anywhere.</b>
 	<? endif ?>
 	
-	<h2>Embed this part list!</h2>
+	<h2>Embed this part list:</h2>
 	<textarea style="width: 600px; height: 50px;"><iframe src="<?=$part->getEmbedUrl()?>" width="600" height="500" frameborder="0">Visit <?=$part->getEmbedUrl()?></iframe></textarea>
+	
+	<h2><a href="http://www.wikidot.com">Wikidot.com</a> embed:</h2>
+	<textarea style="width: 600px; height: 50px;">[[iframe src="<?=$part->getEmbedUrl()?>" width="600" height="500" frameborder="0"]]</textarea>
 <? endif ?>
