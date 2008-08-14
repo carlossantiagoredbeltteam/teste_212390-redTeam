@@ -23,6 +23,7 @@
 							<? foreach ($data AS $unique_id): ?>
 								<? $unique = $list->getUnique($unique_id); ?>
 								<?
+									$raw_id = "";
 									if (!empty($list->raw_list[$unique->id]))
 									{
 										$raw_ids = array();
