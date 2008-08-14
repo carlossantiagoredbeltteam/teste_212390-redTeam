@@ -44,6 +44,26 @@
 
 		}
 		
+		public function embed()
+		{
+			if ($this->args('id'))
+				$part = new UniquePart($this->args('id'));
+			else if ($this->args('name') && $this->args('type'))
+				$part = UniquePart::byName($this->args('name'), $this->args('type'));
+			else
+				$this->set('error', "You didn't pass in the right parameters.");
+				
+			if ($part->id)
+			{
+				$list = $part->getUniquePartList();
+				$this->set('list', $list);
+				$this->set('part', $part);
+			}
+			else
+				$this->set('error', "We could not find the part you are looking for.");
+
+		}
+		
 		public function all()
 		{
 			$sql = "

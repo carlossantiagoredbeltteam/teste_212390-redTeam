@@ -33,6 +33,11 @@
 				'UniquePart' => 'id',
 			));
 		}
+
+		public function getEmbedUrl()
+		{
+			return "http://" . SITE_HOSTNAME . "/embed/" . $this->get('type') . "/" . urlencode($this->get('name'));
+		}
 		
 		public function getViewUrl()
 		{

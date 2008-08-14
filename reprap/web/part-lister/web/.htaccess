@@ -11,6 +11,7 @@ RewriteRule ^amazon_checkout/?$		plister.php?controller=supplier&view=amazon_che
 #detail type stuff
 RewriteRule ^type/([a-zA-Z]+)$			plister.php?controller=parts&view=bytype&type=$1 [NC,L]
 RewriteRule ^part/([a-zA-z]+)/(.+)$		plister.php?controller=parts&view=uniquedetail&type=$1&name=$2 [NC,L]
+RewriteRule ^embed/([a-zA-z]+)/(.+)$	plister.php?mode=ajax&controller=parts&view=embed&type=$1&name=$2 [NC,L]
 RewriteRule ^supplier/(.+)$				plister.php?controller=parts&view=bysupplier&name=$1 [NC,L]
 
 #random stuff
