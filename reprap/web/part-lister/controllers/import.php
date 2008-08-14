@@ -28,7 +28,7 @@
 			loadSuppliers();
 			loadUniqueParts();
 			loadRawSheets();
-			
+
 			//dump our database to the file for others
 			dumpDatabaseToFile();
 			
@@ -240,7 +240,7 @@
 						$legend['main_sheet'] = $row[1];
 
 					//load up our keyed array.	
-					$legend['raw_keys'][$row[0]] = array($legend_row[0], $row[1]);
+					$legend['raw_keys'][$row[0]] = array($legend_row[0], $row[1], $row[2]);
 				}
 			}
 		}
@@ -252,10 +252,18 @@
 	{
 		$legend = loadLegend();
 		
+		var_dump($legend);
 		if (!empty($legend['raw_keys']))
 		{
 			foreach ($legend['raw_keys'] AS $name => $legend_row)
 			{
+//				ob_end_flush();
+				
+				$count++;
+				
+				//if ($count == 2)
+				//	die();
+				
 				//get our initial data.
 				$data = getRawSheetData($legend_row[0], $legend_row[1]);
 
@@ -271,6 +279,14 @@
 					$root->set('parent_id',0);
 					$root->set('part_id', $unique->id);
 					$root->save();
+					
+					//save it to our legend
+					$legend = new LegendPart();
+					$legend->set("unique_part_id", $unique->id);
+					$legend->set("status", $legend_row[2]);
+					$legend->save();
+					
+					var_dump($legend_row);
 					
 					echo "<b>Added root module " . $root->get('raw_text') . "</b><br>";
 					
@@ -317,6 +333,9 @@
 					//forget past assemblies.
 					unset($assembly);
 				}
+
+				//if ($count == 3)
+				//	die();
 			}			
 		}
 	}

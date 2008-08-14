@@ -8,11 +8,15 @@
 		
 		public function home()
 		{
-			$this->set('modules', UniquePart::getModules()->getAll());
-			
 			$raw = new RawPart(1);
 			$root = new UniquePart($raw->get('part_id'));
 			$this->set('root', $root);
+		}
+		
+		public function module_list()
+		{
+			$this->set('status', $this->args('status'));
+			$this->set('modules', LegendPart::getModules($this->args('status'))->getAll());
 		}
 		
 		public function uniqueparts()

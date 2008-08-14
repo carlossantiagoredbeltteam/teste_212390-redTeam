@@ -2,6 +2,7 @@
 DROP TABLE IF EXISTS suppliers;
 DROP TABLE IF EXISTS suppliers_to_countries;
 DROP TABLE IF EXISTS countries;
+DROP TABLE IF EXISTS legend;
 DROP TABLE IF EXISTS unique_parts;
 DROP TABLE IF EXISTS raw_parts;
 DROP TABLE IF EXISTS supplier_parts;
@@ -30,6 +31,14 @@ CREATE TABLE `countries` (
 `group` VARCHAR (255),
 INDEX ( `name` ),
 INDEX ( `group` )
+) ENGINE = MYISAM ;
+
+CREATE TABLE `legend` (
+`id` INT (11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+`unique_part_id` INT( 11 ) NOT NULL ,
+`status` ENUM('production', 'beta', 'obsolete') NOT NULL,
+INDEX ( `unique_part_id` ),
+INDEX ( `status` )
 ) ENGINE = MYISAM ;
 
 CREATE TABLE `unique_parts` (
