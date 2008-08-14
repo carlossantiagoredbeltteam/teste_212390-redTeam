@@ -15,13 +15,32 @@
 				<? if (!empty($list->type_list)): ?>
 					<table>
 						<tr>
+							<th>Id</th>
 							<th>Part</th>
 							<th>Quantity</th>
 						</tr>
 						<? foreach ($list->type_list AS $type => $data): ?>
 							<? foreach ($data AS $unique_id): ?>
 								<? $unique = $list->getUnique($unique_id); ?>
+								<?
+									if (!empty($list->raw_list[$unique->id]))
+									{
+										$raw_ids = array();
+										foreach ($list->raw_list[$unique->id] AS $raw)
+										{
+											$temp = explode(",", $raw->get("raw_id"));
+											if (!empty($temp))
+											{
+												foreach ($temp AS $key => $tval)
+													$temp[$key] = trim($tval);
+											}
+											$raw_ids[] = implode(", ", $temp);
+										}
+										$raw_id = implode(", ", $raw_ids);
+									}
+								?>
 								<tr>
+									<td><?=$raw_id?></td>
 									<td><a href="http://<?=SITE_HOSTNAME?><?=$unique->getViewUrl()?>" target="_blank"><?=$unique->get('name')?></a></td>
 									<td align="center"><?=$list->getUniqueQuantity($unique->id)?> <?=$unique->get('units')?></td>
 								</tr>

@@ -56,6 +56,7 @@ CREATE TABLE `raw_parts` (
 `id` INT (11) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 `part_id` INT( 11 ) NOT NULL ,
 `type` VARCHAR( 32 ) NOT NULL ,
+`raw_id` VARCHAR( 255 ) NOT NULL ,
 `raw_text` VARCHAR( 255 ) NOT NULL ,
 `quantity` INT( 11 ) NOT NULL ,
 `parent_id` INT( 11 ) NOT NULL ,
