@@ -592,14 +592,24 @@ public abstract class GenericExtruder implements Extruder
      */
     public double getExtrusionInfillWidth()
     {
-//    	if(z < lowerFineThickness)
-//    		return extrusionInfillWidth;
-//    	if(z > zMax - upperFineThickness)
-//    		return extrusionInfillWidth;
-//    	if(extrusionBroadWidth < 0)
     		return extrusionInfillWidth;
-//    	return extrusionBroadWidth;
     } 
+    
+    public double getExtrusionBroadWidth()
+    {
+    		return extrusionBroadWidth;
+    } 
+    
+	public double getLowerFineThickness()
+	{
+		return lowerFineThickness;
+	}
+	
+	public double getUpperFineThickness()
+	{
+		return upperFineThickness;
+	}
+    
   
     /* (non-Javadoc)
      * @see org.reprap.Extruder#getCoolingPeriod()

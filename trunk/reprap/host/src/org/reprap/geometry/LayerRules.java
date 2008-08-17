@@ -155,8 +155,8 @@ public class LayerRules
 		if(getMachineLayer() < getFoundationLayers())
 		{
 			if(getFoundationLayers() - getMachineLayer() == 2)
-				return oddHatchDirection;
-			return evenHatchDirection;
+				return evenHatchDirection;
+			return oddHatchDirection;
 		}
 		
 		if(getModelLayer()%2 == 0)
@@ -181,11 +181,20 @@ public class LayerRules
 	 */
 	public double getHatchWidth(Extruder e)
 	{
-		if(getMachineLayer() < getFoundationLayers() - 1)
+		if(getMachineLayer() < getFoundationLayers())
 		{
 			if(getFoundationLayers() - getMachineLayer() == 2)
 				return e.getExtrusionFoundationWidth()*0.5;
+			else if(getMachineLayer() == getFoundationLayers()-1)
+				return e.getExtrusionFoundationWidth()*1.5;
+			
 			return e.getExtrusionFoundationWidth();
+		}
+		
+		if(e.getExtrusionBroadWidth() > 0)
+		{
+			if(modelZ >= e.getLowerFineThickness() && modelZ <= modelZMax - e.getUpperFineThickness())
+				return e.getExtrusionBroadWidth();
 		}
 		
 		return e.getExtrusionInfillWidth();

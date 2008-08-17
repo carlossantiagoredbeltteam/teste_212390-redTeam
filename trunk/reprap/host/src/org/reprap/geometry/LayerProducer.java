@@ -518,7 +518,7 @@ public class LayerProducer {
 		printer.setFeedrate(printer.getFastFeedrateXY());
 		move(p.point(0), p.point(1), true, false);
 
-		printer.getExtruder().setMotor(true);
+		//printer.getExtruder().setMotor(true);
 		plot(p.point(0), p.point(1), false, false);
 		
 		// Print any lead-in.
@@ -599,6 +599,7 @@ public class LayerProducer {
 			if (layerConditions.getPrinter().isCancelled())
 				return i;
 			plot(polygons.polygon(i), outline, firstOneInLayer);
+			firstOneInLayer = false;
 			i++;
 		}
 		return i;
@@ -696,7 +697,8 @@ public class LayerProducer {
 			{
 				if (printer.isCancelled())
 					break;
-				plot(borderPolygons.polygon(jb), true, firstOneInLayer);			
+				plot(borderPolygons.polygon(jb), true, firstOneInLayer);
+				firstOneInLayer = false;
 			}
 		}
 
@@ -707,6 +709,7 @@ public class LayerProducer {
 				if (printer.isCancelled())
 					break;
 				plot(hatchedPolygons.polygon(jh), false, firstOneInLayer);
+				firstOneInLayer = false;
 			}
 		}
 		printer.setLowerShell(lowerShell);
