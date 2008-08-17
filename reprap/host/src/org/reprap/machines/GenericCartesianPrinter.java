@@ -453,6 +453,8 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 	
 	public void delay(long millis)
 	{
+		if(millis <= 0)
+			return;
 		try {
 			Thread.sleep(millis);
 		} catch (Exception e) {}

@@ -383,6 +383,16 @@ public interface Extruder
 	public double getExtrusionInfillWidth();
 	
 	/**
+	 * 
+	 * @return
+	 */
+	public double getExtrusionBroadWidth();
+	
+	
+	public double getLowerFineThickness();
+	public double getUpperFineThickness();
+	
+	/**
 	 * At the support layer before a layer is to be separated, how far up
 	 * the normal Z movement do we go to make a bigger gap to form a weak join?
 	 * @return

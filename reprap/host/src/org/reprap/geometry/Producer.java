@@ -231,6 +231,7 @@ public class Producer {
 			// Take it slow and easy.
 			Debug.d("Printing warmup segments, printing to (1,60)");
 			reprap.moveTo(1, 25, 0, false, false);
+			reprap.getExtruder().setValve(true);
 			reprap.setFeedrate(reprap.getExtruder().getOutlineFeedrate());
 			//reprap.setSpeed(LinePrinter.speedFix(reprap.getExtruder().getXYSpeed(), 
 			//		reprap.getExtruder().getOutlineSpeed(layerRules)));
@@ -289,7 +290,12 @@ public class Producer {
 			waitWhilePaused();
 			
 			if(layerRules.recomputeLayer())
+			{
+				layer.destroy();
+				slice.destroy();
+				slice = stlc.slice(layerRules.getModelZ() + layerRules.getStep()*0.5);
 				layer = new LayerProducer(slice, stlc.getBelow(), layerRules);
+			}
 			
 			layer.plot();
 
