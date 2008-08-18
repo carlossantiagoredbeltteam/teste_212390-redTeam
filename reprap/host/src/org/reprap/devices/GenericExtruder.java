@@ -75,12 +75,12 @@ public abstract class GenericExtruder implements Extruder
 	/**
 	 * below this infill finely
 	 */
-	protected double lowerFineThickness;
+	protected int lowerFineLayers;
 	
 	/**
 	 * Above this infill finely
 	 */
-	protected double upperFineThickness;
+	protected int upperFineLayers;
 	
 	/**
 	 * Use this for broad infill in the middle; if negative, always
@@ -323,8 +323,8 @@ public abstract class GenericExtruder implements Extruder
 			extrusionSize = Preferences.loadGlobalDouble(prefName + "ExtrusionSize(mm)");
 			extrusionHeight = Preferences.loadGlobalDouble(prefName + "ExtrusionHeight(mm)");
 			extrusionInfillWidth = Preferences.loadGlobalDouble(prefName + "ExtrusionInfillWidth(mm)");
-			lowerFineThickness = Preferences.loadGlobalDouble(prefName + "LowerFineThickness(mm)");
-			upperFineThickness = Preferences.loadGlobalDouble(prefName + "UpperFineThickness(mm)");
+			lowerFineLayers = Preferences.loadGlobalInt(prefName + "LowerFineLayers(0...)");
+			upperFineLayers = Preferences.loadGlobalInt(prefName + "UpperFineLayers(0...)");
 			extrusionBroadWidth = Preferences.loadGlobalDouble(prefName + "ExtrusionBroadWidth(mm)");		
 			coolingPeriod = Preferences.loadGlobalInt(prefName + "CoolingPeriod(s)");
 			xyFeedrate = Preferences.loadGlobalDouble(prefName + "XYFeedrate(mm/minute)");
@@ -600,14 +600,14 @@ public abstract class GenericExtruder implements Extruder
     		return extrusionBroadWidth;
     } 
     
-	public double getLowerFineThickness()
+	public int getLowerFineLayers()
 	{
-		return lowerFineThickness;
+		return lowerFineLayers;
 	}
 	
-	public double getUpperFineThickness()
+	public int getUpperFineLayers()
 	{
-		return upperFineThickness;
+		return upperFineLayers;
 	}
     
   
