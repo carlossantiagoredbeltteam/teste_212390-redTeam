@@ -389,8 +389,8 @@ public interface Extruder
 	public double getExtrusionBroadWidth();
 	
 	
-	public double getLowerFineThickness();
-	public double getUpperFineThickness();
+	public int getLowerFineLayers();
+	public int getUpperFineLayers();
 	
 	/**
 	 * At the support layer before a layer is to be separated, how far up

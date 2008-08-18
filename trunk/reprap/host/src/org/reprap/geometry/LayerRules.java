@@ -186,14 +186,14 @@ public class LayerRules
 			if(getFoundationLayers() - getMachineLayer() == 2)
 				return e.getExtrusionFoundationWidth()*0.5;
 			else if(getMachineLayer() == getFoundationLayers()-1)
-				return e.getExtrusionFoundationWidth()*1.5;
+				return e.getExtrusionFoundationWidth();
 			
 			return e.getExtrusionFoundationWidth();
 		}
 		
 		if(e.getExtrusionBroadWidth() > 0)
 		{
-			if(modelZ >= e.getLowerFineThickness() && modelZ <= modelZMax - e.getUpperFineThickness())
+			if(modelLayer+1 > e.getLowerFineLayers() && modelLayer+1 <= modelLayerMax - e.getUpperFineLayers())
 				return e.getExtrusionBroadWidth();
 		}
 		

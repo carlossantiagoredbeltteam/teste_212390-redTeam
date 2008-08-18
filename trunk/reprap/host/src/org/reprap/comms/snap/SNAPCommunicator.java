@@ -28,12 +28,12 @@ public class SNAPCommunicator implements Communicator {
 	 * Timeout in milliseconds before a timeout exception is thrown
 	 * when waiting for an ACK from a device
 	 */
-	private final static int ackTimeout = 800; // Seems long, but the Arduino likes it...
+	private final static int ackTimeout = 1000; // Seems long, but the Arduino likes it...
 	
 	/**
 	 * 
 	 */
-	private final static int messageTimeout = 300;
+	private final static int messageTimeout = 800;  // Ditto...
     
 	/**
 	 * 
@@ -155,22 +155,22 @@ public class SNAPCommunicator implements Communicator {
 		for(;;) 
 		{
 			Debug.c("tx " +	dumpPacket(device, messageToSend));
-			
+
 			sendRawMessage(packet);
 
-			SNAPPacket ackPacket;
-
-			ackPacket = null;
+			SNAPPacket ackPacket = null;
+			
 			try {
 				ackPacket = receivePacket(ackTimeout);	
-			} catch (IOException ex) {
-					tryCount++;
-					Debug.d("Receive error, re-sending: " + ex.getMessage() + "; try: " + tryCount + "; " + 
-							dumpPacket(device, messageToSend));
-					if(tryCount < 16)
-						continue;
-					else
-						ackPacket = null;
+			} catch (IOException ex) 
+			{
+				tryCount++;
+				Debug.d("Receive error, re-sending: " + ex.getMessage() + "; try: " + tryCount + "; " + 
+						dumpPacket(device, messageToSend));
+				if(tryCount < 16)
+					continue;
+				else
+					ackPacket = null;
 			}
 			if(ackPacket == null)
 				throw new IOException("Resend count exceeded.");
@@ -184,7 +184,7 @@ public class SNAPCommunicator implements Communicator {
 			if (!ackPacket.isNak()) {
 				System.err.println("Received data packet when expecting ACK");
 			}
-			
+
 			// All gone wrong - wait a bit and try again - ***AB
 			System.err.println("sendMessage error - retrying");
 			try
@@ -192,6 +192,7 @@ public class SNAPCommunicator implements Communicator {
 				Thread.sleep(100);
 			} catch (Exception e)
 			{
+				System.err.println("sendMessage error" + e.toString());
 			}
 		}
 		
