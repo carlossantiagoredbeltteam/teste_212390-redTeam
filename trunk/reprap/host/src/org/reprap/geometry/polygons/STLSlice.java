@@ -60,6 +60,7 @@ import com.sun.j3d.utils.geometry.GeometryInfo;
 import com.sun.j3d.utils.geometry.NormalGenerator;
 import org.reprap.gui.STLObject;
 import org.reprap.Attributes;
+import org.reprap.Extruder;
 import org.reprap.Preferences;
 import org.reprap.devices.GenericExtruder;
 import org.reprap.utilities.*;
@@ -1306,7 +1307,7 @@ public class STLSlice
 	 * @param z
 	 * @return a CSG representation of all the polygons in the slice
 	 */
-	public RrCSGPolygonList slice(double z)
+	public RrCSGPolygonList slice(double z, Extruder es[])
 	{
 		RrCSGPolygonList rl = new RrCSGPolygonList();
 
@@ -1374,6 +1375,10 @@ public class STLSlice
 				// Remove wrinkles
 
 				pgl = pgl.simplify(Preferences.gridRes()*1.5);
+				
+				// Fix small radii
+				
+				pgl = pgl.arcCompensate(es);
 				
 				//RrGraphics g = new RrGraphics(pgl, false);
 

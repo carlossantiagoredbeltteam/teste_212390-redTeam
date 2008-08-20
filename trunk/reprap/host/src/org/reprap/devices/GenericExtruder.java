@@ -292,6 +292,9 @@ public abstract class GenericExtruder implements Extruder
 	private double extrusionLastFoundationWidth;
 	private double separationFraction;
 	
+	private double arcCompensationFactor;
+	private double arcShortSides;
+	
 	/**
 	* Our printer object.
 	*/
@@ -364,6 +367,9 @@ public abstract class GenericExtruder implements Extruder
 			extrusionFoundationWidth = Preferences.loadGlobalDouble(prefName + "ExtrusionFoundationWidth(mm)");
 			extrusionLastFoundationWidth = Preferences.loadGlobalDouble(prefName + "ExtrusionLastFoundationWidth(mm)");
 			separationFraction = Preferences.loadGlobalDouble(prefName + "SeparationFraction(0..1)");
+			arcCompensationFactor = Preferences.loadGlobalDouble(prefName + "ArcCompensationFactor(0..)");
+			arcShortSides = Preferences.loadGlobalDouble(prefName + "ArcShortSides(0..)");			
+			
 			Color3f col = new Color3f((float)Preferences.loadGlobalDouble(prefName + "ColourR(0..1)"), 
 					(float)Preferences.loadGlobalDouble(prefName + "ColourG(0..1)"), 
 					(float)Preferences.loadGlobalDouble(prefName + "ColourB(0..1)"));
@@ -651,13 +657,23 @@ public abstract class GenericExtruder implements Extruder
     	return materialColour;
     }  
     
-    /**
-     * @return the name of the material
-     */
-    public String toString()
-    {
-    	return material;
-    }
+//    /**
+//     * @return the name of the material
+//     * TODO: should this give more information?
+//     */
+//    public String toString()
+//    {
+//    	return material;
+//    }
+    
+	/**
+	 * What stuff are we working with?
+	 * @return
+	 */
+	public String getMaterial()
+	{
+		return material;
+	}
     
     /**
      * @return determine whether nozzle wipe method is enabled or not 
@@ -925,6 +941,26 @@ public abstract class GenericExtruder implements Extruder
 	public double getSeparationFraction()
 	{
 		return separationFraction;
+	}
+	
+	/**
+	 * The arc compensation factor.  
+	 * See org.reprap.geometry.polygons.RrPolygon.arcCompensate(...)
+	 * @return
+	 */
+	public double getArcCompensationFactor()
+	{
+		return arcCompensationFactor;
+	}
+	
+	/**
+	 * The arc short sides.  
+	 * See org.reprap.geometry.polygons.RrPolygon.arcCompensate(...)
+	 * @return
+	 */
+	public double getArcShortSides()
+	{
+		return arcShortSides;
 	}
     
 }

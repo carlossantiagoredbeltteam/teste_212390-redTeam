@@ -73,6 +73,7 @@ import java.util.*;
 import org.reprap.geometry.*;
 import org.reprap.Attributes;
 import org.reprap.Preferences;
+import org.reprap.Extruder;
 
 /**
  * The main boundary-representation polygon class
@@ -154,7 +155,6 @@ public class RrPolygon
 		if(a == null)
 			System.err.println("RrPolygon(): null attributes!");
 		points = new ArrayList<Rr2Point>();
-		//flags = null;
 		att = a;
 		box = new RrBox();
 	}
@@ -168,17 +168,7 @@ public class RrPolygon
 	{
 		return new Rr2Point(points.get(i));
 	}
-	
-	/**
-	 * @param i
-	 * @return i-th flag
-	 */
-//	private int flag(int i)
-//	{
-//		if(flags == null)
-//			System.err.println("RrPolygon.flag(i): flags not initialized.");
-//		return ((Integer)flags.get(i)).intValue();
-//	}
+
 	
 	/**
 	 * As a string
@@ -195,19 +185,7 @@ public class RrPolygon
 		
 		return result;
 	}
-	
-	/**
-	 * Change a flag value
-	 * @param i
-	 * @param f
-	 */
-//	private void flag(int i, int f)
-//	{
-//		if(flags == null)
-//			System.err.println("RrPolygon.flag(i): flags not initialized.");
-//		flags.set(i, new Integer(f));
-//	}
-	
+		
 	/**
 	 * Length
 	 * @return number of points in polygon
@@ -251,7 +229,7 @@ public class RrPolygon
 	public RrBox getBox() { return box; }
 	
 	/**
-	 * Put a new polygon and its flag values on the end
+	 * Put a new polygon on the end
 	 * (N.B. Attributes of the new polygon are ignored)
 	 * @param p
 	 */
@@ -262,7 +240,6 @@ public class RrPolygon
 		for(int i = 0; i < p.size(); i++)
 		{
 			points.add(new Rr2Point(p.point(i)));
-			//flags.add(new Integer(p.flag(i))); 
 		}
 		box.expand(p.box);
 	}
@@ -275,8 +252,6 @@ public class RrPolygon
 	public void remove(int i)
 	{
 		points.remove(i);
-//		if(flags != null)
-//			flags.remove(i);
 	}
 	
 	/**
@@ -297,14 +272,15 @@ public class RrPolygon
 	 * Output the polygon in SVG XML format
 	 * @param opf
 	 */
-	public void svg(PrintStream opf)
+	public String svg()
 	{
-		opf.println("<polygon points=\"");
+		String result = "<polygon points=\"";
 		int leng = size();
 		for(int i = 0; i < leng; i++)
-			opf.println(Double.toString((point(i)).x()) + "," 
-					+ Double.toString((point(i)).y()));
-		opf.println("\" />");
+			result += Double.toString((point(i)).x()) + "," 
+					+ Double.toString((point(i)).y());
+		result +="\" />";
+		return result;
 	}
 		
 	/**
@@ -317,11 +293,7 @@ public class RrPolygon
 		int f;
 		for(int i = size() - 1; i >= 0; i--)
 		{
-//			if(i > 0)
-//				f = flag(i-1);
-//			else
-//				f = flag(size() - 1);
-			result.add(point(i)); //, f);
+			result.add(point(i)); 
 		}
 		return result;
 	}
@@ -335,7 +307,7 @@ public class RrPolygon
 		int i = rangen.nextInt(size());
 		for(int j = 0; j < size(); j++)
 		{
-			result.add(new Rr2Point(point(i))); //, new Integer((flag(i))));
+			result.add(new Rr2Point(point(i))); 
 			i++;
 			if(i >= size())
 				i = 0;
@@ -352,7 +324,7 @@ public class RrPolygon
 		int i = lc.getModelLayer() % size();
 		for(int j = 0; j < size(); j++)
 		{
-			result.add(new Rr2Point(point(i))); //, new Integer((flag(i))));
+			result.add(new Rr2Point(point(i))); 
 			i++;
 			if(i >= size())
 				i = 0;
@@ -410,11 +382,9 @@ public class RrPolygon
 				if(j < size())
 				{
 					points.add(j, p);
-					//flags.add(j, flags.get(i));
 				} else
 				{
-					points.add(p);
-					//flags.add(flags.get(i));					
+					points.add(p);				
 				}
 				return(j);
 			}
@@ -518,6 +488,78 @@ public class RrPolygon
 //		
 //		return new RrPolygon(att);
 //	}
+	
+	// ****************************************************************************
+	
+	/**
+	 * Offset (some of) the points in the polygon to allow for the fact that extruded
+	 * circles otherwise don't come out right.  See http://reprap.org/bin/view/Main/ArcCompensation.
+	 * If the extruder for the polygon's arc compensation factor is 0, return the polygon unmodified.
+	 * 
+	 * @param es
+	 */
+	public RrPolygon arcCompensate(Extruder[] es)
+	{
+		Extruder e = att.getExtruder(es);
+		
+		// Multiply the geometrically correct result by factor
+		
+		double factor = e.getArcCompensationFactor();
+		if(factor < Preferences.tiny())
+			return this;
+		
+		// The points making the arc must be closer than this together
+		
+		double shortSides = e.getArcShortSides();
+		
+		double thickness = e.getExtrusionSize();
+		
+		RrPolygon result = new RrPolygon(att);
+		
+		Rr2Point previous = point(size() - 1);
+		Rr2Point current = point(0);
+		Rr2Point next;
+		Rr2Point offsetPoint;
+		
+		double d1 = Rr2Point.dSquared(current, previous);
+		double d2;
+		double short2 = shortSides*shortSides;
+		double t2 = thickness*thickness;
+		double offset;
+		
+		for(int i = 0; i < size(); i++)
+		{
+			if(i == size() - 1)
+				next = point(0);
+			else
+				next = point(i + 1);
+			
+			d2 = Rr2Point.dSquared(next, current);
+			if(d1 < short2 && d2 < short2)
+			{
+				try
+				{
+					RrCircle c = new RrCircle(previous, current, next);
+					offset = factor*(Math.sqrt(t2 + 4*c.radiusSquared())*0.5 - Math.sqrt(c.radiusSquared()));
+					//System.out.println("Circle r: " + Math.sqrt(c.radiusSquared()) + " offset: " + offset);
+					offsetPoint = Rr2Point.sub(current, c.centre());
+					offsetPoint = Rr2Point.add(current, Rr2Point.mul(offsetPoint.norm(), offset));
+					result.add(offsetPoint);
+				} catch (Exception ex)
+				{
+					result.add(current);
+				}
+			} else
+				result.add(current);
+			
+			d1 = d2;
+			previous = current;
+			current = next;
+		}
+		
+		
+		return result;
+	}
 	
 	// ****************************************************************************
 	
@@ -785,29 +827,14 @@ public class RrPolygon
 		return points;
 	}
 	
-// 	private void flagSet(int f, List a)
-// 	{
-// 	 		for(int i = 0; i < a.size(); i++)
-//  			flag(((Integer)a.get(i)).intValue(), f);
-//  	}
-	
 	/**
 	 * Set all the flag values in a list the same
 	 * @param f
 	 */
 	private void flagSet(int f, List<Integer> a, int[] flags)
 	{
-//		if(flags == null)
-//		{
-//			flags = new int[size()];
-//			for(int i = 0; i < a.size(); i++)
-//				flags[((Integer)a.get(i)).intValue()] = f;
-//		} else
-//		{
 			for(int i = 0; i < a.size(); i++)
 				flags[(a.get(i)).intValue()] = f;
-//		}
-
 	}	
 	
 	/**
