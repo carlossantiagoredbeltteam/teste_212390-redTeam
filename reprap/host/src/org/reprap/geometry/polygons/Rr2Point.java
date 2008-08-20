@@ -215,7 +215,7 @@ public class Rr2Point
 	 * Inner product
 	 * @param a
 	 * @param b
-	 * @return The point Rr2Point scaled by a factor of point b (?)
+	 * @return The scalar product of the points
 	 */
 	public static double mul(Rr2Point a, Rr2Point b)
 	{

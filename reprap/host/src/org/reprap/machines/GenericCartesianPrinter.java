@@ -312,7 +312,7 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 	public void selectExtruder(Attributes att) {
 		for(int i = 0; i < extruderCount; i++)
 		{
-			if(att.getMaterial().equals(extruders[i].toString()))
+			if(att.getMaterial().equals(extruders[i].getMaterial()))
 			{
 				selectExtruder(i);
 				return;
@@ -540,25 +540,28 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#printTo(double, double, double)
 	 */
-	public void printTo(double x, double y, double z, boolean turnOff) throws ReprapException, IOException
-	{		
-		if (previewer != null)
-			previewer.addSegment(currentX, currentY, currentZ, x, y, z);
-		
-		if (isCancelled())
-			return;
-
-		double distance = segmentLength(x - currentX, y - currentY);
-		if (z != currentZ)
-			distance += Math.abs(currentZ - z);
-			
-		totalDistanceExtruded += distance;
-		totalDistanceMoved += distance;
-		
-		currentX = x;
-		currentY = y;
-		currentZ = z;
-	}
+//	public void printTo(double x, double y, double z, boolean turnOff) throws ReprapException, IOException
+//	{		
+//		System.err.println("printing");
+//		if (previewer != null)
+//			previewer.addSegment(currentX, currentY, currentZ, x, y, z);
+//		else
+//			System.err.println("previewer null!");
+//		
+//		if (isCancelled())
+//			return;
+//
+//		double distance = segmentLength(x - currentX, y - currentY);
+//		if (z != currentZ)
+//			distance += Math.abs(currentZ - z);
+//			
+//		totalDistanceExtruded += distance;
+//		totalDistanceMoved += distance;
+//		
+//		currentX = x;
+//		currentY = y;
+//		currentZ = z;
+//	}
 	
 	/**
 	 * Occasionally re-zero X and Y if that option is selected (i.e. xYReZeroInterval > 0)

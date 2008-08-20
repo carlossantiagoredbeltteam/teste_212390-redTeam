@@ -56,11 +56,12 @@
 
 package org.reprap.geometry.polygons;
 
-import java.io.*;
+//import java.io.*;
 import java.util.*;
 
-import org.reprap.Attributes;
-import org.reprap.Preferences;
+//import org.reprap.Attributes;
+//import org.reprap.Preferences;
+import org.reprap.Extruder;
 
 /**
  * chPair - small class to hold double pointers for convex hull calculations.
@@ -526,9 +527,6 @@ public class RrPolygonList
 	private void negate(int i)
 	{
 		RrPolygon p = polygon(i).negate();
-		//int fl = p.flag(0);
-		//p.flag(0, p.flag(p.size() - 1));
-		//p.flag(p.size() - 1, fl);
 		polygons.set(i, p);
 	}
 	
@@ -547,29 +545,30 @@ public class RrPolygonList
 	}
 	
 	/**
-	 * Write as an SVG xml to file opf
+	 * Turn into SVG xml
 	 * @param opf
 	 */
-	public void svg(PrintStream opf)
+	public String svg()
 	{
-		opf.println("<?xml version=\"1.0\" standalone=\"no\"?>");
-		opf.println("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\"");
-		opf.println("\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">");
-		opf.println("<svg");
-		opf.println(" width=\"" + Double.toString(box.x().length()) + "mm\"");
-		opf.println(" height=\""  + Double.toString(box.y().length()) +  "mm\"");
-		opf.print(" viewBox=\"" + Double.toString(box.x().low()));
-		opf.print(" " + Double.toString(box.y().low()));
-		opf.print(" " + Double.toString(box.x().high()));
-		opf.println(" " + Double.toString(box.y().high()) + "\"");
-		opf.println(" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">");
-		opf.println(" <desc>RepRap polygon list - http://reprap.org</desc>");
+		String result = "<?xml version=\"1.0\" standalone=\"no\"?>" +
+		"<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\"" +
+		"\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">" +
+		"<svg" +
+		" width=\"" + Double.toString(box.x().length()) + "mm\"" +
+		" height=\""  + Double.toString(box.y().length()) +  "mm\"" +
+		" viewBox=\"" + Double.toString(box.x().low()) +
+		" " + Double.toString(box.y().low()) +
+		" " + Double.toString(box.x().high()) +
+		" " + Double.toString(box.y().high()) + "\"" +
+		" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">" +
+		" <desc>RepRap polygon list - http://reprap.org</desc>";
 		
 		int leng = size();
 		for(int i = 0; i < leng; i++)
-			polygon(i).svg(opf);
+			result += polygon(i).svg();
 		
-		opf.println("</svg>");
+		result += "</svg>";
+		return result;
 	}
 	
 	/**
@@ -703,6 +702,25 @@ public class RrPolygonList
 	}
 	
 	/**
+	 * Offset (some of) the points in the polygons to allow for the fact that extruded
+	 * circles otherwise don't come out right.  See http://reprap.org/bin/view/Main/ArcCompensation.
+	 *
+	 * @param es
+	 */	
+	public RrPolygonList arcCompensate(Extruder[] es)
+	{
+		RrPolygonList r = new RrPolygonList();
+		
+		for(int i = 0; i < size(); i++)
+		{
+			RrPolygon p = polygon(i);
+			r.add(p.arcCompensate(es));
+		}
+		
+		return r;		
+	}
+	
+	/**
 	 * Remove edges that are shorter than tiny from the
 	 *   polygons in the list if those edges are preceeded 
 	 *   by gap material.  
@@ -743,51 +761,7 @@ public class RrPolygonList
 			System.err.println("RrPolygonList:inside() - i is both inside and outside j!");
 		return a;
 	}
-	
-//	/**
-//	 * Set every instance of m in the lists null, and replace m's
-//	 * own list with null
-//	 * @param m
-//	 * @param contains
-//	 */
-//	private void getRidOf(int m, List<ArrayList> contains)
-//	{
-//		for(int i = 0; i < size(); i++)
-//		{
-//			if(i == m)
-//				contains.set(i, null);
-//			else
-//			{
-//				if(contains.get(i) != null)
-//				{
-//					List<Integer> contain = contains.get(i);
-//					for(int j = 0; j < contain.size(); j++)
-//					{
-//						if(contain.get(j) != null)
-//						{
-//							if((contain.get(j)).intValue() == m)
-//								contain.set(j, null);
-//						}
-//					}
-//				}
-//			}
-//		}		
-//	}
-	
-//	/**
-//	 * Count the non-null entries in a list.
-//	 * @param a list with entries to be checked
-//	 * @return number non-null entries in list a
-//	 */
-//	private int activeCount(List a)
-//	{
-//		int count = 0;
-//		for(int i = 0; i < a.size(); i++)
-//			if(a.get(i) != null)
-//				count++;
-//		return count;
-//	}
-	
+		
 	/**
 	 * Take a list of CSG expressions, each one corresponding with the entry of the same 
 	 * index in this class, classify each as being inside other(s)
@@ -885,5 +859,5 @@ public class RrPolygonList
 		
 		return polygons;
 	}
-	
+		
 }

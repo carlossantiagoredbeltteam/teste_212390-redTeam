@@ -143,6 +143,8 @@ public class LayerProducer {
 	 */
 	private Rr2Point startNearHere = null;
 	
+	private boolean shellSet = false;
+	
 	/**
 	 * Flag to prevent cyclic graphs going round forever
 	 */
@@ -226,6 +228,7 @@ public class LayerProducer {
 		layerConditions = lc;
 		startNearHere = null;
 		lowerShell = ls;
+		shellSet = false;
 		
 		csgP = csgPols;
 		
@@ -712,7 +715,11 @@ public class LayerProducer {
 				firstOneInLayer = false;
 			}
 		}
-		printer.setLowerShell(lowerShell);
+		if(!shellSet)
+		{
+			printer.setLowerShell(lowerShell);
+			shellSet = true;
+		}
 	}		
 	
 }

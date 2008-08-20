@@ -44,7 +44,25 @@ public class NullCartesianMachine extends GenericCartesianPrinter {
 	public void finishedLayer(int layerNumber) throws Exception {}
 	public void betweenLayers(int layerNumber) throws Exception{}
 	public void startingLayer(int layerNumber) throws Exception {}
-	public void printTo(double x, double y, double z, boolean stopExtruder, boolean closeValve) {}
+
+	public void printTo(double x, double y, double z, boolean stopExtruder, boolean closeValve) 
+	{
+		if (previewer != null)
+			previewer.addSegment(currentX, currentY, currentZ, x, y, z);
+		if (isCancelled())
+			return;
+
+		double distance = segmentLength(x - currentX, y - currentY);
+		if (z != currentZ)
+			distance += Math.abs(currentZ - z);
+
+		totalDistanceExtruded += distance;
+		totalDistanceMoved += distance;
+		currentX = x;
+		currentY = y;
+		currentZ = z;
+	}
+	
 	public void delay(long millis) {}
 	
 	//TODO: make this work normally.

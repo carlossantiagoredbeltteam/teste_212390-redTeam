@@ -187,11 +187,6 @@ public interface Extruder
     public double getExtrusionHeight();
 
     /**
-     * @return the extrusion infill width in millimeters
-     */
-    //public double getExtrusionInfillWidth(double z, double zMax);
-
-    /**
      * @return the cooling period in seconds
      */
     public int getCoolingPeriod();
@@ -219,7 +214,7 @@ public interface Extruder
     /**
      * @return the material name
      */
-    public String toString();
+    //public String toString();
     
     /**
      * @return whether nozzle wipe method is enabled or not 
@@ -405,14 +400,24 @@ public interface Extruder
 	 */
 	public void waitTillNotBusy() throws IOException;
     
-    /**
-     * Deal with waht needs to be done between layers
-     * @param layerNumber
-     * @param printer
-     * @throws Exception
-     */
-
-	//public void finishedLayer(int layerNumber, Printer printer) throws Exception;
-	//public void betweenLayers(int layerNumber, Printer printer) throws Exception;
-	//public void startingLayer(int layerNumber, Printer printer) throws Exception;
+	/**
+	 * The arc compensation factor.  
+	 * See org.reprap.geometry.polygons.RrPolygon.arcCompensate(...)
+	 * @return
+	 */
+	public double getArcCompensationFactor();
+	
+	/**
+	 * The arc short sides.  
+	 * See org.reprap.geometry.polygons.RrPolygon.arcCompensate(...)
+	 * @return
+	 */
+	public double getArcShortSides();
+	
+	/**
+	 * What stuff are we working with?
+	 * @return
+	 */
+	public String getMaterial();
+	
 }

@@ -204,7 +204,8 @@ public class Producer {
 		{
 			Debug.d("Building foundation.");
 
-			slice = stlc.slice(layerRules.getModelZ() + layerRules.getStep()*0.5);
+			slice = stlc.slice(layerRules.getModelZ() + layerRules.getStep()*0.5,
+					reprap.getExtruders());
 			if(slice.size() <= 0)
 				return;
 			layer = new LayerProducer(slice, stlc.getBelow(), layerRules);
@@ -293,7 +294,8 @@ public class Producer {
 			{
 				layer.destroy();
 				slice.destroy();
-				slice = stlc.slice(layerRules.getModelZ() + layerRules.getStep()*0.5);
+				slice = stlc.slice(layerRules.getModelZ() + layerRules.getStep()*0.5,
+						reprap.getExtruders());
 				layer = new LayerProducer(slice, stlc.getBelow(), layerRules);
 			}
 			
@@ -346,7 +348,8 @@ public class Producer {
 				reprap.betweenLayers(layerRules);
 			}
 			
-			RrCSGPolygonList slice = stlc.slice(layerRules.getModelZ() + layerRules.getStep()*0.5); 
+			RrCSGPolygonList slice = stlc.slice(layerRules.getModelZ() + layerRules.getStep()*0.5,
+					reprap.getExtruders()); 
 			
 			layer = null;
 			if(slice.size() > 0)
