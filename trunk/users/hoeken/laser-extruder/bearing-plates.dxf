@@ -257,6 +257,12 @@ $CELTYPE
   6
 ByLayer
   9
+$GRIDUNIT
+ 10
+0.0
+ 20
+0.0
+  9
 $MENU
   1
 .
@@ -268,12 +274,6 @@ $ANGDIR
 $DIMALTTD
  70
 2
-  9
-$GRIDUNIT
- 10
-0.0
- 20
-0.0
   9
 $TREEDEPTH
  70
@@ -789,7 +789,7 @@ $PSVPSCALE
   9
 $CLAYER
   8
-Notes
+Bottom Text
   9
 $DIMSHO
  70
@@ -861,7 +861,7 @@ $ENDCAPS
   9
 $CLAYER
   8
-Notes
+Middle Text
   0
 ENDSEC
   0
@@ -1713,7 +1713,7 @@ LAYER
 100
 AcDbSymbolTable
  70
-4
+8
   0
 LAYER
   5
@@ -1743,7 +1743,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-Bottom Layer
+Bottom Plate
  70
 0
  62
@@ -1763,7 +1763,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-Middle Layer
+Top Plate
  70
 0
  62
@@ -1788,6 +1788,86 @@ Notes
 0
  62
 7
+  6
+CONTINUOUS
+370
+0
+390
+F
+  0
+LAYER
+  5
+46
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
+Top Text
+ 70
+0
+ 62
+4
+  6
+CONTINUOUS
+370
+0
+390
+F
+  0
+LAYER
+  5
+47
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
+Bottom Text
+ 70
+0
+ 62
+4
+  6
+CONTINUOUS
+370
+0
+390
+F
+  0
+LAYER
+  5
+48
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
+Middle Layer
+ 70
+0
+ 62
+7
+  6
+CONTINUOUS
+370
+0
+390
+F
+  0
+LAYER
+  5
+49
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
+Middle Text
+ 70
+0
+ 62
+4
   6
 CONTINUOUS
 370
@@ -2121,13 +2201,13 @@ ENTITIES
   0
 ELLIPSE
   5
-46
+4A
 100
 AcDbEntity
 100
 AcDbEllipse
   8
-Middle Layer
+Top Plate
  62
 256
 370
@@ -2155,13 +2235,13 @@ ByLayer
   0
 CIRCLE
   5
-47
+4B
 100
 AcDbEntity
 100
 AcDbCircle
   8
-Middle Layer
+Top Plate
  62
 256
 370
@@ -2179,13 +2259,13 @@ ByLayer
   0
 CIRCLE
   5
-48
+4C
 100
 AcDbEntity
 100
 AcDbCircle
   8
-Middle Layer
+Top Plate
  62
 256
 370
@@ -2203,13 +2283,13 @@ ByLayer
   0
 LINE
   5
-49
+4D
 100
 AcDbEntity
 100
 AcDbLine
   8
-Middle Layer
+Top Plate
  62
 256
 370
@@ -2231,11 +2311,11 @@ ByLayer
   0
 ARC
   5
-4A
+4E
 100
 AcDbEntity
   8
-Middle Layer
+Top Plate
  62
 256
 370
@@ -2261,13 +2341,13 @@ AcDbArc
   0
 LINE
   5
-4B
+4F
 100
 AcDbEntity
 100
 AcDbLine
   8
-Middle Layer
+Top Plate
  62
 256
 370
@@ -2289,11 +2369,11 @@ ByLayer
   0
 ARC
   5
-4C
+50
 100
 AcDbEntity
   8
-Middle Layer
+Top Plate
  62
 256
 370
@@ -2319,13 +2399,13 @@ AcDbArc
   0
 LINE
   5
-4D
+51
 100
 AcDbEntity
 100
 AcDbLine
   8
-Middle Layer
+Top Plate
  62
 256
 370
@@ -2347,11 +2427,11 @@ ByLayer
   0
 ARC
   5
-4E
+52
 100
 AcDbEntity
   8
-Middle Layer
+Top Plate
  62
 256
 370
@@ -2377,13 +2457,13 @@ AcDbArc
   0
 LINE
   5
-4F
+53
 100
 AcDbEntity
 100
 AcDbLine
   8
-Middle Layer
+Top Plate
  62
 256
 370
@@ -2405,11 +2485,11 @@ ByLayer
   0
 ARC
   5
-50
+54
 100
 AcDbEntity
   8
-Middle Layer
+Top Plate
  62
 256
 370
@@ -2433,39 +2513,15 @@ AcDbArc
  51
 317.3759674952218006
   0
-CIRCLE
-  5
-51
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Middle Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-85.5793044479625706
- 20
-68.6666230857996425
- 30
-0.0
- 40
-8.0
-  0
 ELLIPSE
   5
-52
+55
 100
 AcDbEntity
 100
 AcDbEllipse
   8
-Bottom Layer
+Bottom Plate
  62
 256
 370
@@ -2493,13 +2549,13 @@ ByLayer
   0
 CIRCLE
   5
-53
+56
 100
 AcDbEntity
 100
 AcDbCircle
   8
-Bottom Layer
+Bottom Plate
  62
 256
 370
@@ -2517,13 +2573,13 @@ ByLayer
   0
 CIRCLE
   5
-54
+57
 100
 AcDbEntity
 100
 AcDbCircle
   8
-Bottom Layer
+Bottom Plate
  62
 256
 370
@@ -2541,13 +2597,13 @@ ByLayer
   0
 LINE
   5
-55
+58
 100
 AcDbEntity
 100
 AcDbLine
   8
-Bottom Layer
+Bottom Plate
  62
 256
 370
@@ -2569,11 +2625,11 @@ ByLayer
   0
 ARC
   5
-56
+59
 100
 AcDbEntity
   8
-Bottom Layer
+Bottom Plate
  62
 256
 370
@@ -2599,13 +2655,13 @@ AcDbArc
   0
 LINE
   5
-57
+5A
 100
 AcDbEntity
 100
 AcDbLine
   8
-Bottom Layer
+Bottom Plate
  62
 256
 370
@@ -2627,11 +2683,11 @@ ByLayer
   0
 ARC
   5
-58
+5B
 100
 AcDbEntity
   8
-Bottom Layer
+Bottom Plate
  62
 256
 370
@@ -2657,13 +2713,13 @@ AcDbArc
   0
 LINE
   5
-59
+5C
 100
 AcDbEntity
 100
 AcDbLine
   8
-Bottom Layer
+Bottom Plate
  62
 256
 370
@@ -2685,11 +2741,11 @@ ByLayer
   0
 ARC
   5
-5A
+5D
 100
 AcDbEntity
   8
-Bottom Layer
+Bottom Plate
  62
 256
 370
@@ -2715,13 +2771,13 @@ AcDbArc
   0
 LINE
   5
-5B
+5E
 100
 AcDbEntity
 100
 AcDbLine
   8
-Bottom Layer
+Bottom Plate
  62
 256
 370
@@ -2743,11 +2799,11 @@ ByLayer
   0
 ARC
   5
-5C
+5F
 100
 AcDbEntity
   8
-Bottom Layer
+Bottom Plate
  62
 256
 370
@@ -2773,13 +2829,13 @@ AcDbArc
   0
 CIRCLE
   5
-5D
+60
 100
 AcDbEntity
 100
 AcDbCircle
   8
-Bottom Layer
+Bottom Plate
  62
 256
 370
@@ -2797,7 +2853,465 @@ ByLayer
   0
 MTEXT
   5
-5E
+61
+100
+AcDbEntity
+100
+AcDbMText
+  8
+Top Text
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+90.0
+ 20
+80.0
+ 30
+0.0
+ 40
+2.0
+ 41
+100.0
+ 71
+1
+ 72
+2
+  1
+Top
+  7
+standard
+ 50
+0.0
+ 73
+0
+ 44
+1.0
+  0
+MTEXT
+  5
+62
+100
+AcDbEntity
+100
+AcDbMText
+  8
+Bottom Text
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+87.0
+ 20
+80.0
+ 30
+0.0
+ 40
+2.0
+ 41
+100.0
+ 71
+1
+ 72
+2
+  1
+Bottom
+  7
+standard
+ 50
+0.0
+ 73
+0
+ 44
+1.0
+  0
+ELLIPSE
+  5
+63
+100
+AcDbEntity
+100
+AcDbEllipse
+  8
+Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+84.3775421211188785
+ 20
+84.9487687463009706
+ 30
+0.0
+ 11
+0.766610250398976
+ 21
+3.9258513374786901
+ 31
+0.0
+ 40
+0.4500000000000001
+ 41
+0.0
+ 42
+6.2831853071795862
+  0
+CIRCLE
+  5
+64
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+82.1295583211671669
+ 20
+51.0002920671456366
+ 30
+0.0
+ 40
+2.4249999999999998
+  0
+CIRCLE
+  5
+65
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+89.0290505747579601
+ 20
+86.3329541044538473
+ 30
+0.0
+ 40
+2.4249999999999998
+  0
+LINE
+  5
+66
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+76.1124434597998771
+ 20
+48.7475262681524555
+ 30
+0.0
+ 11
+70.7355269300370821
+ 21
+63.1092164065715551
+ 31
+0.0
+  0
+ARC
+  5
+67
+100
+AcDbEntity
+  8
+Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+85.5793044479625706
+ 20
+68.6666230857996425
+ 30
+0.0
+ 40
+15.8499999999999996
+100
+AcDbArc
+ 50
+137.3759674952218006
+ 51
+200.5255493212027034
+  0
+LINE
+  5
+68
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+73.9166666666665861
+ 20
+79.4000000000000909
+ 30
+0.0
+ 11
+84.3014513479551084
+ 21
+90.6838655665192732
+ 31
+0.0
+  0
+ARC
+  5
+69
+100
+AcDbEntity
+  8
+Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+89.0290505747579601
+ 20
+86.3329541044538473
+ 30
+0.0
+ 40
+6.424999999999998
+100
+AcDbArc
+ 50
+20.5255493212026998
+ 51
+137.3759674952219996
+  0
+LINE
+  5
+6A
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+95.0461654361251789
+ 20
+88.5857199034469431
+ 30
+0.0
+ 11
+100.4230819658880733
+ 21
+74.2240297650278364
+ 31
+0.0
+  0
+ARC
+  5
+6B
+100
+AcDbEntity
+  8
+Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+85.5793044479625706
+ 20
+68.6666230857996425
+ 30
+0.0
+ 40
+15.8499999999999996
+100
+AcDbArc
+ 50
+317.3759674952219143
+ 51
+20.5255493212026998
+  0
+LINE
+  5
+6C
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+97.2419422292584699
+ 20
+57.933246171599329
+ 30
+0.0
+ 11
+86.8571575479700613
+ 21
+46.6493806050801538
+ 31
+0.0
+  0
+ARC
+  5
+6D
+100
+AcDbEntity
+  8
+Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+82.1295583211671669
+ 20
+51.0002920671456366
+ 30
+0.0
+ 40
+6.4249999999999998
+100
+AcDbArc
+ 50
+200.5255493212027034
+ 51
+317.3759674952218006
+  0
+CIRCLE
+  5
+6E
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+85.5793044479625706
+ 20
+68.6666230857996425
+ 30
+0.0
+ 40
+8.0
+  0
+MTEXT
+  5
+6F
+100
+AcDbEntity
+100
+AcDbMText
+  8
+Middle Text
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+90.0000000000000142
+ 20
+80.0
+ 30
+0.0
+ 40
+2.0
+ 41
+100.0
+ 71
+1
+ 72
+2
+  1
+Middle
+  7
+standard
+ 50
+0.0
+ 73
+0
+ 44
+1.0
+  0
+MTEXT
+  5
+70
 100
 AcDbEntity
 100
@@ -2825,7 +3339,7 @@ ByLayer
  72
 2
   1
-Bearing\~Plates\PBottom\~Layer:\~1/4"\~or\~5mm\~acrylic\PMiddle\~Layer:\~1/4"\~or\~5mm\~acrylic
+Bearing\~Plates\PBottom\~Plate:\~1/4"\~or\~5mm\~acrylic\PMiddle\~Plate:\~1/8"\~acrylic\PTop\~Plate:\~1/4"\~or\~5mm\~acrylic
   7
 standard
  50
@@ -2834,6 +3348,30 @@ standard
 0
  44
 1.0
+  0
+CIRCLE
+  5
+71
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Top Plate
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+85.5793044479625706
+ 20
+68.6666230857996425
+ 30
+0.0
+ 40
+5.0
   0
 ENDSEC
   0
@@ -2873,7 +3411,7 @@ E
   3
 AcDbVariableDictionary
 350
-5F
+72
   0
 DICTIONARY
   5
@@ -3337,7 +3875,7 @@ Layout2
   0
 DICTIONARY
   5
-5F
+72
 100
 AcDbDictionary
 281
@@ -3345,15 +3883,15 @@ AcDbDictionary
   3
 DIMASSOC
 350
-61
+74
   3
 HIDETEXT
 350
-60
+73
   0
 DICTIONARYVAR
   5
-60
+73
 100
 DictionaryVariables
 280
@@ -3363,7 +3901,7 @@ DictionaryVariables
   0
 DICTIONARYVAR
   5
-61
+74
 100
 DictionaryVariables
 280
