@@ -1,6 +1,6 @@
 //POVRay-File created by 3d41.ulp v1.05
-///Users/zachsmith/reprap/trunk/reprap/electronics/Arduino/opto_isolator/opto_isolator.brd
-//8/25/08 8:31 PM
+///home/hoeken/Desktop/reprap/trunk/reprap/electronics/Arduino/opto_isolator/opto_isolator.brd
+//9/2/08 9:29 PM
 
 #version 3.5;
 
@@ -92,7 +92,7 @@
 #declare pcb_layer1_used = 1;
 #declare pcb_layer16_used = 1;
 #declare inc_testmode = off;
-#declare global_seed=seed(761);
+#declare global_seed=seed(115);
 #declare global_pcb_layer_dis = array[16]
 {
 	0.000000,
@@ -219,17 +219,17 @@ cylinder{<56.134000,1,2.032000><56.134000,-5,2.032000>1.400000 texture{col_hls}}
 cylinder{<56.134000,1,23.114000><56.134000,-5,23.114000>1.400000 texture{col_hls}}
 //Holes(real)/Board
 //Holes(real)/Vias
-}//End difference(reale Bohrungen/Durchbrche)
+}//End difference(reale Bohrungen/Durchbrüche)
 #end
 #if(pcb_parts=on)//Parts
 union{
 #ifndef(pack_C1) #declare global_pack_C1=yes; object {CAP_DIS_CERAMIC_50MM_76MM("100nF",)translate<0,0,0> rotate<0,0.000000,0>rotate<0,-270.000000,0> rotate<0,0,0> translate<36.322000,0.000000,7.366000>}#end		//ceramic disc capacitator C1 100nF C050-035X075
 #ifndef(pack_C2) #declare global_pack_C2=yes; object {CAP_DIS_CERAMIC_50MM_76MM("100nF",)translate<0,0,0> rotate<0,0.000000,0>rotate<0,-270.000000,0> rotate<0,0,0> translate<36.322000,0.000000,16.764000>}#end		//ceramic disc capacitator C2 100nF C050-035X075
-#ifndef(pack_IC1) #declare global_pack_IC1=yes; object {IC_DIS_DIP14("74ALS04N","ST",)translate<0,0,0> rotate<0,0.000000,0>rotate<0,-270.000000,0> rotate<0,0,0> translate<43.942000,0.000000,12.192000>translate<0,3.000000,0> }#end		//DIP14 IC1 74ALS04N DIL14
+#ifndef(pack_IC1) #declare global_pack_IC1=yes; object {IC_DIS_DIP14("74ALS04N","",)translate<0,0,0> rotate<0,0.000000,0>rotate<0,-270.000000,0> rotate<0,0,0> translate<43.942000,0.000000,12.192000>translate<0,3.000000,0> }#end		//DIP14 IC1 74ALS04N DIL14
 #ifndef(pack_IC1) object{SOCKET_DIP14()rotate<0,-270.000000,0> rotate<0,0,0> translate<43.942000,0.000000,12.192000>}#end					//IC-Sockel 14Pin IC1 74ALS04N
-#ifndef(pack_OK1) #declare global_pack_OK1=yes; object {IC_DIS_DIP8("HCPL2630","PHILIPS",)translate<0,0,0> rotate<0,0.000000,0>rotate<0,-270.000000,0> rotate<0,0,0> translate<25.400000,0.000000,7.620000>translate<0,3.000000,0> }#end		//DIP8 OK1 HCPL2630 DIL08
+#ifndef(pack_OK1) #declare global_pack_OK1=yes; object {IC_DIS_DIP8("HCPL2630","",)translate<0,0,0> rotate<0,0.000000,0>rotate<0,-270.000000,0> rotate<0,0,0> translate<25.400000,0.000000,7.620000>translate<0,3.000000,0> }#end		//DIP8 OK1 HCPL2630 DIL08
 #ifndef(pack_OK1) object{SOCKET_DIP8()rotate<0,-270.000000,0> rotate<0,0,0> translate<25.400000,0.000000,7.620000>}#end					//IC-Sockel 8Pin OK1 HCPL2630
-#ifndef(pack_OK2) #declare global_pack_OK2=yes; object {IC_DIS_DIP8("HCPL2630","PHILIPS",)translate<0,0,0> rotate<0,0.000000,0>rotate<0,-270.000000,0> rotate<0,0,0> translate<25.400000,0.000000,17.780000>translate<0,3.000000,0> }#end		//DIP8 OK2 HCPL2630 DIL08
+#ifndef(pack_OK2) #declare global_pack_OK2=yes; object {IC_DIS_DIP8("HCPL2630","",)translate<0,0,0> rotate<0,0.000000,0>rotate<0,-270.000000,0> rotate<0,0,0> translate<25.400000,0.000000,17.780000>translate<0,3.000000,0> }#end		//DIP8 OK2 HCPL2630 DIL08
 #ifndef(pack_OK2) object{SOCKET_DIP8()rotate<0,-270.000000,0> rotate<0,0,0> translate<25.400000,0.000000,17.780000>}#end					//IC-Sockel 8Pin OK2 HCPL2630
 #ifndef(pack_R1) #declare global_pack_R1=yes; object {RES_DIS_0207_025MMV(texture{pigment{Red*0.7}finish{phong 0.2}},texture{pigment{Red*0.7}finish{phong 0.2}},texture{pigment{DarkBrown}finish{phong 0.2}},texture {T_Gold_5C finish{reflection 0.1}},)translate<0,0,0> rotate<0,0.000000,0>rotate<0,-90.000000,0> rotate<0,0,0> translate<17.780000,0.000000,10.160000>}#end		//Discrete Resistor 0,25W Vertical 100mil R1 220 0207/2V
 #ifndef(pack_R2) #declare global_pack_R2=yes; object {RES_DIS_0207_025MMV(texture{pigment{Red*0.7}finish{phong 0.2}},texture{pigment{Red*0.7}finish{phong 0.2}},texture{pigment{DarkBrown}finish{phong 0.2}},texture {T_Gold_5C finish{reflection 0.1}},)translate<0,0,0> rotate<0,0.000000,0>rotate<0,-270.000000,0> rotate<0,0,0> translate<17.780000,0.000000,5.080000>}#end		//Discrete Resistor 0,25W Vertical 100mil R2 220 0207/2V
