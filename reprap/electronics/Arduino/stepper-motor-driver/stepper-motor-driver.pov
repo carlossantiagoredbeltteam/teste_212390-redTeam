@@ -1,6 +1,6 @@
 //POVRay-File created by 3d41.ulp v1.05
 ///home/hoeken/Desktop/reprap/trunk/reprap/electronics/Arduino/stepper-motor-driver/stepper-motor-driver.brd
-//9/2/08 9:51 PM
+//9/2/08 9:58 PM
 
 #version 3.5;
 
@@ -92,7 +92,7 @@
 #declare pcb_layer1_used = 1;
 #declare pcb_layer16_used = 1;
 #declare inc_testmode = off;
-#declare global_seed=seed(438);
+#declare global_seed=seed(816);
 #declare global_pcb_layer_dis = array[16]
 {
 	0.000000,
@@ -32687,7 +32687,7 @@ rotate pcb_rotdir*180
 //J1		520426-4
 //J2		520426-4
 //POWER	9090-4V	9090-4V
-//R15		B25P
+//R15	10K	B25P
 //SW1		EDG-04
 //U$1		3,0
 //U$2		3,0
