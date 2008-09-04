@@ -1,5 +1,5 @@
 999
-dxflib 2.1.2.0
+dxflib 2.2.0.0
   0
 SECTION
   2
@@ -789,7 +789,7 @@ $PSVPSCALE
   9
 $CLAYER
   8
-Bottom Text
+Middle Text
   9
 $DIMSHO
  70
@@ -1728,6 +1728,8 @@ AcDbLayerTableRecord
 0
  62
 7
+420
+16777215
   6
 CONTINUOUS
 370
@@ -1748,6 +1750,8 @@ Bottom Plate
 0
  62
 7
+420
+16777215
   6
 CONTINUOUS
 370
@@ -1768,6 +1772,8 @@ Top Plate
 0
  62
 7
+420
+16777215
   6
 CONTINUOUS
 370
@@ -1788,6 +1794,8 @@ Notes
 0
  62
 7
+420
+16777215
   6
 CONTINUOUS
 370
@@ -1808,6 +1816,8 @@ Top Text
 0
  62
 4
+420
+65535
   6
 CONTINUOUS
 370
@@ -1828,6 +1838,8 @@ Bottom Text
 0
  62
 4
+420
+65535
   6
 CONTINUOUS
 370
@@ -1848,6 +1860,8 @@ Middle Layer
 0
  62
 7
+420
+16777215
   6
 CONTINUOUS
 370
@@ -1868,6 +1882,8 @@ Middle Text
 0
  62
 4
+420
+65535
   6
 CONTINUOUS
 370
@@ -2827,113 +2843,9 @@ AcDbArc
  51
 317.3759674952218006
   0
-CIRCLE
-  5
-60
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Bottom Plate
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-85.5793044479625706
- 20
-68.6666230857996425
- 30
-0.0
- 40
-8.0
-  0
-MTEXT
-  5
-61
-100
-AcDbEntity
-100
-AcDbMText
-  8
-Top Text
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-90.0
- 20
-80.0
- 30
-0.0
- 40
-2.0
- 41
-100.0
- 71
-1
- 72
-2
-  1
-Top
-  7
-standard
- 50
-0.0
- 73
-0
- 44
-1.0
-  0
-MTEXT
-  5
-62
-100
-AcDbEntity
-100
-AcDbMText
-  8
-Bottom Text
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-87.0
- 20
-80.0
- 30
-0.0
- 40
-2.0
- 41
-100.0
- 71
-1
- 72
-2
-  1
-Bottom
-  7
-standard
- 50
-0.0
- 73
-0
- 44
-1.0
-  0
 ELLIPSE
   5
-63
+60
 100
 AcDbEntity
 100
@@ -2967,7 +2879,7 @@ ByLayer
   0
 CIRCLE
   5
-64
+61
 100
 AcDbEntity
 100
@@ -2991,7 +2903,7 @@ ByLayer
   0
 CIRCLE
   5
-65
+62
 100
 AcDbEntity
 100
@@ -3015,7 +2927,7 @@ ByLayer
   0
 LINE
   5
-66
+63
 100
 AcDbEntity
 100
@@ -3043,7 +2955,7 @@ ByLayer
   0
 ARC
   5
-67
+64
 100
 AcDbEntity
   8
@@ -3073,7 +2985,7 @@ AcDbArc
   0
 LINE
   5
-68
+65
 100
 AcDbEntity
 100
@@ -3101,7 +3013,7 @@ ByLayer
   0
 ARC
   5
-69
+66
 100
 AcDbEntity
   8
@@ -3131,7 +3043,7 @@ AcDbArc
   0
 LINE
   5
-6A
+67
 100
 AcDbEntity
 100
@@ -3159,7 +3071,7 @@ ByLayer
   0
 ARC
   5
-6B
+68
 100
 AcDbEntity
   8
@@ -3189,7 +3101,7 @@ AcDbArc
   0
 LINE
   5
-6C
+69
 100
 AcDbEntity
 100
@@ -3217,7 +3129,7 @@ ByLayer
   0
 ARC
   5
-6D
+6A
 100
 AcDbEntity
   8
@@ -3247,7 +3159,31 @@ AcDbArc
   0
 CIRCLE
   5
-6E
+6B
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Top Plate
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+85.5793044479625706
+ 20
+68.6666230857996425
+ 30
+0.0
+ 40
+5.0
+  0
+CIRCLE
+  5
+6C
 100
 AcDbEntity
 100
@@ -3267,7 +3203,71 @@ ByLayer
  30
 0.0
  40
-8.0
+11.0500000000000007
+  0
+CIRCLE
+  5
+6D
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Bottom Plate
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+85.5793044479625706
+ 20
+68.6666230857996425
+ 30
+0.0
+ 40
+11.0500000000000007
+  0
+MTEXT
+  5
+6E
+100
+AcDbEntity
+100
+AcDbMText
+  8
+Bottom Text
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+88.0
+ 20
+83.0
+ 30
+0.0
+ 40
+2.0
+ 41
+100.0
+ 71
+1
+ 72
+2
+  1
+Bottom
+  7
+standard
+ 50
+0.0
+ 73
+1
+ 44
+1.0
   0
 MTEXT
   5
@@ -3285,9 +3285,9 @@ Middle Text
   6
 ByLayer
  10
-90.0000000000000142
+88.5555555555555571
  20
-80.0
+83.0
  30
 0.0
  40
@@ -3305,13 +3305,53 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
 MTEXT
   5
 70
+100
+AcDbEntity
+100
+AcDbMText
+  8
+Top Text
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+89.8888888888888857
+ 20
+81.1504720765483682
+ 30
+0.0
+ 40
+2.0
+ 41
+100.0
+ 71
+1
+ 72
+2
+  1
+Top
+  7
+standard
+ 50
+0.0
+ 73
+1
+ 44
+1.0
+  0
+MTEXT
+  5
+71
 100
 AcDbEntity
 100
@@ -3339,39 +3379,15 @@ ByLayer
  72
 2
   1
-Bearing\~Plates\PBottom\~Plate:\~1/4"\~or\~5mm\~acrylic\PMiddle\~Plate:\~1/8"\~acrylic\PTop\~Plate:\~1/4"\~or\~5mm\~acrylic
+Bearing\~Plates\PBottom\~Plate:\~1/4"\~or\~5mm\~acrylic\PMiddle\~Plate:\~1/16"\~acrylic\PTop\~Plate:\~1/4"\~or\~5mm\~acrylic
   7
 standard
  50
 0.0
  73
-0
+1
  44
 1.0
-  0
-CIRCLE
-  5
-71
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Top Plate
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-85.5793044479625706
- 20
-68.6666230857996425
- 30
-0.0
- 40
-5.0
   0
 ENDSEC
   0
