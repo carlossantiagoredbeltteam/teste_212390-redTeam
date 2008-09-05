@@ -13,67 +13,9 @@ $HANDSEED
   5
 FFFF
   9
-$SPLINESEGS
- 70
-8
-  9
-$DIMEXE
- 40
-1.25
-  9
-$DIMLUNIT
- 70
-2
-  9
-$GRIDMODE
- 70
-1
-  9
-$INSUNITS
- 70
-4
-  9
-$DIMADEC
- 70
-2
-  9
 $DIMASZ
  40
 2.5
-  9
-$DIMGAP
- 40
-0.625
-  9
-$DIMTXT
- 40
-2.5
-  9
-$GRIDUNIT
- 10
-0.0
- 20
-0.0
-  9
-$DIMEXO
- 40
-0.625
-  9
-$LUPREC
- 70
-4
-  9
-$CLAYER
-  8
-Notes
-  9
-$DIMAUNIT
- 70
-0
-  9
-$AUPREC
- 70
-2
   9
 $PLIMMIN
  10
@@ -81,27 +23,35 @@ $PLIMMIN
  20
 0.0
   9
-$LUNITS
- 70
-2
+$DIMEXE
+ 40
+1.25
+  9
+$DIMGAP
+ 40
+0.625
   9
 $PLIMMAX
  10
-215.9000000000000057
+210.0
  20
-279.3999999999999773
+297.0
   9
-$DIMSTYLE
-  2
-Standard
-  9
-$AUNITS
+$INSUNITS
  70
-0
+4
+  9
+$DIMEXO
+ 40
+0.625
+  9
+$DIMTXT
+ 40
+2.5
   9
 $CLAYER
   8
-Text
+Notes
   0
 ENDSEC
   0
@@ -953,7 +903,7 @@ LAYER
 100
 AcDbSymbolTable
  70
-5
+2
   0
 LAYER
   5
@@ -969,7 +919,7 @@ AcDbLayerTableRecord
  62
 7
 420
-16777215
+0
   6
 CONTINUOUS
 370
@@ -985,79 +935,13 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-Top
- 70
-0
- 62
-7
-420
-16777215
-  6
-CONTINUOUS
-370
-0
-390
-F
-  0
-LAYER
-  5
-44
-100
-AcDbSymbolTableRecord
-100
-AcDbLayerTableRecord
-  2
-Drawings
- 70
-0
- 62
-5
-420
-255
-  6
-CONTINUOUS
-370
-0
-390
-F
-  0
-LAYER
-  5
-45
-100
-AcDbSymbolTableRecord
-100
-AcDbLayerTableRecord
-  2
 Notes
  70
 0
  62
 7
 420
-16777215
-  6
-CONTINUOUS
-370
 0
-390
-F
-  0
-LAYER
-  5
-46
-100
-AcDbSymbolTableRecord
-100
-AcDbLayerTableRecord
-  2
-Text
- 70
-0
- 62
-4
-420
-65535
   6
 CONTINUOUS
 370
@@ -1391,13 +1275,13 @@ ENTITIES
   0
 CIRCLE
   5
-47
+44
 100
 AcDbEntity
 100
 AcDbCircle
   8
-Top
+0
  62
 256
 370
@@ -1405,167 +1289,23 @@ Top
   6
 ByLayer
  10
-45.1869199217334909
+20.0
  20
-49.1144576879316688
+20.0
  30
 0.0
  40
-3.999999999999992
+1.5
   0
 CIRCLE
   5
-48
+45
 100
 AcDbEntity
 100
 AcDbCircle
   8
-Top
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-45.1869199217334909
- 20
-49.1144576879316688
- 30
-0.0
- 40
-9.499999999999984
-  0
-LINE
-  5
-49
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Drawings
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-35.6869199217334909
- 20
-49.1144576879316688
- 30
-0.0
- 11
-54.6869199217334909
- 21
-49.1144576879316688
- 31
-0.0
-  0
-LINE
-  5
-4A
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Drawings
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-45.1869199217334909
- 20
-39.6144576879316688
- 30
-0.0
- 11
-45.186919921733498
- 21
-58.6144576879316688
- 31
-0.0
-  0
-CIRCLE
-  5
-4B
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Drawings
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-45.1869199217334909
- 20
-49.1144576879316688
- 30
-0.0
- 40
-6.75
-  0
-MTEXT
-  5
-4C
-100
-AcDbEntity
-100
-AcDbMText
-  8
-Text
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-45.186919921733498
- 20
-55.8644576879316688
- 30
-0.0
- 40
-2.0
- 41
-100.0
- 71
-5
- 72
 0
-  1
-Drive
-  7
-standard
- 50
-0.0
- 73
-1
- 44
-1.0
-  0
-MTEXT
-  5
-4D
-100
-AcDbEntity
-100
-AcDbMText
-  8
-Text
  62
 256
 370
@@ -1573,33 +1313,17 @@ Text
   6
 ByLayer
  10
-45.1869199217334909
+20.0
  20
-43.3938607366209581
+20.0
  30
 0.0
  40
-2.0
- 41
-100.0
- 71
-5
- 72
-0
-  1
-Spacer
-  7
-standard
- 50
-0.0
- 73
-1
- 44
-1.0
+4.0
   0
 MTEXT
   5
-4E
+46
 100
 AcDbEntity
 100
@@ -1613,27 +1337,27 @@ Notes
   6
 ByLayer
  10
-27.0
+13.8240000000000052
  20
-70.0
+37.4784000000000148
  30
 0.0
  40
-3.0
+2.0
  41
 100.0
  71
 1
  72
-2
+0
   1
-Drive\~Spacer\PMaterial:\~3/16"\~acrylic
+3mm\~Spacer\PMaterial:\~1/4"\~Acrylic
   7
 standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
@@ -1675,7 +1399,7 @@ E
   3
 AcDbVariableDictionary
 350
-4F
+47
   0
 DICTIONARY
   5
@@ -2139,7 +1863,7 @@ Layout2
   0
 DICTIONARY
   5
-4F
+47
 100
 AcDbDictionary
 281
@@ -2147,15 +1871,15 @@ AcDbDictionary
   3
 DIMASSOC
 350
-51
+49
   3
 HIDETEXT
 350
-50
+48
   0
 DICTIONARYVAR
   5
-50
+48
 100
 DictionaryVariables
 280
@@ -2165,7 +1889,7 @@ DictionaryVariables
   0
 DICTIONARYVAR
   5
-51
+49
 100
 DictionaryVariables
 280
