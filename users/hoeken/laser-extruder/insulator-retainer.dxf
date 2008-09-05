@@ -1,5 +1,5 @@
 999
-dxflib 2.1.2.0
+dxflib 2.2.0.0
   0
 SECTION
   2
@@ -257,6 +257,12 @@ $CELTYPE
   6
 ByLayer
   9
+$GRIDUNIT
+ 10
+0.0
+ 20
+0.0
+  9
 $MENU
   1
 .
@@ -268,12 +274,6 @@ $ANGDIR
 $DIMALTTD
  70
 2
-  9
-$GRIDUNIT
- 10
-0.0
- 20
-0.0
   9
 $TREEDEPTH
  70
@@ -1728,6 +1728,8 @@ AcDbLayerTableRecord
 0
  62
 7
+420
+16777215
   6
 CONTINUOUS
 370
@@ -1748,6 +1750,8 @@ Notes
 0
  62
 7
+420
+16777215
   6
 CONTINUOUS
 370
@@ -3157,7 +3161,7 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
