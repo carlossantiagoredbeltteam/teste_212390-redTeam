@@ -1,5 +1,5 @@
 999
-dxflib 2.2.0.0
+dxflib 2.1.2.0
   0
 SECTION
   2
@@ -40,6 +40,14 @@ $PLIMMAX
 $INSUNITS
  70
 4
+  9
+$DIMSTYLE
+  2
+Standard
+  9
+$CLAYER
+  8
+Notes
   9
 $DIMEXO
  40
@@ -918,8 +926,6 @@ AcDbLayerTableRecord
 0
  62
 7
-420
-0
   6
 CONTINUOUS
 370
@@ -940,8 +946,6 @@ Notes
 0
  62
 7
-420
-0
   6
 CONTINUOUS
 370
@@ -1349,15 +1353,15 @@ ByLayer
  71
 1
  72
-0
+2
   1
-3mm\~Spacer\PMaterial:\~1/4"\~Acrylic
+3mm\~Spacer\PMaterial:\~1/4"\~Acrylic\P2\~needed
   7
 standard
  50
 0.0
  73
-1
+0
  44
 1.0
   0

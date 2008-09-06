@@ -1,5 +1,5 @@
 999
-dxflib 2.2.0.0
+dxflib 2.1.2.0
   0
 SECTION
   2
@@ -789,7 +789,7 @@ $PSVPSCALE
   9
 $CLAYER
   8
-Drawing
+Top Text
   9
 $DIMSHO
  70
@@ -1725,11 +1725,9 @@ AcDbLayerTableRecord
   2
 0
  70
-0
+1
  62
-7
-420
-16777215
+-7
   6
 CONTINUOUS
 370
@@ -1750,8 +1748,6 @@ Notes
 0
  62
 7
-420
-16777215
   6
 CONTINUOUS
 370
@@ -1769,11 +1765,9 @@ AcDbLayerTableRecord
   2
 Top Layer
  70
-0
+1
  62
-7
-420
-16777215
+-7
   6
 CONTINUOUS
 370
@@ -1794,8 +1788,6 @@ Middle Layer
 0
  62
 7
-420
-16777215
   6
 CONTINUOUS
 370
@@ -1813,11 +1805,9 @@ AcDbLayerTableRecord
   2
 Bottom Layer
  70
-0
+1
  62
-7
-420
-16777215
+-7
   6
 CONTINUOUS
 370
@@ -1835,11 +1825,9 @@ AcDbLayerTableRecord
   2
 Drawing
  70
-0
+1
  62
-5
-420
-255
+-5
   6
 CONTINUOUS
 370
@@ -1857,11 +1845,9 @@ AcDbLayerTableRecord
   2
 Bottom Text
  70
-0
+1
  62
-4
-420
-65535
+-4
   6
 CONTINUOUS
 370
@@ -1882,8 +1868,6 @@ Middle Text
 0
  62
 4
-420
-65535
   6
 CONTINUOUS
 370
@@ -1901,11 +1885,9 @@ AcDbLayerTableRecord
   2
 Top Text
  70
-0
+1
  62
-4
-420
-65535
+-4
   6
 CONTINUOUS
 370
@@ -6441,7 +6423,7 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
@@ -7489,7 +7471,7 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
@@ -7529,7 +7511,7 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
@@ -7569,7 +7551,7 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
@@ -7609,53 +7591,13 @@ standard
  50
 0.0
  73
-0
- 44
-1.0
-  0
-MTEXT
-  5
-107
-100
-AcDbEntity
-100
-AcDbMText
-  8
-Middle Text
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-112.0
- 20
-109.0
- 30
-0.0
- 40
-2.0
- 41
-100.0
- 71
 1
- 72
-2
-  1
-Top\~Plate\PBottom
-  7
-standard
- 50
-0.0
- 73
-0
  44
 1.0
   0
 LINE
   5
-108
+107
 100
 AcDbEntity
 100
@@ -7683,7 +7625,7 @@ ByLayer
   0
 LINE
   5
-109
+108
 100
 AcDbEntity
 100
@@ -7711,7 +7653,7 @@ ByLayer
   0
 LINE
   5
-10A
+109
 100
 AcDbEntity
 100
@@ -7739,7 +7681,7 @@ ByLayer
   0
 LINE
   5
-10B
+10A
 100
 AcDbEntity
 100
@@ -7767,7 +7709,7 @@ ByLayer
   0
 LINE
   5
-10C
+10B
 100
 AcDbEntity
 100
@@ -7795,13 +7737,37 @@ ByLayer
   0
 CIRCLE
   5
-10D
+10C
 100
 AcDbEntity
 100
 AcDbCircle
   8
 Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+89.3401013151287486
+ 20
+94.2941167806188218
+ 30
+0.0
+ 40
+1.424999999999996
+  0
+CIRCLE
+  5
+10D
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Middle Layer
  62
 256
 370
@@ -7825,7 +7791,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-Middle Layer
+Bottom Layer
  62
 256
 370
@@ -7849,30 +7815,6 @@ AcDbEntity
 100
 AcDbCircle
   8
-Bottom Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-89.3401013151287486
- 20
-94.2941167806188218
- 30
-0.0
- 40
-1.424999999999996
-  0
-CIRCLE
-  5
-110
-100
-AcDbEntity
-100
-AcDbCircle
-  8
 Top Layer
  62
 256
@@ -7891,7 +7833,7 @@ ByLayer
   0
 CIRCLE
   5
-111
+110
 100
 AcDbEntity
 100
@@ -7915,7 +7857,7 @@ ByLayer
   0
 CIRCLE
   5
-112
+111
 100
 AcDbEntity
 100
@@ -7939,7 +7881,7 @@ ByLayer
   0
 LINE
   5
-113
+112
 100
 AcDbEntity
 100
@@ -7967,13 +7909,37 @@ ByLayer
   0
 CIRCLE
   5
-114
+113
 100
 AcDbEntity
 100
 AcDbCircle
   8
 Bottom Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+97.3401013151287486
+ 20
+94.2941167806189497
+ 30
+0.0
+ 40
+1.424999999999996
+  0
+CIRCLE
+  5
+114
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Top Layer
  62
 256
 370
@@ -7997,7 +7963,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-Top Layer
+Middle Layer
  62
 256
 370
@@ -8021,30 +7987,6 @@ AcDbEntity
 100
 AcDbCircle
   8
-Middle Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-97.3401013151287486
- 20
-94.2941167806189497
- 30
-0.0
- 40
-1.424999999999996
-  0
-CIRCLE
-  5
-117
-100
-AcDbEntity
-100
-AcDbCircle
-  8
 Top Layer
  62
 256
@@ -8063,7 +8005,7 @@ ByLayer
   0
 CIRCLE
   5
-118
+117
 100
 AcDbEntity
 100
@@ -8087,7 +8029,7 @@ ByLayer
   0
 CIRCLE
   5
-119
+118
 100
 AcDbEntity
 100
@@ -8108,6 +8050,46 @@ ByLayer
 0.0
  40
 1.424999999999996
+  0
+MTEXT
+  5
+119
+100
+AcDbEntity
+100
+AcDbMText
+  8
+Bottom Text
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+112.0
+ 20
+109.0
+ 30
+0.0
+ 40
+2.0
+ 41
+100.0
+ 71
+1
+ 72
+2
+  1
+Top\~Plate\PBottom
+  7
+standard
+ 50
+0.0
+ 73
+1
+ 44
+1.0
   0
 ENDSEC
   0
