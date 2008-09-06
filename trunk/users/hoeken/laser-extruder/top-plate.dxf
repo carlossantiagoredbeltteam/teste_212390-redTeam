@@ -789,7 +789,7 @@ $PSVPSCALE
   9
 $CLAYER
   8
-Notes
+Drawing
   9
 $DIMSHO
  70
@@ -861,7 +861,7 @@ $ENDCAPS
   9
 $CLAYER
   8
-Drawing
+Top Text
   0
 ENDSEC
   0
@@ -6441,7 +6441,7 @@ standard
  50
 0.0
  73
-1
+0
  44
 1.0
   0
@@ -7481,7 +7481,7 @@ ByLayer
  71
 1
  72
-0
+2
   1
 Top\~Plate\PTop
   7
@@ -7489,7 +7489,7 @@ standard
  50
 0.0
  73
-1
+0
  44
 1.0
   0
@@ -7521,7 +7521,7 @@ ByLayer
  71
 1
  72
-0
+2
   1
 Top\~Plate\PMiddle
   7
@@ -7529,7 +7529,7 @@ standard
  50
 0.0
  73
-1
+0
  44
 1.0
   0
@@ -7561,7 +7561,7 @@ ByLayer
  71
 1
  72
-0
+2
   1
 Top\~Plate\PBottom
   7
@@ -7569,7 +7569,7 @@ standard
  50
 0.0
  73
-1
+0
  44
 1.0
   0
@@ -7601,7 +7601,7 @@ ByLayer
  71
 1
  72
-0
+2
   1
 Top\~Plate\PMiddle
   7
@@ -7609,7 +7609,7 @@ standard
  50
 0.0
  73
-1
+0
  44
 1.0
   0
@@ -7641,7 +7641,7 @@ ByLayer
  71
 1
  72
-0
+2
   1
 Top\~Plate\PBottom
   7
@@ -7649,7 +7649,7 @@ standard
  50
 0.0
  73
-1
+0
  44
 1.0
   0
