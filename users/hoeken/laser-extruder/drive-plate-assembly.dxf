@@ -2555,57 +2555,9 @@ ByLayer
  40
 1.424999999999996
   0
-CIRCLE
-  5
-59
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Top Plate Top
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-84.5272283577441073
- 20
-109.3248121214682556
- 30
-0.0
- 40
-1.424999999999996
-  0
-CIRCLE
-  5
-5A
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Top Plate Top
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-112.7180069813211674
- 20
-119.5854164212385626
- 30
-0.0
- 40
-1.424999999999996
-  0
 LINE
   5
-5B
+59
 100
 AcDbEntity
 100
@@ -2633,7 +2585,7 @@ ByLayer
   0
 LINE
   5
-5C
+5A
 100
 AcDbEntity
 100
@@ -2661,7 +2613,7 @@ ByLayer
   0
 LINE
   5
-5D
+5B
 100
 AcDbEntity
 100
@@ -2689,7 +2641,7 @@ ByLayer
   0
 LINE
   5
-5E
+5C
 100
 AcDbEntity
 100
@@ -2717,7 +2669,7 @@ ByLayer
   0
 LINE
   5
-5F
+5D
 100
 AcDbEntity
 100
@@ -2745,7 +2697,7 @@ ByLayer
   0
 LINE
   5
-60
+5E
 100
 AcDbEntity
 100
@@ -2773,7 +2725,7 @@ ByLayer
   0
 ARC
   5
-61
+5F
 100
 AcDbEntity
   8
@@ -2803,7 +2755,7 @@ AcDbArc
   0
 ARC
   5
-62
+60
 100
 AcDbEntity
   8
@@ -2833,7 +2785,7 @@ AcDbArc
   0
 LINE
   5
-63
+61
 100
 AcDbEntity
 100
@@ -2861,7 +2813,7 @@ ByLayer
   0
 CIRCLE
   5
-64
+62
 100
 AcDbEntity
 100
@@ -2885,7 +2837,7 @@ ByLayer
   0
 CIRCLE
   5
-65
+63
 100
 AcDbEntity
 100
@@ -2907,57 +2859,9 @@ ByLayer
  40
 1.424999999999996
   0
-CIRCLE
-  5
-66
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Top Plate Middle Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-84.5272283577441215
- 20
-109.3248121214682556
- 30
-0.0
- 40
-1.424999999999996
-  0
-CIRCLE
-  5
-67
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Top Plate Middle Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-112.7180069813211674
- 20
-119.5854164212385626
- 30
-0.0
- 40
-1.424999999999996
-  0
 LINE
   5
-68
+64
 100
 AcDbEntity
 100
@@ -2985,7 +2889,7 @@ ByLayer
   0
 LINE
   5
-69
+65
 100
 AcDbEntity
 100
@@ -3013,7 +2917,7 @@ ByLayer
   0
 LINE
   5
-6A
+66
 100
 AcDbEntity
 100
@@ -3041,7 +2945,7 @@ ByLayer
   0
 LINE
   5
-6B
+67
 100
 AcDbEntity
 100
@@ -3069,7 +2973,7 @@ ByLayer
   0
 LINE
   5
-6C
+68
 100
 AcDbEntity
 100
@@ -3097,7 +3001,7 @@ ByLayer
   0
 LINE
   5
-6D
+69
 100
 AcDbEntity
 100
@@ -3125,7 +3029,7 @@ ByLayer
   0
 LINE
   5
-6E
+6A
 100
 AcDbEntity
 100
@@ -3153,7 +3057,7 @@ ByLayer
   0
 LINE
   5
-6F
+6B
 100
 AcDbEntity
 100
@@ -3181,7 +3085,7 @@ ByLayer
   0
 ARC
   5
-70
+6C
 100
 AcDbEntity
   8
@@ -3211,7 +3115,7 @@ AcDbArc
   0
 ARC
   5
-71
+6D
 100
 AcDbEntity
   8
@@ -3241,7 +3145,7 @@ AcDbArc
   0
 LINE
   5
-72
+6E
 100
 AcDbEntity
 100
@@ -3269,7 +3173,7 @@ ByLayer
   0
 CIRCLE
   5
-73
+6F
 100
 AcDbEntity
 100
@@ -3293,7 +3197,7 @@ ByLayer
   0
 CIRCLE
   5
-74
+70
 100
 AcDbEntity
 100
@@ -3315,57 +3219,9 @@ ByLayer
  40
 1.424999999999996
   0
-CIRCLE
-  5
-75
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Top Plate Bottom Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-84.5272283577441215
- 20
-109.3248121214682556
- 30
-0.0
- 40
-1.424999999999996
-  0
-CIRCLE
-  5
-76
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Top Plate Bottom Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-112.7180069813211674
- 20
-119.5854164212385626
- 30
-0.0
- 40
-1.424999999999996
-  0
 LINE
   5
-77
+71
 100
 AcDbEntity
 100
@@ -3393,7 +3249,7 @@ ByLayer
   0
 LINE
   5
-78
+72
 100
 AcDbEntity
 100
@@ -3421,7 +3277,7 @@ ByLayer
   0
 LINE
   5
-79
+73
 100
 AcDbEntity
 100
@@ -3449,7 +3305,7 @@ ByLayer
   0
 LINE
   5
-7A
+74
 100
 AcDbEntity
 100
@@ -3477,7 +3333,7 @@ ByLayer
   0
 LINE
   5
-7B
+75
 100
 AcDbEntity
 100
@@ -3505,7 +3361,7 @@ ByLayer
   0
 LINE
   5
-7C
+76
 100
 AcDbEntity
 100
@@ -3533,7 +3389,7 @@ ByLayer
   0
 ARC
   5
-7D
+77
 100
 AcDbEntity
   8
@@ -3563,7 +3419,7 @@ AcDbArc
   0
 ARC
   5
-7E
+78
 100
 AcDbEntity
   8
@@ -3593,7 +3449,7 @@ AcDbArc
   0
 LINE
   5
-7F
+79
 100
 AcDbEntity
 100
@@ -3621,7 +3477,7 @@ ByLayer
   0
 LINE
   5
-80
+7A
 100
 AcDbEntity
 100
@@ -3649,7 +3505,7 @@ ByLayer
   0
 LINE
   5
-81
+7B
 100
 AcDbEntity
 100
@@ -3677,7 +3533,7 @@ ByLayer
   0
 LINE
   5
-82
+7C
 100
 AcDbEntity
 100
@@ -3705,7 +3561,7 @@ ByLayer
   0
 LINE
   5
-83
+7D
 100
 AcDbEntity
 100
@@ -3733,7 +3589,7 @@ ByLayer
   0
 LINE
   5
-84
+7E
 100
 AcDbEntity
 100
@@ -3761,7 +3617,7 @@ ByLayer
   0
 LINE
   5
-85
+7F
 100
 AcDbEntity
 100
@@ -3789,7 +3645,7 @@ ByLayer
   0
 LINE
   5
-86
+80
 100
 AcDbEntity
 100
@@ -3817,7 +3673,7 @@ ByLayer
   0
 LINE
   5
-87
+81
 100
 AcDbEntity
 100
@@ -3845,7 +3701,7 @@ ByLayer
   0
 LINE
   5
-88
+82
 100
 AcDbEntity
 100
@@ -3873,7 +3729,7 @@ ByLayer
   0
 LINE
   5
-89
+83
 100
 AcDbEntity
 100
@@ -3901,7 +3757,7 @@ ByLayer
   0
 LINE
   5
-8A
+84
 100
 AcDbEntity
 100
@@ -3929,7 +3785,7 @@ ByLayer
   0
 LINE
   5
-8B
+85
 100
 AcDbEntity
 100
@@ -3957,7 +3813,7 @@ ByLayer
   0
 LINE
   5
-8C
+86
 100
 AcDbEntity
 100
@@ -3985,7 +3841,7 @@ ByLayer
   0
 LINE
   5
-8D
+87
 100
 AcDbEntity
 100
@@ -4013,7 +3869,7 @@ ByLayer
   0
 LINE
   5
-8E
+88
 100
 AcDbEntity
 100
@@ -4041,7 +3897,7 @@ ByLayer
   0
 LINE
   5
-8F
+89
 100
 AcDbEntity
 100
@@ -4069,7 +3925,7 @@ ByLayer
   0
 LINE
   5
-90
+8A
 100
 AcDbEntity
 100
@@ -4097,7 +3953,7 @@ ByLayer
   0
 LINE
   5
-91
+8B
 100
 AcDbEntity
 100
@@ -4125,7 +3981,7 @@ ByLayer
   0
 LINE
   5
-92
+8C
 100
 AcDbEntity
 100
@@ -4153,7 +4009,7 @@ ByLayer
   0
 LINE
   5
-93
+8D
 100
 AcDbEntity
 100
@@ -4181,7 +4037,7 @@ ByLayer
   0
 CIRCLE
   5
-94
+8E
 100
 AcDbEntity
 100
@@ -4205,7 +4061,7 @@ ByLayer
   0
 CIRCLE
   5
-95
+8F
 100
 AcDbEntity
 100
@@ -4229,7 +4085,7 @@ ByLayer
   0
 LINE
   5
-96
+90
 100
 AcDbEntity
 100
@@ -4257,7 +4113,7 @@ ByLayer
   0
 CIRCLE
   5
-97
+91
 100
 AcDbEntity
 100
@@ -4281,7 +4137,7 @@ ByLayer
   0
 CIRCLE
   5
-98
+92
 100
 AcDbEntity
 100
@@ -4305,7 +4161,7 @@ ByLayer
   0
 CIRCLE
   5
-99
+93
 100
 AcDbEntity
 100
@@ -4329,7 +4185,7 @@ ByLayer
   0
 CIRCLE
   5
-9A
+94
 100
 AcDbEntity
 100
@@ -4353,7 +4209,7 @@ ByLayer
   0
 CIRCLE
   5
-9B
+95
 100
 AcDbEntity
 100
@@ -4370,6 +4226,150 @@ ByLayer
 125.840101315128905
  20
 85.004024800612342
+ 30
+0.0
+ 40
+1.4199999999999999
+  0
+CIRCLE
+  5
+96
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Top Plate Top
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+125.8401013151287344
+ 20
+96.004024800612342
+ 30
+0.0
+ 40
+1.4199999999999999
+  0
+CIRCLE
+  5
+97
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Top Plate Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+125.8401013151287344
+ 20
+96.004024800612342
+ 30
+0.0
+ 40
+1.4199999999999999
+  0
+CIRCLE
+  5
+98
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Top Plate Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+116.8401013151287344
+ 20
+96.0040248006121999
+ 30
+0.0
+ 40
+1.4199999999999999
+  0
+CIRCLE
+  5
+99
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Top Plate Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+116.840101315128905
+ 20
+85.0040248006121999
+ 30
+0.0
+ 40
+1.4199999999999999
+  0
+CIRCLE
+  5
+9A
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Top Plate Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+125.840101315128905
+ 20
+85.004024800612342
+ 30
+0.0
+ 40
+1.4199999999999999
+  0
+CIRCLE
+  5
+9B
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Top Plate Bottom Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+125.8401013151287344
+ 20
+96.004024800612342
  30
 0.0
  40
@@ -4383,7 +4383,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-Top Plate Top
+Top Plate Bottom Layer
  62
 256
 370
@@ -4391,9 +4391,9 @@ Top Plate Top
   6
 ByLayer
  10
-125.8401013151287344
+116.8401013151287344
  20
-96.004024800612342
+96.0040248006121999
  30
 0.0
  40
@@ -4407,7 +4407,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-Top Plate Middle Layer
+Top Plate Bottom Layer
  62
 256
 370
@@ -4415,9 +4415,9 @@ Top Plate Middle Layer
   6
 ByLayer
  10
-125.8401013151287344
+116.840101315128905
  20
-96.004024800612342
+85.0040248006121999
  30
 0.0
  40
@@ -4426,150 +4426,6 @@ ByLayer
 CIRCLE
   5
 9E
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Top Plate Middle Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-116.8401013151287344
- 20
-96.0040248006121999
- 30
-0.0
- 40
-1.4199999999999999
-  0
-CIRCLE
-  5
-9F
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Top Plate Middle Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-116.840101315128905
- 20
-85.0040248006121999
- 30
-0.0
- 40
-1.4199999999999999
-  0
-CIRCLE
-  5
-A0
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Top Plate Middle Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-125.840101315128905
- 20
-85.004024800612342
- 30
-0.0
- 40
-1.4199999999999999
-  0
-CIRCLE
-  5
-A1
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Top Plate Bottom Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-125.8401013151287344
- 20
-96.004024800612342
- 30
-0.0
- 40
-1.4199999999999999
-  0
-CIRCLE
-  5
-A2
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Top Plate Bottom Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-116.8401013151287344
- 20
-96.0040248006121999
- 30
-0.0
- 40
-1.4199999999999999
-  0
-CIRCLE
-  5
-A3
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Top Plate Bottom Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-116.840101315128905
- 20
-85.0040248006121999
- 30
-0.0
- 40
-1.4199999999999999
-  0
-CIRCLE
-  5
-A4
 100
 AcDbEntity
 100
@@ -4593,7 +4449,7 @@ ByLayer
   0
 LINE
   5
-A5
+9F
 100
 AcDbEntity
 100
@@ -4621,7 +4477,7 @@ ByLayer
   0
 LINE
   5
-A6
+A0
 100
 AcDbEntity
 100
@@ -4649,7 +4505,7 @@ ByLayer
   0
 LINE
   5
-A7
+A1
 100
 AcDbEntity
 100
@@ -4677,7 +4533,7 @@ ByLayer
   0
 MTEXT
   5
-A8
+A2
 100
 AcDbEntity
 100
@@ -4711,13 +4567,13 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
 MTEXT
   5
-A9
+A3
 100
 AcDbEntity
 100
@@ -4751,13 +4607,13 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
 ARC
   5
-AA
+A4
 100
 AcDbEntity
   8
@@ -4787,7 +4643,7 @@ AcDbArc
   0
 LINE
   5
-AB
+A5
 100
 AcDbEntity
 100
@@ -4815,7 +4671,7 @@ ByLayer
   0
 ARC
   5
-AC
+A6
 100
 AcDbEntity
   8
@@ -4845,7 +4701,7 @@ AcDbArc
   0
 LINE
   5
-AD
+A7
 100
 AcDbEntity
 100
@@ -4873,7 +4729,7 @@ ByLayer
   0
 ARC
   5
-AE
+A8
 100
 AcDbEntity
   8
@@ -4903,7 +4759,7 @@ AcDbArc
   0
 LINE
   5
-AF
+A9
 100
 AcDbEntity
 100
@@ -4931,7 +4787,7 @@ ByLayer
   0
 LINE
   5
-B0
+AA
 100
 AcDbEntity
 100
@@ -4959,7 +4815,7 @@ ByLayer
   0
 ARC
   5
-B1
+AB
 100
 AcDbEntity
   8
@@ -4989,7 +4845,7 @@ AcDbArc
   0
 CIRCLE
   5
-B2
+AC
 100
 AcDbEntity
 100
@@ -5013,7 +4869,7 @@ ByLayer
   0
 CIRCLE
   5
-B3
+AD
 100
 AcDbEntity
 100
@@ -5037,7 +4893,7 @@ ByLayer
   0
 CIRCLE
   5
-B4
+AE
 100
 AcDbEntity
 100
@@ -5061,7 +4917,7 @@ ByLayer
   0
 CIRCLE
   5
-B5
+AF
 100
 AcDbEntity
 100
@@ -5085,7 +4941,7 @@ ByLayer
   0
 MTEXT
   5
-B6
+B0
 100
 AcDbEntity
 100
@@ -5119,13 +4975,13 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
 MTEXT
   5
-B7
+B1
 100
 AcDbEntity
 100
@@ -5159,13 +5015,13 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
 LINE
   5
-B8
+B2
 100
 AcDbEntity
 100
@@ -5193,7 +5049,7 @@ ByLayer
   0
 LINE
   5
-B9
+B3
 100
 AcDbEntity
 100
@@ -5221,7 +5077,7 @@ ByLayer
   0
 LINE
   5
-BA
+B4
 100
 AcDbEntity
 100
@@ -5249,7 +5105,7 @@ ByLayer
   0
 LINE
   5
-BB
+B5
 100
 AcDbEntity
 100
@@ -5277,7 +5133,7 @@ ByLayer
   0
 LINE
   5
-BC
+B6
 100
 AcDbEntity
 100
@@ -5305,7 +5161,7 @@ ByLayer
   0
 LINE
   5
-BD
+B7
 100
 AcDbEntity
 100
@@ -5333,7 +5189,7 @@ ByLayer
   0
 LINE
   5
-BE
+B8
 100
 AcDbEntity
 100
@@ -5361,7 +5217,7 @@ ByLayer
   0
 LINE
   5
-BF
+B9
 100
 AcDbEntity
 100
@@ -5384,6 +5240,174 @@ ByLayer
 83.5688817377446043
  21
 114.2968913400583659
+ 31
+0.0
+  0
+LINE
+  5
+BA
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Top Plate Bottom Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+87.540101315129121
+ 20
+76.2941167806189213
+ 30
+0.0
+ 11
+87.5401013151290215
+ 21
+80.2941167806189355
+ 31
+0.0
+  0
+LINE
+  5
+BB
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Top Plate Bottom Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+95.1401013151291437
+ 20
+76.2941167806190634
+ 30
+0.0
+ 11
+87.540101315129121
+ 21
+76.2941167806189213
+ 31
+0.0
+  0
+LINE
+  5
+BC
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Top Plate Bottom Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+95.1401013151289732
+ 20
+80.2941167806189355
+ 30
+0.0
+ 11
+95.1401013151291437
+ 21
+76.2941167806190634
+ 31
+0.0
+  0
+LINE
+  5
+BD
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Top Plate Bottom Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+87.5401013151290215
+ 20
+80.2941167806189355
+ 30
+0.0
+ 11
+95.1401013151289732
+ 21
+80.2941167806189355
+ 31
+0.0
+  0
+LINE
+  5
+BE
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Top Plate Bottom Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+119.5401013151288936
+ 20
+76.2941167806192766
+ 30
+0.0
+ 11
+119.5401013151288083
+ 21
+80.2941167806192766
+ 31
+0.0
+  0
+LINE
+  5
+BF
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Top Plate Bottom Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+127.1401013151288453
+ 20
+76.2941167806193334
+ 30
+0.0
+ 11
+119.5401013151288936
+ 21
+76.2941167806192766
  31
 0.0
   0
@@ -5403,15 +5427,15 @@ Top Plate Bottom Layer
   6
 ByLayer
  10
-87.540101315129121
+127.1401013151288169
  20
-76.2941167806189213
+80.2941167806192766
  30
 0.0
  11
-87.5401013151290215
+127.1401013151288453
  21
-80.2941167806189355
+76.2941167806193334
  31
 0.0
   0
@@ -5431,15 +5455,15 @@ Top Plate Bottom Layer
   6
 ByLayer
  10
-95.1401013151291437
+119.5401013151288083
  20
-76.2941167806190634
+80.2941167806192766
  30
 0.0
  11
-87.540101315129121
+127.1401013151288169
  21
-76.2941167806189213
+80.2941167806192766
  31
 0.0
   0
@@ -5451,35 +5475,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Top Plate Bottom Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-95.1401013151289732
- 20
-80.2941167806189355
- 30
-0.0
- 11
-95.1401013151291437
- 21
-76.2941167806190634
- 31
-0.0
-  0
-LINE
-  5
-C3
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Top Plate Bottom Layer
+Top Plate Middle Layer
  62
 256
 370
@@ -5493,9 +5489,37 @@ ByLayer
  30
 0.0
  11
-95.1401013151289732
+95.1401013151289874
  21
 80.2941167806189355
+ 31
+0.0
+  0
+LINE
+  5
+C3
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Top Plate Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+95.1401013151289874
+ 20
+80.2941167806189355
+ 30
+0.0
+ 11
+95.1401013151291153
+ 21
+76.2941167806189924
  31
 0.0
   0
@@ -5507,7 +5531,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Top Plate Bottom Layer
+Top Plate Middle Layer
  62
 256
 370
@@ -5515,15 +5539,15 @@ Top Plate Bottom Layer
   6
 ByLayer
  10
-119.5401013151288936
+95.1401013151291153
  20
-76.2941167806192766
+76.2941167806189924
  30
 0.0
  11
-119.5401013151288083
+87.540101315129121
  21
-80.2941167806192766
+76.2941167806189355
  31
 0.0
   0
@@ -5535,7 +5559,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Top Plate Bottom Layer
+Top Plate Middle Layer
  62
 256
 370
@@ -5543,15 +5567,15 @@ Top Plate Bottom Layer
   6
 ByLayer
  10
-127.1401013151288453
+87.540101315129121
  20
-76.2941167806193334
+76.2941167806189355
  30
 0.0
  11
-119.5401013151288936
+87.5401013151290215
  21
-76.2941167806192766
+80.2941167806189355
  31
 0.0
   0
@@ -5563,35 +5587,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Top Plate Bottom Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-127.1401013151288169
- 20
-80.2941167806192766
- 30
-0.0
- 11
-127.1401013151288453
- 21
-76.2941167806193334
- 31
-0.0
-  0
-LINE
-  5
-C7
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Top Plate Bottom Layer
+Top Plate Middle Layer
  62
 256
 370
@@ -5608,6 +5604,34 @@ ByLayer
 127.1401013151288169
  21
 80.2941167806192766
+ 31
+0.0
+  0
+LINE
+  5
+C7
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Top Plate Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+127.1401013151288169
+ 20
+80.2941167806192766
+ 30
+0.0
+ 11
+127.1401013151288453
+ 21
+76.2941167806193334
  31
 0.0
   0
@@ -5627,15 +5651,15 @@ Top Plate Middle Layer
   6
 ByLayer
  10
-87.5401013151290215
+119.5401013151288936
  20
-80.2941167806189355
+76.2941167806192766
  30
 0.0
  11
-95.1401013151289874
+119.5401013151288083
  21
-80.2941167806189355
+80.2941167806192766
  31
 0.0
   0
@@ -5655,15 +5679,15 @@ Top Plate Middle Layer
   6
 ByLayer
  10
-95.1401013151289874
+127.1401013151288453
  20
-80.2941167806189355
+76.2941167806193334
  30
 0.0
  11
-95.1401013151291153
+119.5401013151288936
  21
-76.2941167806189924
+76.2941167806192766
  31
 0.0
   0
@@ -5683,15 +5707,15 @@ Top Plate Middle Layer
   6
 ByLayer
  10
-95.1401013151291153
+116.0297355127341916
  20
-76.2941167806189924
+130.3683869829262392
  30
 0.0
  11
-87.540101315129121
+117.3978160860369115
  21
-76.2941167806189355
+126.6096164997826747
  31
 0.0
   0
@@ -5711,15 +5735,15 @@ Top Plate Middle Layer
   6
 ByLayer
  10
-87.540101315129121
+117.3978160860369115
  20
-76.2941167806189355
+126.6096164997826747
  30
 0.0
  11
-87.5401013151290215
+110.2561521680640055
  21
-80.2941167806189355
+124.0102634105074628
  31
 0.0
   0
@@ -5739,15 +5763,15 @@ Top Plate Middle Layer
   6
 ByLayer
  10
-119.5401013151288083
+108.888071594761314
  20
-80.2941167806192766
+127.7690338936511978
  30
 0.0
  11
-127.1401013151288169
+116.0297355127341916
  21
-80.2941167806192766
+130.3683869829262392
  31
 0.0
   0
@@ -5767,15 +5791,15 @@ Top Plate Middle Layer
   6
 ByLayer
  10
-127.1401013151288169
+110.2561521680640055
  20
-80.2941167806192766
+124.0102634105074628
  30
 0.0
  11
-127.1401013151288453
+108.888071594761314
  21
-76.2941167806193334
+127.7690338936511978
  31
 0.0
   0
@@ -5795,15 +5819,15 @@ Top Plate Middle Layer
   6
 ByLayer
  10
-119.5401013151288936
+75.0591372464688078
  20
-76.2941167806192766
+115.4563087339267327
  30
 0.0
  11
-119.5401013151288083
+82.2008011644416285
  21
-80.2941167806192766
+118.0556618232018877
  31
 0.0
   0
@@ -5823,15 +5847,15 @@ Top Plate Middle Layer
   6
 ByLayer
  10
-127.1401013151288453
+76.4272178197717125
  20
-76.2941167806193334
+111.6975382507830687
  30
 0.0
  11
-119.5401013151288936
+75.0591372464688078
  21
-76.2941167806192766
+115.4563087339267327
  31
 0.0
   0
@@ -5851,15 +5875,15 @@ Top Plate Middle Layer
   6
 ByLayer
  10
-116.0297355127341916
+82.2008011644416285
  20
-130.3683869829262392
+118.0556618232018877
  30
 0.0
  11
-117.3978160860369115
+83.5688817377446043
  21
-126.6096164997826747
+114.2968913400583659
  31
 0.0
   0
@@ -5879,15 +5903,15 @@ Top Plate Middle Layer
   6
 ByLayer
  10
-117.3978160860369115
+83.5688817377446043
  20
-126.6096164997826747
+114.2968913400583659
  30
 0.0
  11
-110.2561521680640055
+76.4272178197717125
  21
-124.0102634105074628
+111.6975382507830687
  31
 0.0
   0
@@ -5899,7 +5923,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Top Plate Middle Layer
+Top Plate Top
  62
 256
 370
@@ -5907,15 +5931,15 @@ Top Plate Middle Layer
   6
 ByLayer
  10
-108.888071594761314
+101.9401013151287856
  20
-127.7690338936511978
+101.5040248006119583
  30
 0.0
  11
-116.0297355127341916
+108.9401013151287856
  21
-130.3683869829262392
+101.504024800612072
  31
 0.0
   0
@@ -5927,7 +5951,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Top Plate Middle Layer
+Top Plate Top
  62
 256
 370
@@ -5935,15 +5959,15 @@ Top Plate Middle Layer
   6
 ByLayer
  10
-110.2561521680640055
+108.9401013151291266
  20
-124.0102634105074628
+79.504024800612072
  30
 0.0
  11
-108.888071594761314
+108.9401013151287856
  21
-127.7690338936511978
+101.504024800612072
  31
 0.0
   0
@@ -5955,7 +5979,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Top Plate Middle Layer
+Top Plate Top
  62
 256
 370
@@ -5963,15 +5987,15 @@ Top Plate Middle Layer
   6
 ByLayer
  10
-75.0591372464688078
+101.9401013151291266
  20
-115.4563087339267327
+79.5040248006119583
  30
 0.0
  11
-82.2008011644416285
+101.9401013151287856
  21
-118.0556618232018877
+101.5040248006119583
  31
 0.0
   0
@@ -5983,7 +6007,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Top Plate Middle Layer
+Top Plate Top
  62
 256
 370
@@ -5991,189 +6015,21 @@ Top Plate Middle Layer
   6
 ByLayer
  10
-76.4272178197717125
+101.9401013151291266
  20
-111.6975382507830687
+79.5040248006119583
  30
 0.0
  11
-75.0591372464688078
+108.9401013151291266
  21
-115.4563087339267327
+79.504024800612072
  31
 0.0
   0
 LINE
   5
 D6
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Top Plate Middle Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-82.2008011644416285
- 20
-118.0556618232018877
- 30
-0.0
- 11
-83.5688817377446043
- 21
-114.2968913400583659
- 31
-0.0
-  0
-LINE
-  5
-D7
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Top Plate Middle Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-83.5688817377446043
- 20
-114.2968913400583659
- 30
-0.0
- 11
-76.4272178197717125
- 21
-111.6975382507830687
- 31
-0.0
-  0
-LINE
-  5
-D8
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Top Plate Top
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-101.9401013151287856
- 20
-101.5040248006119583
- 30
-0.0
- 11
-108.9401013151287856
- 21
-101.504024800612072
- 31
-0.0
-  0
-LINE
-  5
-D9
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Top Plate Top
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-108.9401013151291266
- 20
-79.504024800612072
- 30
-0.0
- 11
-108.9401013151287856
- 21
-101.504024800612072
- 31
-0.0
-  0
-LINE
-  5
-DA
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Top Plate Top
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-101.9401013151291266
- 20
-79.5040248006119583
- 30
-0.0
- 11
-101.9401013151287856
- 21
-101.5040248006119583
- 31
-0.0
-  0
-LINE
-  5
-DB
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Top Plate Top
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-101.9401013151291266
- 20
-79.5040248006119583
- 30
-0.0
- 11
-108.9401013151291266
- 21
-79.504024800612072
- 31
-0.0
-  0
-LINE
-  5
-DC
 100
 AcDbEntity
 100
@@ -6201,7 +6057,7 @@ ByLayer
   0
 LINE
   5
-DD
+D7
 100
 AcDbEntity
 100
@@ -6229,7 +6085,7 @@ ByLayer
   0
 LINE
   5
-DE
+D8
 100
 AcDbEntity
 100
@@ -6257,7 +6113,7 @@ ByLayer
   0
 LINE
   5
-DF
+D9
 100
 AcDbEntity
 100
@@ -6285,7 +6141,7 @@ ByLayer
   0
 LINE
   5
-E0
+DA
 100
 AcDbEntity
 100
@@ -6313,7 +6169,7 @@ ByLayer
   0
 LINE
   5
-E1
+DB
 100
 AcDbEntity
 100
@@ -6341,7 +6197,7 @@ ByLayer
   0
 LINE
   5
-E2
+DC
 100
 AcDbEntity
 100
@@ -6369,7 +6225,7 @@ ByLayer
   0
 LINE
   5
-E3
+DD
 100
 AcDbEntity
 100
@@ -6397,7 +6253,7 @@ ByLayer
   0
 LINE
   5
-E4
+DE
 100
 AcDbEntity
 100
@@ -6425,7 +6281,7 @@ ByLayer
   0
 LINE
   5
-E5
+DF
 100
 AcDbEntity
 100
@@ -6453,7 +6309,7 @@ ByLayer
   0
 LINE
   5
-E6
+E0
 100
 AcDbEntity
 100
@@ -6481,7 +6337,7 @@ ByLayer
   0
 LINE
   5
-E7
+E1
 100
 AcDbEntity
 100
@@ -6509,7 +6365,7 @@ ByLayer
   0
 LINE
   5
-E8
+E2
 100
 AcDbEntity
 100
@@ -6537,7 +6393,7 @@ ByLayer
   0
 CIRCLE
   5
-E9
+E3
 100
 AcDbEntity
 100
@@ -6561,7 +6417,7 @@ ByLayer
   0
 CIRCLE
   5
-EA
+E4
 100
 AcDbEntity
 100
@@ -6585,7 +6441,7 @@ ByLayer
   0
 LINE
   5
-EB
+E5
 100
 AcDbEntity
 100
@@ -6613,7 +6469,7 @@ ByLayer
   0
 CIRCLE
   5
-EC
+E6
 100
 AcDbEntity
 100
@@ -6637,7 +6493,7 @@ ByLayer
   0
 CIRCLE
   5
-ED
+E7
 100
 AcDbEntity
 100
@@ -6661,7 +6517,7 @@ ByLayer
   0
 ARC
   5
-EE
+E8
 100
 AcDbEntity
   8
@@ -6691,7 +6547,7 @@ AcDbArc
   0
 LINE
   5
-EF
+E9
 100
 AcDbEntity
 100
@@ -6719,7 +6575,7 @@ ByLayer
   0
 ARC
   5
-F0
+EA
 100
 AcDbEntity
   8
@@ -6749,7 +6605,7 @@ AcDbArc
   0
 LINE
   5
-F1
+EB
 100
 AcDbEntity
 100
@@ -6777,7 +6633,7 @@ ByLayer
   0
 ARC
   5
-F2
+EC
 100
 AcDbEntity
   8
@@ -6807,7 +6663,7 @@ AcDbArc
   0
 LINE
   5
-F3
+ED
 100
 AcDbEntity
 100
@@ -6835,7 +6691,7 @@ ByLayer
   0
 LINE
   5
-F4
+EE
 100
 AcDbEntity
 100
@@ -6863,7 +6719,7 @@ ByLayer
   0
 ARC
   5
-F5
+EF
 100
 AcDbEntity
   8
@@ -6893,7 +6749,7 @@ AcDbArc
   0
 CIRCLE
   5
-F6
+F0
 100
 AcDbEntity
 100
@@ -6917,7 +6773,7 @@ ByLayer
   0
 CIRCLE
   5
-F7
+F1
 100
 AcDbEntity
 100
@@ -6941,7 +6797,7 @@ ByLayer
   0
 CIRCLE
   5
-F8
+F2
 100
 AcDbEntity
 100
@@ -6965,7 +6821,7 @@ ByLayer
   0
 CIRCLE
   5
-F9
+F3
 100
 AcDbEntity
 100
@@ -6989,7 +6845,7 @@ ByLayer
   0
 CIRCLE
   5
-FA
+F4
 100
 AcDbEntity
 100
@@ -7006,6 +6862,150 @@ ByLayer
 94.9401013151288424
  20
 96.0040248006118446
+ 30
+0.0
+ 40
+1.424999999999996
+  0
+CIRCLE
+  5
+F5
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Top Plate Bottom Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+94.940101315129013
+ 20
+85.0040248006118446
+ 30
+0.0
+ 40
+1.424999999999996
+  0
+CIRCLE
+  5
+F6
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Top Plate Bottom Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+85.9401013151288424
+ 20
+96.0040248006117025
+ 30
+0.0
+ 40
+1.424999999999996
+  0
+CIRCLE
+  5
+F7
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Top Plate Bottom Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+85.940101315129013
+ 20
+85.0040248006117025
+ 30
+0.0
+ 40
+1.424999999999996
+  0
+CIRCLE
+  5
+F8
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Top Plate Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+94.9401013151288424
+ 20
+96.0040248006118446
+ 30
+0.0
+ 40
+1.424999999999996
+  0
+CIRCLE
+  5
+F9
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Top Plate Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+94.940101315129013
+ 20
+85.0040248006118446
+ 30
+0.0
+ 40
+1.424999999999996
+  0
+CIRCLE
+  5
+FA
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Top Plate Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+85.9401013151288424
+ 20
+96.0040248006117025
  30
 0.0
  40
@@ -7019,7 +7019,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-Top Plate Bottom Layer
+Top Plate Middle Layer
  62
 256
 370
@@ -7027,9 +7027,9 @@ Top Plate Bottom Layer
   6
 ByLayer
  10
-94.940101315129013
+85.940101315129013
  20
-85.0040248006118446
+85.0040248006117025
  30
 0.0
  40
@@ -7043,7 +7043,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-Top Plate Bottom Layer
+Top Plate Top
  62
 256
 370
@@ -7051,9 +7051,9 @@ Top Plate Bottom Layer
   6
 ByLayer
  10
-85.9401013151288424
+94.9401013151288424
  20
-96.0040248006117025
+96.0040248006118446
  30
 0.0
  40
@@ -7067,7 +7067,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-Top Plate Bottom Layer
+Top Plate Top
  62
 256
 370
@@ -7075,9 +7075,9 @@ Top Plate Bottom Layer
   6
 ByLayer
  10
-85.940101315129013
+94.940101315129013
  20
-85.0040248006117025
+85.0040248006118446
  30
 0.0
  40
@@ -7091,7 +7091,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-Top Plate Middle Layer
+Top Plate Top
  62
 256
 370
@@ -7099,9 +7099,9 @@ Top Plate Middle Layer
   6
 ByLayer
  10
-94.9401013151288424
+85.9401013151288424
  20
-96.0040248006118446
+96.0040248006117025
  30
 0.0
  40
@@ -7115,7 +7115,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-Top Plate Middle Layer
+Top Plate Top
  62
 256
 370
@@ -7123,23 +7123,23 @@ Top Plate Middle Layer
   6
 ByLayer
  10
-94.940101315129013
+85.940101315129013
  20
-85.0040248006118446
+85.0040248006117025
  30
 0.0
  40
 1.424999999999996
   0
-CIRCLE
+MTEXT
   5
 100
 100
 AcDbEntity
 100
-AcDbCircle
+AcDbMText
   8
-Top Plate Middle Layer
+Top Plate Bottom Text
  62
 256
 370
@@ -7147,23 +7147,39 @@ Top Plate Middle Layer
   6
 ByLayer
  10
-85.9401013151288424
+81.0
  20
-96.0040248006117025
+106.0
  30
 0.0
  40
-1.424999999999996
+2.0
+ 41
+100.0
+ 71
+1
+ 72
+2
+  1
+Top\~Plate\PBottom
+  7
+standard
+ 50
+0.0
+ 73
+1
+ 44
+1.0
   0
-CIRCLE
+MTEXT
   5
 101
 100
 AcDbEntity
 100
-AcDbCircle
+AcDbMText
   8
-Top Plate Middle Layer
+Top Plate Bottom Text
  62
 256
 370
@@ -7171,23 +7187,39 @@ Top Plate Middle Layer
   6
 ByLayer
  10
-85.940101315129013
+112.0
  20
-85.0040248006117025
+106.0
  30
 0.0
  40
-1.424999999999996
+2.0
+ 41
+100.0
+ 71
+1
+ 72
+2
+  1
+Top\~Plate\PBottom
+  7
+standard
+ 50
+0.0
+ 73
+1
+ 44
+1.0
   0
-CIRCLE
+MTEXT
   5
 102
 100
 AcDbEntity
 100
-AcDbCircle
+AcDbMText
   8
-Top Plate Top
+Top Plate Top Text
  62
 256
 370
@@ -7195,23 +7227,39 @@ Top Plate Top
   6
 ByLayer
  10
-94.9401013151288424
+81.0
  20
-96.0040248006118446
+106.0
  30
 0.0
  40
-1.424999999999996
+2.0
+ 41
+100.0
+ 71
+1
+ 72
+2
+  1
+Top\~Plate\PTop
+  7
+standard
+ 50
+0.0
+ 73
+1
+ 44
+1.0
   0
-CIRCLE
+MTEXT
   5
 103
 100
 AcDbEntity
 100
-AcDbCircle
+AcDbMText
   8
-Top Plate Top
+Top Plate Top Text
  62
 256
 370
@@ -7219,273 +7267,33 @@ Top Plate Top
   6
 ByLayer
  10
-94.940101315129013
+112.0
  20
-85.0040248006118446
+106.0
  30
 0.0
  40
-1.424999999999996
+2.0
+ 41
+100.0
+ 71
+1
+ 72
+2
+  1
+Top\~Plate\PTop
+  7
+standard
+ 50
+0.0
+ 73
+1
+ 44
+1.0
   0
 CIRCLE
   5
 104
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Top Plate Top
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-85.9401013151288424
- 20
-96.0040248006117025
- 30
-0.0
- 40
-1.424999999999996
-  0
-CIRCLE
-  5
-105
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Top Plate Top
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-85.940101315129013
- 20
-85.0040248006117025
- 30
-0.0
- 40
-1.424999999999996
-  0
-MTEXT
-  5
-106
-100
-AcDbEntity
-100
-AcDbMText
-  8
-Top Plate Bottom Text
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-81.0
- 20
-106.0
- 30
-0.0
- 40
-2.0
- 41
-100.0
- 71
-1
- 72
-2
-  1
-Top\~Plate\PBottom
-  7
-standard
- 50
-0.0
- 73
-0
- 44
-1.0
-  0
-MTEXT
-  5
-107
-100
-AcDbEntity
-100
-AcDbMText
-  8
-Top Plate Bottom Text
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-112.0
- 20
-106.0
- 30
-0.0
- 40
-2.0
- 41
-100.0
- 71
-1
- 72
-2
-  1
-Top\~Plate\PBottom
-  7
-standard
- 50
-0.0
- 73
-0
- 44
-1.0
-  0
-MTEXT
-  5
-108
-100
-AcDbEntity
-100
-AcDbMText
-  8
-Top Plate Top Text
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-81.0
- 20
-106.0
- 30
-0.0
- 40
-2.0
- 41
-100.0
- 71
-1
- 72
-2
-  1
-Top\~Plate\PTop
-  7
-standard
- 50
-0.0
- 73
-0
- 44
-1.0
-  0
-MTEXT
-  5
-109
-100
-AcDbEntity
-100
-AcDbMText
-  8
-Top Plate Top Text
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-112.0
- 20
-106.0
- 30
-0.0
- 40
-2.0
- 41
-100.0
- 71
-1
- 72
-2
-  1
-Top\~Plate\PTop
-  7
-standard
- 50
-0.0
- 73
-0
- 44
-1.0
-  0
-CIRCLE
-  5
-10A
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-112.7180069813213095
- 20
-119.5854164212381363
- 30
-0.0
- 40
-1.425
-  0
-CIRCLE
-  5
-10B
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-84.5272283577440362
- 20
-109.3248121214680708
- 30
-0.0
- 40
-1.425
-  0
-CIRCLE
-  5
-10C
 100
 AcDbEntity
 100
@@ -7509,7 +7317,7 @@ ByLayer
   0
 CIRCLE
   5
-10D
+105
 100
 AcDbEntity
 100
@@ -7533,7 +7341,7 @@ ByLayer
   0
 LINE
   5
-10E
+106
 100
 AcDbEntity
 100
@@ -7561,7 +7369,7 @@ ByLayer
   0
 LINE
   5
-10F
+107
 100
 AcDbEntity
 100
@@ -7589,7 +7397,7 @@ ByLayer
   0
 LINE
   5
-110
+108
 100
 AcDbEntity
 100
@@ -7617,7 +7425,7 @@ ByLayer
   0
 LINE
   5
-111
+109
 100
 AcDbEntity
 100
@@ -7645,7 +7453,7 @@ ByLayer
   0
 LINE
   5
-112
+10A
 100
 AcDbEntity
 100
@@ -7673,7 +7481,7 @@ ByLayer
   0
 LINE
   5
-113
+10B
 100
 AcDbEntity
 100
@@ -7701,7 +7509,7 @@ ByLayer
   0
 LINE
   5
-114
+10C
 100
 AcDbEntity
 100
@@ -7729,7 +7537,7 @@ ByLayer
   0
 LINE
   5
-115
+10D
 100
 AcDbEntity
 100
@@ -7757,7 +7565,7 @@ ByLayer
   0
 LINE
   5
-116
+10E
 100
 AcDbEntity
 100
@@ -7785,7 +7593,7 @@ ByLayer
   0
 LINE
   5
-117
+10F
 100
 AcDbEntity
 100
@@ -7813,7 +7621,7 @@ ByLayer
   0
 LINE
   5
-118
+110
 100
 AcDbEntity
 100
@@ -7841,7 +7649,7 @@ ByLayer
   0
 LINE
   5
-119
+111
 100
 AcDbEntity
 100
@@ -7869,7 +7677,7 @@ ByLayer
   0
 LINE
   5
-11A
+112
 100
 AcDbEntity
 100
@@ -7897,7 +7705,7 @@ ByLayer
   0
 LINE
   5
-11B
+113
 100
 AcDbEntity
 100
@@ -7925,7 +7733,7 @@ ByLayer
   0
 LINE
   5
-11C
+114
 100
 AcDbEntity
 100
@@ -7953,7 +7761,7 @@ ByLayer
   0
 ARC
   5
-11D
+115
 100
 AcDbEntity
   8
@@ -7983,7 +7791,7 @@ AcDbArc
   0
 ARC
   5
-11E
+116
 100
 AcDbEntity
   8
@@ -8013,7 +7821,7 @@ AcDbArc
   0
 ARC
   5
-11F
+117
 100
 AcDbEntity
   8
@@ -8043,7 +7851,7 @@ AcDbArc
   0
 ARC
   5
-120
+118
 100
 AcDbEntity
   8
@@ -8073,7 +7881,7 @@ AcDbArc
   0
 LINE
   5
-121
+119
 100
 AcDbEntity
 100
@@ -8101,7 +7909,7 @@ ByLayer
   0
 LINE
   5
-122
+11A
 100
 AcDbEntity
 100
@@ -8129,55 +7937,7 @@ ByLayer
   0
 CIRCLE
   5
-123
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Main Plate Bottom Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-112.7180069813213095
- 20
-119.5854164212381363
- 30
-0.0
- 40
-1.425
-  0
-CIRCLE
-  5
-124
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Main Plate Bottom Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-84.5272283577440362
- 20
-109.3248121214680708
- 30
-0.0
- 40
-1.425
-  0
-CIRCLE
-  5
-125
+11B
 100
 AcDbEntity
 100
@@ -8201,7 +7961,7 @@ ByLayer
   0
 CIRCLE
   5
-126
+11C
 100
 AcDbEntity
 100
@@ -8225,7 +7985,7 @@ ByLayer
   0
 LINE
   5
-127
+11D
 100
 AcDbEntity
 100
@@ -8253,7 +8013,7 @@ ByLayer
   0
 LINE
   5
-128
+11E
 100
 AcDbEntity
 100
@@ -8281,7 +8041,7 @@ ByLayer
   0
 LINE
   5
-129
+11F
 100
 AcDbEntity
 100
@@ -8309,7 +8069,7 @@ ByLayer
   0
 LINE
   5
-12A
+120
 100
 AcDbEntity
 100
@@ -8337,7 +8097,7 @@ ByLayer
   0
 LINE
   5
-12B
+121
 100
 AcDbEntity
 100
@@ -8365,7 +8125,7 @@ ByLayer
   0
 ARC
   5
-12C
+122
 100
 AcDbEntity
   8
@@ -8395,7 +8155,7 @@ AcDbArc
   0
 ARC
   5
-12D
+123
 100
 AcDbEntity
   8
@@ -8425,7 +8185,7 @@ AcDbArc
   0
 ARC
   5
-12E
+124
 100
 AcDbEntity
   8
@@ -8455,7 +8215,7 @@ AcDbArc
   0
 ARC
   5
-12F
+125
 100
 AcDbEntity
   8
@@ -8485,7 +8245,7 @@ AcDbArc
   0
 MTEXT
   5
-130
+126
 100
 AcDbEntity
 100
@@ -8519,13 +8279,13 @@ standard
  50
 360.0
  73
-1
+0
  44
 1.0
   0
 MTEXT
   5
-131
+127
 100
 AcDbEntity
 100
@@ -8559,13 +8319,13 @@ standard
  50
 360.0
  73
-1
+0
  44
 1.0
   0
 LINE
   5
-132
+128
 100
 AcDbEntity
 100
@@ -8593,7 +8353,7 @@ ByLayer
   0
 LINE
   5
-133
+129
 100
 AcDbEntity
 100
@@ -8621,7 +8381,7 @@ ByLayer
   0
 LINE
   5
-134
+12A
 100
 AcDbEntity
 100
@@ -8649,7 +8409,7 @@ ByLayer
   0
 LINE
   5
-135
+12B
 100
 AcDbEntity
 100
@@ -8677,7 +8437,7 @@ ByLayer
   0
 LINE
   5
-136
+12C
 100
 AcDbEntity
 100
@@ -8705,7 +8465,7 @@ ByLayer
   0
 LINE
   5
-137
+12D
 100
 AcDbEntity
 100
@@ -8733,7 +8493,7 @@ ByLayer
   0
 LINE
   5
-138
+12E
 100
 AcDbEntity
 100
@@ -8761,7 +8521,7 @@ ByLayer
   0
 LINE
   5
-139
+12F
 100
 AcDbEntity
 100
@@ -8789,7 +8549,7 @@ ByLayer
   0
 LINE
   5
-13A
+130
 100
 AcDbEntity
 100
@@ -8817,7 +8577,7 @@ ByLayer
   0
 LINE
   5
-13B
+131
 100
 AcDbEntity
 100
@@ -8845,7 +8605,7 @@ ByLayer
   0
 LINE
   5
-13C
+132
 100
 AcDbEntity
 100
@@ -8873,7 +8633,7 @@ ByLayer
   0
 LINE
   5
-13D
+133
 100
 AcDbEntity
 100
@@ -8901,7 +8661,7 @@ ByLayer
   0
 LINE
   5
-13E
+134
 100
 AcDbEntity
 100
@@ -8929,7 +8689,7 @@ ByLayer
   0
 LINE
   5
-13F
+135
 100
 AcDbEntity
 100
@@ -8957,7 +8717,7 @@ ByLayer
   0
 LINE
   5
-140
+136
 100
 AcDbEntity
 100
@@ -8985,7 +8745,7 @@ ByLayer
   0
 LINE
   5
-141
+137
 100
 AcDbEntity
 100
@@ -9013,7 +8773,7 @@ ByLayer
   0
 LINE
   5
-142
+138
 100
 AcDbEntity
 100
@@ -9041,7 +8801,7 @@ ByLayer
   0
 ARC
   5
-143
+139
 100
 AcDbEntity
   8
@@ -9071,7 +8831,7 @@ AcDbArc
   0
 LINE
   5
-144
+13A
 100
 AcDbEntity
 100
@@ -9099,7 +8859,7 @@ ByLayer
   0
 ARC
   5
-145
+13B
 100
 AcDbEntity
   8
@@ -9129,7 +8889,7 @@ AcDbArc
   0
 LINE
   5
-146
+13C
 100
 AcDbEntity
 100
@@ -9157,55 +8917,7 @@ ByLayer
   0
 CIRCLE
   5
-147
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Main Plate Middle Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-112.7180069813213095
- 20
-119.5854164212381363
- 30
-0.0
- 40
-1.425
-  0
-CIRCLE
-  5
-148
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Main Plate Middle Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-84.5272283577440362
- 20
-109.3248121214680708
- 30
-0.0
- 40
-1.425
-  0
-CIRCLE
-  5
-149
+13D
 100
 AcDbEntity
 100
@@ -9229,7 +8941,7 @@ ByLayer
   0
 CIRCLE
   5
-14A
+13E
 100
 AcDbEntity
 100
@@ -9253,7 +8965,7 @@ ByLayer
   0
 LINE
   5
-14B
+13F
 100
 AcDbEntity
 100
@@ -9281,7 +8993,7 @@ ByLayer
   0
 LINE
   5
-14C
+140
 100
 AcDbEntity
 100
@@ -9309,7 +9021,7 @@ ByLayer
   0
 LINE
   5
-14D
+141
 100
 AcDbEntity
 100
@@ -9337,7 +9049,7 @@ ByLayer
   0
 LINE
   5
-14E
+142
 100
 AcDbEntity
 100
@@ -9365,7 +9077,7 @@ ByLayer
   0
 ARC
   5
-14F
+143
 100
 AcDbEntity
   8
@@ -9395,7 +9107,7 @@ AcDbArc
   0
 ARC
   5
-150
+144
 100
 AcDbEntity
   8
@@ -9425,7 +9137,7 @@ AcDbArc
   0
 ARC
   5
-151
+145
 100
 AcDbEntity
   8
@@ -9455,7 +9167,7 @@ AcDbArc
   0
 ARC
   5
-152
+146
 100
 AcDbEntity
   8
@@ -9485,7 +9197,7 @@ AcDbArc
   0
 LINE
   5
-153
+147
 100
 AcDbEntity
 100
@@ -9513,7 +9225,7 @@ ByLayer
   0
 LINE
   5
-154
+148
 100
 AcDbEntity
 100
@@ -9541,7 +9253,7 @@ ByLayer
   0
 LINE
   5
-155
+149
 100
 AcDbEntity
 100
@@ -9569,7 +9281,7 @@ ByLayer
   0
 LINE
   5
-156
+14A
 100
 AcDbEntity
 100
@@ -9597,7 +9309,7 @@ ByLayer
   0
 LINE
   5
-157
+14B
 100
 AcDbEntity
 100
@@ -9625,7 +9337,7 @@ ByLayer
   0
 LINE
   5
-158
+14C
 100
 AcDbEntity
 100
@@ -9653,7 +9365,7 @@ ByLayer
   0
 LINE
   5
-159
+14D
 100
 AcDbEntity
 100
@@ -9681,7 +9393,7 @@ ByLayer
   0
 LINE
   5
-15A
+14E
 100
 AcDbEntity
 100
@@ -9709,7 +9421,7 @@ ByLayer
   0
 LINE
   5
-15B
+14F
 100
 AcDbEntity
 100
@@ -9737,7 +9449,7 @@ ByLayer
   0
 MTEXT
   5
-15C
+150
 100
 AcDbEntity
 100
@@ -9771,13 +9483,13 @@ standard
  50
 360.0
  73
-1
+0
  44
 1.0
   0
 LINE
   5
-15D
+151
 100
 AcDbEntity
 100
@@ -9805,7 +9517,7 @@ ByLayer
   0
 LINE
   5
-15E
+152
 100
 AcDbEntity
 100
@@ -9833,7 +9545,7 @@ ByLayer
   0
 LINE
   5
-15F
+153
 100
 AcDbEntity
 100
@@ -9861,7 +9573,7 @@ ByLayer
   0
 CIRCLE
   5
-160
+154
 100
 AcDbEntity
 100
@@ -9885,7 +9597,7 @@ ByLayer
   0
 CIRCLE
   5
-161
+155
 100
 AcDbEntity
 100
@@ -9909,7 +9621,7 @@ ByLayer
   0
 CIRCLE
   5
-162
+156
 100
 AcDbEntity
 100
@@ -9933,7 +9645,7 @@ ByLayer
   0
 CIRCLE
   5
-163
+157
 100
 AcDbEntity
 100
@@ -9957,7 +9669,7 @@ ByLayer
   0
 CIRCLE
   5
-164
+158
 100
 AcDbEntity
 100
@@ -9981,7 +9693,7 @@ ByLayer
   0
 CIRCLE
   5
-165
+159
 100
 AcDbEntity
 100
@@ -10005,7 +9717,7 @@ ByLayer
   0
 CIRCLE
   5
-166
+15A
 100
 AcDbEntity
 100
@@ -10029,7 +9741,7 @@ ByLayer
   0
 CIRCLE
   5
-167
+15B
 100
 AcDbEntity
 100
@@ -10053,343 +9765,343 @@ ByLayer
   0
 LINE
   5
+15C
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+116.8401013151283223
+ 20
+99.179450800611562
+ 30
+0.0
+ 11
+119.5901013151283223
+ 21
+97.5917378006115541
+ 31
+0.0
+  0
+LINE
+  5
+15D
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+119.5901013151283223
+ 20
+97.5917378006115541
+ 30
+0.0
+ 11
+119.5901013151283223
+ 21
+94.4163118006115525
+ 31
+0.0
+  0
+LINE
+  5
+15E
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+119.5901013151283223
+ 20
+94.4163118006115525
+ 30
+0.0
+ 11
+116.8401013151282939
+ 21
+92.8285988006115446
+ 31
+0.0
+  0
+LINE
+  5
+15F
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+114.0901013151283223
+ 20
+94.4163118006115667
+ 30
+0.0
+ 11
+116.8401013151282939
+ 21
+92.8285988006115446
+ 31
+0.0
+  0
+LINE
+  5
+160
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+114.0901013151282939
+ 20
+97.5917378006115399
+ 30
+0.0
+ 11
+114.0901013151283223
+ 21
+94.4163118006115667
+ 31
+0.0
+  0
+LINE
+  5
+161
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+116.8401013151283223
+ 20
+99.179450800611562
+ 30
+0.0
+ 11
+114.0901013151282939
+ 21
+97.5917378006115399
+ 31
+0.0
+  0
+LINE
+  5
+162
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+125.8401013151283223
+ 20
+99.1794508006117042
+ 30
+0.0
+ 11
+128.5901013151283223
+ 21
+97.591737800611682
+ 31
+0.0
+  0
+LINE
+  5
+163
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+128.5901013151283223
+ 20
+97.591737800611682
+ 30
+0.0
+ 11
+128.5901013151283223
+ 21
+94.4163118006116946
+ 31
+0.0
+  0
+LINE
+  5
+164
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+128.5901013151283223
+ 20
+94.4163118006116946
+ 30
+0.0
+ 11
+125.8401013151283223
+ 21
+92.8285988006117009
+ 31
+0.0
+  0
+LINE
+  5
+165
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+123.0901013151283223
+ 20
+94.4163118006117088
+ 30
+0.0
+ 11
+125.8401013151283223
+ 21
+92.8285988006117009
+ 31
+0.0
+  0
+LINE
+  5
+166
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+123.0901013151283223
+ 20
+97.5917378006116962
+ 30
+0.0
+ 11
+123.0901013151283223
+ 21
+94.4163118006117088
+ 31
+0.0
+  0
+LINE
+  5
+167
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+125.8401013151283223
+ 20
+99.1794508006117042
+ 30
+0.0
+ 11
+123.0901013151283223
+ 21
+97.5917378006116962
+ 31
+0.0
+  0
+LINE
+  5
 168
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-116.8401013151283223
- 20
-99.179450800611562
- 30
-0.0
- 11
-119.5901013151283223
- 21
-97.5917378006115541
- 31
-0.0
-  0
-LINE
-  5
-169
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-119.5901013151283223
- 20
-97.5917378006115541
- 30
-0.0
- 11
-119.5901013151283223
- 21
-94.4163118006115525
- 31
-0.0
-  0
-LINE
-  5
-16A
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-119.5901013151283223
- 20
-94.4163118006115525
- 30
-0.0
- 11
-116.8401013151282939
- 21
-92.8285988006115446
- 31
-0.0
-  0
-LINE
-  5
-16B
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-114.0901013151283223
- 20
-94.4163118006115667
- 30
-0.0
- 11
-116.8401013151282939
- 21
-92.8285988006115446
- 31
-0.0
-  0
-LINE
-  5
-16C
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-114.0901013151282939
- 20
-97.5917378006115399
- 30
-0.0
- 11
-114.0901013151283223
- 21
-94.4163118006115667
- 31
-0.0
-  0
-LINE
-  5
-16D
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-116.8401013151283223
- 20
-99.179450800611562
- 30
-0.0
- 11
-114.0901013151282939
- 21
-97.5917378006115399
- 31
-0.0
-  0
-LINE
-  5
-16E
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-125.8401013151283223
- 20
-99.1794508006117042
- 30
-0.0
- 11
-128.5901013151283223
- 21
-97.591737800611682
- 31
-0.0
-  0
-LINE
-  5
-16F
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-128.5901013151283223
- 20
-97.591737800611682
- 30
-0.0
- 11
-128.5901013151283223
- 21
-94.4163118006116946
- 31
-0.0
-  0
-LINE
-  5
-170
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-128.5901013151283223
- 20
-94.4163118006116946
- 30
-0.0
- 11
-125.8401013151283223
- 21
-92.8285988006117009
- 31
-0.0
-  0
-LINE
-  5
-171
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-123.0901013151283223
- 20
-94.4163118006117088
- 30
-0.0
- 11
-125.8401013151283223
- 21
-92.8285988006117009
- 31
-0.0
-  0
-LINE
-  5
-172
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-123.0901013151283223
- 20
-97.5917378006116962
- 30
-0.0
- 11
-123.0901013151283223
- 21
-94.4163118006117088
- 31
-0.0
-  0
-LINE
-  5
-173
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-125.8401013151283223
- 20
-99.1794508006117042
- 30
-0.0
- 11
-123.0901013151283223
- 21
-97.5917378006116962
- 31
-0.0
-  0
-LINE
-  5
-174
 100
 AcDbEntity
 100
@@ -10417,7 +10129,7 @@ ByLayer
   0
 LINE
   5
-175
+169
 100
 AcDbEntity
 100
@@ -10445,7 +10157,7 @@ ByLayer
   0
 LINE
   5
-176
+16A
 100
 AcDbEntity
 100
@@ -10473,7 +10185,7 @@ ByLayer
   0
 LINE
   5
-177
+16B
 100
 AcDbEntity
 100
@@ -10501,7 +10213,7 @@ ByLayer
   0
 LINE
   5
-178
+16C
 100
 AcDbEntity
 100
@@ -10529,7 +10241,7 @@ ByLayer
   0
 LINE
   5
-179
+16D
 100
 AcDbEntity
 100
@@ -10557,7 +10269,7 @@ ByLayer
   0
 LINE
   5
-17A
+16E
 100
 AcDbEntity
 100
@@ -10585,7 +10297,7 @@ ByLayer
   0
 LINE
   5
-17B
+16F
 100
 AcDbEntity
 100
@@ -10613,7 +10325,7 @@ ByLayer
   0
 LINE
   5
-17C
+170
 100
 AcDbEntity
 100
@@ -10641,7 +10353,7 @@ ByLayer
   0
 LINE
   5
-17D
+171
 100
 AcDbEntity
 100
@@ -10669,7 +10381,7 @@ ByLayer
   0
 LINE
   5
-17E
+172
 100
 AcDbEntity
 100
@@ -10697,7 +10409,7 @@ ByLayer
   0
 LINE
   5
-17F
+173
 100
 AcDbEntity
 100
@@ -10725,7 +10437,7 @@ ByLayer
   0
 LINE
   5
-180
+174
 100
 AcDbEntity
 100
@@ -10753,7 +10465,7 @@ ByLayer
   0
 LINE
   5
-181
+175
 100
 AcDbEntity
 100
@@ -10781,7 +10493,7 @@ ByLayer
   0
 LINE
   5
-182
+176
 100
 AcDbEntity
 100
@@ -10809,7 +10521,7 @@ ByLayer
   0
 LINE
   5
-183
+177
 100
 AcDbEntity
 100
@@ -10837,7 +10549,7 @@ ByLayer
   0
 LINE
   5
-184
+178
 100
 AcDbEntity
 100
@@ -10865,7 +10577,7 @@ ByLayer
   0
 LINE
   5
-185
+179
 100
 AcDbEntity
 100
@@ -10893,7 +10605,7 @@ ByLayer
   0
 LINE
   5
-186
+17A
 100
 AcDbEntity
 100
@@ -10921,7 +10633,7 @@ ByLayer
   0
 LINE
   5
-187
+17B
 100
 AcDbEntity
 100
@@ -10949,7 +10661,7 @@ ByLayer
   0
 LINE
   5
-188
+17C
 100
 AcDbEntity
 100
@@ -10977,7 +10689,7 @@ ByLayer
   0
 LINE
   5
-189
+17D
 100
 AcDbEntity
 100
@@ -11005,7 +10717,7 @@ ByLayer
   0
 LINE
   5
-18A
+17E
 100
 AcDbEntity
 100
@@ -11033,7 +10745,7 @@ ByLayer
   0
 LINE
   5
-18B
+17F
 100
 AcDbEntity
 100
@@ -11061,7 +10773,7 @@ ByLayer
   0
 LINE
   5
-18C
+180
 100
 AcDbEntity
 100
@@ -11089,7 +10801,7 @@ ByLayer
   0
 LINE
   5
-18D
+181
 100
 AcDbEntity
 100
@@ -11117,7 +10829,7 @@ ByLayer
   0
 LINE
   5
-18E
+182
 100
 AcDbEntity
 100
@@ -11145,7 +10857,7 @@ ByLayer
   0
 LINE
   5
-18F
+183
 100
 AcDbEntity
 100
@@ -11173,7 +10885,7 @@ ByLayer
   0
 LINE
   5
-190
+184
 100
 AcDbEntity
 100
@@ -11201,7 +10913,7 @@ ByLayer
   0
 LINE
   5
-191
+185
 100
 AcDbEntity
 100
@@ -11229,7 +10941,7 @@ ByLayer
   0
 LINE
   5
-192
+186
 100
 AcDbEntity
 100
@@ -11257,7 +10969,7 @@ ByLayer
   0
 LINE
   5
-193
+187
 100
 AcDbEntity
 100
@@ -11285,7 +10997,7 @@ ByLayer
   0
 LINE
   5
-194
+188
 100
 AcDbEntity
 100
@@ -11313,7 +11025,7 @@ ByLayer
   0
 LINE
   5
-195
+189
 100
 AcDbEntity
 100
@@ -11341,7 +11053,7 @@ ByLayer
   0
 LINE
   5
-196
+18A
 100
 AcDbEntity
 100
@@ -11364,6 +11076,342 @@ ByLayer
 127.2401013151287543
  21
 80.2941167806187934
+ 31
+0.0
+  0
+LINE
+  5
+18B
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+127.2401013151287543
+ 20
+80.2941167806187934
+ 30
+0.0
+ 11
+127.2401013151287827
+ 21
+76.294116780618765
+ 31
+0.0
+  0
+LINE
+  5
+18C
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+115.7540416594884505
+ 20
+87.9879491806632501
+ 30
+0.0
+ 11
+118.8812261944697184
+ 21
+87.4365423847829675
+ 31
+0.0
+  0
+LINE
+  5
+18D
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+118.8812261944697184
+ 20
+87.4365423847829675
+ 30
+0.0
+ 11
+119.967285849792205
+ 21
+84.4526180029302225
+ 31
+0.0
+  0
+LINE
+  5
+18E
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+119.967285849792205
+ 20
+84.4526180029302225
+ 30
+0.0
+ 11
+117.9261609707685352
+ 21
+82.0201004205597997
+ 31
+0.0
+  0
+LINE
+  5
+18F
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+114.7989764357872673
+ 20
+82.5715072164400965
+ 30
+0.0
+ 11
+117.9261609707685352
+ 21
+82.0201004205597997
+ 31
+0.0
+  0
+LINE
+  5
+190
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+113.7129167804647807
+ 20
+85.5554315982928415
+ 30
+0.0
+ 11
+114.7989764357872673
+ 21
+82.5715072164400965
+ 31
+0.0
+  0
+LINE
+  5
+191
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+115.7540416594884505
+ 20
+87.9879491806632501
+ 30
+0.0
+ 11
+113.7129167804647807
+ 21
+85.5554315982928415
+ 31
+0.0
+  0
+LINE
+  5
+192
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+124.2523883151284849
+ 20
+87.7540243844493091
+ 30
+0.0
+ 11
+127.4278146755357
+ 21
+87.7540245925304987
+ 31
+0.0
+  0
+LINE
+  5
+193
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+127.4278146755357
+ 20
+87.7540245925304987
+ 30
+0.0
+ 11
+129.0155276755357079
+ 21
+85.0040250086928779
+ 31
+0.0
+  0
+LINE
+  5
+194
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+129.0155276755357079
+ 20
+85.0040250086928779
+ 30
+0.0
+ 11
+127.4278143151285008
+ 21
+82.254025216774096
+ 31
+0.0
+  0
+LINE
+  5
+195
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+124.2523879547212857
+ 20
+82.2540250086929063
+ 30
+0.0
+ 11
+127.4278143151285008
+ 21
+82.254025216774096
+ 31
+0.0
+  0
+LINE
+  5
+196
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+122.6646749547213062
+ 20
+85.0040245925304987
+ 30
+0.0
+ 11
+124.2523879547212857
+ 21
+82.2540250086929063
  31
 0.0
   0
@@ -11383,15 +11431,15 @@ Main Plate Top Layer
   6
 ByLayer
  10
-127.2401013151287543
+124.2523883151284849
  20
-80.2941167806187934
+87.7540243844493091
  30
 0.0
  11
-127.2401013151287827
+122.6646749547213062
  21
-76.294116780618765
+85.0040245925304987
  31
 0.0
   0
@@ -11403,7 +11451,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Main Plate Top Layer
+Main Plate Middle Layer
  62
 256
 370
@@ -11411,15 +11459,15 @@ Main Plate Top Layer
   6
 ByLayer
  10
-115.7540416594884505
+74.9651679843903196
  20
-87.9879491806632501
+115.4221067195941259
  30
 0.0
  11
-118.8812261944697184
+82.2947704265203868
  21
-87.4365423847829675
+118.0898638375341108
  31
 0.0
   0
@@ -11431,7 +11479,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Main Plate Top Layer
+Main Plate Middle Layer
  62
 256
 370
@@ -11439,15 +11487,15 @@ Main Plate Top Layer
   6
 ByLayer
  10
-118.8812261944697184
+82.2947704265203868
  20
-87.4365423847829675
+118.0898638375341108
  30
 0.0
  11
-119.967285849792205
+83.6628509998228651
  21
-84.4526180029302225
+114.3310933543909869
  31
 0.0
   0
@@ -11459,7 +11507,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Main Plate Top Layer
+Main Plate Middle Layer
  62
 256
 370
@@ -11467,15 +11515,15 @@ Main Plate Top Layer
   6
 ByLayer
  10
-119.967285849792205
+83.6628509998228651
  20
-84.4526180029302225
+114.3310933543909869
  30
 0.0
  11
-117.9261609707685352
+82.8171276411156896
  21
-82.0201004205597997
+114.0232752253975548
  31
 0.0
   0
@@ -11487,7 +11535,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Main Plate Top Layer
+Main Plate Middle Layer
  62
 256
 370
@@ -11495,15 +11543,15 @@ Main Plate Top Layer
   6
 ByLayer
  10
-114.7989764357872673
+82.8171276411156896
  20
-82.5715072164400965
+114.0232752253975548
  30
 0.0
  11
-117.9261609707685352
+83.8431880710927828
  21
-82.0201004205597997
+111.2041973630399809
  31
 0.0
   0
@@ -11515,7 +11563,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Main Plate Top Layer
+Main Plate Middle Layer
  62
 256
 370
@@ -11523,15 +11571,15 @@ Main Plate Top Layer
   6
 ByLayer
  10
-113.7129167804647807
+83.8431880710927828
  20
-85.5554315982928415
+111.2041973630399809
  30
 0.0
  11
-114.7989764357872673
+78.2050323463774646
  21
-82.5715072164400965
+109.1520765030859366
  31
 0.0
   0
@@ -11543,7 +11591,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Main Plate Top Layer
+Main Plate Middle Layer
  62
 256
 370
@@ -11551,15 +11599,15 @@ Main Plate Top Layer
   6
 ByLayer
  10
-115.7540416594884505
+78.2050323463774646
  20
-87.9879491806632501
+109.1520765030859366
  30
 0.0
  11
-113.7129167804647807
+77.1789719164002577
  21
-85.5554315982928415
+111.9711543654436099
  31
 0.0
   0
@@ -11571,7 +11619,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Main Plate Top Layer
+Main Plate Middle Layer
  62
 256
 370
@@ -11579,15 +11627,15 @@ Main Plate Top Layer
   6
 ByLayer
  10
-124.2523883151284849
+77.1789719164002577
  20
-87.7540243844493091
+111.9711543654436099
  30
 0.0
  11
-127.4278146755357
+76.3332485576929969
  21
-87.7540245925304987
+111.6633362364504052
  31
 0.0
   0
@@ -11599,7 +11647,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Main Plate Top Layer
+Main Plate Middle Layer
  62
 256
 370
@@ -11607,15 +11655,15 @@ Main Plate Top Layer
   6
 ByLayer
  10
-127.4278146755357
+76.3332485576929969
  20
-87.7540245925304987
+111.6633362364504052
  30
 0.0
  11
-129.0155276755357079
+74.9651679843903196
  21
-85.0040250086928779
+115.4221067195941259
  31
 0.0
   0
@@ -11627,7 +11675,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Main Plate Top Layer
+Main Plate Middle Layer
  62
 256
 370
@@ -11635,15 +11683,15 @@ Main Plate Top Layer
   6
 ByLayer
  10
-129.0155276755357079
+108.7941023326829395
  20
-85.0040250086928779
+127.7348318793181789
  30
 0.0
  11
-127.4278143151285008
+116.1237047748129783
  21
-82.254025216774096
+130.4025889972584764
  31
 0.0
   0
@@ -11655,7 +11703,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Main Plate Top Layer
+Main Plate Middle Layer
  62
 256
 370
@@ -11663,15 +11711,15 @@ Main Plate Top Layer
   6
 ByLayer
  10
-124.2523879547212857
+116.1237047748129783
  20
-82.2540250086929063
+130.4025889972584764
  30
 0.0
  11
-127.4278143151285008
+117.491785348115684
  21
-82.254025216774096
+126.6438185141148836
  31
 0.0
   0
@@ -11683,7 +11731,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Main Plate Top Layer
+Main Plate Middle Layer
  62
 256
 370
@@ -11691,15 +11739,15 @@ Main Plate Top Layer
   6
 ByLayer
  10
-122.6646749547213062
+117.491785348115684
  20
-85.0040245925304987
+126.6438185141148836
  30
 0.0
  11
-124.2523879547212857
+116.6460619894083948
  21
-82.2540250086929063
+126.3360003851216788
  31
 0.0
   0
@@ -11711,7 +11759,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Main Plate Top Layer
+Main Plate Middle Layer
  62
 256
 370
@@ -11719,15 +11767,15 @@ Main Plate Top Layer
   6
 ByLayer
  10
-124.2523883151284849
+116.6460619894083948
  20
-87.7540243844493091
+126.3360003851216788
  30
 0.0
  11
-122.6646749547213062
+117.6721224193853459
  21
-85.0040245925304987
+123.5169225227640055
  31
 0.0
   0
@@ -11747,15 +11795,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-74.9651679843903196
+117.6721224193853459
  20
-115.4221067195941259
+123.5169225227640055
  30
 0.0
  11
-82.2947704265203868
+112.0339666946699424
  21
-118.0898638375341108
+121.4648016628099612
  31
 0.0
   0
@@ -11775,15 +11823,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-82.2947704265203868
+112.0339666946699424
  20
-118.0898638375341108
+121.4648016628099612
  30
 0.0
  11
-83.6628509998228651
+111.0079062646929628
  21
-114.3310933543909869
+124.2838795251676487
  31
 0.0
   0
@@ -11803,15 +11851,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-83.6628509998228651
+111.0079062646929628
  20
-114.3310933543909869
+124.2838795251676487
  30
 0.0
  11
-82.8171276411156896
+110.1621829059856452
  21
-114.0232752253975548
+123.9760613961745861
  31
 0.0
   0
@@ -11831,15 +11879,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-82.8171276411156896
+110.1621829059856452
  20
-114.0232752253975548
+123.9760613961745861
  30
 0.0
  11
-83.8431880710927828
+108.7941023326829395
  21
-111.2041973630399809
+127.7348318793181789
  31
 0.0
   0
@@ -11859,15 +11907,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-83.8431880710927828
+87.440101315128743
  20
-111.2041973630399809
+76.2941167806183671
  30
 0.0
  11
-78.2050323463774646
+95.2401013151287543
  21
-109.1520765030859366
+76.2941167806188218
  31
 0.0
   0
@@ -11887,15 +11935,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-78.2050323463774646
+95.2401013151287543
  20
-109.1520765030859366
+76.2941167806188218
  30
 0.0
  11
-77.1789719164002577
+95.2401013151287543
  21
-111.9711543654436099
+80.2941167806187934
  31
 0.0
   0
@@ -11915,15 +11963,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-77.1789719164002577
+95.2401013151287543
  20
-111.9711543654436099
+80.2941167806187934
  30
 0.0
  11
-76.3332485576929969
+94.3401013151287771
  21
-111.6633362364504052
+80.2941167806187224
  31
 0.0
   0
@@ -11943,15 +11991,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-76.3332485576929969
+94.3401013151287771
  20
-111.6633362364504052
+80.2941167806187224
  30
 0.0
  11
-74.9651679843903196
+94.3401013151287771
  21
-115.4221067195941259
+82.2941167806187366
  31
 0.0
   0
@@ -11971,15 +12019,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-108.7941023326829395
+94.3401013151287771
  20
-127.7348318793181789
+82.2941167806187366
  30
 0.0
  11
-116.1237047748129783
+88.3401013151287486
  21
-130.4025889972584764
+82.2941167806187082
  31
 0.0
   0
@@ -11999,15 +12047,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-116.1237047748129783
+88.3401013151287486
  20
-130.4025889972584764
+82.2941167806187082
  30
 0.0
  11
-117.491785348115684
+88.3401013151287486
  21
-126.6438185141148836
+80.2941167806187366
  31
 0.0
   0
@@ -12027,15 +12075,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-117.491785348115684
+88.3401013151287486
  20
-126.6438185141148836
+80.2941167806187366
  30
 0.0
  11
-116.6460619894083948
+87.440101315128743
  21
-126.3360003851216788
+80.2941167806184239
  31
 0.0
   0
@@ -12055,15 +12103,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-116.6460619894083948
+87.440101315128743
  20
-126.3360003851216788
+80.2941167806184239
  30
 0.0
  11
-117.6721224193853459
+87.440101315128743
  21
-123.5169225227640055
+76.2941167806183671
  31
 0.0
   0
@@ -12083,15 +12131,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-117.6721224193853459
+119.4401013151286861
  20
-123.5169225227640055
+76.2941167806187366
  30
 0.0
  11
-112.0339666946699424
+127.2401013151287827
  21
-121.4648016628099612
+76.294116780618765
  31
 0.0
   0
@@ -12111,15 +12159,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-112.0339666946699424
+127.2401013151287827
  20
-121.4648016628099612
+76.294116780618765
  30
 0.0
  11
-111.0079062646929628
+127.2401013151287543
  21
-124.2838795251676487
+80.2941167806187934
  31
 0.0
   0
@@ -12139,15 +12187,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-111.0079062646929628
+127.2401013151287543
  20
-124.2838795251676487
+80.2941167806187934
  30
 0.0
  11
-110.1621829059856452
+126.3401013151287771
  21
-123.9760613961745861
+80.2941167806187508
  31
 0.0
   0
@@ -12167,15 +12215,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-110.1621829059856452
+126.3401013151287771
  20
-123.9760613961745861
+80.2941167806187508
  30
 0.0
  11
-108.7941023326829395
+126.3401013151287771
  21
-127.7348318793181789
+82.2941167806187224
  31
 0.0
   0
@@ -12195,15 +12243,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-87.440101315128743
+126.3401013151287771
  20
-76.2941167806183671
+82.2941167806187224
  30
 0.0
  11
-95.2401013151287543
+120.3401013151286634
  21
-76.2941167806188218
+82.2941167806187082
  31
 0.0
   0
@@ -12223,15 +12271,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-95.2401013151287543
+120.3401013151286634
  20
-76.2941167806188218
+82.2941167806187082
  30
 0.0
  11
-95.2401013151287543
+120.3401013151288055
  21
-80.2941167806187934
+80.2941167806187366
  31
 0.0
   0
@@ -12251,15 +12299,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-95.2401013151287543
+120.3401013151288055
  20
-80.2941167806187934
+80.2941167806187366
  30
 0.0
  11
-94.3401013151287771
+119.4401013151287998
  21
-80.2941167806187224
+80.294116780618694
  31
 0.0
   0
@@ -12279,15 +12327,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-94.3401013151287771
+119.4401013151287998
  20
-80.2941167806187224
+80.294116780618694
  30
 0.0
  11
-94.3401013151287771
+119.4401013151286861
  21
-82.2941167806187366
+76.2941167806187366
  31
 0.0
   0
@@ -12299,7 +12347,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Main Plate Middle Layer
+Main Plate Bottom Layer
  62
 256
 370
@@ -12307,15 +12355,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-94.3401013151287771
+74.9651679843903196
  20
-82.2941167806187366
+115.4221067195941259
  30
 0.0
  11
-88.3401013151287486
+82.2947704265203868
  21
-82.2941167806187082
+118.0898638375341108
  31
 0.0
   0
@@ -12327,7 +12375,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Main Plate Middle Layer
+Main Plate Bottom Layer
  62
 256
 370
@@ -12335,15 +12383,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-88.3401013151287486
+82.2947704265203868
  20
-82.2941167806187082
+118.0898638375341108
  30
 0.0
  11
-88.3401013151287486
+83.6628509998228651
  21
-80.2941167806187366
+114.3310933543909869
  31
 0.0
   0
@@ -12355,7 +12403,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Main Plate Middle Layer
+Main Plate Bottom Layer
  62
 256
 370
@@ -12363,15 +12411,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-88.3401013151287486
+83.6628509998228651
  20
-80.2941167806187366
+114.3310933543909869
  30
 0.0
  11
-87.440101315128743
+76.3332485576929969
  21
-80.2941167806184239
+111.6633362364504052
  31
 0.0
   0
@@ -12383,7 +12431,147 @@ AcDbEntity
 100
 AcDbLine
   8
-Main Plate Middle Layer
+Main Plate Bottom Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+76.3332485576929969
+ 20
+111.6633362364504052
+ 30
+0.0
+ 11
+74.9651679843903196
+ 21
+115.4221067195941259
+ 31
+0.0
+  0
+LINE
+  5
+1BC
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Bottom Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+108.7941023326829395
+ 20
+127.7348318793181789
+ 30
+0.0
+ 11
+116.1237047748129783
+ 21
+130.4025889972584764
+ 31
+0.0
+  0
+LINE
+  5
+1BD
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Bottom Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+116.1237047748129783
+ 20
+130.4025889972584764
+ 30
+0.0
+ 11
+117.491785348115684
+ 21
+126.6438185141148836
+ 31
+0.0
+  0
+LINE
+  5
+1BE
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Bottom Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+117.491785348115684
+ 20
+126.6438185141148836
+ 30
+0.0
+ 11
+110.1621829059856452
+ 21
+123.9760613961745861
+ 31
+0.0
+  0
+LINE
+  5
+1BF
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Bottom Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+110.1621829059856452
+ 20
+123.9760613961745861
+ 30
+0.0
+ 11
+108.7941023326829395
+ 21
+127.7348318793181789
+ 31
+0.0
+  0
+LINE
+  5
+1C0
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Bottom Layer
  62
 256
 370
@@ -12397,149 +12585,9 @@ ByLayer
  30
 0.0
  11
-87.440101315128743
- 21
-76.2941167806183671
- 31
-0.0
-  0
-LINE
-  5
-1BC
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Middle Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-119.4401013151286861
- 20
-76.2941167806187366
- 30
-0.0
- 11
-127.2401013151287827
- 21
-76.294116780618765
- 31
-0.0
-  0
-LINE
-  5
-1BD
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Middle Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-127.2401013151287827
- 20
-76.294116780618765
- 30
-0.0
- 11
-127.2401013151287543
+95.2401013151287543
  21
 80.2941167806187934
- 31
-0.0
-  0
-LINE
-  5
-1BE
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Middle Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-127.2401013151287543
- 20
-80.2941167806187934
- 30
-0.0
- 11
-126.3401013151287771
- 21
-80.2941167806187508
- 31
-0.0
-  0
-LINE
-  5
-1BF
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Middle Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-126.3401013151287771
- 20
-80.2941167806187508
- 30
-0.0
- 11
-126.3401013151287771
- 21
-82.2941167806187224
- 31
-0.0
-  0
-LINE
-  5
-1C0
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Middle Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-126.3401013151287771
- 20
-82.2941167806187224
- 30
-0.0
- 11
-120.3401013151286634
- 21
-82.2941167806187082
  31
 0.0
   0
@@ -12551,7 +12599,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Main Plate Middle Layer
+Main Plate Bottom Layer
  62
 256
 370
@@ -12559,15 +12607,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-120.3401013151286634
+95.2401013151287543
  20
-82.2941167806187082
+80.2941167806187934
  30
 0.0
  11
-120.3401013151288055
+95.2401013151287543
  21
-80.2941167806187366
+76.2941167806188218
  31
 0.0
   0
@@ -12579,7 +12627,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Main Plate Middle Layer
+Main Plate Bottom Layer
  62
 256
 370
@@ -12587,15 +12635,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-120.3401013151288055
+95.2401013151287543
  20
-80.2941167806187366
+76.2941167806188218
  30
 0.0
  11
-119.4401013151287998
+87.440101315128743
  21
-80.294116780618694
+76.2941167806183671
  31
 0.0
   0
@@ -12607,7 +12655,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Main Plate Middle Layer
+Main Plate Bottom Layer
  62
 256
 370
@@ -12615,15 +12663,15 @@ Main Plate Middle Layer
   6
 ByLayer
  10
-119.4401013151287998
+87.440101315128743
  20
-80.294116780618694
+76.2941167806183671
  30
 0.0
  11
-119.4401013151286861
+87.440101315128743
  21
-76.2941167806187366
+80.2941167806184239
  31
 0.0
   0
@@ -12643,15 +12691,15 @@ Main Plate Bottom Layer
   6
 ByLayer
  10
-74.9651679843903196
+119.4401013151287998
  20
-115.4221067195941259
+80.294116780618694
  30
 0.0
  11
-82.2947704265203868
+127.2401013151287543
  21
-118.0898638375341108
+80.2941167806187934
  31
 0.0
   0
@@ -12671,15 +12719,15 @@ Main Plate Bottom Layer
   6
 ByLayer
  10
-82.2947704265203868
+127.2401013151287543
  20
-118.0898638375341108
+80.2941167806187934
  30
 0.0
  11
-83.6628509998228651
+127.2401013151287827
  21
-114.3310933543909869
+76.294116780618765
  31
 0.0
   0
@@ -12699,15 +12747,15 @@ Main Plate Bottom Layer
   6
 ByLayer
  10
-83.6628509998228651
+127.2401013151287827
  20
-114.3310933543909869
+76.294116780618765
  30
 0.0
  11
-76.3332485576929969
+119.4401013151286861
  21
-111.6633362364504052
+76.2941167806187366
  31
 0.0
   0
@@ -12727,357 +12775,21 @@ Main Plate Bottom Layer
   6
 ByLayer
  10
-76.3332485576929969
+119.4401013151286861
  20
-111.6633362364504052
+76.2941167806187366
  30
 0.0
  11
-74.9651679843903196
+119.4401013151287998
  21
-115.4221067195941259
+80.294116780618694
  31
 0.0
   0
 LINE
   5
 1C8
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Bottom Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-108.7941023326829395
- 20
-127.7348318793181789
- 30
-0.0
- 11
-116.1237047748129783
- 21
-130.4025889972584764
- 31
-0.0
-  0
-LINE
-  5
-1C9
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Bottom Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-116.1237047748129783
- 20
-130.4025889972584764
- 30
-0.0
- 11
-117.491785348115684
- 21
-126.6438185141148836
- 31
-0.0
-  0
-LINE
-  5
-1CA
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Bottom Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-117.491785348115684
- 20
-126.6438185141148836
- 30
-0.0
- 11
-110.1621829059856452
- 21
-123.9760613961745861
- 31
-0.0
-  0
-LINE
-  5
-1CB
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Bottom Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-110.1621829059856452
- 20
-123.9760613961745861
- 30
-0.0
- 11
-108.7941023326829395
- 21
-127.7348318793181789
- 31
-0.0
-  0
-LINE
-  5
-1CC
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Bottom Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-87.440101315128743
- 20
-80.2941167806184239
- 30
-0.0
- 11
-95.2401013151287543
- 21
-80.2941167806187934
- 31
-0.0
-  0
-LINE
-  5
-1CD
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Bottom Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-95.2401013151287543
- 20
-80.2941167806187934
- 30
-0.0
- 11
-95.2401013151287543
- 21
-76.2941167806188218
- 31
-0.0
-  0
-LINE
-  5
-1CE
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Bottom Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-95.2401013151287543
- 20
-76.2941167806188218
- 30
-0.0
- 11
-87.440101315128743
- 21
-76.2941167806183671
- 31
-0.0
-  0
-LINE
-  5
-1CF
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Bottom Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-87.440101315128743
- 20
-76.2941167806183671
- 30
-0.0
- 11
-87.440101315128743
- 21
-80.2941167806184239
- 31
-0.0
-  0
-LINE
-  5
-1D0
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Bottom Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-119.4401013151287998
- 20
-80.294116780618694
- 30
-0.0
- 11
-127.2401013151287543
- 21
-80.2941167806187934
- 31
-0.0
-  0
-LINE
-  5
-1D1
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Bottom Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-127.2401013151287543
- 20
-80.2941167806187934
- 30
-0.0
- 11
-127.2401013151287827
- 21
-76.294116780618765
- 31
-0.0
-  0
-LINE
-  5
-1D2
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Bottom Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-127.2401013151287827
- 20
-76.294116780618765
- 30
-0.0
- 11
-119.4401013151286861
- 21
-76.2941167806187366
- 31
-0.0
-  0
-LINE
-  5
-1D3
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Bottom Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-119.4401013151286861
- 20
-76.2941167806187366
- 30
-0.0
- 11
-119.4401013151287998
- 21
-80.294116780618694
- 31
-0.0
-  0
-LINE
-  5
-1D4
 100
 AcDbEntity
 100
@@ -13105,7 +12817,7 @@ ByLayer
   0
 LINE
   5
-1D5
+1C9
 100
 AcDbEntity
 100
@@ -13133,7 +12845,7 @@ ByLayer
   0
 LINE
   5
-1D6
+1CA
 100
 AcDbEntity
 100
@@ -13161,7 +12873,7 @@ ByLayer
   0
 LINE
   5
-1D7
+1CB
 100
 AcDbEntity
 100
@@ -13189,7 +12901,7 @@ ByLayer
   0
 LINE
   5
-1D8
+1CC
 100
 AcDbEntity
 100
@@ -13217,7 +12929,7 @@ ByLayer
   0
 CIRCLE
   5
-1D9
+1CD
 100
 AcDbEntity
 100
@@ -13241,7 +12953,7 @@ ByLayer
   0
 CIRCLE
   5
-1DA
+1CE
 100
 AcDbEntity
 100
@@ -13265,7 +12977,7 @@ ByLayer
   0
 CIRCLE
   5
-1DB
+1CF
 100
 AcDbEntity
 100
@@ -13289,7 +13001,7 @@ ByLayer
   0
 CIRCLE
   5
-1DC
+1D0
 100
 AcDbEntity
 100
@@ -13313,7 +13025,7 @@ ByLayer
   0
 CIRCLE
   5
-1DD
+1D1
 100
 AcDbEntity
 100
@@ -13337,7 +13049,7 @@ ByLayer
   0
 CIRCLE
   5
-1DE
+1D2
 100
 AcDbEntity
 100
@@ -13361,7 +13073,7 @@ ByLayer
   0
 CIRCLE
   5
-1DF
+1D3
 100
 AcDbEntity
 100
@@ -13385,7 +13097,7 @@ ByLayer
   0
 CIRCLE
   5
-1E0
+1D4
 100
 AcDbEntity
 100
@@ -13409,7 +13121,7 @@ ByLayer
   0
 LINE
   5
-1E1
+1D5
 100
 AcDbEntity
 100
@@ -13432,6 +13144,342 @@ ByLayer
 88.6901013151288424
  21
 97.5917378006117104
+ 31
+0.0
+  0
+LINE
+  5
+1D6
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+88.6901013151288424
+ 20
+97.5917378006117104
+ 30
+0.0
+ 11
+88.6901013151288424
+ 21
+94.4163118006116946
+ 31
+0.0
+  0
+LINE
+  5
+1D7
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+88.6901013151288424
+ 20
+94.4163118006116946
+ 30
+0.0
+ 11
+85.9401013151288424
+ 21
+92.8285988006117151
+ 31
+0.0
+  0
+LINE
+  5
+1D8
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+83.1901013151288709
+ 20
+94.4163118006117088
+ 30
+0.0
+ 11
+85.9401013151288424
+ 21
+92.8285988006117151
+ 31
+0.0
+  0
+LINE
+  5
+1D9
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+83.1901013151288709
+ 20
+97.5917378006116962
+ 30
+0.0
+ 11
+83.1901013151288709
+ 21
+94.4163118006117088
+ 31
+0.0
+  0
+LINE
+  5
+1DA
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+85.9401013151288424
+ 20
+99.1794508006117184
+ 30
+0.0
+ 11
+83.1901013151288709
+ 21
+97.5917378006116962
+ 31
+0.0
+  0
+LINE
+  5
+1DB
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Drawing 2
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+85.9401013151288424
+ 20
+99.1794508006117184
+ 30
+0.0
+ 11
+85.9401013151288424
+ 21
+92.8285988006117151
+ 31
+0.0
+  0
+LINE
+  5
+1DC
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Drawing 2
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+83.1901013151288709
+ 20
+97.5917378006116962
+ 30
+0.0
+ 11
+88.6901013151288424
+ 21
+94.4163118006116946
+ 31
+0.0
+  0
+LINE
+  5
+1DD
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Drawing 2
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+88.6901013151288424
+ 20
+97.5917378006117104
+ 30
+0.0
+ 11
+83.1901013151288709
+ 21
+94.4163118006117088
+ 31
+0.0
+  0
+LINE
+  5
+1DE
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+93.9074683367319523
+ 20
+99.0516206067351703
+ 30
+0.0
+ 11
+97.0346528717132486
+ 21
+98.5002138108548877
+ 31
+0.0
+  0
+LINE
+  5
+1DF
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+97.0346528717132486
+ 20
+98.5002138108548877
+ 30
+0.0
+ 11
+98.120712527353291
+ 21
+95.5162894308031696
+ 31
+0.0
+  0
+LINE
+  5
+1E0
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+98.120712527353291
+ 20
+95.5162894308031696
+ 30
+0.0
+ 11
+96.0795876480120654
+ 21
+93.0837718466317341
+ 31
+0.0
+  0
+LINE
+  5
+1E1
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+92.9524031130307975
+ 20
+93.6351786425120167
+ 30
+0.0
+ 11
+96.0795876480120654
+ 21
+93.0837718466317341
  31
 0.0
   0
@@ -13451,15 +13499,15 @@ Main Plate Top Layer
   6
 ByLayer
  10
-88.6901013151288424
+91.8663434573907551
  20
-97.5917378006117104
+96.6191030225637206
  30
 0.0
  11
-88.6901013151288424
+92.9524031130307975
  21
-94.4163118006116946
+93.6351786425120167
  31
 0.0
   0
@@ -13479,357 +13527,21 @@ Main Plate Top Layer
   6
 ByLayer
  10
-88.6901013151288424
+93.9074683367319523
  20
-94.4163118006116946
+99.0516206067351703
  30
 0.0
  11
-85.9401013151288424
+91.8663434573907551
  21
-92.8285988006117151
+96.6191030225637206
  31
 0.0
   0
 LINE
   5
 1E4
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-83.1901013151288709
- 20
-94.4163118006117088
- 30
-0.0
- 11
-85.9401013151288424
- 21
-92.8285988006117151
- 31
-0.0
-  0
-LINE
-  5
-1E5
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-83.1901013151288709
- 20
-97.5917378006116962
- 30
-0.0
- 11
-83.1901013151288709
- 21
-94.4163118006117088
- 31
-0.0
-  0
-LINE
-  5
-1E6
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-85.9401013151288424
- 20
-99.1794508006117184
- 30
-0.0
- 11
-83.1901013151288709
- 21
-97.5917378006116962
- 31
-0.0
-  0
-LINE
-  5
-1E7
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Drawing 2
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-85.9401013151288424
- 20
-99.1794508006117184
- 30
-0.0
- 11
-85.9401013151288424
- 21
-92.8285988006117151
- 31
-0.0
-  0
-LINE
-  5
-1E8
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Drawing 2
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-83.1901013151288709
- 20
-97.5917378006116962
- 30
-0.0
- 11
-88.6901013151288424
- 21
-94.4163118006116946
- 31
-0.0
-  0
-LINE
-  5
-1E9
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Drawing 2
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-88.6901013151288424
- 20
-97.5917378006117104
- 30
-0.0
- 11
-83.1901013151288709
- 21
-94.4163118006117088
- 31
-0.0
-  0
-LINE
-  5
-1EA
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-93.9074683367319523
- 20
-99.0516206067351703
- 30
-0.0
- 11
-97.0346528717132486
- 21
-98.5002138108548877
- 31
-0.0
-  0
-LINE
-  5
-1EB
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-97.0346528717132486
- 20
-98.5002138108548877
- 30
-0.0
- 11
-98.120712527353291
- 21
-95.5162894308031696
- 31
-0.0
-  0
-LINE
-  5
-1EC
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-98.120712527353291
- 20
-95.5162894308031696
- 30
-0.0
- 11
-96.0795876480120654
- 21
-93.0837718466317341
- 31
-0.0
-  0
-LINE
-  5
-1ED
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-92.9524031130307975
- 20
-93.6351786425120167
- 30
-0.0
- 11
-96.0795876480120654
- 21
-93.0837718466317341
- 31
-0.0
-  0
-LINE
-  5
-1EE
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-91.8663434573907551
- 20
-96.6191030225637206
- 30
-0.0
- 11
-92.9524031130307975
- 21
-93.6351786425120167
- 31
-0.0
-  0
-LINE
-  5
-1EF
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Main Plate Top Layer
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-93.9074683367319523
- 20
-99.0516206067351703
- 30
-0.0
- 11
-91.8663434573907551
- 21
-96.6191030225637206
- 31
-0.0
-  0
-LINE
-  5
-1F0
 100
 AcDbEntity
 100
@@ -13857,7 +13569,7 @@ ByLayer
   0
 LINE
   5
-1F1
+1E5
 100
 AcDbEntity
 100
@@ -13885,7 +13597,7 @@ ByLayer
   0
 LINE
   5
-1F2
+1E6
 100
 AcDbEntity
 100
@@ -13913,7 +13625,7 @@ ByLayer
   0
 LINE
   5
-1F3
+1E7
 100
 AcDbEntity
 100
@@ -13941,7 +13653,7 @@ ByLayer
   0
 LINE
   5
-1F4
+1E8
 100
 AcDbEntity
 100
@@ -13969,7 +13681,7 @@ ByLayer
   0
 LINE
   5
-1F5
+1E9
 100
 AcDbEntity
 100
@@ -13997,7 +13709,7 @@ ByLayer
   0
 LINE
   5
-1F6
+1EA
 100
 AcDbEntity
 100
@@ -14025,7 +13737,7 @@ ByLayer
   0
 LINE
   5
-1F7
+1EB
 100
 AcDbEntity
 100
@@ -14053,7 +13765,7 @@ ByLayer
   0
 LINE
   5
-1F8
+1EC
 100
 AcDbEntity
 100
@@ -14081,7 +13793,7 @@ ByLayer
   0
 LINE
   5
-1F9
+1ED
 100
 AcDbEntity
 100
@@ -14109,7 +13821,7 @@ ByLayer
   0
 LINE
   5
-1FA
+1EE
 100
 AcDbEntity
 100
@@ -14137,7 +13849,7 @@ ByLayer
   0
 LINE
   5
-1FB
+1EF
 100
 AcDbEntity
 100
@@ -14165,7 +13877,7 @@ ByLayer
   0
 LINE
   5
-1FC
+1F0
 100
 AcDbEntity
 100
@@ -14193,7 +13905,7 @@ ByLayer
   0
 LINE
   5
-1FD
+1F1
 100
 AcDbEntity
 100
@@ -14221,7 +13933,7 @@ ByLayer
   0
 LINE
   5
-1FE
+1F2
 100
 AcDbEntity
 100
@@ -14249,7 +13961,7 @@ ByLayer
   0
 LINE
   5
-1FF
+1F3
 100
 AcDbEntity
 100
@@ -14277,7 +13989,7 @@ ByLayer
   0
 LINE
   5
-200
+1F4
 100
 AcDbEntity
 100
@@ -14305,7 +14017,7 @@ ByLayer
   0
 LINE
   5
-201
+1F5
 100
 AcDbEntity
 100
@@ -14333,7 +14045,7 @@ ByLayer
   0
 LINE
   5
-202
+1F6
 100
 AcDbEntity
 100
@@ -14361,7 +14073,7 @@ ByLayer
   0
 LINE
   5
-203
+1F7
 100
 AcDbEntity
 100
@@ -14389,7 +14101,7 @@ ByLayer
   0
 LINE
   5
-204
+1F8
 100
 AcDbEntity
 100
@@ -14417,7 +14129,7 @@ ByLayer
   0
 LINE
   5
-205
+1F9
 100
 AcDbEntity
 100
@@ -14445,7 +14157,7 @@ ByLayer
   0
 LINE
   5
-206
+1FA
 100
 AcDbEntity
 100
@@ -14473,7 +14185,7 @@ ByLayer
   0
 LINE
   5
-207
+1FB
 100
 AcDbEntity
 100
@@ -14501,7 +14213,7 @@ ByLayer
   0
 LINE
   5
-208
+1FC
 100
 AcDbEntity
 100
@@ -14529,7 +14241,7 @@ ByLayer
   0
 ARC
   5
-209
+1FD
 100
 AcDbEntity
   8
@@ -14559,7 +14271,7 @@ AcDbArc
   0
 ARC
   5
-20A
+1FE
 100
 AcDbEntity
   8
@@ -14589,7 +14301,7 @@ AcDbArc
   0
 LINE
   5
-20B
+1FF
 100
 AcDbEntity
 100
@@ -14617,7 +14329,7 @@ ByLayer
   0
 LINE
   5
-20C
+200
 100
 AcDbEntity
 100
@@ -14645,55 +14357,7 @@ ByLayer
   0
 CIRCLE
   5
-20D
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Retainer Plate
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-112.7180069813213095
- 20
-119.5854164212377384
- 30
-0.0
- 40
-1.45
-  0
-CIRCLE
-  5
-20E
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Retainer Plate
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-84.5272283577440362
- 20
-109.324812121468014
- 30
-0.0
- 40
-1.45
-  0
-CIRCLE
-  5
-20F
+201
 100
 AcDbEntity
 100
@@ -14717,7 +14381,7 @@ ByLayer
   0
 CIRCLE
   5
-210
+202
 100
 AcDbEntity
 100
@@ -14741,7 +14405,7 @@ ByLayer
   0
 LINE
   5
-211
+203
 100
 AcDbEntity
 100
@@ -14769,7 +14433,7 @@ ByLayer
   0
 LINE
   5
-212
+204
 100
 AcDbEntity
 100
@@ -14797,7 +14461,7 @@ ByLayer
   0
 LINE
   5
-213
+205
 100
 AcDbEntity
 100
@@ -14825,7 +14489,7 @@ ByLayer
   0
 LINE
   5
-214
+206
 100
 AcDbEntity
 100
@@ -14853,7 +14517,7 @@ ByLayer
   0
 LINE
   5
-215
+207
 100
 AcDbEntity
 100
@@ -14881,7 +14545,7 @@ ByLayer
   0
 CIRCLE
   5
-216
+208
 100
 AcDbEntity
 100
@@ -14905,7 +14569,7 @@ ByLayer
   0
 CIRCLE
   5
-217
+209
 100
 AcDbEntity
 100
@@ -14929,7 +14593,7 @@ ByLayer
   0
 CIRCLE
   5
-218
+20A
 100
 AcDbEntity
 100
@@ -14953,7 +14617,7 @@ ByLayer
   0
 CIRCLE
   5
-219
+20B
 100
 AcDbEntity
 100
@@ -14977,7 +14641,7 @@ ByLayer
   0
 MTEXT
   5
-21A
+20C
 100
 AcDbEntity
 100
@@ -15011,13 +14675,13 @@ standard
  50
 360.0
  73
-0
+1
  44
 1.0
   0
 CIRCLE
   5
-21B
+20D
 100
 AcDbEntity
 100
@@ -15041,7 +14705,7 @@ ByLayer
   0
 CIRCLE
   5
-21C
+20E
 100
 AcDbEntity
 100
@@ -15065,7 +14729,7 @@ ByLayer
   0
 CIRCLE
   5
-21D
+20F
 100
 AcDbEntity
 100
@@ -15089,7 +14753,7 @@ ByLayer
   0
 CIRCLE
   5
-21E
+210
 100
 AcDbEntity
 100
@@ -15113,7 +14777,7 @@ ByLayer
   0
 MTEXT
   5
-21F
+211
 100
 AcDbEntity
 100
@@ -15147,13 +14811,13 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
 MTEXT
   5
-220
+212
 100
 AcDbEntity
 100
@@ -15187,13 +14851,13 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
 MTEXT
   5
-221
+213
 100
 AcDbEntity
 100
@@ -15227,9 +14891,345 @@ standard
  50
 0.0
  73
-1
+0
  44
 1.0
+  0
+CIRCLE
+  5
+214
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Top Plate Top
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+116.0
+ 20
+116.0
+ 30
+0.0
+ 40
+1.424999999999996
+  0
+CIRCLE
+  5
+215
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Top Plate Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+116.0
+ 20
+116.0
+ 30
+0.0
+ 40
+1.424999999999996
+  0
+CIRCLE
+  5
+216
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Top Plate Bottom Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+116.0
+ 20
+116.0
+ 30
+0.0
+ 40
+1.424999999999996
+  0
+CIRCLE
+  5
+217
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+116.0000000000001421
+ 20
+115.9999999999995737
+ 30
+0.0
+ 40
+1.425
+  0
+CIRCLE
+  5
+218
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Main Plate Bottom Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+116.0000000000001421
+ 20
+115.9999999999995737
+ 30
+0.0
+ 40
+1.425
+  0
+CIRCLE
+  5
+219
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Main Plate Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+116.0000000000001421
+ 20
+115.9999999999995737
+ 30
+0.0
+ 40
+1.425
+  0
+CIRCLE
+  5
+21A
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Retainer Plate
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+116.0000000000001421
+ 20
+115.9999999999991758
+ 30
+0.0
+ 40
+1.45
+  0
+CIRCLE
+  5
+21B
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Top Plate Top
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+85.9999999999999858
+ 20
+108.0
+ 30
+0.0
+ 40
+1.424999999999996
+  0
+CIRCLE
+  5
+21C
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Top Plate Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+86.0
+ 20
+108.0
+ 30
+0.0
+ 40
+1.424999999999996
+  0
+CIRCLE
+  5
+21D
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Top Plate Bottom Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+86.0
+ 20
+108.0
+ 30
+0.0
+ 40
+1.424999999999996
+  0
+CIRCLE
+  5
+21E
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Main Plate Top Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+85.9999999999999147
+ 20
+107.9999999999998153
+ 30
+0.0
+ 40
+1.425
+  0
+CIRCLE
+  5
+21F
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Main Plate Bottom Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+85.9999999999999147
+ 20
+107.9999999999998153
+ 30
+0.0
+ 40
+1.425
+  0
+CIRCLE
+  5
+220
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Main Plate Middle Layer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+85.9999999999999147
+ 20
+107.9999999999998153
+ 30
+0.0
+ 40
+1.425
+  0
+CIRCLE
+  5
+221
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Retainer Plate
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+85.9999999999999147
+ 20
+107.9999999999997584
+ 30
+0.0
+ 40
+1.45
   0
 ENDSEC
   0
