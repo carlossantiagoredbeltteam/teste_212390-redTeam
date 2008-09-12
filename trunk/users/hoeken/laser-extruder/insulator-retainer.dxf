@@ -861,7 +861,7 @@ $ENDCAPS
   9
 $CLAYER
   8
-Drawings
+Insulator Retainer
   0
 ENDSEC
   0
@@ -3715,6 +3715,54 @@ ByLayer
  40
 5.5625
   0
+CIRCLE
+  5
+7F
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Insulator Retainer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+80.0999999999999943
+ 20
+152.6000000000000796
+ 30
+0.0
+ 40
+2.4199999999999999
+  0
+CIRCLE
+  5
+80
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Insulator Retainer
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+80.0999999999999943
+ 20
+120.6000000000002927
+ 30
+0.0
+ 40
+2.4199999999999999
+  0
 ENDSEC
   0
 SECTION
@@ -3753,7 +3801,7 @@ E
   3
 AcDbVariableDictionary
 350
-7F
+81
   0
 DICTIONARY
   5
@@ -4217,7 +4265,7 @@ Layout2
   0
 DICTIONARY
   5
-7F
+81
 100
 AcDbDictionary
 281
@@ -4225,15 +4273,15 @@ AcDbDictionary
   3
 DIMASSOC
 350
-81
+83
   3
 HIDETEXT
 350
-80
+82
   0
 DICTIONARYVAR
   5
-80
+82
 100
 DictionaryVariables
 280
@@ -4243,7 +4291,7 @@ DictionaryVariables
   0
 DICTIONARYVAR
   5
-81
+83
 100
 DictionaryVariables
 280
