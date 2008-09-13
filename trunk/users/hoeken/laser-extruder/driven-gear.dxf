@@ -789,7 +789,7 @@ $PSVPSCALE
   9
 $CLAYER
   8
-Text
+0
   9
 $DIMSHO
  70
@@ -1747,9 +1747,9 @@ AcDbLayerTableRecord
   2
 Notes
  70
-1
+0
  62
--7
+7
 420
 16777215
   6
@@ -1769,9 +1769,9 @@ AcDbLayerTableRecord
   2
 Original Nut
  70
-1
+0
  62
--5
+5
 420
 255
   6
@@ -7131,7 +7131,7 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
@@ -7171,7 +7171,7 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
