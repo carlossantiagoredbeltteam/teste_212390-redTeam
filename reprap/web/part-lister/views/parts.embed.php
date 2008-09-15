@@ -39,6 +39,10 @@
 										}
 										$raw_id = implode(", ", $raw_ids);
 									}
+									
+									//hack to get borders.
+									if ($raw_id == "")
+										$raw_id = "&nbsp;";
 								?>
 								<tr>
 									<td><?=$raw_id?></td>

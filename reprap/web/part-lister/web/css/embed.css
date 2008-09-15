@@ -21,7 +21,8 @@ th
 
 td
 {
-	padding: 1px 10px 1px 0px;
+	padding: 3px 10px 3px 0px;
+	border-top: 1px solid #666;
 }
 
 h2

@@ -252,7 +252,6 @@
 	{
 		$legend = loadLegend();
 		
-		var_dump($legend);
 		if (!empty($legend['raw_keys']))
 		{
 			foreach ($legend['raw_keys'] AS $name => $legend_row)
@@ -285,9 +284,7 @@
 					$legend->set("unique_part_id", $unique->id);
 					$legend->set("status", $legend_row[2]);
 					$legend->save();
-					
-					var_dump($legend_row);
-					
+										
 					echo "<b>Added root module " . $root->get('raw_text') . "</b><br>";
 					
 					//get rid of human junk
