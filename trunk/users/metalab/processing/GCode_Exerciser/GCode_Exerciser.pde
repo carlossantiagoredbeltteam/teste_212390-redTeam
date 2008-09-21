@@ -144,7 +144,7 @@ void draw()
 }
 
 int targetTemp = 20;
-int motorSpeed = 0;
+int motorSpeed = 130;
 
 int feedRate = 100;
 
@@ -212,18 +212,18 @@ String getNextCommand()
       c = "G1 X0 Y0 Z2 F450";
       break;
     case 'Q':
-      c = "G1 X0 Y0 Z0.15 F150";
+      c = "G1 X0 Y0 Z0.05 F150";
       break;
     case 'z':
       c = "G1 X0 Y0 Z-2 F450";
       break;
     case 'Z':
-      c = "G1 X0 Y0 Z-0.1 F150";
+      c = "G1 X0 Y0 Z-0.05 F150";
       break;
 
       // Temp    
     case 'u':
-      targetTemp = 200;
+      targetTemp = 225;
       c = "M104 S" + targetTemp;
       break;
     case 'p':
