@@ -14,7 +14,7 @@
 
 //our maximum feedrates
 #define FAST_XY_FEEDRATE 1000.0
-#define FAST_Z_FEEDRATE  50.0
+#define FAST_Z_FEEDRATE  500.0
 
 // Units in curve section
 #define CURVE_SECTION_INCHES 0.019685
@@ -22,7 +22,7 @@
 
 // Set to one if endstop outputs are inverting (ie: 1 means open, 0 means closed)
 // RepRap opto endstops are *not* inverting.
-#define ENDSTOPS_INVERTING 0
+#define ENDSTOPS_INVERTING 1
 // Optionally disable max endstops to save pins or wiring
 #define ENDSTOPS_MIN_ENABLED 1
 #define ENDSTOPS_MAX_ENABLED 0
@@ -35,6 +35,10 @@
 // stepper boards).
 // RepRap stepper boards are *not* inverting.
 #define INVERT_ENABLE_PINS 1
+
+
+#define INVERT_X_DIR 1
+#define INVERT_Z_DIR 1
 
 /****************************************************************************************
 * digital i/o pin assignment
