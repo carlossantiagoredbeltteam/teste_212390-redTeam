@@ -1,7 +1,7 @@
 Format is tab separated preferences.
 Extrusion Diameter (mm):	0.43
 Extrusion Diameter Over Precision (ratio):	10.0
-Extrusion Perimeter Width Over Diameter (ratio):	1.6
+Extrusion Perimeter Width Over Diameter (ratio):	2.2
 Extrusion Height Over Diameter (ratio):	0.85
 Extrusion Width Over Diameter (ratio):	1.72
 Open File to be Sliced	/Users/kintel/code/metalab/checkout/reprap/users/metalab/models/cylinder.gts
