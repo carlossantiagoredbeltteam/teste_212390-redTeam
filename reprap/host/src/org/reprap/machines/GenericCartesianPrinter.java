@@ -1031,4 +1031,17 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 
 		return picTimer;
 	}
+	
+	public double getXStepsPerMM()
+	{
+		return scaleX;
+	}
+	public double getYStepsPerMM()
+	{
+		return scaleY;
+	}
+	public double getZStepsPerMM()
+	{
+		return scaleZ;
+	}
 }

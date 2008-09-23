@@ -71,15 +71,15 @@ public class TestMain
 	
 	public static RrCSGPolygon testPol()
 	{
-		Rr2Point p = new Rr2Point(0.1, 0.15);
-		Rr2Point q = new Rr2Point(0.2, 0.85);
-		Rr2Point r = new Rr2Point(0.97, 0.89);
-		Rr2Point s = new Rr2Point(0.95, 0.03);
+		Rr2Point p = new Rr2Point(10, 15);
+		Rr2Point q = new Rr2Point(20, 85);
+		Rr2Point r = new Rr2Point(97, 89);
+		Rr2Point s = new Rr2Point(95, 3);
 		
-		Rr2Point pp = new Rr2Point(0.3, 0.62);
+		Rr2Point pp = new Rr2Point(30, 62);
 		//Rr2Point qq = new Rr2Point(0.55, 0.95);
-		Rr2Point qq = new Rr2Point(0.35, 0.95);
-		Rr2Point rr = new Rr2Point(0.35, 0.2);    
+		Rr2Point qq = new Rr2Point(35, 95);
+		Rr2Point rr = new Rr2Point(35, 20);    
 		
 		RrHalfPlane ph = new RrHalfPlane(p, q);
 		RrHalfPlane qh = new RrHalfPlane(q, r);
@@ -107,11 +107,11 @@ public class TestMain
 		RrCSG ppc = RrCSG.intersection(qqc, rrc);
 		ppc = RrCSG.difference(pc, ppc);
 		
-		pc = ppc.offset(-0.08);
+		pc = ppc.offset(-8);
 		ppc = RrCSG.difference(ppc, pc);
 		
 		return new RrCSGPolygon(ppc, new 
-				RrBox(new Rr2Point(-0.032,-0.0176), new Rr2Point(1.317,1.12)),
+				RrBox(new Rr2Point(-3.2,-1.76), new Rr2Point(131.7,112)),
 				new Attributes(null, null, null, null));
 	}
 	
