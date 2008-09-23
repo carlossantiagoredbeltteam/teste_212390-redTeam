@@ -1,0 +1,4 @@
+o Debug end.txt
+o Figure out why the raft is not centered
+o Don't do nozzle lift before the bridge layer
+o Skeinview: Flip Y axis
