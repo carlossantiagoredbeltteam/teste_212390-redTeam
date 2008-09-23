@@ -386,7 +386,7 @@ public class LayerProducer {
 	 * @throws ReprapException
 	 * @throws IOException
 	 */
-	private void move(Rr2Point first, Rr2Point second, boolean startUp, boolean endUp) 
+	private void move(Rr2Point first, Rr2Point second, boolean startUp, boolean endUp, boolean fast) 
 		throws ReprapException, IOException
 	{
 		Printer printer = layerConditions.getPrinter();
@@ -402,7 +402,8 @@ public class LayerProducer {
 		
 		double z = layerConditions.getMachineZ();
 		
-		if(startUp)
+		//if(startUp)
+		if(fast)
 		{
 			printer.setFeedrate(printer.getFastFeedrateXY());
 			printer.moveTo(first.x(), first.y(), z, startUp, endUp);
@@ -518,8 +519,12 @@ public class LayerProducer {
 		
 		if (printer.isCancelled()) return;
 		
+		// If getMinLiftedZ() is negative, never lift the head
+		
+		Boolean lift = printer.getExtruder().getMinLiftedZ() >= 0;
+		
 		printer.setFeedrate(printer.getFastFeedrateXY());
-		move(p.point(0), p.point(1), true, false);
+		move(p.point(0), p.point(1), lift, false, true);
 
 		//printer.getExtruder().setMotor(true);
 		plot(p.point(0), p.point(1), false, false);
@@ -547,12 +552,12 @@ public class LayerProducer {
 				if (printer.isCancelled())
 				{
 					printer.stopMotor();
-					move(posNow(), posNow(), true, true);
+					move(posNow(), posNow(), lift, true, true);
 					return;
 				}
 				
 				if(j > stopExtruding || j == p.size())
-					plot(p.point(i), next, true, j == p.size());
+					plot(p.point(i), next, lift, j == p.size());
 				else
 					plot(p.point(i), next, false, false);
 				
@@ -570,7 +575,7 @@ public class LayerProducer {
 				if (printer.isCancelled())
 				{
 					printer.stopMotor();
-					move(posNow(), posNow(), true, true);
+					move(posNow(), posNow(), lift, lift, true);
 					return;
 				}
 				
@@ -580,13 +585,13 @@ public class LayerProducer {
 					plot(p.point(i), next, false, false);
 				
 				if(i > stopValve || i == p.size()-1)
-					plot(p.point(i), next, i == p.size()-1, true);
+					plot(p.point(i), next, i == p.size()-1, lift);
 				else
 					plot(p.point(i), next, false, false);
 			}
 		}
 		
-		move(posNow(), posNow(), true, true);
+		move(posNow(), posNow(), lift, lift, true);
 		
 	}
 	
