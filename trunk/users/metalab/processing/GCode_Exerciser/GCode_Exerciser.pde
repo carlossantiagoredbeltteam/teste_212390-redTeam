@@ -117,8 +117,8 @@ void draw()
   text(temp, 10, 80);
 
   temp = 
-    "a: +X\n" +
-    "d: -X\n" +
+    "a: -X\n" +
+    "d: +X\n" +
     "w: +Y\n" +
     "s: -Y\n" +
     "q: +Z\n" +
@@ -183,16 +183,16 @@ String getNextCommand()
       
       // X axis
     case 'a':
-      c = "G1 X10 Y0 Z0 F950";
-      break;
-    case 'd':
       c = "G1 X-10 Y0 Z0 F950";
       break;
+    case 'd':
+      c = "G1 X10 Y0 Z0 F950";
+      break;
     case 'A':
-      c = "G1 X1 Y0 Z0 F950";
+      c = "G1 X-1 Y0 Z0 F950";
       break;
     case 'D':
-      c = "G1 X-1 Y0 Z0 F950";
+      c = "G1 X1 Y0 Z0 F950";
       break;
       // Y axis
     case 'w':
