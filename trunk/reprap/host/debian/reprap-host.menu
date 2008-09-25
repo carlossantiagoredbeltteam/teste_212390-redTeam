@@ -1,6 +1,6 @@
 ?package(reprap-host):\
 	needs="x11" \
-	section="Apps/Science/Engineering" \
+	section="Applications/Science/Engineering" \
 	command="/usr/bin/reprap-host" \
 	title="Reprap" \
 	hints="3D Printing" \
