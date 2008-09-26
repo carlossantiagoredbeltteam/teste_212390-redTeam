@@ -1,7 +1,10 @@
 // Yep, this is actually -*- c++ -*-
+#ifndef INIT_H_
+#define INIT_H_
 
 // Prints debug output on the serial port - makes stuff slower
 #define DEBUG 1
+
 
 // define the parameters of our machine.
 #define X_STEPS_PER_INCH 6773
@@ -28,8 +31,12 @@
 // RepRap opto endstops are *not* inverting.
 #define ENDSTOPS_INVERTING 1
 // Optionally disable max endstops to save pins or wiring
-#define ENDSTOPS_MIN_ENABLED 1
-#define ENDSTOPS_MAX_ENABLED 0
+#define ENDSTOP_X_MIN_ENABLED 1
+#define ENDSTOP_X_MAX_ENABLED 0
+#define ENDSTOP_Y_MIN_ENABLED 1
+#define ENDSTOP_Y_MAX_ENABLED 0
+#define ENDSTOP_Z_MIN_ENABLED 0
+#define ENDSTOP_Z_MAX_ENABLED 1
 
 // How many temperature samples to take.  each sample takes about 100 usecs.
 #define TEMPERATURE_SAMPLES 5
@@ -44,9 +51,15 @@
 // stepper direction pins are inverted, set these defines to 1
 // for the axes which should be inverted.
 // RepRap stepper boards are *not* inverting.
-//#define INVERT_X_DIR 1
+#define INVERT_X_DIR 0
 #define INVERT_Y_DIR 1
 #define INVERT_Z_DIR 1
+
+// Defines in which logical direction to move when using the G30 command
+// (home to physical reference switches). 1 is positive, 0 is negative
+#define REFERENCE_X_DIR 0
+#define REFERENCE_Y_DIR 0
+#define REFERENCE_Z_DIR 1
 
 /****************************************************************************************
 * digital i/o pin assignment
@@ -69,8 +82,8 @@
 
 #define Z_STEP_PIN 19
 #define Z_DIR_PIN 18
-#define Z_MIN_PIN 17
-#define Z_MAX_PIN 16
+#define Z_MIN_PIN 16
+#define Z_MAX_PIN 17
 #define Z_ENABLE_PIN 15
 
 //extruder pins
@@ -80,3 +93,32 @@
 #define EXTRUDER_FAN_PIN           5
 #define EXTRUDER_THERMISTOR_PIN    0  //NB! analog pin, -1 disables thermistor readings
 #define EXTRUDER_THERMOCOUPLE_PIN  -1 //NB! analog pin, -1 disables thermocouple readings
+
+// Enable/disable features
+#define ENABLE_ARCS                0
+
+enum Axis {
+  X_AXIS = 0,  
+  Y_AXIS = 1,
+  Z_AXIS = 2
+};
+
+struct AxisConfig {
+  uint8_t step_pin;
+  uint8_t dir_pin;
+  uint8_t min_pin;
+  uint8_t max_pin;
+  uint8_t enable_pin;
+  bool invert_dir;
+  bool reference_dir;
+  bool min_endstop_enabled;
+  bool max_endstop_enabled;
+
+  uint16_t x_steps_per_inch;
+  uint16_t x_steps_per_mm;
+  uint16_t x_motor_steps;
+};
+
+extern AxisConfig axes[3];
+
+#endif // INIT_H_
