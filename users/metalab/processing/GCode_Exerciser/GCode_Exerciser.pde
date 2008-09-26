@@ -14,6 +14,7 @@ boolean commandComplete = true;
 int commandCount = 0;
 
 String temperature = "?";
+String debug = "";
 
 String gcode[] = {
 };
@@ -50,9 +51,11 @@ void draw()
       println("Got: " + serialLine);
 
       String m[] = match(serialLine, "^T:([0-9]+)");
-      ;
-      if (m != null)
-        temperature = m[0];
+      if (m != null) temperature = m[0];
+
+      m  = match(serialLine, "^Status:");
+      if (m != null) debug = serialLine;
+      println(debug);
 
       if (match(serialLine, "^start") != null)
         started = true;
@@ -111,6 +114,8 @@ void draw()
   temp += "\nTarget: " + targetTemp + "C";
   temp += "\nDC Speed: " + motorSpeed + "C";
   text(temp, 10, 20);
+  temp = "Status: " + debug + "\n";
+  text(temp, 300, 20);
 
   temp =
     "Keys:\n";
@@ -126,7 +131,7 @@ void draw()
   text(temp, 10, 100);
     
   temp = 
-    "u: Set temp to 185\n" +
+    "u: Set temp to 225\n" +
     "p: Increase temp\n" +
     "l: Decrease temp\n";
   text(temp, 100, 100);
@@ -165,10 +170,6 @@ String getNextCommand()
       println(feedRate);
       break;
       
-    case 'y':
-      c = "G1 X0 Y-0.1 Z0 F" + feedRate;
-      break;
-    
     case 'e':
       c = "G21 (mm)";
       break;
@@ -189,10 +190,10 @@ String getNextCommand()
       c = "G1 X10 Y0 Z0 F950";
       break;
     case 'A':
-      c = "G1 X-1 Y0 Z0 F950";
+      c = "G1 X-1 Y0 Z0 F150";
       break;
     case 'D':
-      c = "G1 X1 Y0 Z0 F950";
+      c = "G1 X1 Y0 Z0 F150";
       break;
       // Y axis
     case 'w':
@@ -202,10 +203,10 @@ String getNextCommand()
       c = "G1 X0 Y-10 Z0 F950";
       break;
     case 'W':
-      c = "G1 X0 Y1 Z0 F950";
+      c = "G1 X0 Y1 Z0 F150";
       break;
     case 'S':
-      c = "G1 X0 Y-1 Z0 F950";
+      c = "G1 X0 Y-1 Z0 F150";
       break;
     // Z axis
     case 'q':
@@ -269,8 +270,18 @@ String getNextCommand()
     case 'F':
       c = "M107 (cooling off)";
     break;
-    }
 
+    // Home
+    case 'h':
+      c = "G30 X10 Y10 Z-10 (home to reference)";
+      break;
+
+    case 'y':
+    case 'Y':
+      c = "M120 (get debug)";
+    break;
+
+    }
   }
 
   return c;
