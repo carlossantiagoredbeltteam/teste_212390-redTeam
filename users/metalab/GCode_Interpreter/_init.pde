@@ -1,4 +1,8 @@
 // Yep, this is actually -*- c++ -*-
+
+// Prints debug output on the serial port - makes stuff slower
+#define DEBUG 1
+
 // define the parameters of our machine.
 #define X_STEPS_PER_INCH 6773
 #define X_STEPS_PER_MM   267
@@ -36,8 +40,12 @@
 // RepRap stepper boards are *not* inverting.
 #define INVERT_ENABLE_PINS 1
 
-
-#define INVERT_X_DIR 1
+// If you use this firmware on a cartesian platform where the
+// stepper direction pins are inverted, set these defines to 1
+// for the axes which should be inverted.
+// RepRap stepper boards are *not* inverting.
+//#define INVERT_X_DIR 1
+#define INVERT_Y_DIR 1
 #define INVERT_Z_DIR 1
 
 /****************************************************************************************
