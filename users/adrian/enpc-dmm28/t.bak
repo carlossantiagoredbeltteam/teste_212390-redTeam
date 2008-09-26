@@ -1,0 +1,133 @@
+Niels Boeing wrote:
+
+> I'm a technology writer from Hamburg and currently writing an update on 
+> Personal Fabrication for Germany's leading weekly DIE ZEIT (www.zeit.de 
+> <http://www.zeit.de>). I read some of your contributions on the RP 
+> mailing list so I thought I'd like to contact you for my story as well. 
+> 
+> I also browsed through the RepRap site so I think I'd like to explain my 
+> interest in the topic before I start asking questions: My background is 
+> in physics, with a venture into the philosophy of technology before 
+> becoming a journalist. Three years ago I wrote a book about 
+> nanotechnology (an introduction for the general public). This started me 
+> thinking about how important the technical modes of production are for 
+> any future development. Together with some friends I wrote a draught of 
+> a "transcapitalist" society that's built among others upon the idea of 
+> personal/local fabrication, see 
+> http://www.km21.org/utopia/transcapitalism.html -> "the open 
+> technosphere". So your RepRap project immediately struck a chord, also 
+> your going back to Marx and Engels (which is not very hip nowadays but 
+> they asked the right questions).
+
+Yes - it's a shame that they didn't stop there, but instead went on to come up with such wrong answers...
+
+> OK, here are some questions then: 
+> 
+> - Do you think that a simple user interface and open, standardized data 
+> format is the bottleneck for "additive fabrication" (I use Wohlers's 
+> umbrella term) to move into a more consumer-friendly market, away from 
+> being just a sophisticated industry tool?
+
+No - user interfaces will evolve very quickly when the technology becomes widespread.  And the STL data format (which is technically very poor, but which works) is already an open-standard data format for these machines.
+
+The bottleneck is that all of that industry is wrapped up in its patents, and it spends significant sums jealously fighting for them in the courts.  Companies
+are very heavily capitalised (the money was needed for development),
+and few - if any - are making profits.  Internally, many 3D printing
+machines are not complicated, and the suppliers are using
+their patent monopoly to sell them for very high prices to try to
+recoup some of that capital.  The cheapest machines cost about
+12,000 GBP.
+
+But the patents will soon expire.  When that happens, a really big
+fish like Hewlett Packard will move in and start selling machines for -
+at a guess - around 1000 GBP.  Private individuals will start buying
+them, and the first generation of patent-holding companies will go to
+the wall or get bought up.
+
+Then, with luck, RepRap will begin to take off undercutting
+everything, and things will start to get really interesting...
+
+
+> - Where do you see remaining technical problems in additive fabrication 
+> technology that would have to be overcome for a mass adoption?
+
+Using them needs to become as easy as document preparation and printing are at the moment.  This is clearly technically achievable.  But I suspect most people will not be designing their own objects and devices, any more than they write their own music.  They'll be downloading designs from free and commercial websites so that they can avoid the inefficiency of going out and buying physical objects,  just as they do at the moment with MP3 music files, and soon will be with TV and movies.
+
+> - If one takes 3 possible scenarios of an adoption of fabbing: 
+> a) industry-only-use (that is on a bigger scale than now), 
+> b) the "kinko's model" (with points of fab for a range of small-scale 
+> producers) or 
+> c) home fabrication - 
+> which do you consider the most likely from your experience in the field? 
+> Or to put it differently: which trends could foster the home fabrication 
+> scenario, which conditions could turn out inhibitive for it (I think the 
+> looming intellectual property problem could be an incentive for the big 
+> industry players to keep this scenario down)?
+
+We are already entering stage a).  The next two stages will follow in that order.  A lot of entertaining fuss will be made about IP issues.  But it will be strictly entertainment - it has little practical consequence.  To see why, consider the following:
+
+Go up to a stranger in the street and ask them to give you their car,
+and you will receive an abrupt reply; go up to a stranger in the
+street and ask them to give you their most interesting idea, and half
+an hour later you will be glancing at your watch and inventing
+fictitious appointments.  And we have all had the experience of coming
+up with a neat concept and experiencing the immediately-subsequent
+impulse to tell everyone about it - you are a journalist, and so you must be particularly prone to it...
+
+This prompts a profound biological question: if novel information is
+such valuable property, what is the Darwinian selective advantage in
+the ubiquitous impulse to give it away as soon as we aquire it?
+
+The answer was worked out a few years ago by the evolutionary
+psychologist Geoffrey Miller.  He realised that the human mind did not
+evolve as a problem-solving device, it evolved - like the peacock's
+tail - to waste valuable resources in an un-fakable way as a sign of fitness to potential mates.  The valuable resource being wasted, of course, is blood glucose.
+
+That is why the most important four words in lonely-hearts columns
+are Good Sense of Humour, why musicians, painters, authors, and actors (who all do nothing actually useful, but demonstrate great mental agility) are so
+attractive to the opposite sex, why accountants, engineers and
+computer programmers (who use their intellect for useful and gainful
+things) are considered geeky and unattractive, and why we all want to
+give away any neat idea as soon as we have it.  These things are what
+our brain is for.
+
+If A gives B a material object, A no longer has the object.  But if A
+gives B an idea, A still retains the idea.  Information, unlike matter
+and energy, is not conserved.  That is why, when teenagers swap MP3
+files, they do not instinctively feel that it is theft - nothing is
+lost that wasn't a fiction in the first place.
+
+Consequently there is - in reality - no copyright in recorded music
+any more, and film and video will soon go the same way.  When anyone
+can make any device or machine, the same will happen to the idea of
+patents as is happening now to copyright.
+
+The whole concept of intellectual property is only game-theoretically
+stable when copying is difficult and legal penalties mean significant
+utility-function losses for those who would copy.  Make copying easy,
+and the very idea of intellectual property evaporates because the Nash
+equilibrium shifts to a point where any legal penalties have nugatory
+influence.
+
+But creativity doesn't evaporate with it.  People don't create because
+of a rational desire to improve their wealth, they create because they
+are driven by an inner compulsion to do so.  And that inner compulsion
+is exactly what you'd expect from an evolutionarily-selected mating
+trait.
+
+> - Are you somehow in connection with Hod Lipson of Cornell? The RepRap 
+> project seems quite similar to his research. This also interests me 
+> because of a second piece I'll write for DIE ZEIT about "evolvable 
+> robotics/machines" and RepRap could be part of that story, too.
+
+Yes - we have exchanged e-mails, and were due both to take part in a conference in the USA earlier this summer.  Unfortunately, a death in my family at the last minute prevented my going, so I was not able to meet him.  I am going again in October though, so I may get the chance then.
+
+If I can be of any more help, please ask.
+
+Yours
+
+Adrian
+
+http://staff.bath.ac.uk/ensab
+http://reprap.org
+
