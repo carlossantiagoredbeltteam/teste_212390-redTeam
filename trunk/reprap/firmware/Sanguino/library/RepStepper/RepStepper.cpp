@@ -19,6 +19,8 @@ RepStepper::RepStepper(int number_of_steps, byte dir_pin, byte step_pin, byte en
 	// setup the pins on the microcontroller:
 	pinMode(this->step_pin, OUTPUT);
 	pinMode(this->direction_pin, OUTPUT);
+	pinMode(this->enable_pin, OUTPUT);
+	
 	this->enable();
 	this->setDirection(RS_FORWARD);
 }

@@ -36,6 +36,14 @@ CartesianBot bot = CartesianBot(
 
 void setup()
 {
+  // Added by AB - seems to make things more stable
+  
+  for(int i = 1; i < 32; i++)
+  {
+    pinMode(i, OUTPUT);
+    digitalWrite(i, LOW);
+  }
+    
 	snap.begin(19200);
 	
 	//run any setup code we need.

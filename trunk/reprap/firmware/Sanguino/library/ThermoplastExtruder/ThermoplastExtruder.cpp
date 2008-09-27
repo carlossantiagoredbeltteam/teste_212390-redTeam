@@ -25,9 +25,11 @@ ThermoplastExtruder::ThermoplastExtruder(byte motor_dir_pin, byte motor_pwm_pin,
 
 	pinMode(this->motor_dir_pin, OUTPUT);
 	pinMode(this->motor_pwm_pin, OUTPUT);
-	pinMode(this->heater_pin, OUTPUT);
 	pinMode(this->valve_dir_pin, OUTPUT);
 	pinMode(this->valve_enable_pin, OUTPUT);
+	pinMode(this->heater_pin, OUTPUT);
+	pinMode(this->cooler_pin, OUTPUT);
+	pinMode(this->thermistor_pin, INPUT);
 
 	this->getTemperature();
 	this->setSpeed(0);

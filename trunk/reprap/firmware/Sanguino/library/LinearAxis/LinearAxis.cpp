@@ -9,7 +9,9 @@ LinearAxis::LinearAxis(char id, int steps, byte dir_pin, byte step_pin, byte min
 	this->max = 0;
 	this->min_pin = min_pin;
 	this->max_pin = max_pin;
-
+	pinMode(this->min_pin, INPUT);
+	pinMode(this->max_pin, INPUT);	
+	
 	this->stepper.setDirection(RS_FORWARD);
 
 	this->readState();
