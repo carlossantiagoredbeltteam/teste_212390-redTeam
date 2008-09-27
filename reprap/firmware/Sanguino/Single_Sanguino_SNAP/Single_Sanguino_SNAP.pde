@@ -1,10 +1,13 @@
 /*
-	Single_Arduino_SNAP.pde - Combined cartesian bot + extruder firmware.
+	Single_Sanguino_SNAP.pde - Combined cartesian bot + extruder firmware.
 
-	History:
+	History (Arduino):
 	* (0.1) Created initial version by Zach Smith.
 	* (0.2) Updated to work with the various optimizations and extruder emulation by Zach Smith
 	* (0.3) Updated with new library changes by Zach Smith.
+
+	History (Sanguino):
+        * (0.4) Converted to Sanguino version by Adrian Bowyer
 	
 	License: GPL v2.0
 */
@@ -13,14 +16,14 @@
 #include "init.h"
 
 //our library includes.
-#include <HardwareSerial.h>
-#include <SNAP.h>
-#include <RepStepper.h>
-#include <LinearAxis.h>
-#include <CartesianBot.h>
-#include <ThermoplastExtruder.h>
-#include <ThermoplastExtruder_SNAP_v1.h>
-#include <CartesianBot_SNAP_v1.h>
+#include "HardwareSerial.h"
+#include "SNAP.h"
+#include "RepStepper.h"
+#include "LinearAxis.h"
+#include "CartesianBot.h"
+#include "ThermoplastExtruder.h"
+#include "ThermoplastExtruder_SNAP_v1.h"
+#include "CartesianBot_SNAP_v1.h"
 
 ThermoplastExtruder extruder(EXTRUDER_MOTOR_DIR_PIN, EXTRUDER_MOTOR_SPEED_PIN, EXTRUDER_HEATER_PIN, 
   EXTRUDER_FAN_PIN, EXTRUDER_THERMISTOR_PIN, VALVE_DIR_PIN, VALVE_ENABLE_PIN);
@@ -39,8 +42,8 @@ void setup()
 	setup_cartesian_bot_snap_v1();
 	setup_extruder_snap_v1();
 	
-	snap.debug();
-	Serial.println("BEGIN");
+	//snap.debug();
+	//Serial.println("BEGIN");
 }
 
 void loop()

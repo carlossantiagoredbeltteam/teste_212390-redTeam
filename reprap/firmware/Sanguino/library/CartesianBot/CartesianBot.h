@@ -93,7 +93,7 @@ class CartesianBot {
 	byte tail;
 	byte size;
 
-	Point point_queue[POINT_QUEUE_SIZE]; // +1 for luck... AB
+	Point point_queue[POINT_QUEUE_SIZE]; 
 };
 
 inline byte CartesianBot::getQueueSize()
