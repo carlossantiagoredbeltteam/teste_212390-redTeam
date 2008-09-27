@@ -21,8 +21,8 @@
 #define Y_MAX_PIN 10
 #define Y_ENABLE_PIN 15
 #define Z_STEP_PIN 11
-#define Z_DIR_PIN 29
-#define Z_MIN_PIN 30
+#define Z_DIR_PIN 24
+#define Z_MIN_PIN 25
 #define Z_MAX_PIN 18
 #define Z_ENABLE_PIN 15
 
@@ -31,7 +31,7 @@
 #define EXTRUDER_MOTOR_DIR_PIN    20
 #define EXTRUDER_HEATER_PIN       12
 #define EXTRUDER_FAN_PIN          19
-#define EXTRUDER_THERMISTOR_PIN   24 // Should this be 0?
+#define EXTRUDER_THERMISTOR_PIN   0
 #define VALVE_DIR_PIN             21
 #define VALVE_ENABLE_PIN          22  
 

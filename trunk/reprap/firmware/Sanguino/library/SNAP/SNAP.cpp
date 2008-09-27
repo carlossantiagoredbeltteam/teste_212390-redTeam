@@ -87,7 +87,7 @@ void SNAP::receiveByte(byte c)
 			this->rxHDB2 = c;
 			if ((c & B11111100) != B01010000)
 			{
-				// Unsupported header.  Drop it an reset
+				// Unsupported header.  Drop it and reset
 				this->rxFlags |= serialErrorBit;  //set serialError
 				this->rxFlags |= wrongByteErrorBit; 
 				this->receiveError();
