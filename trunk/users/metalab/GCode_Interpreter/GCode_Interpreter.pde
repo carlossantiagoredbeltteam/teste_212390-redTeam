@@ -55,7 +55,10 @@ void loop()
   //read in characters if we got them.
   if (Serial.available() > 0) {
     c = Serial.read();
+
+    // Reset no_data timer
     no_data = 0;
+    idle_time = millis();
 
     //  commands end with newlines
     if (c != '\n') {
@@ -73,8 +76,8 @@ void loop()
 
     bytes_received = true;
   }
-  // mark no data if nothing heard for 100 milliseconds
   else {
+    // mark no_data if nothing heard for 100 milliseconds
     if ((millis() - idle_time) >= 100) {
       no_data++;
       idle_time = millis();
@@ -83,8 +86,9 @@ void loop()
 
   // if there's a pause or we got a real command, do it
   if (bytes_received && (c == '\n' || no_data)) {
-    //           Serial.print("debug: ");
-    //           Serial.println(word);
+//     if (no_data) Serial.print("NODATA ");
+//     Serial.print("debug: ");
+//     Serial.println(word);
 
     //process our command!
     process_string(word, serial_count);
