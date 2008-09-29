@@ -15,6 +15,7 @@ int commandCount = 0;
 
 String temperature = "?";
 String debug = "";
+float feedrate = 950;
 
 String gcode[] = {
 };
@@ -32,14 +33,14 @@ void setup()
   myPort = new Serial(this, Serial.list()[0], 19200);
 
   //load our gcode lines
-//  gcode = loadStrings("/home/wizard23/projects/reprap/downloads/gcodestuff/cooled_rings.gcode");
+  //  gcode = loadStrings("/home/wizard23/projects/reprap/downloads/gcodestuff/cooled_rings.gcode");
   //println(gcode);
 }
 
 void draw()
 {
   String cmd;
-  
+
   background(20, 20, 20);
 
   while (myPort.available() > 0)
@@ -80,8 +81,8 @@ void draw()
   {
     if (commandComplete)
     {
-      
-      
+
+
       if (!initialized)
       {
         initialized = true;
@@ -95,11 +96,11 @@ void draw()
       {
         commandComplete = false;
         println("Sent: " +cmd);
-        myPort.write(cmd);
+        myPort.write(cmd + "\n");
       }
     }
   }
-  
+
   if (started && finished)
   {
     println("Job's done!");
@@ -113,13 +114,14 @@ void draw()
   String temp = "Temperature: " + temperature + "C";
   temp += "\nTarget: " + targetTemp + "C";
   temp += "\nDC Speed: " + motorSpeed + "C";
+  temp += "\nFeedrate: " + feedrate + " mm/min.             < >: dec/inc feedrate";
   text(temp, 10, 20);
   temp = "Status: " + debug + "\n";
   text(temp, 300, 20);
 
   temp =
     "Keys:\n";
-  text(temp, 10, 80);
+  text(temp, 10, 100);
 
   temp = 
     "a: -X\n" +
@@ -128,8 +130,8 @@ void draw()
     "s: -Y\n" +
     "q: +Z\n" +
     "z: -Z\n";
-  text(temp, 10, 100);
-    
+  text(temp, 10, 120);
+
   temp = 
     "u: Set temp to 225\n" +
     "p: Increase temp\n" +
@@ -151,43 +153,36 @@ void draw()
 int targetTemp = 20;
 int motorSpeed = 130;
 
-int feedRate = 100;
-
 String getNextCommand()
 {
   String c = null;
   if (keyPressed) { 
     switch (key) { 
-    case '+':
-      feedRate++;
-      println(feedRate);
+    case '>':
+      feedrate+=10;
       break;
-      
-    
-      
-    case '-':
-      feedRate--;
-      println(feedRate);
+    case '<':
+      feedrate-=10;
       break;
-      
+
     case 'e':
       c = "G21 (mm)";
       break;
-      
+
     case 'r':
       c = "G90 (abs)";
       break;
-      
-    //case 'y':
-    //  c = "G92 (set home)";
-    //  break;
-      
+
+      //case 'y':
+      //  c = "G92 (set home)";
+      //  break;
+
       // X axis
     case 'a':
-      c = "G1 X-10 Y0 Z0 F950";
+      c = "G1 X-10 Y0 Z0 F" + int(feedrate);
       break;
     case 'd':
-      c = "G1 X10 Y0 Z0 F950";
+      c = "G1 X10 Y0 Z0 F" + int(feedrate);
       break;
     case 'A':
       c = "G1 X-1 Y0 Z0 F150";
@@ -197,10 +192,10 @@ String getNextCommand()
       break;
       // Y axis
     case 'w':
-      c = "G1 X0 Y10 Z0 F950";
+      c = "G1 X0 Y10 Z0 F" + int(feedrate);
       break;
     case 's':
-      c = "G1 X0 Y-10 Z0 F950";
+      c = "G1 X0 Y-10 Z0 F" + int(feedrate);
       break;
     case 'W':
       c = "G1 X0 Y1 Z0 F150";
@@ -208,7 +203,7 @@ String getNextCommand()
     case 'S':
       c = "G1 X0 Y-1 Z0 F150";
       break;
-    // Z axis
+      // Z axis
     case 'q':
       c = "G1 X0 Y0 Z2 F450";
       break;
@@ -238,51 +233,62 @@ String getNextCommand()
     case 't':
     case 'T':
       c = "M105 (get current temp)";
-    break;
-    
+      break;
+
       // Motor
     case 'i':
       motorSpeed += 1;
       c = "M108 S" + motorSpeed;
-    break;
+      break;
     case 'j':
       motorSpeed -= 1;
       c = "M108 S" + motorSpeed;
-    break;
-    
-    // Extruder    
+      break;
+
+      // Extruder    
     case 'm':
       c = "M101 (extruder on)";
-    break;
+      break;
     case 'n':
     case ' ':
       c = "M103 (extruder off)";
-    break;
+      break;
     case 'b':
       c = "M102 (extruder reverse)";
-    break;
+      break;
 
-    // Cooling
+      // Cooling
     case 'f':
       c = "M106 (cooling on)";
-    break;
-    
+      break;
+
     case 'F':
       c = "M107 (cooling off)";
-    break;
+      break;
 
-    // Home
+      // Home
     case 'h':
-      c = "G30 X10 Y10 Z-10 (home to reference)";
+      c = "G30 X10 Y20 Z-10 F" + int(feedrate) + " (home to reference)";
+      break;
+
+      // Set zero
+    case 'o':
+      c = "G92";
+      break;
+
+      // Goto zero
+    case '0':
+      c = "G28 F" + int(feedrate);
       break;
 
     case 'y':
     case 'Y':
       c = "M120 (get debug)";
-    break;
+      break;
 
     }
   }
 
   return c;
 }
+
