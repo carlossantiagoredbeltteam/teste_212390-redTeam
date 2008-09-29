@@ -114,9 +114,9 @@ struct AxisConfig {
   bool min_endstop_enabled;
   bool max_endstop_enabled;
 
-  uint16_t x_steps_per_inch;
-  uint16_t x_steps_per_mm;
-  uint16_t x_motor_steps;
+  uint16_t steps_per_inch;
+  uint16_t steps_per_mm;
+  uint16_t motor_steps;
 };
 
 extern AxisConfig axes[3];
