@@ -52,15 +52,19 @@ void dda_move(long micro_delay)
   
   //our step flags
   bool can_step_flags[3] = {false, false, false};
-  
+
   //how long do we delay for?
+  // We subtract the expected overhead of the loop to make the real speed
+  // closer to our target feedrate. FIXME: This is just a hack and should
+  // be handled properly.
+  micro_delay -= 100;
   if (micro_delay >= 16383) milli_delay = micro_delay / 1000;
   else milli_delay = 0;
   
   //do our DDA line!
   do {
     for (uint8_t i=0;i<3;i++) {
-      const AxisConfig &a = axes[i];
+      const AxisConfig &a = axes[i]; 
       can_step_flags[i] = can_step(a.min_endstop_enabled, a.max_endstop_enabled, 
                                    a.min_pin, a.max_pin, 
                                    current_steps.p[i], target_steps.p[i], direction[i]);
@@ -267,7 +271,7 @@ void disable_steppers()
 }
 
 
-void home_axis(Axis axis, long micro_delay)
+void home_axis(Axis axis)
 {
   const AxisConfig &a = axes[axis];
 
@@ -276,7 +280,8 @@ void home_axis(Axis axis, long micro_delay)
   // Go to a position guaranteed to be outside the axis
   fp.p[axis] = 1000.0*(a.reference_dir?1.0:-1.0);
   set_target(fp.p[X_AXIS], fp.p[Y_AXIS], fp.p[Z_AXIS]);
-  dda_move(micro_delay);
+  feedrate_micros = calculate_feedrate_delay(feedrate);
+  dda_move(feedrate_micros);
 
   // Move slowly until reference switch is off again, to move to the exact reference
   enable_steppers();
