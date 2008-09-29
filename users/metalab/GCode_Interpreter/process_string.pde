@@ -33,9 +33,9 @@ FloatPoint current_units;
 FloatPoint target_units;
 FloatPoint delta_units;
 
-FloatPoint current_steps;
-FloatPoint target_steps;
-FloatPoint delta_steps;
+LongPoint current_steps;
+LongPoint target_steps;
+LongPoint delta_steps;
 
 bool abs_mode = false; //0 = incremental; 1 = absolute
 
@@ -197,6 +197,9 @@ void process_string(char instruction[], int size)
       else
         feedrate_micros = getMaxSpeed();
 
+//       Serial.println(feedrate, DEC);
+//       Serial.println(feedrate_micros, DEC);
+
       //finally move.
       dda_move(feedrate_micros);
       break;
@@ -211,6 +214,7 @@ void process_string(char instruction[], int size)
       if (gc.seen & GCODE_I) cent.p[X_AXIS] = current_units.p[X_AXIS] + gc.I;
       else cent.p[X_AXIS] = current_units.p[X_AXIS];
       if (gc.seen & GCODE_J) cent.p[Y_AXIS] = current_units.p[Y_AXIS] + gc.J;
+      else cent.p[Y_AXIS] = current_units.p[Y_AXIS];
 
       float angleA, angleB, angle, radius, length, aX, aY, bX, bY;
 
@@ -304,23 +308,20 @@ void process_string(char instruction[], int size)
 
       // Home to physical switches
     case 30:
-      if (gc.seen & GCODE_F) feedrate = calculate_feedrate_delay(gc.F);
-      else feedrate = getMaxSpeed();
-
       if (gc.seen & GCODE_Z) {
-        home_axis(Z_AXIS, feedrate);
+        home_axis(Z_AXIS);
         current_units.p[Z_AXIS] = 0.0;
       }
       if (gc.seen & GCODE_Y) {
-        home_axis(Y_AXIS, feedrate);
+        home_axis(Y_AXIS);
         current_units.p[Y_AXIS] = 0.0;
       }
       if (gc.seen & GCODE_X) {
-        home_axis(X_AXIS, feedrate);
+        home_axis(X_AXIS);
         current_units.p[X_AXIS] = 0.0;
       }
 
-      // Move to given offset
+      // Move to given offset (fp is overwritten by home_axis)
       if (gc.seen & GCODE_X) fp.p[X_AXIS] = gc.X;
       else fp.p[X_AXIS] = current_units.p[X_AXIS];
       if (gc.seen & GCODE_Y) fp.p[Y_AXIS] = gc.Y;
@@ -329,7 +330,8 @@ void process_string(char instruction[], int size)
       else fp.p[Z_AXIS] = current_units.p[Z_AXIS];
 
       set_target(fp.p[X_AXIS], fp.p[Y_AXIS], fp.p[Z_AXIS]);
-      dda_move(feedrate);
+      feedrate_micros = calculate_feedrate_delay(feedrate);
+      dda_move(feedrate_micros);
 
       break;
 
@@ -531,7 +533,7 @@ void process_string(char instruction[], int size)
   // Something wrong happened
   // 	Serial.print("error: ");
   //         instruction[size] = '\0';
-  // 	Serial.println(instruction);
+  //  Serial.println(instruction);
 }
 
 int scan_float(char *str, float *valp, unsigned int *seen, unsigned int flag)
