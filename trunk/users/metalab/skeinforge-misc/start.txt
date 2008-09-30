@@ -1,2 +1,4 @@
-G92 (define current as home)
-
+M104 S225.0
+G90 (abs)
+G30 X120.00 Y110.00 Z-82.85 F780
+G92 (Metalab define current as home)
