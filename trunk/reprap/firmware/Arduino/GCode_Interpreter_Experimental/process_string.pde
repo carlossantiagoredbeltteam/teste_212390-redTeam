@@ -235,7 +235,22 @@ void process_string(char instruction[], int size)
 
 			//Set as home
 			case 92:
-				set_position(0.0, 0.0, 0.0);
+				if (has_command('X', instruction, size))
+					fp.x = search_string('X', instruction, size);
+				else
+					fp.x = current_units.x;
+			
+				if (has_command('Y', instruction, size))
+					fp.y = search_string('Y', instruction, size);
+				else
+					fp.y = current_units.y;
+			
+				if (has_command('Z', instruction, size))
+					fp.z = search_string('Z', instruction, size);
+				else
+					fp.z = current_units.z;
+
+				set_position(fp.x, fp.y, fp.z);
 			break;
 
 /*
@@ -331,7 +346,7 @@ void process_string(char instruction[], int size)
 			
 			//set max extruder speed, in RPM
 			case 108:
-				extruder_rpm = (int)search_string('R', instruction, size);
+				extruder_rpm = (int)search_string('S', instruction, size);
 
 				if (extruder_rpm)
 				{
