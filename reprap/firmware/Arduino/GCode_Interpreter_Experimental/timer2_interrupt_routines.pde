@@ -1,10 +1,11 @@
 //these routines provide an easy interface for controlling Timer2 interrupts
 volatile int cnt = 0;
+volatile int foo2 = 0;
 
 //this handles the timer interrupt event
 SIGNAL(SIG_OUTPUT_COMPARE2A)
 {
-	// somewhat hacked implementation of a PID algorithm as described at:
+  	// somewhat hacked implementation of a PID algorithm as described at:
 	// http://www.embedded.com/2000/0010/0010feat3.htm - PID Without a PhD, Tim Wescott 
 	
 	int abs_error = abs(extruder_error);
@@ -14,7 +15,7 @@ SIGNAL(SIG_OUTPUT_COMPARE2A)
 	int speed = 0;
 
 	//if our error is too high, it means we cant keep up.  bail to protect the extruder motor
-	if (abs_error > 1000)
+	if (abs_error > 750)
 	{
 		disableTimer1Interrupt();
 		disableTimer2Interrupt();
@@ -55,9 +56,20 @@ SIGNAL(SIG_OUTPUT_COMPARE2A)
 			cnt = 0;
 		}
 		*/
-		
+
 		//figure out our real speed and use it.
 		speed = constrain(speed, EXTRUDER_MIN_SPEED, EXTRUDER_MAX_SPEED);
+
+                //debug
+                //if (foo2 > 1000)
+                //{
+                //  foo2 = 0;
+                //  Serial.print(extruder_error);
+                //  Serial.print("/");
+                //  Serial.println(speed);
+                //}
+                foo2++;
+
 		analogWrite(EXTRUDER_MOTOR_SPEED_PIN, speed);
 	}
 }
