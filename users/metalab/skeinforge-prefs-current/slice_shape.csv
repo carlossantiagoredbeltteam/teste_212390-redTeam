@@ -1,9 +1,9 @@
 Format is tab separated preferences.
 Extrusion Diameter (mm):	0.43
 Extrusion Diameter Over Precision (ratio):	10.0
-Extrusion Perimeter Width Over Diameter (ratio):	1.0
-Extrusion Height Over Diameter (ratio):	0.5
-Extrusion Width Over Diameter (ratio):	1.0
+Extrusion Perimeter Width Over Diameter (ratio):	1.24
+Extrusion Height Over Diameter (ratio):	0.55
+Extrusion Width Over Diameter (ratio):	1.24
 Open File to be Sliced	
 Import Coarseness (ratio):	1.0
 Correct Mesh	True

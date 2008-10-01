@@ -1,4 +1,5 @@
-M104 S225.0
+M103 (extruder off)
+M104 S225.0 (heat)
 G90 (abs)
-G30 X120.00 Y110.00 Z-82.85 F780
+G30 X120.00 Y110.00 Z-82.65 F780
 G92 (Metalab define current as home)
