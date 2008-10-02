@@ -14,6 +14,9 @@ SIGNAL(SIG_OUTPUT_COMPARE2A)
 	int dTerm = 0;
 	int speed = 0;
 
+/*
+	//THIS WAS WAY MORE TROUBLE THAN IT WAS WORTH. ABORTED PRINTS 3/4 OF THE WAY THROUGH. ARGH.
+	
 	//if our error is too high, it means we cant keep up.  bail to protect the extruder motor
 	if (abs_error > 750)
 	{
@@ -25,7 +28,13 @@ SIGNAL(SIG_OUTPUT_COMPARE2A)
 	}
 	else
 	{
-		//if we're good, drop her down to minimum. (maybe a bad idea?)
+*/
+		//hack for extruder not keeping up, overflowing, then shutting off.
+		if (extruder_error < -5000)
+			extruder_error = -500;
+		if (extruder_error > 5000)
+			extruder_error = 500;
+
 		if (extruder_error < 0)
 		{
 			//calculate our P term
@@ -71,7 +80,7 @@ SIGNAL(SIG_OUTPUT_COMPARE2A)
                 foo2++;
 
 		analogWrite(EXTRUDER_MOTOR_SPEED_PIN, speed);
-	}
+//	}
 }
 /*
 SIGNAL(SIG_OUTPUT_COMPARE2A)

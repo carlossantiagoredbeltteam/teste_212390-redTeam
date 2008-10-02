@@ -18,6 +18,7 @@ void setup()
 	//Do startup stuff here
 	Serial.begin(19200);
 	Serial.println("start");
+	Serial.println("v1.3");
 	
 	//other initialization.
 	init_process_string();

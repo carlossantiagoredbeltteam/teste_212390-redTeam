@@ -127,40 +127,23 @@ void process_string(char instruction[], int size)
 			//these are basically the same thing.
 			case 0:
 			case 1:
+
 				//set our target.
 				set_target(fp.x, fp.y, fp.z);
-
-				//do we have a set speed?
-				if (has_command('G', instruction, size))
+			
+				//split up xy and z moves
+				if (delta_steps.z && (delta_steps.x || delta_steps.y))
 				{
-					//adjust if we have a specific feedrate.
-					if (code == 1)
-					{
-						//how fast do we move?
-						feedrate = search_string('F', instruction, size);
-						if (feedrate > 0)
-							feedrate_micros = calculate_feedrate_delay(feedrate);
-						//nope, no feedrate
-						else
-							feedrate_micros = getMaxSpeed();
-					}
-					//use our max for normal moves.
-					else
-						feedrate_micros = getMaxSpeed();
+					set_target(current_units.x, current_units.y, fp.z);
+					figure_feedrate(instruction, size, code);
+					dda_move(feedrate_micros);
 				}
-				//nope, just coordinates!
-				else
-				{
-					//do we have a feedrate yet?
-					if (feedrate > 0)
-						feedrate_micros = calculate_feedrate_delay(feedrate);
-					//nope, no feedrate
-					else
-						feedrate_micros = getMaxSpeed();
-				}
-
-				//finally move.
+				
+				//do the last move
+				set_target(fp.x, fp.y, fp.z);
+				figure_feedrate(instruction, size, code);
 				dda_move(feedrate_micros);
+
 			break;
 
 			//Dwell
@@ -296,6 +279,7 @@ void process_string(char instruction[], int size)
 	*/		
 			//turn extruder on, forward
 			case 101:
+				extruder_error = -300;
 				enableTimer1Interrupt();
 				enableTimer2Interrupt();
 			break;
@@ -308,9 +292,9 @@ void process_string(char instruction[], int size)
 			//turn extruder off
 			case 103:
 				disableTimer1Interrupt();
-				//disableTimer2Interrupt();
-				//analogWrite(EXTRUDER_MOTOR_SPEED_PIN, 0);
-				//extruder_error = 0;
+				disableTimer2Interrupt();
+				analogWrite(EXTRUDER_MOTOR_SPEED_PIN, 0);
+				extruder_error = 0;
 			break;
 
 			//custom code for temperature control
@@ -355,6 +339,10 @@ void process_string(char instruction[], int size)
 				}
 			break;
 			
+			case 110:
+				Serial.println("Hi Skeinforge.");
+				break;			
+
 			//set extruder P gain
 			case 120:
 				extruder_pGain = (int)search_string('S', instruction, size);
@@ -447,4 +435,36 @@ bool has_command(char key, char instruction[], int string_size)
 	}
 	
 	return false;
+}
+
+void figure_feedrate(char instruction[], int size, byte code)
+{
+	//do we have a set speed?
+	if (has_command('G', instruction, size))
+	{
+		//adjust if we have a specific feedrate.
+		if (code == 1)
+		{
+			//how fast do we move?
+			feedrate = search_string('F', instruction, size);
+			if (feedrate > 0)
+				feedrate_micros = calculate_feedrate_delay(feedrate);
+			//nope, no feedrate
+			else
+				feedrate_micros = getMaxSpeed();
+		}
+		//use our max for normal moves.
+		else
+			feedrate_micros = getMaxSpeed();
+	}
+	//nope, just coordinates!
+	else
+	{
+		//do we have a feedrate yet?
+		if (feedrate > 0)
+			feedrate_micros = calculate_feedrate_delay(feedrate);
+		//nope, no feedrate
+		else
+			feedrate_micros = getMaxSpeed();
+	}
 }

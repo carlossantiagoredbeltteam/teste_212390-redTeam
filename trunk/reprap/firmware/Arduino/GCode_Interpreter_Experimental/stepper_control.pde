@@ -247,6 +247,11 @@ void calculate_deltas()
 
 long calculate_feedrate_delay(float feedrate)
 {
+	if ((delta_steps.x || delta_steps.y) && feedrate > FAST_XY_FEEDRATE)
+		feedrate = FAST_XY_FEEDRATE;
+	if (delta_steps.z && feedrate > FAST_Z_FEEDRATE)
+		feedrate = FAST_Z_FEEDRATE;
+
 	//how long is our line length?
 	float distance = sqrt(delta_units.x*delta_units.x + delta_units.y*delta_units.y + delta_units.z*delta_units.z);
 	long master_steps = 0;
