@@ -1,4 +1,7 @@
 
+
+
+
 // define the parameters of our machine.
 #define X_STEPS_PER_INCH 203.133
 #define X_STEPS_PER_MM   7.99735
@@ -13,7 +16,7 @@
 #define Z_MOTOR_STEPS    400
 
 //our maximum feedrates
-#define FAST_XY_FEEDRATE 1000.0
+#define FAST_XY_FEEDRATE 1600.0
 #define FAST_Z_FEEDRATE  50.0
 
 // Units in curve section
@@ -34,28 +37,30 @@
 ****************************************************************************************/
 
 //cartesian bot pins
-#define X_STEP_PIN 2
-#define X_DIR_PIN 3
-#define X_MIN_PIN 4
-#define X_MAX_PIN 9
+#define X_STEP_PIN 1
+#define X_DIR_PIN 2
+#define X_MIN_PIN 3
+#define X_MAX_PIN 4
 #define X_ENABLE_PIN 15
 
-#define Y_STEP_PIN 10
-#define Y_DIR_PIN 7
-#define Y_MIN_PIN 8
-#define Y_MAX_PIN 13
+#define Y_STEP_PIN 26
+#define Y_DIR_PIN 27
+#define Y_MIN_PIN 28
+#define Y_MAX_PIN 10
 #define Y_ENABLE_PIN 15
 
-#define Z_STEP_PIN 19
-#define Z_DIR_PIN 18
-#define Z_MIN_PIN 17
-#define Z_MAX_PIN 16
+#define Z_STEP_PIN 11
+#define Z_DIR_PIN 24
+#define Z_MIN_PIN 25
+#define Z_MAX_PIN 18
 #define Z_ENABLE_PIN 15
 
 //extruder pins
-#define EXTRUDER_MOTOR_SPEED_PIN   11
-#define EXTRUDER_MOTOR_DIR_PIN     12
-#define EXTRUDER_HEATER_PIN        6
-#define EXTRUDER_FAN_PIN           5
-#define EXTRUDER_THERMISTOR_PIN    0  //a -1 disables thermistor readings
-#define EXTRUDER_THERMOCOUPLE_PIN  -1 //a -1 disables thermocouple readings
+#define EXTRUDER_MOTOR_SPEED_PIN   13
+#define EXTRUDER_MOTOR_DIR_PIN     20
+#define EXTRUDER_HEATER_PIN        12
+#define EXTRUDER_FAN_PIN           19
+#define EXTRUDER_THERMISTOR_PIN    -1  //a -1 disables thermistor readings
+#define EXTRUDER_THERMOCOUPLE_PIN  0 //a -1 disables thermocouple readings
+#define VALVE_DIR_PIN             21
+#define VALVE_ENABLE_PIN          22  

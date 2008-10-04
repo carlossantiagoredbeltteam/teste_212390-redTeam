@@ -43,7 +43,8 @@ void setup()
     pinMode(i, OUTPUT);
     digitalWrite(i, LOW);
   }
-    
+   pinMode(8, INPUT); 
+   
 	snap.begin(19200);
 	
 	//run any setup code we need.
