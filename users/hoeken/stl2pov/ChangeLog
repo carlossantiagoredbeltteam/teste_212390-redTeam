@@ -1,0 +1,70 @@
+commit e96192486c4eb2bc154663ec97aad57059aafbc4
+Author: Roland Smith <rsmith@slackbox.xs4all.nl>
+Date:   Thu Jul 19 12:33:18 2007 +0200
+
+    Enhance status reporting; make it more frequent.
+    Label as release 2.4.1.
+
+commit 9cbd3ef4ac86a81b558bee5fc3edf4f3c4fa1c13
+Author: Roland Smith <rsmith@slackbox.xs4all.nl>
+Date:   Tue Jun 19 21:25:05 2007 +0200
+
+    Updated win makefile for 2.4.0.
+
+commit b915e143ff4123ab3448df2fec3d629a384d5a48
+Author: Roland Smith <rsmith@slackbox.xs4all.nl>
+Date:   Tue Jun 19 21:20:25 2007 +0200
+
+    Edits for release 2.4.0.
+
+commit 5532be8a8888b22afdaa396911d6cd7d4ab90ba0
+Author: Roland Smith <rsmith@slackbox.xs4all.nl>
+Date:   Tue Jun 19 00:31:44 2007 +0200
+
+    Made handling of binary files less fussy.
+    Updated copyright symbol and date in all source files.
+
+commit d51b76cf8f08207164206134a2b179d8faef7ccc
+Author: Roland Smith <rsmith@slackbox.xs4all.nl>
+Date:   Mon Jun 5 14:09:06 2006 +0200
+
+    Version 2.3.0; chase mesh syntax change in povray.
+
+commit ac090ad16084ebe6ceb3709515a45404945cfd00
+Author: Roland Smith <rsmith@slackbox.xs4all.nl>
+Date:   Sat Apr 8 20:04:13 2006 +0200
+
+    Switched from svn to git for ChangeLog generation.
+
+commit ceed7c2a32f62d693e299a20c2817b501ffeb5e7
+Author: Roland Smith <rsmith@slackbox.xs4all.nl>
+Date:   Sat Apr 8 19:29:11 2006 +0200
+
+    Prepare for release 2.2.1. Changed port/distinfo and win/Makefile 
+for release 2.2.1. Fix distinfo and pkg-list for FreeBSD port of 
+release 2.2.1. Merge port makefile fixes from committer.
+
+commit 2af59b14b95ae70a418b50e0a01133973b4b3c29
+Author: Roland Smith <rsmith@slackbox.xs4all.nl>
+Date:   Sat Apr 8 19:27:06 2006 +0200
+
+    Version 2.2.0. Add port infrastructure for FreeBSD. Fixed Makefile 
+to mind PORTDOCS.
+
+commit 049648997711219e28d7f0cf1d2285bf05c9f2ee
+Author: Roland Smith <rsmith@slackbox.xs4all.nl>
+Date:   Sat Apr 8 19:25:01 2006 +0200
+
+    Version 2.1.0.
+
+commit 187a552c501ddcf4b55283df08cfb3a16b352314
+Author: Roland Smith <rsmith@slackbox.xs4all.nl>
+Date:   Sat Apr 8 19:22:11 2006 +0200
+
+    Version 2.0.0, with FreeBSD fixes applied.
+
+commit b5cb1eac0e426c8bbacb0ef6468c4fa6e5b28908
+Author: Roland Smith <rsmith@slackbox.xs4all.nl>
+Date:   Sat Apr 8 19:18:03 2006 +0200
+
+    Initial import of version 1.0.0.
