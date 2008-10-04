@@ -251,6 +251,9 @@ public class SNAPExtruder extends GenericExtruder
 			Debug.d("Attempting to control or interrogate non-existent extruder for " + material);
 			return;
 		}
+		
+		Debug.d("Extruding at speed: " + speed);
+		
 		// Assumption: Between t0 and maxSpeed, the speed is fairly linear
 		int scaledSpeed;
 		
@@ -287,6 +290,12 @@ public class SNAPExtruder extends GenericExtruder
 			Debug.d("Attempting to control or interrogate non-existent extruder for " + material);
 			return;
 		}
+		
+		if(valveOpen)
+			Debug.d("Opening valve.");
+		else
+			Debug.d("Closing valve.");
+		
 		waitTillNotBusy();
 		snap.lock();
 		try {
@@ -656,7 +665,8 @@ public class SNAPExtruder extends GenericExtruder
 				if(rerangeTemperature(rawHeat))
 					break; // All ok
 				else
-					Thread.sleep(500); // Wait for PIC temp routine to settle before going again
+					printer.wait(500);
+					//Thread.sleep(500); // Wait for PIC temp routine to settle before going again
 			}
 			
 			double resistance = calculateResistance(rawHeat, calibration);

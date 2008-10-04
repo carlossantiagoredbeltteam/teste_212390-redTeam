@@ -74,4 +74,17 @@ public class NullCartesianMachine extends GenericCartesianPrinter {
 	public void stopMotor() throws IOException
 	{
 	}
+	
+	/**
+	 * All machine dwells and delays are routed via this function, rather than 
+	 * calling Thread.sleep - this allows them to generate the right G codes (G4) etc.
+	 * 
+	 * The RS232/USB etc comms system doesn't use this - it sets its own delays.
+	 * 
+	 * Here do no delay; it makes no sense for the simulation machine
+	 * @param milliseconds
+	 */
+	public void machineWait(double milliseconds)
+	{
+	}
 }

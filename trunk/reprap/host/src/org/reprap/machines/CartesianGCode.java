@@ -311,7 +311,7 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		gcode.queue("G92 ;set current position as home");
 	}
 	
-	public void delay(long millis)
+	private void delay(long millis)
 	{
 		gcode.queue("G4 P" + millis + " ;delay");
 	}
@@ -366,5 +366,17 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	//TODO: make this work normally.
 	public void stopValve() throws IOException
 	{
+	}
+	
+	/**
+	 * All machine dwells and delays are routed via this function, rather than 
+	 * calling Thread.sleep - this allows them to generate the right G codes (G4) etc.
+	 * 
+	 * The RS232/USB etc comms system doesn't use this - it sets its own delays.
+	 * @param milliseconds
+	 */
+	public void machineWait(double milliseconds)
+	{
+		delay((long)milliseconds);
 	}
 }
