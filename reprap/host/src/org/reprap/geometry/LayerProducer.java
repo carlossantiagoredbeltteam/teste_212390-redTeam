@@ -336,6 +336,7 @@ public class LayerProducer {
 		Printer printer = layerConditions.getPrinter();
 		if (printer.isCancelled()) return;
 		
+		// Don't call delay; this isn't controlling the printer
 		while(paused)
 		{
 			try
@@ -392,6 +393,7 @@ public class LayerProducer {
 		Printer printer = layerConditions.getPrinter();
 		if (printer.isCancelled()) return;
 		
+//		 Don't call delay; this isn't controlling the printer
 		while(paused)
 		{
 			try

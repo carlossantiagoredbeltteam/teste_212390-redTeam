@@ -321,13 +321,62 @@ public interface Printer {
 	 */
 	public void waitTillNotBusy() throws IOException;
 	
+	/**
+	 * Get the X stepper
+	 * @return
+	 */
 	public GenericStepperMotor getXMotor();
+	
+	/**
+	 * Get the Y stepper
+	 * @return
+	 */
 	public GenericStepperMotor getYMotor();
+	
+	/**
+	 * Get the Z stepper
+	 * @return
+	 */
 	public GenericStepperMotor getZMotor();
+	
+	/**
+	 * Convert XY feedrates in mm/min to internal units
+	 * @param feedrate
+	 * @return
+	 */
 	public int convertFeedrateToSpeedXY(double feedrate);
+	
+	/**
+	 * Convert Z feedrates in mm/min to internal units
+	 * @param feedrate
+	 * @return
+	 */	
 	public int convertFeedrateToSpeedZ(double feedrate);
 	
+	/**
+	 * The X discretisation
+	 * @return
+	 */
 	public double getXStepsPerMM();
+	
+	/**
+	 * The Y discretisation
+	 * @return
+	 */
 	public double getYStepsPerMM();
+	
+	/**
+	 * The Z discretisation
+	 * @return
+	 */
 	public double getZStepsPerMM();
+	
+	/**
+	 * All machine dwells and delays are routed via this function, rather than 
+	 * calling Thread.sleep - this allows them to generate the right G codes (G4) etc.
+	 * 
+	 * The RS232/USB etc comms system doesn't use this - it sets its own delays.
+	 * @param milliseconds
+	 */
+	public void machineWait(double milliseconds);
 }

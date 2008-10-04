@@ -476,7 +476,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
                 extruding = true;
                 extrudeButton.setText("Stop extruding");
 
-                System.out.println("Extruding at speed: " + motorSpeedField.getText());
+                //System.out.println("Extruding at speed: " + motorSpeedField.getText());
         }
         setExtruderSpeed();
     }//GEN-LAST:event_extrudeButtonActionPerformed

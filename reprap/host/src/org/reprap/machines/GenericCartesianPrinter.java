@@ -451,14 +451,14 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 		return extruders;
 	}
 	
-	public void delay(long millis)
-	{
-		if(millis <= 0)
-			return;
-		try {
-			Thread.sleep(millis);
-		} catch (Exception e) {}
-	}
+//	public void delay(long millis)
+//	{
+//		if(millis <= 0)
+//			return;
+//		try {
+//			Thread.sleep(millis);
+//		} catch (Exception e) {}
+//	}
 	
 	/**
 	 * Extrude for the given time in milliseconds, so that polymer is flowing
@@ -485,15 +485,15 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 			if(eDelay >= vDelay)
 			{
 				extruders[extruder].setMotor(true);
-				delay(eDelay - vDelay);
+				wait(eDelay - vDelay);
 				extruders[extruder].setValve(true);
-				delay(vDelay);
+				wait(vDelay);
 			} else
 			{
 				extruders[extruder].setValve(true);
-				delay(vDelay - eDelay);
+				wait(vDelay - eDelay);
 				extruders[extruder].setMotor(true);
-				delay(eDelay);
+				wait(eDelay);
 			}
 			//extruders[extruder].setMotor(false);  // What's this for?  - AB
 		} catch(Exception e)
@@ -773,7 +773,7 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 //			{
 //				getExtruder().setValve(true);
 //				getExtruder().setMotor(true);
-//				Thread.sleep((long)(500*clearTime));
+//				machineWait(500*clearTime);
 //				getExtruder().setMotor(false);
 //				getExtruder().setValve(false);
 //			}
@@ -820,7 +820,7 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 		if(coolTime > cool && (lc.getMachineLayer() != 0))
 		{	
 			cool = coolTime - cool;
-			Thread.sleep((long)(1000*cool));
+			machineWait(1000*cool);
 		}
 		// Fan off
 		
@@ -830,7 +830,7 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 		
 		if(coolTime > 0 && (lc.getMachineLayer() != 0))
 		{
-			Thread.sleep((long)(200 * coolTime));			
+			machineWait(200 * coolTime);			
 			Debug.d("End of cooling period");			
 		}
 		
@@ -843,10 +843,10 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 			{
 				getExtruder().setValve(true);
 				getExtruder().setMotor(true);
-				Thread.sleep((long)(1000*clearTime));
+				machineWait(1000*clearTime);
 				getExtruder().setMotor(false);
 				getExtruder().setValve(false);
-				Thread.sleep((long)(1000*waitTime));
+				machineWait(1000*waitTime);
 			}
 			//setSpeed(LinePrinter.speedFix(getExtruder().getXYSpeed(), 
 			//		getExtruder().getOutlineSpeed(lc)));

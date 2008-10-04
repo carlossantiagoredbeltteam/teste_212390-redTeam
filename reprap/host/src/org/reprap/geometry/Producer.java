@@ -143,6 +143,11 @@ public class Producer {
 			layer.resume();
 	}
 	
+	/**
+	 * NB - this does not call wait - this is a purely interactive function and
+	 * does not control the machine
+	 *
+	 */
 	private void waitWhilePaused()
 	{
 		while(paused)

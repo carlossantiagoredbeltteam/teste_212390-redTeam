@@ -374,10 +374,7 @@ public class Reprap extends GenericCartesianPrinter
 			//if (previewer != null)
 				//previewer.
 				setMessage("Extruder is out of feedstock.  Waiting for refill.");
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-			}
+				machineWait(1000);
 		}
 		//if (previewer != null) previewer.
 		setMessage(null);
@@ -413,15 +410,12 @@ public class Reprap extends GenericCartesianPrinter
 			//if (previewer != null) previewer.
 			setMessage("Waiting for extruder to reach working temperature (" + 
 					Math.round(extruders[extruder].getTemperature()) + ")");
-			try {
-				Thread.sleep(1000);
+				machineWait(1000);
 				// If it stays cold for 10s, remind it of its purpose.
 				if (tempReminder++ >10) {
 					tempReminder=0;
 					temperatureReminder();
 				}
-			} catch (InterruptedException e) {
-			}
 		}
 		Debug.d("Returning to previous position");
 		moveTo(x, y, currentZ, true, false);
@@ -480,7 +474,20 @@ public class Reprap extends GenericCartesianPrinter
 		motorZ.setPosition(convertToStepZ(zeroPoint));
 	}
 	
-
+	/**
+	 * All machine dwells and delays are routed via this function, rather than 
+	 * calling Thread.sleep - this allows them to generate the right G codes (G4) etc.
+	 * 
+	 * The RS232/USB etc comms system doesn't use this - it sets its own delays.
+	 * @param milliseconds
+	 */
+	public void machineWait(double milliseconds)
+	{
+		try {
+			Thread.sleep((long)milliseconds);
+		} catch (InterruptedException e) {
+		}		
+	}
 }
 
 
