@@ -20,6 +20,7 @@ int extruder_error = 0;
 int last_extruder_error = 0;
 int extruder_error_delta = 0;
 bool extruder_direction = EXTRUDER_FORWARD;
+bool valve_open = false;
 
 void init_extruder()
 {
@@ -31,13 +32,27 @@ void init_extruder()
 	pinMode(EXTRUDER_MOTOR_SPEED_PIN, OUTPUT);
 	pinMode(EXTRUDER_HEATER_PIN, OUTPUT);
 	pinMode(EXTRUDER_FAN_PIN, OUTPUT);
-	
+	pinMode(VALVE_DIR_PIN, OUTPUT); 
+        pinMode(VALVE_ENABLE_PIN, OUTPUT);
+
 	//initialize values
 	digitalWrite(EXTRUDER_MOTOR_DIR_PIN, EXTRUDER_FORWARD);
 	analogWrite(EXTRUDER_FAN_PIN, 0);
 	analogWrite(EXTRUDER_HEATER_PIN, 0);
 	analogWrite(EXTRUDER_MOTOR_SPEED_PIN, 0);
+	digitalWrite(VALVE_DIR_PIN, false);
+	digitalWrite(VALVE_ENABLE_PIN, 0);
 }
+
+void valve_set(bool open)
+{
+	valve_open = open;
+	digitalWrite(VALVE_DIR_PIN, open);
+        digitalWrite(VALVE_ENABLE_PIN, 1);
+        delay(500);
+        digitalWrite(VALVE_ENABLE_PIN, 0);
+}
+
 
 void extruder_set_direction(bool direction)
 {
@@ -156,3 +171,66 @@ void extruder_manage_temperature()
         }
 }
 
+#ifdef TEST_MACHINE
+
+bool heat_on;
+
+void extruder_heater_test()
+{
+  int t = extruder_get_temperature();
+  if(t < 50 && !heat_on)
+  {
+    Serial.println("\n *** Turning heater on.\n");
+    heat_on = true;
+    analogWrite(EXTRUDER_HEATER_PIN, extruder_heater_high);
+  }
+
+  if(t > 100 && heat_on)
+  {
+    Serial.println("\n *** Turning heater off.\n");
+    heat_on = false;
+    analogWrite(EXTRUDER_HEATER_PIN, 0);
+  } 
+ 
+  Serial.print("Temperature: ");
+  Serial.print(t);
+  Serial.print(" deg C. The heater is ");
+  if(heat_on)
+    Serial.println("on.");
+  else
+    Serial.println("off.");
+  
+  delay(2000);  
+}
+
+void extruder_drive_test()
+{
+    Serial.println("Turning the extruder motor on forwards for 5 seconds.");
+    extruder_set_direction(true);
+    extruder_set_speed(200);
+    delay(5000);
+    extruder_set_speed(0);
+    Serial.println("Pausing for 2 seconds.");
+    delay(2000);  
+    Serial.println("Turning the extruder motor on backwards for 5 seconds.");
+    extruder_set_direction(false);
+    extruder_set_speed(200);
+    delay(5000);
+    extruder_set_speed(0);    
+    Serial.println("Pausing for 2 seconds.");
+    delay(2000);
+}
+
+void extruder_valve_test()
+{
+    Serial.println("Opening the valve.");
+    valve_set(true);
+    Serial.println("Pausing for 2 seconds.");
+    delay(2000);  
+    Serial.println("Closing the valve.");
+    valve_set(false);
+    Serial.println("Pausing for 2 seconds.");
+    delay(2000);  
+}
+
+#endif

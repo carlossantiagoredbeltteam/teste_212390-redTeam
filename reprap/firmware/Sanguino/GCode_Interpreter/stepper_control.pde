@@ -391,3 +391,65 @@ void delayMicrosecondsInterruptible(unsigned int us)
 		"brne 1b" : "=w" (us) : "0" (us) // 2 cycles
 	);
 }
+
+#ifdef TEST_MACHINE
+
+void X_motor_test()
+{
+    Serial.println("Moving X forward by 100 mm at half maximum speed.");
+    set_target(100, 0, 0);
+    enable_steppers();
+    dda_move(calculate_feedrate_delay(FAST_XY_FEEDRATE/2));
+    
+    Serial.println("Pause for 2 seconds.");
+    delay(2000);
+    
+    Serial.println("Moving X back to the start.");
+    set_target(0, 0, 0);
+    enable_steppers();
+    dda_move(calculate_feedrate_delay(FAST_XY_FEEDRATE/2));
+    
+    Serial.println("Pause for 2 seconds."); 
+    delay(2000);   
+}
+
+void Y_motor_test()
+{
+
+    Serial.println("Moving Y forward by 100 mm at half maximum speed.");
+    set_target(0, 100, 0);
+    enable_steppers();
+    dda_move(calculate_feedrate_delay(FAST_XY_FEEDRATE/2));
+    
+    Serial.println("Pause for 2 seconds.");
+    delay(2000);
+    
+    Serial.println("Moving Y back to the start.");
+    set_target(0, 0, 0);
+    enable_steppers();
+    dda_move(calculate_feedrate_delay(FAST_XY_FEEDRATE/2));
+    
+    Serial.println("Pause for 2 seconds."); 
+    delay(2000);     
+}
+
+void Z_motor_test()
+{
+    Serial.println("Moving Z down by 5 mm at half maximum speed.");
+    set_target(0, 0, 5);
+    enable_steppers();
+    dda_move(calculate_feedrate_delay(FAST_Z_FEEDRATE/2));
+    
+    Serial.println("Pause for 2 seconds.");
+    delay(2000);
+    
+    Serial.println("Moving Z back to the start.");
+    set_target(0, 0, 0);
+    enable_steppers();
+    dda_move(calculate_feedrate_delay(FAST_Z_FEEDRATE/2));
+    
+    Serial.println("Pause for 2 seconds."); 
+    delay(2000);     
+}
+
+#endif

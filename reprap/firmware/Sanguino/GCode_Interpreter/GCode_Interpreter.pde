@@ -7,6 +7,11 @@
 // v1.3 by Zach Hoeken - added thermocouple support and multi-sample temp readings. (hoeken@gmail.com)
 #include <HardwareSerial.h>
 
+// Uncomment the next line to run stand-alone tests on the machine (also see the 
+// ends of the GCode_Interpreter, extruder, and stepper_control code).
+
+//#define TEST_MACHINE
+
 //our command string
 #define COMMAND_SIZE 128
 char word[COMMAND_SIZE];
@@ -30,6 +35,7 @@ void setup()
 
 void loop()
 {
+#ifndef TEST_MACHINE  
 	char c;
 
 	//keep it hot!
@@ -83,4 +89,17 @@ void loop()
 	//no data?  turn off steppers
 	if (no_data > 10 )
 		disable_steppers();
+#else
+
+// Run the parts of the machine as a test
+// Comment out all but one of these
+
+  // extruder_heater_test();
+  // extruder_drive_test();
+  // extruder_valve_test();
+   X_motor_test();
+  // Y_motor_test();
+  // Z_motor_test();
+    
+#endif        
 }
