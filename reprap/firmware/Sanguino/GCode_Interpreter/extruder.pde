@@ -44,12 +44,12 @@ void init_extruder()
 	digitalWrite(VALVE_ENABLE_PIN, 0);
 }
 
-void valve_set(bool open)
+void valve_set(bool open, int millis)
 {
 	valve_open = open;
 	digitalWrite(VALVE_DIR_PIN, open);
         digitalWrite(VALVE_ENABLE_PIN, 1);
-        delay(500);
+        delay(millis);
         digitalWrite(VALVE_ENABLE_PIN, 0);
 }
 
@@ -224,11 +224,11 @@ void extruder_drive_test()
 void extruder_valve_test()
 {
     Serial.println("Opening the valve.");
-    valve_set(true);
+    valve_set(true, 500);
     Serial.println("Pausing for 2 seconds.");
     delay(2000);  
     Serial.println("Closing the valve.");
-    valve_set(false);
+    valve_set(false, 500);
     Serial.println("Pausing for 2 seconds.");
     delay(2000);  
 }
