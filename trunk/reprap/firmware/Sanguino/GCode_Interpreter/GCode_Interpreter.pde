@@ -5,6 +5,7 @@
 // v1.1 by Zach Hoeken - cleaned up and did lots of tweaks (hoeken@gmail.com)
 // v1.2 by Chris Meighan - cleanup / G2&G3 support (cmeighan@gmail.com)
 // v1.3 by Zach Hoeken - added thermocouple support and multi-sample temp readings. (hoeken@gmail.com)
+#include <ctype.h>
 #include <HardwareSerial.h>
 
 // Uncomment the next line to run stand-alone tests on the machine (also see the 
@@ -15,11 +16,9 @@
 //our command string
 #define COMMAND_SIZE 128
 char word[COMMAND_SIZE];
-byte serial_count;
-int no_data = 0;
-long idle_time;
+char c = '?';
+byte serial_count = 0;
 boolean comment = false;
-boolean bytes_received = false;
 
 void setup()
 {
@@ -36,7 +35,7 @@ void setup()
 void loop()
 {
 #ifndef TEST_MACHINE  
-	char c;
+
 
 	//keep it hot!
 	extruder_manage_temperature();
@@ -45,61 +44,104 @@ void loop()
 	if (Serial.available() > 0)
 	{
 		c = Serial.read();
-		no_data = 0;
+                //Serial.print(c);
+                if(c == '\r')
+                  c = '\n';
+                // Throw away control chars except \n
+                if(c >= ' ' || c == '\n')
+                {
 
-		//newlines are ends of commands.
-		if (c != '\n')
-		{
+		  //newlines are ends of commands.
+		  if (c != '\n')
+		  {
 			// Start of comment - ignore any bytes received from now on
-			if (c == '(')
+			if (c == ';')
 				comment = true;
 				
 			// If we're not in comment mode, add it to our array.
 			if (!comment)
-			{
-				word[serial_count] = c;
-				serial_count++;
-			}
-			if (c == ')')
-			        comment = false; // End of comment - start listening again
-		}
+				word[serial_count++] = c;
+		  }
 
-		bytes_received = true;
-	}
-	//mark no data if nothing heard for 100 milliseconds
-	else
-	{
-		if ((millis() - idle_time) >= 100)
-		{
-			no_data++;
-			idle_time = millis();
-		}
+                }
 	}
 
-	//if theres a pause or we got a real command, do it
-	if (bytes_received && (c == '\n' || no_data ))
+        // Data runaway?
+        if(serial_count >= COMMAND_SIZE)
+          init_process_string();
+
+	//if we've got a real command, do it
+	if (serial_count && c == '\n')
 	{
 		//process our command!
 		process_string(word, serial_count);
 
 		//clear command.
 		init_process_string();
+                
 	}
 
-	//no data?  turn off steppers
-	if (no_data > 10 )
-		disable_steppers();
 #else
 
 // Run the parts of the machine as a test
-// Comment out all but one of these
 
-  // extruder_heater_test();
-  // extruder_drive_test();
-  // extruder_valve_test();
-   X_motor_test();
-  // Y_motor_test();
-  // Z_motor_test();
+// Do the comms test first.  It should echo
+// what you type in a terminal window connected
+// to the Sanguino.
+
+// If that works, comment out the next line to test the rest:
+//#define COMMS_TEST
+
+#ifdef COMMS_TEST
+
+  comms_test();
+  
+#else
+  
+  if (Serial.available() > 0)
+  {
+        c = Serial.read();
+        Serial.println(c);
+  }
+        
+  switch(c)
+  {
+    case 0:
+      break;
+      
+    case 'x':
+      X_motor_test();
+      break;
+    case 'y':
+      Y_motor_test();
+      break;
+    case 'z':
+      Z_motor_test();
+      break;
+    case 'h':
+      extruder_heater_test();
+      break;
+    case 'e':
+      extruder_drive_test();
+      break;
+    case 'v':
+      extruder_valve_test();
+      break;
+      
+  default:
+      Serial.println("Commands:\n");
+      Serial.println(" x - X motor test");
+      Serial.println(" y - Y motor test");
+      Serial.println(" z - Z motor test");
+      Serial.println(" h - extruder heater test");
+      Serial.println(" e - extruder drive test");
+      Serial.println(" v - extruder valve test");
+      Serial.println(" s - stop current test at the end of its cycle and print this list\n\n");
+      Serial.print("Command: ");
+      c = 0;
+  }
+
+#endif
     
 #endif        
 }

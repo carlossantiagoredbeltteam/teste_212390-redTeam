@@ -61,12 +61,10 @@ int scan_float(char *str, float *valp);
 void init_process_string()
 {
 	//init our command
-	for (byte i=0; i<COMMAND_SIZE; i++)
-		word[i] = 0;
+	//for (byte i=0; i<COMMAND_SIZE; i++)
+	//	word[i] = 0;
 	serial_count = 0;
-	bytes_received = false;
-
-	idle_time = millis();
+        comment = false;
 }
 
 //our feedrate variables.
@@ -97,12 +95,12 @@ int last_gcode_g = -1;
 #define TYPE_FLOAT 2
 
 /* macros to save typing and bugs in the parser function */
-#define PARSE_INT(ch, instr, str, str_size, len, val, seen, flag) \
+#define PARSE_INT(ch, str, len, val, seen, flag) \
 	case ch: \
 		len = scan_int(str, &val, &seen, flag); \
 		break;
 
-#define PARSE_FLOAT(ch, instr, str, str_size, len, val, seen, flag) \
+#define PARSE_FLOAT(ch, str, len, val, seen, flag) \
 	case ch: \
 		len = scan_float(str, &val, &seen, flag); \
 		break;
@@ -123,20 +121,21 @@ int parse_string(struct GcodeParser * gc, char instruction[], int size)
 		len = 0;
 		switch (instruction[ind])
 		{
-			PARSE_INT('G', instruction, &instruction[ind+1], size-ind, len, gc->G, gc->seen, GCODE_G);
-			PARSE_INT('M', instruction, &instruction[ind+1], size-ind, len, gc->M, gc->seen, GCODE_M);
-			PARSE_FLOAT('S', instruction, &instruction[ind+1], size-ind, len, gc->S, gc->seen, GCODE_S);
-			PARSE_FLOAT('P', instruction, &instruction[ind+1], size-ind, len, gc->P, gc->seen, GCODE_P);
-			PARSE_FLOAT('X', instruction, &instruction[ind+1], size-ind, len, gc->X, gc->seen, GCODE_X);
-			PARSE_FLOAT('Y', instruction, &instruction[ind+1], size-ind, len, gc->Y, gc->seen, GCODE_Y);
-			PARSE_FLOAT('Z', instruction, &instruction[ind+1], size-ind, len, gc->Z, gc->seen, GCODE_Z);
-			PARSE_FLOAT('I', instruction, &instruction[ind+1], size-ind, len, gc->I, gc->seen, GCODE_I);
-			PARSE_FLOAT('J', instruction, &instruction[ind+1], size-ind, len, gc->J, gc->seen, GCODE_J);
-			PARSE_FLOAT('F', instruction, &instruction[ind+1], size-ind, len, gc->F, gc->seen, GCODE_F);
-			PARSE_FLOAT('R', instruction, &instruction[ind+1], size-ind, len, gc->R, gc->seen, GCODE_R);
-			PARSE_FLOAT('Q', instruction, &instruction[ind+1], size-ind, len, gc->Q, gc->seen, GCODE_Q);
+			  PARSE_INT('G', &instruction[ind+1], len, gc->G, gc->seen, GCODE_G);
+			  PARSE_INT('M', &instruction[ind+1], len, gc->M, gc->seen, GCODE_M);
+			PARSE_FLOAT('S', &instruction[ind+1], len, gc->S, gc->seen, GCODE_S);
+			PARSE_FLOAT('P', &instruction[ind+1], len, gc->P, gc->seen, GCODE_P);
+			PARSE_FLOAT('X', &instruction[ind+1], len, gc->X, gc->seen, GCODE_X);
+			PARSE_FLOAT('Y', &instruction[ind+1], len, gc->Y, gc->seen, GCODE_Y);
+			PARSE_FLOAT('Z', &instruction[ind+1], len, gc->Z, gc->seen, GCODE_Z);
+			PARSE_FLOAT('I', &instruction[ind+1], len, gc->I, gc->seen, GCODE_I);
+			PARSE_FLOAT('J', &instruction[ind+1], len, gc->J, gc->seen, GCODE_J);
+			PARSE_FLOAT('F', &instruction[ind+1], len, gc->F, gc->seen, GCODE_F);
+			PARSE_FLOAT('R', &instruction[ind+1], len, gc->R, gc->seen, GCODE_R);
+			PARSE_FLOAT('Q', &instruction[ind+1], len, gc->Q, gc->seen, GCODE_Q);
 			break;
 		}
+                Serial.println(len);
 	}
 }
 
@@ -153,7 +152,8 @@ void process_string(char instruction[], int size)
 		Serial.println("ok");
 		return;
 	}
-
+        instruction[size]=0;
+        Serial.println(instruction);
 	//init baby!
 	FloatPoint fp;
 	fp.x = 0.0;
@@ -162,7 +162,7 @@ void process_string(char instruction[], int size)
 
 	//get all our parameters!
 	parse_string(&gc, instruction, size);
-
+        Serial.println("AA");
 	/* if no command was seen, but parameters were, then use the last G code as 
 	 * the current command
 	 */
@@ -175,7 +175,7 @@ void process_string(char instruction[], int size)
 		gc.G = last_gcode_g;
 		gc.seen |= GCODE_G;
 	}
-
+        Serial.println("BB");
 	//did we get a gcode?
 	if (gc.seen & GCODE_G)
 	{
@@ -221,7 +221,7 @@ void process_string(char instruction[], int size)
 				// Use our max for G0
 				else
 					feedrate_micros = getMaxSpeed();
-
+                                Serial.println("G1");
 				//finally move.
 				dda_move(feedrate_micros);
 				break;
@@ -299,7 +299,7 @@ void process_string(char instruction[], int size)
 
 			
 			case 4: //Dwell
-				delay((int)(gc.P * 1000));
+				delay((int)(gc.P));  // Changed by AB from 1000*gc.P
 				break;
 
 				//Inches for Units
@@ -431,7 +431,7 @@ void process_string(char instruction[], int size)
 				Serial.println(gc.G, DEC);
 		}
 	}
-
+        Serial.println("CC");
 	//find us an m code.
 	if (gc.seen & GCODE_M)
 	{
@@ -510,6 +510,17 @@ void process_string(char instruction[], int size)
 					extruder_speed = (int)gc.S;
 				break;
 
+                                // Open the valve
+                        case 126:
+                                valve_set(true, (int)(gc.P));
+                                break;
+                                
+                                // Close the valve
+                        case 127:
+                                valve_set(false, (int)(gc.P));
+                                break;
+                                                                
+
 			default:
 				Serial.print("Huh? M");
 				Serial.println(gc.M, DEC);
@@ -537,6 +548,10 @@ int scan_float(char *str, float *valp, unsigned int *seen, unsigned int flag)
 	else
 		*valp = 0;
 
+        // absorb trailing space
+        while(isspace(str[len]))
+          len++;
+          
 	return len;	/* length of number */
 }
 
@@ -557,9 +572,23 @@ int scan_int(char *str, int *valp, unsigned int *seen, unsigned int flag)
 	else
 		*valp = 0;
 
+        // absorb trailing space
+        while(isspace(str[len]))
+          len++;
+          
 	return len;	/* length of number */
 }
 
+#ifdef TEST_MACHINE
 
+// Read and echo bytes.
+
+void comms_test()
+{
+  if (Serial.available() > 0)
+        Serial.print((char)Serial.read());
+}
+
+#endif
 
 
