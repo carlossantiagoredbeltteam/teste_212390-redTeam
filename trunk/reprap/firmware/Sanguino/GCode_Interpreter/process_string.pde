@@ -94,7 +94,7 @@ int last_gcode_g = -1;
 #define TYPE_INT 1
 #define TYPE_FLOAT 2
 
-/* macros to save typing and bugs in the parser function */
+
 #define PARSE_INT(ch, str, len, val, seen, flag) \
 	case ch: \
 		len = scan_int(str, &val, &seen, flag); \
@@ -133,9 +133,9 @@ int parse_string(struct GcodeParser * gc, char instruction[], int size)
 			PARSE_FLOAT('F', &instruction[ind+1], len, gc->F, gc->seen, GCODE_F);
 			PARSE_FLOAT('R', &instruction[ind+1], len, gc->R, gc->seen, GCODE_R);
 			PARSE_FLOAT('Q', &instruction[ind+1], len, gc->Q, gc->seen, GCODE_Q);
-			break;
+                        default:
+			  break;
 		}
-                Serial.println(len);
 	}
 }
 
@@ -147,22 +147,17 @@ void process_string(char instruction[], int size)
 	GcodeParser gc;	/* string parse result */
 
 	//the character / means delete block... used for comments and stuff.
-	if (instruction[0] == '/')
-	{
-		Serial.println("ok");
+	if (instruction[0] == '/')	
 		return;
-	}
-        instruction[size]=0;
-        Serial.println(instruction);
+
 	//init baby!
-	FloatPoint fp;
+	FloatPoint fp; // Surely this needs to be preserved between calls?  - AB
 	fp.x = 0.0;
 	fp.y = 0.0;
 	fp.z = 0.0;
 
 	//get all our parameters!
 	parse_string(&gc, instruction, size);
-        Serial.println("AA");
 	/* if no command was seen, but parameters were, then use the last G code as 
 	 * the current command
 	 */
@@ -175,7 +170,6 @@ void process_string(char instruction[], int size)
 		gc.G = last_gcode_g;
 		gc.seen |= GCODE_G;
 	}
-        Serial.println("BB");
 	//did we get a gcode?
 	if (gc.seen & GCODE_G)
 	{
@@ -322,7 +316,7 @@ void process_string(char instruction[], int size)
 				calculate_deltas();
 				break;
 
-				//go home.
+				//go home. // Make these coords negative to force use of endstops?
 			case 28:
 				set_target(0.0, 0.0, 0.0);
 				dda_move(getMaxSpeed());
@@ -431,7 +425,7 @@ void process_string(char instruction[], int size)
 				Serial.println(gc.G, DEC);
 		}
 	}
-        Serial.println("CC");
+
 	//find us an m code.
 	if (gc.seen & GCODE_M)
 	{
@@ -481,7 +475,7 @@ void process_string(char instruction[], int size)
 					while (extruder_get_temperature() < extruder_target_celsius)
 					{
 						extruder_manage_temperature();
-						Serial.print("T:");
+						Serial.print("T: ");
 						Serial.println(extruder_get_temperature());
 						delay(1000);
 					}
@@ -512,12 +506,12 @@ void process_string(char instruction[], int size)
 
                                 // Open the valve
                         case 126:
-                                valve_set(true, (int)(gc.P));
+                                valve_set(true, (int)(gc.P + 0.5));
                                 break;
                                 
                                 // Close the valve
                         case 127:
-                                valve_set(false, (int)(gc.P));
+                                valve_set(false, (int)(gc.P + 0.5));
                                 break;
                                                                 
 
@@ -527,8 +521,6 @@ void process_string(char instruction[], int size)
 		}
 	}
 
-	//tell our host we're done
-	Serial.println("ok");
 }
 
 int scan_float(char *str, float *valp, unsigned int *seen, unsigned int flag)
@@ -536,8 +528,9 @@ int scan_float(char *str, float *valp, unsigned int *seen, unsigned int flag)
 	float res;
 	int len;
 	char *end;
-
+     
 	res = (float)strtod(str, &end);
+      
 	len = end - str;
 
 	if (len > 0)
@@ -547,10 +540,6 @@ int scan_float(char *str, float *valp, unsigned int *seen, unsigned int flag)
 	}
 	else
 		*valp = 0;
-
-        // absorb trailing space
-        while(isspace(str[len]))
-          len++;
           
 	return len;	/* length of number */
 }
@@ -571,10 +560,6 @@ int scan_int(char *str, int *valp, unsigned int *seen, unsigned int flag)
 	}
 	else
 		*valp = 0;
-
-        // absorb trailing space
-        while(isspace(str[len]))
-          len++;
           
 	return len;	/* length of number */
 }
