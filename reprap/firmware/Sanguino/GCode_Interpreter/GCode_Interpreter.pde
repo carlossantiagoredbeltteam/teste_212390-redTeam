@@ -1,17 +1,19 @@
 // Yep, this is actually -*- c++ -*-
 
-// Arduino G-code Interpreter
-// v1.0 by Mike Ellery - initial software (mellery@gmail.com)
+// Sanguino G-code Interpreter
+// Arduino v1.0 by Mike Ellery - initial software (mellery@gmail.com)
 // v1.1 by Zach Hoeken - cleaned up and did lots of tweaks (hoeken@gmail.com)
 // v1.2 by Chris Meighan - cleanup / G2&G3 support (cmeighan@gmail.com)
 // v1.3 by Zach Hoeken - added thermocouple support and multi-sample temp readings. (hoeken@gmail.com)
+// Sanguino v1.4 by Adrian Bowyer - switch to the Sanguino; extensive mods... (a.bowyer@bath.ac.uk)
+
 #include <ctype.h>
 #include <HardwareSerial.h>
 
 // Uncomment the next line to run stand-alone tests on the machine (also see the 
-// ends of the GCode_Interpreter, extruder, and stepper_control code).
-
+// ends of this, the process_string, the extruder, and the stepper_control tabs).
 //#define TEST_MACHINE
+
 
 //our command string
 #define COMMAND_SIZE 128
@@ -44,7 +46,6 @@ void loop()
 	if (Serial.available() > 0)
 	{
 		c = Serial.read();
-                //Serial.print(c);
                 if(c == '\r')
                   c = '\n';
                 // Throw away control chars except \n
@@ -73,12 +74,18 @@ void loop()
 	//if we've got a real command, do it
 	if (serial_count && c == '\n')
 	{
+                // Terminate string
+                word[serial_count] = 0;
+                
 		//process our command!
 		process_string(word, serial_count);
 
 		//clear command.
 		init_process_string();
+
+                // Say we're ready for the next one
                 
+                Serial.println("ok");
 	}
 
 #else
@@ -90,7 +97,7 @@ void loop()
 // to the Sanguino.
 
 // If that works, comment out the next line to test the rest:
-//#define COMMS_TEST
+#define COMMS_TEST
 
 #ifdef COMMS_TEST
 
@@ -136,7 +143,7 @@ void loop()
       Serial.println(" h - extruder heater test");
       Serial.println(" e - extruder drive test");
       Serial.println(" v - extruder valve test");
-      Serial.println(" s - stop current test at the end of its cycle and print this list\n\n");
+      Serial.println(" s - stop current test at the end of its cycle then print this list\n\n");
       Serial.print("Command: ");
       c = 0;
   }

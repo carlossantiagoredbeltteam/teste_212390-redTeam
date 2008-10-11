@@ -1,7 +1,4 @@
 
-
-
-
 // define the parameters of our machine.
 #define X_STEPS_PER_INCH 203.133
 #define X_STEPS_PER_MM   7.99735
