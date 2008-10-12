@@ -790,6 +790,8 @@ public class Main {
 					org.reprap.Preferences.setGlobalString("Geometry", "nullcartesian");
 
 					//throw new Exception(err); // Removed by AB.  We told them already...
+					
+					communicator = null;
 				}
 				catch (gnu.io.PortInUseException e)
 				{

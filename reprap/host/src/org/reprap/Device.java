@@ -49,15 +49,15 @@ public class Device {
 	 * @param address address of the device
 	 */
 	public Device(Communicator communicator, Address address) {
-		//this.communicator = communicator;
+		this.communicator = communicator;
 		this.address = address;
-		isAvailable();
+		//isAvailable();
 	}
 	
 	public Device(Address address)
 	{
 		this.address = address;
-		isAvailable();		
+		//isAvailable();		
 	}
 
 	/**
@@ -67,76 +67,82 @@ public class Device {
 		return address;
 	}
 
-	/**
-	 * @return the communicator
-	 */
-	public Communicator getCommunicator() {
-		return communicator;
-	}
 
-	/**
-	 * @return Version ID of the firmware the device is running  
-	 * @throws IOException
-	 * @throws InvalidPayloadException
-	 */
-	public int getVersion() throws IOException, InvalidPayloadException {
-		VersionRequestMessage request = new VersionRequestMessage();
-		IncomingContext replyContext = sendMessage(request);
-		VersionResponseMessage reply = new VersionResponseMessage(replyContext);
-		return reply.getVersion(); 
-	}
 	
 	/**
 	 * Check if the device is alive
 	 * @return
 	 */
-	public boolean isAvailable()
-	{		
-	       try {
-	            getVersion();
-	        } catch (Exception ex) {
-	        	wasAlive = false;
-	            return false;
-	        }
-	        wasAlive = true;
-	        return true;
-	}
+//	public boolean isAvailable()
+//	{		
+//	       try {
+//	            getVersion();
+//	        } catch (Exception ex) {
+//	        	wasAlive = false;
+//	            return false;
+//	        }
+//	        wasAlive = true;
+//	        return true;
+//	}
 	
 	/**
 	 * Result of last call to isAvailable(), which we don't want to
 	 * call repeatedly as each call polls the device.
 	 * @return
 	 */
-	public boolean wasAvailable()
-	{		
-		return wasAlive;
-	}
+//	public boolean wasAvailable()
+//	{		
+//		return wasAlive;
+//	}
+	
+	//*****************************************************************
 	
 	/**
-	 * @param message 
-	 * @return incoming context
-	 * @throws IOException
+	 * @return the communicator
 	 */
-	public IncomingContext sendMessage(OutgoingMessage message) throws IOException {
-		return communicator.sendMessage(this, message);
+	public Communicator getCommunicator() {
+		return communicator;
 	}
-	
-	/**
-	 * Method to lock communication to this device. 
-	 * <p>TODO: when called?</P> 
-	 */
-	public void lock() {
-		communicator.lock();
-	}
-	
-	/**
-	 * Method to unlock communication to this device
-	 * <p>TODO: when called?</P> 
-	 *  
-	 */
-	public void unlock() {
-		communicator.unlock();
-	}
+//
+//	/**
+//	 * @return Version ID of the firmware the device is running  
+//	 * @throws IOException
+//	 * @throws InvalidPayloadException
+//	 */
+//	public int getVersion() throws IOException, InvalidPayloadException {
+//		VersionRequestMessage request = new VersionRequestMessage();
+//		IncomingContext replyContext = sendMessage(request);
+//		VersionResponseMessage reply = new VersionResponseMessage(replyContext);
+//		return reply.getVersion(); 
+//	}
+//	
+//	/**
+//	 * @param message 
+//	 * @return incoming context
+//	 * @throws IOException
+//	 */
+//	public IncomingContext sendMessage(OutgoingMessage message) throws IOException {
+//		return communicator.sendMessage(this, message);
+//	}
+//	
+//	/**
+//	 * Method to lock communication to this device. 
+//	 * <p>TODO: when called?</P> 
+//	 */
+//	public void lock() {
+//		communicator.lock();
+//	}
+//	
+//	/**
+//	 * Method to unlock communication to this device
+//	 * <p>TODO: when called?</P> 
+//	 *  
+//	 */
+//	public void unlock() {
+//		communicator.unlock();
+//	}
+//	
+	//******************************************************************
 	
 	public void setPrinter(Printer p)
 	{

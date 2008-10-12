@@ -63,9 +63,9 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	
 	public void loadMotors()
 	{
-		motorX = new GCodeStepperMotor('X');
-		motorY = new GCodeStepperMotor('Y');
-		motorZ = new GCodeStepperMotor('Z');
+		motorX = new GCodeStepperMotor(this, 1);
+		motorY = new GCodeStepperMotor(this, 2);
+		motorZ = new GCodeStepperMotor(this, 3);
 	}
 	
 	public void loadExtruders()
@@ -127,18 +127,18 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		if (dx != 0 | dy != 0)
 		{
 			code = "";
-			if (currentFeedrate != xyFeedrate)
+			//if (currentFeedrate != xyFeedrate)
 				code = "G1 ";
 
-			if (dx != 0)
+			//if (dx != 0)
 				code += "X" + gx;
-			if (dy != 0)
+			//if (dy != 0)
 				code += " Y" + gy;
-			if (currentFeedrate != xyFeedrate)
-			{
+			//if (currentFeedrate != xyFeedrate)
+			//{
 				code += " F" + xyFeedrate;
 				currentFeedrate = xyFeedrate;
-			}
+			//}
 
 			code += " ;xy move";
 			gcode.queue(code);
@@ -150,11 +150,11 @@ public class CartesianGCode extends GenericCartesianPrinter {
 			code = "G1 ";
 			code += " Z" + gz;
 			
-			if (zFeedrate != currentFeedrate)
-			{
+			//if (zFeedrate != currentFeedrate)
+			//{
 				code += " F" + zFeedrate;
 				currentFeedrate = zFeedrate;
-			}
+			//}
 			
 			code += " ;lift down";
 			gcode.queue(code);
@@ -165,11 +165,11 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		{
 			code = "G1 Z" + gz;
 			
-			if (zFeedrate != currentFeedrate)
-			{
+			//if (zFeedrate != currentFeedrate)
+			//{
 				code += " F" + zFeedrate;
 				currentFeedrate = zFeedrate;
-			}
+			//}
 
 			code += " ;z down";
 			gcode.queue(code);
@@ -211,20 +211,20 @@ public class CartesianGCode extends GenericCartesianPrinter {
 
 		String code = "";
 		
-		if (feed != currentFeedrate)
+		//if (feed != currentFeedrate)
 			code += "G1 ";
 		
-		if (dx != 0)
+		//if (dx != 0)
 			code += " X" + gx;
-		if (dy != 0)
+		//if (dy != 0)
 			code += " Y" + gy;
-		if (dz != 0)
+		//if (dz != 0)
 			code += " Z" + gz;
-		if (feed != currentFeedrate)
-		{
+		//if (feed != currentFeedrate)
+		//{
 			code += " F" + feed;
 			currentFeedrate = feed;
-		}
+		//}
 		
 		code += " ;print segment";
 		gcode.queue(code);
@@ -307,7 +307,7 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		gcode.queue("G1 X-999 Y-999 F" + xyFeedrate + " ;xy home");
 		currentFeedrate = xyFeedrate;
 		
-		//gcode.queue("G0 Z-999");
+		//gcode.queue("G1 Z-999 F" + zFeedrate + " ;z home");
 		gcode.queue("G92 ;set current position as home");
 	}
 	
@@ -361,11 +361,13 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	//TODO: make this work normally.
 	public void stopMotor() throws IOException
 	{
+		getExtruder().stopExtruding();
 	}
 	
 	//TODO: make this work normally.
 	public void stopValve() throws IOException
 	{
+		getExtruder().setValve(false);
 	}
 	
 	/**

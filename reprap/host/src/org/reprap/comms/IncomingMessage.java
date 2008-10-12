@@ -52,6 +52,11 @@ public abstract class IncomingMessage {
 	 */
 	public IncomingMessage(Device device, OutgoingMessage message, long timeout) throws IOException {
 		Communicator comm = device.getCommunicator();
+		if(comm == null)
+		{
+			System.err.println("IncomingMessage called when GCodes switched on.");
+			return;
+		}
 		for(int i=0;i<3;i++) {	// Allow 3 retries.
 			//System.out.println("Retry: " + i);
 			incomingContext = comm.sendMessage(device, message);

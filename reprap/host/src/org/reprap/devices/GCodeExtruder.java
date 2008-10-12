@@ -84,13 +84,13 @@ public class GCodeExtruder extends GenericExtruder
 			gcode.queue("M107 ;cooler off");
 	}
 	
-	//TODO: actually implement this one.
+
 	public void setValve(boolean valveOpen) throws IOException
 	{
 		if (valveOpen)
-			gcode.queue("M126 ;valve open");
+			gcode.queue("M126 P" + valvePulseTime + ";valve open");
 		else
-			gcode.queue("M127 ;valve closed");
+			gcode.queue("M127 P" + valvePulseTime + ";valve closed");
 	}
 	
 	public boolean isEmpty()

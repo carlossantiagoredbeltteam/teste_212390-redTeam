@@ -18,12 +18,17 @@ import org.reprap.comms.messages.OutgoingAddressMessage;
 import org.reprap.comms.messages.OutgoingBlankMessage;
 import org.reprap.comms.messages.OutgoingByteMessage;
 import org.reprap.comms.messages.OutgoingIntMessage;
-
+import org.reprap.comms.messages.VersionRequestMessage;
+import org.reprap.comms.messages.VersionResponseMessage;
 /**
  *
  */
 public class SNAPStepperMotor extends GenericStepperMotor {
-	
+	/**
+	 * Communicator
+	 * 
+	 */
+	private Communicator communicator = null;	
 	/**
 	 * API for firmware
 	 * Activate the stepper motor in forward direction 
@@ -149,18 +154,20 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 	*/
 	private Device snap;
 	
+	private boolean wasAlive = false;
+	
 	/**
 	 * @param communicator
 	 * @param address
 	 * @param prefs
 	 * @param motorId
 	 */
-	public SNAPStepperMotor(Communicator communicator, Address address, int motorId) {
+	public SNAPStepperMotor(Communicator com, Address address, int motorId) {
 		
 		super(address, motorId);
-		
+		communicator = com;
 		snap = new Device(communicator, address);
-			
+		isAvailable();	
 		refreshPreferences();
 		
 		if(!isAvailable())
@@ -168,7 +175,7 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 		
 		try
 		{
-			firmwareVersion = snap.getVersion();
+			firmwareVersion = getVersion();
 		} catch (Exception ex)
 		{}
 
@@ -176,6 +183,77 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 				((firmwareVersion >> 8) & 0xff) + "." + (firmwareVersion & 0xff));
 
 	}
+	
+	
+	public boolean isAvailable()
+	{		
+	       try {
+	            getVersion();
+	        } catch (Exception ex) {
+	        	wasAlive = false;
+	            return false;
+	        }
+	        wasAlive = true;
+	        return true;
+	}
+	
+	/**
+	 * Result of last call to isAvailable(), which we don't want to
+	 * call repeatedly as each call polls the device.
+	 * @return
+	 */
+	public boolean wasAvailable()
+	{		
+		return wasAlive;
+	}	
+	
+	
+	/**
+	 * @return the communicator
+	 */
+	public Communicator getCommunicator() {
+		return communicator;
+	}
+
+	/**
+	 * @return Version ID of the firmware the device is running  
+	 * @throws IOException
+	 * @throws InvalidPayloadException
+	 */
+	public int getVersion() throws IOException, InvalidPayloadException {
+		VersionRequestMessage request = new VersionRequestMessage();
+		IncomingContext replyContext = sendMessage(request);
+		VersionResponseMessage reply = new VersionResponseMessage(replyContext);
+		return reply.getVersion(); 
+	}
+	
+	/**
+	 * @param message 
+	 * @return incoming context
+	 * @throws IOException
+	 */
+	public IncomingContext sendMessage(OutgoingMessage message) throws IOException {
+		return communicator.sendMessage(this, message);
+	}
+	
+	/**
+	 * Method to lock communication to this device. 
+	 * <p>TODO: when called?</P> 
+	 */
+	public void lock() {
+		communicator.lock();
+	}
+	
+	/**
+	 * Method to unlock communication to this device
+	 * <p>TODO: when called?</P> 
+	 *  
+	 */
+	public void unlock() {
+		communicator.unlock();
+	}
+	
+	//******************************************************************
 	
 	public void refreshPreferences()
 	{
@@ -209,9 +287,9 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 	private int getStatus() throws IOException
 	{
 		int value;
-		snap.lock();
+		communicator.lock();
 		try {
-			IncomingContext replyContext = snap.sendMessage(
+			IncomingContext replyContext = communicator.sendMessage(snap,
 					new OutgoingBlankMessage(MSG_GetStatus));
 			
 			IncomingIntMessage reply = new RequestStatusResponse(replyContext);
@@ -223,7 +301,7 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 			}
 		}
 		finally {
-			snap.unlock();
+			communicator.unlock();
 		}
 		//System.out.println("status: " + (byte)(value >> 8) + ", " + (byte)(value & 0xff));
 		return value;
@@ -281,7 +359,7 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 		if(firmwareVersion < firmwareVersionForBuffering)
 			return false;
 		
-		if(!snap.wasAvailable())
+		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
 			return false;
@@ -291,14 +369,14 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 		
 		waitTillQueueNotFull();
 		//System.out.println("control: " + control);
-		snap.lock();
+		communicator.lock();
 		Debug.d(axis + " axis - queuing point at speed " + movementSpeed + ", control = " + control + ", endX = " + endX + ", endY = " + endY);
 		try {
 			OutgoingMessage request = new RequestQueue(endX, endY, movementSpeed, control);
-			snap.sendMessage(request);
+			communicator.sendMessage(snap, request);
 		}
 		finally {
-			snap.unlock();
+			communicator.unlock();
 		}
 		
 		return true;
@@ -311,21 +389,21 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 	 * @throws IOException
 	 */
 	public void setSpeed(int speed) throws IOException {
-		if(!snap.wasAvailable())
+		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
 			return;
 		}
 		initialiseIfNeeded();
 		waitTillNotBusy();
-		snap.lock();
+		communicator.lock();
 		Debug.d(axis + " axis - setting speed: " + speed);
 		try {
 			OutgoingMessage request = new RequestSetSpeed(speed);
-			snap.sendMessage(request);
+			communicator.sendMessage(snap, request);
 		}
 		finally {
-			snap.unlock();
+			communicator.unlock();
 		}
 	}
 
@@ -333,21 +411,21 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 	 * @throws IOException
 	 */
 	public void setIdle() throws IOException {
-		if(!snap.wasAvailable())
+		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
 			return;
 		}
 		initialiseIfNeeded();
 		waitTillNotBusy();
-		snap.lock();
+		communicator.lock();
 		Debug.d(axis + " axis - going idle.");
 		try {
 			OutgoingMessage request = new RequestSetSpeed();
-			snap.sendMessage(request);
+			communicator.sendMessage(snap, request);
 		}
 		finally {
-			snap.unlock();
+			communicator.unlock();
 		}
 	}
 	
@@ -355,21 +433,21 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 	 * @throws IOException
 	 */
 	public void stepForward() throws IOException {
-		if(!snap.wasAvailable())
+		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
 			return;
 		}
 		initialiseIfNeeded();
 		waitTillNotBusy();
-		snap.lock();
+		communicator.lock();
 		Debug.d(axis + " axis - stepping forward.");		
 		try {
 			OutgoingMessage request = new RequestOneStep(true);
-			snap.sendMessage(request);
+			communicator.sendMessage(snap, request);
 		}
 		finally {
-			snap.unlock();
+			communicator.unlock();
 		}
 	}
 	
@@ -377,21 +455,21 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 	 * @throws IOException
 	 */
 	public void stepBackward() throws IOException {
-		if(!snap.wasAvailable())
+		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
 			return;
 		}
 		initialiseIfNeeded();
 		waitTillNotBusy();
-		snap.lock();
+		communicator.lock();
 		Debug.d(axis + " axis - stepping backward.");	
 		try {
 			OutgoingMessage request = new RequestOneStep(false);
-			snap.sendMessage(request);
+			communicator.sendMessage(snap, request);
 		}
 		finally {
-			snap.unlock();
+			communicator.unlock();
 		}
 	}
 	
@@ -399,7 +477,7 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 	 * @throws IOException
 	 */
 	public void resetPosition() throws IOException {
-		if(!snap.wasAvailable())
+		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
 			return;
@@ -412,20 +490,20 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 	 * @throws IOException
 	 */
 	public void setPosition(int position) throws IOException {
-		if(!snap.wasAvailable())
+		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
 			return;
 		}
 		initialiseIfNeeded();
 		waitTillNotBusy();
-		snap.lock();
+		communicator.lock();
 		Debug.d(axis + " axis - setting position to: " + position);	
 		try {
-			snap.sendMessage(new RequestSetPosition(position));
+			communicator.sendMessage(snap, new RequestSetPosition(position));
 		}
 		finally {
-			snap.unlock();
+			communicator.unlock();
 		}
 	}
 	
@@ -434,7 +512,7 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 	 * @throws IOException
 	 */
 	public int getPosition() throws IOException {
-		if(!snap.wasAvailable())
+		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
 			return 0;
@@ -442,10 +520,10 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 		int value;
 		initialiseIfNeeded();
 		waitTillNotBusy();
-		snap.lock();
+		communicator.lock();
 		Debug.d(axis + " axis - getting position.  It is... ");
 		try {
-			IncomingContext replyContext = snap.sendMessage(
+			IncomingContext replyContext = communicator.sendMessage(snap, 
 					new OutgoingBlankMessage(MSG_GetPosition));
 			
 			IncomingIntMessage reply = new RequestPositionResponse(replyContext);
@@ -457,7 +535,7 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 			}
 		}
 		finally {
-			snap.unlock();
+			communicator.unlock();
 		}
 		Debug.d("..." + value);		
 		return value;
@@ -469,20 +547,20 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 	 * @throws IOException
 	 */
 	public void seek(int speed, int position) throws IOException {
-		if(!snap.wasAvailable())
+		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
 			return;
 		}
 		initialiseIfNeeded();
 		waitTillNotBusy();
-		snap.lock();
+		communicator.lock();
 		Debug.d(axis + " axis - seeking position " + position + " at speed " + speed);
 		try {
-			snap.sendMessage(new RequestSeekPosition(speed, position));
+			communicator.sendMessage(snap, new RequestSeekPosition(speed, position));
 		}
 		finally {
-			snap.unlock();
+			communicator.unlock();
 		}
 	}
 
@@ -492,14 +570,14 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 	 * @throws IOException
 	 */
 	public void seekBlocking(int speed, int position) throws IOException {
-		if(!snap.wasAvailable())
+		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
 			return;
 		}
 		initialiseIfNeeded();
 		waitTillNotBusy();
-		snap.lock();
+		communicator.lock();
 		Debug.d(axis + " axis - seeking-blocking position " + position + " at speed " + speed);
 		try {
 			setNotification();
@@ -509,7 +587,7 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 			// TODO: Nasty error. But WTF do we do about it?
 			e.printStackTrace();
 		} finally {
-			snap.unlock();
+			communicator.unlock();
 		}
 	}
 
@@ -520,24 +598,24 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 	 * @throws InvalidPayloadException
 	 */
 	public AxisMotor.Range getRange(int speed) throws IOException, InvalidPayloadException {
-		if(!snap.wasAvailable())
+		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
 			return new AxisMotor.Range();
 		}
 		initialiseIfNeeded();
 		waitTillNotBusy();
-		snap.lock();
+		communicator.lock();
 		Debug.d(axis + " axis - getting range.");
 		try {
 			if (haveCalibrated) {
-				IncomingContext replyContext = snap.sendMessage(
+				IncomingContext replyContext = communicator.sendMessage(snap,
 						new OutgoingBlankMessage(MSG_GetRange));
 				RequestRangeResponse response = new RequestRangeResponse(replyContext);
 				return response.getRange();
 			} else {
 				setNotification();
-				IncomingContext replyContext = snap.sendMessage(
+				IncomingContext replyContext = communicator.sendMessage(snap,
 						new OutgoingByteMessage(MSG_Calibrate, (byte)speed));
 				RequestRangeResponse response = new RequestRangeResponse(replyContext);
 				setNotificationOff();
@@ -545,7 +623,7 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 			}
 		}
 		finally {
-			snap.unlock();
+			communicator.unlock();
 		}
 	}
 	
@@ -555,21 +633,21 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 	 * @throws InvalidPayloadException
 	 */
 	public void homeReset(int speed) throws IOException, InvalidPayloadException {
-		if(!snap.wasAvailable())
+		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
 			return;
 		}
 		initialiseIfNeeded();
 		waitTillNotBusy();
-		snap.lock();
+		communicator.lock();
 		Debug.d(axis + " axis - home reset at speed " + speed);
 		try {
 			setNotification();
 			new RequestHomeResetResponse(snap, new OutgoingByteMessage(MSG_HomeReset, (byte)speed), 60000);
 			setNotificationOff();
 		} finally {
-			snap.unlock();
+			communicator.unlock();
 		}
 	}
 	
@@ -578,21 +656,21 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 	 * @throws IOException
 	 */
 	public void setSync(byte syncType) throws IOException {
-		if(!snap.wasAvailable())
+		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
 			return;
 		}
 		initialiseIfNeeded();
 		waitTillNotBusy();
-		snap.lock();
+		communicator.lock();
 		Debug.d(axis + " axis - setting sync to " + syncType);
 		try {
-			snap.sendMessage(
+			communicator.sendMessage(snap,
 					new OutgoingByteMessage(MSG_SetSyncMode, syncType));
 		}
 		finally {
-			snap.unlock();
+			communicator.unlock();
 		}
 		
 	}
@@ -604,14 +682,14 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 	 * @throws IOException
 	 */
 	public void dda(int speed, int x1, int deltaY) throws IOException {
-		if(!snap.wasAvailable())
+		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
 			return;
 		}
 		initialiseIfNeeded();
 		waitTillNotBusy();
-		snap.lock();
+		communicator.lock();
 		Debug.d(axis + " axis - dda at speed " + speed + ". x1 = " + x1 + ", deltaY = " + deltaY);
 		try {
 			setNotification();
@@ -621,7 +699,7 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 			setNotificationOff();
 		}
 		finally {
-			snap.unlock();
+			communicator.unlock();
 		}
 	}
 	
@@ -633,8 +711,8 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 		initialiseIfNeeded();
 		Debug.d(axis + " axis - setting notification on.");
 		if (!haveSetNotification) {
-			snap.sendMessage(new OutgoingAddressMessage(MSG_SetNotification,
-					snap.getCommunicator().getAddress()));
+			communicator.sendMessage(snap, new OutgoingAddressMessage(MSG_SetNotification,
+					communicator.getAddress()));
 			haveSetNotification = true;
 		}
 	}
@@ -646,7 +724,7 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 		initialiseIfNeeded()	;
 		Debug.d(axis + " axis - setting notification off.");
 		if (haveSetNotification) {
-			snap.sendMessage(new OutgoingAddressMessage(MSG_SetNotification, snap.getAddress().getNullAddress()));
+			communicator.sendMessage(snap, new OutgoingAddressMessage(MSG_SetNotification, snap.getAddress().getNullAddress()));
 			haveSetNotification = false;
 		}
 	}
@@ -657,7 +735,7 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 	 * @throws IOException
 	 */
 	public void setMaxTorque(int maxTorque) throws IOException {
-		if(!snap.wasAvailable())
+		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent axis drive for " + axis);
 			return;
@@ -667,14 +745,14 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 		if (maxTorque > 100) maxTorque = 100;
 		double power = maxTorque * 68.0 / 100.0;
 		byte scaledPower = (byte)power;
-		snap.lock();
+		communicator.lock();
 		Debug.d(axis + " axis - setting maximum torque to: " + maxTorque);
 		try {
-			snap.sendMessage(
+			communicator.sendMessage(snap,
 					new OutgoingByteMessage(MSG_SetPower, scaledPower));
 		}
 		finally {
-			snap.unlock();
+			communicator.unlock();
 		}
 		
 	}

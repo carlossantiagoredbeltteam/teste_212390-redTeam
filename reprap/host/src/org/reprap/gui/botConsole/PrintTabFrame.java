@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
 //import org.reprap.Main;
 import org.reprap.Preferences;
 import org.reprap.Printer;
+import org.reprap.machines.Reprap;
 
 /**
  *
@@ -361,18 +362,35 @@ org.reprap.Main.gui.setLayerPause(layerPauseCheck.isSelected());
 }//GEN-LAST:event_layerPauseCheckActionPerformed
 
 private void buildRadioButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buildRadioButtonMouseClicked
-if (org.reprap.Main.getCommunicator() == null) {
-            JOptionPane.showMessageDialog(null, "No Communicator. Restart with your device plugged in.");
-            simulateRadioButton.setSelected(true);
-        }
-        else {
-            try {
-                org.reprap.Preferences.setGlobalString("Geometry", "cartesian");
-            }
-            catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "Could not set 'Geometry' preference to cartesian");
-            }
-        }
+	try
+	{
+		String geometry = Preferences.loadGlobalString("Geometry");
+
+		if (geometry.compareToIgnoreCase("cartesian") == 0)
+		{
+			if (org.reprap.Main.getCommunicator() == null) {
+				JOptionPane.showMessageDialog(null, "No Communicator. Restart with your device plugged in.");
+				simulateRadioButton.setSelected(true);
+			}
+			else {
+				try {
+					org.reprap.Preferences.setGlobalString("Geometry", "cartesian");
+				}
+				catch (Exception e) {
+					JOptionPane.showMessageDialog(null, "Could not set 'Geometry' preference to cartesian");
+				}
+			}
+		}
+		else if (geometry.compareToIgnoreCase("gcodewriter") == 0)
+		{
+			if(!Preferences.loadGlobalBool("GCodeUseSerial")) {
+				JOptionPane.showMessageDialog(null, "G-codes are directed to a file, so you cannot control the machine directly.\n" 
+						+ "To change this set the prefrence GCodeUseSerial to true.");
+				simulateRadioButton.setSelected(true);
+			}
+		}
+	} catch (Exception ex)
+	{}
 }//GEN-LAST:event_buildRadioButtonMouseClicked
 
 private void simulateRadioButtonMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_simulateRadioButtonMousePressed
