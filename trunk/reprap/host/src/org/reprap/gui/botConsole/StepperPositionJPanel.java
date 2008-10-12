@@ -39,7 +39,7 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
      */
     public void postSetUp(int m) throws IOException {
         
-        communicator = org.reprap.Main.getCommunicator();
+        //communicator = org.reprap.Main.getCommunicator();
         motorID = m;
         printer = org.reprap.Main.gui.getPrinter();
 
@@ -329,7 +329,6 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
 
 private void stepUpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stepUpButtonActionPerformed
         setSpeed();
-        //System.out.println(nudgeSize);
         newTargetAfterNudge = getTargetPositionInMM() + nudgeSize;
         targetPosition.setText("" + round(newTargetAfterNudge, 2));
         moveToTarget();

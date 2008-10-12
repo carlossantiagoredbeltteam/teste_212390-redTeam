@@ -94,6 +94,7 @@ public interface AxisMotor {
 	 * @return
 	 */
 	public boolean isAvailable();
+	public boolean wasAvailable();
 	
 	/**
 	 * @return current position of the motor

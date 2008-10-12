@@ -43,7 +43,7 @@ public class Reprap extends GenericCartesianPrinter
 	/**
 	 * 
 	 */
-	private Communicator communicator = org.reprap.Main.getCommunicator();
+	//private Communicator communicator = org.reprap.Main.getCommunicator();
 	
 	/**
 	* our line printer object.
@@ -79,11 +79,11 @@ public class Reprap extends GenericCartesianPrinter
 	{
 		try
 		{
-			motorX = new SNAPStepperMotor(communicator,
+			motorX = new SNAPStepperMotor(org.reprap.Main.getCommunicator(),
 					new SNAPAddress(Preferences.loadGlobalInt("XAxisAddress")), 1);
-			motorY = new SNAPStepperMotor(communicator,
+			motorY = new SNAPStepperMotor(org.reprap.Main.getCommunicator(),
 					new SNAPAddress(Preferences.loadGlobalInt("YAxisAddress")), 2);
-			motorZ = new SNAPStepperMotor(communicator,
+			motorZ = new SNAPStepperMotor(org.reprap.Main.getCommunicator(),
 					new SNAPAddress(Preferences.loadGlobalInt("ZAxisAddress")), 3);
 
 			motorX.setPrinter(this);
@@ -107,7 +107,7 @@ public class Reprap extends GenericCartesianPrinter
 		{
 			String prefix = "Extruder" + count + "_";
 			SNAPAddress addy = new SNAPAddress(Preferences.loadGlobalInt(prefix + "Address"));
-			return new SNAPExtruder(communicator, addy, count);
+			return new SNAPExtruder(org.reprap.Main.getCommunicator(), addy, count);
 		}
 		catch (Exception e)
 		{

@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.reprap.Device;
 import org.reprap.Preferences;
 import org.reprap.utilities.Debug;
-import org.reprap.Extruder;
 import org.reprap.comms.Address;
 import org.reprap.comms.Communicator;
 import org.reprap.comms.IncomingMessage;
@@ -13,9 +12,9 @@ import org.reprap.comms.OutgoingMessage;
 import org.reprap.comms.IncomingMessage.InvalidPayloadException;
 import org.reprap.comms.messages.OutgoingBlankMessage;
 import org.reprap.comms.messages.OutgoingByteMessage;
-import javax.media.j3d.Appearance;
-import javax.vecmath.Color3f;
-import javax.media.j3d.Material;
+import org.reprap.comms.IncomingContext;
+import org.reprap.comms.messages.VersionRequestMessage;
+import org.reprap.comms.messages.VersionResponseMessage;
 
 /**
  * @author jwiel
@@ -23,6 +22,11 @@ import javax.media.j3d.Material;
  */
 public class SNAPExtruder extends GenericExtruder
 {
+	/**
+	 * Communicator
+	 * 
+	 */
+	private Communicator communicator = null;
 	
 	/**
 	 * API for firmware
@@ -146,6 +150,8 @@ public class SNAPExtruder extends GenericExtruder
 	*/
 	private Device snap; 
 	
+	private boolean wasAlive = false;
+	
 	/**
 	 * What firmware are we running?
 	 */
@@ -156,11 +162,12 @@ public class SNAPExtruder extends GenericExtruder
 	 */
 	private long lastTemperatureUpdate = 0;
 	
-	public SNAPExtruder(Communicator communicator, Address address, int extruderId)
+	public SNAPExtruder(Communicator com, Address address, int extruderId)
 	{
 		super(extruderId);
-
+		communicator = com;
 		snap = new Device(communicator, address);
+		isAvailable();
 		
 		tH = new double[] {20, 20, 20}; // Bit of a hack - room temp
 		tHi = 0;
@@ -171,7 +178,7 @@ public class SNAPExtruder extends GenericExtruder
 		
 		try
 		{
-			firmwareVersion = snap.getVersion();
+			firmwareVersion = getVersion();
 		} catch (Exception ex) {}
 		
 		// Set up thermometer
@@ -207,6 +214,73 @@ public class SNAPExtruder extends GenericExtruder
 		};
 		pollThread.start();*/
 	}
+	
+	public boolean isAvailable()
+	{		
+	       try {
+	            getVersion();
+	        } catch (Exception ex) {
+	        	wasAlive = false;
+	            return false;
+	        }
+	        wasAlive = true;
+	        return true;
+	}
+	
+	/**
+	 * Result of last call to isAvailable(), which we don't want to
+	 * call repeatedly as each call polls the device.
+	 * @return
+	 */
+	public boolean wasAvailable()
+	{		
+		return wasAlive;
+	}	
+	/**
+	 * @return the communicator
+	 */
+	public Communicator getCommunicator() {
+		return communicator;
+	}
+
+	/**
+	 * @return Version ID of the firmware the device is running  
+	 * @throws IOException
+	 * @throws InvalidPayloadException
+	 */
+	public int getVersion() throws IOException, InvalidPayloadException {
+		VersionRequestMessage request = new VersionRequestMessage();
+		IncomingContext replyContext = sendMessage(request);
+		VersionResponseMessage reply = new VersionResponseMessage(replyContext);
+		return reply.getVersion(); 
+	}
+	
+	/**
+	 * @param message 
+	 * @return incoming context
+	 * @throws IOException
+	 */
+	public IncomingContext sendMessage(OutgoingMessage message) throws IOException {
+		return communicator.sendMessage(snap, message);
+	}
+	
+	/**
+	 * Method to lock communication to this device. 
+	 * <p>TODO: when called?</P> 
+	 */
+	public void lock() {
+		communicator.lock();
+	}
+	
+	/**
+	 * Method to unlock communication to this device
+	 * <p>TODO: when called?</P> 
+	 *  
+	 */
+	public void unlock() {
+		communicator.unlock();
+	}
+	
 	
 	public void refreshPreferences()
 	{
@@ -246,7 +320,7 @@ public class SNAPExtruder extends GenericExtruder
 	 * @throws IOException
 	 */
 	public void setExtrusion(int speed, boolean reverse) throws IOException {
-		if(!snap.wasAvailable())
+		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent extruder for " + material);
 			return;
@@ -262,15 +336,15 @@ public class SNAPExtruder extends GenericExtruder
 		else
 			scaledSpeed = 0;
 		waitTillNotBusy();
-		snap.lock();
+		lock();
 		try {
 			OutgoingMessage request =
 				new OutgoingByteMessage(reverse ? MSG_SetActiveReverse : MSG_SetActive,
 						(byte)scaledSpeed);
-			snap.sendMessage(request);
+			communicator.sendMessage(snap, request);
 		}
 		finally {
-			snap.unlock();
+			communicator.unlock();
 		}
 	}
 	
@@ -285,7 +359,7 @@ public class SNAPExtruder extends GenericExtruder
 		if(valvePulseTime < 0)
 			return;		
 		
-		if(!snap.wasAvailable())
+		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent extruder for " + material);
 			return;
@@ -297,15 +371,15 @@ public class SNAPExtruder extends GenericExtruder
 			Debug.d("Closing valve.");
 		
 		waitTillNotBusy();
-		snap.lock();
+		communicator.lock();
 		try {
 			OutgoingMessage request =
 				new OutgoingByteMessage(valveOpen ? MSG_ValveOpen : MSG_ValveClosed,
 						(byte)valvePulseTime);
-			snap.sendMessage(request);
+			communicator.sendMessage(snap, request);
 		}
 		finally {
-			snap.unlock();
+			communicator.unlock();
 		}
 	}
 	
@@ -313,7 +387,7 @@ public class SNAPExtruder extends GenericExtruder
 	 * @see org.reprap.Extruder#setTemperature(double)
 	 */
 	public void setTemperature(double temperature) throws Exception {
-		if(!snap.wasAvailable())
+		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent extruder for " + material);
 			return;
@@ -390,7 +464,7 @@ public class SNAPExtruder extends GenericExtruder
 	 * @throws IOException
 	 */
 	public void setHeater(int heat, double maxTemp) throws IOException {
-		if(!snap.wasAvailable())
+		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent extruder for " + material);
 			return;
@@ -425,13 +499,13 @@ public class SNAPExtruder extends GenericExtruder
 		if (lock) 
 		{
 			waitTillNotBusy();
-			snap.lock();
+			communicator.lock();
 		}
 		try {
-			snap.sendMessage(new RequestSetHeat((byte)heat, (byte)safetyCutoff));
+			communicator.sendMessage(snap, new RequestSetHeat((byte)heat, (byte)safetyCutoff));
 		}
 		finally {
-			if (lock) snap.unlock();
+			if (lock) communicator.unlock();
 		}
 	}
 
@@ -452,16 +526,16 @@ public class SNAPExtruder extends GenericExtruder
 		if (lock)
 		{
 			waitTillNotBusy();
-			snap.lock();
+			communicator.lock();
 		}
 		try {
-			snap.sendMessage(new RequestSetHeat((byte)heat0,
+			communicator.sendMessage(snap, new RequestSetHeat((byte)heat0,
 										   (byte)heat1,
 										   (byte)t0,
 										   (byte)t1));
 		}
 		finally {
-			if (lock) snap.unlock();
+			if (lock) communicator.unlock();
 		}
 	}
 
@@ -470,7 +544,7 @@ public class SNAPExtruder extends GenericExtruder
 	 * @return true if there is no material remaining
 	 */
 	public boolean isEmpty() {
-		if(!snap.wasAvailable())
+		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent extruder for " + material);
 			return true;
@@ -520,7 +594,7 @@ public class SNAPExtruder extends GenericExtruder
 	private void RefreshEmptySensor() throws IOException {
 		// TODO in future, this should use the notification mechanism rather than polling (when fully working)
 		waitTillNotBusy();
-		snap.lock();
+		communicator.lock();
 		try {
 			//System.out.println(material + " extruder refreshing sensor");
 			RequestIsEmptyResponse reply = new RequestIsEmptyResponse(snap, new OutgoingBlankMessage(MSG_IsEmpty), 500);
@@ -528,7 +602,7 @@ public class SNAPExtruder extends GenericExtruder
 		} catch (InvalidPayloadException e) {
 			throw new IOException();
 		} finally {
-			snap.unlock();
+			communicator.unlock();
 		}
 	}
 
@@ -576,7 +650,7 @@ public class SNAPExtruder extends GenericExtruder
 	 * @see org.reprap.Extruder#getTemperature()
 	 */
 	public double getTemperature() {
-		if(!snap.wasAvailable())
+		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent extruder for " + material);
 			return Preferences.absoluteZero();
@@ -591,7 +665,7 @@ public class SNAPExtruder extends GenericExtruder
 	 * @see org.reprap.Extruder#setCooler(boolean)
 	 */
 	public void setCooler(boolean f) throws IOException {
-		if(!snap.wasAvailable())
+		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent extruder for " + material);
 			return;
@@ -599,14 +673,14 @@ public class SNAPExtruder extends GenericExtruder
 		//System.out.println("setCooler 1");
 		waitTillNotBusy();
 		//System.out.println("setCooler 2");
-		snap.lock();
+		communicator.lock();
 		try {
 			OutgoingMessage request =
 				new OutgoingByteMessage(MSG_SetCooler, f?(byte)200:(byte)0); // Should set speed properly!
-			snap.sendMessage(request);
+			communicator.sendMessage(snap, request);
 		}
 		finally {
-			snap.unlock();
+			communicator.unlock();
 		}
 	}
 	
@@ -646,7 +720,7 @@ public class SNAPExtruder extends GenericExtruder
 	 */
 	private void getDeviceTemperature() throws Exception {
 		waitTillNotBusy();
-		snap.lock();
+		communicator.lock();
 		try {
 			int rawHeat = 0;
 			int calibration = 0;
@@ -677,7 +751,7 @@ public class SNAPExtruder extends GenericExtruder
 			lastTemperatureUpdate = System.currentTimeMillis();
 		}
 		finally {
-			snap.unlock();
+			communicator.unlock();
 		}
 	}
 
@@ -754,7 +828,7 @@ public class SNAPExtruder extends GenericExtruder
 	 * @throws IOException
 	 */
 	private void setVref(int ref) throws IOException {
-		snap.sendMessage(new OutgoingByteMessage(MSG_SetVRef, (byte)ref));		
+		communicator.sendMessage(snap, new OutgoingByteMessage(MSG_SetVRef, (byte)ref));		
 		vRefFactor = ref;
 	}
 
@@ -765,7 +839,7 @@ public class SNAPExtruder extends GenericExtruder
 	 * @throws IOException
 	 */
 	private void setTempScaler(int scale) throws IOException {
-		snap.sendMessage(new OutgoingByteMessage(MSG_SetTempScaler, (byte)scale));		
+		communicator.sendMessage(snap, new OutgoingByteMessage(MSG_SetTempScaler, (byte)scale));		
 		tempScaler = scale;
 	}
 	
