@@ -50,24 +50,28 @@ public class BotConsoleFrame extends javax.swing.JFrame {
         /*
          * Fork off a thread to keep the panels up-to-date
          */
-        pollThread = new Thread() {
-            public void run() {
-                    Thread.currentThread().setName("GUI Poll");
-                    while(!pollThreadExiting) {
-                            try {
-                                    Thread.sleep(5000);
-                                    updateProgress();
-                                    if(carryOnPolling)
-                                    	updatePanels();   
-                            }
-                            catch (InterruptedException ex) {
-                                    // This is normal when shutting down, so ignore
-                            }
-                    }
-                }
-            };
-            
-            pollThread.start(); 
+        pollThread = new Thread() 
+        {
+        	public void run() 
+        	{
+        		Thread.currentThread().setName("GUI Poll");
+        		while(!pollThreadExiting) 
+        		{
+        			try 
+        			{
+        				Thread.sleep(5000);
+        				updateProgress();
+        				if(carryOnPolling)
+        					updatePanels();   
+        			} catch (InterruptedException ex) 
+        			{
+        				// This is normal when shutting down, so ignore
+        			}
+        		}
+        	}
+        };
+
+        pollThread.start(); 
     }
     
 

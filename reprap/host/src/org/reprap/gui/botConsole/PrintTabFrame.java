@@ -354,7 +354,8 @@ org.reprap.Main.gui.clickCancel();
 }//GEN-LAST:event_stopButtonActionPerformed
 
 private void exitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitButtonActionPerformed
-System.exit(0);
+	printer.dispose();
+	System.exit(0);
 }//GEN-LAST:event_exitButtonActionPerformed
 
 private void layerPauseCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_layerPauseCheckActionPerformed

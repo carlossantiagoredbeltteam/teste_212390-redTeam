@@ -734,7 +734,7 @@ public class Main {
                                 ex.printStackTrace();
                 }
                 
-                BotConsoleFrame.main(null);
+
                 
                 try {
                         Thread.currentThread().setName("RepRap");
@@ -748,6 +748,7 @@ public class Main {
                 
                 gui.mainFrame.setFocusable(true);
                 gui.mainFrame.requestFocus();
+                BotConsoleFrame.main(null);
 
             }
         });
