@@ -44,7 +44,7 @@ public class GCodeExtruder extends GenericExtruder
 	
 	public void setExtrusion(int speed, boolean reverse) throws IOException
 	{
-		if (speed == 0 && currentSpeed != 0)
+		if (speed == 0)
 		{
 			gcode.queue("M103" + " ;extruder off");
 			isExtruding = false;
