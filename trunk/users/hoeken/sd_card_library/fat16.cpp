@@ -22,8 +22,8 @@
 #endif
 
 struct fat16_fs_struct fat16_fs_handlers[FAT16_FILE_COUNT];
-  struct fat16_file_struct fat16_file_handlers[FAT16_FILE_COUNT];
-  struct fat16_dir_struct fat16_dir_handlers[FAT16_DIR_COUNT];
+struct fat16_file_struct fat16_file_handlers[FAT16_FILE_COUNT];
+struct fat16_dir_struct fat16_dir_handlers[FAT16_DIR_COUNT];
   
 /**
  * \addtogroup fat16 FAT16 support
