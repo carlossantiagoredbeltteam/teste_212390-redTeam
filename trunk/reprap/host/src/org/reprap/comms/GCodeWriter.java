@@ -1,7 +1,5 @@
 package org.reprap.comms;
 
-import java.util.*;
-
 import javax.swing.JFileChooser;
 
 import java.io.FileNotFoundException;
@@ -267,7 +265,10 @@ public class GCodeWriter
 			else
 			{
 				char c = (char)i;
-				resp += c;
+//				if(c == '\n' || c == '\r')
+//					System.out.print("\\n");
+//				else
+//					System.out.print(c);
 
 				//is it at the end of the line?
 				if (c == '\n' || c == '\r')
@@ -278,9 +279,9 @@ public class GCodeWriter
 					{
 						Debug.d("GCodeWriter.waitForOK() - temperature reading: " + resp);
 					} 
-					else if (resp.startsWith("start"))
+					else if (resp.startsWith("start") || resp.contentEquals(""))
 					{	
-						// That was the reset string from the machine; ignore it.
+						// That was the reset string from the machine or a null line; ignore it.
 					}else
 					{
 						//Gone wrong.  Start again.
@@ -292,8 +293,10 @@ public class GCodeWriter
 							return;
 						}
 					}
+					// If we get here we need a new string
 					resp = "";
-				}
+				} else
+					resp += c;
 			}
 		}
 	}
