@@ -8,7 +8,7 @@
  * published by the Free Software Foundation.
  */
 
-#include "AF_SDLog.h"
+#include "RepRapSDCard.h"
 #include "partition.h"
 #include "partition_config.h"
 #include "sd-reader_config.h"
