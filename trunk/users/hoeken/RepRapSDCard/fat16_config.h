@@ -53,10 +53,12 @@
  * \param[out] min Pointer to a \c uint8_t which receives the current minute.
  * \param[out] sec Pointer to a \c uint8_t which receives the current sec.
  */
+#if FAT16_DATETIME_SUPPORT
 #define fat16_get_datetime(year, month, day, hour, min, sec) \
     get_datetime(year, month, day, hour, min, sec)
 /* forward declaration for the above */
 void get_datetime(uint16_t* year, uint8_t* month, uint8_t* day, uint8_t* hour, uint8_t* min, uint8_t* sec);
+#endif
 
 /**
  * \ingroup fat16_config

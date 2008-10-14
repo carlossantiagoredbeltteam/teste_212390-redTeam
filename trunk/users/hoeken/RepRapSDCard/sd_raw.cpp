@@ -11,7 +11,7 @@
 #include <string.h>
 #include <avr/io.h>
 #include "sd_raw.h"
-#include "AF_SDLog.h"
+#include "RepRapSDCard.h"
 /**
  * \addtogroup sd_raw MMC/SD card raw access
  *

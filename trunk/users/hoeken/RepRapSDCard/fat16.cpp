@@ -8,7 +8,7 @@
  * published by the Free Software Foundation.
  */
 
-#include "AF_SDLog.h"
+#include "RepRapSDCard.h"
 #include "partition.h"
 #include "fat16.h"
 #include "fat16_config.h"
@@ -902,7 +902,8 @@ struct fat16_file_struct*  fat16_open_file(struct fat16_fs_struct* fs, const str
         ++fd;
     }
     if(i >= FAT16_FILE_COUNT) {
-      putstring_nl("no more handlers\n\r"); 
+	//todo: see if this works?
+      //putstring_nl("no more handlers\n\r"); 
         return 0;
     }
 #endif
