@@ -739,7 +739,7 @@ public class SNAPExtruder extends GenericExtruder
 				if(rerangeTemperature(rawHeat))
 					break; // All ok
 				else
-					printer.wait(500);
+					printer.machineWait(500);
 					//Thread.sleep(500); // Wait for PIC temp routine to settle before going again
 			}
 			

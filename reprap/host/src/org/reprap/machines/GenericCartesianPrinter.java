@@ -485,15 +485,15 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 			if(eDelay >= vDelay)
 			{
 				extruders[extruder].setMotor(true);
-				wait(eDelay - vDelay);
+				machineWait(eDelay - vDelay);
 				extruders[extruder].setValve(true);
-				wait(vDelay);
+				machineWait(vDelay);
 			} else
 			{
 				extruders[extruder].setValve(true);
-				wait(vDelay - eDelay);
+				machineWait(vDelay - eDelay);
 				extruders[extruder].setMotor(true);
-				wait(eDelay);
+				machineWait(eDelay);
 			}
 			//extruders[extruder].setMotor(false);  // What's this for?  - AB
 		} catch(Exception e)
