@@ -1,74 +1,49 @@
-pyRepRap
-
+pyRepRap - RepRap Python Library and plotting application
 
 Requirements:
-pyserial (for all)
-pymedia (for rrplotdxf & reprapplot)
-wxpython (for reprapplot)
+pyserial	(for all)
+pygame		(for reprapplot)
+wxpython	(for reprapplot)
 
 To install dependencies under Fedora / Redhat run:
-sudo yum install pyserial pymedia wxpython
+sudo yum install pyserial pygame wxpython
 
 To install dependencies under Ubuntu run:
-sudo apt-get install pyserial pymedia wxpython
-
-
+sudo aptitude install python-serial python-pygame python-wxversion
 
 How to Install :
 python setup.py build
 sudo python setup.py install
 
+
 What's included:
-   python libraries:
-      reprap            General control of reprap
-      reprap.extrude    
-      reprap.fillet     Plot gcode
-   scripts:
-      reprapcontrol     Handy command line control program for RepRap
-      rrplotdxf         Plot dxf CAD files on RepRap
-      reprapplot        Plot gerber PCB files on RepRap (Graphical)
+	python libraries:
+		reprap				General control of reprap
+		reprap.snap			General SNAP comms
+		reprap.toolpath		Objects for storing polygon based toolpath information
+		reprap.shapeplotter	Plots shapes to polygon objects
+		reprap.ffm			Tools for extuding shapes in plastic with extruder
+		reprap.plugins		Access to all plugin modules (import/output/toolhead)
+		reprap.preferences	Access the preferences system
+		reprap.gopython		From python command line import this module to fully configure reprap ready for commands
+		reprap.baseplotters	Base classes for import and outout plugins
+	scripts:
+		reprapcontrol		Command line program to control serial SNAP RepRap
+		reprapplot			Plot various files to various formats (and serial SNAP RepRap)
 
 
-
-Once the package is installed you can run the scripts from the command line at any time
-
-Scritps require serial port permissions. Either run as root or change serial permissions:
-    (as root)
-    chown yourusername /dev/ttyS0
-    chmod 0600 /dev/ttyS0
-    (see http://gphoto.sourceforge.net/doc/manual/permissions-serial.html)
+Scripts require serial port permissions. Either run as root or change serial permissions:
+	 (as root)
+	 chown yourusername /dev/ttyS0
+	 chmod 0600 /dev/ttyS0
+	 (see http://gphoto.sourceforge.net/doc/manual/permissions-serial.html)
 
 
-reprapplot Howto:
-1) run reprapplot
-2) click 'open', select gerber file
-3) click plot to view a preview of the plot (move with mouse drag and zoom with wheel)
-4) adjust preferences and click plot again to tweak as required
-5) Cick 'enable repap'
-6) Click 'reset' (wait)
-7) Click 'pen setup', click down until pen is making good contact with paper
-8) click pen up test and pen down test to make sure good pen movement is achieved
-9) remember the down position value and enter it in preferences (TODO).
-10) Click plot
+If you wish to embed the main reprap control module into your project, just copy __init__.py and snap.py
+into your project directory and rename __init__.py to reprap.py. You will then be able to control the
+RepRap by importing the reprap module.
 
-
-Known issues:
-Preferences do not save
-
-
-
-
-
-
-Licenced under GNU v2 and the 'I'm not going to help you kill people licence'. The latter overrules the former.
-        
-I'm not going to help you kill people licence v1:
-The use of this software in any form for any purposes relating to any form of military activity or
-research either directly or via subcontracts is strictly prohibited.
-Any company or organisation affiliated with any military organisations either directly or through
-subcontracts are strictly prohibited from using any part of this software.
-
-GNU licence:        
+Licence:
 RepRap Gerber Plotter is free software; you can redistribute it and/or modify it 
 under the terms of the GNU General Public License as published by the Free Software Foundation; 
 either version 2 of the License, or (at your option) any later version.
@@ -78,3 +53,6 @@ without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 See the GNU General Public License for more details. You should have received a copy of 
 the GNU General Public License along with File Hunter; if not, write to 
 the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+
