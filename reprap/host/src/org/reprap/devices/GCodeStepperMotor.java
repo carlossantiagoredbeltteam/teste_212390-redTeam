@@ -198,19 +198,20 @@ public class GCodeStepperMotor extends GenericStepperMotor {
 			{
 			case 1:
 				printer.setFeedrate(printer.getFastFeedrateXY());
-				printer.moveTo((double)position/printer.getXStepsPerMM(), y, z, false, false);
+				x = (double)position/printer.getXStepsPerMM();
 				break;
 			case 2:
 				printer.setFeedrate(printer.getFastFeedrateXY());
-				printer.moveTo(x, (double)position/printer.getYStepsPerMM(), z, false, false);
+				y = (double)position/printer.getYStepsPerMM();
 				break;
 			case 3:
 				printer.setFeedrate(printer.getFastFeedrateZ());
-				printer.moveTo(x, y, (double)position/printer.getZStepsPerMM(), false, false);
+				z = (double)position/printer.getZStepsPerMM();
 				break;
 			default:
 				System.err.println("GCodeStepperMotor - seek.  Dud motor id: " + mid);
 			}
+			printer.moveTo(x, y, z, false, false);
 		} catch (Exception ex)
 		{}
 	}
@@ -241,22 +242,18 @@ public class GCodeStepperMotor extends GenericStepperMotor {
 	 * @throws InvalidPayloadException
 	 */
 	public void homeReset(int speed) throws IOException, InvalidPayloadException {
-		double x, y, z;
-		x = printer.getX();
-		y = printer.getY();
-		z = printer.getZ();
 		try
 		{
 			switch(mid)
 			{
 			case 1:
-				printer.moveTo(0, y, z, false, false);
+				printer.homeToZeroX();
 				break;
 			case 2:
-				printer.moveTo(x, 0, z, false, false);
+				printer.homeToZeroY();
 				break;
 			case 3:
-				printer.moveTo(x, y, 0, false, false);
+				printer.homeToZeroZ();
 				break;
 			default:
 				System.err.println("GCodeStepperMotor - homeReset.  Dud motor id: " + mid);

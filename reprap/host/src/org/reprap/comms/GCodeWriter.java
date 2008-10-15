@@ -121,18 +121,21 @@ public class GCodeWriter
 			openFile();
 		
         /*
-         * Fork off a thread to send buffered commands
+         * If comms is direct, fork off a thread to send buffered commands to the RepRap
          */
-        bufferThread = new Thread() 
-        {
-        	public void run() 
-        	{
-        		Thread.currentThread().setName("GCodeWriter() Buffer Thread");
-        		bufferDeQueue();
-        	}
-        };
+		if(!printToFile)
+		{
+			bufferThread = new Thread() 
+			{
+				public void run() 
+				{
+					Thread.currentThread().setName("GCodeWriter() Buffer Thread");
+					bufferDeQueue();
+				}
+			};
 
-        bufferThread.start();
+			bufferThread.start();
+		}
 	}
 	
 	/**
@@ -188,13 +191,11 @@ public class GCodeWriter
 		head++;
 		if(head >= buflen) head = 0;
 		// Have we collided with the tail (i.e. is the ring full)?
-		while(head == tail)
+		while(head == tail-1 || (tail == 0 && head == buflen-1))
 		{
 			// Release the lock so the transmit thread can get rid of stuff
 			threadLock = false;
-			// Short time - the transmit thread mustn't transmit, and hence empty,
-			// the entire full ring while this sleeps.  TODO: is this robust?
-			sleep(29);
+			sleep(223);
 		}
 		// Record the command in the buffer
 		ringBuffer[head] = cmd;
@@ -222,14 +223,14 @@ public class GCodeWriter
 					threadKilled = false;
 					return;
 				}
-				sleep(223);
+				sleep(29);
 			}
 			// Lock out the queuing thread
 			threadLock = true;
 			// Pick up the next command in the buffer
 			tail++;
 			if(tail >= buflen) tail = 0;
-			// Strip any comments and send the command to the machine
+			// Strip any comment and send the command to the machine
 			String cmd = ringBuffer[tail];
 			int com = cmd.indexOf(';');
 			if(com > 0)
