@@ -252,9 +252,9 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		} catch(Exception e){
 			//oops
 		}
-		super.dispose();
 		//write/close our file/serial port
 		gcode.finish();
+		super.dispose();
 	}
 
 
@@ -297,7 +297,7 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		currentFeedrate = xyFeedrate;
 		
 		gcode.queue("G1 Z-999 F" + round(getMaxFeedrateZ(), 4) + " ;z home");
-		gcode.queue("G92 ;set current position as home");
+		gcode.queue("G92 X0 Y0 Z0; set current position as home");
 	}
 	
 	private void delay(long millis)
@@ -311,9 +311,9 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	public void homeToZeroX() throws ReprapException, IOException {
 		super.homeToZeroX();
 		
-		double feedrate = round(getMaxFeedrateX(), 4);
-		gcode.queue("G1 X-999 F" + feedrate + " ;home x");
-		currentFeedrate = feedrate;
+		currentFeedrate = round(getMaxFeedrateX(), 4);
+		gcode.queue("G1 X-999 F" + currentFeedrate + " ;home x");
+		gcode.queue("G92 X0 ;set x 0");
 	}
 
 	/* (non-Javadoc)
@@ -322,9 +322,9 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	public void homeToZeroY() throws ReprapException, IOException {
 		super.homeToZeroY();
 
-		double feedrate = round(getMaxFeedrateY(), 4);
-		gcode.queue("G1 Y-999 F" + feedrate + " ;home y");
-		currentFeedrate = feedrate;
+		currentFeedrate = round(getMaxFeedrateY(), 4);
+		gcode.queue("G1 Y-999 F" + currentFeedrate + " ;home y");
+		gcode.queue("G92 Y0 ;set y 0");
 	}
 
 	/* (non-Javadoc)
@@ -335,7 +335,7 @@ public class CartesianGCode extends GenericCartesianPrinter {
 
 		double feedrate = round(getMaxFeedrateZ(), 4);
 		gcode.queue("G1 Z-999 F" + feedrate + " ;home z");
-		currentFeedrate = feedrate;
+		gcode.queue("G92 Z0 ;set z 0");		
 	}
 	
 	public double round(double c, double d)
