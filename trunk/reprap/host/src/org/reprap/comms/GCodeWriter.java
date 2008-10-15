@@ -154,14 +154,13 @@ public class GCodeWriter
 	 */
 	public void finish()
 	{
-		Debug.d("disposing of gcodewriter.");
+		Debug.c("disposing of gcodewriter.");
 		
 		// Wait for the ring buffer to be exhausted
 		if(!printToFile)
 		{
 			threadKilled = true;
-			while(threadKilled)
-				sleep(200);
+			while(threadKilled)	sleep(200);
 		}
 		
 		try
@@ -200,6 +199,7 @@ public class GCodeWriter
 		// Record the command in the buffer
 		ringBuffer[head] = cmd;
 		threadLock = false;
+		Debug.c("G-code: " + cmd + " queued");
 	}
 	
 	/**
@@ -229,13 +229,25 @@ public class GCodeWriter
 			// Pick up the next command in the buffer
 			tail++;
 			if(tail >= buflen) tail = 0;
-			// Send the command to the machine
-			outStream.print(ringBuffer[tail] + '\n');
-			// Message has effectively gone to the machine, so we can release the queuing thread
+			// Strip any comments and send the command to the machine
+			String cmd = ringBuffer[tail];
+			int com = cmd.indexOf(';');
+			if(com > 0)
+				cmd = cmd.substring(0, com);
+			if(com != 0)
+			{
+				cmd = cmd.trim();
+				outStream.print(cmd + "\n");
+				// Message has effectively gone to the machine, so we can release the queuing thread
+				threadLock = false;				
+				outStream.flush();
+				Debug.c("G-code: " + cmd + " dequeued and sent");
+				// Wait for the machine to respond before we send the next command
+				waitForOK();
+			} else
+				Debug.c("G-code: " + ringBuffer[tail] + " not sent");
+			// Just for safety
 			threadLock = false;
-			outStream.flush();
-			// Wait for the machine to respond before we send the next command
-			waitForOK();
 		}
 	}
 
@@ -259,25 +271,21 @@ public class GCodeWriter
 				i = -1;
 			}
 
-			//nothing found.
-			if (i == -1)
-				break;
-			else
+			//anything found?
+			if (i >= 0)
 			{
 				char c = (char)i;
-//				if(c == '\n' || c == '\r')
-//					System.out.print("\\n");
-//				else
-//					System.out.print(c);
 
 				//is it at the end of the line?
 				if (c == '\n' || c == '\r')
 				{
 					if (resp.startsWith("ok"))
-						return;
-					else if (resp.startsWith("T:"))
 					{
-						Debug.d("GCodeWriter.waitForOK() - temperature reading: " + resp);
+						Debug.c("GCode acknowledged");
+						return;
+					} else if (resp.startsWith("T:"))
+					{
+						Debug.c("GCodeWriter.waitForOK() - temperature reading: " + resp);
 					} 
 					else if (resp.startsWith("start") || resp.contentEquals(""))
 					{	
@@ -285,7 +293,7 @@ public class GCodeWriter
 					}else
 					{
 						//Gone wrong.  Start again.
-						Debug.d("GCodeWriter.waitForOK() dud response: " + resp);
+						Debug.c("GCodeWriter.waitForOK() dud response: " + resp);
 						count++;
 						if(count >= 3)
 						{
@@ -315,11 +323,13 @@ public class GCodeWriter
 		//commands.add(cmd);
 		
 		if (printToFile)
+		{
 			outStream.println(cmd);
-		else
+			Debug.c("G-code: " + cmd + " written to file");
+		} else
 			bufferQueue(cmd);
 		
-		Debug.d("Queued G-code: " + cmd);
+
 	}
 	
 //	private void cleanSerialBuffer()
@@ -343,7 +353,7 @@ public class GCodeWriter
 //			//save it back.
 //			commands.set(currentCommand, next);
 //			
-//			Debug.d(oldString + " converted to: " + next);
+//			Debug.c(oldString + " converted to: " + next);
 //		}
 //	}
 	
@@ -402,7 +412,7 @@ public class GCodeWriter
 //				
 //				//debug... let us know whts up!
 //				Debug.c("Sent: " + next);
-//				Debug.d("Buffer: " + bufferSize + " (" + bufferLength + " commands)");
+//				Debug.c("Buffer: " + bufferSize + " (" + bufferLength + " commands)");
 //				
 //				if (nextCommandToSend == commands.size())
 //					break;
@@ -449,7 +459,7 @@ public class GCodeWriter
 //							currentCommand++;
 //							result = "";
 //							
-//							Debug.d("Buffer: " + bufferSize + " (" + bufferLength + " commands)");
+//							Debug.c("Buffer: " + bufferSize + " (" + bufferLength + " commands)");
 //
 //							//bail, buffer is almost empty.  fill it!
 //							if (bufferLength < 2)
@@ -457,10 +467,10 @@ public class GCodeWriter
 //							
 //							//we'll never get here.. for testing.
 //							if (bufferLength == 0)
-//								Debug.d("Empy buffer!! :(");
+//								Debug.c("Empy buffer!! :(");
 //						}
 //						else if (result.startsWith("T:"))
-//							Debug.d(result.substring(0, result.length()-2));
+//							Debug.c(result.substring(0, result.length()-2));
 //						else
 //							Debug.c(result.substring(0, result.length()-2));
 //							
@@ -480,7 +490,7 @@ public class GCodeWriter
 		int baudRate = 19200;
 		
 		//open our port.
-		Debug.d("GCode opening port " + portName);
+		Debug.c("GCode opening port " + portName);
 		try 
 		{
 			CommPortIdentifier commId = CommPortIdentifier.getPortIdentifier(portName);
@@ -512,7 +522,7 @@ public class GCodeWriter
 					SerialPort.PARITY_NONE);
 		}
 		catch (UnsupportedCommOperationException e) {
-			Debug.d("An unsupported comms operation was encountered.");
+			Debug.c("An unsupported comms operation was encountered.");
 			openFile("stdout");
 			return;		
 		}
@@ -534,7 +544,7 @@ public class GCodeWriter
 		try {
 			port.enableReceiveTimeout(1);
 		} catch (UnsupportedCommOperationException e) {
-			Debug.d("Read timeouts unsupported on this platform");
+			Debug.c("Read timeouts unsupported on this platform");
 		}
 
 		//create our steams
@@ -543,13 +553,13 @@ public class GCodeWriter
 			inStream = port.getInputStream();
 			outStream = new PrintStream(writeStream);
 		} catch (IOException e) {
-			Debug.d("Error opening serial port stream.");
+			Debug.c("Error opening serial port stream.");
 			openFile("stdout");
 			return;		
 		}
 
 		//arduino bootloader skip.
-		Debug.d("Attempting to initialize Arduino");
+		Debug.c("Attempting to initialize Arduino");
         try {Thread.sleep(1000);} catch (Exception e) {}
         for(int i = 0; i < 10; i++)
                 outStream.write('0');
@@ -560,7 +570,7 @@ public class GCodeWriter
 	{
 		printToFile = true;
 		
-		Debug.d("Opening file for GCode output: " + filename);
+		Debug.c("Opening file for GCode output: " + filename);
 		if (filename.equals("stdout"))
 		{
 			outStream = System.out;
@@ -569,12 +579,12 @@ public class GCodeWriter
 		{
 			try
 			{
-				Debug.d("opening: " + filename);
+				Debug.c("opening: " + filename);
 				
 				FileOutputStream fileStream = new FileOutputStream(filename);
 				outStream = new PrintStream(fileStream);
 			} catch (FileNotFoundException e) {
-				Debug.d("File '" + filename + "' not found, printing to stdout");
+				Debug.c("File '" + filename + "' not found, printing to stdout");
 				outStream = System.out;
 			}
 		}
