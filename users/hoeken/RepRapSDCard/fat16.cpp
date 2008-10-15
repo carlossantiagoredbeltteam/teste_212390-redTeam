@@ -13,7 +13,6 @@
 #include "fat16.h"
 #include "fat16_config.h"
 #include "sd-reader_config.h"
-#include "util.h"
 
 #include <string.h>
 

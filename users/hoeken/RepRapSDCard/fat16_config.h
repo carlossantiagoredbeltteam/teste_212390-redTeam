@@ -11,6 +11,9 @@
 #ifndef FAT16_CONFIG_H
 #define FAT16_CONFIG_G
 
+#define UINT16_MAX 65535U
+#define nop asm volatile ("nop\n\t")
+
 /**
  * \addtogroup fat16
  *
