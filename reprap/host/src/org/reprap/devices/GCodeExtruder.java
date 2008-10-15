@@ -39,7 +39,9 @@ public class GCodeExtruder extends GenericExtruder
 	
 	public double getTemperature()
 	{
-		return getTemperatureTarget();
+		gcode.queueRespond("M105; get temperature");
+		String r = gcode.getResponse().substring(2); // Throw away "T:"
+		return Double.parseDouble(r);
 	}
 	
 	public void setExtrusion(int speed, boolean reverse) throws IOException

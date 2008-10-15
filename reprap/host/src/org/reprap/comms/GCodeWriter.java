@@ -64,6 +64,9 @@ public class GCodeWriter
 	private String[] ringBuffer;
 	private boolean threadLock = false;
 	private Thread bufferThread;
+	private int responsesExpected = 0;
+	private boolean responseAvailable = false;
+	private String response;
 	
 //	/**
 //	* our array of gcode commands
@@ -106,6 +109,9 @@ public class GCodeWriter
 		tail = 0;
 		threadLock = false;
 		threadKilled = false;
+		responsesExpected = 0;
+		responseAvailable = false;
+		response = "";
 		try
 		{
 			portName = Preferences.loadGlobalString("Port(name)");
@@ -287,6 +293,12 @@ public class GCodeWriter
 					} else if (resp.startsWith("T:"))
 					{
 						Debug.c("GCodeWriter.waitForOK() - temperature reading: " + resp);
+						if(responsesExpected > 0)
+						{
+							response = resp;
+							responseAvailable = true;
+						} else
+							System.err.println("GCodeWriter.waitForOK(): temperature response returned when none expected.");
 					} 
 					else if (resp.startsWith("start") || resp.contentEquals(""))
 					{	
@@ -331,6 +343,45 @@ public class GCodeWriter
 			bufferQueue(cmd);
 		
 
+	}
+	
+	/**
+	 * Send a G-code command to the machine and flag that
+	 * a response is expected.
+	 * @param cmd
+	 */
+	public void queueRespond(String cmd)
+	{
+		//trim it and cleanup.
+		cmd = cmd.trim();
+		cmd = cmd.replaceAll("  ", " ");
+		
+		if (printToFile)
+		{
+			System.err.println("GCodeWriter.queueRespond() called when file being created.");
+			return;
+		}
+		responsesExpected++;
+		bufferQueue(cmd);
+	}
+	
+	/**
+	 * This hangs until the command's response is available
+	 * @return
+	 */
+	public String getResponse()
+	{
+		if(responsesExpected <= 0)
+		{
+			System.err.println("GCodeWriter.getResponse() called when no response expected.");
+			responsesExpected = 0;
+			responseAvailable = false;
+			return "";
+		}
+		while(!responseAvailable) sleep(31);
+		responseAvailable = false;
+		responsesExpected--;
+		return response;
 	}
 	
 //	private void cleanSerialBuffer()
