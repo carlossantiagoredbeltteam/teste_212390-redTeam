@@ -16,6 +16,8 @@ int milli_delay;
 #define ENABLE_ON HIGH
 #endif
 
+#define ENDSTOPS_MIN_ENABLED 1
+
 void init_steppers()
 {
 	//turn them off to start.

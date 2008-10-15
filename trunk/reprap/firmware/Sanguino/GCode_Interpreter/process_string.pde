@@ -41,7 +41,7 @@ FloatPoint current_steps;
 FloatPoint target_steps;
 FloatPoint delta_steps;
 
-boolean abs_mode = false; //0 = incremental; 1 = absolute
+boolean abs_mode = true; //0 = incremental; 1 = absolute
 
 //default to mm for units
 float x_units = X_STEPS_PER_MM;
@@ -151,7 +151,7 @@ void process_string(char instruction[], int size)
 		return;
 
 	//init baby!
-	FloatPoint fp; // Surely this needs to be preserved between calls?  - AB
+	FloatPoint fp; 
 	fp.x = 0.0;
 	fp.y = 0.0;
 	fp.z = 0.0;
@@ -215,7 +215,6 @@ void process_string(char instruction[], int size)
 				// Use our max for G0
 				else
 					feedrate_micros = getMaxSpeed();
-                                Serial.println("G1");
 				//finally move.
 				dda_move(feedrate_micros);
 				break;
@@ -293,7 +292,7 @@ void process_string(char instruction[], int size)
 
 			
 			case 4: //Dwell
-				delay((int)(gc.P));  // Changed by AB from 1000*gc.P
+				delay((int)(gc.P + 0.5));  // Changed by AB from 1000*gc.P
 				break;
 
 				//Inches for Units
@@ -316,7 +315,7 @@ void process_string(char instruction[], int size)
 				calculate_deltas();
 				break;
 
-				//go home. // Make these coords negative to force use of endstops?
+				//go home.
 			case 28:
 				set_target(0.0, 0.0, 0.0);
 				dda_move(getMaxSpeed());
@@ -404,8 +403,8 @@ void process_string(char instruction[], int size)
 				break;
 
 			
-			case 92: //Set as home
-				set_position(0.0, 0.0, 0.0);
+			case 92: //Set position as fp
+				set_position(fp.x, fp.y, fp.z);
 				break;
 
 				/*
@@ -471,14 +470,14 @@ void process_string(char instruction[], int size)
 				{
 					extruder_set_temperature((int)gc.S);
 
-					//warmup if we're too cold.
-					while (extruder_get_temperature() < extruder_target_celsius)
-					{
-						extruder_manage_temperature();
-						Serial.print("T: ");
-						Serial.println(extruder_get_temperature());
-						delay(1000);
-					}
+//					//warmup if we're too cold.
+//					while (extruder_get_temperature() < extruder_target_celsius)
+//					{
+//						extruder_manage_temperature();
+//						Serial.print("T: ");
+//						Serial.println(extruder_get_temperature());
+//						delay(1000);
+//					}
 				}
 				break;
 

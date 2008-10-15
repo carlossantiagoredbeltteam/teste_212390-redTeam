@@ -43,7 +43,7 @@ void loop()
 	extruder_manage_temperature();
 
 	//read in characters if we got them.
-	if (Serial.available() > 0)
+	if (Serial.available())
 	{
 		c = Serial.read();
                 if(c == '\r')

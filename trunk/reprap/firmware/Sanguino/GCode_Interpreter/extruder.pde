@@ -4,6 +4,7 @@
 
 #define EXTRUDER_FORWARD true
 #define EXTRUDER_REVERSE false
+#define TEMPERATURE_SAMPLES 3
 
 //these our the default values for the extruder.
 int extruder_speed = 128;
@@ -24,8 +25,8 @@ bool valve_open = false;
 
 void init_extruder()
 {
-	//default to room temp.
-	extruder_set_temperature(21);
+	//default to cool...
+	extruder_set_temperature(-273);
 	
 	//setup our pins
 	pinMode(EXTRUDER_MOTOR_DIR_PIN, OUTPUT);
@@ -44,8 +45,21 @@ void init_extruder()
 	digitalWrite(VALVE_ENABLE_PIN, 0);
 }
 
+void wait_for_heater()
+{
+  //warmup if we're too cold.
+  while (extruder_get_temperature() < (extruder_target_celsius - 5))
+  {
+	extruder_manage_temperature();
+	//Serial.print("T: ");
+        //Serial.println(extruder_get_temperature());
+	delay(1000);
+  }  
+}
+
 void valve_set(bool open, int millis)
 {
+        wait_for_heater();
 	valve_open = open;
 	digitalWrite(VALVE_DIR_PIN, open);
         digitalWrite(VALVE_ENABLE_PIN, 1);
@@ -62,6 +76,8 @@ void extruder_set_direction(bool direction)
 
 void extruder_set_speed(byte speed)
 {
+        if(speed > 0)
+          wait_for_heater();
 	analogWrite(EXTRUDER_MOTOR_SPEED_PIN, speed);
 }
 
