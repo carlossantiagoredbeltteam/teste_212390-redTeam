@@ -134,6 +134,9 @@ void loop()
     case 'v':
       extruder_valve_test();
       break;
+    case 'f':
+      extruder_fan_test();
+      break;
       
   default:
       Serial.println("Commands:\n");
@@ -143,6 +146,7 @@ void loop()
       Serial.println(" h - extruder heater test");
       Serial.println(" e - extruder drive test");
       Serial.println(" v - extruder valve test");
+      Serial.println(" f - extruder fan test");
       Serial.println(" s - stop current test at the end of its cycle then print this list\n\n");
       Serial.print("Command: ");
       c = 0;

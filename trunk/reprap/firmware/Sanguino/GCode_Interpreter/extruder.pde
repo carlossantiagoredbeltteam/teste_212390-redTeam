@@ -2,9 +2,8 @@
 
 #include "ThermistorTable.h"
 
-#define EXTRUDER_FORWARD true
-#define EXTRUDER_REVERSE false
-#define TEMPERATURE_SAMPLES 3
+#define EXTRUDER_0_FORWARD true
+#define EXTRUDER_0_REVERSE false
 
 //these our the default values for the extruder.
 int extruder_speed = 128;
@@ -20,7 +19,7 @@ long extruder_delay = 0;
 int extruder_error = 0;
 int last_extruder_error = 0;
 int extruder_error_delta = 0;
-bool extruder_direction = EXTRUDER_FORWARD;
+bool extruder_direction = EXTRUDER_0_FORWARD;
 bool valve_open = false;
 
 void init_extruder()
@@ -29,20 +28,20 @@ void init_extruder()
 	extruder_set_temperature(-273);
 	
 	//setup our pins
-	pinMode(EXTRUDER_MOTOR_DIR_PIN, OUTPUT);
-	pinMode(EXTRUDER_MOTOR_SPEED_PIN, OUTPUT);
-	pinMode(EXTRUDER_HEATER_PIN, OUTPUT);
-	pinMode(EXTRUDER_FAN_PIN, OUTPUT);
-	pinMode(VALVE_DIR_PIN, OUTPUT); 
-        pinMode(VALVE_ENABLE_PIN, OUTPUT);
+	pinMode(EXTRUDER_0_MOTOR_DIR_PIN, OUTPUT);
+	pinMode(EXTRUDER_0_MOTOR_SPEED_PIN, OUTPUT);
+	pinMode(EXTRUDER_0_HEATER_PIN, OUTPUT);
+	pinMode(EXTRUDER_0_FAN_PIN, OUTPUT);
+	pinMode(EXTRUDER_0_VALVE_DIR_PIN, OUTPUT); 
+        pinMode(EXTRUDER_0_VALVE_ENABLE_PIN, OUTPUT);
 
 	//initialize values
-	digitalWrite(EXTRUDER_MOTOR_DIR_PIN, EXTRUDER_FORWARD);
-	analogWrite(EXTRUDER_FAN_PIN, 0);
-	analogWrite(EXTRUDER_HEATER_PIN, 0);
-	analogWrite(EXTRUDER_MOTOR_SPEED_PIN, 0);
-	digitalWrite(VALVE_DIR_PIN, false);
-	digitalWrite(VALVE_ENABLE_PIN, 0);
+	digitalWrite(EXTRUDER_0_MOTOR_DIR_PIN, EXTRUDER_0_FORWARD);
+	analogWrite(EXTRUDER_0_FAN_PIN, 0);
+	analogWrite(EXTRUDER_0_HEATER_PIN, 0);
+	analogWrite(EXTRUDER_0_MOTOR_SPEED_PIN, 0);
+	digitalWrite(EXTRUDER_0_VALVE_DIR_PIN, false);
+	digitalWrite(EXTRUDER_0_VALVE_ENABLE_PIN, 0);
 }
 
 void wait_for_heater()
@@ -61,29 +60,29 @@ void valve_set(bool open, int millis)
 {
         wait_for_heater();
 	valve_open = open;
-	digitalWrite(VALVE_DIR_PIN, open);
-        digitalWrite(VALVE_ENABLE_PIN, 1);
+	digitalWrite(EXTRUDER_0_VALVE_DIR_PIN, open);
+        digitalWrite(EXTRUDER_0_VALVE_ENABLE_PIN, 1);
         delay(millis);
-        digitalWrite(VALVE_ENABLE_PIN, 0);
+        digitalWrite(EXTRUDER_0_VALVE_ENABLE_PIN, 0);
 }
 
 
 void extruder_set_direction(bool direction)
 {
 	extruder_direction = direction;
-	digitalWrite(EXTRUDER_MOTOR_DIR_PIN, direction);
+	digitalWrite(EXTRUDER_0_MOTOR_DIR_PIN, direction);
 }
 
 void extruder_set_speed(byte speed)
 {
         if(speed > 0)
           wait_for_heater();
-	analogWrite(EXTRUDER_MOTOR_SPEED_PIN, speed);
+	analogWrite(EXTRUDER_0_MOTOR_SPEED_PIN, speed);
 }
 
 void extruder_set_cooler(byte speed)
 {
-	analogWrite(EXTRUDER_FAN_PIN, speed);
+	analogWrite(EXTRUDER_0_FAN_PIN, speed);
 }
 
 void extruder_set_temperature(int temp)
@@ -98,9 +97,9 @@ void extruder_set_temperature(int temp)
 */
 int extruder_get_temperature()
 {
-	if (EXTRUDER_THERMISTOR_PIN > -1)
+	if (EXTRUDER_0_THERMISTOR_PIN > -1)
 		return extruder_read_thermistor();
-	else if (EXTRUDER_THERMOCOUPLE_PIN > -1)
+	else if (EXTRUDER_0_THERMOCOUPLE_PIN > -1)
 		return extruder_read_thermocouple();
 }
 
@@ -109,7 +108,7 @@ int extruder_get_temperature()
 */
 int extruder_read_thermistor()
 {
-	int raw = extruder_sample_temperature(EXTRUDER_THERMISTOR_PIN);
+	int raw = extruder_sample_temperature(EXTRUDER_0_THERMISTOR_PIN);
 
 	int celsius = 0;
 	byte i;
@@ -141,7 +140,7 @@ int extruder_read_thermistor()
 */
 int extruder_read_thermocouple()
 {
-	return ( 5.0 * extruder_sample_temperature(EXTRUDER_THERMOCOUPLE_PIN) * 100.0) / 1024.0;
+	return ( 5.0 * extruder_sample_temperature(EXTRUDER_0_THERMOCOUPLE_PIN) * 100.0) / 1024.0;
 }
 
 /*
@@ -183,7 +182,7 @@ void extruder_manage_temperature()
         // Only update heat if it changed
         if (extruder_heater_current != newheat) {
                 extruder_heater_current = newheat;
-                analogWrite(EXTRUDER_HEATER_PIN, extruder_heater_current);
+                analogWrite(EXTRUDER_0_HEATER_PIN, extruder_heater_current);
         }
 }
 
@@ -198,14 +197,14 @@ void extruder_heater_test()
   {
     Serial.println("\n *** Turning heater on.\n");
     heat_on = true;
-    analogWrite(EXTRUDER_HEATER_PIN, extruder_heater_high);
+    analogWrite(EXTRUDER_0_HEATER_PIN, extruder_heater_high);
   }
 
   if(t > 100 && heat_on)
   {
     Serial.println("\n *** Turning heater off.\n");
     heat_on = false;
-    analogWrite(EXTRUDER_HEATER_PIN, 0);
+    analogWrite(EXTRUDER_0_HEATER_PIN, 0);
   } 
  
   Serial.print("Temperature: ");
@@ -248,5 +247,19 @@ void extruder_valve_test()
     Serial.println("Pausing for 2 seconds.");
     delay(2000);  
 }
+
+void extruder_fan_test()
+{
+    Serial.println("Fan on.");
+    extruder_set_cooler(255);
+    Serial.println("Pausing for 2 seconds.");
+    delay(2000);  
+    Serial.println("Fan off.");
+    extruder_set_cooler(0);
+    Serial.println("Pausing for 2 seconds.");
+    delay(2000);  
+}
+
+
 
 #endif

@@ -74,7 +74,7 @@ void dda_move(long micro_delay)
 	bool x_can_step = 0;
 	bool y_can_step = 0;
 	bool z_can_step = 0;
-	
+
 	//how long do we delay for?
 	if (micro_delay >= 16383)
 		milli_delay = micro_delay / 1000;
