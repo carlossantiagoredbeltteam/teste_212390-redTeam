@@ -366,23 +366,30 @@ private void recallAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
 }//GEN-LAST:event_recallAllButtonActionPerformed
 
 private void goButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goButtonActionPerformed
+	double x = printer.getX();
+	double y = printer.getY();
 	double z = printer.getZ();
+	double xTo = xStepperPositionJPanel.getTargetPositionInMM();
+	double yTo = yStepperPositionJPanel.getTargetPositionInMM();
 	double zTo = zStepperPositionJPanel.getTargetPositionInMM();
-	setMotorSpeeds();
+
 	try
 	{
 		if(z >= zTo)
 		{
-			yStepperPositionJPanel.moveToTargetBlocking();
-			xStepperPositionJPanel.moveToTargetBlocking();
-			zStepperPositionJPanel.moveToTargetBlocking();
+			printer.setFeedrate(Double.parseDouble(xySpeedField.getText()));
+			printer.moveTo(xTo, yTo, z, false, false);
+			printer.setFeedrate(Double.parseDouble(zSpeedField.getText()));
+			printer.moveTo(xTo, yTo, zTo, false, false);
 		} else
 		{
-			zStepperPositionJPanel.moveToTargetBlocking();
-			yStepperPositionJPanel.moveToTargetBlocking();
-			xStepperPositionJPanel.moveToTargetBlocking();    	
+			printer.setFeedrate(Double.parseDouble(zSpeedField.getText()));
+			printer.moveTo(x, y, zTo, false, false);
+			printer.setFeedrate(Double.parseDouble(xySpeedField.getText()));
+			printer.moveTo(xTo, yTo, zTo, false, false);	
 		}
-	} catch (Exception ex) {}
+	} catch (Exception e)
+	{}
 }//GEN-LAST:event_goButtonActionPerformed
 
 

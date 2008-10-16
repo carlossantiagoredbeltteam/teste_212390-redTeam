@@ -9,10 +9,10 @@ import java.io.IOException;
 import javax.swing.JOptionPane;
 import org.reprap.Preferences;
 import org.reprap.Printer;
-import org.reprap.AxisMotor;
-import org.reprap.comms.Communicator;
+//import org.reprap.AxisMotor;
+//import org.reprap.comms.Communicator;
 //import org.reprap.comms.snap.SNAPAddress;
-import org.reprap.devices.GenericStepperMotor;
+//import org.reprap.devices.GenericStepperMotor;
 
 /**
  *
@@ -20,13 +20,13 @@ import org.reprap.devices.GenericStepperMotor;
  */
 public class StepperPositionJPanel extends javax.swing.JPanel {
 
-    private Communicator communicator;
+    //private Communicator communicator;
     private int motorID;
     private String axis;
-    private GenericStepperMotor motor;
+    //private GenericStepperMotor motor;
     private Printer printer;
 
-    private double fastSpeed;
+    private double currentSpeed;
     private double motorStepsPerMM;
     private double axisLength;
     private double nudgeSize;
@@ -47,30 +47,30 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
         {
         case 1:
                 axis = "X";
-                motor = printer.getXMotor();
+                //motor = printer.getXMotor();
                 axisLength = 160; // TODO: Replace with Prefs when Java3D parameters work for small wv's.
                 break;
         case 2:
                 axis = "Y";
-                motor = printer.getYMotor();
+                //motor = printer.getYMotor();
                 axisLength = 160; // TODO: Replace with Prefs when Java3D parameters work for small wv's.
                 break;
         case 3:
                 axis = "Z";
-                motor = printer.getZMotor();
+                //motor = printer.getZMotor();
                 axisLength = 80; // TODO: Replace with Prefs when Java3D parameters work for small wv's.
                 break;
         default:
                 axis = "X";
-        		motor = printer.getXMotor();
+        		//motor = printer.getXMotor();
                 System.err.println("StepperPanel - dud axis id:" + motorID);
         }
         
-        if(!motor.isAvailable())
-        {
-            deactivateMotorPanel();  
-            return;
-        }
+//        if(!motor.isAvailable())
+//        {
+//            deactivateMotorPanel();  
+//            return;
+//        }
         
         targetPosition.setEnabled(true);
         stepDownButton.setEnabled(true);
@@ -79,7 +79,7 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
         targetPosition.setText("0");
         storedPosition.setText("0");
         
-        int address = Preferences.loadGlobalInt(axis + "Axis" + "Address");
+        //int address = Preferences.loadGlobalInt(axis + "Axis" + "Address");
         
         //motor = new GenericStepperMotor(communicator, new SNAPAddress(address), Preferences.getGlobalPreferences(), motorID);
 
@@ -91,8 +91,8 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
     }
     
     private void deactivateMotorPanel() {
-            motor.dispose();
-            motor = null;
+            //motor.dispose();
+            //motor = null;
             axisLabel.setEnabled(false);
             targetPosition.setEnabled(false);
             //endButton.setEnabled(false);
@@ -103,18 +103,32 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
             stepUpButton.setEnabled(false);
     }
     
-    private int getSpeedFromFeed(double f)
-    {
-    	if (axis.equals("Z"))
-    		return printer.convertFeedrateToSpeedZ(f);
-    	else
-    		return printer.convertFeedrateToSpeedXY(f);
-    }
+//    private int getSpeedFromFeed(double f)
+//    {
+//    	if (axis.equals("Z"))
+//    		return printer.convertFeedrateToSpeedZ(f);
+//    	else
+//    		return printer.convertFeedrateToSpeedXY(f);
+//    }
     
     public void homeAxis() {
         try {
             setSpeed();
-            motor.homeReset(getSpeedFromFeed(fastSpeed));
+			switch(motorID)
+			{
+			case 1:
+				printer.homeToZeroX();
+				break;
+			case 2:
+				printer.homeToZeroY();
+				break;
+			case 3:
+				printer.homeToZeroZ();
+				break;
+			default:
+				System.err.println("StepperPositionPanel - homeReset.  Dud motor id: " + motorID);
+			}
+            //motor.homeReset(getSpeedFromFeed(currentSpeed));
             targetPosition.setText("0");
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Could not home motor: " + ex);
@@ -122,10 +136,15 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
     }
     
     public void setSpeed() {
-        if (axis.equals("Z")) 
-        	fastSpeed = Double.parseDouble(org.reprap.gui.botConsole.XYZTabPanel.zSpeedField.getText());
-        else
-       		fastSpeed = Double.parseDouble(org.reprap.gui.botConsole.XYZTabPanel.xySpeedField.getText());
+        if (axis.equals("Z"))
+        {
+        	currentSpeed = Double.parseDouble(org.reprap.gui.botConsole.XYZTabPanel.zSpeedField.getText());
+        	printer.setFeedrate(currentSpeed);
+        } else
+        {
+       		currentSpeed = Double.parseDouble(org.reprap.gui.botConsole.XYZTabPanel.xySpeedField.getText());
+       		printer.setFeedrate(currentSpeed);
+        }
     }
     
     public double getTargetPositionInMM() {
@@ -141,33 +160,59 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
         return targetMM;
     }
     
-    private int getTargetPositionInSteps() {
-        double targetMM = getTargetPositionInMM();
-        return (int)Math.round(targetMM * motorStepsPerMM);
-    }
-    
-    private double stepsToMM(int steps)
-    {
-        return (double)steps/motorStepsPerMM;
-    }
+//    private int getTargetPositionInSteps() {
+//        double targetMM = getTargetPositionInMM();
+//        return (int)Math.round(targetMM * motorStepsPerMM);
+//    }
+//    
+//    private double stepsToMM(int steps)
+//    {
+//        return (double)steps/motorStepsPerMM;
+//    }
     
     public void moveToTarget() {
-	    	try {
-	        	motor.seek(getSpeedFromFeed(fastSpeed), getTargetPositionInSteps());
-	        } 
-	        catch (Exception ex) {
-	            JOptionPane.showMessageDialog(null, axis + " motor could not seek: " + ex);
-	        }
+    	    setSpeed();
+    		double x, y, z, p;
+    		x = printer.getX();
+    		y = printer.getY();
+    		z = printer.getZ();
+    		p = getTargetPositionInMM();
+    		try
+    		{
+    			switch(motorID)
+    			{
+    			case 1:
+    				x = p;
+    				break;
+    			case 2:
+    				y = p;
+    				break;
+    			case 3:
+    				z = p;
+    				break;
+    			default:
+    				System.err.println("moveToTarget()  Dud motor id: " + motorID);
+    			}
+    			printer.moveTo(x, y, z, false, false);
+    		} catch (Exception ex)
+    		{}
+//	    	try {
+//	        	motor.seek(getSpeedFromFeed(currentSpeed), getTargetPositionInSteps());
+//	        } 
+//	        catch (Exception ex) {
+//	            JOptionPane.showMessageDialog(null, axis + " motor could not seek: " + ex);
+//	        }
     }
     
-    public void moveToTargetBlocking() {
-    		try {
-                motor.seekBlocking(getSpeedFromFeed(fastSpeed), getTargetPositionInSteps());
-            } 
-            catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, axis + " motor could not block: " + ex);
-            }
-    }
+//    public void moveToTargetBlocking() {
+//    	    setSpeed();
+//    		try {
+//                motor.seekBlocking(getSpeedFromFeed(currentSpeed), getTargetPositionInSteps());
+//            } 
+//            catch (Exception ex) {
+//                JOptionPane.showMessageDialog(null, axis + " motor could not block: " + ex);
+//            }
+//    }
     
     public double round(double Rval, int r2dp) {
         double p = (Double)Math.pow(10,r2dp);
@@ -348,12 +393,26 @@ private void homeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 
 public void store()
 {
-    int moPos = 0;
-    try
-    {   
-        moPos = motor.getPosition();
-    } catch (Exception ex) {}
-    double pos = stepsToMM(moPos);
+    double pos = 0;
+		switch(motorID)
+		{
+		case 1:
+			pos = printer.getX();
+			break;
+		case 2:
+			pos = printer.getY();
+			break;
+		case 3:
+			pos = printer.getZ();
+			break;
+		default:
+			System.err.println("store()  Dud motor id: " + motorID);
+		}
+//    try
+//    {   
+//        moPos = motor.getPosition();
+//    } catch (Exception ex) {}
+//    double pos = stepsToMM(moPos);
     storedPosition.setText("" + round(pos, 2));    
 }
 

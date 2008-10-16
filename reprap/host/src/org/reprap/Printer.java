@@ -77,6 +77,13 @@ public interface Printer {
 	public void homeToZeroY() throws ReprapException, IOException; 
 	
 	/**
+	 * Sync to zero Z location.
+	 * @throws ReprapException
+	 * @throws IOException
+	 */
+	public void homeToZeroZ() throws ReprapException, IOException; 
+	
+	/**
 	 * Select a specific material to print with
 	 * @param attributes with name of the material
 	 */

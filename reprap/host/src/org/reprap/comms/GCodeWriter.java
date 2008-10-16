@@ -341,8 +341,6 @@ public class GCodeWriter
 			Debug.c("G-code: " + cmd + " written to file");
 		} else
 			bufferQueue(cmd);
-		
-
 	}
 	
 	/**
@@ -366,17 +364,17 @@ public class GCodeWriter
 	}
 	
 	/**
-	 * This hangs until the command's response is available
+	 * This sleeps until the command's response is available
 	 * @return
 	 */
 	public String getResponse()
 	{
-		if(responsesExpected <= 0)
+		if(printToFile || responsesExpected <= 0)
 		{
 			System.err.println("GCodeWriter.getResponse() called when no response expected.");
 			responsesExpected = 0;
 			responseAvailable = false;
-			return "";
+			return "0000"; // Safest compromise
 		}
 		while(!responseAvailable) sleep(31);
 		responseAvailable = false;
