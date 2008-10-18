@@ -46,6 +46,9 @@ public class GCodeExtruder extends GenericExtruder
 	
 	public void setExtrusion(int speed, boolean reverse) throws IOException
 	{
+		if(extrusionSpeed < 0)
+			return;
+		
 		if (speed == 0)
 		{
 			gcode.queue("M103" + " ;extruder off");
@@ -89,6 +92,8 @@ public class GCodeExtruder extends GenericExtruder
 
 	public void setValve(boolean valveOpen) throws IOException
 	{
+		if(valvePulseTime <= 0)
+			return;
 		if (valveOpen)
 			gcode.queue("M126 P" + valvePulseTime + ";valve open");
 		else
