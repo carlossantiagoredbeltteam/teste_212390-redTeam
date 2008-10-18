@@ -2,20 +2,13 @@
 <?xml version='1.0' standalone='yes' ?>
 <!--  xml header for scripts & plugin manager --> 
 <script>
-	<name>Join Objects</name>
-	<author>Julian MacDonald</author>
-	<version>1.8</version>
-    <beta>2</beta>
-	<date>23/08/2007</date>
+	<name>JMeta Union</name>
+	<author>Philipp Tiefenbacher</author>
+	<version>0.1</version>
+    <beta>1</beta>
+	<date>23/10/2008</date>
 	<description>
-This script joins a set of selected objects into a single triangle mesh
-non-triangle meshes are converted to triangle meshes using the user-entered Max Error.
-Smoothness values for vertices and edges are retained.  There is also the ability to 'weld' vertices
-within a certain distance of each other.  
-Textures are also partly retained.
-Still to do:  	support for layered textures
-Problems:	texture scaling/orientation/position not retained correctly (need access to methods - Peter to allow in next version)
-		if a texture is used more than once with different mappings, only the last mapping is transferred.
+This script unions all selected Objects
     </description>
     <comments>
     </comments>
@@ -47,4 +40,6 @@ for(int i=1;i<sel.length;i++)
 window.addObject(oo2, new CoordinateSystem(), "MetaUnion", null);
 
 
-//new MessageDialog(window,"Done");
+
+
+
