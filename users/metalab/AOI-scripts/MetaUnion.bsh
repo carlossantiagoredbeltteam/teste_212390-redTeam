@@ -17,7 +17,8 @@ This script unions all selected Objects
 
 
 scene=window.getScene();
-sel=scene.getSelection();
+sel=window.getSelectedIndices();
+
 //
 // make sure at least 2 objects have been selected
 if (sel.length<2) 
@@ -28,18 +29,16 @@ if (sel.length<2)
 
 
 o1 = scene.getObject(sel[0]);
-oo2 = o1;
 
 for(int i=1;i<sel.length;i++)
 {
 	o1 = new CSGObject(o1, scene.getObject(sel[i]), CSGObject.UNION);  // get the ith ObjInfo
-	oo2 = o1;
-	o1 = new ObjectInfo(o1, new CoordinateSystem(), "xxx");
+	o1 = new ObjectInfo(o1, new CoordinateSystem(), "MetaUnion");
 }
+for(int i=0;i<sel.length;i++) {
+	scene.getObject(sel[i]).setVisible(false);
+}
+window.clearSelection();
 
-window.addObject(oo2, new CoordinateSystem(), "MetaUnion", null);
-
-
-
-
-
+window.addObject(o1, null);
+window.addToSelection(scene.indexOf(o1));
