@@ -87,4 +87,8 @@ public class NullCartesianMachine extends GenericCartesianPrinter {
 	public void machineWait(double milliseconds)
 	{
 	}
+	
+	public void waitWhileBufferNotEmpty()
+	{
+	}
 }

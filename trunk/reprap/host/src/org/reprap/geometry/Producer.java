@@ -297,6 +297,7 @@ public class Producer {
 			
 			if(layerRules.recomputeLayer())
 			{
+				reprap.waitWhileBufferNotEmpty();
 				layer.destroy();
 				slice.destroy();
 				slice = stlc.slice(layerRules.getModelZ() + layerRules.getStep()*0.5,
@@ -353,6 +354,7 @@ public class Producer {
 				reprap.betweenLayers(layerRules);
 			}
 			
+			reprap.waitWhileBufferNotEmpty();
 			RrCSGPolygonList slice = stlc.slice(layerRules.getModelZ() + layerRules.getStep()*0.5,
 					reprap.getExtruders()); 
 			

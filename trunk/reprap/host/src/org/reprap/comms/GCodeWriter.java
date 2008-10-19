@@ -62,44 +62,23 @@ public class GCodeWriter
 	private int head, tail;
 	private static final int buflen = 100;
 	private String[] ringBuffer;
+	
+	/**
+	 * The transmission to the RepRap machine is handled by
+	 * a separate thread.  These control that.
+	 */
 	private boolean threadLock = false;
 	private Thread bufferThread;
+	
+	/**
+	 * Some commands (at the moment just M105 - get temperature) generate
+	 * a response.  Return that as a string.
+	 */
 	private int responsesExpected = 0;
 	private boolean responseAvailable = false;
 	private String response;
 	
-//	/**
-//	* our array of gcode commands
-//	*/
-//	private Vector commands;
-//	
-//	/**
-//	* our pointer to the currently executing command
-//	*/
-//	private int currentCommand = 0;
-//	
-//	/**
-//	* what was the last command we sent? (we may send commands faster than it can process)
-//	*/
-//	private int nextCommandToSend = 0;
-//	
-//	/**
-//	* the size of the buffer on the GCode host
-//	*/
-//	private int maxBufferSize = 128;
-//	
-//	/**
-//	* the amount of data we've sent and is in the buffer.
-//	*/
-//	private int bufferSize = 0;
-//	
-//	/**
-//	* how many commands do we have in the buffer?
-//	*/
-//	private int bufferLength = 0;
-//	
-//	private String result = "";
-//	
+
 		
 	public GCodeWriter()
 	{
@@ -111,7 +90,7 @@ public class GCodeWriter
 		threadKilled = false;
 		responsesExpected = 0;
 		responseAvailable = false;
-		response = "";
+		response = "0000";
 		try
 		{
 			portName = Preferences.loadGlobalString("Port(name)");
@@ -131,6 +110,7 @@ public class GCodeWriter
          */
 		if(!printToFile)
 		{
+			int thisPriority = Thread.currentThread().getPriority();
 			bufferThread = new Thread() 
 			{
 				public void run() 
@@ -140,6 +120,9 @@ public class GCodeWriter
 				}
 			};
 
+			// Give the dequeing thread a slightly higher priority
+			// so it doesn't sit waiting when the main thread is computing paths etc.
+			//bufferThread.setPriority(thisPriority + 1);
 			bufferThread.start();
 		}
 	}
@@ -148,7 +131,7 @@ public class GCodeWriter
 	 * Wrapper for Thread.sleep()
 	 * @param millis
 	 */
-	private void sleep(int millis)
+	public void sleep(int millis)
 	{
 		try
 		{
@@ -180,6 +163,16 @@ public class GCodeWriter
 			if (outStream != null)
 				outStream.close();
 		} catch (Exception e) {}
+	}
+	
+	/**
+	 * Anything in the buffer?  (NB this still works if we aren't
+	 * using the buffer as then head == tail == 0 always).
+	 * @return
+	 */
+	public boolean bufferEmpty()
+	{
+		return head == tail;
 	}
 	
 	/**
@@ -219,7 +212,7 @@ public class GCodeWriter
 		for(;;)
 		{
 			// Are we locked out by the queuing thread?
-			while(threadLock) sleep(211);
+			while(threadLock) sleep(29);
 			// Wait for something to be there to send
 			while(head == tail)
 			{
@@ -229,7 +222,7 @@ public class GCodeWriter
 					threadKilled = false;
 					return;
 				}
-				sleep(29);
+				sleep(211);
 			}
 			// Lock out the queuing thread
 			threadLock = true;
@@ -255,6 +248,8 @@ public class GCodeWriter
 				Debug.c("G-code: " + ringBuffer[tail] + " not sent");
 			// Just for safety
 			threadLock = false;
+			// We are running at high priority - give others a look in
+			//sleep(7);
 		}
 	}
 
@@ -318,6 +313,8 @@ public class GCodeWriter
 					resp = "";
 				} else
 					resp += c;
+				// We are running at high priority; give others a look in
+				//sleep(5);
 			}
 		}
 	}
@@ -382,157 +379,7 @@ public class GCodeWriter
 		return response;
 	}
 	
-//	private void cleanSerialBuffer()
-//	{
-//		for (currentCommand = 0; currentCommand < commands.size(); currentCommand++)
-//		{
-//			String next = (String)commands.get(currentCommand);
-//			String oldString = next;
-//			
-//			//strip comments
-//			int commentIndex = next.indexOf(';');
-//			if (commentIndex >= -1)
-//				next = next.substring(0, commentIndex);
-//			
-//			//trim whitespace
-//			next = next.trim();	
-//			
-//			//remove spaces
-//			next = next.replaceAll(" ", "");
-//			
-//			//save it back.
-//			commands.set(currentCommand, next);
-//			
-//			Debug.c(oldString + " converted to: " + next);
-//		}
-//	}
-	
-//	private void fillSerialBuffer()
-//	{
-//		cleanSerialBuffer();
-//		
-//		currentCommand = 0;
-//		nextCommandToSend = 0;
-//		
-//		//keep trying until we send all commands.
-//		while(nextCommandToSend < commands.size())
-//		{
-//			//check to see if we got a response.
-//			readResponse();
-//			
-//			//whats our next command?
-//			String next = (String)commands.get(nextCommandToSend);
-//			
-//			//skip empty commands.
-//			if (next.length() == 0)
-//			{
-//				nextCommandToSend++;
-//				continue;
-//			}
-//			
-//			//will it fit into our buffer?
-//			while (bufferSize + next.length() < maxBufferSize)
-//			{
-//				//send it a byte at a time.
-//				for (int i=0; i<next.length(); i++)
-//				{
-//					outStream.write(next.charAt(i));
-//					outStream.flush();
-//										
-//					//wait 5us between bytes.
-//					try{
-//						Thread.sleep(5);
-//					} catch (Exception e){}
-//				}
-//
-//				//newline is our delimiter.
-//				outStream.write('\n');
-//				outStream.flush();
-//				
-//				//wait between commands.
-//				try{
-//					Thread.sleep(5);
-//				} catch (Exception e){}
-//				
-//				//record it in our buffer tracker.
-//				nextCommandToSend++;
-//
-//				bufferSize += next.length() + 1;
-//				bufferLength++;
-//				
-//				//debug... let us know whts up!
-//				Debug.c("Sent: " + next);
-//				Debug.c("Buffer: " + bufferSize + " (" + bufferLength + " commands)");
-//				
-//				if (nextCommandToSend == commands.size())
-//					break;
-//				
-//				next = (String)commands.get(nextCommandToSend);
-//			}
-//		}
-//	}
-	
-//	private void readResponse()
-//	{
-//		String cmd = "";
-//		
-//		//read for any results.
-//		for (;;)
-//		{
-//			try
-//			{
-//				//read a byte.
-//				int i = inStream.read();
-//
-//				//nothing found.
-//				if (i == -1)
-//					break;
-//				else
-//				{
-//					//get it as ascii.
-//					char c = (char)i;
-//					result += c;
-//				
-//					//is it a done command?
-//					if (c == '\n')
-//					{
-//						if (result.startsWith("ok"))
-//						{
-//							cmd = (String)commands.get(currentCommand);
-//
-//							if (result.length() > 2)
-//								Debug.c("got: " + result.substring(0, result.length()-2) + "(" + bufferSize + " - " + (cmd.length() + 1) + " = " + (bufferSize - (cmd.length() + 1)) + ")");
-//
-//							bufferSize -= cmd.length() + 1;
-//							bufferLength--;
-//							
-//							currentCommand++;
-//							result = "";
-//							
-//							Debug.c("Buffer: " + bufferSize + " (" + bufferLength + " commands)");
-//
-//							//bail, buffer is almost empty.  fill it!
-//							if (bufferLength < 2)
-//								break;
-//							
-//							//we'll never get here.. for testing.
-//							if (bufferLength == 0)
-//								Debug.c("Empy buffer!! :(");
-//						}
-//						else if (result.startsWith("T:"))
-//							Debug.c(result.substring(0, result.length()-2));
-//						else
-//							Debug.c(result.substring(0, result.length()-2));
-//							
-//						result = "";
-//					}
-//				}					
-//			} catch (IOException e) {
-//				break;
-//			}
-//		}	
-//	}
-	
+
 	private void openSerialConnection(String portName)
 	{
 		printToFile = false;

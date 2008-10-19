@@ -370,4 +370,13 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	{
 		delay((long)milliseconds);
 	}
+	
+	/**
+	 * Wait until the GCodeWriter has exhausted its buffer.
+	 */
+	public void waitWhileBufferNotEmpty()
+	{
+		while(!gcode.bufferEmpty())
+			gcode.sleep(97);
+	}
 }
