@@ -379,4 +379,14 @@ public class CartesianGCode extends GenericCartesianPrinter {
 		while(!gcode.bufferEmpty())
 			gcode.sleep(97);
 	}
+	
+	public void slowBuffer()
+	{
+		gcode.slowBufferThread();
+	}
+	
+	public void speedBuffer()
+	{
+		gcode.speedBufferThread();
+	}
 }

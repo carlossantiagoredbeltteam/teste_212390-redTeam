@@ -385,6 +385,13 @@ public interface Printer {
 	public void waitWhileBufferNotEmpty();
 	
 	/**
+	 * It's also useful to be able to change its priority
+	 *
+	 */
+	public void slowBuffer();
+	public void speedBuffer();
+	
+	/**
 	 * All machine dwells and delays are routed via this function, rather than 
 	 * calling Thread.sleep - this allows them to generate the right G codes (G4) etc.
 	 * 
