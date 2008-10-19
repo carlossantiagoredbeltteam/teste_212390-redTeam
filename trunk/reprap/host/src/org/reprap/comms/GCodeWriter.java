@@ -69,6 +69,7 @@ public class GCodeWriter
 	 */
 	private boolean threadLock = false;
 	private Thread bufferThread;
+	private int myPriority;
 	
 	/**
 	 * Some commands (at the moment just M105 - get temperature) generate
@@ -105,12 +106,13 @@ public class GCodeWriter
 		else
 			openFile();
 		
-        /*
+	    /*
          * If comms is direct, fork off a thread to send buffered commands to the RepRap
-         */
+         */		
+		myPriority = Thread.currentThread().getPriority();
+		bufferThread = null;
 		if(!printToFile)
 		{
-			int thisPriority = Thread.currentThread().getPriority();
 			bufferThread = new Thread() 
 			{
 				public void run() 
@@ -120,9 +122,6 @@ public class GCodeWriter
 				}
 			};
 
-			// Give the dequeing thread a slightly higher priority
-			// so it doesn't sit waiting when the main thread is computing paths etc.
-			//bufferThread.setPriority(thisPriority + 1);
 			bufferThread.start();
 		}
 	}
@@ -174,6 +173,23 @@ public class GCodeWriter
 	{
 		return head == tail;
 	}
+	
+	/**
+	 * Between layers othing will be queued.  Use the next two
+	 * functions to stop and start the buffer spinning.
+	 *
+	 */
+	public void slowBufferThread()
+	{
+		if(bufferThread != null)
+			bufferThread.setPriority(1);
+	}
+	
+	public void speedBufferThread()
+	{
+		if(bufferThread != null)		
+			bufferThread.setPriority(myPriority);
+	}	
 	
 	/**
 	 * Queue a command into the ring buffer.  Note the use of prime time periods

@@ -91,4 +91,12 @@ public class NullCartesianMachine extends GenericCartesianPrinter {
 	public void waitWhileBufferNotEmpty()
 	{
 	}
+	
+	public void slowBuffer()
+	{
+	}
+	
+	public void speedBuffer()
+	{
+	}
 }
