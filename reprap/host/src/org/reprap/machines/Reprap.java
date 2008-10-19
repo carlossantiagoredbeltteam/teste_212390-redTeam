@@ -488,6 +488,10 @@ public class Reprap extends GenericCartesianPrinter
 		} catch (InterruptedException e) {
 		}		
 	}
+	
+	public void waitWhileBufferNotEmpty()
+	{
+	}
 }
 
 

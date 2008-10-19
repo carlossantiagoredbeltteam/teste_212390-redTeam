@@ -379,6 +379,12 @@ public interface Printer {
 	public double getZStepsPerMM();
 	
 	/**
+	 * If we are using an output buffer, it's a good idea to wait till
+	 * it's empty between layers.
+	 */
+	public void waitWhileBufferNotEmpty();
+	
+	/**
 	 * All machine dwells and delays are routed via this function, rather than 
 	 * calling Thread.sleep - this allows them to generate the right G codes (G4) etc.
 	 * 
