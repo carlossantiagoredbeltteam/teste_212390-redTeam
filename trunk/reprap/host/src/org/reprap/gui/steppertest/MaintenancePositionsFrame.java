@@ -61,9 +61,9 @@ public class MaintenancePositionsFrame  extends JFrame {
 		 * TODO: Trying to recognise null/cartesian status: Won't work?
 		 * 
 		 * //Establish connection type
-		String connection = "nullcartesian";
+		String connection = "simulator";
 		try {
-		connection = Preferences.loadGlobalString("Geometry");
+		connection = Preferences.loadGlobalString("RepRap_Machine");
 		}
 		
 		catch (Exception e){
@@ -72,7 +72,7 @@ public class MaintenancePositionsFrame  extends JFrame {
 		}
 		
 		//Initialise comms with bot
-		if (connection == "cartesian"){*/
+		if (connection == "SNAPRepRap"){*/
 			try { 
 				talkToBot();
 			}

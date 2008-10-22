@@ -721,18 +721,18 @@ public class Main {
 
             String port = "";
             String err = "";
-            String geometry = "nullcartesian";
+            String machine = "simulator";
 			Boolean use_serial = false;
 
 			try
 			{
 	            port = org.reprap.Preferences.loadGlobalString("Port(name)");
-	            geometry = org.reprap.Preferences.loadGlobalString("Geometry");
+	            machine = org.reprap.Preferences.loadGlobalString("RepRap_Machine");
 				use_serial = org.reprap.Preferences.loadGlobalBool("GCodeUseSerial");
 			}
 			catch (Exception e)	{}
 
-			if (geometry.equals("cartesian"))
+			if (machine.equals("SNAPRepRap"))
 			{
 				try
 				{
@@ -745,18 +745,18 @@ public class Main {
 					err += "Check that you have your serial connector plugged in.\n\n";
 					err += "The program will continue but your geometry preference has been set to 'nullcartesian' for this session.";
 
-					org.reprap.Preferences.setGlobalString("Geometry", "nullcartesian");
-
-					//throw new Exception(err); // Removed by AB.  We told them already...
+					org.reprap.Preferences.setGlobalString("RepRap_Machine", "simulator");
 					
 					communicator = null;
+
+					throw new Exception(err);
 				}
 				catch (gnu.io.PortInUseException e)
 				{
 					err = "\nThe " + port + " port is already in use by another program, or your bot isn't plugged in.\n";
 					err += "The program will continue but your geometry preference has been set to 'nullcartesian' for this session.";
 
-					org.reprap.Preferences.setGlobalString("Geometry", "nullcartesian");
+					org.reprap.Preferences.setGlobalString("RepRap_Machine", "simulator");
 
 					throw new Exception(err);
 				}
