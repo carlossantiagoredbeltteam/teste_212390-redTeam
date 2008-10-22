@@ -124,6 +124,11 @@ public class Reprap extends GenericCartesianPrinter
 		motorZ.refreshPreferences();
 	}
 	
+	public void startRun()
+	{
+		
+	}
+	
 	/**
 	 * Wait while the motors move about
 	 * @throws IOException

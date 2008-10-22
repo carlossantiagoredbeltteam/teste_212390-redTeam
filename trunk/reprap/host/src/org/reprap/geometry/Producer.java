@@ -196,7 +196,7 @@ public class Producer {
 		
 		//reprap.setSpeedZ(movementSpeedZ);
 		Debug.d("Intialising reprap");
-		reprap.initialise();
+		reprap.startRun();
 		// By convention, extruder 0 has the support/foundation material
 		Debug.d("Selecting material 0");
 		reprap.selectExtruder(0);
