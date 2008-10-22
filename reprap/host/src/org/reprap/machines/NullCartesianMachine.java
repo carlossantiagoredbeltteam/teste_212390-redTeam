@@ -40,6 +40,11 @@ public class NullCartesianMachine extends GenericCartesianPrinter {
 		return new NullExtruder(count);
 	}
 	
+	public void startRun()
+	{
+		
+	}
+	
 	public void waitTillNotBusy() throws IOException {}
 	public void finishedLayer(int layerNumber) throws Exception {}
 	public void betweenLayers(int layerNumber) throws Exception{}

@@ -96,6 +96,12 @@ public interface Printer {
 	public void selectExtruder(int extr);
 	
 	/**
+	 * Start a production run (as opposed to moving the machine about
+	 * interactively, for example).
+	 */
+	public void startRun() throws Exception;
+	
+	/**
 	 * Indicates end of job, homes extruder, powers down etc
 	 * @throws Exception
 	 */
@@ -142,10 +148,10 @@ public interface Printer {
 	 */
 	public boolean isCancelled();
 	
-	/**
-	 * @throws Exception
-	 */
-	public void initialise() throws Exception;
+//	/**
+//	 * @throws Exception
+//	 */
+//	public void initialise() throws Exception;
 	
 	/**
 	 * @return current X position
@@ -163,9 +169,21 @@ public interface Printer {
 	public double getZ();
 
 	/**
-	 * @return the extruder for the printer
+	 * @return the extruder currently in use
 	 */
 	public Extruder getExtruder();
+	
+	/**
+	 * @param name
+	 * @return the extruder for the material called name; null if not found.
+	 */
+	public Extruder getExtruder(String name);
+	
+	/**
+	 * Get the list of all the extruders
+	 * @return
+	 */
+	public Extruder[] getExtruders();
 	
 	/**
 	 * Stop the extrude motor (if any)
@@ -199,26 +217,6 @@ public interface Printer {
 	public void setZManual(double zeroPoint) throws IOException;
 	
 	/**
-	 * Returns the extrusion size for the currently selected material
-	 * @return the size in mm
-	 */
-//	public double getExtrusionSize();
-	
-	/**
-	 * Returns the gap between infill lines
-	 * @return the size in mm
-	 */
-//	public double getInfillWidth();	
-	
-	/**
-	 * Related to the getExtrusionSize, except this is the height
-	 * of material that forms after any settling has taken place. 
-	 * @return the extrusion height in mm
-	 */
-//	public double getExtrusionHeight();
-
-	
-	/**
 	 * Get the total distance moved (whether extruding or not)
 	 * @return a double representing the distance travelled (mm)
 	 */
@@ -229,26 +227,6 @@ public interface Printer {
 	 * @return a double representing the distance travelled (mm)
 	 */
 	public double getTotalDistanceExtruded();
-	
-	/**
-	 * Turn on or off the layer cooling system
-	 * @param enable
-	 */
-//	public void setCooling(boolean enable) throws IOException;
-	
-	/**
-	 * Get the length before the end of a track to turn the extruder off
-	 * to allow for the delay in the stream stopping.
-	 * @return
-	 */
-//	public double getOverRun();
-	
-	/**
-	 * Get the number of milliseconds to wait between turning an 
-	 * extruder on and starting to move it.
-	 * @return
-	 */
-//	public long getDelay();
 
 	/**
 	 * @return total time the extruder has been moving in seconds
@@ -256,24 +234,14 @@ public interface Printer {
 	public double getTotalElapsedTime();
 	
 	/**
+	 * The bits of the parts made so for for the simulation
 	 * @param ls
 	 */
 	public void setLowerShell(BranchGroup ls);
 	
-	/**
-	 * @param name
-	 * @return the extruder for the material called name; null if not found.
-	 */
-	public Extruder getExtruder(String name);
 	
 	/**
-	 * Get the list of all the extruders
-	 * @return
-	 */
-	public Extruder[] getExtruders();
-	
-	/**
-	 * Just finished a layer
+	 * Just finished a layer. Do whatever needs to be done then.
 	 * @param layerNumber
 	 */
 	public void finishedLayer(LayerRules lc) throws Exception;
@@ -317,7 +285,7 @@ public interface Printer {
 	public int getFoundationLayers();
 	
 	/**
-	 * 
+	 * Tell the printer it's been cancelled
 	 * @param c
 	 */
 	public void setCancelled(boolean c);
@@ -346,19 +314,19 @@ public interface Printer {
 	 */
 	public GenericStepperMotor getZMotor();
 	
-	/**
-	 * Convert XY feedrates in mm/min to internal units
-	 * @param feedrate
-	 * @return
-	 */
-	public int convertFeedrateToSpeedXY(double feedrate);
+//	/**
+//	 * Convert XY feedrates in mm/min to internal units
+//	 * @param feedrate
+//	 * @return
+//	 */
+//	public int convertFeedrateToSpeedXY(double feedrate);
 	
-	/**
-	 * Convert Z feedrates in mm/min to internal units
-	 * @param feedrate
-	 * @return
-	 */	
-	public int convertFeedrateToSpeedZ(double feedrate);
+//	/**
+//	 * Convert Z feedrates in mm/min to internal units
+//	 * @param feedrate
+//	 * @return
+//	 */	
+//	public int convertFeedrateToSpeedZ(double feedrate);
 	
 	/**
 	 * The X discretisation
@@ -380,7 +348,7 @@ public interface Printer {
 	
 	/**
 	 * If we are using an output buffer, it's a good idea to wait till
-	 * it's empty between layers.
+	 * it's empty between layers before computing the next one.
 	 */
 	public void waitWhileBufferNotEmpty();
 	

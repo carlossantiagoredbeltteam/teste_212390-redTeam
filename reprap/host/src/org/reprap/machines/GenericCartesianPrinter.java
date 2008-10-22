@@ -216,9 +216,9 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.reprap.Printer#initialise()
+	 * @see org.reprap.Printer#startRun()
 	 */
-	public void initialise() throws Exception
+	public void startRun() throws Exception
 	{
 		if (previewer != null)
 			previewer.reset();

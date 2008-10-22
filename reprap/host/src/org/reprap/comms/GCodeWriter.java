@@ -1,11 +1,15 @@
 package org.reprap.comms;
 
 import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
@@ -16,14 +20,11 @@ import gnu.io.SerialPort;
 import gnu.io.UnsupportedCommOperationException;
 
 import org.reprap.utilities.Debug;
+import org.reprap.utilities.ExtensionFileFilter;
 import org.reprap.Preferences;
 
 public class GCodeWriter
 {
-	/**
-	 * Are we talking to the RepRap machine directly?
-	 */
-	boolean useSerialPort = false;
 	
 	/**
 	 * The name of the port talking to the RepRap machine
@@ -49,6 +50,11 @@ public class GCodeWriter
 	 * this is our read handle
 	 */
 	private InputStream inStream;
+	
+	/**
+	 * This is used for file input
+	 */
+	private BufferedReader fileInStream;
 
 	/**
 	* are we printing to a file, or serial?
@@ -79,11 +85,11 @@ public class GCodeWriter
 	private boolean responseAvailable = false;
 	private String response;
 	
-
+	private boolean sendFileToMachine = false;
 		
 	public GCodeWriter()
 	{
-		//commands = new Vector();
+		
 		ringBuffer = new String[buflen];
 		head = 0;
 		tail = 0;
@@ -95,16 +101,12 @@ public class GCodeWriter
 		try
 		{
 			portName = Preferences.loadGlobalString("Port(name)");
-			useSerialPort = Preferences.loadGlobalBool("GCodeUseSerial");
 		} catch (Exception ex)
 		{
 			portName = "stdout";
-			useSerialPort = false;
 		}
-		if (useSerialPort)
-			openSerialConnection(portName);
-		else
-			openFile();
+		
+		openSerialConnection(portName);
 		
 	    /*
          * If comms is direct, fork off a thread to send buffered commands to the RepRap
@@ -124,6 +126,53 @@ public class GCodeWriter
 
 			bufferThread.start();
 		}
+	}
+	
+	public void setSendFileToMachine(boolean sftm)
+	{
+		sendFileToMachine = sftm;
+	}
+	
+	/**
+	 * Start the production run
+	 * (as opposed to driving the machine interactively).
+	 */
+	public void startRun()
+	{
+		/**
+		 * Are we talking to the RepRap machine directly?
+		 */
+		boolean useSerialPort = false;
+		
+		try
+		{
+			useSerialPort = Preferences.loadGlobalBool("GCodeUseSerial") || sendFileToMachine;
+		} catch (Exception ex)
+		{
+			portName = "stdout";
+			useSerialPort = false;
+		}
+		
+		if (useSerialPort)
+		{
+			if(sendFileToMachine)
+				openFile();
+		} else
+			openFile();		
+	}
+	
+	public void playFile()
+	{
+		String line;
+		try 
+		{
+	        while ((line = fileInStream.readLine()) != null) 
+	        {
+	        	bufferQueue(line);
+	        }
+	        fileInStream.close();
+	    } catch (IOException e) 
+	    {  }
 	}
 	
 	/**
@@ -357,11 +406,11 @@ public class GCodeWriter
 	}
 	
 	/**
-	 * Send a G-code command to the machine and flag that
-	 * a response is expected.
+	 * Send a G-code command to the machine and return
+	 * a response.
 	 * @param cmd
 	 */
-	public void queueRespond(String cmd)
+	public String queueRespond(String cmd)
 	{
 		//trim it and cleanup.
 		cmd = cmd.trim();
@@ -370,29 +419,21 @@ public class GCodeWriter
 		if (printToFile)
 		{
 			System.err.println("GCodeWriter.queueRespond() called when file being created.");
-			return;
+			return "0000"; // Safest compromise
 		}
 		responsesExpected++;
 		bufferQueue(cmd);
-	}
-	
-	/**
-	 * This sleeps until the command's response is available
-	 * @return
-	 */
-	public String getResponse()
-	{
-		if(printToFile || responsesExpected <= 0)
+		if(responsesExpected <= 0)
 		{
 			System.err.println("GCodeWriter.getResponse() called when no response expected.");
 			responsesExpected = 0;
 			responseAvailable = false;
-			return "0000"; // Safest compromise
+			return "0000";
 		}
 		while(!responseAvailable) sleep(31);
 		responseAvailable = false;
 		responsesExpected--;
-		return response;
+		return response;		
 	}
 	
 
@@ -481,23 +522,33 @@ public class GCodeWriter
 	
 	private void openFile(String filename)
 	{
-		printToFile = true;
+		if(!sendFileToMachine)
+		{
+			printToFile = true;
+			Debug.c("Opening file for GCode output: " + filename);
+		} else
+			Debug.c("Opening file for GCode input: " + filename);
 		
-		Debug.c("Opening file for GCode output: " + filename);
 		if (filename.equals("stdout"))
 		{
+			sendFileToMachine = false;
 			outStream = System.out;
-		}
-		else
+		}else
 		{
 			try
 			{
 				Debug.c("opening: " + filename);
-				
-				FileOutputStream fileStream = new FileOutputStream(filename);
-				outStream = new PrintStream(fileStream);
+				if(sendFileToMachine)
+				{
+					fileInStream = new BufferedReader(new FileReader(filename));
+				} else
+				{
+					FileOutputStream fileStream = new FileOutputStream(filename);
+					outStream = new PrintStream(fileStream);
+				}
 			} catch (FileNotFoundException e) {
 				Debug.c("File '" + filename + "' not found, printing to stdout");
+				sendFileToMachine = false;
 				outStream = System.out;
 			}
 		}
@@ -506,6 +557,12 @@ public class GCodeWriter
 	private void openFile()
 	{
 		JFileChooser chooser = new JFileChooser();
+        FileFilter filter;
+        if(sendFileToMachine)
+        	filter = new ExtensionFileFilter("G Code for reading", new String[] { "gcode" });
+        else
+        	filter = new ExtensionFileFilter("G Code for writing", new String[] { "gcode" });
+        chooser.setFileFilter(filter);
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		//chooser.setCurrentDirectory();
 
@@ -517,6 +574,7 @@ public class GCodeWriter
 		}
 		else
 		{
+			sendFileToMachine = false;
 			openFile("stdout");
 		}
 	}
