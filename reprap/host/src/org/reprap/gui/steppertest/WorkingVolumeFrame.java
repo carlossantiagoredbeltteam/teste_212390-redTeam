@@ -65,9 +65,9 @@ public class WorkingVolumeFrame  extends JFrame {
 	public WorkingVolumeFrame()
 	{
 		/*//Establish connection type
-		String connection = "nullcartesian";
+		String connection = "simulator";
 		try {
-		connection = Preferences.loadGlobalString("Geometry");
+		connection = Preferences.loadGlobalString("RepRap_Machine");
 		}
 		
 		catch (Exception e){
@@ -76,7 +76,7 @@ public class WorkingVolumeFrame  extends JFrame {
 		}*/
 		
 		//Initialise comms with bot
-		/*if (connection == "cartesian"){*/
+		/*if (connection == "SNAPRepRap"){*/
 			try { 
 				talkToBot();
 			}

@@ -24,16 +24,16 @@ public class MachineFactory {
 	 */
 	static public Printer create() throws Exception
 	{
-		String geometry = Preferences.loadGlobalString("Geometry");
+		String machine = Preferences.loadGlobalString("RepRap_Machine");
 
-		if (geometry.compareToIgnoreCase("cartesian") == 0)
+		if (machine.compareToIgnoreCase("SNAPRepRap") == 0)
 		  	return new Reprap();
-		if (geometry.compareToIgnoreCase("gcodewriter") == 0)
+		if (machine.compareToIgnoreCase("GCodeRepRap") == 0)
 		  	return new CartesianGCode();
-		else if (geometry.compareToIgnoreCase("nullcartesian") == 0)
+		else if (machine.compareToIgnoreCase("simulator") == 0)
 		    return new NullCartesianMachine();		
 		else
-			throw new ReprapException("Invalid geometry in properties file");
+			throw new ReprapException("Invalid geometry in properties file: " + machine);
 	}
 	
 }
