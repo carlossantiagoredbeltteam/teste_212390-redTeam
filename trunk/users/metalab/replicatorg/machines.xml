@@ -47,8 +47,19 @@
 			<tool name="Custom extruder" type="extruder" material="abs" motor="true" floodcoolant="false" mistcoolant="false" fan="false" valve="false" collet="false" heater="true"/>
 		</tools>
 		<clamps></clamps>
+		<warmup>
+		  M103 (extruder off)
+		  G90 (abs)
+		  G30 X120.00 Y110.00 Z-82.65 F780
+		  G92 (Metalab define current as home)
+		  M104 S225.0 (heat)
+		</warmup>
+		<cooldown>
+		  G91 (Metalab relative positioning)
+		  G1 Z10 F780 (move up)
+		</cooldown>
 		<driver name="serialpassthrough">
-			<portname>/dev/tty.test</portname>
+			<portname>/dev/tty.usbserial-A10&#16;15F9</portname>
 			<!-- optional, defaults to 19200.                      <rate>19200</rate> -->
 			<!-- optional, defaults to 8.                          <parity>8</parity> -->
 			<!-- optional, defaults to 1.                          <databits>1</databits> -->
