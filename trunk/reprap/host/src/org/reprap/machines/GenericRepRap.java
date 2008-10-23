@@ -24,8 +24,11 @@ import org.reprap.utilities.Debug;
 import org.reprap.utilities.Timer;
 import org.reprap.gui.*;
 
-public abstract class GenericCartesianPrinter implements CartesianPrinter
+public abstract class GenericRepRap implements CartesianPrinter
 {
+	protected boolean stlLoaded = false;
+	protected boolean gcodeLoaded = false;
+	
 	/**
 	 * 
 	 */
@@ -150,7 +153,7 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 	public GenericStepperMotor motorY;
 	public GenericStepperMotor motorZ;
 	
-	public GenericCartesianPrinter() throws Exception
+	public GenericRepRap() throws Exception
 	{
 		startTime = System.currentTimeMillis();
 		
@@ -1043,5 +1046,27 @@ public abstract class GenericCartesianPrinter implements CartesianPrinter
 	public double getZStepsPerMM()
 	{
 		return scaleZ;
+	}
+	
+	/**
+	 * Load a file to be made.
+	 * Currently these can be STLs (more than one can be loaded) or
+	 * a GCode file.
+	 * @return the name of the file
+	 */
+	public String addSTLFileForMaking()
+	{
+		gcodeLoaded = false;		
+		stlLoaded = true;
+		return org.reprap.Main.gui.onOpen();
+	}
+	
+	public String loadGCodeFileForMaking()
+	{
+		if(stlLoaded)
+			org.reprap.Main.gui.deleteAllSTLs();
+		stlLoaded = false;
+		gcodeLoaded = true;
+		return ""; //FIXME
 	}
 }

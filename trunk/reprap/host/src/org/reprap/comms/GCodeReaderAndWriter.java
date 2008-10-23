@@ -23,7 +23,7 @@ import org.reprap.utilities.Debug;
 import org.reprap.utilities.ExtensionFileFilter;
 import org.reprap.Preferences;
 
-public class GCodeWriter
+public class GCodeReaderAndWriter
 {
 	
 	/**
@@ -66,7 +66,7 @@ public class GCodeWriter
 	 * transmission to the RepRap machine.
 	 */
 	private int head, tail;
-	private static final int buflen = 100;
+	private static final int buflen = 10; // Too long and pause doesn't work well
 	private String[] ringBuffer;
 	
 	/**
@@ -87,7 +87,7 @@ public class GCodeWriter
 	
 	private boolean sendFileToMachine = false;
 		
-	public GCodeWriter()
+	public GCodeReaderAndWriter()
 	{
 		
 		ringBuffer = new String[buflen];
@@ -103,6 +103,7 @@ public class GCodeWriter
 			portName = Preferences.loadGlobalString("Port(name)");
 		} catch (Exception ex)
 		{
+			System.err.println("Cannot load preference Port(name).");
 			portName = "stdout";
 		}
 		
@@ -128,10 +129,15 @@ public class GCodeWriter
 		}
 	}
 	
-	public void setSendFileToMachine(boolean sftm)
+	public String addFileForMaking()
 	{
-		sendFileToMachine = sftm;
+		return openInputFile();
 	}
+	
+//	public void setSendFileToMachine(boolean sftm)
+//	{
+//		sendFileToMachine = sftm;
+//	}
 	
 	/**
 	 * Start the production run
@@ -156,11 +162,15 @@ public class GCodeWriter
 		if (useSerialPort)
 		{
 			if(sendFileToMachine)
-				openFile();
+				openInputFile();
 		} else
-			openFile();		
+			openOutputFile();		
 	}
 	
+	/**
+	 * Send a file to the machine
+	 *
+	 */
 	public void playFile()
 	{
 		String line;
@@ -451,12 +461,12 @@ public class GCodeWriter
 			port = (SerialPort)commId.open(portName, 30000);
 		} catch (NoSuchPortException e) {
 			System.err.println("Error opening port: " + portName);
-			openFile("stdout");
+			openNamedOutputFile("stdout");
 			return;
 		}
 		catch (PortInUseException e){
 			System.err.println("Port '" + portName + "' is already in use.");
-			openFile("stdout");
+			openNamedOutputFile("stdout");
 			return;			
 		}
 		
@@ -477,7 +487,7 @@ public class GCodeWriter
 		}
 		catch (UnsupportedCommOperationException e) {
 			Debug.c("An unsupported comms operation was encountered.");
-			openFile("stdout");
+			openNamedOutputFile("stdout");
 			return;		
 		}
 
@@ -508,7 +518,7 @@ public class GCodeWriter
 			outStream = new PrintStream(writeStream);
 		} catch (IOException e) {
 			Debug.c("Error opening serial port stream.");
-			openFile("stdout");
+			openNamedOutputFile("stdout");
 			return;		
 		}
 
@@ -520,7 +530,7 @@ public class GCodeWriter
         try {Thread.sleep(1000);} catch (Exception e) {}
 	}
 	
-	private void openFile(String filename)
+	private void openNamedOutputFile(String filename)
 	{
 		if(!sendFileToMachine)
 		{
@@ -554,14 +564,45 @@ public class GCodeWriter
 		}
 	}
 	
-	private void openFile()
+	private String openOutputFile()
+	{
+		JFileChooser chooser = new JFileChooser();
+		sendFileToMachine = false;
+		FileFilter filter;
+		filter = new ExtensionFileFilter("G Code file to write to", new String[] { "gcode" });
+		chooser.setFileFilter(filter);
+		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		//chooser.setCurrentDirectory();
+
+		int result = chooser.showSaveDialog(null);
+		if (result == JFileChooser.APPROVE_OPTION)
+		{
+			String name = chooser.getSelectedFile().getAbsolutePath();
+
+			try
+			{
+				Debug.c("opening: " + name);
+				FileOutputStream fileStream = new FileOutputStream(name);
+				outStream = new PrintStream(fileStream);
+			} catch (FileNotFoundException e) {
+				Debug.c("File '" + name + "' not found, printing to stdout");
+				sendFileToMachine = false;
+				outStream = System.out;
+			}
+		}
+		else
+		{
+			sendFileToMachine = false;
+			outStream = System.out;;
+		}
+		return chooser.getName();
+	}
+	
+	private String openInputFile()
 	{
 		JFileChooser chooser = new JFileChooser();
         FileFilter filter;
-        if(sendFileToMachine)
-        	filter = new ExtensionFileFilter("G Code for reading", new String[] { "gcode" });
-        else
-        	filter = new ExtensionFileFilter("G Code for writing", new String[] { "gcode" });
+        filter = new ExtensionFileFilter("G Code file to be read", new String[] { "gcode" });
         chooser.setFileFilter(filter);
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		//chooser.setCurrentDirectory();
@@ -570,12 +611,21 @@ public class GCodeWriter
 		if (result == JFileChooser.APPROVE_OPTION)
 		{
 			String name = chooser.getSelectedFile().getAbsolutePath();
-			openFile(name);
-		}
-		else
+			try
+			{
+				Debug.c("opening: " + name);
+				fileInStream = new BufferedReader(new FileReader(name));
+			} catch (FileNotFoundException e) 
+			{
+				Debug.c("Can't write to file '" + name + "'.");
+				fileInStream = null;
+			}
+		} else
 		{
-			sendFileToMachine = false;
-			openFile("stdout");
+			Debug.c("Can't write to file.");
+			fileInStream = null;			
 		}
+
+		return chooser.getName();
 	}
 }

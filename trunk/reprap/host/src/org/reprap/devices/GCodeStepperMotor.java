@@ -9,16 +9,16 @@ import org.reprap.AxisMotor;
 import org.reprap.ReprapException;
 import org.reprap.comms.IncomingMessage.InvalidPayloadException;
 import org.reprap.devices.GenericStepperMotor;
-import org.reprap.comms.GCodeWriter;
-import org.reprap.machines.CartesianGCode;
+import org.reprap.comms.GCodeReaderAndWriter;
+import org.reprap.machines.GCodeRepRap;
 
 public class GCodeStepperMotor extends GenericStepperMotor {
 	
-	CartesianGCode printer;
+	GCodeRepRap printer;
 	/**
 	 * @param motorId
 	 */
-	public GCodeStepperMotor(CartesianGCode p, int motorId) {
+	public GCodeStepperMotor(GCodeRepRap p, int motorId) {
 		super(null, motorId);
 		printer = p;
 	}

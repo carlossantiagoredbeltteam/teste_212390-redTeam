@@ -10,12 +10,12 @@ import org.reprap.utilities.Debug;
 import javax.media.j3d.Appearance;
 import javax.vecmath.Color3f;
 import javax.media.j3d.Material;
-import org.reprap.comms.GCodeWriter;
+import org.reprap.comms.GCodeReaderAndWriter;
 
 
 public class GCodeExtruder extends GenericExtruder
 {
-	GCodeWriter gcode;
+	GCodeReaderAndWriter gcode;
 	
 	int currentSpeed = 0;
 	
@@ -23,7 +23,7 @@ public class GCodeExtruder extends GenericExtruder
 	 * @param prefs
 	 * @param extruderId
 	 */
-	public GCodeExtruder(GCodeWriter writer, int extruderId)
+	public GCodeExtruder(GCodeReaderAndWriter writer, int extruderId)
 	{
 		super(extruderId);
 

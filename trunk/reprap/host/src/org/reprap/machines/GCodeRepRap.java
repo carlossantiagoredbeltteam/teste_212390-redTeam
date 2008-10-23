@@ -16,7 +16,7 @@ import org.reprap.Preferences;
 import org.reprap.ReprapException;
 import org.reprap.gui.Previewer;
 import org.reprap.Extruder;
-import org.reprap.comms.GCodeWriter;
+import org.reprap.comms.GCodeReaderAndWriter;
 import org.reprap.utilities.Debug;
 import org.reprap.devices.GCodeExtruder;
 import org.reprap.devices.GCodeStepperMotor;
@@ -30,12 +30,12 @@ import java.io.PrintStream;
 /**
  *
  */
-public class CartesianGCode extends GenericCartesianPrinter {
+public class GCodeRepRap extends GenericRepRap {
 	
 	/**
 	* our class to send gcode instructions
 	*/
-	GCodeWriter gcode;
+	GCodeReaderAndWriter gcode;
 	
 	/**
 	* what is our current feedrate?
@@ -46,11 +46,11 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	 * @param prefs
 	 * @throws Exception
 	 */
-	public CartesianGCode() throws Exception {
+	public GCodeRepRap() throws Exception {
 		
 		super();
 
-		gcode = new GCodeWriter();
+		gcode = new GCodeReaderAndWriter();
 		
 		loadExtruders();
 	}
@@ -391,5 +391,14 @@ public class CartesianGCode extends GenericCartesianPrinter {
 	public void speedBuffer()
 	{
 		gcode.speedBufferThread();
+	}
+	
+	/**
+	 * Load a GCode file to be made.
+	 * @return the name of the file
+	 */
+	public String addFileForMaking()
+	{
+		return gcode.addFileForMaking();
 	}
 }

@@ -19,12 +19,12 @@ import org.reprap.devices.GenericStepperMotor;
 /**
  *
  */
-public class NullCartesianMachine extends GenericCartesianPrinter {
+public class Simulator extends GenericRepRap {
 	
 	/**
 	 * @param config
 	 */
-	public NullCartesianMachine() throws Exception {
+	public Simulator() throws Exception {
 		super();
 	}
 	
@@ -103,5 +103,10 @@ public class NullCartesianMachine extends GenericCartesianPrinter {
 	
 	public void speedBuffer()
 	{
+	}
+	
+	public String addFileForMaking()
+	{
+		return org.reprap.Main.gui.onOpen();
 	}
 }

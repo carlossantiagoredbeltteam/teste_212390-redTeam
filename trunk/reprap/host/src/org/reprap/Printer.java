@@ -1,12 +1,12 @@
 package org.reprap;
 
-import java.awt.print.PrinterAbortException;
+//import java.awt.print.PrinterAbortException;
 import java.io.IOException;
 import javax.media.j3d.*;
 import javax.swing.JCheckBoxMenuItem;
 import org.reprap.geometry.LayerRules;
 import org.reprap.gui.Previewer;
-import org.reprap.devices.GenericExtruder;
+//import org.reprap.devices.GenericExtruder;
 import org.reprap.devices.GenericStepperMotor;
 
 public interface Printer {
@@ -367,4 +367,13 @@ public interface Printer {
 	 * @param milliseconds
 	 */
 	public void machineWait(double milliseconds);
+	
+	/**
+	 * Load a file to be made.
+	 * Currently these can be STLs (more than one can be loaded) or
+	 * a GCode file.
+	 * @return the name of the file
+	 */
+	public String addSTLFileForMaking();
+	public String loadGCodeFileForMaking();
 }

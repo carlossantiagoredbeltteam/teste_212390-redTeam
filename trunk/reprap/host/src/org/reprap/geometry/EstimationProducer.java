@@ -4,7 +4,7 @@ import javax.vecmath.*;
 import org.reprap.Preferences;
 import org.reprap.geometry.Producer;
 import org.reprap.gui.RepRapBuild;
-import org.reprap.machines.NullCartesianMachine;
+import org.reprap.machines.Simulator;
 
 /**
  * A specialisation of Producer that doesn't preview anything
@@ -21,7 +21,7 @@ public class EstimationProducer extends Producer {
 	public EstimationProducer(RepRapBuild builder) throws Exception {
 		super(null, null, builder);
 		
-		layerRules.setPrinter(new NullCartesianMachine()); 
+		layerRules.setPrinter(new Simulator()); 
 		//reprap = new NullCartesianMachine(); 
 
 	}
