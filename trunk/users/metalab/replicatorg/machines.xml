@@ -1,0 +1,58 @@
+<?xml version="1.1" encoding="utf-8"?>
+<machines>
+	<!-- do not remove this machine configuration!!! -->
+	<machine>
+		<name>3-Axis Simulator</name>
+		<geometry type="cartesian">
+			<axis id="x" length="300" maxfeedrate="1000" scale="11.4485"/>
+			<axis id="y" length="300" maxfeedrate="1000" scale="11.4485"/>
+			<axis id="z" length="300" maxfeedrate="100" scale="320"/>
+		</geometry>
+		<tools>
+			<tool name="Generic Extruder" type="extruder" material="abs" motor="true" floodcoolant="true" mistcoolant="true" fan="true" valve="true" collet="true" heater="true"/>
+		</tools>
+		<clamps></clamps>
+		<driver name="null"> <!-- use a fake driver -->
+			<speedup>20</speedup> <!-- amount to speed up print process:  1 = realtime, 2 = 2x, 10 = 10x, etc. -->
+		</driver>
+	</machine>
+	<!-- end protected configuration -->
+	<machine>
+		<name>Darwin</name>
+		<geometry type="cartesian">
+			<axis id="x" length="300" maxfeedrate="1000" scale="11.4485"/>
+			<axis id="y" length="300" maxfeedrate="1000" scale="11.4485"/>
+			<axis id="z" length="300" maxfeedrate="100" scale="320"/>
+		</geometry>
+		<tools>
+			<tool name="Lasercut Extruder v1.0" type="extruder" material="abs" motor="true" floodcoolant="false" mistcoolant="false" fan="true" valve="false" collet="false" heater="true"/>
+		</tools>
+		<clamps></clamps>
+		<driver name="serialpassthrough">
+			<!-- optional, defaults to first serial port found.    <portname>COM1</portname> -->
+			<!-- optional, defaults to 19200.                      <rate>19200</rate> -->
+			<!-- optional, defaults to 8.                          <parity>8</parity> -->
+			<!-- optional, defaults to 1.                          <databits>1</databits> -->
+			<!-- optional, defaults to N.                          <stopbits>N</stopbits> -->
+		</driver>
+	</machine>
+	<machine>
+		<name>Metalab CNC</name>
+		<geometry type="cartesian">
+			<axis id="x" length="300" maxfeedrate="780" scale="267"/>
+			<axis id="y" length="300" maxfeedrate="780" scale="267"/>
+			<axis id="z" length="300" maxfeedrate="780" scale="267"/>
+		</geometry>
+		<tools>
+			<tool name="Custom extruder" type="extruder" material="abs" motor="true" floodcoolant="false" mistcoolant="false" fan="false" valve="false" collet="false" heater="true"/>
+		</tools>
+		<clamps></clamps>
+		<driver name="serialpassthrough">
+			<portname>/dev/tty.test</portname>
+			<!-- optional, defaults to 19200.                      <rate>19200</rate> -->
+			<!-- optional, defaults to 8.                          <parity>8</parity> -->
+			<!-- optional, defaults to 1.                          <databits>1</databits> -->
+			<!-- optional, defaults to N.                          <stopbits>N</stopbits> -->
+		</driver>
+	</machine>
+</machines>
