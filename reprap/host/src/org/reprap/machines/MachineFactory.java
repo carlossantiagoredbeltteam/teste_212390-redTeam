@@ -27,13 +27,13 @@ public class MachineFactory {
 		String machine = Preferences.loadGlobalString("RepRap_Machine");
 
 		if (machine.compareToIgnoreCase("SNAPRepRap") == 0)
-		  	return new Reprap();
+		  	return new SNAPReprap();
 		if (machine.compareToIgnoreCase("GCodeRepRap") == 0)
-		  	return new CartesianGCode();
+		  	return new GCodeRepRap();
 		else if (machine.compareToIgnoreCase("simulator") == 0)
-		    return new NullCartesianMachine();		
+		    return new Simulator();		
 		else
-			throw new ReprapException("Invalid geometry in properties file: " + machine);
+			throw new ReprapException("Invalid RepRap machine in properties file: " + machine);
 	}
 	
 }

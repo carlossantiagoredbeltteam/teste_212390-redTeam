@@ -32,7 +32,7 @@ import org.reprap.gui.*;
  * extruders
  *
  */
-public class Reprap extends GenericCartesianPrinter
+public class SNAPReprap extends GenericRepRap
 {
 	
 	/**
@@ -54,7 +54,7 @@ public class Reprap extends GenericCartesianPrinter
 	 * @param prefs
 	 * @throws Exception
 	 */
-	public Reprap() throws Exception
+	public SNAPReprap() throws Exception
 	{
 		super();
 		
@@ -504,6 +504,11 @@ public class Reprap extends GenericCartesianPrinter
 	
 	public void speedBuffer()
 	{
+	}
+	
+	public String addFileForMaking()
+	{
+		return org.reprap.Main.gui.onOpen();
 	}
 }
 

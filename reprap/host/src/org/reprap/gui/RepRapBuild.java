@@ -458,5 +458,16 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 			wv_and_stls.removeChild(index);
 		}
 	}
+	
+	public void deleteAllSTLs()
+	{
+		for(int i = 0; i < stls.size(); i++)
+		{
+			STLObject s = (STLObject)stls.get(i);
+			stls.remove(i);
+			int index = wv_and_stls.indexOfChild(s.top);
+			wv_and_stls.removeChild(index);
+		}		
+	}
 
 }

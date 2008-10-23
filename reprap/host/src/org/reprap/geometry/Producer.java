@@ -8,7 +8,7 @@ import org.reprap.geometry.polygons.*;
 import org.reprap.gui.PreviewPanel;
 import org.reprap.gui.RepRapBuild;
 import org.reprap.machines.MachineFactory;
-import org.reprap.machines.NullCartesianMachine;
+import org.reprap.machines.Simulator;
 import org.reprap.utilities.Debug;
 import org.reprap.devices.pseudo.LinePrinter;
 

@@ -514,7 +514,6 @@ public class Main {
 			public void run() {
 				Thread.currentThread().setName("Producer");
 				try {
-					// TODO Some kind of progress indicator would be good
 					
 					if (!viewPreview.isSelected()) {
 						viewPreview.setSelected(true);
@@ -550,17 +549,25 @@ public class Main {
 		t.start();
 	}
 	
-    private void onOpen() 
+    public String onOpen() 
     {
         String result = null;
+        File f;
         int returnVal = chooser.showOpenDialog(mainFrame);
         if(returnVal == JFileChooser.APPROVE_OPTION) 
         {
-            File f = chooser.getSelectedFile();
+            f = chooser.getSelectedFile();
             result = "file:" + f.getAbsolutePath();
-        }
         
-        builder.anotherSTLFile(result);
+            builder.anotherSTLFile(result);
+            return f.getName();
+        }
+        return "";
+    }
+    
+    public void deleteAllSTLs()
+    {
+    	builder.deleteAllSTLs();
     }
     
     private void onRotateX() {

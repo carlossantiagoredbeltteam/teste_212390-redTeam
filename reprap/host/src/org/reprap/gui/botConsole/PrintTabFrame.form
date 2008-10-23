@@ -28,56 +28,54 @@
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="loadGCode" alignment="0" min="-2" pref="100" max="-2" attributes="1"/>
-                          <Component id="loadSTL" alignment="0" min="-2" pref="100" max="-2" attributes="1"/>
                           <Component id="loadRFO" alignment="0" min="-2" pref="100" max="-2" attributes="1"/>
+                          <Component id="loadSTL" alignment="0" min="-2" pref="100" max="-2" attributes="1"/>
                       </Group>
-                      <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="toSNAPRepRapRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="gCodeToFileRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="simulateRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="toGCodeRepRapRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" attributes="0">
+                              <Component id="printButton" min="-2" pref="72" max="-2" attributes="1"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="pauseButton" min="-2" pref="61" max="-2" attributes="1"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="stopButton" min="-2" pref="75" max="-2" attributes="1"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="exitButton" min="-2" pref="62" max="-2" attributes="1"/>
+                          </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="toSNAPRepRapRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="toGCodeRepRapRadioButton" min="-2" max="-2" attributes="0"/>
-                                  <Component id="gCodeToFileRadioButton" min="-2" max="-2" attributes="0"/>
+                                  <Component id="layerPauseCheck" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="interLayerCoolingCheck" alignment="0" min="-2" max="-2" attributes="1"/>
+                                  <Component id="preferencesButton" min="-2" max="-2" attributes="1"/>
                               </Group>
-                              <EmptySpace type="separate" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="interLayerCoolingCheck" min="-2" max="-2" attributes="0"/>
-                                  <Component id="layerPauseCheck" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Component id="getWebPage" min="-2" pref="190" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="simulateRadioButton" min="-2" max="-2" attributes="0"/>
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace min="-2" pref="147" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="fileNameBox" alignment="0" pref="160" max="32767" attributes="1"/>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="printButton" pref="100" max="32767" attributes="1"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="pauseButton" pref="84" max="32767" attributes="1"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="stopButton" pref="92" max="32767" attributes="1"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="exitButton" pref="83" max="32767" attributes="1"/>
-                                  </Group>
-                              </Group>
-                          </Group>
                       </Group>
-                      <EmptySpace pref="27" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="expectedBuildTimeLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                          <Component id="progressLabel" min="-2" max="-2" attributes="0"/>
-                          <Component id="expectedFinishTimeLabel" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
+                          <Component id="expectedBuildTimeLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" alignment="0" groupAlignment="1" attributes="0">
+                              <Component id="progressLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                              <Component id="expectedFinishTimeLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Group type="102" alignment="0" attributes="1">
                               <Component id="expectedBuildTime" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="hoursMinutesLabel1" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="fileNameBox" max="32767" attributes="1"/>
                           </Group>
                           <Component id="expectedFinishTime" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
@@ -86,9 +84,9 @@
                               <Component id="progressBar" min="-2" pref="430" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace min="-2" pref="52" max="-2" attributes="0"/>
                   </Group>
               </Group>
+              <EmptySpace pref="24" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -96,74 +94,78 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Group type="102" alignment="1" attributes="0">
-                      <Component id="getWebPage" min="-2" pref="72" max="-2" attributes="0"/>
-                      <EmptySpace pref="32" max="32767" attributes="0"/>
-                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="exitButton" min="-2" pref="39" max="-2" attributes="1"/>
-                          <Component id="stopButton" alignment="0" min="-2" pref="39" max="-2" attributes="1"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="1" attributes="1">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="layerPauseCheck" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="interLayerCoolingCheck" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="preferencesButton" min="-2" max="-2" attributes="1"/>
+                          </Group>
+                          <Component id="getWebPage" min="-2" pref="72" max="-2" attributes="0"/>
                       </Group>
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Group type="103" alignment="0" groupAlignment="1" attributes="0">
+                              <Component id="exitButton" min="-2" pref="39" max="-2" attributes="1"/>
+                              <Component id="stopButton" min="-2" pref="39" max="-2" attributes="1"/>
+                          </Group>
+                          <Group type="103" alignment="0" groupAlignment="1" attributes="0">
+                              <Component id="pauseButton" min="-2" pref="39" max="-2" attributes="1"/>
+                              <Component id="printButton" alignment="1" min="-2" pref="39" max="-2" attributes="1"/>
+                          </Group>
+                      </Group>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="1">
+                      <Component id="toSNAPRepRapRadioButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="toGCodeRepRapRadioButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="gCodeToFileRadioButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="simulateRadioButton" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="loadSTL" min="-2" pref="41" max="-2" attributes="1"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="loadGCode" min="-2" pref="41" max="-2" attributes="1"/>
-                  </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="-2" pref="102" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="loadRFO" min="-2" pref="41" max="-2" attributes="1"/>
                   </Group>
-                  <Group type="102" alignment="1" attributes="1">
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="toSNAPRepRapRadioButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="layerPauseCheck" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
+              </Group>
+              <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Group type="102" alignment="1" attributes="0">
+                      <Component id="expectedBuildTimeLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="1" attributes="0">
-                              <EmptySpace min="-2" pref="54" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="1" attributes="0">
-                                  <Group type="102" alignment="1" attributes="0">
-                                      <EmptySpace max="32767" attributes="0"/>
-                                      <Component id="printButton" min="-2" pref="39" max="-2" attributes="1"/>
-                                  </Group>
-                                  <Component id="pauseButton" min="-2" pref="39" max="-2" attributes="1"/>
-                              </Group>
-                          </Group>
+                      <Component id="expectedFinishTimeLabel" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="progressLabel" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="expectedBuildTime" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="hoursMinutesLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="fileNameBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="toGCodeRepRapRadioButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="interLayerCoolingCheck" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="gCodeToFileRadioButton" min="-2" max="-2" attributes="0"/>
+                              <Component id="expectedFinishTime" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="simulateRadioButton" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="currentLayerOutOfN" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="1" attributes="1">
+                              <EmptySpace max="32767" attributes="0"/>
+                              <Component id="progressBar" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
               </Group>
-              <EmptySpace pref="22" max="32767" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="expectedBuildTime" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="hoursMinutesLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="expectedBuildTimeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="fileNameBox" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="expectedFinishTime" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="expectedFinishTimeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="progressLabel" min="-2" max="-2" attributes="0"/>
-                  <Component id="currentLayerOutOfN" min="-2" max="-2" attributes="0"/>
-                  <Component id="progressBar" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -391,6 +393,21 @@
         </Property>
         <Property name="text" type="java.lang.String" value=" - "/>
       </Properties>
+    </Component>
+    <Component class="java.awt.Button" name="preferencesButton">
+      <Properties>
+        <Property name="actionCommand" type="java.lang.String" value="preferences"/>
+        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="ff" green="66" red="ff" type="rgb"/>
+        </Property>
+        <Property name="label" type="java.lang.String" value="Preferences" noResource="true"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="preferences"/>
+      </Events>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_SerializeTo" type="java.lang.String" value="PrintTabFrame_preferencesButton"/>
+      </AuxValues>
     </Component>
   </SubComponents>
 </Form>
