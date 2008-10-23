@@ -34,6 +34,8 @@
 //our include files.
 #include <ThermoplastExtruder.h>
 #include <SNAP.h>
+
+#undef round
 #include <math.h>
 
 //
