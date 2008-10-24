@@ -39,27 +39,27 @@ public class GCodeReaderAndWriter
 	/**
 	 * Flag to tell it we've finished
 	 */
-	private boolean threadKilled = false;
+	private boolean exhaustBuffer = false;
 	
 	/**
-	* this is for doing easy writes
+	* this is for doing easy serial writes
 	*/
-	private PrintStream outStream;
+	private PrintStream serialOutStream = null;
 	
 	/**
-	 * this is our read handle
+	 * this is our read handle on the serial port
 	 */
-	private InputStream inStream;
+	private InputStream serialInStream = null;
 	
 	/**
 	 * This is used for file input
 	 */
-	private BufferedReader fileInStream;
-
+	private BufferedReader fileInStream = null;
+	
 	/**
-	* are we printing to a file, or serial?
-	*/
-	private boolean printToFile = false;
+	 * This is for file output
+	 */
+	private PrintStream fileOutStream = null;
 	
 	/**
 	 * The ring buffer that stores the commands for direct
@@ -85,16 +85,16 @@ public class GCodeReaderAndWriter
 	private boolean responseAvailable = false;
 	private String response;
 	
-	private boolean sendFileToMachine = false;
+	//private boolean sendFileToMachine = false;
 		
 	public GCodeReaderAndWriter()
 	{
-		
+
 		ringBuffer = new String[buflen];
 		head = 0;
 		tail = 0;
 		threadLock = false;
-		threadKilled = false;
+		exhaustBuffer = false;
 		responsesExpected = 0;
 		responseAvailable = false;
 		response = "0000";
@@ -106,15 +106,14 @@ public class GCodeReaderAndWriter
 			System.err.println("Cannot load preference Port(name).");
 			portName = "stdout";
 		}
-		
+
 		openSerialConnection(portName);
-		
-	    /*
-         * If comms is direct, fork off a thread to send buffered commands to the RepRap
-         */		
+
 		myPriority = Thread.currentThread().getPriority();
+
 		bufferThread = null;
-		if(!printToFile)
+		
+		if(serialOutStream != null)
 		{
 			bufferThread = new Thread() 
 			{
@@ -128,16 +127,18 @@ public class GCodeReaderAndWriter
 			bufferThread.start();
 		}
 	}
+
 	
-	public String addFileForMaking()
+	public boolean buildingFromFile()
 	{
-		return openInputFile();
+		return fileInStream != null;
 	}
 	
-//	public void setSendFileToMachine(boolean sftm)
-//	{
-//		sendFileToMachine = sftm;
-//	}
+	public boolean savingToFile()
+	{
+		return fileOutStream != null;
+	}
+
 	
 	/**
 	 * Start the production run
@@ -145,34 +146,35 @@ public class GCodeReaderAndWriter
 	 */
 	public void startRun()
 	{
-		/**
-		 * Are we talking to the RepRap machine directly?
-		 */
-		boolean useSerialPort = false;
-		
-		try
+		if(fileOutStream != null)
 		{
-			useSerialPort = Preferences.loadGlobalBool("GCodeUseSerial") || sendFileToMachine;
-		} catch (Exception ex)
-		{
-			portName = "stdout";
-			useSerialPort = false;
-		}
-		
-		if (useSerialPort)
-		{
-			if(sendFileToMachine)
-				openInputFile();
-		} else
-			openOutputFile();		
+			// Exhause buffer before we start.
+			if(bufferThread != null)
+			{
+				exhaustBuffer = true;
+				while(exhaustBuffer) sleep(200);
+			}
+		}	
 	}
 	
 	/**
-	 * Send a file to the machine
+	 * Send a GCode file to the machine
 	 *
 	 */
 	public void playFile()
 	{
+		if(fileInStream == null)
+		{
+			System.err.println("GCodeWriter: attempt to read from non-existent file.");
+			return;
+		}
+		
+		if(bufferThread == null)
+		{
+			System.err.println("GCodeWriter: attempt to write to non-existent buffer.");
+			return;
+		}			
+		
 		String line;
 		try 
 		{
@@ -207,19 +209,25 @@ public class GCodeReaderAndWriter
 		Debug.c("disposing of gcodewriter.");
 		
 		// Wait for the ring buffer to be exhausted
-		if(!printToFile)
+		if(fileOutStream == null && bufferThread != null)
 		{
-			threadKilled = true;
-			while(threadKilled)	sleep(200);
+			exhaustBuffer = true;
+			while(exhaustBuffer) sleep(200);
 		}
 		
 		try
 		{
-			if (inStream != null)
-				inStream.close();
+			if (serialInStream != null)
+				serialInStream.close();
 
-			if (outStream != null)
-				outStream.close();
+			if (serialOutStream != null)
+				serialOutStream.close();
+			
+			if (fileInStream != null)
+				fileInStream.close();
+			
+			if (fileOutStream != null)
+				fileOutStream.close();
 		} catch (Exception e) {}
 	}
 	
@@ -292,9 +300,9 @@ public class GCodeReaderAndWriter
 			while(head == tail)
 			{
 				// If nothing more is ever coming, finish
-				if(threadKilled)
+				if(exhaustBuffer)
 				{
-					threadKilled = false;
+					exhaustBuffer = false;
 					return;
 				}
 				sleep(211);
@@ -312,10 +320,10 @@ public class GCodeReaderAndWriter
 			if(com != 0)
 			{
 				cmd = cmd.trim();
-				outStream.print(cmd + "\n");
+				serialOutStream.print(cmd + "\n");
 				// Message has effectively gone to the machine, so we can release the queuing thread
 				threadLock = false;				
-				outStream.flush();
+				serialOutStream.flush();
 				Debug.c("G-code: " + cmd + " dequeued and sent");
 				// Wait for the machine to respond before we send the next command
 				waitForOK();
@@ -342,7 +350,7 @@ public class GCodeReaderAndWriter
 		{
 			try
 			{
-				i = inStream.read();
+				i = serialInStream.read();
 			} catch (Exception e)
 			{
 				i = -1;
@@ -407,9 +415,9 @@ public class GCodeReaderAndWriter
 		//add to list.
 		//commands.add(cmd);
 		
-		if (printToFile)
+		if(fileOutStream != null)
 		{
-			outStream.println(cmd);
+			fileOutStream.println(cmd);
 			Debug.c("G-code: " + cmd + " written to file");
 		} else
 			bufferQueue(cmd);
@@ -426,7 +434,7 @@ public class GCodeReaderAndWriter
 		cmd = cmd.trim();
 		cmd = cmd.replaceAll("  ", " ");
 		
-		if (printToFile)
+		if (fileOutStream != null)
 		{
 			System.err.println("GCodeWriter.queueRespond() called when file being created.");
 			return "0000"; // Safest compromise
@@ -449,9 +457,10 @@ public class GCodeReaderAndWriter
 
 	private void openSerialConnection(String portName)
 	{
-		printToFile = false;
 		
 		int baudRate = 19200;
+		serialInStream = null;
+		serialOutStream = null;
 		
 		//open our port.
 		Debug.c("GCode opening port " + portName);
@@ -461,12 +470,10 @@ public class GCodeReaderAndWriter
 			port = (SerialPort)commId.open(portName, 30000);
 		} catch (NoSuchPortException e) {
 			System.err.println("Error opening port: " + portName);
-			openNamedOutputFile("stdout");
 			return;
 		}
 		catch (PortInUseException e){
 			System.err.println("Port '" + portName + "' is already in use.");
-			openNamedOutputFile("stdout");
 			return;			
 		}
 		
@@ -487,7 +494,6 @@ public class GCodeReaderAndWriter
 		}
 		catch (UnsupportedCommOperationException e) {
 			Debug.c("An unsupported comms operation was encountered.");
-			openNamedOutputFile("stdout");
 			return;		
 		}
 
@@ -514,11 +520,12 @@ public class GCodeReaderAndWriter
 		//create our steams
 		try {
 			OutputStream writeStream = port.getOutputStream();
-			inStream = port.getInputStream();
-			outStream = new PrintStream(writeStream);
+			serialInStream = port.getInputStream();
+			serialOutStream = new PrintStream(writeStream);
 		} catch (IOException e) {
-			Debug.c("Error opening serial port stream.");
-			openNamedOutputFile("stdout");
+			System.err.println("GCodeWriter: Error opening serial port stream.");
+			serialInStream = null;
+			serialOutStream = null;
 			return;		
 		}
 
@@ -526,48 +533,15 @@ public class GCodeReaderAndWriter
 		Debug.c("Attempting to initialize Arduino");
         try {Thread.sleep(1000);} catch (Exception e) {}
         for(int i = 0; i < 10; i++)
-                outStream.write('0');
+                serialOutStream.write('0');
         try {Thread.sleep(1000);} catch (Exception e) {}
+        
+        return;
 	}
 	
-	private void openNamedOutputFile(String filename)
-	{
-		if(!sendFileToMachine)
-		{
-			printToFile = true;
-			Debug.c("Opening file for GCode output: " + filename);
-		} else
-			Debug.c("Opening file for GCode input: " + filename);
-		
-		if (filename.equals("stdout"))
-		{
-			sendFileToMachine = false;
-			outStream = System.out;
-		}else
-		{
-			try
-			{
-				Debug.c("opening: " + filename);
-				if(sendFileToMachine)
-				{
-					fileInStream = new BufferedReader(new FileReader(filename));
-				} else
-				{
-					FileOutputStream fileStream = new FileOutputStream(filename);
-					outStream = new PrintStream(fileStream);
-				}
-			} catch (FileNotFoundException e) {
-				Debug.c("File '" + filename + "' not found, printing to stdout");
-				sendFileToMachine = false;
-				outStream = System.out;
-			}
-		}
-	}
-	
-	private String openOutputFile()
+	private String setGCodeFileForOutput()
 	{
 		JFileChooser chooser = new JFileChooser();
-		sendFileToMachine = false;
 		FileFilter filter;
 		filter = new ExtensionFileFilter("G Code file to write to", new String[] { "gcode" });
 		chooser.setFileFilter(filter);
@@ -583,22 +557,22 @@ public class GCodeReaderAndWriter
 			{
 				Debug.c("opening: " + name);
 				FileOutputStream fileStream = new FileOutputStream(name);
-				outStream = new PrintStream(fileStream);
+				fileOutStream = new PrintStream(fileStream);
 			} catch (FileNotFoundException e) {
-				Debug.c("File '" + name + "' not found, printing to stdout");
-				sendFileToMachine = false;
-				outStream = System.out;
+				System.err.println("Can't write to file '" + name);
+				fileOutStream = null;
+				return null;
 			}
 		}
 		else
 		{
-			sendFileToMachine = false;
-			outStream = System.out;;
+			fileOutStream = null;
+			return null;
 		}
 		return chooser.getName();
 	}
 	
-	private String openInputFile()
+	public String loadGCodeFileForMaking()
 	{
 		JFileChooser chooser = new JFileChooser();
         FileFilter filter;
@@ -607,7 +581,7 @@ public class GCodeReaderAndWriter
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		//chooser.setCurrentDirectory();
 
-		int result = chooser.showSaveDialog(null);
+		int result = chooser.showOpenDialog(null);
 		if (result == JFileChooser.APPROVE_OPTION)
 		{
 			String name = chooser.getSelectedFile().getAbsolutePath();
@@ -617,13 +591,15 @@ public class GCodeReaderAndWriter
 				fileInStream = new BufferedReader(new FileReader(name));
 			} catch (FileNotFoundException e) 
 			{
-				Debug.c("Can't write to file '" + name + "'.");
+				System.err.println("Can't read file " + name);
 				fileInStream = null;
+				return null;
 			}
 		} else
 		{
 			Debug.c("Can't write to file.");
-			fileInStream = null;			
+			fileInStream = null;
+			return null;
 		}
 
 		return chooser.getName();

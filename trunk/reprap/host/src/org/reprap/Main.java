@@ -553,7 +553,8 @@ public class Main {
     {
         String result = null;
         File f;
-        int returnVal = chooser.showOpenDialog(mainFrame);
+
+        int returnVal = chooser.showOpenDialog(null);// chooser.showOpenDialog(mainFrame);
         if(returnVal == JFileChooser.APPROVE_OPTION) 
         {
             f = chooser.getSelectedFile();
