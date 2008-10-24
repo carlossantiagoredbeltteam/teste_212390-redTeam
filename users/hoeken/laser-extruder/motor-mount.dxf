@@ -861,7 +861,7 @@ $ENDCAPS
   9
 $CLAYER
   8
-0
+gear2
   0
 ENDSEC
   0
@@ -1713,7 +1713,7 @@ LAYER
 100
 AcDbSymbolTable
  70
-3
+6
   0
 LAYER
   5
@@ -1774,6 +1774,72 @@ Text
 4
 420
 65535
+  6
+CONTINUOUS
+370
+0
+390
+F
+  0
+LAYER
+  5
+45
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
+gear1
+ 70
+0
+ 62
+7
+420
+0
+  6
+CONTINUOUS
+370
+0
+390
+F
+  0
+LAYER
+  5
+46
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
+drawings
+ 70
+0
+ 62
+7
+420
+0
+  6
+CONTINUOUS
+370
+0
+390
+F
+  0
+LAYER
+  5
+47
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
+gear2
+ 70
+0
+ 62
+7
+420
+0
   6
 CONTINUOUS
 370
@@ -2107,7 +2173,7 @@ ENTITIES
   0
 MTEXT
   5
-45
+48
 100
 AcDbEntity
 100
@@ -2141,13 +2207,13 @@ standard
  50
 0.0
  73
-1
+0
  44
 1.0
   0
 LINE
   5
-46
+49
 100
 AcDbEntity
 100
@@ -2175,7 +2241,7 @@ ByLayer
   0
 ARC
   5
-47
+4A
 100
 AcDbEntity
   8
@@ -2205,7 +2271,7 @@ AcDbArc
   0
 LINE
   5
-48
+4B
 100
 AcDbEntity
 100
@@ -2233,7 +2299,7 @@ ByLayer
   0
 ARC
   5
-49
+4C
 100
 AcDbEntity
   8
@@ -2263,7 +2329,7 @@ AcDbArc
   0
 LINE
   5
-4A
+4D
 100
 AcDbEntity
 100
@@ -2291,7 +2357,7 @@ ByLayer
   0
 CIRCLE
   5
-4B
+4E
 100
 AcDbEntity
 100
@@ -2315,7 +2381,7 @@ ByLayer
   0
 CIRCLE
   5
-4C
+4F
 100
 AcDbEntity
 100
@@ -2339,7 +2405,7 @@ ByLayer
   0
 ARC
   5
-4D
+50
 100
 AcDbEntity
   8
@@ -2369,7 +2435,7 @@ AcDbArc
   0
 ARC
   5
-4E
+51
 100
 AcDbEntity
   8
@@ -2399,7 +2465,7 @@ AcDbArc
   0
 ARC
   5
-4F
+52
 100
 AcDbEntity
   8
@@ -2429,7 +2495,7 @@ AcDbArc
   0
 LINE
   5
-50
+53
 100
 AcDbEntity
 100
@@ -2457,7 +2523,7 @@ ByLayer
   0
 CIRCLE
   5
-51
+54
 100
 AcDbEntity
 100
@@ -2481,7 +2547,7 @@ ByLayer
   0
 LINE
   5
-52
+55
 100
 AcDbEntity
 100
@@ -2509,7 +2575,7 @@ ByLayer
   0
 MTEXT
   5
-53
+56
 100
 AcDbEntity
 100
@@ -2543,13 +2609,13 @@ standard
  50
 360.0
  73
-1
+0
  44
 1.0
   0
 CIRCLE
   5
-54
+57
 100
 AcDbEntity
 100
@@ -2573,7 +2639,7 @@ ByLayer
   0
 LINE
   5
-55
+58
 100
 AcDbEntity
 100
@@ -2601,7 +2667,7 @@ ByLayer
   0
 ARC
   5
-56
+59
 100
 AcDbEntity
   8
@@ -2631,7 +2697,7 @@ AcDbArc
   0
 ARC
   5
-57
+5A
 100
 AcDbEntity
   8
@@ -2661,7 +2727,7 @@ AcDbArc
   0
 CIRCLE
   5
-58
+5B
 100
 AcDbEntity
 100
@@ -2685,7 +2751,7 @@ ByLayer
   0
 CIRCLE
   5
-59
+5C
 100
 AcDbEntity
 100
@@ -2709,7 +2775,7 @@ ByLayer
   0
 ARC
   5
-5A
+5D
 100
 AcDbEntity
   8
@@ -2739,7 +2805,7 @@ AcDbArc
   0
 LINE
   5
-5B
+5E
 100
 AcDbEntity
 100
@@ -2767,7 +2833,7 @@ ByLayer
   0
 LINE
   5
-5C
+5F
 100
 AcDbEntity
 100
@@ -2795,7 +2861,7 @@ ByLayer
   0
 ARC
   5
-5D
+60
 100
 AcDbEntity
   8
@@ -2825,7 +2891,7 @@ AcDbArc
   0
 LINE
   5
-5E
+61
 100
 AcDbEntity
 100
@@ -2853,7 +2919,7 @@ ByLayer
   0
 LINE
   5
-5F
+62
 100
 AcDbEntity
 100
@@ -2881,7 +2947,7 @@ ByLayer
   0
 ARC
   5
-60
+63
 100
 AcDbEntity
   8
@@ -2947,7 +3013,7 @@ E
   3
 AcDbVariableDictionary
 350
-61
+64
   0
 DICTIONARY
   5
@@ -3411,7 +3477,7 @@ Layout2
   0
 DICTIONARY
   5
-61
+64
 100
 AcDbDictionary
 281
@@ -3419,15 +3485,15 @@ AcDbDictionary
   3
 DIMASSOC
 350
-63
+66
   3
 HIDETEXT
 350
-62
+65
   0
 DICTIONARYVAR
   5
-62
+65
 100
 DictionaryVariables
 280
@@ -3437,7 +3503,7 @@ DictionaryVariables
   0
 DICTIONARYVAR
   5
-63
+66
 100
 DictionaryVariables
 280
