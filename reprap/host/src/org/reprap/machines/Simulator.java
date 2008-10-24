@@ -105,8 +105,14 @@ public class Simulator extends GenericRepRap {
 	{
 	}
 	
-	public String addFileForMaking()
+	/**
+	 * Load a GCode file to be made.
+	 * @return the name of the file
+	 */
+	public String loadGCodeFileForMaking()
 	{
-		return org.reprap.Main.gui.onOpen();
+		System.err.println("Simulator: attempt tp load GCode file.");
+		//super.loadGCodeFileForMaking();
+		return null;
 	}
 }

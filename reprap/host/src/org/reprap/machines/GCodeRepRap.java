@@ -397,8 +397,9 @@ public class GCodeRepRap extends GenericRepRap {
 	 * Load a GCode file to be made.
 	 * @return the name of the file
 	 */
-	public String addFileForMaking()
+	public String loadGCodeFileForMaking()
 	{
-		return gcode.addFileForMaking();
+		super.loadGCodeFileForMaking();
+		return gcode.loadGCodeFileForMaking();
 	}
 }

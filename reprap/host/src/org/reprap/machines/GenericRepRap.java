@@ -1067,6 +1067,6 @@ public abstract class GenericRepRap implements CartesianPrinter
 			org.reprap.Main.gui.deleteAllSTLs();
 		stlLoaded = false;
 		gcodeLoaded = true;
-		return ""; //FIXME
+		return null;
 	}
 }
