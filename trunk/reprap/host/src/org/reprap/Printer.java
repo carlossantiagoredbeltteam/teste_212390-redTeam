@@ -376,4 +376,17 @@ public interface Printer {
 	 */
 	public String addSTLFileForMaking();
 	public String loadGCodeFileForMaking();
+	
+	/**
+	 * Set an output file
+	 * @return
+	 */
+	public String setGCodeFileForOutput();
+	
+	/**
+	 * If a file replay is being done, do it and return true
+	 * otherwise return false.
+	 * @return
+	 */
+	public boolean filePlay();
 }

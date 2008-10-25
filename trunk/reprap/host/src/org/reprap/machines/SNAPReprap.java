@@ -512,11 +512,30 @@ public class SNAPReprap extends GenericRepRap
 	 */
 	public String loadGCodeFileForMaking()
 	{
-		System.err.println("SNAP RepRap: attempt tp load GCode file.");
+		System.err.println("SNAP RepRap: attempt to load GCode file.");
 		//super.loadGCodeFileForMaking();
 		return null;
-	}	
+	}
+	
+	/**
+	 * Set an output file
+	 * @return
+	 */
+	public String setGCodeFileForOutput()
+	{
+		System.err.println("SNAP RepRap: cannot generate GCode file.");
+		return null;		
+	}
 
+	/**
+	 * If a file replay is being done, do it and return true
+	 * otherwise return false.
+	 * @return
+	 */
+	public boolean filePlay()
+	{
+		return false;
+	}
 }
 
 
