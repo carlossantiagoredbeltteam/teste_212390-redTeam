@@ -111,8 +111,23 @@ public class Simulator extends GenericRepRap {
 	 */
 	public String loadGCodeFileForMaking()
 	{
-		System.err.println("Simulator: attempt tp load GCode file.");
+		System.err.println("Simulator: attempt to load GCode file.");
 		//super.loadGCodeFileForMaking();
 		return null;
+	}
+	
+	/**
+	 * Set an output file
+	 * @return
+	 */
+	public String setGCodeFileForOutput()
+	{
+		System.err.println("Simulator: cannot generate GCode file.");
+		return null;		
+	}
+	
+	public boolean filePlay()
+	{
+		return false;
 	}
 }

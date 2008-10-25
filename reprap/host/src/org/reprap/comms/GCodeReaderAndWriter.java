@@ -74,7 +74,7 @@ public class GCodeReaderAndWriter
 	 * a separate thread.  These control that.
 	 */
 	private boolean threadLock = false;
-	private Thread bufferThread;
+	private Thread bufferThread = null;
 	private int myPriority;
 	
 	/**
@@ -154,6 +154,7 @@ public class GCodeReaderAndWriter
 				exhaustBuffer = true;
 				while(exhaustBuffer) sleep(200);
 			}
+			bufferThread = null;
 		}	
 	}
 	
@@ -161,18 +162,18 @@ public class GCodeReaderAndWriter
 	 * Send a GCode file to the machine
 	 *
 	 */
-	public void playFile()
+	public boolean filePlay()
 	{
 		if(fileInStream == null)
 		{
-			System.err.println("GCodeWriter: attempt to read from non-existent file.");
-			return;
+			// Not playing a file...
+			return false;
 		}
 		
 		if(bufferThread == null)
 		{
 			System.err.println("GCodeWriter: attempt to write to non-existent buffer.");
-			return;
+			return true;
 		}			
 		
 		String line;
@@ -184,7 +185,11 @@ public class GCodeReaderAndWriter
 	        }
 	        fileInStream.close();
 	    } catch (IOException e) 
-	    {  }
+	    {  
+	    	System.err.println("Error printing file: " + e.toString());
+	    }
+	    
+	    return true;
 	}
 	
 	/**
@@ -206,7 +211,7 @@ public class GCodeReaderAndWriter
 	 */
 	public void finish()
 	{
-		Debug.c("disposing of gcodewriter.");
+		Debug.c("disposing of GCodeReaderAndWriter.");
 		
 		// Wait for the ring buffer to be exhausted
 		if(fileOutStream == null && bufferThread != null)
@@ -242,8 +247,8 @@ public class GCodeReaderAndWriter
 	}
 	
 	/**
-	 * Between layers othing will be queued.  Use the next two
-	 * functions to stop and start the buffer spinning.
+	 * Between layers nothing will be queued.  Use the next two
+	 * functions to slow and speed the buffer's spinning.
 	 *
 	 */
 	public void slowBufferThread()
@@ -331,8 +336,6 @@ public class GCodeReaderAndWriter
 				Debug.c("G-code: " + ringBuffer[tail] + " not sent");
 			// Just for safety
 			threadLock = false;
-			// We are running at high priority - give others a look in
-			//sleep(7);
 		}
 	}
 
@@ -539,7 +542,7 @@ public class GCodeReaderAndWriter
         return;
 	}
 	
-	private String setGCodeFileForOutput()
+	public String setGCodeFileForOutput()
 	{
 		JFileChooser chooser = new JFileChooser();
 		FileFilter filter;
@@ -588,7 +591,8 @@ public class GCodeReaderAndWriter
 			try
 			{
 				Debug.c("opening: " + name);
-				fileInStream = new BufferedReader(new FileReader(name));
+				fileInStream = new BufferedReader(new FileReader(chooser.getSelectedFile()));
+				return chooser.getSelectedFile().getName();
 			} catch (FileNotFoundException e) 
 			{
 				System.err.println("Can't read file " + name);
@@ -597,11 +601,10 @@ public class GCodeReaderAndWriter
 			}
 		} else
 		{
-			Debug.c("Can't write to file.");
+			System.err.println("Can't read file.");
 			fileInStream = null;
-			return null;
 		}
 
-		return chooser.getName();
+		return null;
 	}
 }

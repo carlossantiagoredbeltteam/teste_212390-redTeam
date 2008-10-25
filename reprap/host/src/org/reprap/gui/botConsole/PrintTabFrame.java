@@ -445,6 +445,10 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
 
 private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
     parentBotConsoleFrame.suspendPolling();
+    if(gCodeToFileRadioButton.isSelected())
+    	printer.setGCodeFileForOutput();
+    if(printer.filePlay())
+    	return;
     org.reprap.Main.gui.onProduceB();
 }//GEN-LAST:event_printButtonActionPerformed
 
@@ -552,6 +556,11 @@ private void loadSTL(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadSTL
 		loadedFiles = "";
 	}
 	String fn = printer.addSTLFileForMaking();
+	if(fn == null)
+	{
+		JOptionPane.showMessageDialog(null, "No STL was loaded.");
+		return;
+	}
 	
 	if(loadedFilesLong)
 		return;
@@ -597,6 +606,12 @@ private void LoadGCode(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoadGC
 		loadedFiles = "";
 	}
 	loadedFiles = printer.loadGCodeFileForMaking();
+	if(loadedFiles == null)
+	{
+		JOptionPane.showMessageDialog(null, "No GCode was loaded.");
+		return;
+	}
+	
 	fileNameBox.setText(loadedFiles);
 	gcodeLoaded = true;
 	stlLoaded = false;
