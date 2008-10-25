@@ -1,0 +1,8 @@
+//MPD-File
+#ifndef(pack_JP2) #declare global_pack_JP2=yes; object {PH_1X7()translate<0,0,0> rotate<0,0.000000,0>rotate<0,0.000000,0> rotate<0,0,0> translate<25.400000,0.000000,38.100000>}#end		//Header 2,54mm Grid 7Pin 1Row (jumper.lib) JP2  1X07
+#ifndef(pack_LED1) #declare global_pack_LED1=yes; object {DIODE_DIS_LED_3MM(Red,0.500000,0.000000,)translate<0,0,0> rotate<0,0.000000,0>rotate<0,0.000000,0> rotate<0,0,0> translate<13.970000,0.000000,29.210000>}#end		//Diskrete 3MM LED LED1  LED3MM
+#ifndef(pack_S1) #declare global_pack_S1=yes; object {SWITCH_B3F_10XX1()translate<0,0,0> rotate<0,0.000000,0>rotate<0,0.000000,0> rotate<0,0,0> translate<25.400000,0.000000,29.210000>}#end		//Tactile Switch-Omron S1  B3F-10XX
+#ifndef(pack_S2) #declare global_pack_S2=yes; object {SWITCH_B3F_10XX1()translate<0,0,0> rotate<0,0.000000,0>rotate<0,0.000000,0> rotate<0,0,0> translate<38.100000,0.000000,19.050000>}#end		//Tactile Switch-Omron S2  B3F-10XX
+#ifndef(pack_S3) #declare global_pack_S3=yes; object {SWITCH_B3F_10XX1()translate<0,0,0> rotate<0,0.000000,0>rotate<0,0.000000,0> rotate<0,0,0> translate<25.400000,0.000000,8.890000>}#end		//Tactile Switch-Omron S3  B3F-10XX
+#ifndef(pack_S4) #declare global_pack_S4=yes; object {SWITCH_B3F_10XX1()translate<0,0,0> rotate<0,0.000000,0>rotate<0,0.000000,0> rotate<0,0,0> translate<12.700000,0.000000,19.050000>}#end		//Tactile Switch-Omron S4  B3F-10XX
+#ifndef(pack_S5) #declare global_pack_S5=yes; object {SWITCH_B3F_10XX1()translate<0,0,0> rotate<0,0.000000,0>rotate<0,0.000000,0> rotate<0,0,0> translate<25.400000,0.000000,19.050000>}#end		//Tactile Switch-Omron S5  B3F-10XX
