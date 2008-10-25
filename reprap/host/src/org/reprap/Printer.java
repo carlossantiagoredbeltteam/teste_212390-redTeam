@@ -389,4 +389,16 @@ public interface Printer {
 	 * @return
 	 */
 	public boolean filePlay();
+	
+	/**
+	 * Stop the printer building.
+	 * This _shouldn't_ also stop it being controlled interactively.
+	 */
+	public void pause();
+	
+	/**
+	 * Resume building.
+	 *
+	 */
+	public void resume();
 }

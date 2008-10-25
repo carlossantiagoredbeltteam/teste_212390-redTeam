@@ -474,7 +474,8 @@ private void pauseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 }//GEN-LAST:event_pauseButtonActionPerformed
 
 private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonActionPerformed
-org.reprap.Main.gui.clickCancel();
+//org.reprap.Main.gui.clickCancel();
+	pauseAction(); //FIXME - best we can do at the moment
 }//GEN-LAST:event_stopButtonActionPerformed
 
 private void exitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitButtonActionPerformed

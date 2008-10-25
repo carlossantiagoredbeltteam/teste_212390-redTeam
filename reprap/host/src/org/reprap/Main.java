@@ -475,11 +475,13 @@ public class Main {
 	 */
 	public void pause()
 	{
-		producer.pause();
+		if(producer != null)
+			producer.pause();
 		try
 		{
 			printer.stopMotor();
 			printer.stopValve();
+			printer.pause();
 		} catch (Exception ex) {}
 	}
 	
@@ -490,7 +492,9 @@ public class Main {
 	 */
 	public void resume()
 	{
-		producer.resume();
+		printer.resume();
+		if(producer != null)
+			producer.resume();
 	}
 	
 	public int getLayers()
