@@ -40,7 +40,9 @@ public class GCodeRepRap extends GenericRepRap {
 	/**
 	* what is our current feedrate?
 	*/
-	double currentFeedrate = 0.0;
+	//double currentXYFeedrate = 0.0;
+	
+	//double currentZFeedrate = 0.0;
 	
 	/**
 	 * @param prefs
@@ -105,11 +107,11 @@ public class GCodeRepRap extends GenericRepRap {
 		{
 			code = "G1 Z" + liftedZ;
 
-			if (zFeedrate != currentFeedrate)
-			{
+			//if (zFeedrate != currentFeedrate)
+			//{
 				code += " F" + zFeedrate;
-				currentFeedrate = zFeedrate;
-			}
+				//currentFeedrate = zFeedrate;
+			//}
 
 			code += " ;lift up";
 			
@@ -148,7 +150,7 @@ public class GCodeRepRap extends GenericRepRap {
 			//if (zFeedrate != currentFeedrate)
 			//{
 				code += " F" + zFeedrate;
-				currentFeedrate = zFeedrate;
+				//currentFeedrate = zFeedrate;
 			//}
 			
 			code += " ;lift down";
@@ -163,7 +165,7 @@ public class GCodeRepRap extends GenericRepRap {
 			//if (zFeedrate != currentFeedrate)
 			//{
 				code += " F" + zFeedrate;
-				currentFeedrate = zFeedrate;
+				//currentFeedrate = zFeedrate;
 			//}
 
 			code += " ;z down";
@@ -305,6 +307,7 @@ public class GCodeRepRap extends GenericRepRap {
 		
 		gcode.queue("G1 Z-999 F" + round(getMaxFeedrateZ(), 4) + " ;z home");
 		gcode.queue("G92 X0 Y0 Z0; set current position as home");
+		
 	}
 	
 	private void delay(long millis)
@@ -319,7 +322,7 @@ public class GCodeRepRap extends GenericRepRap {
 		super.homeToZeroX();
 		
 		currentFeedrate = round(getMaxFeedrateX(), 4);
-		gcode.queue("G1 X-999 F" + currentFeedrate + " ;home x");
+		gcode.queue("G1 X-999 F" + round(getMaxFeedrateX(), 4) + " ;home x");
 		gcode.queue("G92 X0 ;set x 0");
 	}
 
@@ -330,7 +333,7 @@ public class GCodeRepRap extends GenericRepRap {
 		super.homeToZeroY();
 
 		currentFeedrate = round(getMaxFeedrateY(), 4);
-		gcode.queue("G1 Y-999 F" + currentFeedrate + " ;home y");
+		gcode.queue("G1 Y-999 F" + round(getMaxFeedrateY(), 4) + " ;home y");
 		gcode.queue("G92 Y0 ;set y 0");
 	}
 
@@ -340,8 +343,8 @@ public class GCodeRepRap extends GenericRepRap {
 	public void homeToZeroZ() throws ReprapException, IOException {
 		super.homeToZeroZ();
 
-		double feedrate = round(getMaxFeedrateZ(), 4);
-		gcode.queue("G1 Z-999 F" + feedrate + " ;home z");
+		//double feedrate = round(getMaxFeedrateZ(), 4);
+		gcode.queue("G1 Z-999 F" + round(getMaxFeedrateZ(), 4) + " ;home z");
 		gcode.queue("G92 Z0 ;set z 0");		
 	}
 	
@@ -424,5 +427,23 @@ public class GCodeRepRap extends GenericRepRap {
 	public boolean filePlay()
 	{
 		return gcode.filePlay();
+	}
+	
+	/**
+	 * Stop the printer building.
+	 * This _shouldn't_ also stop it being controlled interactively.
+	 */
+	public void pause()
+	{
+		gcode.pause();
+	}
+	
+	/**
+	 * Resume building.
+	 *
+	 */
+	public void resume()
+	{
+		gcode.resume();
 	}
 }

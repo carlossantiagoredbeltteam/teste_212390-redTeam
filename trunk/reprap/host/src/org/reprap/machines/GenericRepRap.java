@@ -1049,9 +1049,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	}
 	
 	/**
-	 * Load a file to be made.
-	 * Currently these can be STLs (more than one can be loaded) or
-	 * a GCode file.
+	 * Load an STL file to be made.
 	 * @return the name of the file
 	 */
 	public String addSTLFileForMaking()
@@ -1060,7 +1058,11 @@ public abstract class GenericRepRap implements CartesianPrinter
 		stlLoaded = true;
 		return org.reprap.Main.gui.onOpen();
 	}
-	
+
+	/**
+	 * Load a GCode file to be made.
+	 * @return the name of the file
+	 */
 	public String loadGCodeFileForMaking()
 	{
 		if(stlLoaded)
@@ -1068,5 +1070,21 @@ public abstract class GenericRepRap implements CartesianPrinter
 		stlLoaded = false;
 		gcodeLoaded = true;
 		return null;
+	}
+	
+	/**
+	 * Stop the printer building.
+	 * This _shouldn't_ also stop it being controlled interactively.
+	 */
+	public void pause()
+	{
+	}
+	
+	/**
+	 * Resume building.
+	 *
+	 */
+	public void resume()
+	{
 	}
 }

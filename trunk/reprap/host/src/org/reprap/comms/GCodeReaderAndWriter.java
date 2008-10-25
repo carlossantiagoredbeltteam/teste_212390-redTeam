@@ -25,6 +25,10 @@ import org.reprap.Preferences;
 
 public class GCodeReaderAndWriter
 {
+	/**
+	 * Stop sending a file (if we are).
+	 */
+	private boolean paused = false;
 	
 	/**
 	 * The name of the port talking to the RepRap machine
@@ -89,7 +93,7 @@ public class GCodeReaderAndWriter
 		
 	public GCodeReaderAndWriter()
 	{
-
+		paused = false;
 		ringBuffer = new String[buflen];
 		head = 0;
 		tail = 0;
@@ -139,6 +143,28 @@ public class GCodeReaderAndWriter
 		return fileOutStream != null;
 	}
 
+	/**
+	 * Stop the printer building.
+	 * This _shouldn't_ also stop it being controlled interactively.
+	 */
+	public void pause()
+	{
+		paused = true;
+		while(!bufferEmpty())
+		{
+			//System.err.println("Waiting for buffer to empty.");
+			sleep (131);
+		}
+	}
+	
+	/**
+	 * Resume building.
+	 *
+	 */
+	public void resume()
+	{
+		paused = false;
+	}
 	
 	/**
 	 * Start the production run
@@ -176,19 +202,36 @@ public class GCodeReaderAndWriter
 			return true;
 		}			
 		
-		String line;
-		try 
+		// Launch a thread to run through the file, so we can return control
+		// to the user
+		
+		Thread playFile = new Thread() 
 		{
-	        while ((line = fileInStream.readLine()) != null) 
-	        {
-	        	bufferQueue(line);
-	        }
-	        fileInStream.close();
-	    } catch (IOException e) 
-	    {  
-	    	System.err.println("Error printing file: " + e.toString());
-	    }
-	    
+			public void run() 
+			{
+				Thread.currentThread().setName("GCode file printer");
+				String line;
+				try 
+				{
+					while ((line = fileInStream.readLine()) != null) 
+					{
+						bufferQueue(line);
+						while(paused)
+						{
+							//System.err.println("Waiting for pause to end.");
+							sleep(239);
+						}
+					}
+					fileInStream.close();
+				} catch (Exception e) 
+				{  
+					System.err.println("Error printing file: " + e.toString());
+				}
+			}
+		};
+		
+		playFile.start();
+
 	    return true;
 	}
 	
