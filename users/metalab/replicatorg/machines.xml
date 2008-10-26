@@ -50,9 +50,10 @@
 		<warmup>
 		  M103 (extruder off)
 		  G90 (abs)
-		  G30 X120.00 Y110.00 Z-82.65 F780
-		  G92 (Metalab define current as home)
+		  G30 F780
 		  M104 S225.0 (heat)
+		  G0 X120.00 Y110.00 Z-82.65 F780
+		  G92 (Metalab define current as home)
 		</warmup>
 		<cooldown>
 		  G91 (Metalab relative positioning)
