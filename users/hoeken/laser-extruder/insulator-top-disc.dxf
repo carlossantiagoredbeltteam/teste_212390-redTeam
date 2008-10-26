@@ -1,5 +1,5 @@
 999
-dxflib 2.1.2.0
+dxflib 2.2.0.0
   0
 SECTION
   2
@@ -257,6 +257,12 @@ $CELTYPE
   6
 ByLayer
   9
+$GRIDUNIT
+ 10
+0.0
+ 20
+0.0
+  9
 $MENU
   1
 .
@@ -268,12 +274,6 @@ $ANGDIR
 $DIMALTTD
  70
 2
-  9
-$GRIDUNIT
- 10
-0.0
- 20
-0.0
   9
 $TREEDEPTH
  70
@@ -773,9 +773,9 @@ $LIMCHECK
   9
 $PINSBASE
  10
-0.0
+-44.866248256624857
  20
-0.0
+-35.2305439330544772
  30
 0.0
   9
@@ -1713,7 +1713,7 @@ LAYER
 100
 AcDbSymbolTable
  70
-2
+3
   0
 LAYER
   5
@@ -1728,6 +1728,8 @@ AcDbLayerTableRecord
 0
  62
 7
+420
+16777215
   6
 CONTINUOUS
 370
@@ -1748,6 +1750,30 @@ Notes
 0
  62
 7
+420
+16777215
+  6
+CONTINUOUS
+370
+0
+390
+F
+  0
+LAYER
+  5
+44
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
+Extruder Mount Plate
+ 70
+0
+ 62
+7
+420
+16777215
   6
 CONTINUOUS
 370
@@ -2081,37 +2107,13 @@ ENTITIES
   0
 CIRCLE
   5
-44
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-0
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-97.0158826232975002
- 20
-81.3147991298490069
- 30
-0.0
- 40
-1.425
-  0
-CIRCLE
-  5
 45
 100
 AcDbEntity
 100
 AcDbCircle
   8
-0
+Extruder Mount Plate
  62
 256
 370
@@ -2119,13 +2121,13 @@ AcDbCircle
   6
 ByLayer
  10
-72.2966535882484038
+110.0
  20
-92.8537425785700918
+80.0
  30
 0.0
  40
-1.425
+2.1000000000000001
   0
 CIRCLE
   5
@@ -2135,7 +2137,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-0
+Extruder Mount Plate
  62
 256
 370
@@ -2143,13 +2145,13 @@ AcDbCircle
   6
 ByLayer
  10
-94.6492862651975031
+79.9999999999999716
  20
-108.4917511605279969
+62.6794919243112219
  30
 0.0
  40
-1.425
+2.1000000000000001
   0
 CIRCLE
   5
@@ -2159,7 +2161,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-0
+Extruder Mount Plate
  62
 256
 370
@@ -2167,13 +2169,13 @@ AcDbCircle
   6
 ByLayer
  10
-104.2196999517074971
+80.0
  20
-91.1674998962145935
+97.3205080756887639
  30
 0.0
  40
-2.4249999999999998
+2.1000000000000001
   0
 CIRCLE
   5
@@ -2183,7 +2185,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-0
+Notes
  62
 256
 370
@@ -2191,13 +2193,13 @@ AcDbCircle
   6
 ByLayer
  10
-75.2233245103449946
+90.0
  20
-104.7030165565992093
+80.0
  30
 0.0
  40
-2.4249999999999998
+25.3999999999999986
   0
 CIRCLE
   5
@@ -2207,7 +2209,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-0
+Notes
  62
 256
 370
@@ -2215,41 +2217,17 @@ AcDbCircle
   6
 ByLayer
  10
-87.9872741589145022
+90.0
  20
-94.2200976229823937
+80.0
  30
 0.0
  40
-5.2000000000000002
-  0
-CIRCLE
-  5
-4A
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-0
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-87.9872741589145022
- 20
-94.2200976229823937
- 30
-0.0
- 40
-21.5
+5.0
   0
 MTEXT
   5
-4B
+4A
 100
 AcDbEntity
 100
@@ -2277,13 +2255,13 @@ ByLayer
  72
 2
   1
-Insulator\~Top\~Disc\PMaterial:\~1/4"\~or\~5mm\~acrylic
+Insulator\~Top\~Disc\PMaterial:\~1/16"\~metal\PPrint\~onto\~sticker\~for\~drilling\~aid
   7
 standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
@@ -2325,7 +2303,7 @@ E
   3
 AcDbVariableDictionary
 350
-4C
+4B
   0
 DICTIONARY
   5
@@ -2789,7 +2767,7 @@ Layout2
   0
 DICTIONARY
   5
-4C
+4B
 100
 AcDbDictionary
 281
@@ -2797,15 +2775,15 @@ AcDbDictionary
   3
 DIMASSOC
 350
-4E
+4D
   3
 HIDETEXT
 350
-4D
+4C
   0
 DICTIONARYVAR
   5
-4D
+4C
 100
 DictionaryVariables
 280
@@ -2815,7 +2793,7 @@ DictionaryVariables
   0
 DICTIONARYVAR
   5
-4E
+4D
 100
 DictionaryVariables
 280
