@@ -78,26 +78,36 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
         printer = org.reprap.Main.gui.getPrinter();
     }
     
-    public void updateProgress()
+    /**
+     * Keep the user amused.  If fractionDone is negative, the function
+     * queries the layer statistics.  If it is 0 or positive, the function uses
+     * it.
+     * @param fractionDone
+     */
+    public void updateProgress(double fractionDone)
     {
-    	int layers = org.reprap.Main.gui.getLayers();
-    	if(layers <= 0)
-    		return;
-    	
-    	int layer = org.reprap.Main.gui.getLayer();
-    	
-    	// Only bother if the layer has just changed
-    	
-    	if(layer == oldLayer)
-    		return;
-    	
-    	oldLayer = layer;
+    	if(fractionDone < 0)
+    	{
+    		int layers = org.reprap.Main.gui.getLayers();
+    		if(layers <= 0)
+    			return;
 
-    	currentLayerOutOfN.setText("" + layer + "/" + layers);
+    		int layer = org.reprap.Main.gui.getLayer();
+
+    		// Only bother if the layer has just changed
+
+    		if(layer == oldLayer)
+    			return;
+
+    		oldLayer = layer;
+
+    		currentLayerOutOfN.setText("" + layer + "/" + layers);
+    		fractionDone = (double)layer/(double)layers;
+    	}
  
     	progressBar.setMinimum(0);
-    	progressBar.setMaximum(layers);
-    	progressBar.setValue(layer);
+    	progressBar.setMaximum(100);
+    	progressBar.setValue((int)(100*fractionDone));
     	
     	GregorianCalendar cal = new GregorianCalendar();
     	SimpleDateFormat dateFormat = new SimpleDateFormat("EE HH:mm");
@@ -109,10 +119,10 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
     		return;
     	}
     	
-    	if(layer <= 0)
-    		return;
+    	//if(layer <= 0)
+    		//return;
     	
-    	long f = (layers*(e - startTime))/(layer);
+    	long f = (long)((double)(e - startTime)/fractionDone);
     	int h = (int)(f/60000)/60;
     	int m = (int)(f/60000)%60;
     	
