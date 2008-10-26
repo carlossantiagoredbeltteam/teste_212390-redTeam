@@ -61,6 +61,11 @@ public class GCodeReaderAndWriter
 	private BufferedReader fileInStream = null;
 	
 	/**
+	 * How long is our G-Code input file (if any).
+	 */
+	private long fileInStreamLength = -1;
+	
+	/**
 	 * This is for file output
 	 */
 	private PrintStream fileOutStream = null;
@@ -211,11 +216,16 @@ public class GCodeReaderAndWriter
 			{
 				Thread.currentThread().setName("GCode file printer");
 				String line;
+				long bytes = 0;
+				double fractionDone = 0;
 				try 
 				{
 					while ((line = fileInStream.readLine()) != null) 
 					{
 						bufferQueue(line);
+						bytes += line.length();
+						fractionDone = (double)bytes/(double)fileInStreamLength;
+						org.reprap.gui.botConsole.BotConsoleFrame.getBotConsoleFrame().setFractionDone(fractionDone);
 						while(paused)
 						{
 							//System.err.println("Waiting for pause to end.");
@@ -634,6 +644,7 @@ public class GCodeReaderAndWriter
 			try
 			{
 				Debug.c("opening: " + name);
+				fileInStreamLength = chooser.getSelectedFile().length();
 				fileInStream = new BufferedReader(new FileReader(chooser.getSelectedFile()));
 				return chooser.getSelectedFile().getName();
 			} catch (FileNotFoundException e) 

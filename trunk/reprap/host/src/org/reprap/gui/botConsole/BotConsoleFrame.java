@@ -30,6 +30,8 @@ public class BotConsoleFrame extends javax.swing.JFrame {
     private boolean pollThreadExiting = false;
     private boolean carryOnPolling = true;
     private GenericExtruderTabPanel[] extruderPanels;
+    double fractionDone = -1;
+    private static BotConsoleFrame bcf = null;
     
     /** Creates new form BotConsoleFrame */
     public BotConsoleFrame() {
@@ -45,7 +47,7 @@ public class BotConsoleFrame extends javax.swing.JFrame {
         initComponents();
         printTabFrame1.setFrames(this, xYZTabPanel);
         //xYZTabPanel.setBedPanelDimensions();
-        this.setTitle("Bot Console");
+        this.setTitle("RepRap Console");
         
         /*
          * Fork off a thread to keep the panels up-to-date
@@ -89,10 +91,16 @@ public class BotConsoleFrame extends javax.swing.JFrame {
     /**
      * The update thread calls this to update everything
      * that is independent of the RepRap machine.
+     * @param fractionDone
      */
     private void updateProgress()
     {
-    	printTabFrame1.updateProgress();
+    	printTabFrame1.updateProgress(fractionDone);
+    }
+    
+    public void setFractionDone(double f)
+    {
+    	fractionDone = f;
     }
 
     /**
@@ -163,11 +171,17 @@ public class BotConsoleFrame extends javax.swing.JFrame {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new BotConsoleFrame().setVisible(true);
+                bcf = new BotConsoleFrame();
+                bcf.setVisible(true);
             }
             
         });
      }
+    
+    public static BotConsoleFrame getBotConsoleFrame()
+    {
+    	return bcf;
+    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTabbedPane jTabbedPane1;
