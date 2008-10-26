@@ -75,7 +75,7 @@ public class GCodeReaderAndWriter
 	 * transmission to the RepRap machine.
 	 */
 	private int head, tail;
-	private static final int buflen = 10; // Too long and pause doesn't work well
+	private static final int buflen = 10; // No too long, or pause doesn't work well
 	private String[] ringBuffer;
 	
 	/**
@@ -186,11 +186,14 @@ public class GCodeReaderAndWriter
 				while(exhaustBuffer) sleep(200);
 			}
 			bufferThread = null;
+			head = 0;
+			tail = 0;
 		}	
 	}
 	
 	/**
-	 * Send a GCode file to the machine
+	 * Send a GCode file to the machine if that's what we have to do, and
+	 * return true.  Otherwise return false.
 	 *
 	 */
 	public boolean filePlay()
@@ -264,7 +267,7 @@ public class GCodeReaderAndWriter
 	 */
 	public void finish()
 	{
-		Debug.c("disposing of GCodeReaderAndWriter.");
+		Debug.d("disposing of GCodeReaderAndWriter.");
 		
 		// Wait for the ring buffer to be exhausted
 		if(fileOutStream == null && bufferThread != null)
@@ -468,9 +471,6 @@ public class GCodeReaderAndWriter
 		cmd = cmd.trim();
 		cmd = cmd.replaceAll("  ", " ");
 		
-		//add to list.
-		//commands.add(cmd);
-		
 		if(fileOutStream != null)
 		{
 			fileOutStream.println(cmd);
@@ -519,7 +519,7 @@ public class GCodeReaderAndWriter
 		serialOutStream = null;
 		
 		//open our port.
-		Debug.c("GCode opening port " + portName);
+		Debug.d("GCode opening port " + portName);
 		try 
 		{
 			CommPortIdentifier commId = CommPortIdentifier.getPortIdentifier(portName);
@@ -549,7 +549,7 @@ public class GCodeReaderAndWriter
 					SerialPort.PARITY_NONE);
 		}
 		catch (UnsupportedCommOperationException e) {
-			Debug.c("An unsupported comms operation was encountered.");
+			Debug.d("An unsupported comms operation was encountered.");
 			return;		
 		}
 
@@ -570,7 +570,7 @@ public class GCodeReaderAndWriter
 		try {
 			port.enableReceiveTimeout(1);
 		} catch (UnsupportedCommOperationException e) {
-			Debug.c("Read timeouts unsupported on this platform");
+			Debug.d("Read timeouts unsupported on this platform");
 		}
 
 		//create our steams
@@ -586,7 +586,7 @@ public class GCodeReaderAndWriter
 		}
 
 		//arduino bootloader skip.
-		Debug.c("Attempting to initialize Arduino");
+		Debug.d("Attempting to initialize Arduino");
         try {Thread.sleep(1000);} catch (Exception e) {}
         for(int i = 0; i < 10; i++)
                 serialOutStream.write('0');
@@ -611,7 +611,7 @@ public class GCodeReaderAndWriter
 
 			try
 			{
-				Debug.c("opening: " + name);
+				Debug.d("opening: " + name);
 				FileOutputStream fileStream = new FileOutputStream(name);
 				fileOutStream = new PrintStream(fileStream);
 			} catch (FileNotFoundException e) {
@@ -643,7 +643,7 @@ public class GCodeReaderAndWriter
 			String name = chooser.getSelectedFile().getAbsolutePath();
 			try
 			{
-				Debug.c("opening: " + name);
+				Debug.d("opening: " + name);
 				fileInStreamLength = chooser.getSelectedFile().length();
 				fileInStream = new BufferedReader(new FileReader(chooser.getSelectedFile()));
 				return chooser.getSelectedFile().getName();
