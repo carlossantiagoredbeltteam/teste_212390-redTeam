@@ -1,0 +1,72 @@
+/*
+<?xml version='1.0' standalone='yes' ?>
+<!--  xml header for scripts & plugin manager --> 
+<script>
+	<name>MetaCAD</name>
+	<author>Stefan Farthofer and Philipp Tiefenbacher</author>
+	<version>0.1</version>
+    <beta>1</beta>
+	<date>23/10/2008</date>
+	<description>
+This script unions all selected Objects
+    </description>
+    <comments>
+    </comments>
+</script>
+*/
+
+
+class MetaCAD
+{
+	public static ObjectInfo calculateNode(ObjectInfo object)
+	{
+		if (object.name.equalsIgnoreCase("union"))
+			return MetaCAD.Combine(object, CSGObject.UNION);
+		else if (object.name.equalsIgnoreCase("intersection"))
+			return MetaCAD.Combine(object, CSGObject.INTERSECTION);
+		else if (object.name.equalsIgnoreCase("difference"))
+			return MetaCAD.Combine(object, CSGObject.DIFFERENCE12);
+		else return object;
+	}
+
+	
+	public static ObjectInfo Combine(ObjectInfo object, int operation)
+	{
+		ObjectInfo[] children = object.getChildren();
+		
+		if (children == null || children.length == 0) return object;
+		
+		new MessageDialog(window, object.name);
+		
+		union = calculateNode(children[0]);
+		
+		//create combined object
+		for(int i=1;i<children.length;i++)
+		{
+			union = new CSGObject(union, calculateNode(children[i]), operation);  // get the ith ObjInfo
+			union = new ObjectInfo(union, new CoordinateSystem(), object.name);
+		}
+
+		object.object.copyObject(union.getObject());
+		object.setCoords(new CoordinateSystem());
+		object.clearCachedMeshes();		
+		
+		return union;
+	}
+}
+
+scene=window.getScene();
+sel=window.getSelectedObjects();
+
+//new MessageDialog(window,""+sel.size());
+//try {
+	it = sel.iterator();
+	while(it.hasNext())
+	{
+		MetaCAD.calculateNode(it.next());
+	}
+//}
+//catch(Exception ex)
+//{
+//	new MessageDialog(window, "Exception in MetaCAD:" + ex.toString());
+//}
