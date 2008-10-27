@@ -60,4 +60,64 @@ class LinearAxis {
 	byte max_pin;
 };
 
+inline bool LinearAxis::atMin()
+{
+	return digitalRead(this->min_pin);
+}
+
+/*
+ * NB!!!  Turned off by Adrian to free up pins
+*/
+inline bool LinearAxis::atMax()
+{
+	return 0;
+	//return digitalRead(this->max_pin);
+}
+
+inline void LinearAxis::doStep()
+{
+	//gotta call readState() before you can step again!
+	//this->can_step = false;
+	
+	//record our step
+	if (this->stepper.direction == RS_FORWARD)
+		this->forward1();
+	else
+		this->reverse1();
+}
+
+inline void LinearAxis::forward1()
+{
+	stepper.setDirection(RS_FORWARD);
+	stepper.pulse();
+	
+	this->current++;
+}
+
+inline void LinearAxis::reverse1()
+{
+	stepper.setDirection(RS_REVERSE);
+	stepper.pulse();
+	
+	this->current--;
+}
+
+inline void LinearAxis::setPosition(long p)
+{
+	this->current = p;
+	
+	//recalculate stuff.
+	this->setTarget(this->target);
+}
+
+
+
+inline void LinearAxis::initDDA(long max_delta)
+{
+	this->counter = -max_delta/2;
+}
+
+
+
+
 #endif

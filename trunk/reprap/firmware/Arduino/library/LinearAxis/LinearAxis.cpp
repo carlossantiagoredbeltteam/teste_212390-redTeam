@@ -30,15 +30,16 @@ void LinearAxis::readState()
 	else
 		this->can_step = true;
 }
-
+/*
 bool LinearAxis::atMin()
 {
 	return digitalRead(this->min_pin);
 }
-
+*/
 /*
  * NB!!!  Turned off by Adrian to free up pins
 */
+/*
 bool LinearAxis::atMax()
 {
 	return 0;
@@ -80,7 +81,7 @@ void LinearAxis::setPosition(long p)
 	//recalculate stuff.
 	this->setTarget(this->target);
 }
-
+*/
 void LinearAxis::setTarget(long t)
 {
 	this->target = t;
@@ -92,12 +93,12 @@ void LinearAxis::setTarget(long t)
 		
 	this->delta = abs(this->target - this->current);
 }
-
+/*
 void LinearAxis::initDDA(long max_delta)
 {
 	this->counter = -max_delta/2;
 }
-
+*/
 void LinearAxis::ddaStep(long max_delta)
 {
 	this->counter += this->delta;
