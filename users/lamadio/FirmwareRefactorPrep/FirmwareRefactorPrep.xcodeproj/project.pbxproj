@@ -11,6 +11,7 @@
 		DE1526BE0E82219400EBBB94 /* Collections.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DE1526B90E82219400EBBB94 /* Collections.cpp */; };
 		DE1526BF0E82219400EBBB94 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DE1526BB0E82219400EBBB94 /* main.cpp */; };
 		DE1526C00E82219400EBBB94 /* EventLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DE1526BD0E82219400EBBB94 /* EventLoop.cpp */; };
+		DEA4F7110EAA594900AE4546 /* Observable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DEA4F7100EAA594900AE4546 /* Observable.cpp */; };
 		DEC005D00E8D7E05003D1A1B /* wiringEmulator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DEC005CF0E8D7E05003D1A1B /* wiringEmulator.cpp */; };
 /* End PBXBuildFile section */
 
@@ -35,6 +36,8 @@
 		DE1526BB0E82219400EBBB94 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		DE1526BC0E82219400EBBB94 /* EventLoop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventLoop.h; sourceTree = "<group>"; };
 		DE1526BD0E82219400EBBB94 /* EventLoop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EventLoop.cpp; sourceTree = "<group>"; };
+		DEA4F70F0EAA594900AE4546 /* Observable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Observable.h; sourceTree = "<group>"; };
+		DEA4F7100EAA594900AE4546 /* Observable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Observable.cpp; sourceTree = "<group>"; };
 		DEC005CE0E8D7E05003D1A1B /* WProgram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WProgram.h; sourceTree = "<group>"; };
 		DEC005CF0E8D7E05003D1A1B /* wiringEmulator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wiringEmulator.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -70,6 +73,8 @@
 				DE1526BD0E82219400EBBB94 /* EventLoop.cpp */,
 				DEC005CE0E8D7E05003D1A1B /* WProgram.h */,
 				DEC005CF0E8D7E05003D1A1B /* wiringEmulator.cpp */,
+				DEA4F70F0EAA594900AE4546 /* Observable.h */,
+				DEA4F7100EAA594900AE4546 /* Observable.cpp */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -137,6 +142,7 @@
 				DE1526BF0E82219400EBBB94 /* main.cpp in Sources */,
 				DE1526C00E82219400EBBB94 /* EventLoop.cpp in Sources */,
 				DEC005D00E8D7E05003D1A1B /* wiringEmulator.cpp in Sources */,
+				DEA4F7110EAA594900AE4546 /* Observable.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

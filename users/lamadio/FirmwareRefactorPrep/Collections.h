@@ -17,6 +17,7 @@ inline int max(int x, int y)
 #endif
 
 typedef int (*DArraySortCallback)(const void* item1, const void* item2);
+typedef void (*DArrayForEach)(void* item, void* context);
 
 
 //
@@ -27,30 +28,36 @@ typedef int (*DArraySortCallback)(const void* item1, const void* item2);
 class DArray
 {
     void** _array;
-    int _count;
+    size_t _count;
 public:
     DArray();
     ~DArray();
     
     inline int count() { return _count; }
-    void* item(int i);
+    void* item(size_t i);
     void push(void* item);
     void* pop();
     void* dequeue();
-    void set(int i, void* item);
-    bool insert(int i, void* item);
-    void remove(int i);
-    int find(void* item);
+    void set(size_t i, void* item);
+    bool insert(size_t i, void* item);
+    void remove(size_t i);
+    bool find(void* item, size_t* index = NULL);
+    
+    void* operator[](size_t index) { return item(index); }
     
     DArray* shallowClone();
     
     void sort(DArraySortCallback cb);
     
-    inline int value(int i) { return (int)item(i); }
-    inline void pushValue(int i) { push((void*)i); }
+    // Do not modify the array during handling
+    void foreach(DArrayForEach cb, void* context);
+    
+    inline int value(size_t i) { return (int)item(i); }
+    inline bool findValue(int i, size_t* index) { return find((void*)i, index); }
+    inline void pushValue(size_t i) { push((void*)i); }
     inline int popValue() { return (int)pop(); }
     inline int dequeueValue() { return (int)dequeue(); }
-    inline bool insertValue(int i, int value) { return insert(i, (void*)value); }
+    inline bool insertValue(size_t i, int value) { return insert(i, (void*)value); }
 };
 
 bool testCollections();

@@ -23,9 +23,9 @@ DArray::~DArray()
         free(_array);
 }
 
-void* DArray::item(int i)
+void* DArray::item(size_t i)
 {
-    if (i >= 0 && i < _count)
+    if (i < _count)
     {
         return _array[i];
     }
@@ -63,21 +63,17 @@ void* DArray::pop()
     return item;
 }
 
-void DArray::set(int i, void* item)
+void DArray::set(size_t i, void* item)
 {
-    if (i < 0)
-        i = 0;
     if (i < _count)
     {
         _array[i] = item;
     }
 }
 
-bool DArray::insert(int i, void* item)
+bool DArray::insert(size_t i, void* item)
 {
-    if (i < 0)
-        i = 0;
-    int needed = max(i, _count + 1);
+    size_t needed = max(i, _count + 1);
     
     if (_array)
     {
@@ -107,32 +103,40 @@ bool DArray::insert(int i, void* item)
     return true;
 }
 
-void DArray::remove(int i)
+void DArray::remove(size_t i)
 {
-    if (i < 0)
-        return;
-    
     if (i < _count)
     {
         memmove(&_array[i], &_array[i + 1], (_count - i) * sizeof(void*));
+
+        // We don't need to reallocate this, because realloc will handle this correctly.
+        _count--;
     }
-    
-    // We don't need to reallocate this, because realloc will handle this correctly.
-    _count--;
 }
 
-int DArray::find(void* item)
+bool DArray::find(void* item, size_t* at)
 {
-    for (int index = 0; index < count(); index++)
+    for (size_t index = 0; index < count(); index++)
     {
         void* i = this->item(index);
         if (i == item)
-            return index;
+        {
+            if (at)
+                *at = index;
+            return true;
+        }
     }
     
-    return -1;
+    return false;
 }
 
+void DArray::foreach(DArrayForEach cb, void* context)
+{
+    for (size_t index = 0; index < count(); index++)
+    {
+        cb(_array[index], context);
+    }
+}
 
 void DArray::sort(DArraySortCallback cb)
 {
@@ -184,6 +188,20 @@ bool testCollections()
         if (tests[index] != a.value(index))
             return false;
     }
+    
+    DArray b;
+    b.pushValue(0);
+    b.pushValue(1);
+    b.pushValue(2);
+    b.pushValue(3);
+    b.pushValue(4);
+    
+    size_t index;
+    if (b.findValue(1, &index) && index != 1)
+    {
+        return false;
+    }
+    
     
     return true;
 }
