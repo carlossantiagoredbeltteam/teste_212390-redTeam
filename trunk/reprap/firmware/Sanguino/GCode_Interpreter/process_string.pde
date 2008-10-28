@@ -218,7 +218,8 @@ void process_string(char instruction[], int size)
 				//finally move.
 				dda_move(feedrate_micros);
 				break;
-
+#ifdef SANGUINO
+// No room for this in the Arduino
 			//Clockwise arc
 			case 2:
 			//Counterclockwise arc
@@ -289,7 +290,7 @@ void process_string(char instruction[], int size)
 				}
 			}
 			break;
-
+#endif
 			
 			case 4: //Dwell
 				delay((int)(gc.P + 0.5));  // Changed by AB from 1000*gc.P

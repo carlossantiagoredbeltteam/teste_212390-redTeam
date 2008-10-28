@@ -106,6 +106,7 @@ int extruder_get_temperature()
 /*
 * This function gives us the temperature from the thermistor in Celsius
 */
+
 int extruder_read_thermistor()
 {
 	int raw = extruder_sample_temperature(EXTRUDER_0_THERMISTOR_PIN);
