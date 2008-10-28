@@ -1,0 +1,64 @@
+// dummy needed to make ComponentsDialog nonmodal
+class MetaCADDummyCallback implements java.lang.Runnable
+{
+	public void run()
+	{
+		// We don't care if we are called
+	}
+}
+
+class MetaCADCallbacks implements java.lang.Runnable
+{
+	public void evaluate()
+	{
+		new MessageDialog(window, "evaluate");
+	}
+	
+	public void devaluate()
+	{
+		new MessageDialog(window, "devaluate");
+	}
+	
+	public void union()
+	{
+		new MessageDialog(window, "union");
+	}
+	
+	public void intersect()
+	{
+		new MessageDialog(window, "intersect");
+	}
+	
+	public void subtract()
+	{
+		new MessageDialog(window, "subtract");
+	}
+}
+
+	
+	
+BButton evaluateButton, devaluateButton;
+BButton unionButton, intersectButton, subtractButton;
+
+
+dlg = new ComponentsDialog(window, "MetaCAD Controll Panel" ,
+new Widget [] { 
+	evaluateButton = new BButton( "evaluate" ),
+	devaluateButton = new BButton( "devaluate" ),
+
+	unionButton = new BButton( "union" ),
+	intersectButton = new BButton( "intersect" ),
+	subtractButton = new BButton( "subtract" ),
+	},
+new String [] {"Actions", "", "Boolean Operations", "", ""}, new MetaCADDummyCallback(), new MetaCADDummyCallback() );
+dlg.setOkEnabled(false);
+
+MetaCADCallbacks callbacks = new MetaCADCallbacks();
+
+evaluateButton.addEventLink(CommandEvent.class, callbacks, "evaluate" );
+devaluateButton.addEventLink(CommandEvent.class, callbacks, "devaluate" );
+
+unionButton.addEventLink(CommandEvent.class, callbacks, "union" );
+intersectButton.addEventLink(CommandEvent.class, callbacks, "intersect" );
+subtractButton.addEventLink(CommandEvent.class, callbacks, "subtract" );
+
