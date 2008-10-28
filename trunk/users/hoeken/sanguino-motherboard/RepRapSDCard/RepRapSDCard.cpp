@@ -22,7 +22,7 @@ uint8_t RepRapSDCard::init_card(void)
 
 uint8_t RepRapSDCard::isLocked(void)
 {
-	return sd_raw_locked();
+	return sd_raw_locked() == 0x00;
 }
 
 uint8_t RepRapSDCard::isAvailable(void)

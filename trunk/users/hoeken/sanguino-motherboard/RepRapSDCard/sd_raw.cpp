@@ -10,6 +10,7 @@
 
 #include <string.h>
 #include <avr/io.h>
+#include <HardwareSerial.h>
 #include "sd_raw.h"
 #include "RepRapSDCard.h"
 /**
@@ -584,8 +585,11 @@ uint8_t sd_raw_write(uint32_t offset, const uint8_t* buffer, uint16_t length)
 #if SD_RAW_WRITE_SUPPORT
 
     if(get_pin_locked())
+    {
+    	Serial.println("locked.");
         return 0;
-
+	}
+	
     uint32_t block_address;
     uint16_t block_offset;
     uint16_t write_length;
