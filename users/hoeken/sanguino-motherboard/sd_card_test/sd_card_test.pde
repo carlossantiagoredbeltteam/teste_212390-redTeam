@@ -16,23 +16,36 @@ void setup()
 
   if (!card.init_card())
   {
-    Serial.println("Card init failed!"); 
-    error = 1;
+    if (!card.isAvailable())
+    {
+      Serial.println("No card present"); 
+      error = 1;
+    }
+    else
+    {
+      Serial.println("Card init failed"); 
+      error = 2;
+    }
   }
   else if (!card.open_partition())
   {
-    Serial.println("No partition!"); 
-    error = 2;
+    Serial.println("No partition"); 
+    error = 3;
   }
   else if (!card.open_filesys())
   {
     Serial.println("Can't open filesys"); 
-    error = 3;
+    error = 4;
   }
   else if (!card.open_dir("/"))
   {
     Serial.println("Can't open /");
-    error = 4;
+    error = 5;
+  }
+  else if (card.isLocked())
+  {
+    Serial.println("Card is locked");
+    error = 6;
   }
 }
 
@@ -81,17 +94,21 @@ void open_file()
   {
     Serial.println("couldnt create: ");
     Serial.println(buffer);
-    error = 5;
+    error = 7;
   }
-
-  f = card.open_file(buffer);
-  if (!f)
+  else
   {
-    Serial.println("error opening: ");
-    Serial.println(buffer);
-    error = 6;
+    f = card.open_file(buffer);
+    if (!f)
+    {
+      Serial.println("error opening: ");
+      Serial.println(buffer);
+      error = 8;
+    }
+    else
+    {
+      Serial.println("writing to: ");
+      Serial.println(buffer);
+    }
   }
-
-  Serial.println("writing to: ");
-  Serial.println(buffer);
 }
