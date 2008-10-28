@@ -20,6 +20,17 @@ uint8_t RepRapSDCard::init_card(void)
 	return sd_raw_init();
 }
 
+uint8_t RepRapSDCard::isLocked(void)
+{
+	return sd_raw_locked();
+}
+
+uint8_t RepRapSDCard::isAvailable(void)
+{
+	return sd_raw_available();
+}
+
+
 uint8_t RepRapSDCard::open_partition(void)
 {
 	/* open first partition */

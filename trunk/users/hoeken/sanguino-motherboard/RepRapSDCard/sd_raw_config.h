@@ -89,13 +89,11 @@
     #error "no sd/mmc pin mapping available!"
 #endif
 
-//TODO: update with real values.
-#define configure_pin_available() DDRC &= ~(1 << DDC4)
-#define configure_pin_locked() DDRC &= ~(1 << DDC5)
+#define configure_pin_available() DDRA &= ~(1 << DDA7)
+#define configure_pin_locked() DDRA &= ~(1 << DDA3)
 
-//TODO: update with real values.
-#define get_pin_available() ((PINC >> PC4) & 0x01)
-#define get_pin_locked() ((PINC >> PC5) & 0x01)
+#define get_pin_available() ((PINA >> PC7) & 0x01)
+#define get_pin_locked() ((~PINA >> PC3) & 0x01)
 
 /**
  * @}

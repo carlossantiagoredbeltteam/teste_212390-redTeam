@@ -21,6 +21,8 @@ class RepRapSDCard
 
 	public:
 		RepRapSDCard(void);
+		uint8_t isAvailable(void);
+		uint8_t isLocked(void);
 		uint8_t init_card(void);
 		uint8_t open_partition(void);
 		uint8_t open_filesys(void);
