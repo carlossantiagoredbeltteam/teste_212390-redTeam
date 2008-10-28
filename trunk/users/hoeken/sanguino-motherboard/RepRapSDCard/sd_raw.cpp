@@ -586,7 +586,7 @@ uint8_t sd_raw_write(uint32_t offset, const uint8_t* buffer, uint16_t length)
 
     if(get_pin_locked())
     {
-    	Serial.println("locked.");
+    	//Serial.println("locked.");
         return 0;
 	}
 	

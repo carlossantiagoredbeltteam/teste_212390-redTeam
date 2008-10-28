@@ -48,7 +48,7 @@ void setup()
     error = 6;
   }
 
-  open_file();
+  open_new_file();
 
   if (error == 0)
   {
@@ -62,13 +62,15 @@ void setup()
     card.write_file(f, (uint8_t *) buffer, bufferIndex);
     card.close_file(f);
   }
+  
+  read_first_file();
 }
 
 void loop()
 {
 }
 
-void open_file()
+void open_new_file()
 {
   strcpy(buffer, "RRJOB00.TXT");
   for (buffer[5] = '0'; buffer[5] <= '9'; buffer[5]++)
@@ -86,7 +88,7 @@ void open_file()
 
   if(!card.create_file(buffer))
   {
-    Serial.println("couldnt create: ");
+    Serial.print("couldnt create: ");
     Serial.println(buffer);
     error = 7;
   }
@@ -95,14 +97,44 @@ void open_file()
     f = card.open_file(buffer);
     if (!f)
     {
-      Serial.println("error opening: ");
+      Serial.print("error opening: ");
       Serial.println(buffer);
       error = 8;
     }
     else
     {
-      Serial.println("writing to: ");
+      Serial.print("writing to: ");
       Serial.println(buffer);
     }
   }
+}
+
+void read_first_file()
+{
+  strcpy(buffer, "RRJOB00.TXT");
+  f = card.open_file(buffer);
+
+    if (!f)
+    {
+      Serial.print("error opening: ");
+      Serial.println(buffer);
+      error = 8;
+    }
+    else
+    {
+      Serial.print("reading from: ");
+      Serial.println(buffer);
+
+      uint8_t result = card.read_file(f, (uint8_t *)buffer, 8);
+
+      if (result >0)
+        Serial.print(buffer);
+      else if (result == 0)
+        Serial.println("end of file.");
+      else
+      {
+        Serial.print("read error: ");
+        Serial.println(result, DEC);
+      }
+    }
 }
