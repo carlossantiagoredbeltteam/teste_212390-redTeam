@@ -93,7 +93,7 @@
 #define configure_pin_locked() DDRA &= ~(1 << DDA3)
 
 #define get_pin_available() ((PINA >> PC7) & 0x01)
-#define get_pin_locked() ((~PINA >> PC3) & 0x01)
+#define get_pin_locked() ((PINA >> PC3) & 0x01)
 
 /**
  * @}

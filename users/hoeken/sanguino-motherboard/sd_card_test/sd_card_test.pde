@@ -47,40 +47,34 @@ void setup()
     Serial.println("Card is locked");
     error = 6;
   }
+
+  open_file();
+
+  if (error == 0)
+  {
+    bufferIndex = 0;
+    for (char c = 'a'; c<= 'z'; c++)
+    {
+      buffer[bufferIndex] = c;
+      bufferIndex++;
+    }
+
+    card.write_file(f, (uint8_t *) buffer, bufferIndex);
+    card.close_file(f);
+  }
 }
 
 void loop()
 {
-  if (error == 0)
-  {
-    for (int i=0; i<10; i++)
-    {
-      open_file();
-
-      if (error == 0)
-      {
-        bufferIndex = 0;
-        for (char c = 'a'; c<= 'z'; c++)
-        {
-          buffer[bufferIndex] = c;
-          bufferIndex++;
-        }
-
-        card.write_file(f, (uint8_t *) buffer, bufferIndex);
-        card.close_file(f);
-      }
-      else
-        break;
-    }
-  }
 }
 
 void open_file()
 {
   strcpy(buffer, "RRJOB00.TXT");
-  for (buffer[5] = '0'; buffer[5] <= '9'; buffer[5]++) {
-    for (buffer[6] = '0'; buffer[6] <= '9'; buffer[6]++) {
-      //putstring("\n\rtrying to open ");Serial.println(buffer);
+  for (buffer[5] = '0'; buffer[5] <= '9'; buffer[5]++)
+  {
+    for (buffer[6] = '0'; buffer[6] <= '9'; buffer[6]++)
+    {
       f = card.open_file(buffer);
       if (!f)
         break;        // found a file!      

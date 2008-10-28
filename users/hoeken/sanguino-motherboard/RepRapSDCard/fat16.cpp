@@ -15,6 +15,7 @@
 #include "sd-reader_config.h"
 
 #include <string.h>
+#include <HardwareSerial.h>
 
 #if USE_DYNAMIC_MEMORY
     #include <stdlib.h>
@@ -1490,8 +1491,11 @@ uint8_t fat16_create_file(struct fat16_dir_struct* parent, const char* file, str
 {
 #if FAT16_WRITE_SUPPORT
     if(!parent || !file || !file[0] || !dir_entry)
+    {
+    	Serial.println("faila1");
         return 0;
-
+	}
+	
     /* check if the file already exists */
     while(1)
     {
@@ -1501,6 +1505,8 @@ uint8_t fat16_create_file(struct fat16_dir_struct* parent, const char* file, str
         if(strcmp(file, dir_entry->long_name) == 0)
         {
             fat16_reset_dir(parent);
+            Serial.println("faila2");
+
             return 0;
         }
     }
@@ -1513,15 +1519,22 @@ uint8_t fat16_create_file(struct fat16_dir_struct* parent, const char* file, str
 
     /* find place where to store directory entry */
     if(!(dir_entry->entry_offset = fat16_find_offset_for_dir_entry(fs, parent, dir_entry)))
+    {
+      	Serial.println("faila3");
         return 0;
-    
+    }
     /* write directory entry to disk */
     if(!fat16_write_dir_entry(fs, dir_entry))
-        return 0;
+    {
+    	Serial.println("faila4");
+  		return 0;
+    }
     
     return 1;
     
 #else
+   	Serial.println("faila5");
+
     return 0;
 #endif
 }
