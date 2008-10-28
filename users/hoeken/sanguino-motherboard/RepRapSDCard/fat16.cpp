@@ -15,15 +15,32 @@
 #include "sd-reader_config.h"
 
 #include <string.h>
-#include <HardwareSerial.h>
 
 #if USE_DYNAMIC_MEMORY
     #include <stdlib.h>
 #endif
 
+static uint8_t fat16_read_header(struct fat16_fs_struct* fs);
+static uint16_t fat16_get_next_cluster(const struct fat16_fs_struct* fs, uint16_t cluster_num);
+static uint16_t fat16_append_clusters(const struct fat16_fs_struct* fs, uint16_t cluster_num, uint16_t count);
+static uint8_t fat16_free_clusters(const struct fat16_fs_struct* fs, uint16_t cluster_num);
+static uint8_t fat16_terminate_clusters(const struct fat16_fs_struct* fs, uint16_t cluster_num);
+static uint8_t fat16_clear_cluster(const struct fat16_fs_struct* fs, uint16_t cluster_num);
+static uint16_t fat16_clear_cluster_callback(uint8_t* buffer, uint32_t offset, void* p);
+static uint32_t fat16_cluster_offset(const struct fat16_fs_struct* fs, uint16_t cluster_num);
+static uint8_t fat16_dir_entry_read_callback(uint8_t* buffer, uint32_t offset, void* p);
+static uint8_t fat16_interpret_dir_entry(struct fat16_dir_entry_struct* dir_entry, const uint8_t* raw_entry);
+static uint32_t fat16_find_offset_for_dir_entry(const struct fat16_fs_struct* fs, const struct fat16_dir_struct* parent, const struct fat16_dir_entry_struct* dir_entry);
+static uint8_t fat16_write_dir_entry(const struct fat16_fs_struct* fs, struct fat16_dir_entry_struct* dir_entry);
+
+//static uint8_t fat16_get_fs_free_callback(uint8_t* buffer, uint32_t offset, void* p);
+
+//static void fat16_set_file_modification_date(struct fat16_dir_entry_struct* dir_entry, uint16_t year, uint8_t month, uint8_t day);
+//static void fat16_set_file_modification_time(struct fat16_dir_entry_struct* dir_entry, uint8_t hour, uint8_t min, uint8_t sec);
+
 struct fat16_fs_struct fat16_fs_handlers[FAT16_FILE_COUNT];
-struct fat16_file_struct fat16_file_handlers[FAT16_FILE_COUNT];
-struct fat16_dir_struct fat16_dir_handlers[FAT16_DIR_COUNT];
+  struct fat16_file_struct fat16_file_handlers[FAT16_FILE_COUNT];
+  struct fat16_dir_struct fat16_dir_handlers[FAT16_DIR_COUNT];
   
 /**
  * \addtogroup fat16 FAT16 support
@@ -901,11 +918,6 @@ struct fat16_file_struct*  fat16_open_file(struct fat16_fs_struct* fs, const str
 
         ++fd;
     }
-    if(i >= FAT16_FILE_COUNT) {
-	//todo: see if this works?
-      //putstring_nl("no more handlers\n\r"); 
-        return 0;
-    }
 #endif
     
     memcpy(&fd->dir_entry, dir_entry, sizeof(*dir_entry));
@@ -932,6 +944,101 @@ void fat16_close_file(struct fat16_file_struct* fd)
         fd->fs = 0;
 #endif
 }
+
+/**
+ * \ingroup fat16_file
+ * Reads data from a file.
+ * 
+ * The data requested is read from the current file location.
+ *
+ * \param[in] fd The file handle of the file from which to read.
+ * \param[out] buffer The buffer into which to write.
+ * \param[in] buffer_len The amount of data to read.
+ * \returns The number of bytes read, 0 on end of file, or -1 on failure.
+ * \see fat16_write_file
+ */
+int16_t fat16_read_file(struct fat16_file_struct* fd, uint8_t* buffer, uint16_t buffer_len)
+{
+    /* check arguments */
+    if(!fd || !buffer || buffer_len < 1)
+        return -1;
+
+    /* determine number of bytes to read */
+    if(fd->pos + buffer_len > fd->dir_entry.file_size)
+        buffer_len = fd->dir_entry.file_size - fd->pos;
+    if(buffer_len == 0)
+        return 0;
+    
+    uint16_t cluster_size = fd->fs->header.cluster_size;
+    uint16_t cluster_num = fd->pos_cluster;
+    uint16_t buffer_left = buffer_len;
+    uint16_t first_cluster_offset = fd->pos % cluster_size;
+
+    /* find cluster in which to start reading */
+    if(!cluster_num)
+    {
+        cluster_num = fd->dir_entry.cluster;
+        
+        if(!cluster_num)
+        {
+            if(!fd->pos)
+                return 0;
+            else
+                return -1;
+        }
+
+        if(fd->pos)
+        {
+            uint32_t pos = fd->pos;
+            while(pos >= cluster_size)
+            {
+                pos -= cluster_size;
+                cluster_num = fat16_get_next_cluster(fd->fs, cluster_num);
+                if(!cluster_num)
+                    return -1;
+            }
+        }
+    }
+    
+    /* read data */
+    do
+    {
+        /* calculate data size to copy from cluster */
+        uint32_t cluster_offset = fat16_cluster_offset(fd->fs, cluster_num) + first_cluster_offset;
+        uint16_t copy_length = cluster_size - first_cluster_offset;
+        if(copy_length > buffer_left)
+            copy_length = buffer_left;
+
+        /* read data */
+        if(!fd->fs->partition->device_read(cluster_offset, buffer, copy_length))
+            return buffer_len - buffer_left;
+
+        /* calculate new file position */
+        buffer += copy_length;
+        buffer_left -= copy_length;
+        fd->pos += copy_length;
+
+        if(first_cluster_offset + copy_length >= cluster_size)
+        {
+            /* we are on a cluster boundary, so get the next cluster */
+            if((cluster_num = fat16_get_next_cluster(fd->fs, cluster_num)))
+            {
+                first_cluster_offset = 0;
+            }
+            else
+            {
+                fd->pos_cluster = 0;
+                return buffer_len - buffer_left;
+            }
+        }
+
+        fd->pos_cluster = cluster_num;
+
+    } while(buffer_left > 0); /* check if we are done */
+
+    return buffer_len;
+}
+
 
 /**
  * \ingroup fat16_file
@@ -1091,8 +1198,6 @@ int16_t fat16_write_file(struct fat16_file_struct* fd, const uint8_t* buffer, ui
  * \returns 0 on failure, 1 on success.
  */
  
- /* We could use this to append to the log but we just make a new one!
- 
 uint8_t fat16_seek_file(struct fat16_file_struct* fd, int32_t* offset, uint8_t whence)
 {
     if(!fd || !offset)
@@ -1123,8 +1228,6 @@ uint8_t fat16_seek_file(struct fat16_file_struct* fd, int32_t* offset, uint8_t w
     *offset = new_pos;
     return 1;
 }
-*/
-
 
 /**
  * \ingroup fat16_dir
@@ -1491,11 +1594,8 @@ uint8_t fat16_create_file(struct fat16_dir_struct* parent, const char* file, str
 {
 #if FAT16_WRITE_SUPPORT
     if(!parent || !file || !file[0] || !dir_entry)
-    {
-    	Serial.println("faila1");
         return 0;
-	}
-	
+
     /* check if the file already exists */
     while(1)
     {
@@ -1505,8 +1605,6 @@ uint8_t fat16_create_file(struct fat16_dir_struct* parent, const char* file, str
         if(strcmp(file, dir_entry->long_name) == 0)
         {
             fat16_reset_dir(parent);
-            Serial.println("faila2");
-
             return 0;
         }
     }
@@ -1519,22 +1617,15 @@ uint8_t fat16_create_file(struct fat16_dir_struct* parent, const char* file, str
 
     /* find place where to store directory entry */
     if(!(dir_entry->entry_offset = fat16_find_offset_for_dir_entry(fs, parent, dir_entry)))
-    {
-      	Serial.println("faila3");
         return 0;
-    }
+    
     /* write directory entry to disk */
     if(!fat16_write_dir_entry(fs, dir_entry))
-    {
-    	Serial.println("faila4");
-  		return 0;
-    }
+        return 0;
     
     return 1;
     
 #else
-   	Serial.println("faila5");
-
     return 0;
 #endif
 }
@@ -1619,3 +1710,18 @@ uint8_t fat16_get_fs_free_callback(uint8_t* buffer, uint32_t offset, void* p)
     return 1;
 }
 
+/**
+ * \ingroup fat16_fs
+ * Calculates the offset of the specified cluster.
+ *
+ * \param[in] fs The filesystem on which to operate.
+ * \param[in] cluster_num The cluster whose offset to calculate.
+ * \returns The cluster offset.
+ */
+uint32_t fat16_cluster_offset(const struct fat16_fs_struct* fs, uint16_t cluster_num)
+{
+    if(!fs || cluster_num < 2)
+        return 0;
+
+    return fs->header.cluster_zero_offset + (uint32_t) (cluster_num - 2) * fs->header.cluster_size;
+}

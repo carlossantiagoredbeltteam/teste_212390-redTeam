@@ -125,11 +125,20 @@ uint8_t RepRapSDCard::create_file(char *name)
 	return fat16_create_file(dd, name, &file_entry);
 }
 
-/*
-uint8_t RepRapSDCard::seek_file(File fd, int32_t *offset, uint8_t whence) {
-  return  fat16_seek_file(fd, offset, whence);
-}*/
+uint8_t RepRapSDCard::reset_file(File f)
+{
+	return fat16_seek_file(f, 0, FAT16_SEEK_SET);
+}
 
+uint8_t RepRapSDCard::seek_file(File f, int32_t *offset, uint8_t whence)
+{
+	return fat16_seek_file(f, offset, whence);
+}
+
+uint16_t RepRapSDCard::read_file(File f, uint8_t* buffer, uint16_t buffer_len)
+{
+	return fat16_read_file(f, buffer, buffer_len);
+}
 
 uint8_t RepRapSDCard::write_file(File f, uint8_t *buff, uint8_t siz) 
 {

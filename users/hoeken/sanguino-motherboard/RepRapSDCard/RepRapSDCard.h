@@ -33,8 +33,10 @@ class RepRapSDCard
 		File open_file(char *name);
 		void close_file(File f);
 		uint8_t create_file(char *name);
-		uint8_t write_file(File f, uint8_t *b, uint8_t num);
 		uint8_t seek_file(File fd, int32_t *offset, uint8_t whence);
+		uint8_t reset_file(File f);
+		uint16_t read_file(File f, uint8_t* buffer, uint16_t buffer_len);
+		uint8_t write_file(File f, uint8_t *b, uint8_t num);
 };
 
 #endif
