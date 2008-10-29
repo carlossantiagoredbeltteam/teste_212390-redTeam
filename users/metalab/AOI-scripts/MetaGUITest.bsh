@@ -131,6 +131,8 @@ class MetaCAD
 	window.rebuildItemList();
 	window.clearSelection();
 	window.addToSelection(window.getScene().indexOf(result));
+	
+	return result;
     }
 }
 
