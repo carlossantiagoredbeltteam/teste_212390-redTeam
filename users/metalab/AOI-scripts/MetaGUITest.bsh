@@ -1,38 +1,222 @@
+/*
+<?xml version='1.0' standalone='yes' ?>
+<!--  xml header for scripts & plugin manager --> 
+<script>
+  <name>MetaGuiTest</name>
+  <author>Metalab</author>
+  <version>0.1</version>
+  <beta>1</beta>
+  <date>23/10/2008</date>
+  <description>
+    MetaMagic
+  </description>
+  <comments>
+  </comments>
+</script>
+*/
+
+class MetaCAD
+{
+    public static String opToString(int operation) {
+	switch (operation) {
+	case CSGObject.UNION:
+	    return "union";
+	    break;
+	case CSGObject.INTERSECTION:
+	    return "intersection";
+	    break;
+	case CSGObject.DIFFERENCE12:
+	    return "difference";
+	    break;
+	default:
+	    return null;
+	}
+    }
+
+    public static int stringToOp(String opstr) {
+	if (opstr.equalsIgnoreCase("union")) return CSGObject.UNION;
+	else if (opstr.equalsIgnoreCase("intersection")) return CSGObject.INTERSECTION;
+	else if (opstr.equalsIgnoreCase("difference")) return CSGObject.DIFFERENCE12;
+	else return -1;
+    }
+
+    /*
+      Recursively (Re-)calculates the object tree rooted at the given root object
+      based on the object name
+    */
+    public static ObjectInfo calculateNode(ObjectInfo parent)
+    {
+	int op = stringToOp(parent.name);
+	if (op == -1) return parent;
+	else return combine(parent, op);
+    }
+
+    /*
+    */
+    public static void devaluateNode(ObjectInfo parent)
+    {
+	int op = stringToOp(parent.name);
+	if (op != -1 && parent.object.getClass() == CSGObject.class) {
+	    parent.setVisible(false);
+	    window.getScene().objectModified(parent.getObject());
+	    ObjectInfo[] children = parent.getChildren();
+	    for (int i=0;i<children.length;i++) {
+		devaluateNode(children[i]);
+	    }
+	}
+	else {
+	    parent.setVisible(true);
+	    window.getScene().objectModified(parent.getObject());
+	}
+    }
+
+    /*
+      Performs the given operation on all the children of the given object.
+      Recursively calls calculateNode() on each child.
+     */	
+    public static ObjectInfo combine(ObjectInfo parent, int operation)
+    {
+	ObjectInfo unioninfo = combine(parent.getChildren(), operation);
+	parent.object.copyObject(unioninfo.object);
+	parent.setCoords(new CoordinateSystem());
+	parent.setVisible(true);
+	parent.clearCachedMeshes();		
+	window.getScene().objectModified(parent.object);
+		
+	return parent;
+    }
+
+    /*
+      Performs the given operation on the list of objects (of size >= 2),
+      and returns the resulting ObjectInfo containing a CSGObject.
+
+      Calls calculateNode() on each child.
+    */
+    public static ObjectInfo combine(ObjectInfo[] objects, int operation)
+    {
+	if (objects.length < 1) return null;
+	if (objects.length < 2) return objects[0];
+
+	Object3D unionobj = new CSGObject(calculateNode(objects[0]), 
+					  calculateNode(objects[1]), 
+					  operation);
+	ObjectInfo unioninfo = new ObjectInfo(unionobj, new CoordinateSystem(), "tmp");
+	for (int i=2;i<objects.length;i++) {
+	    unionobj = new CSGObject(unioninfo, calculateNode(objects[i]), operation);
+	    unioninfo = new ObjectInfo(unionobj, new CoordinateSystem(), "tmp");
+	}
+
+	for (int i=0;i<objects.length;i++) {
+	    objects[i].setVisible(false);
+	    window.getScene().objectModified(objects[i].getObject());
+	}
+	return unioninfo;
+    }
+
+    /*
+      Creates a new object consisting of the result of performing the given
+      operation on the given list of objects (of length >= 2).
+
+      Inserts the new object into the scene and makes the original objects
+      children of the new object. Also hides the children.
+    */
+    public static ObjectInfo create(ObjectInfo[] objects, int operation)
+    {
+ 	ObjectInfo result = combine(objects, operation);
+	result.setName(opToString(operation));
+	for (int i=0;i<objects.length;i++) {
+	    result.addChild(objects[i], i);
+	}
+	window.getScene().addObject(result, null);
+	window.rebuildItemList();
+	window.clearSelection();
+	window.addToSelection(window.getScene().indexOf(result));
+    }
+}
+
 // dummy needed to make ComponentsDialog nonmodal
 class MetaCADDummyCallback implements java.lang.Runnable
 {
-	public void run()
-	{
-		// We don't care if we are called
-	}
+    public void run()
+    {
+	// We don't care if we are called
+    }
 }
 
-class MetaCADCallbacks implements java.lang.Runnable
+class MetaCADCallbacks
 {
-	public void evaluate()
-	{
-		new MessageDialog(window, "evaluate");
+    public ObjectInfo[] getSelection() {
+	sel = window.getSelectedObjects();
+	if (sel.size() < 2) {
+	    new MessageDialog(window, "Minimum two objects must be selected.");
+	    return null;
 	}
+	else {
+	    ObjectInfo[] objects = new ObjectInfo[sel.size()];
+	    it = sel.iterator();
+	    int i = 0;
+	    while (it.hasNext()) {
+		objects[i++] = it.next();
+	    }
+	    return objects;
+	}
+    }
+
+    public void evaluate()
+    {
+	sel = window.getSelectedObjects();
 	
-	public void devaluate()
-	{
-		new MessageDialog(window, "devaluate");
+	it = sel.iterator();
+	while (it.hasNext()) {
+	    MetaCAD.calculateNode(it.next());
 	}
+	window.rebuildItemList();
+	window.updateImage();
+	window.setModified();
+    }
 	
-	public void union()
-	{
-		new MessageDialog(window, "union");
-	}
+    public void devaluate()
+    {
+	sel = window.getSelectedObjects();
 	
-	public void intersect()
-	{
-		new MessageDialog(window, "intersect");
+	it = sel.iterator();
+	while (it.hasNext()) {
+	    MetaCAD.devaluateNode(it.next());
 	}
+	window.rebuildItemList();
+	window.updateImage();
+	window.setModified();
+    }
 	
-	public void subtract()
-	{
-		new MessageDialog(window, "subtract");
+    public void union()
+    {
+	ObjectInfo[] objects = getSelection();
+	if (objects != null) {
+	    ObjectInfo result = MetaCAD.create(objects, CSGObject.UNION);
 	}
+	window.updateImage();
+	window.setModified();
+    }
+	
+    public void intersect()
+    {
+	ObjectInfo[] objects = getSelection();
+	if (objects != null) {
+	    ObjectInfo result = MetaCAD.create(objects, CSGObject.INTERSECTION);
+	}
+	window.updateImage();
+	window.setModified();
+    }
+	
+    public void subtract()
+    {
+	ObjectInfo[] objects = getSelection();
+	if (objects != null) {
+	    ObjectInfo result = MetaCAD.create(objects, CSGObject.DIFFERENCE12);
+	}
+	window.setModified();
+	window.updateImage();
+    }
 }
 
 	
@@ -41,16 +225,16 @@ BButton evaluateButton, devaluateButton;
 BButton unionButton, intersectButton, subtractButton;
 
 
-dlg = new ComponentsDialog(window, "MetaCAD Controll Panel" ,
-new Widget [] { 
-	evaluateButton = new BButton( "evaluate" ),
-	devaluateButton = new BButton( "devaluate" ),
+dlg = new ComponentsDialog(window, "MetaCAD Control Panel" ,
+			   new Widget [] { 
+			       evaluateButton = new BButton( "evaluate" ),
+			       devaluateButton = new BButton( "devaluate" ),
 
-	unionButton = new BButton( "union" ),
-	intersectButton = new BButton( "intersect" ),
-	subtractButton = new BButton( "subtract" ),
-	},
-new String [] {"Actions", "", "Boolean Operations", "", ""}, new MetaCADDummyCallback(), new MetaCADDummyCallback() );
+			       unionButton = new BButton( "union" ),
+			       intersectButton = new BButton( "intersect" ),
+			       subtractButton = new BButton( "subtract" ),
+			   },
+			   new String [] {"Actions", "", "Boolean Operations", "", ""}, new MetaCADDummyCallback(), new MetaCADDummyCallback() );
 dlg.setOkEnabled(false);
 
 MetaCADCallbacks callbacks = new MetaCADCallbacks();
