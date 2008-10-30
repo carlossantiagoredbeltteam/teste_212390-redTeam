@@ -73,7 +73,7 @@ public class Main {
     private JCheckBoxMenuItem layerPause;
     
     private JMenuItem cancelMenuItem;
-    private JMenuItem produceProduceT, produceProduceB;
+    private JMenuItem produceProduceB;
 
     public void setSegmentPause(boolean state) {
         segmentPause.setState(state);
@@ -118,37 +118,37 @@ public class Main {
         // Create menus
         JMenuBar menubar = new JMenuBar();
         
-        JMenu fileMenu = new JMenu("File");
-        fileMenu.setMnemonic(KeyEvent.VK_F);
-        menubar.add(fileMenu);
+        //JMenu fileMenu = new JMenu("File");
+        //fileMenu.setMnemonic(KeyEvent.VK_F);
+        //menubar.add(fileMenu);
         
-        JMenuItem fileOpen = new JMenuItem("Open...", KeyEvent.VK_O);
-        fileOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-        fileOpen.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				onOpen();
-			}});
-        fileMenu.add(fileOpen);
+        //JMenuItem fileOpen = new JMenuItem("Open...", KeyEvent.VK_O);
+        //fileOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+        //fileOpen.addActionListener(new ActionListener() {
+		//	public void actionPerformed(ActionEvent arg0) {
+		//		onOpen();
+		//	}});
+        //fileMenu.add(fileOpen);
         
-        fileMenu.addSeparator();
+        //fileMenu.addSeparator();
 
-        JMenuItem filePrefs = new JMenuItem("Preferences...", KeyEvent.VK_R);
-        filePrefs.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				Preferences prefs = new Preferences();
-				prefs.setVisible(true);	// prefs.show();
-			}});
-        fileMenu.add(filePrefs);
+        //JMenuItem filePrefs = new JMenuItem("Preferences...", KeyEvent.VK_R);
+        //filePrefs.addActionListener(new ActionListener() {
+		//	public void actionPerformed(ActionEvent arg0) {
+		//		Preferences prefs = new Preferences();
+		//		prefs.setVisible(true);	// prefs.show();
+		//	}});
+        //fileMenu.add(filePrefs);
 
-        fileMenu.addSeparator();
+        //fileMenu.addSeparator();
 
-        JMenuItem fileExit = new JMenuItem("Exit", KeyEvent.VK_X);
-        fileExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.ALT_MASK));
-        fileExit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				dispose();
-			}});
-        fileMenu.add(fileExit);
+        //JMenuItem fileExit = new JMenuItem("Exit", KeyEvent.VK_X);
+        //fileExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.ALT_MASK));
+        //fileExit.addActionListener(new ActionListener() {
+		//	public void actionPerformed(ActionEvent arg0) {
+		//		dispose();
+		//	}});
+        //fileMenu.add(fileExit);
 
         JMenu viewMenu = new JMenu("View");
         viewMenu.setMnemonic(KeyEvent.VK_V);
@@ -214,13 +214,6 @@ public class Main {
 			}});
         manipMenu.add(inToMM);
         
-//        JMenuItem materialSTL = new JMenuItem("New material for selected object", KeyEvent.VK_M);
-//        materialSTL.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, ActionEvent.CTRL_MASK));
-//        materialSTL.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent arg0) {
-//				onMaterial();
-//			}});
-//        manipMenu.add(materialSTL);
         
         JMenuItem deleteSTL = new JMenuItem("Delete selected object", KeyEvent.VK_W);
         deleteSTL.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.CTRL_MASK));
@@ -232,148 +225,122 @@ public class Main {
         
         
 
-        JMenu produceMenu = new JMenu("Build");
-        produceMenu.setMnemonic(KeyEvent.VK_P);
-        menubar.add(produceMenu);
+        //JMenu produceMenu = new JMenu("Build");
+        //produceMenu.setMnemonic(KeyEvent.VK_P);
+        //menubar.add(produceMenu);
 
-//        produceProduceT = new JMenuItem("Produce test piece...", KeyEvent.VK_T);
-//        produceProduceT.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, ActionEvent.CTRL_MASK));
-//        produceProduceT.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent arg0) {
-//				onProduceT();
-//			}});
-//        produceMenu.add(produceProduceT);
         
-        produceProduceB = new JMenuItem("Start build...", KeyEvent.VK_B);
-        produceProduceB.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.CTRL_MASK));
-        produceProduceB.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				onProduceB();
-			}});
-        produceMenu.add(produceProduceB);
+        //produceProduceB = new JMenuItem("Start build...", KeyEvent.VK_B);
+        //produceProduceB.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.CTRL_MASK));
+        //produceProduceB.addActionListener(new ActionListener() {
+		//	public void actionPerformed(ActionEvent arg0) {
+		//		onProduceB();
+		//	}});
+        //produceMenu.add(produceProduceB);
 
-        cancelMenuItem = new JMenuItem("Cancel", KeyEvent.VK_P);
-        cancelMenuItem.setEnabled(false);
-        cancelMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				if(producer != null)
-					producer.setCancelled(true);
-			}});
-        produceMenu.add(cancelMenuItem);
+        //cancelMenuItem = new JMenuItem("Cancel", KeyEvent.VK_P);
+        //cancelMenuItem.setEnabled(false);
+        //cancelMenuItem.addActionListener(new ActionListener() {
+		//	public void actionPerformed(ActionEvent arg0) {
+		//		if(producer != null)
+		//			producer.setCancelled(true);
+		//	}});
+        //produceMenu.add(cancelMenuItem);
         
         
         
-        produceMenu.addSeparator();
+        //produceMenu.addSeparator();
 
         segmentPause = new JCheckBoxMenuItem("Pause before segment");
-        produceMenu.add(segmentPause);
+        //produceMenu.add(segmentPause);
 
         layerPause = new JCheckBoxMenuItem("Pause before layer");
-        produceMenu.add(layerPause);
+        //produceMenu.add(layerPause);
 
-        produceMenu.addSeparator();
-
-//        JMenuItem estimateMenuItemT = new JMenuItem("Estimate test-piece resources...", KeyEvent.VK_E);
-//        estimateMenuItemT.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent arg0) {
-//				estimateResourcesT();
-//			}});
-//        produceMenu.add(estimateMenuItemT);
+        //produceMenu.addSeparator();
         
-        JMenuItem estimateMenuItemB = new JMenuItem("Estimate build resources...", KeyEvent.VK_E);
-        estimateMenuItemB.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				estimateResourcesB();
-			}});
-        produceMenu.add(estimateMenuItemB);
+        //JMenuItem estimateMenuItemB = new JMenuItem("Estimate build resources...", KeyEvent.VK_E);
+        //estimateMenuItemB.addActionListener(new ActionListener() {
+		//	public void actionPerformed(ActionEvent arg0) {
+		//		estimateResourcesB();
+		//	}});
+        //produceMenu.add(estimateMenuItemB);
                 
-        JMenu toolsMenu = new JMenu("Tools");
-        toolsMenu.setMnemonic(KeyEvent.VK_T);
-        menubar.add(toolsMenu);
+        //JMenu toolsMenu = new JMenu("Tools");
+        //toolsMenu.setMnemonic(KeyEvent.VK_T);
+        //menubar.add(toolsMenu);
         
-        JMenuItem toolsWorkingVolume = new JMenuItem("Working volume probe", KeyEvent.VK_W);
-        toolsWorkingVolume.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					new org.reprap.gui.steppertest.WorkingVolumeFrame();
-				}
-              	catch (Exception ex) {
-             		JOptionPane.showMessageDialog(null, "Working volume probe exception: " + ex);
-         			ex.printStackTrace();
-             	}
-			}});
-        toolsMenu.add(toolsWorkingVolume);
+        //JMenuItem toolsWorkingVolume = new JMenuItem("Working volume probe", KeyEvent.VK_W);
+        //toolsWorkingVolume.addActionListener(new ActionListener() {
+		//	public void actionPerformed(ActionEvent arg0) {
+		//		try {
+		//			new org.reprap.gui.steppertest.WorkingVolumeFrame();
+		//		}
+        //     	catch (Exception ex) {
+        //     		JOptionPane.showMessageDialog(null, "Working volume probe exception: " + ex);
+        // 			ex.printStackTrace();
+        //     	}
+		//	}});
+        //toolsMenu.add(toolsWorkingVolume);
         
-      JMenuItem toolsMaintenancePositions = new JMenuItem("Maintenance positions", KeyEvent.VK_M);
-      toolsMaintenancePositions.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					new org.reprap.gui.steppertest.MaintenancePositionsFrame();
-				}
-            	catch (Exception ex) {
-           		JOptionPane.showMessageDialog(null, "Maintenance positions exception: " + ex);
-       			ex.printStackTrace();
-           	}
-			}});
-      toolsMenu.add(toolsMaintenancePositions);
+      //JMenuItem toolsMaintenancePositions = new JMenuItem("Maintenance positions", KeyEvent.VK_M);
+      //toolsMaintenancePositions.addActionListener(new ActionListener() {
+		//	public void actionPerformed(ActionEvent arg0) {
+		//		try {
+		//			new org.reprap.gui.steppertest.MaintenancePositionsFrame();
+		//		}
+        //    	catch (Exception ex) {
+        //   		JOptionPane.showMessageDialog(null, "Maintenance positions exception: " + ex);
+       	//		ex.printStackTrace();
+        //   	}
+		//	}});
+      //toolsMenu.add(toolsMaintenancePositions);
         
-        JMenuItem toolsExerciser = new JMenuItem("Stepper exerciser", KeyEvent.VK_S);
-        toolsExerciser.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					org.reprap.gui.steppertest.Main.main(null);
-				}
-              	catch (Exception ex) {
-             		JOptionPane.showMessageDialog(null, "Stepper exerciser exception: " + ex);
-         			ex.printStackTrace();
-             	}
-			}});
-        toolsMenu.add(toolsExerciser);
+        //JMenuItem toolsExerciser = new JMenuItem("Stepper exerciser", KeyEvent.VK_S);
+        //toolsExerciser.addActionListener(new ActionListener() {
+		//	public void actionPerformed(ActionEvent arg0) {
+		//		try {
+		//			org.reprap.gui.steppertest.Main.main(null);
+		//		}
+        //      	catch (Exception ex) {
+        //    		JOptionPane.showMessageDialog(null, "Stepper exerciser exception: " + ex);
+        // 			ex.printStackTrace();
+        //     	}
+		//	}});
+        //toolsMenu.add(toolsExerciser);
 
-        JMenuItem toolsExtruderExerciser = new JMenuItem("Extruder exerciser", KeyEvent.VK_E);
-        toolsExtruderExerciser.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					org.reprap.gui.extrudertest.Main.main(null);
-				}
-              	catch (Exception ex) {
-             		JOptionPane.showMessageDialog(null, "Extruder exerciser exception: " + ex);
-         			ex.printStackTrace();
-             	}
-			}});
-        toolsMenu.add(toolsExtruderExerciser);
+        //JMenuItem toolsExtruderExerciser = new JMenuItem("Extruder exerciser", KeyEvent.VK_E);
+        //toolsExtruderExerciser.addActionListener(new ActionListener() {
+		//	public void actionPerformed(ActionEvent arg0) {
+		//		try {
+		//			org.reprap.gui.extrudertest.Main.main(null);
+		//		}
+        //      	catch (Exception ex) {
+        //     		JOptionPane.showMessageDialog(null, "Extruder exerciser exception: " + ex);
+        // 			ex.printStackTrace();
+        //     	}
+		//	}});
+        //toolsMenu.add(toolsExtruderExerciser);
 
-        JMenuItem toolsExtruderProfiler = new JMenuItem("Extruder heat profiler", KeyEvent.VK_H);
-        toolsExtruderProfiler.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					org.reprap.gui.extruderprofile.Main.main(null);
-				}
-              	catch (Exception ex) {
-             		JOptionPane.showMessageDialog(null, "Extruder profiler exception: " + ex);
-         			ex.printStackTrace();
-             	}
-			}});
-        toolsMenu.add(toolsExtruderProfiler);
+        //JMenuItem toolsExtruderProfiler = new JMenuItem("Extruder heat profiler", KeyEvent.VK_H);
+        //toolsExtruderProfiler.addActionListener(new ActionListener() {
+		//	public void actionPerformed(ActionEvent arg0) {
+		//		try {
+		//			org.reprap.gui.extruderprofile.Main.main(null);
+		//		}
+        //      	catch (Exception ex) {
+        //     		JOptionPane.showMessageDialog(null, "Extruder profiler exception: " + ex);
+        // 			ex.printStackTrace();
+        //     	}
+		//	}});
+        //toolsMenu.add(toolsExtruderProfiler);
 
         
-//        JMenuItem toolsSquareTest = new JMenuItem("Square Test", KeyEvent.VK_Q);
-//        toolsSquareTest.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent arg0) {
-//				try {
-//					org.reprap.SquareTest.main(null);
-//				}
-//              	catch (Exception ex) {
-//             		JOptionPane.showMessageDialog(null, "Square Test exception: " + ex);
-//         			ex.printStackTrace();
-//             	}
-//			}});
-//        toolsMenu.add(toolsSquareTest);
-        
-        JMenu diagnosticsMenu = new JMenu("Diagnostics");
-        toolsMenu.add(diagnosticsMenu);
-        JMenuItem diagnosticsCommsTest = new JMenuItem("Basic comms test");
-        diagnosticsMenu.add(diagnosticsCommsTest);
+
+        //JMenu diagnosticsMenu = new JMenu("Diagnostics");
+        //toolsMenu.add(diagnosticsMenu);
+        //JMenuItem diagnosticsCommsTest = new JMenuItem("Basic comms test");
+        //diagnosticsMenu.add(diagnosticsCommsTest);
 
         // Create the main window area
         // This is a horizontal box layout that includes
