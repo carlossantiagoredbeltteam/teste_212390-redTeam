@@ -91,7 +91,7 @@ public abstract class GenericExtruder implements Extruder
 	/**
 	 * The number of seconds to cool between layers
 	 */
-	protected int coolingPeriod;
+	protected double coolingPeriod;
 	
 	/**
 	 * The speed of movement in XY when depositing
@@ -329,7 +329,7 @@ public abstract class GenericExtruder implements Extruder
 			lowerFineLayers = Preferences.loadGlobalInt(prefName + "LowerFineLayers(0...)");
 			upperFineLayers = Preferences.loadGlobalInt(prefName + "UpperFineLayers(0...)");
 			extrusionBroadWidth = Preferences.loadGlobalDouble(prefName + "ExtrusionBroadWidth(mm)");		
-			coolingPeriod = Preferences.loadGlobalInt(prefName + "CoolingPeriod(s)");
+			coolingPeriod = Preferences.loadGlobalDouble(prefName + "CoolingPeriod(s)");
 			xyFeedrate = Preferences.loadGlobalDouble(prefName + "XYFeedrate(mm/minute)");
 			t0 = Preferences.loadGlobalInt(prefName + "t0(0..255)");
 			iSpeed = Preferences.loadGlobalDouble(prefName + "InfillSpeed(0..1)");
@@ -620,7 +620,7 @@ public abstract class GenericExtruder implements Extruder
     /* (non-Javadoc)
      * @see org.reprap.Extruder#getCoolingPeriod()
      */
-    public int getCoolingPeriod()
+    public double getCoolingPeriod()
     {
     	return coolingPeriod;
     } 

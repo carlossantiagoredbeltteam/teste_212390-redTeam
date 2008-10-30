@@ -326,6 +326,12 @@ public class GCodeReaderAndWriter
 	 */
 	private void bufferQueue(String cmd)
 	{
+		// Is the output thread running?
+		if(bufferThread == null)
+		{
+			System.err.println("bufferQueue: attempt to queue: " + cmd + " to a non-running output buffer.");
+			return;
+		}
 		// Are we locked out by the transmit thread?
 		while(threadLock) sleep(211);
 		// Lock out the transmit thread
