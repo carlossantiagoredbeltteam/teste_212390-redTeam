@@ -189,7 +189,7 @@ public interface Extruder
     /**
      * @return the cooling period in seconds
      */
-    public int getCoolingPeriod();
+    public double getCoolingPeriod();
  
     /**
      * @return the X offset in millimeters
