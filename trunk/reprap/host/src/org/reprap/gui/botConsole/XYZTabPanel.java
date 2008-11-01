@@ -98,8 +98,6 @@ public class XYZTabPanel extends javax.swing.JPanel {
         xySpeedField = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         zSpeedField = new javax.swing.JTextField();
-        zSlider = new javax.swing.JSlider();
-        jLabel1 = new javax.swing.JLabel();
         plotExtruderCheck = new javax.swing.JCheckBox();
         extruderToPlotWith = new javax.swing.JTextField();
 
@@ -258,13 +256,6 @@ public class XYZTabPanel extends javax.swing.JPanel {
                 .add(xySpeedField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
 
-        zSlider.setOrientation(javax.swing.JSlider.VERTICAL);
-        zSlider.setValue(0);
-        zSlider.setInverted(true);
-
-        jLabel1.setFont(jLabel1.getFont().deriveFont((float)12));
-        jLabel1.setText("Z");
-
         plotExtruderCheck.setText("Plot using Extruder #");
 
         extruderToPlotWith.setColumns(1);
@@ -279,34 +270,21 @@ public class XYZTabPanel extends javax.swing.JPanel {
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                         .addContainerGap()
                         .add(nudgePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(layout.createSequentialGroup()
-                                .add(350, 350, 350)
-                                .add(zSlider, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 22, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                            .add(layout.createSequentialGroup()
-                                .add(2, 2, 2)
-                                .add(speedsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                                .add(plotExtruderCheck)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(extruderToPlotWith, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                        .add(235, 235, 235))
-                    .add(layout.createSequentialGroup()
-                        .add(motorsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(2, 2, 2)
+                        .add(speedsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                        .add(jLabel1)))
+                        .add(plotExtruderCheck)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(extruderToPlotWith, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(235, 235, 235))
+                    .add(motorsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(motorsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 226, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel1)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(zSlider, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                .add(motorsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 226, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -321,8 +299,6 @@ public class XYZTabPanel extends javax.swing.JPanel {
                             .add(plotExtruderCheck))))
                 .addContainerGap())
         );
-
-        motorsPanel.getAccessibleContext().setAccessibleName("Axis positions");
     }// </editor-fold>//GEN-END:initComponents
 
 private void nudgeSizeRB1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nudgeSizeRB1ActionPerformed
@@ -398,7 +374,6 @@ private void goButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     private javax.swing.JTextField extruderToPlotWith;
     private javax.swing.JButton goButton;
     private javax.swing.JButton homeAllButton;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel motorsPanel;
@@ -413,7 +388,6 @@ private void goButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     private org.reprap.gui.botConsole.StepperPositionJPanel xStepperPositionJPanel;
     public static javax.swing.JTextField xySpeedField;
     private org.reprap.gui.botConsole.StepperPositionJPanel yStepperPositionJPanel;
-    private javax.swing.JSlider zSlider;
     public static javax.swing.JTextField zSpeedField;
     private org.reprap.gui.botConsole.StepperPositionJPanel zStepperPositionJPanel;
     // End of variables declaration//GEN-END:variables
