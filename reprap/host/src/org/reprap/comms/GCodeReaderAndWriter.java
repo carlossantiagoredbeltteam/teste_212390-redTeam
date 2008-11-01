@@ -333,7 +333,7 @@ public class GCodeReaderAndWriter
 			return;
 		}
 		// Are we locked out by the transmit thread?
-		while(threadLock) sleep(211);
+		while(threadLock) sleep(5);
 		// Lock out the transmit thread
 		threadLock = true;
 		// Next location in the ring
@@ -362,9 +362,9 @@ public class GCodeReaderAndWriter
 		for(;;)
 		{
 			// Are we locked out by the queuing thread?
-			while(threadLock) sleep(29);
+			while(threadLock) sleep(7);
 			// Wait for something to be there to send
-			while(head == tail)
+			while(bufferEmpty())
 			{
 				// If nothing more is ever coming, finish
 				if(exhaustBuffer)
@@ -372,7 +372,7 @@ public class GCodeReaderAndWriter
 					exhaustBuffer = false;
 					return;
 				}
-				sleep(211);
+				sleep(19);
 			}
 			// Lock out the queuing thread
 			threadLock = true;
