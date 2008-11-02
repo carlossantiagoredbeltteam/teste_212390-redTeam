@@ -3,12 +3,12 @@
 <!--  xml header for scripts & plugin manager --> 
 <script>
   <name>MetaGuiTest</name>
-  <author>Metalab</author>
-  <version>0.1</version>
+  <author>Philipp Tiefenbacher, Stefan Farthofer and Marius Kintel (Metalab)</author>
+  <version>1.0</version>
   <beta>1</beta>
-  <date>23/10/2008</date>
+  <date>2/11/2008</date>
   <description>
-    MetaMagic
+    FIXME: MetaMagic
   </description>
   <comments>
   </comments>
@@ -34,17 +34,26 @@ class MetaCAD
     }
 
     public static int stringToOp(String opstr) {
-	if (opstr.equalsIgnoreCase("union")) return CSGObject.UNION;
-	else if (opstr.equalsIgnoreCase("intersection")) return CSGObject.INTERSECTION;
-	else if (opstr.equalsIgnoreCase("difference")) return CSGObject.DIFFERENCE12;
+	String lower = opstr.toLowerCase();
+	if (lower.startsWith("union") || lower.startsWith("+")) {
+	    return CSGObject.UNION;
+	}
+	else if (lower.startsWith("intersection") || lower.startsWith("/")) {
+	    return CSGObject.INTERSECTION;
+	}
+	else if (opstr.equalsIgnoreCase("difference") || lower.startsWith("-")) {
+	    return CSGObject.DIFFERENCE12;
+	}
 	else return -1;
     }
 
     /*
-      Recursively (Re-)calculates the object tree rooted at the given root object
-      based on the object name
+      Recursively (Re-)evaluates the object tree rooted at the given root object
+      based on the object name.
+
+      The result should be one CSG object where the entire child tree is disabled.
     */
-    public static ObjectInfo calculateNode(ObjectInfo parent)
+    public static ObjectInfo evaluateNode(ObjectInfo parent)
     {
 	int op = stringToOp(parent.name);
 	if (op == -1) return parent;
@@ -52,6 +61,10 @@ class MetaCAD
     }
 
     /*
+      Recursively (Re-)deevaluates the object tree rooted at the given root object
+      based on the object name.
+
+      This disables all implicit (parent) objects and enabled the leaf nodes.
     */
     public static void devaluateNode(ObjectInfo parent)
     {
@@ -72,7 +85,7 @@ class MetaCAD
 
     /*
       Performs the given operation on all the children of the given object.
-      Recursively calls calculateNode() on each child.
+      Recursively calls evaluateNode() on each child.
      */	
     public static ObjectInfo combine(ObjectInfo parent, int operation)
     {
@@ -90,19 +103,19 @@ class MetaCAD
       Performs the given operation on the list of objects (of size >= 2),
       and returns the resulting ObjectInfo containing a CSGObject.
 
-      Calls calculateNode() on each child.
+      Calls evaluateNode() on each child.
     */
     public static ObjectInfo combine(ObjectInfo[] objects, int operation)
     {
 	if (objects.length < 1) return null;
 	if (objects.length < 2) return objects[0];
 
-	Object3D unionobj = new CSGObject(calculateNode(objects[0]), 
-					  calculateNode(objects[1]), 
+	Object3D unionobj = new CSGObject(evaluateNode(objects[0]), 
+					  evaluateNode(objects[1]), 
 					  operation);
 	ObjectInfo unioninfo = new ObjectInfo(unionobj, new CoordinateSystem(), "tmp");
 	for (int i=2;i<objects.length;i++) {
-	    unionobj = new CSGObject(unioninfo, calculateNode(objects[i]), operation);
+	    unionobj = new CSGObject(unioninfo, evaluateNode(objects[i]), operation);
 	    unioninfo = new ObjectInfo(unionobj, new CoordinateSystem(), "tmp");
 	}
 
@@ -170,7 +183,7 @@ class MetaCADCallbacks
 	
 	it = sel.iterator();
 	while (it.hasNext()) {
-	    MetaCAD.calculateNode(it.next());
+	    MetaCAD.evaluateNode(it.next());
 	}
 	window.rebuildItemList();
 	window.updateImage();
