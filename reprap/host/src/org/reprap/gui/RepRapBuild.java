@@ -289,7 +289,7 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 		String stlFile = getStlBackground();
 
 		workingVolume = new STLObject();
-		workingVolume.addSTL(stlFile, wv_offset, wv_app);
+		workingVolume.addSTL(stlFile, wv_offset, wv_app, null);
 		wv_and_stls.addChild(workingVolume.top);
 
 		// Set the mouse to move everything
@@ -374,7 +374,7 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 			return;
 		objectIndex++;
 		STLObject stl = new STLObject();
-		Attributes att = stl.addSTL(s, null, Preferences.unselectedApp());
+		Attributes att = stl.addSTL(s, null, Preferences.unselectedApp(), lastPicked);
 		if(att != null)
 		{
 			wv_and_stls.addChild(stl.top);
@@ -455,7 +455,9 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 		{
 			stls.remove(index);
 			index = wv_and_stls.indexOfChild(lastPicked.top);
+			mouseToWorld();
 			wv_and_stls.removeChild(index);
+			lastPicked = null;
 		}
 	}
 	

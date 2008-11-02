@@ -76,6 +76,15 @@ import org.reprap.devices.GenericExtruder;
  * 
  */
 
+/**
+ * Little class to hold offsets of loaded STL objects
+ */
+class Offsets
+{
+	public Vector3d centreToOrigin;
+	public Vector3d bottomLeftShift;
+}
+
 public class STLObject
 {
     private MouseObject mouse = null;  // The mouse, if it is controlling us
@@ -85,6 +94,7 @@ public class STLObject
     public BranchGroup stl = null;     // The actual STL geometry
     public Vector3d size = null;       // X, Y and Z extent
     private BoundingBox bbox = null;   // Temporary storage for the bounding box while loading
+    private Vector3d rootOffset = null;// Offset of the first-loaded STL under stl
     
 
     public STLObject()
@@ -119,6 +129,12 @@ public class STLObject
         trans.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
         trans.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
         
+        stl.setCapability(Group.ALLOW_CHILDREN_EXTEND);
+        stl.setCapability(Group.ALLOW_CHILDREN_WRITE);
+        stl.setCapability(Group.ALLOW_CHILDREN_READ);
+        stl.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
+        stl.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
+        
         trans.addChild(stl);
         handle.addChild(trans);
         top.addChild(handle);
@@ -138,7 +154,7 @@ public class STLObject
      * @param att
      * @return
      */
-    private BranchGroup loadSingleSTL(String location, Attributes att)
+    private BranchGroup loadSingleSTL(String location, Attributes att, Vector3d offset, STLObject lastPicked)
     {
     	BranchGroup result = null;
         STLLoader loader = new STLLoader();
@@ -151,10 +167,9 @@ public class STLObject
                 result = scene.getSceneGroup();
                 result.setCapability(Node.ALLOW_BOUNDS_READ);
                 result.setCapability(Group.ALLOW_CHILDREN_READ);
+                result.setCapability(Shape3D.ALLOW_APPEARANCE_WRITE);
                 
-                att.setPart(result);
-                result.setUserData(att);
-        		stl.addChild(result);
+
                 
                 // Recursively add its attribute
                 
@@ -175,6 +190,28 @@ public class STLObject
                         recursiveSetUserData(value, att);
                     }
                 }
+                
+                att.setPart(result);
+                result.setUserData(att);
+                Offsets off;
+                if(lastPicked != null)
+                {
+                	// Add this object to lastPicked
+                	setOffset(result, lastPicked.rootOffset);
+                	lastPicked.stl.addChild(result);
+                	lastPicked.setAppearance(lastPicked.getAppearance());
+                } else
+                {
+                	// New independent object.
+                	stl.addChild(result);
+                	off = getOffsets(result, offset);
+                	rootOffset = off.centreToOrigin;
+                	setOffset(stl, rootOffset);
+                	Transform3D temp_t = new Transform3D();
+                    temp_t.set(off.bottomLeftShift);
+                	trans.setTransform(temp_t);
+                	restoreAppearance();
+                }
             } 
 
         } catch ( Exception e ) 
@@ -183,18 +220,19 @@ public class STLObject
                     + location);
             e.printStackTrace();
         }
-        
         return result;
     }
     
     /**
-     * Move the object by actually changing all its coordinates (i.e. don't just add a
+     * Find how to move the object by actually changing all its coordinates (i.e. don't just add a
      * transform).  Also record its size.
      * @param child
      * @param offset
      */
-    private void applyOffset(BranchGroup child, Vector3d offset) 
+    private Offsets getOffsets(BranchGroup child, Vector3d offset) 
     {
+    	Offsets result = new Offsets();
+    	
     	if(child != null && bbox != null)
     	{
             javax.vecmath.Point3d p0 = new javax.vecmath.Point3d();
@@ -207,7 +245,7 @@ public class STLObject
             if(offset == null) 
             {
                 offset = new Vector3d();
-                offset.x = -p0.x;  // Generally offset to but bottom left at the origin
+                offset.x = -p0.x;  // Generally offset to put bottom left at the origin
                 offset.y = -p0.y;
                 offset.z = -p0.z;
             }
@@ -224,18 +262,26 @@ public class STLObject
             // loaded object; we actually shift all its points to put it in this
             // standard place.
             
-            setOffset(offset);
+            //setOffset(offset);
+            
+            result.centreToOrigin = offset;
+            
+            //System.out.println("centreToOrigin = " + offset.toString());
 
             // Now shift us to have bottom left at origin using our transform.
             
-            Transform3D temp_t = new Transform3D();
-            temp_t.set(scale(size, 0.5));
-            trans.setTransform(temp_t);
+            //Transform3D temp_t = new Transform3D();
+            //temp_t.set(scale(size, 0.5));
+            result.bottomLeftShift = scale(size, 0.5);
+            //System.out.println("half-size = " + result.bottomLeftShift.toString());
+            //trans.setTransform(temp_t);
             
-            restoreAppearance();
+            //restoreAppearance();
             
         } else
             System.err.println("applyOffset(): no bounding box or child.");
+    	
+    	return result;
     }
     
     /**
@@ -247,16 +293,16 @@ public class STLObject
      * @param offset
      * @param material
      */
-    public Attributes addSTL(String location, Vector3d offset, String material) 
-    {
-    	Attributes att = new Attributes(material, this, null,
-    			GenericExtruder.getAppearanceFromNumber(GenericExtruder.getNumberFromMaterial(material)));
-    	BranchGroup child = loadSingleSTL(location, att);
-    	if(child == null)
-    		return null;
-    	applyOffset(child, offset);
-    	return att;
-    }
+//    public Attributes addSTL(String location, Vector3d offset, String material) 
+//    {
+//    	Attributes att = new Attributes(material, this, null,
+//    			GenericExtruder.getAppearanceFromNumber(GenericExtruder.getNumberFromMaterial(material)));
+//    	BranchGroup child = loadSingleSTL(location, att);
+//    	if(child == null)
+//    		return null;
+//    	applyOffset(child, offset);
+//    	return att;
+//    }
     
     /**
      * Load an STL object from a file with a known offset (set that null to put
@@ -266,13 +312,12 @@ public class STLObject
      * @param offset
      * @param app
      */
-    public Attributes addSTL(String location, Vector3d offset, Appearance app) 
+    public Attributes addSTL(String location, Vector3d offset, Appearance app, STLObject lastPicked) 
     {
     	Attributes att = new Attributes(null, this, null, app);
-    	BranchGroup child = loadSingleSTL(location, att);
+    	BranchGroup child = loadSingleSTL(location, att, offset, lastPicked);
     	if(child == null)
     		return null;
-    	applyOffset(child, offset);
     	return att;
     }
     
@@ -293,7 +338,7 @@ public class STLObject
     // method to recursively set the user data for objects in the scenegraph tree
     // we also set the capabilites on Shape3D objects required by the PickTool
 
-    void recursiveSetUserData(Object value, Object me) 
+    private void recursiveSetUserData(Object value, Object me) 
     {
         if( value instanceof SceneGraphObject != false ) 
         {
@@ -321,7 +366,7 @@ public class STLObject
     
     // Move the object by p permanently (i.e. don't just apply a transform).
     
-    void recursiveSetOffset( Object value, Vector3d p) 
+    private void recursiveSetOffset(Object value, Vector3d p) 
     {
         if( value instanceof SceneGraphObject != false ) 
         {
@@ -338,21 +383,21 @@ public class STLObject
                 
                 while(enumKids.hasMoreElements( ))
                     recursiveSetOffset( enumKids.nextElement( ), p );
-            } else if ( sg instanceof Shape3D ) 
+            } else if (sg instanceof Shape3D) 
             {
                     s3dOffset((Shape3D)sg, p);
             }
         }
     }
     
-    void setOffset(Vector3d p)
+    private void setOffset(BranchGroup bg, Vector3d p)
     {
-    	recursiveSetOffset(stl, p);
+    	recursiveSetOffset(bg, p);
     }
     
     // Shift a Shape3D permanently by p
     
-    void s3dOffset(Shape3D shape, Tuple3d p)
+    private void s3dOffset(Shape3D shape, Tuple3d p)
     {
         GeometryArray g = (GeometryArray)shape.getGeometry();
         Point3d p3d = new Point3d();
@@ -369,7 +414,7 @@ public class STLObject
     
     // Scale the object by s permanently (i.e. don't just apply a transform).
     
-    void recursiveSetScale( Object value, double s) 
+    private void recursiveSetScale( Object value, double s) 
     {
         if( value instanceof SceneGraphObject != false ) 
         {
@@ -395,7 +440,7 @@ public class STLObject
     
    // Scale a Shape3D permanently by s
     
-    void s3dScale(Shape3D shape, double s)
+    private void s3dScale(Shape3D shape, double s)
     {
         GeometryArray g = (GeometryArray)shape.getGeometry();
         Point3d p3d = new Point3d();
@@ -474,6 +519,39 @@ public class STLObject
     }
     
     /**
+     * dig down to find our appearance
+     * @param gp
+     * @return
+     */
+    private static Appearance getAppearance_r(Object gp) 
+    {
+        if( gp instanceof Group ) 
+        {
+            Group g = (Group) gp;
+            
+            // recurse on child nodes
+            java.util.Enumeration enumKids = g.getAllChildren( );
+            
+            while(enumKids.hasMoreElements( )) 
+            {
+                Object child = enumKids.nextElement( );
+                if(child instanceof Shape3D) 
+                {
+                    Shape3D lf = (Shape3D) child;
+                    return lf.getAppearance();
+                } else
+                    return getAppearance_r(child);
+            }
+        }
+        return new Appearance();
+    }
+    
+    public Appearance getAppearance()
+    {
+    	return getAppearance_r(stl);
+    }
+    
+    /**
      * Restore the appearances to the correct colour.
      */
     public void restoreAppearance()
@@ -521,7 +599,7 @@ public class STLObject
     
     // Put a vector in the positive octant (sort of abs for vectors)
     
-    Vector3d posOct(Vector3d v)
+    private Vector3d posOct(Vector3d v)
     {
         Vector3d result = new Vector3d();
         result.x = Math.abs(v.x);
@@ -584,7 +662,7 @@ public class STLObject
     
    // Rescale the STL object (for inch -> mm conversion)
     
-    void rScale(double s)
+    private void rScale(double s)
     {
         if(mouse == null)
             return;
