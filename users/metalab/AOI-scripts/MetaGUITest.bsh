@@ -15,6 +15,17 @@
 </script>
 */
 
+
+/*
+  TODO:
+
+  * don't collapse hierarchy after operation: Need to get hold of the TreeList instance
+  * ok/cancel -> close: Use superclass of ComponentDialog?
+  * Make devaluate work with object which have been converted to triangles
+  * Better undo support
+
+ */
+
 class MetaCAD
 {
     public static String opToString(int operation) {
@@ -47,6 +58,9 @@ class MetaCAD
 	else return -1;
     }
 
+    
+
+
     /*
       Recursively (Re-)evaluates the object tree rooted at the given root object
       based on the object name.
@@ -66,18 +80,21 @@ class MetaCAD
 
       This disables all implicit (parent) objects and enabled the leaf nodes.
     */
-    public static void devaluateNode(ObjectInfo parent)
+    public static void devaluateNode(ObjectInfo parent, UndoRecord undo)
     {
 	int op = stringToOp(parent.name);
-	if (op != -1 && parent.object.getClass() == CSGObject.class) {
+	if (op != -1) {
+	    undo.addCommandAtBeginning(UndoRecord.COPY_OBJECT_INFO, 
+				       new Object [] {parent, parent.duplicate()});
 	    parent.setVisible(false);
 	    window.getScene().objectModified(parent.getObject());
 	    ObjectInfo[] children = parent.getChildren();
 	    for (int i=0;i<children.length;i++) {
-		devaluateNode(children[i]);
+		devaluateNode(children[i], undo);
 	    }
 	}
 	else {
+	    undo.addCommandAtBeginning(UndoRecord.COPY_OBJECT_INFO, new Object [] {parent, parent.duplicate()});
 	    parent.setVisible(true);
 	    window.getScene().objectModified(parent.getObject());
 	}
@@ -90,12 +107,12 @@ class MetaCAD
     public static ObjectInfo combine(ObjectInfo parent, int operation)
     {
 	ObjectInfo unioninfo = combine(parent.getChildren(), operation);
-	parent.object.copyObject(unioninfo.object);
+	//	window.getScene().replaceObject(parent.object, unioninfo.object);
+ 	parent.object.copyObject(unioninfo.object);
 	parent.setCoords(new CoordinateSystem());
 	parent.setVisible(true);
-	parent.clearCachedMeshes();		
+	parent.clearCachedMeshes();
 	window.getScene().objectModified(parent.object);
-		
 	return parent;
     }
 
@@ -133,14 +150,20 @@ class MetaCAD
       Inserts the new object into the scene and makes the original objects
       children of the new object. Also hides the children.
     */
-    public static ObjectInfo create(ObjectInfo[] objects, int operation)
+    public static ObjectInfo create(ObjectInfo[] objects, int operation, UndoRecord undo)
     {
+	Scene scene = window.getScene();
  	ObjectInfo result = combine(objects, operation);
 	result.setName(opToString(operation));
+	window.getScene().addObject(result, undo);
 	for (int i=0;i<objects.length;i++) {
+	    //	    removeObject(scene.indexOf(objects[i]), undo);
+//    	    if (undo != null) {
+//    		undo.addCommandAtBeginning(REMOVE_FROM_GROUP, 
+//  					   new Object [] {result, objects[i]});
+//    	    }
 	    result.addChild(objects[i], i);
 	}
-	window.getScene().addObject(result, null);
 	window.rebuildItemList();
 	window.clearSelection();
 	window.addToSelection(window.getScene().indexOf(result));
@@ -160,30 +183,34 @@ class MetaCADDummyCallback implements java.lang.Runnable
 
 class MetaCADCallbacks
 {
+    /**
+       Returns a normalized selection, meaning children of a selected parent
+       are removed.
+     */
     public ObjectInfo[] getSelection() {
 	sel = window.getSelectedObjects();
-	if (sel.size() < 2) {
-	    new MessageDialog(window, "Minimum two objects must be selected.");
-	    return null;
-	}
-	else {
-	    ObjectInfo[] objects = new ObjectInfo[sel.size()];
-	    it = sel.iterator();
-	    int i = 0;
-	    while (it.hasNext()) {
-		objects[i++] = it.next();
+	ObjectInfo[] objects = new ObjectInfo[sel.size()];
+	it = sel.iterator();
+	int i = 0;
+	while (it.hasNext()) {
+	    ObjectInfo objinfo = it.next();
+	    ObjectInfo p = objinfo.getParent();
+	    while (p != null) { // Check if any parent is selected
+		if (window.isObjectSelected(p)) break;
+		p = p.getParent();
 	    }
-	    return objects;
+	    if (p == null) objects[i++] = objinfo;
 	}
+	ObjectInfo[] cleanedobjects = new ObjectInfo[i];
+	System.arraycopy(objects, 0, cleanedobjects, 0, i);
+	return cleanedobjects;
     }
 
     public void evaluate()
     {
-	sel = window.getSelectedObjects();
-	
-	it = sel.iterator();
-	while (it.hasNext()) {
-	    MetaCAD.evaluateNode(it.next());
+	ObjectInfo[] objects = getSelection();
+	for (int i=0;i<objects.length;i++) {
+	    MetaCAD.evaluateNode(objects[i]);
 	}
 	window.rebuildItemList();
 	window.updateImage();
@@ -192,45 +219,43 @@ class MetaCADCallbacks
 	
     public void devaluate()
     {
-	sel = window.getSelectedObjects();
-	
-	it = sel.iterator();
-	while (it.hasNext()) {
-	    MetaCAD.devaluateNode(it.next());
-	}
-	window.rebuildItemList();
-	window.updateImage();
-	window.setModified();
-    }
-	
-    public void union()
-    {
+	window.setUndoRecord(undo = new UndoRecord(window, false));
 	ObjectInfo[] objects = getSelection();
 	if (objects != null) {
-	    ObjectInfo result = MetaCAD.create(objects, CSGObject.UNION);
+	    for (int i=0;i<objects.length;i++) {
+		MetaCAD.devaluateNode(objects[i], undo);
+	    }
+	    window.rebuildItemList();
+	    window.updateImage();
+	    window.setModified();
 	}
-	window.updateImage();
-	window.setModified();
+    }
+	
+    public void execute(int operation) {
+	ObjectInfo[] objects = getSelection();
+	if (objects == null || objects.length < 2) {
+	    new MessageDialog(window, "Minimum two objects must be selected.");
+	}
+	else {
+ 	    ObjectInfo result = MetaCAD.create(objects, operation, null);
+ 	    window.updateImage();
+ 	    window.setModified();
+	}
+    }
+
+    public void union()
+    {
+	execute(CSGObject.UNION);
     }
 	
     public void intersect()
     {
-	ObjectInfo[] objects = getSelection();
-	if (objects != null) {
-	    ObjectInfo result = MetaCAD.create(objects, CSGObject.INTERSECTION);
-	}
-	window.updateImage();
-	window.setModified();
+	execute(CSGObject.INTERSECTION);
     }
 	
     public void subtract()
     {
-	ObjectInfo[] objects = getSelection();
-	if (objects != null) {
-	    ObjectInfo result = MetaCAD.create(objects, CSGObject.DIFFERENCE12);
-	}
-	window.setModified();
-	window.updateImage();
+	execute(CSGObject.DIFFERENCE12);
     }
 }
 
@@ -250,7 +275,7 @@ dlg = new ComponentsDialog(window, "MetaCAD Control Panel" ,
 			       subtractButton = new BButton( "subtract" ),
 			   },
 			   new String [] {"Actions", "", "Boolean Operations", "", ""}, new MetaCADDummyCallback(), new MetaCADDummyCallback() );
-dlg.setOkEnabled(false);
+dlg.setOkEnabled(true);
 
 MetaCADCallbacks callbacks = new MetaCADCallbacks();
 
