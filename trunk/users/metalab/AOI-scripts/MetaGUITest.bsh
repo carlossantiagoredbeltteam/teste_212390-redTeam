@@ -52,7 +52,7 @@ class MetaCAD
 	else if (lower.startsWith("intersection") || lower.startsWith("/")) {
 	    return CSGObject.INTERSECTION;
 	}
-	else if (opstr.equalsIgnoreCase("difference") || lower.startsWith("-")) {
+	else if (lower.startsWith("difference") || lower.startsWith("-")) {
 	    return CSGObject.DIFFERENCE12;
 	}
 	else return -1;
@@ -107,12 +107,16 @@ class MetaCAD
     public static ObjectInfo combine(ObjectInfo parent, int operation)
     {
 	ObjectInfo unioninfo = combine(parent.getChildren(), operation);
-	//	window.getScene().replaceObject(parent.object, unioninfo.object);
- 	parent.object.copyObject(unioninfo.object);
+//   	parent.setObject(unioninfo.object.duplicate());
+//  	parent.clearCachedMeshes();
+//  	window.getScene().objectModified(parent.object);
+//	window.getScene().replaceObject(parent.object, unioninfo.object);
+	parent.object.copyObject(unioninfo.object);
 	parent.setCoords(new CoordinateSystem());
 	parent.setVisible(true);
 	parent.clearCachedMeshes();
 	window.getScene().objectModified(parent.object);
+	window.rebuildItemList();
 	return parent;
     }
 
@@ -209,12 +213,15 @@ class MetaCADCallbacks
     public void evaluate()
     {
 	ObjectInfo[] objects = getSelection();
-	for (int i=0;i<objects.length;i++) {
-	    MetaCAD.evaluateNode(objects[i]);
+	if (object != null) {
+	    for (int i=0;i<objects.length;i++) {
+		MetaCAD.evaluateNode(objects[i]);
+	    }
+	    window.rebuildItemList();
+	    window.updateImage();
+	    window.setModified();
+	    //	    new MessageDialog(window, "evaluate OK");
 	}
-	window.rebuildItemList();
-	window.updateImage();
-	window.setModified();
     }
 	
     public void devaluate()
@@ -228,6 +235,7 @@ class MetaCADCallbacks
 	    window.rebuildItemList();
 	    window.updateImage();
 	    window.setModified();
+	    //	    new MessageDialog(window, "devaluate OK");
 	}
     }
 	
