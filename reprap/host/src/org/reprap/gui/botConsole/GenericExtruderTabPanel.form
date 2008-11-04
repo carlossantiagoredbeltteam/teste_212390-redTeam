@@ -165,9 +165,9 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
                   <Group type="103" groupAlignment="1" attributes="0">
-                      <Component id="heatButton" pref="42" max="32767" attributes="1"/>
+                      <Component id="heatButton" pref="54" max="32767" attributes="1"/>
                       <Component id="tempColor" alignment="0" max="32767" attributes="1"/>
-                      <Component id="RampButton" alignment="0" pref="42" max="32767" attributes="1"/>
+                      <Component id="RampButton" alignment="0" pref="54" max="32767" attributes="1"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -179,7 +179,7 @@
                               <Component id="jLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <Component id="tempProgress" alignment="1" pref="42" max="32767" attributes="1"/>
+                      <Component id="tempProgress" alignment="1" pref="54" max="32767" attributes="1"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
@@ -250,7 +250,7 @@
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="42" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="54" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
@@ -326,7 +326,7 @@
                   <Component id="motorSpeedField" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabel12" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="129" max="32767" attributes="0"/>
+                  <EmptySpace pref="135" max="32767" attributes="0"/>
                   <Component id="valveToggleButton" min="-2" pref="97" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="extrudeButton" min="-2" pref="110" max="-2" attributes="0"/>
@@ -425,7 +425,7 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
-                  <EmptySpace pref="241" max="32767" attributes="0"/>
+                  <EmptySpace pref="275" max="32767" attributes="0"/>
                   <Component id="homeAllButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="moveToSwapButton" min="-2" max="-2" attributes="0"/>
@@ -458,11 +458,20 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Home all"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="homeAllButtonAction"/>
+          </Events>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_SerializeTo" type="java.lang.String" value="GenericExtruderTabPanel_homeAllButton"/>
+          </AuxValues>
         </Component>
         <Component class="javax.swing.JToggleButton" name="moveToSwapButton">
           <Properties>
             <Property name="text" type="java.lang.String" value="Move to swap point"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="moveToSwapPointAction"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
