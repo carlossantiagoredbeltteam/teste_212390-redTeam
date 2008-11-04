@@ -17,7 +17,7 @@ import org.reprap.Printer;
  * @author  ensab
  */
 public class PrintTabFrame extends javax.swing.JInternalFrame {
-	
+	private static final long serialVersionUID = 1L;
 	private BotConsoleFrame parentBotConsoleFrame = null;
 //	private XYZTabPanel xYZTabPanel = null;
     private Printer printer;

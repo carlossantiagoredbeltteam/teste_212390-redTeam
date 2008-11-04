@@ -27,7 +27,7 @@ import org.reprap.devices.SNAPExtruder;
 import org.reprap.gui.Utility;
 
 public class Main extends javax.swing.JDialog implements ChangeListener {
-
+	private static final long serialVersionUID = 1L;
 	private final int intialXYSpeed = 236;
 	private final int intialZSpeed = 230;
 	

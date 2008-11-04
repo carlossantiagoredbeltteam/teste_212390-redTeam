@@ -29,6 +29,7 @@ import org.reprap.devices.pseudo.LinePrinter;
  * LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
  */
 public class LineTest extends javax.swing.JDialog {
+	private static final long serialVersionUID = 1L;
 	private JButton OkButton;
 	private JLabel jLabel4;
 	private JButton plotButton;

@@ -22,6 +22,7 @@ import javax.swing.text.StyleConstants;
 * LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
 */
 public class StatusMessage extends javax.swing.JDialog {
+	private static final long serialVersionUID = 1L;
 	private boolean cancelRequested = false;
 	private JButton cancelButton;
 	private JTextPane message;

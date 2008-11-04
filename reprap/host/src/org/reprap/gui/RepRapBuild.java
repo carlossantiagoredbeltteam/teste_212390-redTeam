@@ -118,6 +118,7 @@ import org.reprap.Preferences;
  *
  */
 class MaterialRadioButtons extends JPanel{
+	private static final long serialVersionUID = 1L;
 	private static Attributes att;
 	private static JFrame frame;
 	
@@ -199,6 +200,7 @@ class MaterialRadioButtons extends JPanel{
  */
 
 public class RepRapBuild extends Panel3D implements MouseListener {
+	private static final long serialVersionUID = 1L;
 	private MouseObject mouse = null;
 	private PickCanvas pickCanvas = null; // The thing picked by a mouse click
 	private STLObject lastPicked = null; // The last thing picked

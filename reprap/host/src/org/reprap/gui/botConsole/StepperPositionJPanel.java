@@ -19,7 +19,7 @@ import org.reprap.Printer;
  * @author  ensab
  */
 public class StepperPositionJPanel extends javax.swing.JPanel {
-
+	private static final long serialVersionUID = 1L;
     //private Communicator communicator;
     private int motorID;
     private String axis;

@@ -16,7 +16,7 @@ import org.reprap.devices.GenericStepperMotor;
 import org.reprap.devices.pseudo.LinePrinter;
 
 public class ShapePanel extends JPanel {
-
+	private static final long serialVersionUID = 1L;
 	private JTextField x0, x1, y0, y1;
 	
 	private StepperPanel motorX, motorY;
