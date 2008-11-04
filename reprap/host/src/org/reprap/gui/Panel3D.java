@@ -220,7 +220,7 @@ abstract public class Panel3D extends JPanel {
 	public static URL getWorkingDirectory() {
 		try {
 			File file = new File(System.getProperty("user.dir"));
-			return file.toURL();
+			return file.toURI().toURL();
 		} catch (Exception e) {
 			System.err.println("getWorkingDirectory( ): can't get user dir.");
 		}
