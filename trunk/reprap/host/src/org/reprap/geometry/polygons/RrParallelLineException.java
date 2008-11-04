@@ -54,8 +54,6 @@
 
 package org.reprap.geometry.polygons;
 
-import java.util.*;
-
 /**
 * Exception for when trying to intersect parallel lines
 */

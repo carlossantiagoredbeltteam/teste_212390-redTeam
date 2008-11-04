@@ -21,7 +21,6 @@ import javax.swing.event.ChangeListener;
 import org.reprap.Preferences;
 import org.reprap.comms.Communicator;
 import org.reprap.comms.snap.SNAPAddress;
-import org.reprap.devices.GenericStepperMotor;
 import org.reprap.devices.SNAPStepperMotor;
 
 /// TODO There is a bug in this app that can cause the stepper to skip some steps

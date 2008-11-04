@@ -6,7 +6,6 @@ package org.reprap.gui.steppertest;
 import org.reprap.Preferences;
 import org.reprap.comms.snap.SNAPAddress;
 import org.reprap.comms.Communicator;
-import org.reprap.comms.snap.SNAPCommunicator;
 import org.reprap.devices.SNAPStepperMotor;
 import java.io.*;
 

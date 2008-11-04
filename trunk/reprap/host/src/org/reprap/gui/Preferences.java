@@ -3,8 +3,6 @@ package org.reprap.gui;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.GridLayout;
-//import java.awt.GridBagLayout;
-import java.awt.Dimension;
 import java.io.IOException;
 import java.lang.System;
 import java.util.Arrays;

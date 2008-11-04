@@ -9,13 +9,9 @@ package org.reprap.gui.botConsole;
 import java.util.*;
 import java.text.SimpleDateFormat;
 import java.net.URI;
-//import java.awt.Desktop; //***AB
-//import java.io.IOException;
 import javax.swing.JOptionPane;
-//import org.reprap.Main;
 import org.reprap.Preferences;
 import org.reprap.Printer;
-import org.reprap.machines.SNAPReprap;
 
 /**
  *

@@ -1,16 +1,8 @@
 package org.reprap;
 
-import java.io.IOException;
-
 import org.reprap.Printer;
 import org.reprap.comms.Address;
 import org.reprap.comms.Communicator;
-import org.reprap.comms.IncomingContext;
-import org.reprap.comms.OutgoingMessage;
-import org.reprap.comms.IncomingMessage.InvalidPayloadException;
-import org.reprap.comms.messages.VersionRequestMessage;
-import org.reprap.comms.messages.VersionResponseMessage;
-import org.reprap.utilities.Debug;
 
 /**
  * Class implements an abstract device containing the basic properties and methods.

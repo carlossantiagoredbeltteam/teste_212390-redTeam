@@ -1,7 +1,5 @@
 package org.reprap.geometry.polygons;
 
-import org.reprap.Preferences;
-
 /**
  * this class stores a grid of booleans at the same grid resolution
  * as the RepRap machine's finest resolution.

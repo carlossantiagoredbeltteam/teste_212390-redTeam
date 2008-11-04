@@ -14,8 +14,6 @@ import javax.swing.WindowConstants;
 
 import org.reprap.AxisMotor;
 import org.reprap.Extruder;
-import org.reprap.devices.SNAPExtruder;
-import org.reprap.devices.SNAPStepperMotor;
 import org.reprap.devices.pseudo.LinePrinter;
 
 /**

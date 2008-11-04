@@ -68,7 +68,6 @@
 
 package org.reprap.geometry.polygons;
 
-import java.io.*;
 import java.util.*;
 import org.reprap.geometry.*;
 import org.reprap.Attributes;

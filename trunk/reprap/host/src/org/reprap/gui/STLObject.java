@@ -64,7 +64,6 @@ import com.sun.j3d.loaders.Scene;
 import org.j3d.renderer.java3d.loaders.STLLoader;
 import org.reprap.Attributes;
 import org.reprap.Preferences;
-import org.reprap.devices.GenericExtruder;
 
 /**
  * Class for holding a group (maybe just 1) of 3D objects for RepRap to make.

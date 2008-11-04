@@ -19,38 +19,20 @@ import java.awt.Color;
 
 import java.io.IOException;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
-import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
-import org.reprap.Printer;
-import java.io.IOException;
 import java.util.Timer;
-
-import javax.swing.event.ChangeEvent;
 
 import org.reprap.Preferences;
 import org.reprap.comms.Communicator;
 import org.reprap.comms.snap.SNAPAddress;
-import org.reprap.comms.snap.SNAPCommunicator;
-import org.reprap.devices.GenericExtruder;
-import org.reprap.devices.GenericStepperMotor;
 import org.reprap.devices.SNAPStepperMotor;
-import org.reprap.gui.Utility;
-
-import javax.swing.event.ChangeListener;
-
-
 
 public class WorkingVolumeFrame  extends JFrame {
 	

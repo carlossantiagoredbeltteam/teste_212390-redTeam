@@ -2,20 +2,10 @@ package org.reprap.devices;
 
 import java.io.IOException;
 
-import org.reprap.Device;
 import org.reprap.Preferences;
-import org.reprap.utilities.Debug;
 import org.reprap.Extruder;
 import org.reprap.Printer;
-import org.reprap.devices.pseudo.LinePrinter;
 import org.reprap.geometry.LayerRules;
-import org.reprap.comms.Address;
-import org.reprap.comms.Communicator;
-import org.reprap.comms.IncomingMessage;
-import org.reprap.comms.OutgoingMessage;
-import org.reprap.comms.IncomingMessage.InvalidPayloadException;
-import org.reprap.comms.messages.OutgoingBlankMessage;
-import org.reprap.comms.messages.OutgoingByteMessage;
 import javax.media.j3d.Appearance;
 import javax.vecmath.Color3f;
 import javax.media.j3d.Material;
