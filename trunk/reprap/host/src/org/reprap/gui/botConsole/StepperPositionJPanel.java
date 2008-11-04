@@ -91,18 +91,18 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
 
     }
     
-    private void deactivateMotorPanel() {
-            //motor.dispose();
-            //motor = null;
-            axisLabel.setEnabled(false);
-            targetPosition.setEnabled(false);
-            //endButton.setEnabled(false);
-            homeButton.setEnabled(false);
-            storeButton.setEnabled(false);
-            recallButton.setEnabled(false);
-            stepDownButton.setEnabled(false);
-            stepUpButton.setEnabled(false);
-    }
+//    private void deactivateMotorPanel() {
+//            //motor.dispose();
+//            //motor = null;
+//            axisLabel.setEnabled(false);
+//            targetPosition.setEnabled(false);
+//            //endButton.setEnabled(false);
+//            homeButton.setEnabled(false);
+//            storeButton.setEnabled(false);
+//            recallButton.setEnabled(false);
+//            stepDownButton.setEnabled(false);
+//            stepUpButton.setEnabled(false);
+//    }
     
 //    private int getSpeedFromFeed(double f)
 //    {
