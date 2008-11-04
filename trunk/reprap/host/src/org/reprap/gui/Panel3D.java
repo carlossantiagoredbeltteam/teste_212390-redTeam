@@ -38,7 +38,7 @@ import com.sun.j3d.utils.geometry.Cylinder;
 import com.sun.j3d.utils.geometry.Primitive;
 
 abstract public class Panel3D extends JPanel {
-
+	private static final long serialVersionUID = 1L;
 	//-------------------------------------------------------------
 	
 	// What follows are defaults.  These values should be overwritten from

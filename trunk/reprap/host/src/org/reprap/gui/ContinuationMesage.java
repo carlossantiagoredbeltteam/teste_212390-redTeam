@@ -21,6 +21,7 @@ import javax.swing.SwingConstants;
 * LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
 */
 public class ContinuationMesage extends javax.swing.JDialog {
+	private static final long serialVersionUID = 1L;
 	private static Point lastScreenPosition = null;
 	private JButton cancelButton;
 

@@ -31,6 +31,7 @@ import org.reprap.devices.GenericStepperMotor;
 * LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
 */
 public class CalibrateZAxis extends javax.swing.JDialog {
+	private static final long serialVersionUID = 1L;
 
 	private JRadioButton radio1step;
 	private JRadioButton radio1mm;

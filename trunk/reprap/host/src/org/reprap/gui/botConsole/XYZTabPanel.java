@@ -13,6 +13,8 @@ import org.reprap.Printer;
  * @author  ensab
  */
 public class XYZTabPanel extends javax.swing.JPanel {
+	private static final long serialVersionUID = 1L;
+
     private double XYfastSpeed;
     private double ZfastSpeed;
     private Printer printer;

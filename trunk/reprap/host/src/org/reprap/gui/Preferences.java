@@ -45,7 +45,7 @@ enum Category
 }
 
 public class Preferences extends JFrame {
-	
+	private static final long serialVersionUID = 1L;
 	// Load of arrays for all the stuff...
 	
 	private int extruderCount;

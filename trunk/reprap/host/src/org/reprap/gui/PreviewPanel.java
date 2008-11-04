@@ -9,6 +9,7 @@ import org.reprap.Printer;
 //import javax.vecmath.Vector3d;
 
 public class PreviewPanel extends Panel3D implements Previewer {
+	private static final long serialVersionUID = 1L;
 	private Printer reprap;
 //	private Extruder extruder = null;
 	@SuppressWarnings("unused")

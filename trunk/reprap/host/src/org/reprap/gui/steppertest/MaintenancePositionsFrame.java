@@ -33,7 +33,7 @@ import org.reprap.devices.SNAPStepperMotor;
 import java.awt.Color;
 
 public class MaintenancePositionsFrame  extends JFrame {
-	
+	private static final long serialVersionUID = 1L;
 	// Panel globals
 	private JLabel warning;
 	private JLabel area;

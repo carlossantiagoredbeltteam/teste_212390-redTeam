@@ -34,7 +34,8 @@ import org.reprap.comms.snap.SNAPAddress;
 import org.reprap.devices.SNAPStepperMotor;
 
 public class WorkingVolumeFrame  extends JFrame {
-	
+	private static final long serialVersionUID = 1L;
+
 	private JLabel status;
 	private final int fastSpeed = 245;
 	private final int slowSpeed = 160;

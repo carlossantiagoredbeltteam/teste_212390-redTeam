@@ -29,7 +29,7 @@ import java.awt.Color;
  * @author  en0es
  */
 public class GenericExtruderTabPanel extends javax.swing.JPanel {
-    
+	private static final long serialVersionUID = 1L;
     private int extruderID = 0;
     private boolean heatPushed = false;
     private double startTime = -1;

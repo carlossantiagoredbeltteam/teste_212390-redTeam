@@ -742,6 +742,7 @@ public class RrGraphics
 	 */
 	class MyComponent extends JComponent 
 	{
+		private static final long serialVersionUID = 1L;
 		public MyComponent()
 		{
 			super();

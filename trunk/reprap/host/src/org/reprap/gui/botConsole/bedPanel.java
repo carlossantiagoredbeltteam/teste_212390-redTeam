@@ -22,8 +22,8 @@ import java.awt.font.FontRenderContext;
  * @author  reprap
  */
 public class bedPanel extends javax.swing.JPanel {
-    
-    private final int CROSS_HAIR_SIZE = 10;
+	private static final long serialVersionUID = 1L;
+	private final int CROSS_HAIR_SIZE = 10;
     private Line2D.Double a1, a2, b1, b2;
     private Point2D.Double aDatum, bDatum;
     private int x;

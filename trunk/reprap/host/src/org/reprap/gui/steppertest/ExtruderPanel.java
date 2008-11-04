@@ -20,7 +20,7 @@ import org.reprap.devices.GenericExtruder;
  *
  */
 public class ExtruderPanel extends JPanel {
-	
+	private static final long serialVersionUID = 1L;
 	/**
 	 * 
 	 */

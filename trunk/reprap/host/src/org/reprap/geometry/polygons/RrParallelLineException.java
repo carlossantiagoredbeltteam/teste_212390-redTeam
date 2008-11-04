@@ -59,6 +59,7 @@ package org.reprap.geometry.polygons;
 */
 public class RrParallelLineException extends Exception
 {
+	private static final long serialVersionUID = 1L;
 	public RrParallelLineException(String s)
 	{
 		super(s);

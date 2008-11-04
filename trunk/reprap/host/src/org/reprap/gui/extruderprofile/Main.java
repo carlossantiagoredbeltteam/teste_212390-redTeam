@@ -30,6 +30,7 @@ import org.reprap.Extruder;
 * LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
 */
 public class Main extends javax.swing.JDialog {
+	private static final long serialVersionUID = 1L;
 	private final static int stablePeriod = 60000;
 	
 	private JLabel jLabel1;

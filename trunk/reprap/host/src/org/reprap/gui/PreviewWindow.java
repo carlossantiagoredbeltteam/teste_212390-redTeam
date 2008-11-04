@@ -6,7 +6,7 @@ import javax.swing.WindowConstants;
 import org.reprap.Printer;
 
 public class PreviewWindow extends javax.swing.JFrame implements Previewer {
-
+	private static final long serialVersionUID = 1L;
 	private PreviewPanel panel;
 	
 	public PreviewWindow(Printer p) {

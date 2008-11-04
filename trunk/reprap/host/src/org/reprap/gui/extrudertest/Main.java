@@ -36,6 +36,7 @@ import org.reprap.gui.Utility;
 * LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
 */
 public class Main extends javax.swing.JDialog {
+	private static final long serialVersionUID = 1L;
 	private JLabel jLabel1;
 	private JLabel jLabel2;
 	private JLabel jLabel4;
