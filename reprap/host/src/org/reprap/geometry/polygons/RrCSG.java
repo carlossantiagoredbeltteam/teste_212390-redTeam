@@ -782,151 +782,151 @@ public class RrCSG
 	}
 	
 	
-	/**
-	 * FIXME: there's a bug in reg_4 somewhere.  So it's not called at present.
-	 * Regularise a set with a contents of 4
-	 * This assumes simplify has been run over the set
-	 * @return regularised CSG object
-	 */	
-	private RrCSG reg_4()
-	{            
-		RrCSG result = this;
-		
-		if(complexity != 4)
-			return result;
-		
-		RrCSG temp;	
-		
-		if(c1.complexity == 1)
-		{
-			temp = c2.reg_3();
-			if(temp.complexity <= 2)
-			{
-				if(op == RrCSGOp.UNION)
-					result = union(c1, temp).reg_3();
-				else
-					result = intersection(c1, temp).reg_3();
-			}else
-			{
-				// c1 can only equal at most one leaf of c2 as all three c2 leaves
-				// must be distinct because reg_3() didn't simplify c2.
-				
-				if(c1 == c2.c1)
-				{
-					result = c1;
-				}
-				else if(c1 == c2.c2.c1 || c1 == c2.c2.c2)
-				{
-					if(c1 == c2.c2.c2)
-						c2.c2.c2 = c2.c2.c1;
-					int ops = 0;
-					if(op == RrCSGOp.UNION)
-						ops++;
-					if(c2.op == RrCSGOp.UNION)
-						ops += 2;
-					if(c2.c2.op == RrCSGOp.UNION)
-						ops += 4;
-					switch(ops)
-					{
-					case 0:
-						result = c2;
-						break;
-					case 1:
-					case 6:
-						result = c1;
-						break;
-					case 2:
-					case 5:
-					case 7:
-						result.c2.c2 = c2.c2.c2;
-						break;                            
-					case 3:
-					case 4:
-						result.c2 = c2.c1;
-						break;
-					default:
-						System.err.println("reg_4() 1: addition doesn't work...");
-					}  
-				}
-			}
-		} else
-		{
-			int type = 0;
-			if(c1.c1 == c2.c1)
-				type++;
-			else if(c1.c1 == c2.c2)
-			{
-				type++;
-				temp = c2.c2;
-				c2.c2 = c2.c1;
-				c2.c1 = temp;
-			}
-			if(c1.c2 == c2.c2)
-				type++;
-			else if(c1.c2 == c2.c1)
-			{
-				type++;
-				temp = c1.c2;
-				c1.c2 = c1.c1;
-				c1.c1 = temp;
-			}
-			
-			int ops = 0;
-			if(op == RrCSGOp.UNION)
-				ops += 4;
-			if(c1.op == RrCSGOp.UNION)
-				ops++;
-			if(c2.op == RrCSGOp.UNION)
-				ops += 2;
-			
-			switch(type)
-			{
-			case 0:
-				break;
-				
-			case 1:
-				switch(ops)
-				{
-				case 0:
-					result = intersection(c1, c2.c2);
-					break;
-				case 1:
-					result = intersection(c1.c1, c2.c2);
-					break;
-				case 2:
-				case 5:
-					result = c1;
-				case 3:
-					result = union(c1.c1, intersection(c1.c2, c2.c2));
-					break;
-				case 4:
-					result = intersection(c1.c1, union(c1.c2, c2.c2));
-					break;
-				case 6:
-					result = union(c1.c1, c2.c2);
-					break;
-				case 7:
-					result = union(c1, c2.c2);
-					break;
-				default:
-					System.err.println("reg_4() 2: addition doesn't work...");
-				}
-				break;
-				
-			case 2:		// Pick the child that's an intersection (if there is one)		
-				if(c1.op == RrCSGOp.UNION)
-					result = c2;
-				else
-					result = c1;
-				break;
-				
-			default:
-				System.err.println("reg_4() 4: addition doesn't work...");
-			}
-		}
-		
-		return result;
-	}
+//	/**
+//	 * FIXME: there's a bug in reg_4 somewhere.  So it's not called at present.
+//	 * Regularise a set with a contents of 4
+//	 * This assumes simplify has been run over the set
+//	 * @return regularised CSG object
+//	 */	
+//	private RrCSG reg_4()
+//	{            
+//		RrCSG result = this;
+//		
+//		if(complexity != 4)
+//			return result;
+//		
+//		RrCSG temp;	
+//		
+//		if(c1.complexity == 1)
+//		{
+//			temp = c2.reg_3();
+//			if(temp.complexity <= 2)
+//			{
+//				if(op == RrCSGOp.UNION)
+//					result = union(c1, temp).reg_3();
+//				else
+//					result = intersection(c1, temp).reg_3();
+//			}else
+//			{
+//				// c1 can only equal at most one leaf of c2 as all three c2 leaves
+//				// must be distinct because reg_3() didn't simplify c2.
+//				
+//				if(c1 == c2.c1)
+//				{
+//					result = c1;
+//				}
+//				else if(c1 == c2.c2.c1 || c1 == c2.c2.c2)
+//				{
+//					if(c1 == c2.c2.c2)
+//						c2.c2.c2 = c2.c2.c1;
+//					int ops = 0;
+//					if(op == RrCSGOp.UNION)
+//						ops++;
+//					if(c2.op == RrCSGOp.UNION)
+//						ops += 2;
+//					if(c2.c2.op == RrCSGOp.UNION)
+//						ops += 4;
+//					switch(ops)
+//					{
+//					case 0:
+//						result = c2;
+//						break;
+//					case 1:
+//					case 6:
+//						result = c1;
+//						break;
+//					case 2:
+//					case 5:
+//					case 7:
+//						result.c2.c2 = c2.c2.c2;
+//						break;                            
+//					case 3:
+//					case 4:
+//						result.c2 = c2.c1;
+//						break;
+//					default:
+//						System.err.println("reg_4() 1: addition doesn't work...");
+//					}  
+//				}
+//			}
+//		} else
+//		{
+//			int type = 0;
+//			if(c1.c1 == c2.c1)
+//				type++;
+//			else if(c1.c1 == c2.c2)
+//			{
+//				type++;
+//				temp = c2.c2;
+//				c2.c2 = c2.c1;
+//				c2.c1 = temp;
+//			}
+//			if(c1.c2 == c2.c2)
+//				type++;
+//			else if(c1.c2 == c2.c1)
+//			{
+//				type++;
+//				temp = c1.c2;
+//				c1.c2 = c1.c1;
+//				c1.c1 = temp;
+//			}
+//			
+//			int ops = 0;
+//			if(op == RrCSGOp.UNION)
+//				ops += 4;
+//			if(c1.op == RrCSGOp.UNION)
+//				ops++;
+//			if(c2.op == RrCSGOp.UNION)
+//				ops += 2;
+//			
+//			switch(type)
+//			{
+//			case 0:
+//				break;
+//				
+//			case 1:
+//				switch(ops)
+//				{
+//				case 0:
+//					result = intersection(c1, c2.c2);
+//					break;
+//				case 1:
+//					result = intersection(c1.c1, c2.c2);
+//					break;
+//				case 2:
+//				case 5:
+//					result = c1;
+//				case 3:
+//					result = union(c1.c1, intersection(c1.c2, c2.c2));
+//					break;
+//				case 4:
+//					result = intersection(c1.c1, union(c1.c2, c2.c2));
+//					break;
+//				case 6:
+//					result = union(c1.c1, c2.c2);
+//					break;
+//				case 7:
+//					result = union(c1, c2.c2);
+//					break;
+//				default:
+//					System.err.println("reg_4() 2: addition doesn't work...");
+//				}
+//				break;
+//				
+//			case 2:		// Pick the child that's an intersection (if there is one)		
+//				if(c1.op == RrCSGOp.UNION)
+//					result = c2;
+//				else
+//					result = c1;
+//				break;
+//				
+//			default:
+//				System.err.println("reg_4() 4: addition doesn't work...");
+//			}
+//		}
+//		
+//		return result;
+//	}
 	
 	/**
 	 * Regularise a set with simple contents ( < 4 )

@@ -1127,13 +1127,13 @@ public class STLSlice
     		return null;
     }
 
-    /**
-     * Useful for debugging - plot a bit of the quad tree.
-     */
-    private static void quickPlot(STLSlice s)
-    {
-    	s.qp = new RrGraphics(s);
-    }
+//    /**
+//     * Useful for debugging - plot a bit of the quad tree.
+//     */
+//    private static void quickPlot(STLSlice s)
+//    {
+//    	s.qp = new RrGraphics(s);
+//    }
     
     public void recursiveReport()
     {

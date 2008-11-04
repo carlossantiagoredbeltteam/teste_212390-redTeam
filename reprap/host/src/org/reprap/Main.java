@@ -26,7 +26,6 @@ import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
-import org.reprap.geometry.EstimationProducer;
 import org.reprap.geometry.Producer;
 import org.reprap.machines.MachineFactory;
 import org.reprap.gui.PreviewPanel;
@@ -594,37 +593,37 @@ public class Main {
     	    	  panel.setDividerLocation(0.0);
     }
     
-    private void estimateResourcesT() {
-	    	EstimationProducer eProducer = null;
-	    	try {
-	    		eProducer = new EstimationProducer(builder);
-	    		eProducer.produce();
-	    		JOptionPane.showMessageDialog(mainFrame,
-	    				"Expected " + getResourceMessage(eProducer));
-	    		
-	    	} catch (Exception ex) {
-	    		JOptionPane.showMessageDialog(null, "Exception during estimation: " + ex);    
-	    	} finally {
-	    		if (eProducer != null)
-	    			eProducer.dispose();
-	    	}
-    }
+//    private void estimateResourcesT() {
+//	    	EstimationProducer eProducer = null;
+//	    	try {
+//	    		eProducer = new EstimationProducer(builder);
+//	    		eProducer.produce();
+//	    		JOptionPane.showMessageDialog(mainFrame,
+//	    				"Expected " + getResourceMessage(eProducer));
+//	    		
+//	    	} catch (Exception ex) {
+//	    		JOptionPane.showMessageDialog(null, "Exception during estimation: " + ex);    
+//	    	} finally {
+//	    		if (eProducer != null)
+//	    			eProducer.dispose();
+//	    	}
+//    }
     
-    private void estimateResourcesB() {
-    	EstimationProducer eProducer = null;
-    	try {
-    		eProducer = new EstimationProducer(builder);
-    		eProducer.produce();
-    		JOptionPane.showMessageDialog(mainFrame,
-    				"Expected " + getResourceMessage(eProducer));
-    		
-    	} catch (Exception ex) {
-    		JOptionPane.showMessageDialog(null, "Exception during estimation: " + ex);    
-    	} finally {
-    		if (eProducer != null)
-    			eProducer.dispose();
-    	}
-}
+//    private void estimateResourcesB() {
+//    	EstimationProducer eProducer = null;
+//    	try {
+//    		eProducer = new EstimationProducer(builder);
+//    		eProducer.produce();
+//    		JOptionPane.showMessageDialog(mainFrame,
+//    				"Expected " + getResourceMessage(eProducer));
+//    		
+//    	} catch (Exception ex) {
+//    		JOptionPane.showMessageDialog(null, "Exception during estimation: " + ex);    
+//    	} finally {
+//    		if (eProducer != null)
+//    			eProducer.dispose();
+//    	}
+//}
     
 	private String getResourceMessage(Producer rProducer) {
 		double moved = Math.round(rProducer.getTotalDistanceMoved() * 10.0) / 10.0;
