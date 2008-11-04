@@ -116,8 +116,8 @@ public class Preferences {
 	 */
 	private void comparePreferences()
 	{
-		Enumeration usersLot = mainPreferences.propertyNames();
-		Enumeration distLot = fallbackPreferences.propertyNames();
+		Enumeration<?> usersLot = mainPreferences.propertyNames();
+		Enumeration<?> distLot = fallbackPreferences.propertyNames();
 		
 		String result = "";
 		int count = 0;
@@ -297,8 +297,8 @@ public class Preferences {
 	public static String[] startsWith(String prefix) throws IOException 
 	{
 		initIfNeeded();
-		Enumeration allOfThem = globalPrefs.mainPreferences.propertyNames();
-		List r = new ArrayList();
+		Enumeration<?> allOfThem = globalPrefs.mainPreferences.propertyNames();
+		List<String> r = new ArrayList<String>();
 		
 		while(allOfThem.hasMoreElements())
 		{
@@ -317,8 +317,8 @@ public class Preferences {
 	public static String[] notStartsWith(String prefix) throws IOException 
 	{
 		initIfNeeded();
-		Enumeration allOfThem = globalPrefs.mainPreferences.propertyNames();
-		List r = new ArrayList();
+		Enumeration<?> allOfThem = globalPrefs.mainPreferences.propertyNames();
+		List<String> r = new ArrayList<String>();
 		
 		while(allOfThem.hasMoreElements())
 		{

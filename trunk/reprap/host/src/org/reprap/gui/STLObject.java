@@ -172,8 +172,8 @@ public class STLObject
                 
                 // Recursively add its attribute
                 
-                Hashtable namedObjects = scene.getNamedObjects( );
-                java.util.Enumeration enumValues = namedObjects.elements( );
+                Hashtable<?,?> namedObjects = scene.getNamedObjects( );
+                java.util.Enumeration<?> enumValues = namedObjects.elements( );
                 
                 if( enumValues != null ) 
                 {
@@ -351,7 +351,7 @@ public class STLObject
                 Group g = (Group) sg;
                 
                 // recurse on child nodes
-                java.util.Enumeration enumKids = g.getAllChildren( );
+                java.util.Enumeration<?> enumKids = g.getAllChildren( );
                 
                 while(enumKids.hasMoreElements( ))
                     recursiveSetUserData( enumKids.nextElement( ), me );
@@ -378,7 +378,7 @@ public class STLObject
                 Group g = (Group) sg;
                 
                 // recurse on child nodes
-                java.util.Enumeration enumKids = g.getAllChildren( );
+                java.util.Enumeration<?> enumKids = g.getAllChildren( );
                 
                 while(enumKids.hasMoreElements( ))
                     recursiveSetOffset( enumKids.nextElement( ), p );
@@ -426,7 +426,7 @@ public class STLObject
                 Group g = (Group) sg;
                 
                 // recurse on child nodes
-                java.util.Enumeration enumKids = g.getAllChildren( );
+                java.util.Enumeration<?> enumKids = g.getAllChildren( );
                 
                 while(enumKids.hasMoreElements( ))
                     recursiveSetScale( enumKids.nextElement( ), s );
@@ -495,7 +495,7 @@ public class STLObject
             Group g = (Group) gp;
             
             // recurse on child nodes
-            java.util.Enumeration enumKids = g.getAllChildren( );
+            java.util.Enumeration<?> enumKids = g.getAllChildren( );
             
             while(enumKids.hasMoreElements( )) 
             {
@@ -529,7 +529,7 @@ public class STLObject
             Group g = (Group) gp;
             
             // recurse on child nodes
-            java.util.Enumeration enumKids = g.getAllChildren( );
+            java.util.Enumeration<?> enumKids = g.getAllChildren( );
             
             while(enumKids.hasMoreElements( )) 
             {
@@ -555,7 +555,7 @@ public class STLObject
      */
     public void restoreAppearance()
     {
-    	java.util.Enumeration enumKids = stl.getAllChildren( );
+    	java.util.Enumeration<?> enumKids = stl.getAllChildren( );
         
         while(enumKids.hasMoreElements( ))
         {
@@ -701,7 +701,7 @@ public class STLObject
         
         // Rescale the object
  
-        Enumeration things;
+        Enumeration<?> things;
 
         things = stl.getAllChildren();
         while(things.hasMoreElements()) 

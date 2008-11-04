@@ -54,7 +54,7 @@ enum Bop
  * @author ensab
  *
  */
-class Variable implements Comparator
+class Variable implements Comparator<Variable>
 {
 	boolean bv;
 	boolean init;
@@ -84,9 +84,9 @@ class Variable implements Comparator
 	/**
 	 * Compare means compare the lexical order of the names.
 	 */
-	public final int compare(Object a, Object b)
+	public final int compare(Variable a, Variable b)
 	{
-		return(((Variable)a).n.compareTo(((Variable)b).n));
+		return(a.n.compareTo(b.n));
 	}
 	
 }
@@ -374,7 +374,7 @@ class BooleanExpression
  *
  */
 
-class TableRow implements Comparator
+class TableRow implements Comparator<TableRow>
 {
 	private Variable[] vs;
 	private boolean b;
@@ -499,10 +499,10 @@ class TableRow implements Comparator
 	 * @param a
 	 * @param b
 	 */
-	public final int compare(Object a, Object b)
+	public final int compare(TableRow a,TableRow b)
 	{
-		int va = ((TableRow)a).number();
-		int vb = ((TableRow)b).number();
+		int va = a.number();
+		int vb = b.number();
 		
 		if(va < vb)
 			return -1;
