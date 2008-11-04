@@ -26,11 +26,6 @@ public class SNAPReprap extends GenericRepRap
 	/**
 	 * 
 	 */
-	private final int localNodeNumber = 0;
-	
-	/**
-	 * 
-	 */
 	//private Communicator communicator = org.reprap.Main.getCommunicator();
 	
 	/**

@@ -20,7 +20,7 @@ public class Device {
 	 * Result of the last call to isAvailable (which we don't want to call in loops
 	 * etc as it does real comms)
 	 */
-	private boolean wasAlive = false;
+//	private boolean wasAlive = false; // commented out as isAvailable is commented
 	
 	/**
 	 * Communicator

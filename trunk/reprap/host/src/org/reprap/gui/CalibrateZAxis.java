@@ -9,7 +9,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
-import javax.swing.JTextField;
 
 import org.reprap.devices.GenericStepperMotor;
 
@@ -33,7 +32,6 @@ import org.reprap.devices.GenericStepperMotor;
 */
 public class CalibrateZAxis extends javax.swing.JDialog {
 
-	private JTextField message;
 	private JRadioButton radio1step;
 	private JRadioButton radio1mm;
 	private JRadioButton radio10mm;

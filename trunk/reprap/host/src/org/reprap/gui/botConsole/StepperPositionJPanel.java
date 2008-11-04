@@ -27,7 +27,8 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
     private Printer printer;
 
     private double currentSpeed;
-    private double motorStepsPerMM;
+    @SuppressWarnings("unused")
+	private double motorStepsPerMM;
     private double axisLength;
     private double nudgeSize;
     private double newTargetAfterNudge;

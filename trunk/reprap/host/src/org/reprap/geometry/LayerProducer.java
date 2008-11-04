@@ -482,7 +482,7 @@ public class LayerProducer {
 				att.getExtruder(printer.getExtruders()).getInfillSpeed(layerConditions));
 		*/
 		
-		double baseFeedrate = att.getExtruder(printer.getExtruders()).getXYFeedrate();
+		/* double baseFeedrate = */ att.getExtruder(printer.getExtruders()).getXYFeedrate();
 		double outlineFeedrate = att.getExtruder(printer.getExtruders()).getOutlineFeedrate();
 		double infillFeedrate = att.getExtruder(printer.getExtruders()).getInfillFeedrate();
 		

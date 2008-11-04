@@ -83,7 +83,9 @@ public class SNAPExtruder extends GenericExtruder
 	/**
 	 * Temprature history
 	 */
+	@SuppressWarnings("unused")
 	private double[] tH;
+	@SuppressWarnings("unused")
 	private int tHi;
 	
 	/**
@@ -91,12 +93,6 @@ public class SNAPExtruder extends GenericExtruder
 	 * If this is the case, TODO: impact?
 	 */
 	private boolean currentMaterialOutSensor = false;
-	
-	
-	/**
-	 * Indicates when polled values are first ready 
-	 */
-	private boolean sensorsInitialised = false;
 	
 	/**
 	 * 
@@ -106,6 +102,7 @@ public class SNAPExtruder extends GenericExtruder
 	/**
 	 * 
 	 */
+	@SuppressWarnings("unused")
 	private boolean pollThreadExiting = false;
 	
 	/**

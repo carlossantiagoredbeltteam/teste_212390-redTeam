@@ -1,7 +1,6 @@
 package org.reprap.gui;
 
 import javax.media.j3d.*;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.vecmath.Color3f;
 //import org.reprap.Extruder;
@@ -12,12 +11,13 @@ import org.reprap.Printer;
 public class PreviewPanel extends Panel3D implements Previewer {
 	private Printer reprap;
 //	private Extruder extruder = null;
+	@SuppressWarnings("unused")
 	private double previousZ = Double.NaN;
-	private JCheckBoxMenuItem layerPauseCheckbox = null, segmentPauseCheckbox = null;
 	private BranchGroup extrusionsNew;
 	private BranchGroup extrusionsOld = null;
     private BranchGroup lowerShell = null;
     
+	@SuppressWarnings("unused")
 	private StatusMessage statusWindow;
 	
 //	private double extrusionSize = 1.0;

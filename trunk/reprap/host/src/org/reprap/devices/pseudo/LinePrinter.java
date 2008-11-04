@@ -102,7 +102,9 @@ public class LinePrinter {
 		
 		AxisMotor master, slave;
 
-		int x0, x1, y0, y1;
+		@SuppressWarnings("unused")
+		int x0; 
+		int x1, y0, y1;
 		
 		// Whichever is the greater distance will be the master
 		// From an algorithmic point of view, we'll just consider

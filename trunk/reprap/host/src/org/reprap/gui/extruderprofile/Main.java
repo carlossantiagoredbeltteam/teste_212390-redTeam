@@ -42,7 +42,7 @@ public class Main extends javax.swing.JDialog {
 	private JLabel jLabel3;
 	private JTextField maxTemp;
 
-	private final int localNodeNumber = 0;
+//	private final int localNodeNumber = 0;
 	
 	private Thread pollThread = null;
 	private boolean pollThreadExiting = false;

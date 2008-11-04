@@ -697,6 +697,7 @@ public class Main {
             String port = "";
             String err = "";
             String machine = "simulator";
+			@SuppressWarnings("unused")
 			Boolean use_serial = false;
 
 			try

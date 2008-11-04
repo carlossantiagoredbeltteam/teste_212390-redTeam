@@ -8,7 +8,6 @@ package org.reprap.gui.botConsole;
 
 import java.util.*;
 import java.text.SimpleDateFormat;
-import java.net.URI;
 import javax.swing.JOptionPane;
 import org.reprap.Preferences;
 import org.reprap.Printer;
@@ -20,7 +19,7 @@ import org.reprap.Printer;
 public class PrintTabFrame extends javax.swing.JInternalFrame {
 	
 	private BotConsoleFrame parentBotConsoleFrame = null;
-	private XYZTabPanel xYZTabPanel = null;
+//	private XYZTabPanel xYZTabPanel = null;
     private Printer printer;
     private boolean paused = false;
     private boolean seenSNAP = false;
@@ -142,7 +141,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
     public void setFrames(BotConsoleFrame b, XYZTabPanel xyz)
     {
     	parentBotConsoleFrame = b;
-    	xYZTabPanel = xyz;
+//    	xYZTabPanel = xyz;
     }
 
     /** This method is called from within the constructor to
@@ -507,6 +506,7 @@ org.reprap.Main.gui.setLayerPause(layerPauseCheck.isSelected());
 
 private void selectorRadioButtonMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_selectorRadioButtonMousePressed
 	
+	@SuppressWarnings("unused")
 	String machine = "simulator";
 	boolean closeMessage = false;
 	try
@@ -561,7 +561,7 @@ try {
 
 private void getWebPageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_getWebPageActionPerformed
 try {
-            URI url = new URI("http://reprap.org");
+//            URI url = new URI("http://reprap.org");
             //Desktop.getDesktop().browse(url);//***AB
         } catch(Exception e) {
             e.printStackTrace();

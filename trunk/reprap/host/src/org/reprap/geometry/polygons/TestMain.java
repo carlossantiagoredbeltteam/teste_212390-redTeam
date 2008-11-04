@@ -86,7 +86,7 @@ public class TestMain
 		RrHalfPlane rh = new RrHalfPlane(r, s);
 		RrHalfPlane sh = new RrHalfPlane(s, p);
 		
-		RrHalfPlane pph = new RrHalfPlane(pp, qq);
+		/* RrHalfPlane pph = */ new RrHalfPlane(pp, qq);
 		RrHalfPlane qqh = new RrHalfPlane(qq, rr);
 		RrHalfPlane rrh = new RrHalfPlane(rr, pp);
 		
@@ -124,7 +124,7 @@ public class TestMain
 		//RrPolygonList pl = cp.megList(2, 3);
 		//RrGraphics g = new RrGraphics(pl, false);
 		//System.out.println(cp.toString());
-		RrGraphics g1 = new RrGraphics(cp);
+		/* RrGraphics g1 = */ new RrGraphics(cp);
 		//RrHalfPlane hatch = new RrHalfPlane(new Rr2Point(1, -1), new Rr2Point(-1, 1));
 		//RrHalfPlane hatch = new RrHalfPlane(new Rr2Point(1, 1), new Rr2Point(-1, -1));
 		//RrPolygonList h = cp.hatch(hatch, 0.05, 3, 0);
@@ -156,7 +156,7 @@ public class TestMain
 //		RrCSGPolygon restored = hp.toCSG();
 //		restored.divide(1.0e-6, 1);
 //		System.out.println(restored.toString());
-		RrGraphics g = new RrGraphics(hp);
+		/* RrGraphics g = */ new RrGraphics(hp);
 
 		//g.addCSG(cp);
 		//g.addCSG(restored);

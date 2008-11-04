@@ -34,7 +34,7 @@ public class AxisRepeatabilityTest {
 		final int localNodeNumber = 0;
 		int address;
 
-                SNAPAddress myAddress = new SNAPAddress(localNodeNumber);
+                /* SNAPAddress myAddress = */ new SNAPAddress(localNodeNumber);
 		Communicator communicator = org.reprap.Main.getCommunicator();
                 
 		try
@@ -91,7 +91,7 @@ public class AxisRepeatabilityTest {
 		
 		System.out.println("\nReset your calipers, and then push return to start...");
 		try {
-			String trigger = console.readLine();}
+			/* String trigger = */ console.readLine();}
 		catch(Exception ex)
 		{
 			System.err.println("Argh 5!");
