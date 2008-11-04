@@ -15,7 +15,6 @@ package org.reprap.gui.botConsole;
 //import java.util.*;
 //import java.text.SimpleDateFormat;
 import org.reprap.Preferences;
-import javax.swing.JOptionPane;
 import javax.swing.*;
 //import org.reprap.comms.snap.SNAPAddress;
 //import org.reprap.comms.snap.SNAPCommunicator;
@@ -536,11 +535,11 @@ private void RampButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 }//GEN-LAST:event_RampButtonActionPerformed
 
 private void homeAllButtonAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homeAllButtonAction
-	org.reprap.gui.botConsole.BotConsoleFrame.getBotConsoleFrame().XYZ().homeAll();
+	BotConsoleFrame.XYZ().homeAll();
 }//GEN-LAST:event_homeAllButtonAction
 
 private void moveToSwapPointAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveToSwapPointAction
-	org.reprap.gui.botConsole.BotConsoleFrame.getBotConsoleFrame().XYZ().homeAll();
+	BotConsoleFrame.XYZ().homeAll();
 }//GEN-LAST:event_moveToSwapPointAction
 
     private void setExtruderSpeed() {
