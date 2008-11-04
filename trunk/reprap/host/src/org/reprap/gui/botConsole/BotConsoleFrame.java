@@ -183,6 +183,11 @@ public class BotConsoleFrame extends javax.swing.JFrame {
     	return bcf;
     }
     
+    public static org.reprap.gui.botConsole.XYZTabPanel XYZ()
+    {
+    	return bcf.xYZTabPanel;
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTabbedPane jTabbedPane1;
     private org.reprap.gui.botConsole.PrintTabFrame printTabFrame1;

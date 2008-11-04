@@ -313,10 +313,15 @@ private void nudgeSizeRB3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     setNudgeSize(Double.parseDouble(nudgeSizeRB3.getText()));
 }//GEN-LAST:event_nudgeSizeRB3ActionPerformed
 
-private void homeAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homeAllButtonActionPerformed
+public void homeAll()
+{
     xStepperPositionJPanel.homeAxis();
     yStepperPositionJPanel.homeAxis();
-    zStepperPositionJPanel.homeAxis();
+    zStepperPositionJPanel.homeAxis();	
+}
+
+private void homeAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homeAllButtonActionPerformed
+	homeAll();
 }//GEN-LAST:event_homeAllButtonActionPerformed
 
 public void storeAll()
