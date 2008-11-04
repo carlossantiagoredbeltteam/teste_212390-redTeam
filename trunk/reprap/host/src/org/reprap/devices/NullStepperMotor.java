@@ -179,19 +179,19 @@ public class NullStepperMotor extends GenericStepperMotor {
 		Debug.d(axis + " axis - dda at speed " + speed + ". x1 = " + x1 + ", deltaY = " + deltaY);
 	}
 	
-	/**
-	 * @throws IOException
-	 */
-	private void setNotification() throws IOException {
-		Debug.d(axis + " axis - setting notification on.");
-	}
+//	/**
+//	 * @throws IOException
+//	 */
+//	private void setNotification() throws IOException {
+//		Debug.d(axis + " axis - setting notification on.");
+//	}
 
-	/**
-	 * @throws IOException
-	 */
-	private void setNotificationOff() throws IOException {
-		Debug.d(axis + " axis - setting notification off.");
-	}
+//	/**
+//	 * @throws IOException
+//	 */
+//	private void setNotificationOff() throws IOException {
+//		Debug.d(axis + " axis - setting notification off.");
+//	}
 
 	/**
 	 * 
