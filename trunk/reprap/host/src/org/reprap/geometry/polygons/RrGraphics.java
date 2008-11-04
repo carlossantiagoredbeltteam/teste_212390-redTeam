@@ -506,7 +506,7 @@ public class RrGraphics
 				{
 					if(g.value(x,y))
 					{
-						Rr2Point p = transform(new Rr2Point(x*g.gridX(), y*g.gridY()));
+						Rr2Point p = transform(new Rr2Point(x*BooleanGrid.gridX(), y*BooleanGrid.gridY()));
 						g2d.fillRect((int)Math.round(p.x()), (int)Math.round(p.y()), 1, 1);
 					}
 					y++;
