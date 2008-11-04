@@ -527,9 +527,9 @@ public class RrHalfPlane
 		if(up)
 		{
 			java.util.Collections.sort(crossings, 
-					new java.util.Comparator() 
+					new java.util.Comparator<lineIntersection>() 
 					{
-				public int compare(Object a, Object b)
+				public int compare(lineIntersection a, lineIntersection b)
 				{
 					if(((lineIntersection)a).parameter() < 
 							((lineIntersection)b).parameter())
@@ -544,9 +544,9 @@ public class RrHalfPlane
 		} else
 		{
 			java.util.Collections.sort(crossings, 
-					new java.util.Comparator() 
+					new java.util.Comparator<lineIntersection>() 
 					{
-				public int compare(Object a, Object b)
+				public int compare(lineIntersection a, lineIntersection b)
 				{
 					if(((lineIntersection)a).parameter() > 
 							((lineIntersection)b).parameter())

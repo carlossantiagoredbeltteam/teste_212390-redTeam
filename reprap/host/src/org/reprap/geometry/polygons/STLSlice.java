@@ -337,6 +337,7 @@ class MaterialLists
 		super.finalize();
 	}	
 	
+	@SuppressWarnings("unchecked")
 	public MaterialLists()
 	{
 		extruderCount = 0;
@@ -581,7 +582,7 @@ public class STLSlice
 			STLObject stl = shapeList.get(i);
 			Transform3D trans = stl.getTransform();
 			BranchGroup bg = stl.getSTL();
-			java.util.Enumeration enumKids = bg.getAllChildren();
+			java.util.Enumeration<?> enumKids = bg.getAllChildren();
 			
 	        while(enumKids.hasMoreElements())
 	        {
@@ -861,7 +862,7 @@ public class STLSlice
             if(sg instanceof Group) 
             {
                 Group g = (Group)sg;
-                java.util.Enumeration enumKids = g.getAllChildren( );
+                java.util.Enumeration<?> enumKids = g.getAllChildren( );
                 while(enumKids.hasMoreElements())
                     recursiveSetEdges(enumKids.nextElement(), trans, z, att);
             } else if (sg instanceof Shape3D) 

@@ -202,7 +202,7 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 	private MouseObject mouse = null;
 	private PickCanvas pickCanvas = null; // The thing picked by a mouse click
 	private STLObject lastPicked = null; // The last thing picked
-	private java.util.List stls = new ArrayList(); // All the STLObjects to be built
+	private java.util.List<STLObject> stls = new ArrayList<STLObject>(); // All the STLObjects to be built
 	private int objectIndex = 0; // Counter for STLs as they are loaded
 
 	// Constructors
@@ -210,7 +210,7 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 		initialise();
 	}
 	
-	public java.util.List getSTLs()
+	public java.util.List<STLObject> getSTLs()
 	{
 		return stls;
 	}

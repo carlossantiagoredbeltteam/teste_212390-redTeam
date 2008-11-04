@@ -276,7 +276,7 @@ abstract public class Panel3D extends JPanel {
 	}
 
 	public javax.media.j3d.Locale getFirstLocale() {
-		java.util.Enumeration en = universe.getAllLocales();
+		java.util.Enumeration<?> en = universe.getAllLocales();
 
 		if (en.hasMoreElements() != false)
 			return (javax.media.j3d.Locale) en.nextElement();
