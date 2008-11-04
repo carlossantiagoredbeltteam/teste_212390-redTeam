@@ -87,7 +87,7 @@ public class Preferences {
 		String path = new String(System.getProperty("user.home") + File.separatorChar + 
 			propsFolder + File.separatorChar + propsFile);
 		File mainFile = new File(path);
-		URL mainUrl = mainFile.toURL();
+		URL mainUrl = mainFile.toURI().toURL();
 		
 		if (fallbackUrl == null && !mainFile.exists())
 			throw new IOException("Cannot load RepRap properties file or default "+propsFileDist);

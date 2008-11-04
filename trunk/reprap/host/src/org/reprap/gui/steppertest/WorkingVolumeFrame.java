@@ -88,7 +88,7 @@ public class WorkingVolumeFrame  extends JFrame {
 		
 		pack();
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		show();
+		setVisible(true);
 	}
 	
 	public void talkToBot() throws Exception {
