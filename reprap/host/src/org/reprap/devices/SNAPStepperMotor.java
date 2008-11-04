@@ -3,7 +3,6 @@ package org.reprap.devices;
 import java.io.IOException;
 import org.reprap.utilities.Debug;
 import org.reprap.Device;
-import org.reprap.Printer;
 import org.reprap.Preferences;
 import org.reprap.AxisMotor;
 import org.reprap.ReprapException;

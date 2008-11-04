@@ -1,20 +1,10 @@
 package org.reprap.machines;
 
 import java.io.IOException;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JFrame;
-import javax.media.j3d.*;
 
-import org.reprap.Attributes;
-import org.reprap.CartesianPrinter;
-import org.reprap.Preferences;
 import org.reprap.Extruder;
-import org.reprap.AxisMotor;
 import org.reprap.devices.NullStepperMotor;
-import org.reprap.ReprapException;
-import org.reprap.gui.*;
 import org.reprap.devices.NullExtruder;
-import org.reprap.devices.GenericStepperMotor;
 
 /**
  *

@@ -1,13 +1,12 @@
 package org.reprap.machines;
 
 import java.io.IOException;
-import javax.media.j3d.*;
-import java.io.IOException;
+
+import javax.media.j3d.BranchGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 
 import org.reprap.Attributes;
-import org.reprap.AxisMotor;
 import org.reprap.CartesianPrinter;
 import org.reprap.Preferences;
 import org.reprap.ReprapException;
@@ -15,14 +14,13 @@ import org.reprap.devices.NullExtruder;
 import org.reprap.devices.GenericExtruder;
 import org.reprap.devices.GenericStepperMotor;
 import org.reprap.devices.NullStepperMotor;
-import org.reprap.devices.pseudo.LinePrinter;
 import org.reprap.geometry.LayerRules;
-import org.reprap.gui.CalibrateZAxis;
+import org.reprap.gui.ContinuationMesage;
 import org.reprap.gui.Previewer;
+import org.reprap.gui.StatusMessage;
 import org.reprap.Extruder;
 import org.reprap.utilities.Debug;
 import org.reprap.utilities.Timer;
-import org.reprap.gui.*;
 
 public abstract class GenericRepRap implements CartesianPrinter
 {

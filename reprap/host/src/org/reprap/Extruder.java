@@ -2,8 +2,6 @@ package org.reprap;
 import java.io.IOException;
 import javax.media.j3d.Appearance;
 
-import org.reprap.Device;
-
 public interface Extruder
 {
 	

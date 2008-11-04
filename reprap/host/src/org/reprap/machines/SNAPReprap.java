@@ -1,30 +1,18 @@
 package org.reprap.machines;
 
 import java.io.IOException;
-import javax.vecmath.Color3f;
-import javax.media.j3d.*;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JFrame;
 import java.lang.Math;
 
-import org.reprap.Attributes;
-import org.reprap.CartesianPrinter;
 import org.reprap.Preferences;
 import org.reprap.ReprapException;
-import org.reprap.comms.Communicator;
 import org.reprap.comms.snap.SNAPAddress;
-import org.reprap.comms.snap.SNAPCommunicator;
 import org.reprap.devices.NullExtruder;
 import org.reprap.devices.SNAPExtruder;
-import org.reprap.devices.GenericStepperMotor;
 import org.reprap.devices.SNAPStepperMotor;
 import org.reprap.devices.pseudo.LinePrinter;
 import org.reprap.gui.CalibrateZAxis;
-import org.reprap.gui.Previewer;
 import org.reprap.Extruder;
 import org.reprap.utilities.Debug;
-import org.reprap.utilities.Timer;
-import org.reprap.gui.*;
 
 /**
  * 

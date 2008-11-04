@@ -4,7 +4,6 @@ import java.io.IOException;
 import org.reprap.Extruder;
 import org.reprap.AxisMotor;
 import org.reprap.devices.SNAPStepperMotor;
-import org.reprap.utilities.Debug;
 
 /**
  * This is a pseudo device that provides an apparent single device

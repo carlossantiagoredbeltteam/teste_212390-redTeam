@@ -10,22 +10,14 @@ package org.reprap.machines;
  * TODO: make GCodeWriter a subclass of NullCartesian, so I don't have to fix code all over the place.
  */
 
-import org.reprap.Attributes;
-import org.reprap.CartesianPrinter;
-import org.reprap.Preferences;
 import org.reprap.ReprapException;
-import org.reprap.gui.Previewer;
 import org.reprap.Extruder;
 import org.reprap.comms.GCodeReaderAndWriter;
 import org.reprap.utilities.Debug;
 import org.reprap.devices.GCodeExtruder;
 import org.reprap.devices.GCodeStepperMotor;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 
 /**
  *

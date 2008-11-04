@@ -7,8 +7,6 @@
 package org.reprap.gui.botConsole;
 
 import java.io.IOException;
-import javax.swing.JOptionPane;
-import org.reprap.Preferences;
 import org.reprap.Printer;
 /**
  *

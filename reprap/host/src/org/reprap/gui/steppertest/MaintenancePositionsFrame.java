@@ -28,11 +28,7 @@ import org.reprap.Preferences;
 import org.reprap.comms.Communicator;
 import org.reprap.comms.snap.SNAPAddress;
 import org.reprap.comms.snap.SNAPCommunicator;
-import org.reprap.devices.GenericExtruder;
-import org.reprap.devices.SNAPExtruder;
-import org.reprap.devices.GenericStepperMotor;
 import org.reprap.devices.SNAPStepperMotor;
-import org.reprap.gui.Utility;
 
 import java.awt.Color;
 

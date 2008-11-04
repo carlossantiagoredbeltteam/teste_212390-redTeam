@@ -13,8 +13,6 @@
 
 package org.reprap.gui.botConsole;
 
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.font.FontRenderContext;

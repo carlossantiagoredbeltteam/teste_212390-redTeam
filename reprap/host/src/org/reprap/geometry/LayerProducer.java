@@ -14,7 +14,6 @@ import org.reprap.ReprapException;
 import org.reprap.geometry.polygons.*;
 import org.reprap.devices.pseudo.LinePrinter;
 import org.reprap.utilities.Debug;
-import org.reprap.geometry.Producer;
 
 /**
  *

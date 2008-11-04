@@ -1,7 +1,5 @@
 package org.reprap.geometry;
 
-import javax.vecmath.*;
-import org.reprap.Preferences;
 import org.reprap.geometry.Producer;
 import org.reprap.gui.RepRapBuild;
 import org.reprap.machines.Simulator;

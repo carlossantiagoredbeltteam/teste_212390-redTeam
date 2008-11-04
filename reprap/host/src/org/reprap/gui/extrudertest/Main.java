@@ -19,8 +19,6 @@ import javax.swing.event.ChangeListener;
 import org.reprap.Preferences;
 import org.reprap.comms.Communicator;
 import org.reprap.comms.snap.SNAPAddress;
-import org.reprap.comms.snap.SNAPCommunicator;
-import org.reprap.devices.GenericExtruder;
 import org.reprap.devices.SNAPExtruder;
 import org.reprap.Extruder;
 import org.reprap.gui.Utility;

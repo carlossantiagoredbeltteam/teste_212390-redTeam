@@ -26,12 +26,9 @@ import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
-import javax.vecmath.*;
-
 import org.reprap.geometry.EstimationProducer;
 import org.reprap.geometry.Producer;
 import org.reprap.machines.MachineFactory;
-import org.reprap.gui.Preferences;
 import org.reprap.gui.PreviewPanel;
 import org.reprap.gui.RepRapBuild;
 import org.reprap.gui.Utility;
@@ -39,7 +36,6 @@ import org.reprap.gui.botConsole.BotConsoleFrame;
 import org.reprap.comms.Communicator;
 import org.reprap.comms.snap.SNAPAddress;
 import org.reprap.comms.snap.SNAPCommunicator;
-import org.reprap.utilities.Debug;
 import org.reprap.utilities.ExtensionFileFilter;
 
 /**
