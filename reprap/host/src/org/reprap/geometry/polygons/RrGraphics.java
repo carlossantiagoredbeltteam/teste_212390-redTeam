@@ -188,7 +188,7 @@ public class RrGraphics
 		jframe.setSize(frameWidth, frameHeight);
 		jframe.getContentPane().add(new MyComponent());
 		jframe.setVisible(true);
-		jframe.setCursor(Cursor.CROSSHAIR_CURSOR);
+		jframe.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
 		jframe.addMouseListener(new myMouse());
 		jframe.addKeyListener(new myKB());
 		
