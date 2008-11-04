@@ -722,7 +722,6 @@ public class RrCSGPolygon
     public RrPolygon meg()
     {
     	
-    	int flag = 1;
     	RrPolygon result = new RrPolygon(att);
     	
     	if(!corner)

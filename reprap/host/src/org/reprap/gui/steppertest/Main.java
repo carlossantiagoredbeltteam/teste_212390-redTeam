@@ -28,8 +28,6 @@ import org.reprap.gui.Utility;
 
 public class Main extends javax.swing.JDialog implements ChangeListener {
 
-	private final int localNodeNumber = 0;
-	
 	private final int intialXYSpeed = 236;
 	private final int intialZSpeed = 230;
 	
@@ -64,9 +62,9 @@ public class Main extends javax.swing.JDialog implements ChangeListener {
 	public Main(JFrame frame) throws Exception {
 		super(frame);
 
-		SNAPAddress myAddress = new SNAPAddress(localNodeNumber);
-		
-		String port = Preferences.loadGlobalString("Port(name)");
+//		SNAPAddress myAddress = new SNAPAddress(localNodeNumber);
+//		
+//		String port = Preferences.loadGlobalString("Port(name)");
 		String err = "";
 		
 //		try {

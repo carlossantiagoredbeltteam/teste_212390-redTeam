@@ -27,7 +27,6 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
-import java.util.Timer;
 
 import org.reprap.Preferences;
 import org.reprap.comms.Communicator;
@@ -40,7 +39,6 @@ public class WorkingVolumeFrame  extends JFrame {
 	private final int fastSpeed = 245;
 	private final int slowSpeed = 160;
 	
-	private final int localNodeNumber = 0;
 	JPanel motorX, motorY, motorZ;
 	Communicator communicator = org.reprap.Main.getCommunicator();
 	
@@ -95,10 +93,10 @@ public class WorkingVolumeFrame  extends JFrame {
 	
 	public void talkToBot() throws Exception {
 		
-		SNAPAddress myAddress = new SNAPAddress(localNodeNumber);
+//		SNAPAddress myAddress = new SNAPAddress(localNodeNumber);
 		
-		String port = Preferences.loadGlobalString("Port(name)");
-		String err = "";
+//		String port = Preferences.loadGlobalString("Port(name)");
+//		String err = "";
 		
 //		try {
 //			communicator = new SNAPCommunicator(port, myAddress);
@@ -139,9 +137,6 @@ public class WorkingVolumeFrame  extends JFrame {
 
 	public JPanel axisPanel(String name, int motorId, Communicator communicator) throws IOException 
 	{
-	    int maxValue = 30000;
-		int startingPosition = 5000;
-		Timer updateTimer;
 		final SNAPStepperMotor motor;
 		
 		final String axis;

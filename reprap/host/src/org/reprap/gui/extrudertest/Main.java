@@ -58,8 +58,6 @@ public class Main extends javax.swing.JDialog {
 	private int extruderCount;
 	private int extruder;
 	
-	private final int localNodeNumber = 0;
-	
 	private Thread pollThread = null;
 	private boolean pollThreadExiting = false;
 

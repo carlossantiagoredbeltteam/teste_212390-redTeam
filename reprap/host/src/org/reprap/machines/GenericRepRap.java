@@ -131,16 +131,6 @@ public abstract class GenericRepRap implements CartesianPrinter
 	*/
 	protected boolean excludeZ = false;
 	
-	/**
-	 * 
-	 */
-	private double overRun;
-	
-	/**
-	 * 
-	 */
-	private long delay;
-	
 	private int foundationLayers = 0;
 
 	
@@ -724,8 +714,8 @@ public abstract class GenericRepRap implements CartesianPrinter
 	{
 		double datumX = getExtruder().getNozzleWipeDatumX();
 		double datumY = getExtruder().getNozzleWipeDatumY();
-		double strokeX = getExtruder().getNozzleWipeStrokeX();
-		double strokeY = getExtruder().getNozzleWipeStrokeY();
+//		double strokeX = getExtruder().getNozzleWipeStrokeX();
+//		double strokeY = getExtruder().getNozzleWipeStrokeY();
 		double coolTime = getExtruder().getCoolingPeriod();
 		
 		startCooling = -1;
@@ -764,7 +754,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 */
 	public void betweenLayers(LayerRules lc) throws Exception
 	{
-		double clearTime = getExtruder().getNozzleClearTime();
+//		double clearTime = getExtruder().getNozzleClearTime();
 				
 		// Do half the extrusion between layers now
 		

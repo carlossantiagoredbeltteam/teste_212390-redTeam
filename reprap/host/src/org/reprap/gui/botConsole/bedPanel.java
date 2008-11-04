@@ -16,7 +16,6 @@ package org.reprap.gui.botConsole;
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.font.FontRenderContext;
-import java.awt.font.LineMetrics;
 
 /**
  *
@@ -152,7 +151,6 @@ public class bedPanel extends javax.swing.JPanel {
 
             for (int i = 0; i < lines; i++) {
                   width = (float)font.getStringBounds(s[i], frc).getWidth();
-                  LineMetrics lm = font.getLineMetrics(s[i], frc);
                   sx = (x - width)/2;
                   sy = y/2+(lineHeight)/2 - (lines-1)*((lineHeight+space)/2) + (i*(lineHeight+space));
                   g2.drawString(s[i], sx, sy);

@@ -289,7 +289,6 @@ public class RrPolygon
 	public RrPolygon negate()
 	{
 		RrPolygon result = new RrPolygon(att);
-		int f;
 		for(int i = size() - 1; i >= 0; i--)
 		{
 			result.add(point(i)); 
