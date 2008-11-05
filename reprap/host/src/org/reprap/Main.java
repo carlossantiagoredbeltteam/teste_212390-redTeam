@@ -61,9 +61,9 @@ public class Main {
     private JFileChooser chooser;
     private JFrame mainFrame;
     private RepRapBuild builder;
-    private PreviewPanel preview = null;
-    private JCheckBoxMenuItem viewBuilder;
-    private JCheckBoxMenuItem viewPreview;
+//    private PreviewPanel preview = null;
+//    private JCheckBoxMenuItem viewBuilder;
+//    private JCheckBoxMenuItem viewPreview;
     private JCheckBoxMenuItem segmentPause;
     private JCheckBoxMenuItem layerPause;
     
@@ -104,7 +104,7 @@ public class Main {
 
 	private void createAndShowGUI() throws Exception {
         JFrame.setDefaultLookAndFeelDecorated(false);
-        mainFrame = new JFrame("RepRap");
+        mainFrame = new JFrame("RepRap             grid: 20 mm");
         mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         // Required so menus float over Java3D
@@ -149,28 +149,28 @@ public class Main {
         viewMenu.setMnemonic(KeyEvent.VK_V);
         menubar.add(viewMenu);
 
-        JMenuItem viewToggle = new JMenuItem("Toggle view", KeyEvent.VK_V);
-        viewToggle.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK));
-        viewToggle.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				onViewToggle();
-			}});
-        viewMenu.add(viewToggle);
+//        JMenuItem viewToggle = new JMenuItem("Toggle view", KeyEvent.VK_V);
+//        viewToggle.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK));
+//        viewToggle.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent arg0) {
+//				onViewToggle();
+//			}});
+//        viewMenu.add(viewToggle);
         
-        viewBuilder = new JCheckBoxMenuItem("Setup build");
-        viewBuilder.setSelected(true);
-        viewBuilder.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				onViewBuilder();
-			}});
-        viewMenu.add(viewBuilder);
+//        viewBuilder = new JCheckBoxMenuItem("Setup build");
+//        viewBuilder.setSelected(true);
+//        viewBuilder.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent arg0) {
+//				onViewBuilder();
+//			}});
+//        viewMenu.add(viewBuilder);
         
-        viewPreview = new JCheckBoxMenuItem("Progress");
-        viewPreview.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				onViewPreview();
-			}});
-        viewMenu.add(viewPreview);
+//        viewPreview = new JCheckBoxMenuItem("Progress");
+//        viewPreview.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent arg0) {
+//				onViewPreview();
+//			}});
+//        viewMenu.add(viewPreview);
 
         
         JMenu manipMenu = new JMenu("Manipulate");
@@ -355,10 +355,10 @@ public class Main {
         panel.setOneTouchExpandable(true);
         panel.setContinuousLayout(true);
         panel.setLeftComponent(builderFrame);
-        if(org.reprap.Preferences.loadGlobalBool("DisplaySimulation"))
-        	panel.setRightComponent(createPreviewPanel());
-        else
-        	preview = null;
+//        if(org.reprap.Preferences.loadGlobalBool("DisplaySimulation"))
+//        	panel.setRightComponent(createPreviewPanel());
+//        else
+//        	preview = null;
         panel.setDividerLocation(panel.getPreferredSize().width);
         
         mainFrame.getContentPane().add(panel);
@@ -370,17 +370,17 @@ public class Main {
         mainFrame.setVisible(true);
 	}
 
-	private Box createPreviewPanel() throws Exception {
-		
-        Box pane = new Box(BoxLayout.Y_AXIS);
-        pane.add(new JLabel("Build progress"));
-		preview = new PreviewPanel();
-		pane.setMinimumSize(new Dimension(0,0));
-		if(preview != null)
-			pane.add(preview);
-		
-		return pane;
-	}
+//	private Box createPreviewPanel() throws Exception {
+//		
+//        Box pane = new Box(BoxLayout.Y_AXIS);
+//        pane.add(new JLabel("Build progress"));
+//		preview = new PreviewPanel();
+//		pane.setMinimumSize(new Dimension(0,0));
+//		if(preview != null)
+//			pane.add(preview);
+//		
+//		return pane;
+//	}
 	
 //	private void onProduceT() {
 //        cancelMenuItem.setEnabled(true);
@@ -481,10 +481,10 @@ public class Main {
 				Thread.currentThread().setName("Producer");
 				try {
 					
-					if (!viewPreview.isSelected()) {
-						viewPreview.setSelected(true);
-						updateView();
-					}
+//					if (!viewPreview.isSelected()) {
+//						viewPreview.setSelected(true);
+//						updateView();
+//					}
 					
 //					if(preview != null)
 //					{
@@ -494,7 +494,7 @@ public class Main {
 					
 					if(printer == null)
 						System.err.println("Production attempted with null printer.");
-					producer = new Producer(printer, preview, builder);
+					producer = new Producer(printer, null, builder);
 					producer.setSegmentPause(segmentPause);
 					producer.setLayerPause(layerPause);
 					producer.produce();
@@ -562,35 +562,35 @@ public class Main {
       }
 
 	private void onViewBuilder() {
-    		if (!viewBuilder.isSelected() && !viewPreview.isSelected())
-    			viewPreview.setSelected(true);
+//    		if (!viewBuilder.isSelected() && !viewPreview.isSelected())
+//    			viewPreview.setSelected(true);
         	updateView();
     }
 
-    private void onViewPreview() {
-		if (!viewPreview.isSelected() && !viewBuilder.isSelected())
-			viewBuilder.setSelected(true);
-		updateView();
-    }
+//    private void onViewPreview() {
+//		if (!viewPreview.isSelected() && !viewBuilder.isSelected())
+//			viewBuilder.setSelected(true);
+//		updateView();
+//    }
     
-    private void onViewToggle() {
-    		if (viewBuilder.isSelected()) {
-    			viewPreview.setSelected(true);
-    			viewBuilder.setSelected(false);
-    		} else {
-    			viewPreview.setSelected(false);
-    			viewBuilder.setSelected(true);
-    		}
-        	updateView();
-    }
+//    private void onViewToggle() {
+//    		if (viewBuilder.isSelected()) {
+//    			viewPreview.setSelected(true);
+//    			viewBuilder.setSelected(false);
+//    		} else {
+//    			viewPreview.setSelected(false);
+//    			viewBuilder.setSelected(true);
+//    		}
+//        	updateView();
+//    }
     
     private void updateView() {
-    	    if (viewBuilder.isSelected() && viewPreview.isSelected())
-    	    	  panel.setDividerLocation(0.5);
-    	    else if (viewBuilder.isSelected())
+//    	    if (viewBuilder.isSelected() && viewPreview.isSelected())
+//    	    	  panel.setDividerLocation(0.5);
+//    	    else if (viewBuilder.isSelected())
   	    	  panel.setDividerLocation(1.0);
-    	    else
-    	    	  panel.setDividerLocation(0.0);
+//    	    else
+//    	    	  panel.setDividerLocation(0.0);
     }
     
 //    private void estimateResourcesT() {

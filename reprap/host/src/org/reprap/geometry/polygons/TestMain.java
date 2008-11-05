@@ -2,6 +2,7 @@
 package org.reprap.geometry.polygons;
 
 import org.reprap.Attributes;
+import org.reprap.utilities.RrGraphics;
 
 /**
  * Testing class
