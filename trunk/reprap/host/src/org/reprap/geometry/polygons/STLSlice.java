@@ -165,12 +165,12 @@ class LineSegment
 		
 		for(int i = 0; i < q.edges().size(); i++)
 		{
-			if(q.box().pointRelative(q.segment(i).a) == 0)
+			if(q.box().pointRelative(q.segmentA(i)) == 0)
 			{
 				q.segment(i).qa = q;
 				count++;
 			}
-			if(q.box().pointRelative(q.segment(i).b) == 0)
+			if(q.box().pointRelative(q.segmentB(i)) == 0)
 			{
 				q.segment(i).qb = q;
 				count++;
@@ -665,9 +665,19 @@ public class STLSlice
 	 * @param i index of line segement
 	 * @return Linesegment object of the STL slice at index i
 	 */
-	public LineSegment segment(int i)
+	protected LineSegment segment(int i)
 	{
 		return edges.get(i);
+	}
+	
+	public Rr2Point segmentA(int i)
+	{
+		return edges.get(i).a;
+	}
+	
+	public Rr2Point segmentB(int i)
+	{
+		return edges.get(i).b;
 	}
 	
 	/**

@@ -54,12 +54,24 @@
  
  */
 
-package org.reprap.geometry.polygons;
+package org.reprap.utilities;
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.List;
+
+import org.reprap.geometry.polygons.BooleanGrid;
+import org.reprap.geometry.polygons.Rr2Point;
+import org.reprap.geometry.polygons.RrBox;
+import org.reprap.geometry.polygons.RrCSGOp;
+import org.reprap.geometry.polygons.RrCSGPolygon;
+import org.reprap.geometry.polygons.RrHalfPlane;
+import org.reprap.geometry.polygons.RrInterval;
+import org.reprap.geometry.polygons.RrLine;
+import org.reprap.geometry.polygons.RrPolygon;
+import org.reprap.geometry.polygons.RrPolygonList;
+import org.reprap.geometry.polygons.STLSlice;
 import org.reprap.gui.*;
 
 /**
@@ -596,8 +608,8 @@ public class RrGraphics
 			g2d.setColor(polygon1);
 			for(int i = 0; i < s.edges().size(); i++)
 			{
-				move(s.segment(i).a);
-				plot(s.segment(i).b);
+				move(s.segmentA(i));
+				plot(s.segmentB(i));
 			}
 		} else
 		{
