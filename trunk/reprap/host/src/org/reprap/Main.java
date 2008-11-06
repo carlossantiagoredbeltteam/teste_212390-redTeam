@@ -225,21 +225,21 @@ public class Main {
         //menubar.add(produceMenu);
 
         
-        //produceProduceB = new JMenuItem("Start build...", KeyEvent.VK_B);
-        //produceProduceB.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.CTRL_MASK));
-        //produceProduceB.addActionListener(new ActionListener() {
-		//	public void actionPerformed(ActionEvent arg0) {
-		//		onProduceB();
-		//	}});
+        produceProduceB = new JMenuItem("Start build...", KeyEvent.VK_B);
+        produceProduceB.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, ActionEvent.CTRL_MASK));
+        produceProduceB.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				onProduceB();
+			}});
         //produceMenu.add(produceProduceB);
 
-        //cancelMenuItem = new JMenuItem("Cancel", KeyEvent.VK_P);
-        //cancelMenuItem.setEnabled(false);
-        //cancelMenuItem.addActionListener(new ActionListener() {
-		//	public void actionPerformed(ActionEvent arg0) {
-		//		if(producer != null)
-		//			producer.setCancelled(true);
-		//	}});
+        cancelMenuItem = new JMenuItem("Cancel", KeyEvent.VK_P);
+        cancelMenuItem.setEnabled(false);
+        cancelMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if(producer != null)
+					producer.setCancelled(true);
+			}});
         //produceMenu.add(cancelMenuItem);
         
         
@@ -494,7 +494,7 @@ public class Main {
 					
 					if(printer == null)
 						System.err.println("Production attempted with null printer.");
-					producer = new Producer(printer, null, builder);
+					producer = new Producer(printer, builder);
 					producer.setSegmentPause(segmentPause);
 					producer.setLayerPause(layerPause);
 					producer.produce();

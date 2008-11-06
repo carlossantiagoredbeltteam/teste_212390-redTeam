@@ -7,6 +7,7 @@ import org.reprap.geometry.polygons.*;
 import org.reprap.gui.PreviewPanel;
 import org.reprap.gui.RepRapBuild;
 import org.reprap.utilities.Debug;
+import org.reprap.utilities.RrGraphics;
 
 public class Producer {
 	
@@ -19,6 +20,8 @@ public class Producer {
 	private LayerProducer layer = null;
 	
 	protected LayerRules layerRules = null;
+	
+	private RrGraphics simulationPlot = null;
 	
 	/**
 	 * The machine doing the making
@@ -62,12 +65,12 @@ public class Producer {
 	 * @param builder
 	 * @throws Exception
 	 */
-	public Producer(Printer pr, PreviewPanel preview, RepRapBuild builder) throws Exception 
+	public Producer(Printer pr, RepRapBuild builder) throws Exception 
 	{
 		
-		pr.setPreviewer(preview);
-		if(preview != null)
-			preview.setMachine(pr);
+//		pr.setPreviewer(preview);
+//		if(preview != null)
+//			preview.setMachine(pr);
 		bld = builder;
 
 		//		Original hatch vectors
@@ -83,6 +86,12 @@ public class Producer {
 //		evenHatchDirection = new RrHalfPlane(new Rr2Point(1.0, 0.0), new Rr2Point(0.0, 0.0));		
 		
 		stlc = new STLSlice(bld.getSTLs());
+
+		if(Preferences.loadGlobalBool("DisplaySimulation"))
+		{
+			simulationPlot = new RrGraphics("RepRap building simulation");
+		} else
+			simulationPlot = null;
 		
 		double modZMax = stlc.maxZ();
 		double stepZ = pr.getExtruders()[0].getExtrusionHeight();
@@ -209,7 +218,7 @@ public class Producer {
 					reprap.getExtruders());
 			if(slice.size() <= 0)
 				return;
-			layer = new LayerProducer(slice, stlc.getBelow(), layerRules);
+			layer = new LayerProducer(slice, stlc.getBelow(), layerRules, simulationPlot);
 
 			if(layer == null)
 				return;
@@ -299,7 +308,7 @@ public class Producer {
 				slice.destroy();
 				slice = stlc.slice(layerRules.getModelZ() + layerRules.getStep()*0.5,
 						reprap.getExtruders());
-				layer = new LayerProducer(slice, stlc.getBelow(), layerRules);
+				layer = new LayerProducer(slice, stlc.getBelow(), layerRules, simulationPlot);
 			}
 			
 			reprap.speedBuffer();
@@ -359,7 +368,7 @@ public class Producer {
 			
 			layer = null;
 			if(slice.size() > 0)
-				layer = new LayerProducer(slice, stlc.getBelow(), layerRules);
+				layer = new LayerProducer(slice, stlc.getBelow(), layerRules, simulationPlot);
 			else
 				Debug.d("Null slice at model Z = " + layerRules.getModelZ());
 			
