@@ -73,6 +73,10 @@ import org.reprap.geometry.polygons.RrPolygon;
 import org.reprap.geometry.polygons.RrPolygonList;
 import org.reprap.geometry.polygons.STLSlice;
 import org.reprap.gui.*;
+import org.reprap.Attributes;
+import javax.media.j3d.Appearance;
+import javax.vecmath.Color3f;
+import javax.media.j3d.Material;
 
 /**
  * Class to plot images of geometrical structures for debugging.
@@ -157,6 +161,108 @@ public class RrGraphics
 	 */
 	private boolean plot_box = false;
 	
+	private String title = "RepRap diagnostics";
+	
+	private boolean initialised = false;
+	
+	/**
+	 * Constructor for just a box - add stuff later
+	 * @param b
+	 * @param pb
+	 */
+	public RrGraphics(RrBox b, String t) 
+	{
+		p_list = null;
+		csg_p = null;
+		stlc = null;
+		hp = null;
+		title = t;
+		init(b, false);
+	}
+	
+	/**
+	 * Constructor for nothing - add stuff later
+	 * @param b
+	 * @param pb
+	 */
+	public RrGraphics(String t) 
+	{
+		p_list = null;
+		csg_p = null;
+		stlc = null;
+		hp = null;
+		title = t;
+		initialised = false;
+	}
+	
+	
+	/**
+	 * Constructor for point-list polygon
+	 * @param pl
+	 * @param pb
+	 */
+	public RrGraphics(RrPolygonList pl) 
+	{
+		if(pl.size() <= 0)
+		{
+			System.err.println("Attempt to plot a null polygon list!");
+			return;
+		}
+		
+		p_list = pl;
+		hp = null;
+		csg_p = null;
+		stlc = null;
+		
+		init(pl.getBox(), true);
+	}
+	
+	/**
+	 * Constructor for CSG polygon
+	 * @param cp
+	 */
+	public RrGraphics(RrCSGPolygon cp) 
+	{
+		p_list = null;
+		hp = null;
+		csg_p = cp;
+		stlc = null;
+		
+		init(csg_p.box(), true);
+	}
+	
+	/**
+	 * Constructor for CSG polygon and crossing lines
+	 * @param cp
+	 * @param pb
+	 */
+	public RrGraphics(RrCSGPolygon cp, List<RrHalfPlane> h) 
+	{
+		p_list = null;
+		csg_p = cp;
+		hp = h;
+		stlc = null;
+		
+		init(csg_p.box(), true);
+	}
+	
+	/**
+	 * Constructor for STL polygons
+	 * @param s
+	 * @param pb
+	 */
+	public RrGraphics(STLSlice s) 
+	{
+		p_list = null;
+		csg_p = null;
+		hp = null;
+		stlc = s;
+		
+		init(stlc.box(), true);
+	}
+	
+
+	
 	private void setScales(RrBox b)
 	{
 		scaledBox = b.scale(1.2);
@@ -191,7 +297,7 @@ public class RrGraphics
 	/**
 	 * @param b
 	 */
-	private void init(RrBox b)
+	public void init(RrBox b, boolean waitTillDone)
 	{
 		originalBox = b;
 		setScales(b);
@@ -199,115 +305,51 @@ public class RrGraphics
 		jframe = new JFrame();
 		jframe.setSize(frameWidth, frameHeight);
 		jframe.getContentPane().add(new MyComponent());
+		jframe.setTitle(title);
 		jframe.setVisible(true);
 		jframe.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
 		jframe.addMouseListener(new myMouse());
 		jframe.addKeyListener(new myKB());
+		jframe.setIgnoreRepaint(false);
 		
-		StatusMessage statusWindow = new StatusMessage(new JFrame());
-		//statusWindow.setButton("Continue");
-		statusWindow.setMessage("Left mouse - magnify\n" +
-				"Middle mouse - evaluate\n" +
-				"Right mouse - full image\n" +
-				"b - toggle boxes\n" + 
-				"s - toggle solid shading\n\n" 
-				);
-		statusWindow.setLocation(new Point(frameWidth + 20, 0));
-		statusWindow.setVisible(true);
+		initialised = true;
 		
-		boolean loop = true;
-		while(loop)
+		if(waitTillDone)
 		{
-			try {
-				Thread.sleep(100);
-				loop = !statusWindow.isCancelled();
-			} catch (InterruptedException e) 
+			StatusMessage statusWindow = new StatusMessage(new JFrame());
+			//statusWindow.setButton("Continue");
+			statusWindow.setMessage("Left mouse - magnify\n" +
+					"Middle mouse - evaluate\n" +
+					"Right mouse - full image\n" +
+					"b - toggle boxes\n" + 
+					"s - toggle solid shading\n\n" 
+			);
+			statusWindow.setLocation(new Point(frameWidth + 20, 0));
+			statusWindow.setVisible(true);
+
+
+			boolean loop = true;
+			while(loop)
 			{
-				
+				try {
+					Thread.sleep(100);
+					loop = !statusWindow.isCancelled();
+				} catch (InterruptedException e) 
+				{
+
+				}
 			}
+			jframe.dispose();
 		}
-		jframe.dispose();
 	}
 	
-	/**
-	 * Constructor for point-list polygon
-	 * @param pl
-	 * @param pb
-	 */
-	public RrGraphics(RrPolygonList pl) 
+	
+	public boolean isInitialised()
 	{
-		if(pl.size() <= 0)
-		{
-			System.err.println("Attempt to plot a null polygon list!");
-			return;
-		}
-		
-		p_list = pl;
-		hp = null;
-		csg_p = null;
-		stlc = null;
-		
-		init(pl.getBox());
+		return initialised;
 	}
 	
-	/**
-	 * Constructor for CSG polygon
-	 * @param cp
-	 */
-	public RrGraphics(RrCSGPolygon cp) 
-	{
-		p_list = null;
-		hp = null;
-		csg_p = cp;
-		stlc = null;
-		
-		init(csg_p.box());
-	}
-	
-	/**
-	 * Constructor for CSG polygon and crossing lines
-	 * @param cp
-	 * @param pb
-	 */
-	public RrGraphics(RrCSGPolygon cp, List<RrHalfPlane> h) 
-	{
-		p_list = null;
-		csg_p = cp;
-		hp = h;
-		stlc = null;
-		
-		init(csg_p.box());
-	}
-	
-	/**
-	 * Constructor for STL polygons
-	 * @param s
-	 * @param pb
-	 */
-	public RrGraphics(STLSlice s) 
-	{
-		p_list = null;
-		csg_p = null;
-		hp = null;
-		stlc = s;
-		
-		init(stlc.box());
-	}
-	
-	/**
-	 * Constructor for just a box - add stuff later
-	 * @param b
-	 * @param pb
-	 */
-	public RrGraphics(RrBox b) 
-	{
-		p_list = null;
-		csg_p = null;
-		stlc = null;
-		hp = null;
-		
-		init(b);
-	}
+
 	
 	/**
 	 * @param pl
@@ -315,6 +357,7 @@ public class RrGraphics
 	public void add(RrPolygonList pl)
 	{
 		p_list = pl;
+		jframe.repaint();
 	}
 	
 	/**
@@ -323,6 +366,7 @@ public class RrGraphics
 	public void add(RrCSGPolygon cp)
 	{
 		csg_p = cp;
+		jframe.repaint();
 	}
 	
 	/**
@@ -331,6 +375,7 @@ public class RrGraphics
 	public void add(STLSlice s)
 	{
 		stlc = s;
+		jframe.repaint();
 	}
 	
 	/**
@@ -339,6 +384,7 @@ public class RrGraphics
 	public void add(List<RrHalfPlane>h)
 	{
 		hp = h;
+		jframe.repaint();
 	}
 	
 	/**
@@ -432,6 +478,19 @@ public class RrGraphics
 	}
 	
 	/**
+	 * Set the colour from a RepRap attribute
+	 * @param at
+	 */
+	private void setColour(Attributes at)
+	{
+		Appearance ap = at.getAppearance();
+		Material mt = ap.getMaterial();
+		Color3f col = new Color3f();
+		mt.getDiffuseColor(col);
+		g2d.setColor(col.get());		
+	}
+	
+	/**
 	 * Plot a polygon
 	 * @param p
 	 */
@@ -440,12 +499,13 @@ public class RrGraphics
 		if(RrBox.intersection(p.getBox(), scaledBox).empty())
 			return;
 		
+		setColour(p.getAttributes());
+		
 		move(p.point(0));
-		g2d.setColor(polygon1);
 		for(int i = 1; i < p.size(); i++)	
 				plot(p.point(i));
-		g2d.setColor(polygon0);
-		plot(p.point(0));
+		if(p.isClosed())
+			plot(p.point(0));
 	}
 	
 	/**
@@ -632,8 +692,8 @@ public class RrGraphics
 			
 			if(plot_box)
 				boxCSG(csg_p);
-			else
-				plot(csg_p.box());
+			//else
+				//plot(csg_p.box());
 			
 			plot(csg_p);
 		}
@@ -647,16 +707,16 @@ public class RrGraphics
 			{
 				for(int i = 0; i < leng; i++)
 					plot(p_list.polygon(i).getBox());
-			} else
-				plot(p_list.getBox());
+			} //else
+				//plot(p_list.getBox());
 		}
 		
 		if(stlc != null)
 		{
 			if(plot_box)
 				boxSTL(stlc);
-			else
-				plot(stlc.box());
+			//else
+				//plot(stlc.box());
 			
 			plot(stlc);
 		}
@@ -735,8 +795,8 @@ public class RrGraphics
 				if(csg_p != null)
 				{
 					Rr2Point pc = iTransform(ix, iy);
-					System.out.println("Potential at " + pc.toString() + " is " + csg_p.value(pc));
-					System.out.println("Quad: " + csg_p.quad(pc).toString());
+					JOptionPane.showMessageDialog(null, "Potential at " + pc.toString() + " is " + csg_p.value(pc) +
+							"\nQuad: " + csg_p.quad(pc).toString());
 				}
 				break;
 				

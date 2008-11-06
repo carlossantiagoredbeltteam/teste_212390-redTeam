@@ -14,6 +14,7 @@ import org.reprap.ReprapException;
 import org.reprap.geometry.polygons.*;
 import org.reprap.devices.pseudo.LinePrinter;
 import org.reprap.utilities.Debug;
+import org.reprap.utilities.RrGraphics;
 
 /**
  *
@@ -81,6 +82,8 @@ class segmentSpeeds
  *
  */
 public class LayerProducer {
+	
+	private RrGraphics simulationPlot = null;
 	
 	/**
 	 * 
@@ -222,12 +225,13 @@ public class LayerProducer {
 	 * @param ls
 	 * @param hatchDirection
 	 */
-	public LayerProducer(RrCSGPolygonList csgPols, BranchGroup ls, LayerRules lc) throws Exception 
+	public LayerProducer(RrCSGPolygonList csgPols, BranchGroup ls, LayerRules lc, RrGraphics simPlot) throws Exception 
 	{
 		layerConditions = lc;
 		startNearHere = null;
 		lowerShell = ls;
 		shellSet = false;
+		simulationPlot = simPlot;
 		
 		csgP = csgPols;
 		
@@ -251,10 +255,23 @@ public class LayerProducer {
 			offBorder = csgPols.offset(layerConditions, true);
 			offBorder.divide(Preferences.tiny(), 1.01);
 			borderPolygons = offBorder.megList();
+			borderPolygons.setClosed(true);
 		}
 		
 		hatchedPolygons = new RrPolygonList();
-		hatchedPolygons.add(offHatch.hatch(layerConditions));	
+		hatchedPolygons.add(offHatch.hatch(layerConditions));
+		hatchedPolygons.setClosed(false);
+		
+		if(simulationPlot != null)
+		{
+			RrPolygonList pl = new RrPolygonList();
+			pl.add(hatchedPolygons);
+			if(borderPolygons != null)
+				pl.add(borderPolygons);
+			if(!simulationPlot.isInitialised())
+				simulationPlot.init(pl.getBox(), false);
+			simulationPlot.add(pl);
+		}
 	
 //		RrPolygonList pllist = new RrPolygonList();
 //		if(!layerConditions.getLayingFoundations())

@@ -508,6 +508,16 @@ public class RrPolygonList
 	}
 	
 	/**
+	 * Set whether we loop back on ourself.
+	 * @param c
+	 */
+	public void setClosed(boolean c)
+	{
+		for(int i = 0; i < size(); i++)
+			polygon(i).setClosed(c);		
+	}
+	
+	/**
 	 * Create a new polygon list with a random start vertex for each 
 	 * polygon in the list
 	 * @return new polygonlist

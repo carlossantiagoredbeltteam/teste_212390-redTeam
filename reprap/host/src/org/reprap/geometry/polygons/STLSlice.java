@@ -571,7 +571,7 @@ public class STLSlice
 		mls = new MaterialLists();
 		try
 		{
-			generateLowerTriangles = Preferences.loadGlobalBool("DisplaySimulation");
+			generateLowerTriangles = false; //Preferences.loadGlobalBool("DisplaySimulation");
 		} catch (Exception e)
 		{}
 		

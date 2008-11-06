@@ -80,6 +80,11 @@ import org.reprap.Extruder;
 public class RrPolygon
 {
 	/**
+	 * End joined to beginning?
+	 */
+	private boolean closed = false;
+	
+	/**
 	 * Used to choose the starting point for a randomized-start copy of a polygon
 	 */
 	private static Random rangen = new Random(918273);
@@ -184,6 +189,24 @@ public class RrPolygon
 		
 		return result;
 	}
+	
+	/**
+	 * Do we loop back on ourself?
+	 * @return
+	 */
+	public boolean isClosed()
+	{
+		return closed;
+	}
+	
+	/**
+	 * Set whether we loop back on ourself.
+	 * @param c
+	 */
+	public void setClosed(boolean c)
+	{
+		closed = c;
+	}
 		
 	/**
 	 * Length
@@ -202,7 +225,8 @@ public class RrPolygon
 	{
 		this(p.att);
 		for(int i = 0; i < p.size(); i++)
-			add(new Rr2Point(p.point(i))); //, new Integer((p.flag(i))));		
+			add(new Rr2Point(p.point(i))); 
+		closed = p.closed;
 	}
 	
 	/**

@@ -35,7 +35,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
     public PrintTabFrame() {
         initComponents();
     	String machine = "simulator";
-    	simulateRadioButton.setSelected(false);
+    	
     	toSNAPRepRapRadioButton.setSelected(false);
     	toGCodeRepRapRadioButton.setSelected(false);
     	gCodeToFileRadioButton.setSelected(false);
@@ -43,10 +43,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
     	{
     		machine = org.reprap.Preferences.loadGlobalString("RepRap_Machine");
 
-    		if(machine.equalsIgnoreCase("simulator"))
-    		{
-    			simulateRadioButton.setSelected(true);
-    		} else if(machine.equalsIgnoreCase("SNAPRepRap"))
+    		if(machine.equalsIgnoreCase("SNAPRepRap"))
     		{
     			toSNAPRepRapRadioButton.setSelected(true);
     			seenSNAP = true;
@@ -64,12 +61,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
             return;
         }
         
-        try {
-            interLayerCoolingCheck.setSelected(Preferences.loadGlobalBool("InterLayerCooling"));
-        } catch (Exception ex) {
-            System.err.println("Warning: could not load InterLayerCooling flag for check box");
-            return;
-        }
+
         printer = org.reprap.Main.gui.getPrinter();
     }
     
@@ -159,8 +151,6 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
         exitButton = new java.awt.Button();
         layerPauseCheck = new javax.swing.JCheckBox();
         toSNAPRepRapRadioButton = new javax.swing.JRadioButton();
-        simulateRadioButton = new javax.swing.JRadioButton();
-        interLayerCoolingCheck = new javax.swing.JCheckBox();
         getWebPage = new javax.swing.JButton();
         expectedBuildTimeLabel = new javax.swing.JLabel();
         hoursMinutesLabel1 = new javax.swing.JLabel();
@@ -178,6 +168,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
         fileNameBox = new javax.swing.JLabel();
         preferencesButton = new java.awt.Button();
         saveRFO = new java.awt.Button();
+        displayPathsCheck = new javax.swing.JCheckBox();
 
         printButton.setBackground(new java.awt.Color(51, 204, 0));
         printButton.setFont(printButton.getFont());
@@ -224,22 +215,6 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
         toSNAPRepRapRadioButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 selectorRadioButtonMousePressed(evt);
-            }
-        });
-
-        buttonGroup1.add(simulateRadioButton);
-        simulateRadioButton.setText("Simulate");
-        simulateRadioButton.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                selectorRadioButtonMousePressed(evt);
-            }
-        });
-
-        interLayerCoolingCheck.setSelected(true);
-        interLayerCoolingCheck.setText("Inter-layer cooling");
-        interLayerCoolingCheck.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                interLayerCoolingCheckMouseClicked(evt);
             }
         });
 
@@ -336,6 +311,13 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
             }
         });
 
+        displayPathsCheck.setText("Display paths");
+        displayPathsCheck.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                displayPathsCheckMouseClicked(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -344,21 +326,25 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(saveRFO, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 100, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(loadGCode, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 100, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                .add(loadRFO, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 100, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(loadSTL, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 100, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(toSNAPRepRapRadioButton)
+                            .add(toGCodeRepRapRadioButton)
+                            .add(gCodeToFileRadioButton)
+                            .add(layerPauseCheck)
+                            .add(displayPathsCheck))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
                             .add(layout.createSequentialGroup()
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(loadGCode, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 100, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                    .add(loadRFO, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 100, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                    .add(loadSTL, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 100, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(toSNAPRepRapRadioButton)
-                                    .add(gCodeToFileRadioButton)
-                                    .add(simulateRadioButton)
-                                    .add(toGCodeRepRapRadioButton)))
-                            .add(saveRFO, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 100, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .add(22, 22, 22)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                .add(preferencesButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .add(getWebPage, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 190, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                             .add(layout.createSequentialGroup()
                                 .add(printButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 72, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -366,20 +352,11 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(stopButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 75, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(exitButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 62, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                            .add(layout.createSequentialGroup()
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(layerPauseCheck)
-                                    .add(interLayerCoolingCheck)
-                                    .add(preferencesButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(getWebPage, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 190, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap())
+                                .add(exitButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 62, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
                     .add(layout.createSequentialGroup()
                         .add(expectedFinishTimeLabel)
                         .add(7, 7, 7)
-                        .add(expectedFinishTime)
-                        .addContainerGap(489, Short.MAX_VALUE))
+                        .add(expectedFinishTime))
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(layout.createSequentialGroup()
@@ -391,15 +368,13 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
                                 .add(7, 7, 7)
                                 .add(currentLayerOutOfN)))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(layout.createSequentialGroup()
-                                .add(progressBar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 430, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(31, Short.MAX_VALUE))
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
                             .add(layout.createSequentialGroup()
                                 .add(hoursMinutesLabel1)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(fileNameBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
-                                .add(242, 242, 242))))))
+                                .add(fileNameBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .add(progressBar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 430, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(29, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -407,36 +382,38 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
-                        .add(loadSTL, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(loadGCode, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(getWebPage, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 72, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(layout.createSequentialGroup()
+                                .add(loadSTL, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(loadGCode, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(layout.createSequentialGroup()
+                                .add(toSNAPRepRapRadioButton)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(toGCodeRepRapRadioButton)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(gCodeToFileRadioButton))
+                            .add(preferencesButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 45, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(loadRFO, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(getWebPage, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 72, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                            .add(layerPauseCheck)
-                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                            .add(interLayerCoolingCheck)
-                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                            .add(preferencesButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                            .add(toSNAPRepRapRadioButton)
-                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                            .add(toGCodeRepRapRadioButton)
-                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                            .add(gCodeToFileRadioButton)
-                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                            .add(simulateRadioButton))))
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(layout.createSequentialGroup()
+                                .add(layerPauseCheck)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(displayPathsCheck))
+                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(pauseButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 39, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                    .add(printButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 39, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                    .add(stopButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 39, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                    .add(exitButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 39, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                .add(layout.createSequentialGroup()
+                                    .add(loadRFO, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                    .add(saveRFO, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(saveRFO, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                        .add(printButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 39, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(exitButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 39, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(stopButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 39, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(pauseButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 39, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .add(27, 27, 27)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(expectedBuildTimeLabel)
                     .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
@@ -453,7 +430,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
                         .add(progressLabel)
                         .add(currentLayerOutOfN))
                     .add(progressBar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
 
         pack();
@@ -513,10 +490,7 @@ private void selectorRadioButtonMousePressed(java.awt.event.MouseEvent evt) {//G
 		machine = org.reprap.Preferences.loadGlobalString("RepRap_Machine");
 
 
-		if(evt.getSource() == simulateRadioButton)
-		{
-			org.reprap.Preferences.setGlobalString("RepRap_Machine", "simulator");
-		} else if(evt.getSource() == toSNAPRepRapRadioButton)
+		if(evt.getSource() == toSNAPRepRapRadioButton)
 		{
 			org.reprap.Preferences.setGlobalString("RepRap_Machine", "SNAPRepRap");
 			if(seenGCode)
@@ -547,16 +521,6 @@ private void selectorRadioButtonMousePressed(java.awt.event.MouseEvent evt) {//G
 		JOptionPane.showMessageDialog(null, "Could not get preference 'RepRap_Machine'");
 	}
 }//GEN-LAST:event_selectorRadioButtonMousePressed
-
-private void interLayerCoolingCheckMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_interLayerCoolingCheckMouseClicked
-try {
-        org.reprap.Preferences.setGlobalBool("InterLayerCooling", interLayerCoolingCheck.isSelected());
-//        System.out.println(Preferences.loadGlobalBool("InterLayerCooling"));
-    }
-    catch (Exception e) {
-        JOptionPane.showMessageDialog(null, "Could not set 'InterLayerCooling' preference flag");
-    }
-}//GEN-LAST:event_interLayerCoolingCheckMouseClicked
 
 private void getWebPageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_getWebPageActionPerformed
 try {
@@ -650,10 +614,19 @@ private void saveRFO(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveRFO
 	JOptionPane.showMessageDialog(null, "RFO files not yet supported.  But see http://reprap.org/bin/view/Main/MultipleMaterialsFiles");
 }//GEN-LAST:event_saveRFO
 
+private void displayPathsCheckMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_displayPathsCheckMouseClicked
+	try
+	{
+		org.reprap.Preferences.setGlobalBool("DisplaySimulation", displayPathsCheck.isSelected());
+	} catch (Exception e)
+	{}
+}//GEN-LAST:event_displayPathsCheckMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel currentLayerOutOfN;
+    private javax.swing.JCheckBox displayPathsCheck;
     private java.awt.Button exitButton;
     private javax.swing.JLabel expectedBuildTime;
     private javax.swing.JLabel expectedBuildTimeLabel;
@@ -663,7 +636,6 @@ private void saveRFO(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveRFO
     private javax.swing.JRadioButton gCodeToFileRadioButton;
     private javax.swing.JButton getWebPage;
     private javax.swing.JLabel hoursMinutesLabel1;
-    private javax.swing.JCheckBox interLayerCoolingCheck;
     private javax.swing.JCheckBox layerPauseCheck;
     private java.awt.Button loadGCode;
     private java.awt.Button loadRFO;
@@ -674,7 +646,6 @@ private void saveRFO(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveRFO
     private javax.swing.JProgressBar progressBar;
     private javax.swing.JLabel progressLabel;
     private java.awt.Button saveRFO;
-    private javax.swing.JRadioButton simulateRadioButton;
     private java.awt.Button stopButton;
     private javax.swing.JRadioButton toGCodeRepRapRadioButton;
     private javax.swing.JRadioButton toSNAPRepRapRadioButton;
