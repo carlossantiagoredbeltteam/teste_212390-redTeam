@@ -56,11 +56,28 @@ This version: 14 April 2006
 
 package org.reprap.gui;
 
-import java.util.*;
-import javax.media.j3d.*;
-import javax.vecmath.*;
-import com.sun.j3d.utils.picking.*;
+import java.util.Enumeration;
+import java.util.Hashtable;
+
+import javax.media.j3d.Appearance;
+import javax.media.j3d.BoundingBox;
+import javax.media.j3d.BranchGroup;
+import javax.media.j3d.GeometryArray;
+import javax.media.j3d.Group;
+import javax.media.j3d.Node;
+import javax.media.j3d.SceneGraphObject;
+import javax.media.j3d.Shape3D;
+import javax.media.j3d.Transform3D;
+import javax.media.j3d.TransformGroup;
+import javax.vecmath.AxisAngle4d;
+import javax.vecmath.Matrix3d;
+import javax.vecmath.Point3d;
+import javax.vecmath.Tuple3d;
+import javax.vecmath.Vector3d;
+
 import com.sun.j3d.loaders.Scene;
+import com.sun.j3d.utils.picking.PickTool;
+
 import org.j3d.renderer.java3d.loaders.STLLoader;
 import org.reprap.Attributes;
 import org.reprap.Preferences;

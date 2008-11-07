@@ -9,7 +9,6 @@ package org.reprap.gui.botConsole;
 import java.util.*;
 import java.text.SimpleDateFormat;
 import javax.swing.JOptionPane;
-import org.reprap.Preferences;
 import org.reprap.Printer;
 
 /**
