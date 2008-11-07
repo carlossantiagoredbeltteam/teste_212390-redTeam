@@ -85,9 +85,13 @@
 
 package org.reprap.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Cursor;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
 import javax.media.j3d.AmbientLight;
@@ -100,6 +104,15 @@ import javax.media.j3d.Group;
 import javax.media.j3d.Node;
 import javax.media.j3d.TransformGroup;
 import javax.media.j3d.ViewPlatform;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.SwingConstants;
 import javax.vecmath.Color3f;
 
 import com.sun.j3d.utils.picking.PickCanvas;
@@ -117,7 +130,7 @@ import org.reprap.Preferences;
  * @author adrian
  *
  */
-class MaterialRadioButtons extends JPanel{
+class MaterialRadioButtons extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private static Attributes att;
 	private static JFrame frame;

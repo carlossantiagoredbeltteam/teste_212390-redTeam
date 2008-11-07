@@ -56,9 +56,15 @@
 
 package org.reprap.utilities;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.List;
 
 import org.reprap.geometry.polygons.BooleanGrid;
@@ -72,9 +78,12 @@ import org.reprap.geometry.polygons.RrLine;
 import org.reprap.geometry.polygons.RrPolygon;
 import org.reprap.geometry.polygons.RrPolygonList;
 import org.reprap.geometry.polygons.STLSlice;
-import org.reprap.gui.*;
+import org.reprap.gui.StatusMessage;
 import org.reprap.Attributes;
 import javax.media.j3d.Appearance;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.vecmath.Color3f;
 import javax.media.j3d.Material;
 

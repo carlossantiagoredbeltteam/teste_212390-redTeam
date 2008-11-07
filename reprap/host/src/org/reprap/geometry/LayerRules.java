@@ -3,7 +3,7 @@ package org.reprap.geometry;
 
 import org.reprap.Printer;
 import org.reprap.Extruder;
-import org.reprap.geometry.polygons.*;
+import org.reprap.geometry.polygons.RrHalfPlane;
 
 /**
  * This stores a set of facts about the layer currently being made, and the

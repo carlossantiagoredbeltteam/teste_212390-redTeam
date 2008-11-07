@@ -1,6 +1,8 @@
 package org.reprap.geometry.polygons;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.reprap.Attributes;
 import org.reprap.Extruder;
 import org.reprap.geometry.LayerRules;

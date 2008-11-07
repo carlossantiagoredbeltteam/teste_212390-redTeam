@@ -1,6 +1,8 @@
 package org.reprap;
 
-import javax.media.j3d.*;
+import javax.media.j3d.Appearance;
+import javax.media.j3d.BranchGroup;
+
 import org.reprap.devices.GenericExtruder;
 import org.reprap.gui.STLObject;
 

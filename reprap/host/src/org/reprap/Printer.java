@@ -2,7 +2,8 @@ package org.reprap;
 
 //import java.awt.print.PrinterAbortException;
 import java.io.IOException;
-import javax.media.j3d.*;
+
+import javax.media.j3d.BranchGroup;
 import javax.swing.JCheckBoxMenuItem;
 import org.reprap.geometry.LayerRules;
 import org.reprap.gui.Previewer;

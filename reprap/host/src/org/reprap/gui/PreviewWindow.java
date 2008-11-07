@@ -1,8 +1,8 @@
 package org.reprap.gui;
 import java.awt.BorderLayout;
-import javax.media.j3d.*;
+
+import javax.media.j3d.BranchGroup;
 import javax.swing.WindowConstants;
-//import org.reprap.Extruder;
 import org.reprap.Printer;
 
 public class PreviewWindow extends javax.swing.JFrame implements Previewer {
