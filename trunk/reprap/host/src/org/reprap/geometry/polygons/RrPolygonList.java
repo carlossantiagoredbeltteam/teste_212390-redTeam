@@ -56,11 +56,9 @@
 
 package org.reprap.geometry.polygons;
 
-//import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-//import org.reprap.Attributes;
-//import org.reprap.Preferences;
 import org.reprap.Extruder;
 
 /**

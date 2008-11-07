@@ -1,9 +1,16 @@
 package org.reprap.gui;
 
-import javax.media.j3d.*;
+import javax.media.j3d.AmbientLight;
+import javax.media.j3d.Background;
+import javax.media.j3d.Bounds;
+import javax.media.j3d.BranchGroup;
+import javax.media.j3d.DirectionalLight;
+import javax.media.j3d.Group;
+import javax.media.j3d.TransformGroup;
+import javax.media.j3d.ViewPlatform;
 import javax.swing.JFrame;
 import javax.vecmath.Color3f;
-//import org.reprap.Extruder;
+
 import org.reprap.Printer;
 
 //import javax.vecmath.Vector3d;

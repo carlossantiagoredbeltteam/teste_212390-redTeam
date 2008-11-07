@@ -1,8 +1,8 @@
 package org.reprap.gui;
 
-import javax.media.j3d.*;
-import org.reprap.Printer;
+import javax.media.j3d.BranchGroup;
 
+import org.reprap.Printer;
 
 public interface Previewer {
 

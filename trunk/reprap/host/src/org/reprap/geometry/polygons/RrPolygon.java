@@ -68,11 +68,14 @@
 
 package org.reprap.geometry.polygons;
 
-import java.util.*;
-import org.reprap.geometry.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import org.reprap.Attributes;
 import org.reprap.Preferences;
 import org.reprap.Extruder;
+import org.reprap.geometry.LayerRules;
 
 /**
  * The main boundary-representation polygon class

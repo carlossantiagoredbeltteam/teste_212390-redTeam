@@ -13,9 +13,14 @@
 
 package org.reprap.gui.botConsole;
 
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.font.FontRenderContext;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 
 /**
  *

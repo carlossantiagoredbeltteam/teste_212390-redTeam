@@ -3,8 +3,8 @@
  */
 package org.reprap.utilities;
 
-import java.util.*;
 import java.text.DecimalFormat;
+import java.util.Date;
 
 /**
  * @author Adrian

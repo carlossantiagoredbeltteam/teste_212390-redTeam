@@ -53,17 +53,30 @@
 
 package org.reprap.geometry.polygons;
 
-import java.util.*;
-import javax.media.j3d.*;
-import javax.vecmath.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
+import javax.media.j3d.Appearance;
+import javax.media.j3d.BranchGroup;
+import javax.media.j3d.GeometryArray;
+import javax.media.j3d.Group;
+import javax.media.j3d.SceneGraphObject;
+import javax.media.j3d.Shape3D;
+import javax.media.j3d.Transform3D;
+import javax.vecmath.Point3d;
+import javax.vecmath.Tuple3d;
+
 import com.sun.j3d.utils.geometry.GeometryInfo;
 import com.sun.j3d.utils.geometry.NormalGenerator;
 import org.reprap.gui.STLObject;
+import org.reprap.utilities.Debug;
+import org.reprap.utilities.RrGraphics;
 import org.reprap.Attributes;
 import org.reprap.Extruder;
 import org.reprap.Preferences;
 import org.reprap.devices.GenericExtruder;
-import org.reprap.utilities.*;
 
 // Small class to hold line segments and the quads in which their ends lie
 

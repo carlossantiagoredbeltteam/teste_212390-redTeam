@@ -6,13 +6,18 @@
 package org.reprap.geometry;
 
 import java.io.IOException;
-import javax.media.j3d.*;
+
+import javax.media.j3d.BranchGroup;
+
 import org.reprap.Printer;
 import org.reprap.Attributes;
 import org.reprap.Preferences;
 import org.reprap.ReprapException;
-import org.reprap.geometry.polygons.*;
 import org.reprap.devices.pseudo.LinePrinter;
+import org.reprap.geometry.polygons.Rr2Point;
+import org.reprap.geometry.polygons.RrCSGPolygonList;
+import org.reprap.geometry.polygons.RrPolygon;
+import org.reprap.geometry.polygons.RrPolygonList;
 import org.reprap.utilities.Debug;
 import org.reprap.utilities.RrGraphics;
 

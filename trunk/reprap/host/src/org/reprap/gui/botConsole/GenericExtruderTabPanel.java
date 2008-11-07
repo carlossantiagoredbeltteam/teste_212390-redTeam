@@ -12,17 +12,14 @@
 
 package org.reprap.gui.botConsole;
 
-//import java.util.*;
-//import java.text.SimpleDateFormat;
 import org.reprap.Preferences;
-import javax.swing.*;
-//import org.reprap.comms.snap.SNAPAddress;
-//import org.reprap.comms.snap.SNAPCommunicator;
 import org.reprap.Printer;
 import org.reprap.utilities.Timer;
-//import org.reprap.devices.GenericExtruder;
 import org.reprap.Extruder;
 import java.awt.Color;
+
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 /**
  *
  * @author  en0es

@@ -6,8 +6,10 @@
 
 package org.reprap.gui.botConsole;
 
-import java.util.*;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 import javax.swing.JOptionPane;
 import org.reprap.Printer;
 

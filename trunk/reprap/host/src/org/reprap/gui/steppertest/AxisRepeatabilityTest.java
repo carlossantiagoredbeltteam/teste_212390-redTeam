@@ -3,11 +3,13 @@
  */
 package org.reprap.gui.steppertest;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
 import org.reprap.Preferences;
 import org.reprap.comms.snap.SNAPAddress;
 import org.reprap.comms.Communicator;
 import org.reprap.devices.SNAPStepperMotor;
-import java.io.*;
 
 /**
  * @author eD Sells
