@@ -28,7 +28,6 @@ import javax.swing.WindowConstants;
 
 import org.reprap.geometry.Producer;
 import org.reprap.machines.MachineFactory;
-import org.reprap.gui.PreviewPanel;
 import org.reprap.gui.RepRapBuild;
 import org.reprap.gui.Utility;
 import org.reprap.gui.botConsole.BotConsoleFrame;
@@ -561,11 +560,11 @@ public class Main {
     	  builder.deleteSTL();
       }
 
-	private void onViewBuilder() {
-//    		if (!viewBuilder.isSelected() && !viewPreview.isSelected())
-//    			viewPreview.setSelected(true);
-        	updateView();
-    }
+//	private void onViewBuilder() {
+////    		if (!viewBuilder.isSelected() && !viewPreview.isSelected())
+////    			viewPreview.setSelected(true);
+//        	updateView();
+//    }
 
 //    private void onViewPreview() {
 //		if (!viewPreview.isSelected() && !viewBuilder.isSelected())
@@ -584,14 +583,14 @@ public class Main {
 //        	updateView();
 //    }
     
-    private void updateView() {
-//    	    if (viewBuilder.isSelected() && viewPreview.isSelected())
-//    	    	  panel.setDividerLocation(0.5);
-//    	    else if (viewBuilder.isSelected())
-  	    	  panel.setDividerLocation(1.0);
-//    	    else
-//    	    	  panel.setDividerLocation(0.0);
-    }
+//    private void updateView() {
+////    	    if (viewBuilder.isSelected() && viewPreview.isSelected())
+////    	    	  panel.setDividerLocation(0.5);
+////    	    else if (viewBuilder.isSelected())
+//  	    	  panel.setDividerLocation(1.0);
+////    	    else
+////    	    	  panel.setDividerLocation(0.0);
+//    }
     
 //    private void estimateResourcesT() {
 //	    	EstimationProducer eProducer = null;
