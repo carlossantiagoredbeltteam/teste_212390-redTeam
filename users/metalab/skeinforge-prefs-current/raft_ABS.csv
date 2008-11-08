@@ -1,6 +1,6 @@
 Format is tab separated preferences.
 Activate Raft, Elevate Nozzle, Orbit and Set Altitude:	True
-Base Infill Density (ratio):	0.3
+Base Infill Density (ratio):	0.4
 Base Layer Height over Extrusion Height:	1.0
 Base Layers (integer):	1
 Base Nozzle Lift over Half Base Extrusion Height (ratio):	0.0
@@ -12,7 +12,7 @@ Metric	False
 PWM Setting	True
 Flowrate PWM Setting (if PWM Setting is Chosen):	153.0
 Infill Overhang (ratio):	0.1
-Interface Infill Density (ratio):	0.3
+Interface Infill Density (ratio):	0.4
 Interface Layer Height over Extrusion Height:	1.0
 Interface Layers (integer):	1
 Interface Nozzle Lift over Half Interface Extrusion Height (ratio):	0.0
