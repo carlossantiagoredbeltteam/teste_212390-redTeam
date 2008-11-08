@@ -268,7 +268,7 @@ String getNextCommand()
 
       // Home
     case 'h':
-      c = "G30 X10 Y20 Z-10 F" + int(feedrate) + " (home to reference)";
+      c = "G30 X0 Y0 Z0";
       break;
 
       // Set zero
