@@ -20,8 +20,8 @@
   TODO:
 
   * don't collapse hierarchy after operation: Need to get hold of the TreeList instance
-  * ok/cancel -> close: Use superclass of ComponentDialog?
-  * Make devaluate work with object which have been converted to triangles
+  * ok/cancel -> close: Use superclass of ComponentsDialog?
+  * Make evaluate work with object which have been converted to triangles
   * Better undo support
 
  */
