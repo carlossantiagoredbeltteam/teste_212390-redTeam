@@ -536,7 +536,7 @@ private void homeAllButtonAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:ev
 }//GEN-LAST:event_homeAllButtonAction
 
 private void moveToSwapPointAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveToSwapPointAction
-	BotConsoleFrame.XYZ().homeAll();
+	BotConsoleFrame.XYZ().goTo(10, 160, BotConsoleFrame.XYZ().getPrinter().getZ());
 }//GEN-LAST:event_moveToSwapPointAction
 
     private void setExtruderSpeed() {

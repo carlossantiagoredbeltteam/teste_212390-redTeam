@@ -345,13 +345,16 @@ private void recallAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
 	recallAll();
 }//GEN-LAST:event_recallAllButtonActionPerformed
 
-private void goButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goButtonActionPerformed
+public Printer getPrinter()
+{
+	return printer;
+}
+
+public void goTo(double xTo, double yTo, double zTo)
+{
 	double x = printer.getX();
 	double y = printer.getY();
 	double z = printer.getZ();
-	double xTo = xStepperPositionJPanel.getTargetPositionInMM();
-	double yTo = yStepperPositionJPanel.getTargetPositionInMM();
-	double zTo = zStepperPositionJPanel.getTargetPositionInMM();
 
 	try
 	{
@@ -369,7 +372,14 @@ private void goButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 			printer.moveTo(xTo, yTo, zTo, false, false);	
 		}
 	} catch (Exception e)
-	{}
+	{}	
+}
+
+private void goButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goButtonActionPerformed
+	double xTo = xStepperPositionJPanel.getTargetPositionInMM();
+	double yTo = yStepperPositionJPanel.getTargetPositionInMM();
+	double zTo = zStepperPositionJPanel.getTargetPositionInMM();
+	goTo(xTo, yTo, zTo);
 }//GEN-LAST:event_goButtonActionPerformed
 
 
