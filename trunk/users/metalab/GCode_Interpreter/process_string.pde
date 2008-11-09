@@ -1,4 +1,4 @@
-// Yep, this is actually -*- c++ -*-
+/* -*- mode: c++; c-basic-offset: 8; indent-tabs-mode: t -*- */
 
 // Our point structures to make things nice.
 struct LongPoint

@@ -1,4 +1,4 @@
-// Yep, this is actually -*- c++ -*-
+/* -*- mode: c++; c-basic-offset: 8; indent-tabs-mode: t -*- */
 
 // Arduino G-code Interpreter
 // v1.0 by Mike Ellery - initial software (mellery@gmail.com)
@@ -10,9 +10,9 @@
 
 #include "_init.h"
 AxisConfig axes[3] = {
-  {X_STEP_PIN, X_DIR_PIN, X_MIN_PIN, X_MAX_PIN, X_ENABLE_PIN, INVERT_X_DIR, REFERENCE_X_DIR, ENDSTOP_X_MIN_ENABLED, ENDSTOP_X_MAX_ENABLED, X_STEPS_PER_INCH, X_STEPS_PER_MM, X_MOTOR_STEPS},
-  {Y_STEP_PIN, Y_DIR_PIN, Y_MIN_PIN, Y_MAX_PIN, Y_ENABLE_PIN, INVERT_Y_DIR, REFERENCE_Y_DIR, ENDSTOP_Y_MIN_ENABLED, ENDSTOP_Y_MAX_ENABLED, Y_STEPS_PER_INCH, Y_STEPS_PER_MM, Y_MOTOR_STEPS},
-  {Z_STEP_PIN, Z_DIR_PIN, Z_MIN_PIN, Z_MAX_PIN, Z_ENABLE_PIN, INVERT_Z_DIR, REFERENCE_Z_DIR, ENDSTOP_Z_MIN_ENABLED, ENDSTOP_Z_MAX_ENABLED, Z_STEPS_PER_INCH, Z_STEPS_PER_MM, Z_MOTOR_STEPS}
+	{X_STEP_PIN, X_DIR_PIN, X_MIN_PIN, X_MAX_PIN, X_ENABLE_PIN, INVERT_X_DIR, REFERENCE_X_DIR, ENDSTOP_X_MIN_ENABLED, ENDSTOP_X_MAX_ENABLED, X_STEPS_PER_INCH, X_STEPS_PER_MM, X_MOTOR_STEPS},
+	{Y_STEP_PIN, Y_DIR_PIN, Y_MIN_PIN, Y_MAX_PIN, Y_ENABLE_PIN, INVERT_Y_DIR, REFERENCE_Y_DIR, ENDSTOP_Y_MIN_ENABLED, ENDSTOP_Y_MAX_ENABLED, Y_STEPS_PER_INCH, Y_STEPS_PER_MM, Y_MOTOR_STEPS},
+	{Z_STEP_PIN, Z_DIR_PIN, Z_MIN_PIN, Z_MAX_PIN, Z_ENABLE_PIN, INVERT_Z_DIR, REFERENCE_Z_DIR, ENDSTOP_Z_MIN_ENABLED, ENDSTOP_Z_MAX_ENABLED, Z_STEPS_PER_INCH, Z_STEPS_PER_MM, Z_MOTOR_STEPS}
 };
 
 //our command string
@@ -26,77 +26,84 @@ boolean bytes_received = false;
 
 void setup()
 {
-  //Do startup stuff here
-  Serial.begin(19200);
-  Serial.println("start");
+	//Do startup stuff here
+	Serial.begin(19200);
+	Serial.println("start");
 	
-  //other initialization.
-  init_steppers();
-  init_extruder();
-  clear_process_string();
+	//other initialization.
+	init_steppers();
+	init_extruder();
+	clear_process_string();
 }
 
 void clear_process_string()
 {
-  //init our command buffer
-  for (uint8_t i=0; i<COMMAND_SIZE; i++) word[i] = 0;
-  serial_count = 0;
-  bytes_received = false;
+	//init our command buffer
+	for (uint8_t i=0; i<COMMAND_SIZE; i++) word[i] = 0;
+	serial_count = 0;
+	bytes_received = false;
 
-  idle_time = millis();
+	idle_time = millis();
 }
 
 void loop()
 {
-  char c;
+	char c;
 
-  extruder_manage_temperature();  //keep it hot!
+	extruder_manage_temperature();  //keep it hot!
 
-  //read in characters if we got them.
-  if (Serial.available() > 0) {
-    c = Serial.read();
+	//read in characters if we got them.
+	if (Serial.available() > 0)
+	{
+		c = Serial.read();
+		
+		// Reset no_data timer
+		no_data = 0;
+		idle_time = millis();
+		
+		//  commands end with newlines
+		if (c != '\n')
+		{
+			// Start of comment - ignore any bytes received from now on
+			if (c == '(') comment = true;
+			
+			// If we're not in comment mode, add it to our array.
+			if (!comment)
+			{
+				word[serial_count] = c;
+				serial_count++;
+			}
+			
+			if (c == ')') comment = false; // End of comment - start listening again
+		}
+		
+		bytes_received = true;
+	}
+	else
+	{
+		// mark no_data if nothing heard for 100 milliseconds
+		if ((millis() - idle_time) >= 100)
+		{	
+			no_data++;
+			idle_time = millis();
+		}
+	}
 
-    // Reset no_data timer
-    no_data = 0;
-    idle_time = millis();
+	// if there's a pause or we got a real command, do it
+	if (bytes_received && (c == '\n' || no_data))
+	{
+		//     if (no_data) Serial.print("NODATA ");
+		//     Serial.print("debug: ");
+		//     Serial.println(word);
 
-    //  commands end with newlines
-    if (c != '\n') {
-      // Start of comment - ignore any bytes received from now on
-      if (c == '(') comment = true;
-				
-      // If we're not in comment mode, add it to our array.
-      if (!comment) {
-        word[serial_count] = c;
-        serial_count++;
-      }
+		//process our command!
+		process_string(word, serial_count);
 
-      if (c == ')') comment = false; // End of comment - start listening again
-    }
+		//clear command.
+		clear_process_string();
+	}
 
-    bytes_received = true;
-  }
-  else {
-    // mark no_data if nothing heard for 100 milliseconds
-    if ((millis() - idle_time) >= 100) {
-      no_data++;
-      idle_time = millis();
-    }
-  }
-
-  // if there's a pause or we got a real command, do it
-  if (bytes_received && (c == '\n' || no_data)) {
-//     if (no_data) Serial.print("NODATA ");
-//     Serial.print("debug: ");
-//     Serial.println(word);
-
-    //process our command!
-    process_string(word, serial_count);
-
-    //clear command.
-    clear_process_string();
-  }
-
-  //no data for > 1 sec -> turn off steppers
-  if (no_data > 10) disable_steppers();
+	//no data for > 1 sec -> turn off steppers
+	if (no_data > 10)
+		disable_steppers();
 }
