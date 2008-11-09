@@ -1,4 +1,4 @@
-// Yep, this is actually -*- c++ -*-
+/* -*- mode: c++; c-basic-offset: 8; indent-tabs-mode: t -*- */
 
 #include "ThermistorTable.h"
 
@@ -23,42 +23,42 @@ bool extruder_direction = EXTRUDER_FORWARD;
 
 void init_extruder()
 {
-  //default to room temp.
-  extruder_set_temperature(21);
+	//default to room temp.
+	extruder_set_temperature(21);
 	
-  //setup our pins
-  pinMode(EXTRUDER_MOTOR_DIR_PIN, OUTPUT);
-  pinMode(EXTRUDER_MOTOR_SPEED_PIN, OUTPUT);
-  pinMode(EXTRUDER_HEATER_PIN, OUTPUT);
-  pinMode(EXTRUDER_FAN_PIN, OUTPUT);
+	//setup our pins
+	pinMode(EXTRUDER_MOTOR_DIR_PIN, OUTPUT);
+	pinMode(EXTRUDER_MOTOR_SPEED_PIN, OUTPUT);
+	pinMode(EXTRUDER_HEATER_PIN, OUTPUT);
+	pinMode(EXTRUDER_FAN_PIN, OUTPUT);
 	
-  //initialize values
-  digitalWrite(EXTRUDER_MOTOR_DIR_PIN, EXTRUDER_FORWARD);
-  analogWrite(EXTRUDER_FAN_PIN, 0);
-  analogWrite(EXTRUDER_HEATER_PIN, 0);
-  analogWrite(EXTRUDER_MOTOR_SPEED_PIN, 0);
+	//initialize values
+	digitalWrite(EXTRUDER_MOTOR_DIR_PIN, EXTRUDER_FORWARD);
+	analogWrite(EXTRUDER_FAN_PIN, 0);
+	analogWrite(EXTRUDER_HEATER_PIN, 0);
+	analogWrite(EXTRUDER_MOTOR_SPEED_PIN, 0);
 }
 
 void extruder_set_direction(bool direction)
 {
-  extruder_direction = direction;
-  digitalWrite(EXTRUDER_MOTOR_DIR_PIN, direction);
+	extruder_direction = direction;
+	digitalWrite(EXTRUDER_MOTOR_DIR_PIN, direction);
 }
 
 void extruder_set_speed(byte speed)
 {
-  analogWrite(EXTRUDER_MOTOR_SPEED_PIN, speed);
+	analogWrite(EXTRUDER_MOTOR_SPEED_PIN, speed);
 }
 
 void extruder_set_cooler(byte speed)
 {
-  analogWrite(EXTRUDER_FAN_PIN, speed);
+	analogWrite(EXTRUDER_FAN_PIN, speed);
 }
 
 void extruder_set_temperature(int temp)
 {
-  extruder_target_celsius = temp;
-  extruder_max_celsius = (int)((float)temp * 1.1);
+	extruder_target_celsius = temp;
+	extruder_max_celsius = (int)((float)temp * 1.1);
 }
 
 /**
@@ -68,9 +68,9 @@ void extruder_set_temperature(int temp)
 int extruder_get_temperature()
 {
 #if EXTRUDER_THERMISTOR_PIN >= 0
-  return extruder_read_thermistor();
+	return extruder_read_thermistor();
 #elif EXTRUDER_THERMOCOUPLE_PIN >= 0
-  return extruder_read_thermocouple();
+	return extruder_read_thermocouple();
 #endif
 }
 
@@ -79,31 +79,31 @@ int extruder_get_temperature()
  */
 int extruder_read_thermistor()
 {
-  int raw = extruder_sample_temperature(EXTRUDER_THERMISTOR_PIN);
+	int raw = extruder_sample_temperature(EXTRUDER_THERMISTOR_PIN);
 
-  int celsius = 0;
-  byte i;
+	int celsius = 0;
+	byte i;
 
-  for (i=1; i<NUMTEMPS; i++)
-    {
-      if (temptable[i][0] > raw)
-        {
-          celsius  = temptable[i-1][1] + 
-            (raw - temptable[i-1][0]) * 
-            (temptable[i][1] - temptable[i-1][1]) /
-            (temptable[i][0] - temptable[i-1][0]);
+	for (i=1; i<NUMTEMPS; i++)
+	{
+			if (temptable[i][0] > raw)
+			{
+					celsius  = temptable[i-1][1] + 
+						(raw - temptable[i-1][0]) * 
+						(temptable[i][1] - temptable[i-1][1]) /
+						(temptable[i][0] - temptable[i-1][0]);
 
-          break;
-        }
-    }
+					break;
+			}
+	}
 
-  // Overflow: Set to last value in the table
-  if (i == NUMTEMPS) celsius = temptable[i-1][1];
-  // Clamp to byte
-  if (celsius > 255) celsius = 255; 
-  else if (celsius < 0) celsius = 0; 
+	// Overflow: Set to last value in the table
+	if (i == NUMTEMPS) celsius = temptable[i-1][1];
+	// Clamp to byte
+	if (celsius > 255) celsius = 255; 
+	else if (celsius < 0) celsius = 0; 
 
-  return celsius;
+	return celsius;
 }
 
 
@@ -113,7 +113,7 @@ int extruder_read_thermistor()
  */
 int extruder_read_thermocouple()
 {
-  return ( 5.0 * extruder_sample_temperature(EXTRUDER_THERMOCOUPLE_PIN) * 100.0) / 1024.0;
+	return ( 5.0 * extruder_sample_temperature(EXTRUDER_THERMOCOUPLE_PIN) * 100.0) / 1024.0;
 }
 #endif
 
@@ -122,17 +122,17 @@ int extruder_read_thermocouple()
  */
 int extruder_sample_temperature(byte pin)
 {
-  int raw = 0;
+	int raw = 0;
 	
-  //read in a certain number of samples
-  for (byte i=0; i<TEMPERATURE_SAMPLES; i++)
-    raw += analogRead(pin);
+	//read in a certain number of samples
+	for (byte i=0; i<TEMPERATURE_SAMPLES; i++)
+		raw += analogRead(pin);
 		
-  //average the samples
-  raw = raw/TEMPERATURE_SAMPLES;
+	//average the samples
+	raw = raw/TEMPERATURE_SAMPLES;
 
-  //send it back.
-  return raw;
+	//send it back.
+	return raw;
 }
 
 /*!
@@ -142,26 +142,28 @@ int extruder_sample_temperature(byte pin)
 */
 void extruder_manage_temperature()
 {
-  static long lastread = 0;
+	static long lastread = 0;
 
-  if (millis() - lastread > 200) {
-    lastread = millis();
+	if (millis() - lastread > 200)
+	{
+		lastread = millis();
 
-    //make sure we know what our temp is.
-    int current_celsius = extruder_get_temperature();
-    byte newheat = 0;
+		//make sure we know what our temp is.
+		int current_celsius = extruder_get_temperature();
+		byte newheat = 0;
     
-    //put the heater into high mode if we're not at our target.
-    if (current_celsius < extruder_target_celsius)
-      newheat = extruder_heater_high;
-    //put the heater on low if we're at our target.
-    else if (current_celsius < extruder_max_celsius)
-      newheat = extruder_heater_low;
+		//put the heater into high mode if we're not at our target.
+		if (current_celsius < extruder_target_celsius)
+			newheat = extruder_heater_high;
+		//put the heater on low if we're at our target.
+		else if (current_celsius < extruder_max_celsius)
+			newheat = extruder_heater_low;
     
-    // Only update heat if it changed
-    if (extruder_heater_current != newheat) {
-      extruder_heater_current = newheat;
-      analogWrite(EXTRUDER_HEATER_PIN, extruder_heater_current);
-    }
-  }
+		// Only update heat if it changed
+		if (extruder_heater_current != newheat)
+		{
+			extruder_heater_current = newheat;
+			analogWrite(EXTRUDER_HEATER_PIN, extruder_heater_current);
+		}
+	}
 }
