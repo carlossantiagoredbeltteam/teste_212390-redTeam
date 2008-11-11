@@ -29,33 +29,33 @@
 class MetaCAD
 {
     public static String opToString(int operation) {
-	switch (operation) {
-	case CSGObject.UNION:
-	    return "union";
-	    break;
-	case CSGObject.INTERSECTION:
-	    return "intersection";
-	    break;
-	case CSGObject.DIFFERENCE12:
-	    return "difference";
-	    break;
-	default:
-	    return null;
-	}
+        switch (operation) {
+        case CSGObject.UNION:
+            return "union";
+            break;
+        case CSGObject.INTERSECTION:
+            return "intersection";
+            break;
+        case CSGObject.DIFFERENCE12:
+            return "difference";
+            break;
+        default:
+            return null;
+        }
     }
 
     public static int stringToOp(String opstr) {
-	String lower = opstr.toLowerCase();
-	if (lower.startsWith("union") || lower.startsWith("+")) {
-	    return CSGObject.UNION;
-	}
-	else if (lower.startsWith("intersection") || lower.startsWith("/")) {
-	    return CSGObject.INTERSECTION;
-	}
-	else if (lower.startsWith("difference") || lower.startsWith("-")) {
-	    return CSGObject.DIFFERENCE12;
-	}
-	else return -1;
+        String lower = opstr.toLowerCase();
+        if (lower.startsWith("union") || lower.startsWith("+")) {
+            return CSGObject.UNION;
+        }
+        else if (lower.startsWith("intersection") || lower.startsWith("/")) {
+            return CSGObject.INTERSECTION;
+        }
+        else if (lower.startsWith("difference") || lower.startsWith("-")) {
+            return CSGObject.DIFFERENCE12;
+        }
+        else return -1;
     }
 
     
@@ -69,9 +69,9 @@ class MetaCAD
     */
     public static ObjectInfo evaluateNode(ObjectInfo parent)
     {
-	int op = stringToOp(parent.name);
-	if (op == -1) return parent;
-	else return combine(parent, op);
+        int op = stringToOp(parent.name);
+        if (op == -1) return parent;
+        else return combine(parent, op);
     }
 
     /*
@@ -82,42 +82,42 @@ class MetaCAD
     */
     public static void devaluateNode(ObjectInfo parent, UndoRecord undo)
     {
-	int op = stringToOp(parent.name);
-	if (op != -1) {
-	    undo.addCommandAtBeginning(UndoRecord.COPY_OBJECT_INFO, 
-				       new Object [] {parent, parent.duplicate()});
-	    parent.setVisible(false);
-	    window.getScene().objectModified(parent.getObject());
-	    ObjectInfo[] children = parent.getChildren();
-	    for (int i=0;i<children.length;i++) {
-		devaluateNode(children[i], undo);
-	    }
-	}
-	else {
-	    undo.addCommandAtBeginning(UndoRecord.COPY_OBJECT_INFO, new Object [] {parent, parent.duplicate()});
-	    parent.setVisible(true);
-	    window.getScene().objectModified(parent.getObject());
-	}
+        int op = stringToOp(parent.name);
+        if (op != -1) {
+            undo.addCommandAtBeginning(UndoRecord.COPY_OBJECT_INFO, 
+                                       new Object [] {parent, parent.duplicate()});
+            parent.setVisible(false);
+            window.getScene().objectModified(parent.getObject());
+            ObjectInfo[] children = parent.getChildren();
+            for (int i=0;i<children.length;i++) {
+                devaluateNode(children[i], undo);
+            }
+        }
+        else {
+            undo.addCommandAtBeginning(UndoRecord.COPY_OBJECT_INFO, new Object [] {parent, parent.duplicate()});
+            parent.setVisible(true);
+            window.getScene().objectModified(parent.getObject());
+        }
     }
 
     /*
       Performs the given operation on all the children of the given object.
       Recursively calls evaluateNode() on each child.
-    */	
+    */ 
     public static ObjectInfo combine(ObjectInfo parent, int operation)
     {
-	ObjectInfo unioninfo = combine(parent.getChildren(), operation);
-        //   	parent.setObject(unioninfo.object.duplicate());
-        //  	parent.clearCachedMeshes();
-        //  	window.getScene().objectModified(parent.object);
-        //	window.getScene().replaceObject(parent.object, unioninfo.object);
-	parent.object.copyObject(unioninfo.object);
-	parent.setCoords(new CoordinateSystem());
-	parent.setVisible(true);
-	parent.clearCachedMeshes();
-	window.getScene().objectModified(parent.object);
-	window.rebuildItemList();
-	return parent;
+        ObjectInfo unioninfo = combine(parent.getChildren(), operation);
+        //    parent.setObject(unioninfo.object.duplicate());
+        //   parent.clearCachedMeshes();
+        //   window.getScene().objectModified(parent.object);
+        // window.getScene().replaceObject(parent.object, unioninfo.object);
+        parent.object.copyObject(unioninfo.object);
+        parent.setCoords(new CoordinateSystem());
+        parent.setVisible(true);
+        parent.clearCachedMeshes();
+        window.getScene().objectModified(parent.object);
+        window.rebuildItemList();
+        return parent;
     }
 
     /*
@@ -128,23 +128,23 @@ class MetaCAD
     */
     public static ObjectInfo combine(ObjectInfo[] objects, int operation)
     {
-	if (objects.length < 1) return null;
-	if (objects.length < 2) return objects[0];
+        if (objects.length < 1) return null;
+        if (objects.length < 2) return objects[0];
 
-	Object3D unionobj = new CSGObject(evaluateNode(objects[0]), 
-					  evaluateNode(objects[1]), 
-					  operation);
-	ObjectInfo unioninfo = new ObjectInfo(unionobj, new CoordinateSystem(), "tmp");
-	for (int i=2;i<objects.length;i++) {
-	    unionobj = new CSGObject(unioninfo, evaluateNode(objects[i]), operation);
-	    unioninfo = new ObjectInfo(unionobj, new CoordinateSystem(), "tmp");
-	}
+        Object3D unionobj = new CSGObject(evaluateNode(objects[0]), 
+                                          evaluateNode(objects[1]), 
+                                          operation);
+        ObjectInfo unioninfo = new ObjectInfo(unionobj, new CoordinateSystem(), "tmp");
+        for (int i=2;i<objects.length;i++) {
+            unionobj = new CSGObject(unioninfo, evaluateNode(objects[i]), operation);
+            unioninfo = new ObjectInfo(unionobj, new CoordinateSystem(), "tmp");
+        }
 
-	for (int i=0;i<objects.length;i++) {
-	    objects[i].setVisible(false);
-	    window.getScene().objectModified(objects[i].getObject());
-	}
-	return unioninfo;
+        for (int i=0;i<objects.length;i++) {
+            objects[i].setVisible(false);
+            window.getScene().objectModified(objects[i].getObject());
+        }
+        return unioninfo;
     }
 
     /*
@@ -156,23 +156,23 @@ class MetaCAD
     */
     public static ObjectInfo create(ObjectInfo[] objects, int operation, UndoRecord undo)
     {
-	Scene scene = window.getScene();
- 	ObjectInfo result = combine(objects, operation);
-	result.setName(opToString(operation));
-	window.getScene().addObject(result, undo);
-	for (int i=0;i<objects.length;i++) {
-	    //	    removeObject(scene.indexOf(objects[i]), undo);
-            //    	    if (undo != null) {
-            //    		undo.addCommandAtBeginning(REMOVE_FROM_GROUP, 
-            //  					   new Object [] {result, objects[i]});
-            //    	    }
-	    result.addChild(objects[i], i);
-	}
-	window.rebuildItemList();
-	window.clearSelection();
-	window.addToSelection(window.getScene().indexOf(result));
-	
-	return result;
+        Scene scene = window.getScene();
+        ObjectInfo result = combine(objects, operation);
+        result.setName(opToString(operation));
+        window.getScene().addObject(result, undo);
+        for (int i=0;i<objects.length;i++) {
+            //     removeObject(scene.indexOf(objects[i]), undo);
+            //         if (undo != null) {
+            //      undo.addCommandAtBeginning(REMOVE_FROM_GROUP, 
+            //          new Object [] {result, objects[i]});
+            //         }
+            result.addChild(objects[i], i);
+        }
+        window.rebuildItemList();
+        window.clearSelection();
+        window.addToSelection(window.getScene().indexOf(result));
+ 
+        return result;
     }
 }
 
@@ -181,7 +181,7 @@ class MetaCADDummyCallback implements java.lang.Runnable
 {
     public void run()
     {
-	// We don't care if we are called
+        // We don't care if we are called
     }
 }
 
@@ -192,97 +192,97 @@ class MetaCADCallbacks
        are removed.
     */
     public ObjectInfo[] getSelection() {
-	sel = window.getSelectedObjects();
-	ObjectInfo[] objects = new ObjectInfo[sel.size()];
-	it = sel.iterator();
-	int i = 0;
-	while (it.hasNext()) {
-	    ObjectInfo objinfo = it.next();
-	    ObjectInfo p = objinfo.getParent();
-	    while (p != null) { // Check if any parent is selected
-		if (window.isObjectSelected(p)) break;
-		p = p.getParent();
-	    }
-	    if (p == null) objects[i++] = objinfo;
-	}
-	ObjectInfo[] cleanedobjects = new ObjectInfo[i];
-	System.arraycopy(objects, 0, cleanedobjects, 0, i);
-	return cleanedobjects;
+        sel = window.getSelectedObjects();
+        ObjectInfo[] objects = new ObjectInfo[sel.size()];
+        it = sel.iterator();
+        int i = 0;
+        while (it.hasNext()) {
+            ObjectInfo objinfo = it.next();
+            ObjectInfo p = objinfo.getParent();
+            while (p != null) { // Check if any parent is selected
+                if (window.isObjectSelected(p)) break;
+                p = p.getParent();
+            }
+            if (p == null) objects[i++] = objinfo;
+        }
+        ObjectInfo[] cleanedobjects = new ObjectInfo[i];
+        System.arraycopy(objects, 0, cleanedobjects, 0, i);
+        return cleanedobjects;
     }
 
     public void evaluate()
     {
-	ObjectInfo[] objects = getSelection();
-	if (object != null) {
-	    for (int i=0;i<objects.length;i++) {
-		MetaCAD.evaluateNode(objects[i]);
-	    }
-	    window.rebuildItemList();
-	    window.updateImage();
-	    window.setModified();
-	    //	    new MessageDialog(window, "evaluate OK");
-	}
+        ObjectInfo[] objects = getSelection();
+        if (object != null) {
+            for (int i=0;i<objects.length;i++) {
+                MetaCAD.evaluateNode(objects[i]);
+            }
+            window.rebuildItemList();
+            window.updateImage();
+            window.setModified();
+            //     new MessageDialog(window, "evaluate OK");
+        }
     }
-	
+ 
     public void devaluate()
     {
-	window.setUndoRecord(undo = new UndoRecord(window, false));
-	ObjectInfo[] objects = getSelection();
-	if (objects != null) {
-	    for (int i=0;i<objects.length;i++) {
-		MetaCAD.devaluateNode(objects[i], undo);
-	    }
-	    window.rebuildItemList();
-	    window.updateImage();
-	    window.setModified();
-	    //	    new MessageDialog(window, "devaluate OK");
-	}
+        window.setUndoRecord(undo = new UndoRecord(window, false));
+        ObjectInfo[] objects = getSelection();
+        if (objects != null) {
+            for (int i=0;i<objects.length;i++) {
+                MetaCAD.devaluateNode(objects[i], undo);
+            }
+            window.rebuildItemList();
+            window.updateImage();
+            window.setModified();
+            //     new MessageDialog(window, "devaluate OK");
+        }
     }
-	
+ 
     public void execute(int operation) {
-	ObjectInfo[] objects = getSelection();
-	if (objects == null || objects.length < 2) {
-	    new MessageDialog(window, "Minimum two objects must be selected.");
-	}
-	else {
- 	    ObjectInfo result = MetaCAD.create(objects, operation, null);
- 	    window.updateImage();
- 	    window.setModified();
-	}
+        ObjectInfo[] objects = getSelection();
+        if (objects == null || objects.length < 2) {
+            new MessageDialog(window, "Minimum two objects must be selected.");
+        }
+        else {
+            ObjectInfo result = MetaCAD.create(objects, operation, null);
+            window.updateImage();
+            window.setModified();
+        }
     }
 
     public void union()
     {
-	execute(CSGObject.UNION);
+        execute(CSGObject.UNION);
     }
-	
+ 
     public void intersect()
     {
-	execute(CSGObject.INTERSECTION);
+        execute(CSGObject.INTERSECTION);
     }
-	
+ 
     public void subtract()
     {
-	execute(CSGObject.DIFFERENCE12);
+        execute(CSGObject.DIFFERENCE12);
     }
 }
 
-	
-	
+ 
+ 
 BButton evaluateButton, devaluateButton;
 BButton unionButton, intersectButton, subtractButton;
 
 
 dlg = new ComponentsDialog(window, "MetaCAD Control Panel" ,
-			   new Widget [] { 
-			       evaluateButton = new BButton( "evaluate" ),
-			       devaluateButton = new BButton( "devaluate" ),
+                           new Widget [] { 
+                               evaluateButton = new BButton( "evaluate" ),
+                               devaluateButton = new BButton( "devaluate" ),
 
-			       unionButton = new BButton( "union" ),
-			       intersectButton = new BButton( "intersect" ),
-			       subtractButton = new BButton( "subtract" ),
-			   },
-			   new String [] {"Actions", "", "Boolean Operations", "", ""}, new MetaCADDummyCallback(), new MetaCADDummyCallback() );
+                               unionButton = new BButton( "union" ),
+                               intersectButton = new BButton( "intersect" ),
+                               subtractButton = new BButton( "subtract" ),
+                           },
+                           new String [] {"Actions", "", "Boolean Operations", "", ""}, new MetaCADDummyCallback(), new MetaCADDummyCallback() );
 dlg.setOkEnabled(true);
 
 MetaCADCallbacks callbacks = new MetaCADCallbacks();
