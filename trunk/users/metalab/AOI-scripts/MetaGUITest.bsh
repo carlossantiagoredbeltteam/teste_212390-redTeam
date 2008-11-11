@@ -1,30 +1,30 @@
 /*
-<?xml version='1.0' standalone='yes' ?>
-<!--  xml header for scripts & plugin manager --> 
-<script>
+  <?xml version='1.0' standalone='yes' ?>
+  <!--  xml header for scripts & plugin manager --> 
+  <script>
   <name>MetaGuiTest</name>
   <author>Philipp Tiefenbacher, Stefan Farthofer and Marius Kintel (Metalab)</author>
   <version>1.0</version>
   <beta>1</beta>
   <date>2/11/2008</date>
   <description>
-    FIXME: MetaMagic
+  FIXME: MetaMagic
   </description>
   <comments>
   </comments>
-</script>
+  </script>
 */
 
 
 /*
-  TODO:
+  Todo:
 
   * don't collapse hierarchy after operation: Need to get hold of the TreeList instance
   * ok/cancel -> close: Use superclass of ComponentsDialog?
   * Make evaluate work with object which have been converted to triangles
   * Better undo support
 
- */
+  */
 
 class MetaCAD
 {
@@ -103,14 +103,14 @@ class MetaCAD
     /*
       Performs the given operation on all the children of the given object.
       Recursively calls evaluateNode() on each child.
-     */	
+    */	
     public static ObjectInfo combine(ObjectInfo parent, int operation)
     {
 	ObjectInfo unioninfo = combine(parent.getChildren(), operation);
-//   	parent.setObject(unioninfo.object.duplicate());
-//  	parent.clearCachedMeshes();
-//  	window.getScene().objectModified(parent.object);
-//	window.getScene().replaceObject(parent.object, unioninfo.object);
+        //   	parent.setObject(unioninfo.object.duplicate());
+        //  	parent.clearCachedMeshes();
+        //  	window.getScene().objectModified(parent.object);
+        //	window.getScene().replaceObject(parent.object, unioninfo.object);
 	parent.object.copyObject(unioninfo.object);
 	parent.setCoords(new CoordinateSystem());
 	parent.setVisible(true);
@@ -162,10 +162,10 @@ class MetaCAD
 	window.getScene().addObject(result, undo);
 	for (int i=0;i<objects.length;i++) {
 	    //	    removeObject(scene.indexOf(objects[i]), undo);
-//    	    if (undo != null) {
-//    		undo.addCommandAtBeginning(REMOVE_FROM_GROUP, 
-//  					   new Object [] {result, objects[i]});
-//    	    }
+            //    	    if (undo != null) {
+            //    		undo.addCommandAtBeginning(REMOVE_FROM_GROUP, 
+            //  					   new Object [] {result, objects[i]});
+            //    	    }
 	    result.addChild(objects[i], i);
 	}
 	window.rebuildItemList();
@@ -190,7 +190,7 @@ class MetaCADCallbacks
     /**
        Returns a normalized selection, meaning children of a selected parent
        are removed.
-     */
+    */
     public ObjectInfo[] getSelection() {
 	sel = window.getSelectedObjects();
 	ObjectInfo[] objects = new ObjectInfo[sel.size()];
