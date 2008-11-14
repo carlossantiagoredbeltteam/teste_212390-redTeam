@@ -23,7 +23,7 @@ class meander(kicad_container):
 
 
 module = kicad_board('RepRap Heating Plate')
-p = meander(100, 2, 0.8, 1000/102)
+p = meander(150, 1.5, 0.8, 99/1.5)
 module.add(p)
 
 print module.render()
