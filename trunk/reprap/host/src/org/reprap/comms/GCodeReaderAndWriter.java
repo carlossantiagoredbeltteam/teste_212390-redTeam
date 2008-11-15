@@ -619,18 +619,18 @@ public class GCodeReaderAndWriter
 				Debug.d("opening: " + name);
 				FileOutputStream fileStream = new FileOutputStream(name);
 				fileOutStream = new PrintStream(fileStream);
-			} catch (FileNotFoundException e) {
+				return chooser.getSelectedFile().getName();
+			} catch (FileNotFoundException e) 
+			{
 				System.err.println("Can't write to file '" + name);
 				fileOutStream = null;
-				return null;
 			}
 		}
 		else
 		{
 			fileOutStream = null;
-			return null;
 		}
-		return chooser.getName();
+		return null;
 	}
 	
 	public String loadGCodeFileForMaking()

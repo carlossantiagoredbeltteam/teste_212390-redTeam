@@ -305,12 +305,12 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 
 		workingVolume = new STLObject();
 		workingVolume.addSTL(stlFile, wv_offset, wv_app, null);
-		wv_and_stls.addChild(workingVolume.top);
+		wv_and_stls.addChild(workingVolume.top());
 
 		// Set the mouse to move everything
 
 		mouse.move(world, false);
-		objRoot.addChild(world.top);
+		objRoot.addChild(world.top());
 
 		return objRoot;
 	}
@@ -392,8 +392,11 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 		Attributes att = stl.addSTL(s, null, Preferences.unselectedApp(), lastPicked);
 		if(att != null)
 		{
-			wv_and_stls.addChild(stl.top);
-			stls.add(stl);
+			if(stl.numChildren() > 0)
+			{
+				wv_and_stls.addChild(stl.top());
+				stls.add(stl);
+			}
 			MaterialRadioButtons.createAndShowGUI(att);
 		}
 	}
@@ -469,7 +472,7 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 		if (index >= 0) 
 		{
 			stls.remove(index);
-			index = wv_and_stls.indexOfChild(lastPicked.top);
+			index = wv_and_stls.indexOfChild(lastPicked.top());
 			mouseToWorld();
 			wv_and_stls.removeChild(index);
 			lastPicked = null;
@@ -482,7 +485,7 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 		{
 			STLObject s = (STLObject)stls.get(i);
 			stls.remove(i);
-			int index = wv_and_stls.indexOfChild(s.top);
+			int index = wv_and_stls.indexOfChild(s.top());
 			wv_and_stls.removeChild(index);
 		}		
 	}

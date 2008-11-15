@@ -103,14 +103,14 @@ class Offsets
 
 public class STLObject
 {
-    private MouseObject mouse = null;  // The mouse, if it is controlling us
-    public BranchGroup top = null;     // The thing that links us to the world
-    public BranchGroup handle = null;  // Internal handle for the mouse to grab
-    public TransformGroup trans = null;// Static transform for when the mouse is away
-    public BranchGroup stl = null;     // The actual STL geometry
-    public Vector3d size = null;       // X, Y and Z extent
-    private BoundingBox bbox = null;   // Temporary storage for the bounding box while loading
-    private Vector3d rootOffset = null;// Offset of the first-loaded STL under stl
+    private MouseObject mouse = null;   // The mouse, if it is controlling us
+    private BranchGroup top = null;     // The thing that links us to the world
+    private BranchGroup handle = null;  // Internal handle for the mouse to grab
+    private TransformGroup trans = null;// Static transform for when the mouse is away
+    private BranchGroup stl = null;     // The actual STL geometry
+    private Vector3d size = null;       // X, Y and Z extent
+    private BoundingBox bbox = null;    // Temporary storage for the bounding box while loading
+    private Vector3d rootOffset = null; // Offset of the first-loaded STL under stl
     
 
     public STLObject()
@@ -163,11 +163,34 @@ public class STLObject
         
         bbox = null;
     }
+    
+    /**
+     * Load an STL object from a file with a known offset (set that null to put
+     * the object bottom-left-at-origin) and set its appearance
+     * 
+     * @param location
+     * @param offset
+     * @param app
+     */
+    public Attributes addSTL(String location, Vector3d offset, Appearance app, STLObject lastPicked) 
+    {
+    	Attributes att = new Attributes(null, this, null, app);
+    	BranchGroup child = loadSingleSTL(location, att, offset, lastPicked);
+    	if(child == null)
+    		return null;
+    	return att;
+    }
 
     /**
-     * Actually load the stl file and set its attributes
+     * Actually load the stl file and set its attributes.  Offset decides where to put it relative to 
+     * the origin.  If lastPicked is null, the file is loaded as a new independent STLObject; if not
+     * it is added to lastPicked and subsequently is subjected to all the same transforms, so they retain
+     * their relative positions.  This is how multi-material objects are loaded.
+     * 
      * @param location
      * @param att
+     * @param offset
+     * @param lastPicked
      * @return
      */
     private BranchGroup loadSingleSTL(String location, Attributes att, Vector3d offset, STLObject lastPicked)
@@ -216,6 +239,7 @@ public class STLObject
                 	setOffset(result, lastPicked.rootOffset);
                 	lastPicked.stl.addChild(result);
                 	lastPicked.setAppearance(lastPicked.getAppearance());
+                	lastPicked.updateBox(bbox);
                 } else
                 {
                 	// New independent object.
@@ -237,6 +261,57 @@ public class STLObject
             e.printStackTrace();
         }
         return result;
+    }
+    
+    private void updateBox(BoundingBox bb)
+    {
+        javax.vecmath.Point3d pNew = new javax.vecmath.Point3d();
+        javax.vecmath.Point3d pOld = new javax.vecmath.Point3d();
+        bb.getLower(pNew);
+        bbox.getLower(pOld);
+        if(pNew.x < pOld.x)
+        	pOld.x = pNew.x;
+        if(pNew.y < pOld.y)
+        	pOld.y = pNew.y;
+        if(pNew.z < pOld.z)
+        	pOld.z = pNew.z;
+        bbox.setLower(pOld);
+        size = new Vector3d(pOld.x, pOld.y, pOld.z);
+
+        bb.getUpper(pNew);
+        bbox.getUpper(pOld);
+        if(pNew.x > pOld.x)
+        	pOld.x = pNew.x;
+        if(pNew.y > pOld.y)
+        	pOld.y = pNew.y;
+        if(pNew.z > pOld.z)
+        	pOld.z = pNew.z;
+        bbox.setUpper(pOld);
+        
+        size.x = pOld.x - size.x;
+        size.y = pOld.y - size.y;
+        size.z = pOld.z - size.z;
+        
+    }
+    
+    public BranchGroup top()
+    {
+    	return top;
+    }
+    
+    public TransformGroup trans()
+    {
+    	return trans;
+    }
+    
+    public BranchGroup handle()
+    {
+    	return handle;
+    }
+    
+    public Vector3d size()
+    {
+    	return size;
     }
     
     /**
@@ -300,42 +375,6 @@ public class STLObject
     	return result;
     }
     
-    /**
-     * Load an STL object from a file with a known offset (set that null to put
-     * the object bottom-left-at-origin) and set its material (and hence its
-     * appearance).
-     * 
-     * @param location
-     * @param offset
-     * @param material
-     */
-//    public Attributes addSTL(String location, Vector3d offset, String material) 
-//    {
-//    	Attributes att = new Attributes(material, this, null,
-//    			GenericExtruder.getAppearanceFromNumber(GenericExtruder.getNumberFromMaterial(material)));
-//    	BranchGroup child = loadSingleSTL(location, att);
-//    	if(child == null)
-//    		return null;
-//    	applyOffset(child, offset);
-//    	return att;
-//    }
-    
-    /**
-     * Load an STL object from a file with a known offset (set that null to put
-     * the object bottom-left-at-origin) and set its appearance
-     * 
-     * @param location
-     * @param offset
-     * @param app
-     */
-    public Attributes addSTL(String location, Vector3d offset, Appearance app, STLObject lastPicked) 
-    {
-    	Attributes att = new Attributes(null, this, null, app);
-    	BranchGroup child = loadSingleSTL(location, att, offset, lastPicked);
-    	if(child == null)
-    		return null;
-    	return att;
-    }
     
     /**
      * Make an STL object from an existing BranchGroup
@@ -351,12 +390,16 @@ public class STLObject
         trans.setTransform(temp_t); 
     }
 
-    // method to recursively set the user data for objects in the scenegraph tree
-    // we also set the capabilites on Shape3D objects required by the PickTool
 
+    /**
+     * method to recursively set the user data for objects in the scenegraph tree
+     * we also set the capabilites on Shape3D objects required by the PickTool
+     * @param value
+     * @param me
+     */
     private void recursiveSetUserData(Object value, Object me) 
     {
-        if( value instanceof SceneGraphObject != false ) 
+        if( value instanceof SceneGraphObject  ) 
         {
             // set the user data for the item
             SceneGraphObject sg = (SceneGraphObject) value;
@@ -489,11 +532,21 @@ public class STLObject
         return result;
     }
     
-    // Get the actual object
+    // Get one of the the actual objects
     
+//    public BranchGroup getSTL(int i)
+//    {
+//    	return (BranchGroup)(stl.getChild(i));
+//    }
     public BranchGroup getSTL()
     {
     	return stl;
+    }
+    // Get the number of objects
+    
+    public int numChildren()
+    {
+    	return stl.numChildren();
     }
     
     // The mouse calls this to tell us it is controlling us

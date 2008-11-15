@@ -116,13 +116,13 @@ public class PreviewPanel extends Panel3D implements Previewer {
 
 		workingVolume = new STLObject();
 		workingVolume.addSTL(stlFile, wv_offset, wv_app, null);
-		wv_and_stls.addChild(workingVolume.top);
+		wv_and_stls.addChild(workingVolume.top());
 
 		// Set the mouse to move everything
 		MouseObject mouse = new MouseObject(getApplicationBounds(), mouse_tf, mouse_zf);
 		mouse.move(world, false);
 		
-		objRoot.addChild(world.top);
+		objRoot.addChild(world.top());
 
 		return objRoot;
 	}

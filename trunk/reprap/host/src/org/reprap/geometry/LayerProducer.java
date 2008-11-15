@@ -241,13 +241,13 @@ public class LayerProducer {
 		csgP = csgPols;
 		
 		offHatch = csgPols.offset(layerConditions, false);
-		offHatch.divide(Preferences.tiny(), 1.01);
 		
 		//RrGraphics g = new RrGraphics(offBorder, true);
 		
 		if(layerConditions.getLayingSupport())
 		{
 			borderPolygons = null;
+			offHatch = offHatch.union(lc.getPrinter().getExtruders());
 //			hatchedPolygons = offHatch.megList();
 //			RrPolygon allHatch = new RrPolygon(hatchedPolygons.polygon(0).getAttributes());
 //			for(int i = 0; i < hatchedPolygons.size(); i++)
@@ -263,6 +263,7 @@ public class LayerProducer {
 			borderPolygons.setClosed(true);
 		}
 		
+		offHatch.divide(Preferences.tiny(), 1.01);		
 		hatchedPolygons = new RrPolygonList();
 		hatchedPolygons.add(offHatch.hatch(layerConditions));
 		hatchedPolygons.setClosed(false);

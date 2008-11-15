@@ -594,20 +594,23 @@ public class STLSlice
 		{
 			STLObject stl = shapeList.get(i);
 			Transform3D trans = stl.getTransform();
-			BranchGroup bg = stl.getSTL();
-			java.util.Enumeration<?> enumKids = bg.getAllChildren();
-			
-	        while(enumKids.hasMoreElements())
-	        {
-	        	Object ob = enumKids.nextElement();
-	        	
-	        	if(ob instanceof BranchGroup)
-	        	{
-	        		BranchGroup bg1 = (BranchGroup)ob;
-	        		Attributes att = (Attributes)(bg1.getUserData());
-	        		mls.add(att, trans);
-	        	}
-	        }
+			//for(int c = 0; c < stl.numChildren(); c++)
+			//{
+				BranchGroup bg = stl.getSTL();
+				java.util.Enumeration<?> enumKids = bg.getAllChildren();
+
+				while(enumKids.hasMoreElements())
+				{
+					Object ob = enumKids.nextElement();
+
+					if(ob instanceof BranchGroup)
+					{
+						BranchGroup bg1 = (BranchGroup)ob;
+						Attributes att = (Attributes)(bg1.getUserData());
+						mls.add(att, trans);
+					}
+				}
+			//}
 		}
 	}
 	
@@ -1318,8 +1321,8 @@ public class STLSlice
 		for(int i = 0; i < shapeList.size(); i++)
 		{
 			stl = (STLObject)shapeList.get(i);
-			if(stl.size.z > result)
-				result = stl.size.z;
+			if(stl.size().z > result)
+				result = stl.size().z;
 		}
 		return result;
 	}

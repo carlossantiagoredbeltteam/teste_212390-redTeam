@@ -159,9 +159,9 @@ public class MouseObject
         
         if(movingThing != null)
         {
-            movingThing.trans.setTransform(t3d);
-            movingThing.handle.detach();
-            movingThing.top.addChild(movingThing.handle);
+            movingThing.setTransform(t3d);
+            movingThing.handle().detach();
+            movingThing.top().addChild(movingThing.handle());
             movingThing.setMouse(null);
         }
         
@@ -185,12 +185,12 @@ public class MouseObject
         // Get the current transform of the thing being moved...
         
         t3d = new Transform3D();
-        movingThing.trans.getTransform(t3d);
+        movingThing.trans().getTransform(t3d);
         
         // ...set that thing's static transform to the identity...
         
         Transform3D identity = new Transform3D();
-        movingThing.trans.setTransform(identity);
+        movingThing.setTransform(identity);
         
         // ...and set the mouse transform to that of the thing being moved.
         
@@ -198,9 +198,9 @@ public class MouseObject
         
         // Put us in the path to the thing being moved.
         
-        movingThing.handle.detach();
-        trans.addChild(movingThing.handle);
-        movingThing.top.addChild(top); 
+        movingThing.handle().detach();
+        trans.addChild(movingThing.handle());
+        movingThing.top().addChild(top); 
         
         //top.setUserData(movingThing.name);
         //trans.setUserData(movingThing.name);
