@@ -120,7 +120,7 @@ public class RrCSGPolygonList {
 		{
 			Attributes att = get(i).getAttributes();
 			if(att == null)
-				System.err.println("offset(): null attribute!");
+				System.err.println("RrCSGPolygonList.offset(): null attribute!");
 			else
 			{
 				Extruder [] es = lc.getPrinter().getExtruders();
@@ -152,6 +152,42 @@ public class RrCSGPolygonList {
 				}
 			}
 		}
+		return result;
+	}
+	
+	/**
+	 * Make a list with a single entry: the union of all the entries.
+	 * Set its attributes to that of extruder 0 in the extruder list.
+	 * @param a
+	 * @return
+	 */
+	public RrCSGPolygonList union(Extruder[] es)
+	{	
+		RrCSGPolygonList result = new RrCSGPolygonList();
+		if(size() <= 0)
+			return result;
+		RrCSG contents = get(0).csg();
+		RrBox b = get(0).box();
+		Attributes a = get(0).getAttributes();
+		Boolean foundAttribute0 = false;
+		if(a.getExtruder(es) == es[0])
+			foundAttribute0 = true;
+		for(int i = 1; i < size(); i++)
+		{
+			if(!foundAttribute0)
+			{
+				if(get(i).getAttributes().getExtruder(es) == es[0])
+				{
+					a = get(i).getAttributes();
+					foundAttribute0 = true;
+				}
+			}
+			contents = RrCSG.union(contents, get(i).csg());
+			b = RrBox.union(get(i).box(), b);
+		}
+		if(!foundAttribute0)
+			System.err.println("RrCSGPolygonList.union(): Attribute of extruder 0 not found.");
+		result.add(new RrCSGPolygon(contents, b, a));
 		return result;
 	}
 	
