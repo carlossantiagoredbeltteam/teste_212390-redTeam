@@ -10,7 +10,7 @@ Open File to be Rafted	/Users/kintel/code/metalab/checkout/reprap/users/metalab/
 Do Not Add Flowrate	False
 Metric	False
 PWM Setting	True
-Flowrate PWM Setting (if PWM Setting is Chosen):	153.0
+Flowrate PWM Setting (if PWM Setting is Chosen):	155.0
 Infill Overhang (ratio):	0.1
 Interface Infill Density (ratio):	0.4
 Interface Layer Height over Extrusion Height:	1.0
@@ -23,8 +23,8 @@ Temperature Change Time of Raft (seconds):	0.0
 Temperature Change Time of First Layer Outline (seconds):	0.0
 Temperature Change Time of First Layer Within (seconds):	0.0
 Temperature Change Time of Next Layers (seconds):	0.0
-Temperature of Raft (Celcius):	225.0
-Temperature of Shape First Layer Outline (Celcius):	225.0
-Temperature of Shape First Layer Within (Celcius):	225.0
-Temperature of Shape Next Layers (Celcius):	225.0
+Temperature of Raft (Celcius):	220.0
+Temperature of Shape First Layer Outline (Celcius):	220.0
+Temperature of Shape First Layer Within (Celcius):	220.0
+Temperature of Shape Next Layers (Celcius):	220.0
 Turn Extruder On Early:	True
