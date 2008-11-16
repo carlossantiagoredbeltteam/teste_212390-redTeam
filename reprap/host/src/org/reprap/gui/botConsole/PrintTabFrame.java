@@ -439,6 +439,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
 
 private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
     parentBotConsoleFrame.suspendPolling();
+    org.reprap.Main.gui.mouseToWorld();
     if(gCodeToFileRadioButton.isSelected())
     {
     	if(printer.setGCodeFileForOutput() == null)

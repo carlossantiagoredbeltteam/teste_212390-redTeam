@@ -559,6 +559,11 @@ public class Main {
     private void onDelete() {
     	  builder.deleteSTL();
       }
+    
+    public void mouseToWorld()
+    {
+    	builder.mouseToWorld();
+    }
 
 //	private void onViewBuilder() {
 ////    		if (!viewBuilder.isSelected() && !viewPreview.isSelected())
