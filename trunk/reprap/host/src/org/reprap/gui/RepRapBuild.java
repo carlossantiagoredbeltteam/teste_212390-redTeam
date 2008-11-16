@@ -218,7 +218,7 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 	private PickCanvas pickCanvas = null; // The thing picked by a mouse click
 	private STLObject lastPicked = null; // The last thing picked
 	private java.util.List<STLObject> stls = new ArrayList<STLObject>(); // All the STLObjects to be built
-	private int objectIndex = 0; // Counter for STLs as they are loaded
+	//private int objectIndex = 0; // Counter for STLs as they are loaded
 
 	// Constructors
 	public RepRapBuild() throws Exception {
@@ -387,11 +387,12 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 	public void anotherSTLFile(String s) {
 		if (s == null)
 			return;
-		objectIndex++;
+		//objectIndex++;
 		STLObject stl = new STLObject();
 		Attributes att = stl.addSTL(s, null, Preferences.unselectedApp(), lastPicked);
 		if(att != null)
 		{
+			// New separate object, or just appended to lastPicked?
 			if(stl.numChildren() > 0)
 			{
 				wv_and_stls.addChild(stl.top());
