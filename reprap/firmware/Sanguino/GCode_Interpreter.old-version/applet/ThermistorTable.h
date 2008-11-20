@@ -1,12 +1,6 @@
 #ifndef THERMISTORTABLE_H_
 #define THERMISTORTABLE_H_
 
-// Uncomment the next line if you are using a thermistor; leave it if you have a thermocouple
-//#define USE_THERMISTOR
-
-// How many temperature samples to take.  each sample takes about 100 usecs.
-#define TEMPERATURE_SAMPLES 3
-
 // Thermistor lookup table for RepRap Temperature Sensor Boards (http://make.rrrf.org/ts)
 // Made with createTemperatureLookup.py (http://svn.reprap.org/trunk/reprap/firmware/Arduino/utilities/createTemperatureLookup.py)
 // ./createTemperatureLookup.py --r0=100000 --t0=25 --r1=0 --r2=4700 --beta=4066 --max-adc=1023
@@ -16,7 +10,6 @@
 // r2: 4700
 // beta: 4066
 // max adc: 1023
-#ifdef USE_THERMISTOR
 #define NUMTEMPS 20
 short temptable[NUMTEMPS][2] = {
    {1, 841},
@@ -40,5 +33,4 @@ short temptable[NUMTEMPS][2] = {
    {955, 34},
    {1008, 3}
 };
-#endif
 #endif
