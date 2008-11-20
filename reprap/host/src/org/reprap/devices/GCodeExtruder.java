@@ -18,7 +18,7 @@ public class GCodeExtruder extends GenericExtruder
 	public GCodeExtruder(GCodeReaderAndWriter writer, int extruderId)
 	{
 		super(extruderId);
-
+		currentSpeed = 0;
 		gcode = writer;
 	}
 	
@@ -48,23 +48,14 @@ public class GCodeExtruder extends GenericExtruder
 		{
 			if (speed != currentSpeed)
 			{
-				gcode.queue("M108 R" + speed + " ;extruder speed in RPM");
+				gcode.queue("M108 S" + speed + " ;extruder speed in RPM");
 				currentSpeed = speed;
 			}
 
 			if (reverse)
 				gcode.queue("M102" + " ;extruder on, reverse");
 			else
-			{
-				try
-				{
-					gcode.queue("M101" + " ;extruder on, forward");
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
+				gcode.queue("M101" + " ;extruder on, forward");
 
 			isExtruding = true;
 		}
