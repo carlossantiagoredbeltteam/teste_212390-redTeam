@@ -1,6 +1,4 @@
-#include "parameters.h"
-#include "pins.h"
-#include "extruder.h"
+// Yep, this is actually -*- c++ -*-
 
 //init our variables
 long max_delta;
@@ -23,7 +21,9 @@ int milli_delay;
 void init_steppers()
 {
 	//turn them off to start.
+#ifdef SANGUINO
 	disable_steppers();
+#endif
 	
 	//init our points.
 	current_units.x = 0.0;
@@ -35,10 +35,8 @@ void init_steppers()
 	
 	pinMode(X_STEP_PIN, OUTPUT);
 	pinMode(X_DIR_PIN, OUTPUT);
-
 	pinMode(Y_STEP_PIN, OUTPUT);
 	pinMode(Y_DIR_PIN, OUTPUT);
-
 	pinMode(Z_STEP_PIN, OUTPUT);
 	pinMode(Z_DIR_PIN, OUTPUT);
 
@@ -66,7 +64,9 @@ void init_steppers()
 void dda_move(long micro_delay)
 {
 	//turn on steppers to start moving =)
+#ifdef SANGUINO
 	enable_steppers();
+#endif
 	
 	//figure out our deltas
 	max_delta = max(delta_steps.x, delta_steps.y);
@@ -144,7 +144,7 @@ void dda_move(long micro_delay)
 		}
 		
 		//keep it hot =)
-		manage_all_extruders();
+		extruder_manage_temperature();
 				
 		//wait for next step.
 		if (milli_delay > 0)
@@ -306,15 +306,13 @@ long getMaxSpeed()
 		return calculate_feedrate_delay(FAST_XY_FEEDRATE);
 }
 
+#ifdef SANGUINO
 void enable_steppers()
 {
 	// Enable steppers only for axes which are moving
 	// taking account of the fact that some or all axes
 	// may share an enable line (check using macros at
 	// compile time to avoid needless code)
-        // Not enough pins for enable on Arduino
-        
-#ifdef SANGUINO        
 	if ( target_units.x == current_units.x
 		#if X_ENABLE_PIN == Y_ENABLE_PIN
 		     && target_units.y == current_units.y
@@ -348,18 +346,16 @@ void enable_steppers()
 		digitalWrite(Z_ENABLE_PIN, !ENABLE_ON);
 	else
 		digitalWrite(Z_ENABLE_PIN, ENABLE_ON);
-#endif
 }
 
 void disable_steppers()
 {
- #ifdef SANGUINO 
 	//disable our steppers
 	digitalWrite(X_ENABLE_PIN, !ENABLE_ON);
 	digitalWrite(Y_ENABLE_PIN, !ENABLE_ON);
 	digitalWrite(Z_ENABLE_PIN, !ENABLE_ON);
-#endif
 }
+#endif
 
 void delayMicrosecondsInterruptible(unsigned int us)
 {

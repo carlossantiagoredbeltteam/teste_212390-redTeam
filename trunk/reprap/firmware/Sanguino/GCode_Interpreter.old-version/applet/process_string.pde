@@ -1,14 +1,4 @@
-
-#include "parameters.h"
-#include "pins.h"
-#include "extruder.h"
-
-//our command string
-#define COMMAND_SIZE 128
-char word[COMMAND_SIZE];
-char c = '?';
-byte serial_count = 0;
-boolean comment = false;
+// Yep, this is actually -*- c++ -*-
 
 // our point structure to make things nice.
 struct LongPoint
@@ -64,67 +54,17 @@ byte x_direction = 1;
 byte y_direction = 1;
 byte z_direction = 1;
 
-int extruder_speed = 0;
-
 int scan_int(char *str, int *valp);
 int scan_float(char *str, float *valp);
 
 //init our string processing
 void init_process_string()
 {
+	//init our command
+	//for (byte i=0; i<COMMAND_SIZE; i++)
+	//	word[i] = 0;
 	serial_count = 0;
         comment = false;
-}
-
-// Get a command and process it
-
-void get_and_do_command()
-{
-	//read in characters if we got them.
-	if (Serial.available())
-	{
-		c = Serial.read();
-                if(c == '\r')
-                  c = '\n';
-                // Throw away control chars except \n
-                if(c >= ' ' || c == '\n')
-                {
-
-		  //newlines are ends of commands.
-		  if (c != '\n')
-		  {
-			// Start of comment - ignore any bytes received from now on
-			if (c == ';')
-				comment = true;
-				
-			// If we're not in comment mode, add it to our array.
-			if (!comment)
-				word[serial_count++] = c;
-		  }
-
-                }
-	}
-
-        // Data runaway?
-        if(serial_count >= COMMAND_SIZE)
-          init_process_string();
-
-	//if we've got a real command, do it
-	if (serial_count && c == '\n')
-	{
-                // Terminate string
-                word[serial_count] = 0;
-                
-		//process our command!
-		process_string(word, serial_count);
-
-		//clear command.
-		init_process_string();
-
-                // Say we're ready for the next one
-                
-                Serial.println("ok");
-	}
 }
 
 //our feedrate variables.
@@ -510,33 +450,33 @@ void process_string(char instruction[], int size)
 				 */
 				//turn extruder on, forward
 			case 101:
-				ex[extruder_in_use]->set_direction(1);
-				ex[extruder_in_use]->set_speed(extruder_speed);
+				extruder_set_direction(1);
+				extruder_set_speed(extruder_speed);
 				break;
 
 				//turn extruder on, reverse
 			case 102:
-				ex[extruder_in_use]->set_direction(0);
-				ex[extruder_in_use]->set_speed(extruder_speed);
+				extruder_set_direction(0);
+				extruder_set_speed(extruder_speed);
 				break;
 
 				//turn extruder off
 			case 103:
-				ex[extruder_in_use]->set_speed(0);
+				extruder_set_speed(0);
 				break;
 
 				//custom code for temperature control
 			case 104:
 				if (gc.seen & GCODE_S)
 				{
-					ex[extruder_in_use]->set_temperature((int)gc.S);
+					extruder_set_temperature((int)gc.S);
 
 //					//warmup if we're too cold.
-//					while (ex[extruder_in_use]->get_temperature() < extruder_target_celsius)
+//					while (extruder_get_temperature() < extruder_target_celsius)
 //					{
-//						manage_all_extruders();
+//						extruder_manage_temperature();
 //						Serial.print("T: ");
-//						Serial.println(ex[extruder_in_use]->get_temperature());
+//						Serial.println(extruder_get_temperature());
 //						delay(1000);
 //					}
 				}
@@ -545,17 +485,17 @@ void process_string(char instruction[], int size)
 				//custom code for temperature reading
 			case 105:
 				Serial.print("T:");
-				Serial.println(ex[extruder_in_use]->get_temperature());
+				Serial.println(extruder_get_temperature());
 				break;
 
 				//turn fan on
 			case 106:
-				ex[extruder_in_use]->set_cooler(255);
+				extruder_set_cooler(255);
 				break;
 
 				//turn fan off
 			case 107:
-				ex[extruder_in_use]->set_cooler(0);
+				extruder_set_cooler(0);
 				break;
 
 				//set max extruder speed, 0-255 PWM
@@ -566,12 +506,12 @@ void process_string(char instruction[], int size)
 
                                 // Open the valve
                         case 126:
-                                ex[extruder_in_use]->valve_set(true, (int)(gc.P + 0.5));
+                                valve_set(true, (int)(gc.P + 0.5));
                                 break;
                                 
                                 // Close the valve
                         case 127:
-                                ex[extruder_in_use]->valve_set(false, (int)(gc.P + 0.5));
+                                valve_set(false, (int)(gc.P + 0.5));
                                 break;
                                                                 
 

@@ -1,115 +1,137 @@
-// Yep, this is actually -*- c++ -*-
 
+#include "parameters.h"
+#include "pins.h"
 #include "ThermistorTable.h"
+#include "extruder.h" 
 
-#define EXTRUDER_0_FORWARD true
-#define EXTRUDER_0_REVERSE false
-
-//these our the default values for the extruder.
-int extruder_speed = 128;
-int extruder_target_celsius = 0;
-int extruder_max_celsius = 0;
-byte extruder_heater_low = 64;
-byte extruder_heater_high = 255;
-byte extruder_heater_current = 0;
-
-//this is for doing encoder based extruder control
-int extruder_rpm = 0;
-long extruder_delay = 0;
-int extruder_error = 0;
-int last_extruder_error = 0;
-int extruder_error_delta = 0;
-bool extruder_direction = EXTRUDER_0_FORWARD;
-bool valve_open = false;
-
-void init_extruder()
+void manage_all_extruders()
 {
-	//default to cool...
-	extruder_set_temperature(-273);
-	
+    for(byte i = 0; i < EXTRUDER_COUNT; i++)
+       ex[i]->manage();
+}
+   
+extruder::extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin, byte vd_pin, byte ve_pin)
+{
+         motor_dir_pin = md_pin;
+         motor_speed_pin = ms_pin;
+         heater_pin = h_pin;
+         fan_pin = f_pin;
+         temp_pin = t_pin;
+         valve_dir_pin = vd_pin;
+         valve_en_pin = ve_pin;
+         
 	//setup our pins
-	pinMode(EXTRUDER_0_MOTOR_DIR_PIN, OUTPUT);
-	pinMode(EXTRUDER_0_MOTOR_SPEED_PIN, OUTPUT);
-	pinMode(EXTRUDER_0_HEATER_PIN, OUTPUT);
-	pinMode(EXTRUDER_0_FAN_PIN, OUTPUT);
-	pinMode(EXTRUDER_0_VALVE_DIR_PIN, OUTPUT); 
-        pinMode(EXTRUDER_0_VALVE_ENABLE_PIN, OUTPUT);
+	pinMode(motor_dir_pin, OUTPUT);
+	pinMode(motor_speed_pin, OUTPUT);
+	pinMode(heater_pin, OUTPUT);
+	pinMode(fan_pin, OUTPUT);
+	pinMode(temp_pin, INPUT);
+	pinMode(valve_dir_pin, OUTPUT); 
+        pinMode(valve_en_pin, OUTPUT);
 
 	//initialize values
-	digitalWrite(EXTRUDER_0_MOTOR_DIR_PIN, EXTRUDER_0_FORWARD);
-	analogWrite(EXTRUDER_0_FAN_PIN, 0);
-	analogWrite(EXTRUDER_0_HEATER_PIN, 0);
-	analogWrite(EXTRUDER_0_MOTOR_SPEED_PIN, 0);
-	digitalWrite(EXTRUDER_0_VALVE_DIR_PIN, false);
-	digitalWrite(EXTRUDER_0_VALVE_ENABLE_PIN, 0);
+	digitalWrite(motor_dir_pin, EXTRUDER_FORWARD);
+	analogWrite(fan_pin, 0);
+	analogWrite(heater_pin, 0);
+	analogWrite(motor_speed_pin, 0);
+	digitalWrite(valve_dir_pin, false);
+	digitalWrite(valve_en_pin, 0);
+
+        //these our the default values for the extruder.
+        e_speed = 128;
+        target_celsius = -273;
+        max_celsius = 0;
+        heater_low = 64;
+        heater_high = 255;
+        heater_current = 0;
+        valve_open = false;
+        
+//this is for doing encoder based extruder control
+        rpm = 0;
+        e_delay = 0;
+        error = 0;
+        last_extruder_error = 0;
+        error_delta = 0;
+        e_direction = EXTRUDER_FORWARD;
+        
+        //default to cool
+        set_temperature(target_celsius);
 }
 
-void wait_for_heater()
+void extruder::wait_for_heater()
 {
   //warmup if we're too cold.
-  while (extruder_get_temperature() < (extruder_target_celsius - 5))
+  byte count = 0;
+  int oldT, newT;
+  oldT = get_temperature();
+  while (get_temperature() < (target_celsius - 5))
   {
-	extruder_manage_temperature();
-	//Serial.print("T: ");
-        //Serial.println(extruder_get_temperature());
+	manage_all_extruders();
+        count++;
+        if(count > 20)
+        {
+            newT = get_temperature();
+            if(newT > oldT)
+            {
+               oldT = newT;
+            } else
+            {
+                // Temp's stuck - dud heater or temperature sensor
+                // Tell the host and return.
+                Serial.print("E: ");
+                Serial.println(newT);
+                return;
+            }
+            count = 0;
+        }
 	delay(1000);
   }  
 }
 
-void valve_set(bool open, int millis)
+void extruder::valve_set(bool open, int millis)
 {
         wait_for_heater();
 	valve_open = open;
-	digitalWrite(EXTRUDER_0_VALVE_DIR_PIN, open);
-        digitalWrite(EXTRUDER_0_VALVE_ENABLE_PIN, 1);
+	digitalWrite(valve_dir_pin, open);
+        digitalWrite(valve_en_pin, 1);
         delay(millis);
-        digitalWrite(EXTRUDER_0_VALVE_ENABLE_PIN, 0);
+        digitalWrite(valve_en_pin, 0);
 }
 
 
-void extruder_set_direction(bool direction)
+void extruder::set_direction(bool dir)
 {
-	extruder_direction = direction;
-	digitalWrite(EXTRUDER_0_MOTOR_DIR_PIN, direction);
+	e_direction = dir;
+	digitalWrite(motor_dir_pin, e_direction);
 }
 
-void extruder_set_speed(byte speed)
+void extruder::set_speed(byte sp)
 {
-        if(speed > 0)
+    e_speed = sp;
+    if(e_speed > 0)
           wait_for_heater();
-	analogWrite(EXTRUDER_0_MOTOR_SPEED_PIN, speed);
+    analogWrite(motor_speed_pin, e_speed);
 }
 
-void extruder_set_cooler(byte speed)
+void extruder::set_cooler(byte sp)
 {
-	analogWrite(EXTRUDER_0_FAN_PIN, speed);
+	analogWrite(fan_pin, sp);
 }
 
-void extruder_set_temperature(int temp)
+void extruder::set_temperature(int temp)
 {
-	extruder_target_celsius = temp;
-	extruder_max_celsius = (int)((float)temp * 1.1);
+	target_celsius = temp;
+	max_celsius = (temp*11)/10;
 }
 
 /**
 *  Samples the temperature and converts it to degrees celsius.
 *  Returns degrees celsius.
 */
-int extruder_get_temperature()
+int extruder::get_temperature()
 {
-	if (EXTRUDER_0_THERMISTOR_PIN > -1)
-		return extruder_read_thermistor();
-	else if (EXTRUDER_0_THERMOCOUPLE_PIN > -1)
-		return extruder_read_thermocouple();
-}
-
-/*
-* This function gives us the temperature from the thermistor in Celsius
-*/
-
-int extruder_read_thermistor()
-{
-	int raw = extruder_sample_temperature(EXTRUDER_0_THERMISTOR_PIN);
+#ifdef USE_THERMISTOR
+	int raw = sample_temperature(temp_pin);
 
 	int celsius = 0;
 	byte i;
@@ -134,20 +156,17 @@ int extruder_read_thermistor()
         else if (celsius < 0) celsius = 0; 
 
 	return celsius;
+#else
+  return ( 5.0 * sample_temperature(temp_pin) * 100.0) / 1024.0;
+#endif
 }
 
-/*
-* This function gives us the temperature from the thermocouple in Celsius
-*/
-int extruder_read_thermocouple()
-{
-	return ( 5.0 * extruder_sample_temperature(EXTRUDER_0_THERMOCOUPLE_PIN) * 100.0) / 1024.0;
-}
+
 
 /*
 * This function gives us an averaged sample of the analog temperature pin.
 */
-int extruder_sample_temperature(byte pin)
+int extruder::sample_temperature(byte pin)
 {
 	int raw = 0;
 	
@@ -163,27 +182,29 @@ int extruder_sample_temperature(byte pin)
 }
 
 /*!
-  Manages motor and heater based on measured temperature:
+  Manages extruder functions to keep temps, speeds etc
+  at the set levels.  Should be called only by manage_all_extruders(),
+  which should be called in all non-trivial loops.
   o If temp is too low, don't start the motor
   o Adjust the heater power to keep the temperature at the target
  */
-void extruder_manage_temperature()
+void extruder::manage()
 {
 	//make sure we know what our temp is.
-	int current_celsius = extruder_get_temperature();
+	int current_celsius = get_temperature();
         byte newheat = 0;
   
         //put the heater into high mode if we're not at our target.
-        if (current_celsius < extruder_target_celsius)
-                newheat = extruder_heater_high;
+        if (current_celsius < target_celsius)
+                newheat = heater_high;
         //put the heater on low if we're at our target.
-        else if (current_celsius < extruder_max_celsius)
-                newheat = extruder_heater_low;
+        else if (current_celsius < max_celsius)
+                newheat = heater_low;
         
         // Only update heat if it changed
-        if (extruder_heater_current != newheat) {
-                extruder_heater_current = newheat;
-                analogWrite(EXTRUDER_0_HEATER_PIN, extruder_heater_current);
+        if (heater_current != newheat) {
+                heater_current = newheat;
+                analogWrite(heater_pin, heater_current);
         }
 }
 
@@ -191,21 +212,21 @@ void extruder_manage_temperature()
 
 bool heat_on;
 
-void extruder_heater_test()
+void extruder::heater_test()
 {
-  int t = extruder_get_temperature();
+  int t = get_temperature();
   if(t < 50 && !heat_on)
   {
     Serial.println("\n *** Turning heater on.\n");
     heat_on = true;
-    analogWrite(EXTRUDER_0_HEATER_PIN, extruder_heater_high);
+    analogWrite(heater_pin, heater_high);
   }
 
   if(t > 100 && heat_on)
   {
     Serial.println("\n *** Turning heater off.\n");
     heat_on = false;
-    analogWrite(EXTRUDER_0_HEATER_PIN, 0);
+    analogWrite(heater_pin, 0);
   } 
  
   Serial.print("Temperature: ");
@@ -219,25 +240,25 @@ void extruder_heater_test()
   delay(2000);  
 }
 
-void extruder_drive_test()
+void extruder::drive_test()
 {
     Serial.println("Turning the extruder motor on forwards for 5 seconds.");
-    extruder_set_direction(true);
-    extruder_set_speed(200);
+    set_direction(true);
+    set_speed(200);
     delay(5000);
-    extruder_set_speed(0);
+    set_speed(0);
     Serial.println("Pausing for 2 seconds.");
     delay(2000);  
     Serial.println("Turning the extruder motor on backwards for 5 seconds.");
-    extruder_set_direction(false);
-    extruder_set_speed(200);
+    set_direction(false);
+    set_speed(200);
     delay(5000);
-    extruder_set_speed(0);    
+    set_speed(0);    
     Serial.println("Pausing for 2 seconds.");
     delay(2000);
 }
 
-void extruder_valve_test()
+void extruder::valve_test()
 {
     Serial.println("Opening the valve.");
     valve_set(true, 500);
@@ -249,14 +270,14 @@ void extruder_valve_test()
     delay(2000);  
 }
 
-void extruder_fan_test()
+void extruder::fan_test()
 {
     Serial.println("Fan on.");
-    extruder_set_cooler(255);
+    set_cooler(255);
     Serial.println("Pausing for 2 seconds.");
     delay(2000);  
     Serial.println("Fan off.");
-    extruder_set_cooler(0);
+    set_cooler(0);
     Serial.println("Pausing for 2 seconds.");
     delay(2000);  
 }

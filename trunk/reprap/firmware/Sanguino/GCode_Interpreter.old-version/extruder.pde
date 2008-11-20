@@ -64,6 +64,7 @@ void valve_set(bool open, int millis)
         digitalWrite(EXTRUDER_0_VALVE_ENABLE_PIN, 1);
         delay(millis);
         digitalWrite(EXTRUDER_0_VALVE_ENABLE_PIN, 0);
+        digitalWrite(EXTRUDER_0_VALVE_DIR_PIN, 0);
 }
 
 
