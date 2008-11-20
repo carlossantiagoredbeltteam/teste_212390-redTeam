@@ -1,3 +1,15 @@
+#ifndef PARAMETERS_H
+#define PARAMETERS_H
+
+// Comment the next line out to use the Arduino
+//#define SANGUINO
+
+// Uncomment the next line to run stand-alone tests on the machine (also see the 
+// ends of this, the process_string, the extruder, and the stepper_control tabs).
+//#define TEST_MACHINE
+// If that works, comment out the next line to test the rest:
+#define COMMS_TEST
+
 // define the parameters of our machine.
 #define X_STEPS_PER_MM   7.976
 #define X_STEPS_PER_INCH (X_STEPS_PER_MM*25.4)
@@ -23,5 +35,5 @@
 // RepRap opto endstops are *not* inverting.
 #define SENSORS_INVERTING 0
 
-// How many temperature samples to take.  each sample takes about 100 usecs.
-#define TEMPERATURE_SAMPLES 3
+
+#endif
