@@ -1,5 +1,5 @@
 999
-dxflib 2.1.2.0
+dxflib 2.2.0.0
   0
 SECTION
   2
@@ -47,7 +47,7 @@ Standard
   9
 $CLAYER
   8
-Rotor Plate Text
+Bearings
   9
 $DIMEXO
  40
@@ -59,7 +59,7 @@ $DIMTXT
   9
 $CLAYER
   8
-Layer 4 Text
+Rotor Plate
   0
 ENDSEC
   0
@@ -911,7 +911,7 @@ LAYER
 100
 AcDbSymbolTable
  70
-25
+23
   0
 LAYER
   5
@@ -926,6 +926,8 @@ AcDbLayerTableRecord
 0
  62
 7
+420
+16777215
   6
 CONTINUOUS
 370
@@ -946,6 +948,8 @@ Rotor Plate
 0
  62
 7
+420
+16777215
   6
 CONTINUOUS
 370
@@ -961,11 +965,13 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-Layer 1
+Layer 8
  70
 0
  62
 7
+420
+16777215
   6
 CONTINUOUS
 370
@@ -981,11 +987,13 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-Layer 2
+Layer 7
  70
 0
  62
 7
+420
+16777215
   6
 CONTINUOUS
 370
@@ -1001,11 +1009,13 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-Layer 3
+Layer 6
  70
 0
  62
 7
+420
+16777215
   6
 CONTINUOUS
 370
@@ -1026,6 +1036,8 @@ Layer 4
 0
  62
 7
+420
+16777215
   6
 CONTINUOUS
 370
@@ -1041,11 +1053,13 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-Layer 5
+Layer 3
  70
 0
  62
 7
+420
+16777215
   6
 CONTINUOUS
 370
@@ -1061,11 +1075,13 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-Layer 6
+Layer 2
  70
 0
  62
 7
+420
+16777215
   6
 CONTINUOUS
 370
@@ -1081,11 +1097,13 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-Layer 7
+Layer 1
  70
 0
  62
 7
+420
+16777215
   6
 CONTINUOUS
 370
@@ -1101,11 +1119,13 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-Layer 8
+Motor Gear
  70
 0
  62
 7
+420
+16777215
   6
 CONTINUOUS
 370
@@ -1121,11 +1141,13 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-Layer 9
+Rotor Gear
  70
 0
  62
 7
+420
+16777215
   6
 CONTINUOUS
 370
@@ -1141,11 +1163,13 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-Motor Gear
+Layer 8 Text
  70
 0
  62
-7
+4
+420
+65535
   6
 CONTINUOUS
 370
@@ -1161,11 +1185,13 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-Rotor Gear
+Layer 7 Text
  70
 0
  62
-7
+4
+420
+65535
   6
 CONTINUOUS
 370
@@ -1181,11 +1207,13 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-Layer 1 Text
+Layer 6 Text
  70
 0
  62
 4
+420
+65535
   6
 CONTINUOUS
 370
@@ -1201,11 +1229,13 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-Layer 2 Text
+Layer 4 Text
  70
 0
  62
 4
+420
+65535
   6
 CONTINUOUS
 370
@@ -1226,6 +1256,8 @@ Layer 3 Text
 0
  62
 4
+420
+65535
   6
 CONTINUOUS
 370
@@ -1241,11 +1273,13 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-Layer 4 Text
+Layer 2 Text
  70
 0
  62
 4
+420
+65535
   6
 CONTINUOUS
 370
@@ -1261,11 +1295,13 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-Layer 5 Text
+Layer 1 Text
  70
 0
  62
 4
+420
+65535
   6
 CONTINUOUS
 370
@@ -1281,11 +1317,13 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-Layer 6 Text
+Motor Gear Text
  70
 0
  62
 4
+420
+65535
   6
 CONTINUOUS
 370
@@ -1301,11 +1339,13 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-Layer 7 Text
+Rotor Gear Text
  70
 0
  62
 4
+420
+65535
   6
 CONTINUOUS
 370
@@ -1321,11 +1361,13 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-Layer 8 Text
+Rotor Plate Text
  70
 0
  62
 4
+420
+65535
   6
 CONTINUOUS
 370
@@ -1341,11 +1383,13 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-Motor Gear Text
+Layer 5
  70
 0
  62
-4
+7
+420
+16777215
   6
 CONTINUOUS
 370
@@ -1361,51 +1405,13 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-Rotor Gear Text
+Layer 5 Text
  70
 0
  62
 4
-  6
-CONTINUOUS
-370
-0
-390
-F
-  0
-LAYER
-  5
-59
-100
-AcDbSymbolTableRecord
-100
-AcDbLayerTableRecord
-  2
-Rotor Plate Text
- 70
-0
- 62
-4
-  6
-CONTINUOUS
-370
-0
-390
-F
-  0
-LAYER
-  5
-5A
-100
-AcDbSymbolTableRecord
-100
-AcDbLayerTableRecord
-  2
-Layer 9 Text
- 70
-0
- 62
-4
+420
+65535
   6
 CONTINUOUS
 370
@@ -1739,6 +1745,54 @@ ENTITIES
   0
 CIRCLE
   5
+59
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 7
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+69.4999850054044543
+ 20
+91.4731265266271834
+ 30
+0.0
+ 40
+1.4299999999999999
+  0
+CIRCLE
+  5
+5A
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 7
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+69.4999850054044259
+ 20
+73.8731265266271464
+ 30
+0.0
+ 40
+1.4299999999999999
+  0
+CIRCLE
+  5
 5B
 100
 AcDbEntity
@@ -1753,13 +1807,13 @@ Layer 7
   6
 ByLayer
  10
-49.9999850054043975
+69.4999850054044543
  20
-34.7798160249545276
+91.4731265266271834
  30
 0.0
  40
-4.25
+1.4299999999999999
   0
 CIRCLE
   5
@@ -1777,21 +1831,19 @@ Layer 7
   6
 ByLayer
  10
-92.5
+69.4999850054044259
  20
-50.0
+73.8731265266271464
  30
 0.0
  40
-2.5
+1.4299999999999999
   0
-CIRCLE
+ARC
   5
 5D
 100
 AcDbEntity
-100
-AcDbCircle
   8
 Layer 7
  62
@@ -1800,22 +1852,30 @@ Layer 7
 -1
   6
 ByLayer
+100
+AcDbCircle
  10
-92.5
+98.0
  20
-7.4999999999999991
+98.0
  30
 0.0
  40
-2.5
+2.0
+100
+AcDbArc
+ 50
+0.0
+ 51
+90.0
   0
-CIRCLE
+LINE
   5
 5E
 100
 AcDbEntity
 100
-AcDbCircle
+AcDbLine
   8
 Layer 7
  62
@@ -1825,21 +1885,23 @@ Layer 7
   6
 ByLayer
  10
-7.4999999999999991
+98.0
  20
-7.5
+100.0
  30
 0.0
- 40
-2.5
+ 11
+2.0
+ 21
+100.0
+ 31
+0.0
   0
-CIRCLE
+ARC
   5
 5F
 100
 AcDbEntity
-100
-AcDbCircle
   8
 Layer 7
  62
@@ -1848,22 +1910,30 @@ Layer 7
 -1
   6
 ByLayer
+100
+AcDbCircle
  10
-7.5
+2.0
  20
-50.0
+98.0
  30
 0.0
  40
-2.5
+2.0
+100
+AcDbArc
+ 50
+90.0
+ 51
+180.0
   0
-CIRCLE
+LINE
   5
 60
 100
 AcDbEntity
 100
-AcDbCircle
+AcDbLine
   8
 Layer 7
  62
@@ -1873,13 +1943,17 @@ Layer 7
   6
 ByLayer
  10
-7.5
+0.0
  20
-92.5
+98.0
  30
 0.0
- 40
-2.5
+ 11
+0.0
+ 21
+2.0
+ 31
+0.0
   0
 ARC
   5
@@ -1897,13 +1971,13 @@ ByLayer
 100
 AcDbCircle
  10
-30.5
+2.0
  20
-70.5
+2.0
  30
 0.0
  40
-0.5
+2.0
 100
 AcDbArc
  50
@@ -1927,51 +2001,21 @@ Layer 7
   6
 ByLayer
  10
-30.0
+2.0
  20
-99.5
+0.0
  30
 0.0
  11
-30.0
+98.0
  21
-70.5
+0.0
  31
 0.0
   0
-ARC
-  5
-63
-100
-AcDbEntity
-  8
-Layer 7
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-29.5
- 20
-99.5
- 30
-0.0
- 40
-0.5
-100
-AcDbArc
- 50
-0.0
- 51
-90.0
-  0
 LINE
   5
-64
+63
 100
 AcDbEntity
 100
@@ -1985,21 +2029,21 @@ Layer 7
   6
 ByLayer
  10
-99.5
+100.0
  20
-70.0
+2.0
  30
 0.0
  11
-30.5
+100.0
  21
-70.0
+98.0
  31
 0.0
   0
 ARC
   5
-65
+64
 100
 AcDbEntity
   8
@@ -2013,19 +2057,43 @@ ByLayer
 100
 AcDbCircle
  10
-99.5
+98.0
  20
-69.5
+2.0
  30
 0.0
  40
-0.5
+2.0
 100
 AcDbArc
  50
-0.0
+270.0
  51
-90.0
+0.0
+  0
+CIRCLE
+  5
+65
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 7
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+49.9999850054043975
+ 20
+34.7798160249545276
+ 30
+0.0
+ 40
+8.0
   0
 MTEXT
   5
@@ -2063,15 +2131,17 @@ standard
  50
 0.0
  73
-1
+0
  44
 1.0
   0
-ARC
+CIRCLE
   5
 67
 100
 AcDbEntity
+100
+AcDbCircle
   8
 Layer 7
  62
@@ -2080,30 +2150,22 @@ Layer 7
 -1
   6
 ByLayer
-100
-AcDbCircle
  10
-98.0
+92.5
  20
-1.9999999999999998
+50.0
  30
 0.0
  40
-2.0
-100
-AcDbArc
- 50
-270.0
- 51
-360.0
+2.4300000000000002
   0
-LINE
+CIRCLE
   5
 68
 100
 AcDbEntity
 100
-AcDbLine
+AcDbCircle
   8
 Layer 7
  62
@@ -2113,23 +2175,21 @@ Layer 7
   6
 ByLayer
  10
-2.0
+92.5
  20
-0.0
+7.4999999999999991
  30
 0.0
- 11
-98.0
- 21
-0.0
- 31
-0.0
+ 40
+2.4300000000000002
   0
-ARC
+CIRCLE
   5
 69
 100
 AcDbEntity
+100
+AcDbCircle
   8
 Layer 7
  62
@@ -2138,30 +2198,22 @@ Layer 7
 -1
   6
 ByLayer
-100
-AcDbCircle
  10
-2.0
+7.4999999999999991
  20
-2.0
+7.5
  30
 0.0
  40
-2.0
-100
-AcDbArc
- 50
-180.0
- 51
-270.0
+2.4300000000000002
   0
-LINE
+CIRCLE
   5
 6A
 100
 AcDbEntity
 100
-AcDbLine
+AcDbCircle
   8
 Layer 7
  62
@@ -2171,25 +2223,21 @@ Layer 7
   6
 ByLayer
  10
-0.0
+7.5
  20
-98.0
+50.0
  30
 0.0
- 11
-0.0
- 21
-2.0
- 31
-0.0
+ 40
+2.4300000000000002
   0
-LINE
+CIRCLE
   5
 6B
 100
 AcDbEntity
 100
-AcDbLine
+AcDbCircle
   8
 Layer 7
  62
@@ -2199,23 +2247,21 @@ Layer 7
   6
 ByLayer
  10
-29.5
+7.5
  20
-100.0
+92.5
  30
 0.0
- 11
-2.0
- 21
-100.0
- 31
-0.0
+ 40
+2.4300000000000002
   0
-ARC
+CIRCLE
   5
 6C
 100
 AcDbEntity
+100
+AcDbCircle
   8
 Layer 7
  62
@@ -2224,22 +2270,14 @@ Layer 7
 -1
   6
 ByLayer
-100
-AcDbCircle
  10
-2.0
+92.5
  20
-98.0
+92.5
  30
 0.0
  40
-2.0
-100
-AcDbArc
- 50
-90.0
- 51
-180.0
+2.4300000000000002
   0
 CIRCLE
   5
@@ -2263,15 +2301,13 @@ ByLayer
  30
 0.0
  40
-8.0
+11.0
   0
-CIRCLE
+ARC
   5
 6E
 100
 AcDbEntity
-100
-AcDbCircle
   8
 Layer 1
  62
@@ -2280,22 +2316,30 @@ Layer 1
 -1
   6
 ByLayer
+100
+AcDbCircle
  10
-7.5
+30.5
  20
-292.5
+270.5
  30
 0.0
  40
-2.5
+0.5
+100
+AcDbArc
+ 50
+180.0
+ 51
+270.0
   0
-CIRCLE
+LINE
   5
 6F
 100
 AcDbEntity
 100
-AcDbCircle
+AcDbLine
   8
 Layer 1
  62
@@ -2305,21 +2349,23 @@ Layer 1
   6
 ByLayer
  10
-7.5
+30.0
  20
-207.5
+299.5
  30
 0.0
- 40
-2.5
+ 11
+30.0
+ 21
+270.5
+ 31
+0.0
   0
-CIRCLE
+ARC
   5
 70
 100
 AcDbEntity
-100
-AcDbCircle
   8
 Layer 1
  62
@@ -2328,22 +2374,30 @@ Layer 1
 -1
   6
 ByLayer
+100
+AcDbCircle
  10
-92.5
+29.5
  20
-207.5
+299.5
  30
 0.0
  40
-2.5
+0.5
+100
+AcDbArc
+ 50
+0.0
+ 51
+90.0
   0
-CIRCLE
+LINE
   5
 71
 100
 AcDbEntity
 100
-AcDbCircle
+AcDbLine
   8
 Layer 1
  62
@@ -2353,21 +2407,23 @@ Layer 1
   6
 ByLayer
  10
-7.5
+99.5
  20
-250.0
+270.0
  30
 0.0
- 40
-2.5
+ 11
+30.5
+ 21
+270.0
+ 31
+0.0
   0
-CIRCLE
+ARC
   5
 72
 100
 AcDbEntity
-100
-AcDbCircle
   8
 Layer 1
  62
@@ -2376,22 +2432,30 @@ Layer 1
 -1
   6
 ByLayer
+100
+AcDbCircle
  10
-92.5
+99.5
  20
-250.0
+269.5
  30
 0.0
  40
-2.5
+0.5
+100
+AcDbArc
+ 50
+0.0
+ 51
+90.0
   0
-CIRCLE
+LINE
   5
 73
 100
 AcDbEntity
 100
-AcDbCircle
+AcDbLine
   8
 Layer 1
  62
@@ -2401,21 +2465,55 @@ Layer 1
   6
 ByLayer
  10
-69.4999850054044543
+29.5
  20
-291.4731265266271976
+300.0
  30
 0.0
- 40
-1.4299999999999999
+ 11
+2.0
+ 21
+300.0
+ 31
+0.0
   0
-CIRCLE
+ARC
   5
 74
 100
 AcDbEntity
+  8
+Layer 1
+ 62
+256
+370
+-1
+  6
+ByLayer
 100
 AcDbCircle
+ 10
+2.0
+ 20
+298.0
+ 30
+0.0
+ 40
+2.0
+100
+AcDbArc
+ 50
+90.0
+ 51
+180.0
+  0
+LINE
+  5
+75
+100
+AcDbEntity
+100
+AcDbLine
   8
 Layer 1
  62
@@ -2425,17 +2523,81 @@ Layer 1
   6
 ByLayer
  10
-69.4999850054044259
+0.0
  20
-273.8731265266271748
+298.0
+ 30
+0.0
+ 11
+0.0
+ 21
+202.0
+ 31
+0.0
+  0
+ARC
+  5
+76
+100
+AcDbEntity
+  8
+Layer 1
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+2.0
+ 20
+202.0
  30
 0.0
  40
-1.4299999999999999
+2.0
+100
+AcDbArc
+ 50
+180.0
+ 51
+270.0
+  0
+ARC
+  5
+77
+100
+AcDbEntity
+  8
+Layer 1
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+98.0
+ 20
+202.0
+ 30
+0.0
+ 40
+2.0
+100
+AcDbArc
+ 50
+270.0
+ 51
+0.0
   0
 MTEXT
   5
-75
+78
 100
 AcDbEntity
 100
@@ -2469,103 +2631,17 @@ standard
  50
 0.0
  73
-1
+0
  44
 1.0
   0
-ARC
-  5
-76
-100
-AcDbEntity
-  8
-Layer 1
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-2.0
- 20
-298.0
- 30
-0.0
- 40
-2.0
-100
-AcDbArc
- 50
-90.0
- 51
-180.0
-  0
-LINE
-  5
-77
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Layer 1
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-98.0
- 20
-300.0
- 30
-0.0
- 11
-2.0
- 21
-300.0
- 31
-0.0
-  0
-ARC
-  5
-78
-100
-AcDbEntity
-  8
-Layer 1
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-98.0
- 20
-298.0
- 30
-0.0
- 40
-2.0
-100
-AcDbArc
- 50
-0.0
- 51
-90.0
-  0
-ARC
+CIRCLE
   5
 79
 100
 AcDbEntity
+100
+AcDbCircle
   8
 Layer 1
  62
@@ -2574,30 +2650,22 @@ Layer 1
 -1
   6
 ByLayer
-100
-AcDbCircle
  10
-98.0
+7.5
  20
-202.0
+292.5
  30
 0.0
  40
-2.0
-100
-AcDbArc
- 50
-270.0
- 51
-0.0
+2.4300000000000002
   0
-LINE
+CIRCLE
   5
 7A
 100
 AcDbEntity
 100
-AcDbLine
+AcDbCircle
   8
 Layer 1
  62
@@ -2607,25 +2675,93 @@ Layer 1
   6
 ByLayer
  10
-0.0
+7.5
  20
-298.0
+250.0
  30
 0.0
- 11
-0.0
- 21
-202.0
- 31
-0.0
+ 40
+2.4300000000000002
   0
-ARC
+CIRCLE
   5
 7B
 100
 AcDbEntity
+100
+AcDbCircle
   8
 Layer 1
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+7.5
+ 20
+207.5
+ 30
+0.0
+ 40
+2.4300000000000002
+  0
+CIRCLE
+  5
+7C
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 1
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+92.5
+ 20
+207.5
+ 30
+0.0
+ 40
+2.4300000000000002
+  0
+CIRCLE
+  5
+7D
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 1
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+92.5
+ 20
+250.0
+ 30
+0.0
+ 40
+2.4300000000000002
+  0
+ARC
+  5
+7E
+100
+AcDbEntity
+  8
+Layer 2
  62
 256
 370
@@ -2635,7 +2771,183 @@ ByLayer
 100
 AcDbCircle
  10
+130.5
+ 20
+270.5
+ 30
+0.0
+ 40
+0.5
+100
+AcDbArc
+ 50
+180.0
+ 51
+270.0
+  0
+LINE
+  5
+7F
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 2
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+130.0
+ 20
+299.5
+ 30
+0.0
+ 11
+130.0
+ 21
+270.5
+ 31
+0.0
+  0
+ARC
+  5
+80
+100
+AcDbEntity
+  8
+Layer 2
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+129.5
+ 20
+299.5
+ 30
+0.0
+ 40
+0.5
+100
+AcDbArc
+ 50
+0.0
+ 51
+90.0
+  0
+LINE
+  5
+81
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 2
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+199.5
+ 20
+270.0
+ 30
+0.0
+ 11
+130.5
+ 21
+270.0
+ 31
+0.0
+  0
+ARC
+  5
+82
+100
+AcDbEntity
+  8
+Layer 2
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+199.5
+ 20
+269.5
+ 30
+0.0
+ 40
+0.5
+100
+AcDbArc
+ 50
+0.0
+ 51
+90.0
+  0
+ARC
+  5
+83
+100
+AcDbEntity
+  8
+Layer 2
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+198.0
+ 20
+202.0
+ 30
+0.0
+ 40
 2.0
+100
+AcDbArc
+ 50
+270.0
+ 51
+360.0
+  0
+ARC
+  5
+84
+100
+AcDbEntity
+  8
+Layer 2
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+102.0
  20
 202.0
  30
@@ -2649,9 +2961,95 @@ AcDbArc
  51
 270.0
   0
+LINE
+  5
+85
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 2
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+100.0
+ 20
+298.0
+ 30
+0.0
+ 11
+100.0
+ 21
+202.0
+ 31
+0.0
+  0
+LINE
+  5
+86
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 2
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+129.5
+ 20
+300.0
+ 30
+0.0
+ 11
+102.0
+ 21
+300.0
+ 31
+0.0
+  0
+ARC
+  5
+87
+100
+AcDbEntity
+  8
+Layer 2
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+102.0
+ 20
+298.0
+ 30
+0.0
+ 40
+2.0
+100
+AcDbArc
+ 50
+90.0
+ 51
+180.0
+  0
 CIRCLE
   5
-7C
+88
 100
 AcDbEntity
 100
@@ -2671,179 +3069,11 @@ ByLayer
  30
 0.0
  40
-11.0
-  0
-CIRCLE
-  5
-7D
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Layer 2
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-107.5
- 20
-292.5
- 30
-0.0
- 40
-2.5
-  0
-CIRCLE
-  5
-7E
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Layer 2
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-107.5
- 20
-250.0
- 30
-0.0
- 40
-2.5
-  0
-CIRCLE
-  5
-7F
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Layer 2
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-107.5
- 20
-207.5
- 30
-0.0
- 40
-2.5
-  0
-CIRCLE
-  5
-80
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Layer 2
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-192.5
- 20
-207.5
- 30
-0.0
- 40
-2.5
-  0
-CIRCLE
-  5
-81
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Layer 2
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-192.5
- 20
-250.0
- 30
-0.0
- 40
-2.5
-  0
-CIRCLE
-  5
-82
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Layer 2
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-169.4999850054044543
- 20
-291.4731265266271976
- 30
-0.0
- 40
-1.4299999999999999
-  0
-CIRCLE
-  5
-83
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Layer 2
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-169.4999850054044259
- 20
-273.8731265266271748
- 30
-0.0
- 40
-1.4299999999999999
+8.0
   0
 MTEXT
   5
-84
+89
 100
 AcDbEntity
 100
@@ -2877,161 +3107,17 @@ standard
  50
 0.0
  73
-1
+0
  44
 1.0
   0
-ARC
-  5
-85
-100
-AcDbEntity
-  8
-Layer 2
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-198.0
- 20
-298.0
- 30
-0.0
- 40
-2.0
-100
-AcDbArc
- 50
-0.0
- 51
-90.0
-  0
-ARC
-  5
-86
-100
-AcDbEntity
-  8
-Layer 2
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-198.0
- 20
-202.0
- 30
-0.0
- 40
-2.0
-100
-AcDbArc
- 50
-270.0
- 51
-0.0
-  0
-ARC
-  5
-87
-100
-AcDbEntity
-  8
-Layer 2
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-102.0
- 20
-202.0
- 30
-0.0
- 40
-2.0
-100
-AcDbArc
- 50
-180.0
- 51
-270.0
-  0
-LINE
-  5
-88
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Layer 2
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-100.0
- 20
-298.0
- 30
-0.0
- 11
-100.0
- 21
-202.0
- 31
-0.0
-  0
-LINE
-  5
-89
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Layer 2
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-198.0
- 20
-300.0
- 30
-0.0
- 11
-102.0
- 21
-300.0
- 31
-0.0
-  0
-ARC
+CIRCLE
   5
 8A
 100
 AcDbEntity
+100
+AcDbCircle
   8
 Layer 2
  62
@@ -3040,22 +3126,14 @@ Layer 2
 -1
   6
 ByLayer
-100
-AcDbCircle
  10
-102.0
+192.5
  20
-298.0
+250.0
  30
 0.0
  40
-2.0
-100
-AcDbArc
- 50
-90.0
- 51
-180.0
+2.4300000000000002
   0
 CIRCLE
   5
@@ -3065,7 +3143,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-Layer 3
+Layer 2
  62
 256
 370
@@ -3073,13 +3151,13 @@ Layer 3
   6
 ByLayer
  10
-249.9999850054043975
+192.5
  20
-234.7798160249545276
+207.5
  30
 0.0
  40
-4.25
+2.4300000000000002
   0
 CIRCLE
   5
@@ -3089,7 +3167,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-Layer 3
+Layer 2
  62
 256
 370
@@ -3097,13 +3175,13 @@ Layer 3
   6
 ByLayer
  10
-292.5
+107.5
  20
-250.0
+207.5
  30
 0.0
  40
-2.5
+2.4300000000000002
   0
 CIRCLE
   5
@@ -3113,7 +3191,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-Layer 3
+Layer 2
  62
 256
 370
@@ -3121,13 +3199,13 @@ Layer 3
   6
 ByLayer
  10
-292.5
+107.5
  20
-207.5
+250.0
  30
 0.0
  40
-2.5
+2.4300000000000002
   0
 CIRCLE
   5
@@ -3137,7 +3215,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-Layer 3
+Layer 2
  62
 256
 370
@@ -3145,13 +3223,13 @@ Layer 3
   6
 ByLayer
  10
-207.5
+107.5
  20
-207.5
+292.5
  30
 0.0
  40
-2.5
+2.4300000000000002
   0
 CIRCLE
   5
@@ -3169,13 +3247,13 @@ Layer 3
   6
 ByLayer
  10
-207.5
+249.9999850054043975
  20
-250.0
+282.6731265266270725
  30
 0.0
  40
-2.5
+4.8250000000000002
   0
 CIRCLE
   5
@@ -3193,13 +3271,13 @@ Layer 3
   6
 ByLayer
  10
-207.5
+269.4999850054044828
  20
-292.5
+291.4731265266271976
  30
 0.0
  40
-2.5
+1.4299999999999999
   0
 CIRCLE
   5
@@ -3217,30 +3295,6 @@ Layer 3
   6
 ByLayer
  10
-269.4999850054044828
- 20
-291.4731265266271976
- 30
-0.0
- 40
-1.4299999999999999
-  0
-CIRCLE
-  5
-92
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Layer 3
- 62
-256
-370
--1
-  6
-ByLayer
- 10
 269.4999850054044259
  20
 273.8731265266271748
@@ -3249,13 +3303,11 @@ ByLayer
  40
 1.4299999999999999
   0
-CIRCLE
+ARC
   5
-93
+92
 100
 AcDbEntity
-100
-AcDbCircle
   8
 Layer 3
  62
@@ -3264,22 +3316,60 @@ Layer 3
 -1
   6
 ByLayer
+100
+AcDbCircle
  10
-269.4999850054044828
+202.0
  20
-291.4731265266271976
+298.0
  30
 0.0
  40
-1.4299999999999999
+2.0
+100
+AcDbArc
+ 50
+90.0
+ 51
+180.0
   0
-CIRCLE
+ARC
+  5
+93
+100
+AcDbEntity
+  8
+Layer 3
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+298.0
+ 20
+202.0
+ 30
+0.0
+ 40
+2.0
+100
+AcDbArc
+ 50
+270.0
+ 51
+0.0
+  0
+LINE
   5
 94
 100
 AcDbEntity
 100
-AcDbCircle
+AcDbLine
   8
 Layer 3
  62
@@ -3289,17 +3379,223 @@ Layer 3
   6
 ByLayer
  10
-269.4999850054044259
+200.0
  20
-273.8731265266271748
+298.0
+ 30
+0.0
+ 11
+200.0
+ 21
+202.0
+ 31
+0.0
+  0
+ARC
+  5
+95
+100
+AcDbEntity
+  8
+Layer 3
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+202.0
+ 20
+202.0
  30
 0.0
  40
-1.4299999999999999
+2.0
+100
+AcDbArc
+ 50
+180.0
+ 51
+270.0
+  0
+LINE
+  5
+96
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 3
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+274.7999850054043804
+ 20
+271.5731265266270498
+ 30
+0.0
+ 11
+274.7999850054043804
+ 21
+298.0
+ 31
+0.0
+  0
+LINE
+  5
+97
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 3
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+272.7999850054043804
+ 20
+300.0
+ 30
+0.0
+ 11
+202.0
+ 21
+300.0
+ 31
+0.0
+  0
+ARC
+  5
+98
+100
+AcDbEntity
+  8
+Layer 3
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+272.7999850054043804
+ 20
+298.0
+ 30
+0.0
+ 40
+2.0
+100
+AcDbArc
+ 50
+0.0
+ 51
+90.0
+  0
+LINE
+  5
+99
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 3
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+274.7999850054043804
+ 20
+271.5731265266270498
+ 30
+0.0
+ 11
+298.0
+ 21
+271.5731265266271066
+ 31
+0.0
+  0
+LINE
+  5
+9A
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 3
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+300.0
+ 20
+202.0
+ 30
+0.0
+ 11
+300.0
+ 21
+269.5731265266271066
+ 31
+0.0
+  0
+ARC
+  5
+9B
+100
+AcDbEntity
+  8
+Layer 3
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+298.0
+ 20
+269.5731265266271066
+ 30
+0.0
+ 40
+2.0
+100
+AcDbArc
+ 50
+0.0
+ 51
+90.0
   0
 MTEXT
   5
-95
+9C
 100
 AcDbEntity
 100
@@ -3333,247 +3629,49 @@ standard
  50
 0.0
  73
-1
+0
  44
 1.0
   0
 ARC
   5
-96
-100
-AcDbEntity
-  8
-Layer 3
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-298.0
- 20
-298.0
- 30
-0.0
- 40
-2.0
-100
-AcDbArc
- 50
-0.0
- 51
-90.0
-  0
-LINE
-  5
-97
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Layer 3
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-298.0
- 20
-300.0
- 30
-0.0
- 11
-202.0
- 21
-300.0
- 31
-0.0
-  0
-ARC
-  5
-98
-100
-AcDbEntity
-  8
-Layer 3
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-202.0
- 20
-298.0
- 30
-0.0
- 40
-2.0
-100
-AcDbArc
- 50
-90.0
- 51
-180.0
-  0
-LINE
-  5
-99
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Layer 3
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-200.0
- 20
-298.0
- 30
-0.0
- 11
-200.0
- 21
-202.0
- 31
-0.0
-  0
-ARC
-  5
-9A
-100
-AcDbEntity
-  8
-Layer 3
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-202.0
- 20
-202.0
- 30
-0.0
- 40
-2.0
-100
-AcDbArc
- 50
-180.0
- 51
-270.0
-  0
-LINE
-  5
-9B
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Layer 3
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-300.0
- 20
-202.0
- 30
-0.0
- 11
-300.0
- 21
-298.0
- 31
-0.0
-  0
-ARC
-  5
-9C
-100
-AcDbEntity
-  8
-Layer 3
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-298.0
- 20
-202.0
- 30
-0.0
- 40
-2.0
-100
-AcDbArc
- 50
-270.0
- 51
-0.0
-  0
-CIRCLE
-  5
 9D
 100
 AcDbEntity
-100
-AcDbCircle
   8
-Layer 4
+Layer 3
  62
 256
 370
 -1
   6
 ByLayer
+100
+AcDbCircle
  10
-7.5
+237.9999850054043975
  20
-192.5
+200.8386905280002566
  30
 0.0
  40
-2.5
+2.0
+100
+AcDbArc
+ 50
+0.0
+ 51
+70.528779365509422
   0
-CIRCLE
+LINE
   5
 9E
 100
 AcDbEntity
 100
-AcDbCircle
+AcDbLine
   8
-Layer 4
+Layer 3
  62
 256
 370
@@ -3581,71 +3679,87 @@ Layer 4
   6
 ByLayer
  10
-7.5
+259.9999850054043691
  20
-150.0
+200.0
  30
 0.0
- 40
-2.5
+ 11
+259.9999850054043691
+ 21
+200.8386905280002281
+ 31
+0.0
   0
-CIRCLE
+ARC
   5
 9F
 100
 AcDbEntity
-100
-AcDbCircle
   8
-Layer 4
+Layer 3
  62
 256
 370
 -1
   6
 ByLayer
+100
+AcDbCircle
  10
-7.5
+249.9999850054043975
  20
-107.5
+234.7798160249545276
  30
 0.0
  40
-2.5
+34.0
+100
+AcDbArc
+ 50
+289.4712206344906917
+ 51
+250.5287793655092514
   0
-CIRCLE
+ARC
   5
 A0
 100
 AcDbEntity
-100
-AcDbCircle
   8
-Layer 4
+Layer 3
  62
 256
 370
 -1
   6
 ByLayer
+100
+AcDbCircle
  10
-92.5
+261.9999850054043691
  20
-107.5
+200.8386905280002281
  30
 0.0
  40
-2.5
+2.0
+100
+AcDbArc
+ 50
+109.4712206344910044
+ 51
+180.0
   0
-CIRCLE
+LINE
   5
 A1
 100
 AcDbEntity
 100
-AcDbCircle
+AcDbLine
   8
-Layer 4
+Layer 3
  62
 256
 370
@@ -3653,43 +3767,41 @@ Layer 4
   6
 ByLayer
  10
-92.5
+239.9999850054043975
  20
-150.0
+200.0
  30
 0.0
- 40
-2.5
+ 11
+239.9999850054043975
+ 21
+200.8386905280002566
+ 31
+0.0
   0
-ARC
+CIRCLE
   5
 A2
 100
 AcDbEntity
+100
+AcDbCircle
   8
-Layer 4
+Layer 3
  62
 256
 370
 -1
   6
 ByLayer
-100
-AcDbCircle
  10
-49.9999850054043975
+292.5
  20
-134.7798160249545276
+250.0
  30
 0.0
  40
-36.0
-100
-AcDbArc
- 50
-284.9600621400871887
- 51
-255.0399378599128113
+2.4300000000000002
   0
 CIRCLE
   5
@@ -3699,7 +3811,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-Layer 4
+Layer 3
  62
 256
 370
@@ -3707,17 +3819,89 @@ Layer 4
   6
 ByLayer
  10
-69.4999850054044543
+292.5
  20
-191.4731265266271976
+207.5
  30
 0.0
  40
-1.4299999999999999
+2.4300000000000002
   0
 CIRCLE
   5
 A4
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 3
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+207.5
+ 20
+207.5
+ 30
+0.0
+ 40
+2.4300000000000002
+  0
+CIRCLE
+  5
+A5
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 3
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+207.5
+ 20
+250.0
+ 30
+0.0
+ 40
+2.4300000000000002
+  0
+CIRCLE
+  5
+A6
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 3
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+207.5
+ 20
+292.5
+ 30
+0.0
+ 40
+2.4300000000000002
+  0
+CIRCLE
+  5
+A7
 100
 AcDbEntity
 100
@@ -3731,17 +3915,193 @@ Layer 4
   6
 ByLayer
  10
-69.4999850054044259
+49.9999850054043975
  20
-173.8731265266271464
+182.6731265266270725
  30
 0.0
  40
-1.4299999999999999
+4.8250000000000002
+  0
+ARC
+  5
+A8
+100
+AcDbEntity
+  8
+Layer 4
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+98.0
+ 20
+102.0
+ 30
+0.0
+ 40
+2.0
+100
+AcDbArc
+ 50
+270.0
+ 51
+0.0
+  0
+ARC
+  5
+A9
+100
+AcDbEntity
+  8
+Layer 4
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+98.0
+ 20
+198.0
+ 30
+0.0
+ 40
+2.0
+100
+AcDbArc
+ 50
+0.0
+ 51
+90.0
+  0
+LINE
+  5
+AA
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 4
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+98.0
+ 20
+200.0
+ 30
+0.0
+ 11
+2.0
+ 21
+200.0
+ 31
+0.0
+  0
+ARC
+  5
+AB
+100
+AcDbEntity
+  8
+Layer 4
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+2.0
+ 20
+198.0
+ 30
+0.0
+ 40
+2.0
+100
+AcDbArc
+ 50
+90.0
+ 51
+180.0
+  0
+LINE
+  5
+AC
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 4
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+0.0
+ 20
+198.0
+ 30
+0.0
+ 11
+0.0
+ 21
+101.9999999999999716
+ 31
+0.0
+  0
+ARC
+  5
+AD
+100
+AcDbEntity
+  8
+Layer 4
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+2.0
+ 20
+101.9999999999999858
+ 30
+0.0
+ 40
+2.0
+100
+AcDbArc
+ 50
+180.0
+ 51
+270.0
   0
 MTEXT
   5
-A5
+AE
 100
 AcDbEntity
 100
@@ -3775,300 +4135,36 @@ standard
  50
 0.0
  73
-1
+0
  44
 1.0
   0
-ARC
-  5
-A6
-100
-AcDbEntity
-  8
-Layer 4
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-98.0
- 20
-198.0
- 30
-0.0
- 40
-2.0
-100
-AcDbArc
- 50
-0.0
- 51
-90.0
-  0
 LINE
-  5
-A7
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Layer 4
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-98.0
- 20
-200.0
- 30
-0.0
- 11
-2.0
- 21
-200.0
- 31
-0.0
-  0
-ARC
-  5
-A8
-100
-AcDbEntity
-  8
-Layer 4
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-2.0
- 20
-198.0
- 30
-0.0
- 40
-2.0
-100
-AcDbArc
- 50
-90.0
- 51
-180.0
-  0
-LINE
-  5
-A9
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Layer 4
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-0.0
- 20
-198.0
- 30
-0.0
- 11
-0.0
- 21
-102.0
- 31
-0.0
-  0
-ARC
-  5
-AA
-100
-AcDbEntity
-  8
-Layer 4
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-2.0
- 20
-102.0
- 30
-0.0
- 40
-2.0
-100
-AcDbArc
- 50
-180.0
- 51
-270.0
-  0
-LINE
-  5
-AB
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Layer 4
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-2.0
- 20
-100.0
- 30
-0.0
- 11
-98.0
- 21
-100.0
- 31
-0.0
-  0
-ARC
-  5
-AC
-100
-AcDbEntity
-  8
-Layer 4
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-98.0
- 20
-102.0
- 30
-0.0
- 40
-2.0
-100
-AcDbArc
- 50
-270.0
- 51
-0.0
-  0
-ARC
-  5
-AD
-100
-AcDbEntity
-  8
-Layer 5
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-149.9999850054043975
- 20
-134.7798160249545276
- 30
-0.0
- 40
-35.0
-100
-AcDbArc
- 50
-0.0
- 51
-180.0
-  0
-LINE
-  5
-AE
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Layer 5
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-114.9999850054043975
- 20
-134.7798160249545276
- 30
-0.0
- 11
-114.9999850054043975
- 21
-100.5
- 31
-0.0
-  0
-ARC
   5
 AF
 100
 AcDbEntity
+100
+AcDbLine
   8
-Layer 5
+Layer 4
  62
 256
 370
 -1
   6
 ByLayer
-100
-AcDbCircle
  10
-114.4999850054043975
+66.3245590054045095
  20
-100.5
+191.4731265266272544
  30
 0.0
- 40
-0.5
-100
-AcDbArc
- 50
-270.0
- 51
+ 11
+67.9122720054044891
+ 21
+194.2231265266272544
+ 31
 0.0
   0
 LINE
@@ -4079,7 +4175,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Layer 5
+Layer 4
  62
 256
 370
@@ -4087,57 +4183,55 @@ Layer 5
   6
 ByLayer
  10
-184.9999850054043975
+67.9122720054044891
  20
-134.7798160249545276
+194.2231265266272544
  30
 0.0
  11
-184.9999850054043975
+71.0876980054045049
  21
-100.5
+194.2231265266272544
  31
 0.0
   0
-ARC
+LINE
   5
 B1
 100
 AcDbEntity
+100
+AcDbLine
   8
-Layer 5
+Layer 4
  62
 256
 370
 -1
   6
 ByLayer
-100
-AcDbCircle
  10
-185.4999850054043975
+71.0876980054045049
  20
-100.5
+194.2231265266272544
  30
 0.0
- 40
-0.5
-100
-AcDbArc
- 50
-180.0
- 51
-270.0
+ 11
+72.6754110054044844
+ 21
+191.4731265266272544
+ 31
+0.0
   0
-CIRCLE
+LINE
   5
 B2
 100
 AcDbEntity
 100
-AcDbCircle
+AcDbLine
   8
-Layer 5
+Layer 4
  62
 256
 370
@@ -4145,23 +4239,27 @@ Layer 5
   6
 ByLayer
  10
-107.5
+71.0876980054044765
  20
-192.5
+188.7231265266272544
  30
 0.0
- 40
-2.5
+ 11
+72.6754110054044844
+ 21
+191.4731265266272544
+ 31
+0.0
   0
-CIRCLE
+LINE
   5
 B3
 100
 AcDbEntity
 100
-AcDbCircle
+AcDbLine
   8
-Layer 5
+Layer 4
  62
 256
 370
@@ -4169,23 +4267,27 @@ Layer 5
   6
 ByLayer
  10
-107.5
+67.9122720054044891
  20
-150.0
+188.7231265266272544
  30
 0.0
- 40
-2.5
+ 11
+71.0876980054044765
+ 21
+188.7231265266272544
+ 31
+0.0
   0
-CIRCLE
+LINE
   5
 B4
 100
 AcDbEntity
 100
-AcDbCircle
+AcDbLine
   8
-Layer 5
+Layer 4
  62
 256
 370
@@ -4193,23 +4295,27 @@ Layer 5
   6
 ByLayer
  10
-107.5
+66.3245590054045095
  20
-107.5
+191.4731265266272544
  30
 0.0
- 40
-2.5
+ 11
+67.9122720054044891
+ 21
+188.7231265266272544
+ 31
+0.0
   0
-CIRCLE
+LINE
   5
 B5
 100
 AcDbEntity
 100
-AcDbCircle
+AcDbLine
   8
-Layer 5
+Layer 4
  62
 256
 370
@@ -4217,23 +4323,27 @@ Layer 5
   6
 ByLayer
  10
-192.5
+66.3245590054044385
  20
-107.5
+173.873126526627118
  30
 0.0
- 40
-2.5
+ 11
+67.912272005404418
+ 21
+176.6231265266271464
+ 31
+0.0
   0
-CIRCLE
+LINE
   5
 B6
 100
 AcDbEntity
 100
-AcDbCircle
+AcDbLine
   8
-Layer 5
+Layer 4
  62
 256
 370
@@ -4241,17 +4351,423 @@ Layer 5
   6
 ByLayer
  10
+67.912272005404418
+ 20
+176.6231265266271464
+ 30
+0.0
+ 11
+71.0876980054044338
+ 21
+176.6231265266271464
+ 31
+0.0
+  0
+LINE
+  5
+B7
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 4
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+71.0876980054044338
+ 20
+176.6231265266271464
+ 30
+0.0
+ 11
+72.6754110054044133
+ 21
+173.873126526627118
+ 31
+0.0
+  0
+LINE
+  5
+B8
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 4
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+71.0876980054044054
+ 20
+171.1231265266271464
+ 30
+0.0
+ 11
+72.6754110054044133
+ 21
+173.873126526627118
+ 31
+0.0
+  0
+LINE
+  5
+B9
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 4
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+67.912272005404418
+ 20
+171.1231265266271748
+ 30
+0.0
+ 11
+71.0876980054044054
+ 21
+171.1231265266271464
+ 31
+0.0
+  0
+LINE
+  5
+BA
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 4
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+66.3245590054044385
+ 20
+173.873126526627118
+ 30
+0.0
+ 11
+67.912272005404418
+ 21
+171.1231265266271748
+ 31
+0.0
+  0
+LINE
+  5
+BB
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 4
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+39.9999850054043975
+ 20
+100.0
+ 30
+0.0
+ 11
+39.9999850054043975
+ 21
+100.8386905280002424
+ 31
+0.0
+  0
+ARC
+  5
+BC
+100
+AcDbEntity
+  8
+Layer 4
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+37.9999850054043975
+ 20
+100.8386905280002424
+ 30
+0.0
+ 40
+2.0
+100
+AcDbArc
+ 50
+0.0
+ 51
+70.528779365509422
+  0
+LINE
+  5
+BD
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 4
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+59.9999850054043975
+ 20
+100.0000000000000142
+ 30
+0.0
+ 11
+59.9999850054043975
+ 21
+100.8386905280002424
+ 31
+0.0
+  0
+ARC
+  5
+BE
+100
+AcDbEntity
+  8
+Layer 4
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+61.9999850054043975
+ 20
+100.8386905280002424
+ 30
+0.0
+ 40
+2.0
+100
+AcDbArc
+ 50
+109.4712206344910186
+ 51
+180.0
+  0
+ARC
+  5
+BF
+100
+AcDbEntity
+  8
+Layer 4
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+49.9999850054043975
+ 20
+134.7798160249545276
+ 30
+0.0
+ 40
+34.0
+100
+AcDbArc
+ 50
+289.4712206344906917
+ 51
+250.5287793655093083
+  0
+CIRCLE
+  5
+C0
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 4
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+7.5
+ 20
 192.5
+ 30
+0.0
+ 40
+2.4300000000000002
+  0
+CIRCLE
+  5
+C1
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 4
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+7.5
  20
 150.0
  30
 0.0
  40
-2.5
+2.4300000000000002
   0
 CIRCLE
   5
-B7
+C2
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 4
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+7.5
+ 20
+107.5
+ 30
+0.0
+ 40
+2.4300000000000002
+  0
+CIRCLE
+  5
+C3
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 4
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+92.5
+ 20
+107.5
+ 30
+0.0
+ 40
+2.4300000000000002
+  0
+CIRCLE
+  5
+C4
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 4
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+92.5
+ 20
+150.0
+ 30
+0.0
+ 40
+2.4300000000000002
+  0
+CIRCLE
+  5
+C5
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 4
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+92.5
+ 20
+192.5
+ 30
+0.0
+ 40
+2.4300000000000002
+  0
+CIRCLE
+  5
+C6
 100
 AcDbEntity
 100
@@ -4275,7 +4791,7 @@ ByLayer
   0
 CIRCLE
   5
-B8
+C7
 100
 AcDbEntity
 100
@@ -4289,9 +4805,9 @@ Layer 5
   6
 ByLayer
  10
-169.4999850054044543
+169.4999850054044828
  20
-191.4731265266271976
+191.4731265266272544
  30
 0.0
  40
@@ -4299,7 +4815,7 @@ ByLayer
   0
 CIRCLE
   5
-B9
+C8
 100
 AcDbEntity
 100
@@ -4315,15 +4831,219 @@ ByLayer
  10
 169.4999850054044259
  20
-173.8731265266271464
+173.873126526627118
  30
 0.0
  40
 1.4299999999999999
   0
+ARC
+  5
+C9
+100
+AcDbEntity
+  8
+Layer 5
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+198.0
+ 20
+101.9999999999999716
+ 30
+0.0
+ 40
+2.0
+100
+AcDbArc
+ 50
+270.0
+ 51
+0.0
+  0
+LINE
+  5
+CA
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 5
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+199.9999999999999432
+ 20
+101.9999999999999432
+ 30
+0.0
+ 11
+200.0
+ 21
+198.0000000000004263
+ 31
+0.0
+  0
+ARC
+  5
+CB
+100
+AcDbEntity
+  8
+Layer 5
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+198.0
+ 20
+198.0000000000004263
+ 30
+0.0
+ 40
+2.0
+100
+AcDbArc
+ 50
+0.0
+ 51
+90.0
+  0
+LINE
+  5
+CC
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 5
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+198.0
+ 20
+200.0
+ 30
+0.0
+ 11
+102.0
+ 21
+200.0
+ 31
+0.0
+  0
+ARC
+  5
+CD
+100
+AcDbEntity
+  8
+Layer 5
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+102.0
+ 20
+198.0
+ 30
+0.0
+ 40
+2.0
+100
+AcDbArc
+ 50
+90.0
+ 51
+180.0
+  0
+LINE
+  5
+CE
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 5
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+100.0
+ 20
+198.0
+ 30
+0.0
+ 11
+99.9999999999999716
+ 21
+101.9999999999999716
+ 31
+0.0
+  0
+ARC
+  5
+CF
+100
+AcDbEntity
+  8
+Layer 5
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+101.9999999999999716
+ 20
+101.9999999999999858
+ 30
+0.0
+ 40
+2.0
+100
+AcDbArc
+ 50
+180.0
+ 51
+270.0
+  0
 MTEXT
   5
-BA
+D0
 100
 AcDbEntity
 100
@@ -4357,629 +5077,9 @@ standard
  50
 0.0
  73
-1
+0
  44
 1.0
-  0
-LINE
-  5
-BB
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Layer 5
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-185.4999850054043975
- 20
-100.0
- 30
-0.0
- 11
-198.0
- 21
-100.0
- 31
-0.0
-  0
-ARC
-  5
-BC
-100
-AcDbEntity
-  8
-Layer 5
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-198.0
- 20
-102.0
- 30
-0.0
- 40
-2.0
-100
-AcDbArc
- 50
-270.0
- 51
-0.0
-  0
-ARC
-  5
-BD
-100
-AcDbEntity
-  8
-Layer 5
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-198.0
- 20
-198.0
- 30
-0.0
- 40
-2.0
-100
-AcDbArc
- 50
-0.0
- 51
-90.0
-  0
-LINE
-  5
-BE
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Layer 5
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-198.0
- 20
-200.0
- 30
-0.0
- 11
-102.0
- 21
-200.0
- 31
-0.0
-  0
-ARC
-  5
-BF
-100
-AcDbEntity
-  8
-Layer 5
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-102.0
- 20
-198.0
- 30
-0.0
- 40
-2.0
-100
-AcDbArc
- 50
-90.0
- 51
-180.0
-  0
-LINE
-  5
-C0
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Layer 5
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-100.0
- 20
-198.0
- 30
-0.0
- 11
-100.0
- 21
-101.9999999999999716
- 31
-0.0
-  0
-LINE
-  5
-C1
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Layer 5
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-102.0
- 20
-100.0
- 30
-0.0
- 11
-114.4999850054043975
- 21
-100.0
- 31
-0.0
-  0
-ARC
-  5
-C2
-100
-AcDbEntity
-  8
-Layer 5
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-102.0
- 20
-101.9999999999999858
- 30
-0.0
- 40
-2.0
-100
-AcDbArc
- 50
-180.0
- 51
-270.0
-  0
-CIRCLE
-  5
-C3
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Layer 8
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-149.9999850054043975
- 20
-34.7798160249545276
- 30
-0.0
- 40
-11.0
-  0
-CIRCLE
-  5
-C4
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Layer 8
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-107.5
- 20
-92.5
- 30
-0.0
- 40
-2.5
-  0
-CIRCLE
-  5
-C5
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Layer 8
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-107.5
- 20
-50.0
- 30
-0.0
- 40
-2.5
-  0
-CIRCLE
-  5
-C6
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Layer 8
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-107.5
- 20
-7.5
- 30
-0.0
- 40
-2.5
-  0
-CIRCLE
-  5
-C7
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Layer 8
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-192.5
- 20
-7.5
- 30
-0.0
- 40
-2.5
-  0
-CIRCLE
-  5
-C8
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Layer 8
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-192.5
- 20
-50.0
- 30
-0.0
- 40
-2.5
-  0
-ARC
-  5
-C9
-100
-AcDbEntity
-  8
-Layer 8
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-130.5
- 20
-70.5
- 30
-0.0
- 40
-0.5
-100
-AcDbArc
- 50
-180.0
- 51
-270.0
-  0
-LINE
-  5
-CA
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Layer 8
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-130.0
- 20
-99.5
- 30
-0.0
- 11
-130.0
- 21
-70.5
- 31
-0.0
-  0
-ARC
-  5
-CB
-100
-AcDbEntity
-  8
-Layer 8
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-129.5
- 20
-99.5
- 30
-0.0
- 40
-0.5
-100
-AcDbArc
- 50
-0.0
- 51
-90.0
-  0
-LINE
-  5
-CC
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Layer 8
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-199.5
- 20
-70.0
- 30
-0.0
- 11
-130.5
- 21
-70.0
- 31
-0.0
-  0
-ARC
-  5
-CD
-100
-AcDbEntity
-  8
-Layer 8
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-199.5
- 20
-69.5
- 30
-0.0
- 40
-0.5
-100
-AcDbArc
- 50
-0.0
- 51
-90.0
-  0
-MTEXT
-  5
-CE
-100
-AcDbEntity
-100
-AcDbMText
-  8
-Layer 8 Text
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-110.0
- 20
-83.0
- 30
-0.0
- 40
-3.0
- 41
-100.0
- 71
-1
- 72
-2
-  1
-Layer\~8
-  7
-standard
- 50
-0.0
- 73
-1
- 44
-1.0
-  0
-LINE
-  5
-CF
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Layer 8
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-129.5
- 20
-100.0
- 30
-0.0
- 11
-102.0
- 21
-100.0
- 31
-0.0
-  0
-ARC
-  5
-D0
-100
-AcDbEntity
-  8
-Layer 8
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-102.0
- 20
-98.0
- 30
-0.0
- 40
-2.0
-100
-AcDbArc
- 50
-90.0
- 51
-180.0
   0
 LINE
   5
@@ -4989,7 +5089,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Layer 8
+Layer 5
  62
 256
 370
@@ -4997,15 +5097,15 @@ Layer 8
   6
 ByLayer
  10
-100.0
+139.9999850054043975
  20
-98.0
+100.0
  30
 0.0
  11
-100.0
+139.9999850054043975
  21
-2.0
+100.8386905280002424
  31
 0.0
   0
@@ -5015,7 +5115,7 @@ D2
 100
 AcDbEntity
   8
-Layer 8
+Layer 5
  62
 256
 370
@@ -5025,9 +5125,9 @@ ByLayer
 100
 AcDbCircle
  10
-102.0
+137.9999850054043975
  20
-2.0
+100.8386905280002424
  30
 0.0
  40
@@ -5035,9 +5135,9 @@ AcDbCircle
 100
 AcDbArc
  50
-180.0
+0.0
  51
-270.0
+70.528779365509422
   0
 LINE
   5
@@ -5047,7 +5147,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Layer 8
+Layer 5
  62
 256
 370
@@ -5055,15 +5155,15 @@ Layer 8
   6
 ByLayer
  10
-102.0
+159.9999850054043975
  20
-0.0
+100.0
  30
 0.0
  11
-198.0
+159.9999850054043975
  21
-0.0
+100.8386905280002424
  31
 0.0
   0
@@ -5073,7 +5173,7 @@ D4
 100
 AcDbEntity
   8
-Layer 8
+Layer 5
  62
 256
 370
@@ -5083,9 +5183,9 @@ ByLayer
 100
 AcDbCircle
  10
-198.0
+161.9999850054043975
  20
-2.0
+100.8386905280002424
  30
 0.0
  40
@@ -5093,33 +5193,39 @@ AcDbCircle
 100
 AcDbArc
  50
-270.0
+109.4712206344910044
  51
-0.0
+180.0
   0
-CIRCLE
+ARC
   5
 D5
 100
 AcDbEntity
-100
-AcDbCircle
   8
-Layer 9
+Layer 5
  62
 256
 370
 -1
   6
 ByLayer
+100
+AcDbCircle
  10
-249.9999850054043975
+149.9999850054043975
  20
-34.7798160249545276
+134.7798160249545276
  30
 0.0
  40
-8.0
+34.0
+100
+AcDbArc
+ 50
+289.4712206344906917
+ 51
+250.5287793655093083
   0
 CIRCLE
   5
@@ -5129,7 +5235,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-Layer 9
+Layer 5
  62
 256
 370
@@ -5137,13 +5243,13 @@ Layer 9
   6
 ByLayer
  10
-207.5
+107.5
  20
-92.5
+192.5
  30
 0.0
  40
-2.5
+2.4300000000000002
   0
 CIRCLE
   5
@@ -5153,7 +5259,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-Layer 9
+Layer 5
  62
 256
 370
@@ -5161,13 +5267,13 @@ Layer 9
   6
 ByLayer
  10
-207.5
+107.4999999999999716
  20
-50.0
+150.0
  30
 0.0
  40
-2.5
+2.4300000000000002
   0
 CIRCLE
   5
@@ -5177,7 +5283,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-Layer 9
+Layer 5
  62
 256
 370
@@ -5185,13 +5291,13 @@ Layer 9
   6
 ByLayer
  10
-207.5
+107.4999999999999432
  20
-7.5
+107.4999999999999858
  30
 0.0
  40
-2.5
+2.4300000000000002
   0
 CIRCLE
   5
@@ -5201,7 +5307,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-Layer 9
+Layer 5
  62
 256
 370
@@ -5209,13 +5315,13 @@ Layer 9
   6
 ByLayer
  10
-292.5
+192.5
  20
-7.5
+107.4999999999999716
  30
 0.0
  40
-2.5
+2.4300000000000002
   0
 CIRCLE
   5
@@ -5225,7 +5331,7 @@ AcDbEntity
 100
 AcDbCircle
   8
-Layer 9
+Layer 5
  62
 256
 370
@@ -5233,43 +5339,37 @@ Layer 9
   6
 ByLayer
  10
-292.5
+192.5
  20
-50.0
+149.9999999999999432
  30
 0.0
  40
-2.5
+2.4300000000000002
   0
-ARC
+CIRCLE
   5
 DB
 100
 AcDbEntity
+100
+AcDbCircle
   8
-Layer 9
+Layer 5
  62
 256
 370
 -1
   6
 ByLayer
-100
-AcDbCircle
  10
-229.5
+192.5
  20
-99.5
+192.5
  30
 0.0
  40
-0.5
-100
-AcDbArc
- 50
-0.0
- 51
-90.0
+2.4300000000000002
   0
 ARC
   5
@@ -5277,7 +5377,7 @@ DC
 100
 AcDbEntity
   8
-Layer 9
+Layer 6
  62
 256
 370
@@ -5287,13 +5387,13 @@ ByLayer
 100
 AcDbCircle
  10
-299.5
+298.0
  20
-69.5
+198.0
  30
 0.0
  40
-0.5
+2.0
 100
 AcDbArc
  50
@@ -5309,7 +5409,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Layer 9
+Layer 6
  62
 256
 370
@@ -5317,289 +5417,25 @@ Layer 9
   6
 ByLayer
  10
-230.0
+298.0
  20
-99.5
+200.0
  30
 0.0
  11
-230.0
+202.0
  21
-70.5
+200.0
  31
 0.0
   0
-LINE
+ARC
   5
 DE
 100
 AcDbEntity
-100
-AcDbLine
   8
-Layer 9
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-299.5
- 20
-70.0
- 30
-0.0
- 11
-230.5
- 21
-70.0
- 31
-0.0
-  0
-ARC
-  5
-DF
-100
-AcDbEntity
-  8
-Layer 9
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-230.5
- 20
-70.5
- 30
-0.0
- 40
-0.5
-100
-AcDbArc
- 50
-180.0
- 51
-270.0
-  0
-MTEXT
-  5
-E0
-100
-AcDbEntity
-100
-AcDbMText
-  8
-Layer 9 Text
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-210.0
- 20
-83.0
- 30
-0.0
- 40
-3.0
- 41
-100.0
- 71
-1
- 72
-2
-  1
-Layer\~9
-  7
-standard
- 50
-0.0
- 73
-1
- 44
-1.0
-  0
-MTEXT
-  5
-E1
-100
-AcDbEntity
-100
-AcDbMText
-  8
-Layer 9 Text
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-250.0
- 20
-10.0
- 30
-0.0
- 40
-3.0
- 41
-100.0
- 71
-2
- 72
-2
-  1
-Peristaltic\~Pump\~v1.0\Pmake.rrrf.org/pp-1.0
-  7
-standard
- 50
-0.0
- 73
-1
- 44
-1.0
-  0
-MTEXT
-  5
-E2
-100
-AcDbEntity
-100
-AcDbMText
-  8
-Layer 9 Text
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-250.0
- 20
-20.0
- 30
-0.0
- 40
-3.0
- 41
-100.0
- 71
-2
- 72
-2
-  1
-Design\~By:\~ZachHoeken.com
-  7
-standard
- 50
-0.0
- 73
-1
- 44
-1.0
-  0
-LINE
-  5
-E3
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Layer 9
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-300.0
- 20
-2.0
- 30
-0.0
- 11
-300.0
- 21
-69.5
- 31
-0.0
-  0
-ARC
-  5
-E4
-100
-AcDbEntity
-  8
-Layer 9
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-298.0
- 20
-2.0
- 30
-0.0
- 40
-2.0
-100
-AcDbArc
- 50
-270.0
- 51
-0.0
-  0
-LINE
-  5
-E5
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Layer 9
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-202.0
- 20
-0.0
- 30
-0.0
- 11
-298.0
- 21
-0.0
- 31
-0.0
-  0
-ARC
-  5
-E6
-100
-AcDbEntity
-  8
-Layer 9
+Layer 6
  62
 256
 370
@@ -5611,93 +5447,7 @@ AcDbCircle
  10
 202.0
  20
-2.0
- 30
-0.0
- 40
-2.0
-100
-AcDbArc
- 50
-180.0
- 51
-270.0
-  0
-LINE
-  5
-E7
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Layer 9
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-200.0
- 20
-98.0
- 30
-0.0
- 11
-200.0
- 21
-2.0
- 31
-0.0
-  0
-LINE
-  5
-E8
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Layer 9
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-229.5
- 20
-100.0
- 30
-0.0
- 11
-202.0
- 21
-100.0
- 31
-0.0
-  0
-ARC
-  5
-E9
-100
-AcDbEntity
-  8
-Layer 9
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-202.0
- 20
-98.0
+198.0
  30
 0.0
  40
@@ -5709,129 +5459,9 @@ AcDbArc
  51
 180.0
   0
-CIRCLE
-  5
-EA
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Layer 6
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-292.5
- 20
-150.0
- 30
-0.0
- 40
-2.5
-  0
-CIRCLE
-  5
-EB
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Layer 6
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-292.5
- 20
-107.5
- 30
-0.0
- 40
-2.5
-  0
-CIRCLE
-  5
-EC
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Layer 6
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-207.5
- 20
-107.5
- 30
-0.0
- 40
-2.5
-  0
-CIRCLE
-  5
-ED
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Layer 6
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-207.5
- 20
-150.0
- 30
-0.0
- 40
-2.5
-  0
-CIRCLE
-  5
-EE
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Layer 6
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-207.5
- 20
-192.5
- 30
-0.0
- 40
-2.5
-  0
 ARC
   5
-EF
+DF
 100
 AcDbEntity
   8
@@ -5845,27 +5475,27 @@ ByLayer
 100
 AcDbCircle
  10
-249.9999850054043691
+202.0
  20
-134.7798160249545276
+102.0
  30
 0.0
  40
-36.0
+2.0
 100
 AcDbArc
  50
-284.9600621400871887
+180.0
  51
-255.0399378599128113
+270.0
   0
-CIRCLE
+LINE
   5
-F0
+E0
 100
 AcDbEntity
 100
-AcDbCircle
+AcDbLine
   8
 Layer 6
  62
@@ -5875,21 +5505,23 @@ Layer 6
   6
 ByLayer
  10
-249.9999850054043691
+300.0
  20
-182.6731265266270725
+102.0
  30
 0.0
- 40
-4.8250000000000002
+ 11
+300.0
+ 21
+198.0
+ 31
+0.0
   0
-CIRCLE
+ARC
   5
-F1
+E1
 100
 AcDbEntity
-100
-AcDbCircle
   8
 Layer 6
  62
@@ -5898,42 +5530,26 @@ Layer 6
 -1
   6
 ByLayer
- 10
-269.4999850054044828
- 20
-191.4731265266271976
- 30
-0.0
- 40
-1.4299999999999999
-  0
-CIRCLE
-  5
-F2
-100
-AcDbEntity
 100
 AcDbCircle
-  8
-Layer 6
- 62
-256
-370
--1
-  6
-ByLayer
  10
-269.4999850054044259
+298.0
  20
-173.8731265266271464
+102.0
  30
 0.0
  40
-1.4299999999999999
+2.0
+100
+AcDbArc
+ 50
+270.0
+ 51
+0.0
   0
 MTEXT
   5
-F3
+E2
 100
 AcDbEntity
 100
@@ -5967,13 +5583,61 @@ standard
  50
 0.0
  73
-1
+0
  44
 1.0
   0
+CIRCLE
+  5
+E3
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 6
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+269.4999850054044828
+ 20
+191.4731265266271976
+ 30
+0.0
+ 40
+1.4299999999999999
+  0
+CIRCLE
+  5
+E4
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 6
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+269.4999850054044259
+ 20
+173.8731265266271464
+ 30
+0.0
+ 40
+1.4299999999999999
+  0
 ARC
   5
-F4
+E5
 100
 AcDbEntity
   8
@@ -5987,9 +5651,9 @@ ByLayer
 100
 AcDbCircle
  10
-202.0
+237.9999850054043975
  20
-198.0
+100.8386905280002424
  30
 0.0
  40
@@ -5997,13 +5661,101 @@ AcDbCircle
 100
 AcDbArc
  50
-90.0
+0.0
+ 51
+70.528779365509422
+  0
+LINE
+  5
+E6
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 6
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+259.9999850054043691
+ 20
+100.0
+ 30
+0.0
+ 11
+259.9999850054043691
+ 21
+100.8386905280002424
+ 31
+0.0
+  0
+ARC
+  5
+E7
+100
+AcDbEntity
+  8
+Layer 6
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+249.9999850054043975
+ 20
+134.7798160249545276
+ 30
+0.0
+ 40
+34.0
+100
+AcDbArc
+ 50
+289.4712206344906917
+ 51
+250.5287793655092514
+  0
+ARC
+  5
+E8
+100
+AcDbEntity
+  8
+Layer 6
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+261.9999850054043691
+ 20
+100.8386905280002424
+ 30
+0.0
+ 40
+2.0
+100
+AcDbArc
+ 50
+109.4712206344910044
  51
 180.0
   0
 LINE
   5
-F5
+E9
 100
 AcDbEntity
 100
@@ -6017,25 +5769,249 @@ Layer 6
   6
 ByLayer
  10
-298.0
+239.9999850054043975
  20
-200.0
+100.0
  30
 0.0
  11
-202.0
+239.9999850054043975
  21
-200.0
+100.8386905280002424
  31
 0.0
   0
+LINE
+  5
+EA
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 6
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+202.0
+ 20
+100.0
+ 30
+0.0
+ 11
+239.9999850054043975
+ 21
+100.0
+ 31
+0.0
+  0
+LINE
+  5
+EB
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 6
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+259.9999850054043691
+ 20
+100.0
+ 30
+0.0
+ 11
+298.0
+ 21
+100.0
+ 31
+0.0
+  0
+CIRCLE
+  5
+EC
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 6
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+207.5
+ 20
+192.5
+ 30
+0.0
+ 40
+2.4300000000000002
+  0
+CIRCLE
+  5
+ED
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 6
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+207.5
+ 20
+150.0
+ 30
+0.0
+ 40
+2.4300000000000002
+  0
+CIRCLE
+  5
+EE
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 6
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+207.5
+ 20
+107.5
+ 30
+0.0
+ 40
+2.4300000000000002
+  0
+CIRCLE
+  5
+EF
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 6
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+292.5
+ 20
+107.5
+ 30
+0.0
+ 40
+2.4300000000000002
+  0
+CIRCLE
+  5
+F0
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 6
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+292.5
+ 20
+150.0
+ 30
+0.0
+ 40
+2.4300000000000002
+  0
+CIRCLE
+  5
+F1
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 6
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+292.5
+ 20
+192.5
+ 30
+0.0
+ 40
+2.4300000000000002
+  0
+CIRCLE
+  5
+F2
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Layer 8
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+149.9999850054043975
+ 20
+34.7798160249545276
+ 30
+0.0
+ 40
+11.0
+  0
 ARC
   5
-F6
+F3
 100
 AcDbEntity
   8
-Layer 6
+Layer 8
  62
 256
 370
@@ -6045,9 +6021,9 @@ ByLayer
 100
 AcDbCircle
  10
-298.0
- 20
 198.0
+ 20
+98.0
  30
 0.0
  40
@@ -6061,13 +6037,13 @@ AcDbArc
   0
 LINE
   5
-F7
+F4
 100
 AcDbEntity
 100
 AcDbLine
   8
-Layer 6
+Layer 8
  62
 256
 370
@@ -6075,25 +6051,25 @@ Layer 6
   6
 ByLayer
  10
-300.0
+200.0
  20
-102.0
+2.0
  30
 0.0
  11
-300.0
+200.0
  21
-198.0
+98.0
  31
 0.0
   0
 ARC
   5
-F8
+F5
 100
 AcDbEntity
   8
-Layer 6
+Layer 8
  62
 256
 370
@@ -6103,9 +6079,9 @@ ByLayer
 100
 AcDbCircle
  10
-298.0
+198.0
  20
-102.0
+2.0
  30
 0.0
  40
@@ -6115,6 +6091,92 @@ AcDbArc
  50
 270.0
  51
+0.0
+  0
+LINE
+  5
+F6
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 8
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+102.0
+ 20
+0.0
+ 30
+0.0
+ 11
+198.0
+ 21
+0.0
+ 31
+0.0
+  0
+ARC
+  5
+F7
+100
+AcDbEntity
+  8
+Layer 8
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+102.0
+ 20
+2.0
+ 30
+0.0
+ 40
+2.0
+100
+AcDbArc
+ 50
+180.0
+ 51
+270.0
+  0
+LINE
+  5
+F8
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Layer 8
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+100.0
+ 20
+98.0
+ 30
+0.0
+ 11
+100.0
+ 21
+2.0
+ 31
 0.0
   0
 LINE
@@ -6125,7 +6187,7 @@ AcDbEntity
 100
 AcDbLine
   8
-Layer 6
+Layer 8
  62
 256
 370
@@ -6133,41 +6195,13 @@ Layer 6
   6
 ByLayer
  10
-200.0
- 20
 198.0
- 30
-0.0
- 11
-200.0
- 21
-102.0
- 31
-0.0
-  0
-LINE
-  5
-FA
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Layer 6
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-202.0
  20
 100.0
  30
 0.0
  11
-298.0
+102.0
  21
 100.0
  31
@@ -6175,11 +6209,11 @@ ByLayer
   0
 ARC
   5
-FB
+FA
 100
 AcDbEntity
   8
-Layer 6
+Layer 8
  62
 256
 370
@@ -6189,9 +6223,9 @@ ByLayer
 100
 AcDbCircle
  10
-202.0
- 20
 102.0
+ 20
+98.0
  30
 0.0
  40
@@ -6199,19 +6233,59 @@ AcDbCircle
 100
 AcDbArc
  50
-180.0
+90.0
  51
-270.0
+180.0
   0
-LINE
+MTEXT
+  5
+FB
+100
+AcDbEntity
+100
+AcDbMText
+  8
+Layer 8 Text
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+110.0
+ 20
+83.0
+ 30
+0.0
+ 40
+3.0
+ 41
+100.0
+ 71
+1
+ 72
+2
+  1
+Layer\~8
+  7
+standard
+ 50
+0.0
+ 73
+0
+ 44
+1.0
+  0
+CIRCLE
   5
 FC
 100
 AcDbEntity
 100
-AcDbLine
+AcDbCircle
   8
-Motor Gear
+Layer 8
  62
 256
 370
@@ -6219,27 +6293,23 @@ Motor Gear
   6
 ByLayer
  10
-164.6194256063309354
+107.5
  20
-135.957085784037929
+92.5
  30
 0.0
- 11
-164.9867851611464005
- 21
-135.9866167673471296
- 31
-0.0
+ 40
+2.4300000000000002
   0
-LINE
+CIRCLE
   5
 FD
 100
 AcDbEntity
 100
-AcDbLine
+AcDbCircle
   8
-Motor Gear
+Layer 8
  62
 256
 370
@@ -6247,27 +6317,23 @@ Motor Gear
   6
 ByLayer
  10
-164.9867851611464005
+107.5
  20
-135.9866167673471296
+50.0
  30
 0.0
- 11
-165.9659235658242835
- 21
-135.8261848563640228
- 31
-0.0
+ 40
+2.4300000000000002
   0
-LINE
+CIRCLE
   5
 FE
 100
 AcDbEntity
 100
-AcDbLine
+AcDbCircle
   8
-Motor Gear
+Layer 8
  62
 256
 370
@@ -6275,27 +6341,23 @@ Motor Gear
   6
 ByLayer
  10
-165.9659235658242835
+107.5
  20
-135.8261848563640228
+7.5
  30
 0.0
- 11
-167.3268734733729275
- 21
-135.2567139842479378
- 31
-0.0
+ 40
+2.4300000000000002
   0
-LINE
+CIRCLE
   5
 FF
 100
 AcDbEntity
 100
-AcDbLine
+AcDbCircle
   8
-Motor Gear
+Layer 8
  62
 256
 370
@@ -6303,27 +6365,23 @@ Motor Gear
   6
 ByLayer
  10
-167.3268734733729275
+192.5
  20
-135.2567139842479378
+7.5
  30
 0.0
- 11
-167.3268734733729275
- 21
-134.3029180656611743
- 31
-0.0
+ 40
+2.4300000000000002
   0
-LINE
+CIRCLE
   5
 100
 100
 AcDbEntity
 100
-AcDbLine
+AcDbCircle
   8
-Motor Gear
+Layer 8
  62
 256
 370
@@ -6331,27 +6389,23 @@ Motor Gear
   6
 ByLayer
  10
-167.3268734733729275
+192.5
  20
-134.3029180656611743
+50.0
  30
 0.0
- 11
-165.9659235658242835
- 21
-133.7334471935450324
- 31
-0.0
+ 40
+2.4300000000000002
   0
-LINE
+CIRCLE
   5
 101
 100
 AcDbEntity
 100
-AcDbLine
+AcDbCircle
   8
-Motor Gear
+Layer 8
  62
 256
 370
@@ -6359,17 +6413,13 @@ Motor Gear
   6
 ByLayer
  10
-165.9659235658242835
+192.5
  20
-133.7334471935450324
+92.5
  30
 0.0
- 11
-164.9867851611464005
- 21
-133.5730152825619257
- 31
-0.0
+ 40
+2.4300000000000002
   0
 LINE
   5
@@ -6387,15 +6437,15 @@ Motor Gear
   6
 ByLayer
  10
-164.9867851611464005
+64.6194256063309354
  20
-133.5730152825619257
+135.957085784037929
  30
 0.0
  11
-164.6194256063309354
+64.9867851611464005
  21
-133.6025462658711831
+135.9866167673471296
  31
 0.0
   0
@@ -6415,15 +6465,15 @@ Motor Gear
   6
 ByLayer
  10
-164.6194256063309354
+64.9867851611464005
  20
-133.6025462658711831
+135.9866167673471296
  30
 0.0
  11
-164.4261105784571555
+65.9659235658242835
  21
-132.1331058202641771
+135.8261848563640228
  31
 0.0
   0
@@ -6443,15 +6493,15 @@ Motor Gear
   6
 ByLayer
  10
-164.4261105784571555
+65.9659235658242835
  20
-132.1331058202641771
+135.8261848563640228
  30
 0.0
  11
-164.7884445303029963
+67.3268734733729275
  21
-132.0667124992841082
+135.2567139842479378
  31
 0.0
   0
@@ -6471,15 +6521,15 @@ Motor Gear
   6
 ByLayer
  10
-164.7884445303029963
+67.3268734733729275
  20
-132.0667124992841082
+135.2567139842479378
  30
 0.0
  11
-165.6926026010118846
+67.3268734733729275
  21
-131.6583021095798358
+134.3029180656611743
  31
 0.0
   0
@@ -6499,15 +6549,15 @@ Motor Gear
   6
 ByLayer
  10
-165.6926026010118846
+67.3268734733729275
  20
-131.6583021095798358
+134.3029180656611743
  30
 0.0
  11
-166.8600289463638831
+65.9659235658242835
  21
-130.7560290110420169
+133.7334471935450324
  31
 0.0
   0
@@ -6527,15 +6577,15 @@ Motor Gear
   6
 ByLayer
  10
-166.8600289463638831
+65.9659235658242835
  20
-130.7560290110420169
+133.7334471935450324
  30
 0.0
  11
-166.6130975919471666
+64.9867851611464005
  21
-129.8344868958022289
+133.5730152825619257
  31
 0.0
   0
@@ -6555,15 +6605,15 @@ Motor Gear
   6
 ByLayer
  10
-166.6130975919471666
+64.9867851611464005
  20
-129.8344868958022289
+133.5730152825619257
  30
 0.0
  11
-165.1509877585867514
+64.6194256063309354
  21
-129.6367740942725391
+133.6025462658711831
  31
 0.0
   0
@@ -6583,15 +6633,15 @@ Motor Gear
   6
 ByLayer
  10
-165.1509877585867514
+64.6194256063309354
  20
-129.6367740942725391
+133.6025462658711831
  30
 0.0
  11
-164.1636808937956573
+64.4261105784571555
  21
-129.7352119421616408
+132.1331058202641771
  31
 0.0
   0
@@ -6611,15 +6661,15 @@ Motor Gear
   6
 ByLayer
  10
-164.1636808937956573
+64.4261105784571555
  20
-129.7352119421616408
+132.1331058202641771
  30
 0.0
  11
-163.8166367378717041
+64.7884445303029963
  21
-129.8587822575889277
+132.0667124992841082
  31
 0.0
   0
@@ -6639,15 +6689,15 @@ Motor Gear
   6
 ByLayer
  10
-163.8166367378717041
+64.7884445303029963
  20
-129.8587822575889277
+132.0667124992841082
  30
 0.0
  11
-163.2494693908024601
+65.6926026010118846
  21
-128.4896638899271011
+131.6583021095798358
  31
 0.0
   0
@@ -6667,15 +6717,15 @@ Motor Gear
   6
 ByLayer
  10
-163.2494693908024601
+65.6926026010118846
  20
-128.4896638899271011
+131.6583021095798358
  30
 0.0
  11
-163.5822716172241087
+66.8600289463638831
  21
-128.3315355039909207
+130.7560290110420169
  31
 0.0
   0
@@ -6695,15 +6745,15 @@ Motor Gear
   6
 ByLayer
  10
-163.5822716172241087
+66.8600289463638831
  20
-128.3315355039909207
+130.7560290110420169
  30
 0.0
  11
-164.3500838622986464
+66.6130975919471666
  21
-127.7032119416942493
+129.8344868958022289
  31
 0.0
   0
@@ -6723,15 +6773,15 @@ Motor Gear
   6
 ByLayer
  10
-164.3500838622986464
+66.6130975919471666
  20
-127.7032119416942493
+129.8344868958022289
  30
 0.0
  11
-165.2439792242853116
+65.1509877585867514
  21
-126.5295021084001945
+129.6367740942725391
  31
 0.0
   0
@@ -6751,15 +6801,15 @@ Motor Gear
   6
 ByLayer
  10
-165.2439792242853116
+65.1509877585867514
  20
-126.5295021084001945
+129.6367740942725391
  30
 0.0
  11
-164.7670812649919583
+64.1636808937956573
  21
-125.7032564681359474
+129.7352119421616408
  31
 0.0
   0
@@ -6779,15 +6829,15 @@ Motor Gear
   6
 ByLayer
  10
-164.7670812649919583
+64.1636808937956573
  20
-125.7032564681359474
+129.7352119421616408
  30
 0.0
  11
-163.3037150308891796
+63.8166367378717041
  21
-125.8907058188284083
+129.8587822575889277
  31
 0.0
   0
@@ -6807,15 +6857,15 @@ Motor Gear
   6
 ByLayer
  10
-163.3037150308891796
+63.8166367378717041
  20
-125.8907058188284083
+129.8587822575889277
  30
 0.0
  11
-162.3754708748315068
+63.2494693908024601
  21
-126.2413106426567282
+128.4896638899271011
  31
 0.0
   0
@@ -6835,15 +6885,15 @@ Motor Gear
   6
 ByLayer
  10
-162.3754708748315068
+63.2494693908024601
  20
-126.2413106426567282
+128.4896638899271011
  30
 0.0
  11
-162.0721996317190872
+63.5822716172241087
  21
-126.4505425536510188
+128.3315355039909207
  31
 0.0
   0
@@ -6863,15 +6913,15 @@ Motor Gear
   6
 ByLayer
  10
-162.0721996317190872
+63.5822716172241087
  20
-126.4505425536510188
+128.3315355039909207
  30
 0.0
  11
-161.1699265331813251
+64.3500838622986464
  21
-125.2747392138629863
+127.7032119416942493
  31
 0.0
   0
@@ -6891,15 +6941,15 @@ Motor Gear
   6
 ByLayer
  10
-161.1699265331813251
+64.3500838622986464
  20
-125.2747392138629863
+127.7032119416942493
  30
 0.0
  11
-161.4505773681252947
+65.2439792242853116
  21
-125.0359763195594667
+126.5295021084001945
  31
 0.0
   0
@@ -6919,15 +6969,15 @@ Motor Gear
   6
 ByLayer
  10
-161.4505773681252947
+65.2439792242853116
  20
-125.0359763195594667
+126.5295021084001945
  30
 0.0
  11
-162.0294738432120312
+64.7670812649919583
  21
-124.2302553546246173
+125.7032564681359474
  31
 0.0
   0
@@ -6947,15 +6997,15 @@ Motor Gear
   6
 ByLayer
  10
-162.0294738432120312
+64.7670812649919583
  20
-124.2302553546246173
+125.7032564681359474
  30
 0.0
  11
-162.5893105780346843
+63.3037150308891796
  21
-122.8651162077429291
+125.8907058188284083
  31
 0.0
   0
@@ -6975,15 +7025,15 @@ Motor Gear
   6
 ByLayer
  10
-162.5893105780346843
+63.3037150308891796
  20
-122.8651162077429291
+125.8907058188284083
  30
 0.0
  11
-161.9146998172116128
+62.3754708748315068
  21
-122.1905054469198575
+126.2413106426567282
  31
 0.0
   0
@@ -7003,15 +7053,15 @@ Motor Gear
   6
 ByLayer
  10
-161.9146998172116128
+62.3754708748315068
  20
-122.1905054469198575
+126.2413106426567282
  30
 0.0
  11
-160.5495606703299245
+62.0721996317190872
  21
-122.750342181742468
+126.4505425536510188
  31
 0.0
   0
@@ -7031,15 +7081,15 @@ Motor Gear
   6
 ByLayer
  10
-160.5495606703299245
+62.0721996317190872
  20
-122.750342181742468
+126.4505425536510188
  30
 0.0
  11
-159.7438397053950894
+61.1699265331813251
  21
-123.3292386568292756
+125.2747392138629863
  31
 0.0
   0
@@ -7059,15 +7109,15 @@ Motor Gear
   6
 ByLayer
  10
-159.7438397053950894
+61.1699265331813251
  20
-123.3292386568292756
+125.2747392138629863
  30
 0.0
  11
-159.5050768110915271
+61.4505773681252947
  21
-123.6098894917732167
+125.0359763195594667
  31
 0.0
   0
@@ -7087,15 +7137,15 @@ Motor Gear
   6
 ByLayer
  10
-159.5050768110915271
+61.4505773681252947
  20
-123.6098894917732167
+125.0359763195594667
  30
 0.0
  11
-158.3292734713034804
+62.0294738432120312
  21
-122.7076163932354262
+124.2302553546246173
  31
 0.0
   0
@@ -7115,15 +7165,15 @@ Motor Gear
   6
 ByLayer
  10
-158.3292734713034804
+62.0294738432120312
  20
-122.7076163932354262
+124.2302553546246173
  30
 0.0
  11
-158.5385053822977852
+62.5893105780346843
  21
-122.4043451501230066
+122.8651162077429291
  31
 0.0
   0
@@ -7143,15 +7193,15 @@ Motor Gear
   6
 ByLayer
  10
-158.5385053822977852
+62.5893105780346843
  20
-122.4043451501230066
+122.8651162077429291
  30
 0.0
  11
-158.8891102061261051
+61.9146998172116128
  21
-121.4761009940653622
+122.1905054469198575
  31
 0.0
   0
@@ -7171,15 +7221,15 @@ Motor Gear
   6
 ByLayer
  10
-158.8891102061261051
+61.9146998172116128
  20
-121.4761009940653622
+122.1905054469198575
  30
 0.0
  11
-159.0765595568185802
+60.5495606703299245
  21
-120.0127347599625551
+122.750342181742468
  31
 0.0
   0
@@ -7199,15 +7249,15 @@ Motor Gear
   6
 ByLayer
  10
-159.0765595568185802
+60.5495606703299245
  20
-120.0127347599625551
+122.750342181742468
  30
 0.0
  11
-158.2503139165543189
+59.7438397053950894
  21
-119.5358368006691734
+123.3292386568292756
  31
 0.0
   0
@@ -7227,15 +7277,15 @@ Motor Gear
   6
 ByLayer
  10
-158.2503139165543189
+59.7438397053950894
  20
-119.5358368006691734
+123.3292386568292756
  30
 0.0
  11
-157.0766040832602641
+59.5050768110915271
  21
-120.4297321626558528
+123.6098894917732167
  31
 0.0
   0
@@ -7255,15 +7305,15 @@ Motor Gear
   6
 ByLayer
  10
-157.0766040832602641
+59.5050768110915271
  20
-120.4297321626558528
+123.6098894917732167
  30
 0.0
  11
-156.4482805209636069
+58.3292734713034804
  21
-121.1975444077304047
+122.7076163932354262
  31
 0.0
   0
@@ -7283,15 +7333,15 @@ Motor Gear
   6
 ByLayer
  10
-156.4482805209636069
+58.3292734713034804
  20
-121.1975444077304047
+122.7076163932354262
  30
 0.0
  11
-156.2901521350274265
+58.5385053822977852
  21
-121.5303466341520533
+122.4043451501230066
  31
 0.0
   0
@@ -7311,15 +7361,15 @@ Motor Gear
   6
 ByLayer
  10
-156.2901521350274265
+58.5385053822977852
  20
-121.5303466341520533
+122.4043451501230066
  30
 0.0
  11
-154.9210337673655999
+58.8891102061261051
  21
-120.9631792870828519
+121.4761009940653622
  31
 0.0
   0
@@ -7339,15 +7389,15 @@ Motor Gear
   6
 ByLayer
  10
-154.9210337673655999
+58.8891102061261051
  20
-120.9631792870828519
+121.4761009940653622
  30
 0.0
  11
-155.0446040827928869
+59.0765595568185802
  21
-120.6161351311588561
+120.0127347599625551
  31
 0.0
   0
@@ -7367,15 +7417,15 @@ Motor Gear
   6
 ByLayer
  10
-155.0446040827928869
+59.0765595568185802
  20
-120.6161351311588561
+120.0127347599625551
  30
 0.0
  11
-155.1430419306819601
+58.2503139165543189
  21
-119.628828266367762
+119.5358368006691734
  31
 0.0
   0
@@ -7395,15 +7445,15 @@ Motor Gear
   6
 ByLayer
  10
-155.1430419306819601
+58.2503139165543189
  20
-119.628828266367762
+119.5358368006691734
  30
 0.0
  11
-154.9453291291522419
+57.0766040832602641
  21
-118.1667184330073752
+120.4297321626558528
  31
 0.0
   0
@@ -7423,15 +7473,15 @@ Motor Gear
   6
 ByLayer
  10
-154.9453291291522419
+57.0766040832602641
  20
-118.1667184330073752
+120.4297321626558528
  30
 0.0
  11
-154.0237870139124823
+56.4482805209636069
  21
-117.9197870785906446
+121.1975444077304047
  31
 0.0
   0
@@ -7451,15 +7501,15 @@ Motor Gear
   6
 ByLayer
  10
-154.0237870139124823
+56.4482805209636069
  20
-117.9197870785906446
+121.1975444077304047
  30
 0.0
  11
-153.1215139153746918
+56.2901521350274265
  21
-119.087213423942643
+121.5303466341520533
  31
 0.0
   0
@@ -7479,15 +7529,15 @@ Motor Gear
   6
 ByLayer
  10
-153.1215139153746918
+56.2901521350274265
  20
-119.087213423942643
+121.5303466341520533
  30
 0.0
  11
-152.713103525670391
+54.9210337673655999
  21
-119.9913714946515171
+120.9631792870828519
  31
 0.0
   0
@@ -7507,15 +7557,15 @@ Motor Gear
   6
 ByLayer
  10
-152.713103525670391
+54.9210337673655999
  20
-119.9913714946515171
+120.9631792870828519
  30
 0.0
  11
-152.646710204690379
+55.0446040827928869
  21
-120.3537054464973721
+120.6161351311588561
  31
 0.0
   0
@@ -7535,15 +7585,15 @@ Motor Gear
   6
 ByLayer
  10
-152.646710204690379
+55.0446040827928869
  20
-120.3537054464973721
+120.6161351311588561
  30
 0.0
  11
-151.1772697590834014
+55.1430419306819601
  21
-120.1603904186236065
+119.628828266367762
  31
 0.0
   0
@@ -7563,15 +7613,15 @@ Motor Gear
   6
 ByLayer
  10
-151.1772697590834014
+55.1430419306819601
  20
-120.1603904186236065
+119.628828266367762
  30
 0.0
  11
-151.2068007423925735
+54.9453291291522419
  21
-119.7930308638081414
+118.1667184330073752
  31
 0.0
   0
@@ -7591,15 +7641,15 @@ Motor Gear
   6
 ByLayer
  10
-151.2068007423925735
+54.9453291291522419
  20
-119.7930308638081414
+118.1667184330073752
  30
 0.0
  11
-151.0463688314094952
+54.0237870139124823
  21
-118.8138924591302583
+117.9197870785906446
  31
 0.0
   0
@@ -7619,15 +7669,15 @@ Motor Gear
   6
 ByLayer
  10
-151.0463688314094952
+54.0237870139124823
  20
-118.8138924591302583
+117.9197870785906446
  30
 0.0
  11
-150.4768979592933533
+53.1215139153746918
  21
-117.4529425515816001
+119.087213423942643
  31
 0.0
   0
@@ -7647,15 +7697,15 @@ Motor Gear
   6
 ByLayer
  10
-150.4768979592933533
+53.1215139153746918
  20
-117.4529425515816001
+119.087213423942643
  30
 0.0
  11
-149.5231020407066467
+52.713103525670391
  21
-117.4529425515816001
+119.9913714946515171
  31
 0.0
   0
@@ -7675,15 +7725,15 @@ Motor Gear
   6
 ByLayer
  10
-149.5231020407066467
+52.713103525670391
  20
-117.4529425515816001
+119.9913714946515171
  30
 0.0
  11
-148.9536311685905048
+52.646710204690379
  21
-118.8138924591302583
+120.3537054464973721
  31
 0.0
   0
@@ -7703,15 +7753,15 @@ Motor Gear
   6
 ByLayer
  10
-148.9536311685905048
+52.646710204690379
  20
-118.8138924591302583
+120.3537054464973721
  30
 0.0
  11
-148.7931992576074265
+51.1772697590834014
  21
-119.7930308638081414
+120.1603904186236065
  31
 0.0
   0
@@ -7731,15 +7781,15 @@ Motor Gear
   6
 ByLayer
  10
-148.7931992576074265
+51.1772697590834014
  20
-119.7930308638081414
+120.1603904186236065
  30
 0.0
  11
-148.8227302409165986
+51.2068007423925735
  21
-120.1603904186236065
+119.7930308638081414
  31
 0.0
   0
@@ -7759,15 +7809,15 @@ Motor Gear
   6
 ByLayer
  10
-148.8227302409165986
+51.2068007423925735
  20
-120.1603904186236065
+119.7930308638081414
  30
 0.0
  11
-147.353289795309621
+51.0463688314094952
  21
-120.3537054464973721
+118.8138924591302583
  31
 0.0
   0
@@ -7787,15 +7837,15 @@ Motor Gear
   6
 ByLayer
  10
-147.353289795309621
+51.0463688314094952
  20
-120.3537054464973721
+118.8138924591302583
  30
 0.0
  11
-147.286896474329609
+50.4768979592933533
  21
-119.9913714946515171
+117.4529425515816001
  31
 0.0
   0
@@ -7815,15 +7865,15 @@ Motor Gear
   6
 ByLayer
  10
-147.286896474329609
+50.4768979592933533
  20
-119.9913714946515171
+117.4529425515816001
  30
 0.0
  11
-146.8784860846252798
+49.5231020407066467
  21
-119.087213423942643
+117.4529425515816001
  31
 0.0
   0
@@ -7843,15 +7893,15 @@ Motor Gear
   6
 ByLayer
  10
-146.8784860846252798
+49.5231020407066467
  20
-119.087213423942643
+117.4529425515816001
  30
 0.0
  11
-145.9762129860875177
+48.9536311685905048
  21
-117.9197870785906588
+118.8138924591302583
  31
 0.0
   0
@@ -7871,15 +7921,15 @@ Motor Gear
   6
 ByLayer
  10
-145.9762129860875177
+48.9536311685905048
  20
-117.9197870785906588
+118.8138924591302583
  30
 0.0
  11
-145.0546708708477297
+48.7931992576074265
  21
-118.1667184330073752
+119.7930308638081414
  31
 0.0
   0
@@ -7899,15 +7949,15 @@ Motor Gear
   6
 ByLayer
  10
-145.0546708708477297
+48.7931992576074265
  20
-118.1667184330073752
+119.7930308638081414
  30
 0.0
  11
-144.8569580693180114
+48.8227302409165986
  21
-119.628828266367762
+120.1603904186236065
  31
 0.0
   0
@@ -7927,15 +7977,15 @@ Motor Gear
   6
 ByLayer
  10
-144.8569580693180114
+48.8227302409165986
  20
-119.628828266367762
+120.1603904186236065
  30
 0.0
  11
-144.9553959172070847
+47.353289795309621
  21
-120.6161351311588703
+120.3537054464973721
  31
 0.0
   0
@@ -7955,15 +8005,15 @@ Motor Gear
   6
 ByLayer
  10
-144.9553959172070847
+47.353289795309621
  20
-120.6161351311588703
+120.3537054464973721
  30
 0.0
  11
-145.0789662326343716
+47.286896474329609
  21
-120.9631792870828519
+119.9913714946515171
  31
 0.0
   0
@@ -7983,15 +8033,15 @@ Motor Gear
   6
 ByLayer
  10
-145.0789662326343716
+47.286896474329609
  20
-120.9631792870828519
+119.9913714946515171
  30
 0.0
  11
-143.7098478649725735
+46.8784860846252798
  21
-121.5303466341520533
+119.087213423942643
  31
 0.0
   0
@@ -8011,15 +8061,15 @@ Motor Gear
   6
 ByLayer
  10
-143.7098478649725735
+46.8784860846252798
  20
-121.5303466341520533
+119.087213423942643
  30
 0.0
  11
-143.5517194790363931
+45.9762129860875177
  21
-121.1975444077304047
+117.9197870785906588
  31
 0.0
   0
@@ -8039,15 +8089,15 @@ Motor Gear
   6
 ByLayer
  10
-143.5517194790363931
+45.9762129860875177
  20
-121.1975444077304047
+117.9197870785906588
  30
 0.0
  11
-142.9233959167397074
+45.0546708708477297
  21
-120.4297321626558528
+118.1667184330073752
  31
 0.0
   0
@@ -8067,15 +8117,15 @@ Motor Gear
   6
 ByLayer
  10
-142.9233959167397074
+45.0546708708477297
  20
-120.4297321626558528
+118.1667184330073752
  30
 0.0
  11
-141.7496860834456527
+44.8569580693180114
  21
-119.5358368006691734
+119.628828266367762
  31
 0.0
   0
@@ -8095,15 +8145,15 @@ Motor Gear
   6
 ByLayer
  10
-141.7496860834456527
+44.8569580693180114
  20
-119.5358368006691734
+119.628828266367762
  30
 0.0
  11
-140.9234404431814198
+44.9553959172070847
  21
-120.0127347599625551
+120.6161351311588703
  31
 0.0
   0
@@ -8123,15 +8173,15 @@ Motor Gear
   6
 ByLayer
  10
-140.9234404431814198
+44.9553959172070847
  20
-120.0127347599625551
+120.6161351311588703
  30
 0.0
  11
-141.1108897938738664
+45.0789662326343716
  21
-121.4761009940653622
+120.9631792870828519
  31
 0.0
   0
@@ -8151,15 +8201,15 @@ Motor Gear
   6
 ByLayer
  10
-141.1108897938738664
+45.0789662326343716
  20
-121.4761009940653622
+120.9631792870828519
  30
 0.0
  11
-141.4614946177021864
+43.7098478649725735
  21
-122.4043451501230066
+121.5303466341520533
  31
 0.0
   0
@@ -8179,15 +8229,15 @@ Motor Gear
   6
 ByLayer
  10
-141.4614946177021864
+43.7098478649725735
  20
-122.4043451501230066
+121.5303466341520533
  30
 0.0
  11
-141.6707265286965196
+43.5517194790363931
  21
-122.7076163932354262
+121.1975444077304047
  31
 0.0
   0
@@ -8207,15 +8257,15 @@ Motor Gear
   6
 ByLayer
  10
-141.6707265286965196
+43.5517194790363931
  20
-122.7076163932354262
+121.1975444077304047
  30
 0.0
  11
-140.4949231889084444
+42.9233959167397074
  21
-123.6098894917732167
+120.4297321626558528
  31
 0.0
   0
@@ -8235,15 +8285,15 @@ Motor Gear
   6
 ByLayer
  10
-140.4949231889084444
+42.9233959167397074
  20
-123.6098894917732167
+120.4297321626558528
  30
 0.0
  11
-140.2561602946049106
+41.7496860834456527
  21
-123.3292386568292756
+119.5358368006691734
  31
 0.0
   0
@@ -8263,15 +8313,15 @@ Motor Gear
   6
 ByLayer
  10
-140.2561602946049106
+41.7496860834456527
  20
-123.3292386568292756
+119.5358368006691734
  30
 0.0
  11
-139.4504393296700755
+40.9234404431814198
  21
-122.7503421817424822
+120.0127347599625551
  31
 0.0
   0
@@ -8291,15 +8341,15 @@ Motor Gear
   6
 ByLayer
  10
-139.4504393296700755
+40.9234404431814198
  20
-122.7503421817424822
+120.0127347599625551
  30
 0.0
  11
-138.0853001827883872
+41.1108897938738664
  21
-122.1905054469198575
+121.4761009940653622
  31
 0.0
   0
@@ -8319,15 +8369,15 @@ Motor Gear
   6
 ByLayer
  10
-138.0853001827883872
+41.1108897938738664
  20
-122.1905054469198575
+121.4761009940653622
  30
 0.0
  11
-137.4106894219652872
+41.4614946177021864
  21
-122.8651162077429291
+122.4043451501230066
  31
 0.0
   0
@@ -8347,15 +8397,15 @@ Motor Gear
   6
 ByLayer
  10
-137.4106894219652872
+41.4614946177021864
  20
-122.8651162077429291
+122.4043451501230066
  30
 0.0
  11
-137.9705261567879404
+41.6707265286965196
  21
-124.2302553546246173
+122.7076163932354262
  31
 0.0
   0
@@ -8375,15 +8425,15 @@ Motor Gear
   6
 ByLayer
  10
-137.9705261567879404
+41.6707265286965196
  20
-124.2302553546246173
+122.7076163932354262
  30
 0.0
  11
-138.5494226318747053
+40.4949231889084444
  21
-125.0359763195594809
+123.6098894917732167
  31
 0.0
   0
@@ -8403,15 +8453,15 @@ Motor Gear
   6
 ByLayer
  10
-138.5494226318747053
+40.4949231889084444
  20
-125.0359763195594809
+123.6098894917732167
  30
 0.0
  11
-138.8300734668186749
+40.2561602946049106
  21
-125.2747392138629863
+123.3292386568292756
  31
 0.0
   0
@@ -8431,15 +8481,15 @@ Motor Gear
   6
 ByLayer
  10
-138.8300734668186749
+40.2561602946049106
  20
-125.2747392138629863
+123.3292386568292756
  30
 0.0
  11
-137.9278003682809128
+39.4504393296700755
  21
-126.450542553651033
+122.7503421817424822
  31
 0.0
   0
@@ -8459,15 +8509,15 @@ Motor Gear
   6
 ByLayer
  10
-137.9278003682809128
+39.4504393296700755
  20
-126.450542553651033
+122.7503421817424822
  30
 0.0
  11
-137.6245291251684648
+38.0853001827883872
  21
-126.2413106426567566
+122.1905054469198575
  31
 0.0
   0
@@ -8487,15 +8537,15 @@ Motor Gear
   6
 ByLayer
  10
-137.6245291251684648
+38.0853001827883872
  20
-126.2413106426567566
+122.1905054469198575
  30
 0.0
  11
-136.6962849691108204
+37.4106894219652872
  21
-125.8907058188284225
+122.8651162077429291
  31
 0.0
   0
@@ -8515,15 +8565,15 @@ Motor Gear
   6
 ByLayer
  10
-136.6962849691108204
+37.4106894219652872
  20
-125.8907058188284225
+122.8651162077429291
  30
 0.0
  11
-135.2329187350080133
+37.9705261567879404
  21
-125.7032564681359617
+124.2302553546246173
  31
 0.0
   0
@@ -8543,15 +8593,15 @@ Motor Gear
   6
 ByLayer
  10
-135.2329187350080133
+37.9705261567879404
  20
-125.7032564681359617
+124.2302553546246173
  30
 0.0
  11
-134.75602077571466
+38.5494226318747053
  21
-126.5295021084001945
+125.0359763195594809
  31
 0.0
   0
@@ -8571,15 +8621,15 @@ Motor Gear
   6
 ByLayer
  10
-134.75602077571466
+38.5494226318747053
  20
-126.5295021084001945
+125.0359763195594809
  30
 0.0
  11
-135.6499161377013252
+38.8300734668186749
  21
-127.7032119416942493
+125.2747392138629863
  31
 0.0
   0
@@ -8599,15 +8649,15 @@ Motor Gear
   6
 ByLayer
  10
-135.6499161377013252
+38.8300734668186749
  20
-127.7032119416942493
+125.2747392138629863
  30
 0.0
  11
-136.4177283827758913
+37.9278003682809128
  21
-128.3315355039909207
+126.450542553651033
  31
 0.0
   0
@@ -8627,15 +8677,15 @@ Motor Gear
   6
 ByLayer
  10
-136.4177283827758913
+37.9278003682809128
  20
-128.3315355039909207
+126.450542553651033
  30
 0.0
  11
-136.7505306091975399
+37.6245291251684648
  21
-128.4896638899271011
+126.2413106426567566
  31
 0.0
   0
@@ -8655,15 +8705,15 @@ Motor Gear
   6
 ByLayer
  10
-136.7505306091975399
+37.6245291251684648
  20
-128.4896638899271011
+126.2413106426567566
  30
 0.0
  11
-136.1833632621282959
+36.6962849691108204
  21
-129.8587822575889277
+125.8907058188284225
  31
 0.0
   0
@@ -8683,15 +8733,15 @@ Motor Gear
   6
 ByLayer
  10
-136.1833632621282959
+36.6962849691108204
  20
-129.8587822575889277
+125.8907058188284225
  30
 0.0
  11
-135.8363191062043143
+35.2329187350080133
  21
-129.7352119421616408
+125.7032564681359617
  31
 0.0
   0
@@ -8711,15 +8761,15 @@ Motor Gear
   6
 ByLayer
  10
-135.8363191062043143
+35.2329187350080133
  20
-129.7352119421616408
+125.7032564681359617
  30
 0.0
  11
-134.8490122414132202
+34.75602077571466
  21
-129.6367740942725391
+126.5295021084001945
  31
 0.0
   0
@@ -8739,15 +8789,15 @@ Motor Gear
   6
 ByLayer
  10
-134.8490122414132202
+34.75602077571466
  20
-129.6367740942725391
+126.5295021084001945
  30
 0.0
  11
-133.3869024080528334
+35.6499161377013252
  21
-129.8344868958022289
+127.7032119416942493
  31
 0.0
   0
@@ -8767,15 +8817,15 @@ Motor Gear
   6
 ByLayer
  10
-133.3869024080528334
+35.6499161377013252
  20
-129.8344868958022289
+127.7032119416942493
  30
 0.0
  11
-133.1399710536361169
+36.4177283827758913
  21
-130.7560290110420738
+128.3315355039909207
  31
 0.0
   0
@@ -8795,15 +8845,15 @@ Motor Gear
   6
 ByLayer
  10
-133.1399710536361169
+36.4177283827758913
  20
-130.7560290110420738
+128.3315355039909207
  30
 0.0
  11
-134.3073973989881154
+36.7505306091975399
  21
-131.6583021095798358
+128.4896638899271011
  31
 0.0
   0
@@ -8823,15 +8873,15 @@ Motor Gear
   6
 ByLayer
  10
-134.3073973989881154
+36.7505306091975399
  20
-131.6583021095798358
+128.4896638899271011
  30
 0.0
  11
-135.2115554696970037
+36.1833632621282959
  21
-132.0667124992841082
+129.8587822575889277
  31
 0.0
   0
@@ -8851,15 +8901,15 @@ Motor Gear
   6
 ByLayer
  10
-135.2115554696970037
+36.1833632621282959
  20
-132.0667124992841082
+129.8587822575889277
  30
 0.0
  11
-135.5738894215428445
+35.8363191062043143
  21
-132.1331058202641771
+129.7352119421616408
  31
 0.0
   0
@@ -8879,15 +8929,15 @@ Motor Gear
   6
 ByLayer
  10
-135.5738894215428445
+35.8363191062043143
  20
-132.1331058202641771
+129.7352119421616408
  30
 0.0
  11
-135.3805743936690646
+34.8490122414132202
  21
-133.6025462658711831
+129.6367740942725391
  31
 0.0
   0
@@ -8907,15 +8957,15 @@ Motor Gear
   6
 ByLayer
  10
-135.3805743936690646
+34.8490122414132202
  20
-133.6025462658711831
+129.6367740942725391
  30
 0.0
  11
-135.0132148388535995
+33.3869024080528334
  21
-133.5730152825619257
+129.8344868958022289
  31
 0.0
   0
@@ -8935,15 +8985,15 @@ Motor Gear
   6
 ByLayer
  10
-135.0132148388535995
+33.3869024080528334
  20
-133.5730152825619257
+129.8344868958022289
  30
 0.0
  11
-134.0340764341756881
+33.1399710536361169
  21
-133.7334471935450324
+130.7560290110420738
  31
 0.0
   0
@@ -8963,15 +9013,15 @@ Motor Gear
   6
 ByLayer
  10
-134.0340764341756881
+33.1399710536361169
  20
-133.7334471935450324
+130.7560290110420738
  30
 0.0
  11
-132.6731265266270725
+34.3073973989881154
  21
-134.3029180656611743
+131.6583021095798358
  31
 0.0
   0
@@ -8991,15 +9041,15 @@ Motor Gear
   6
 ByLayer
  10
-132.6731265266270725
+34.3073973989881154
  20
-134.3029180656611743
+131.6583021095798358
  30
 0.0
  11
-132.6731265266270725
+35.2115554696970037
  21
-135.2567139842479378
+132.0667124992841082
  31
 0.0
   0
@@ -9019,15 +9069,15 @@ Motor Gear
   6
 ByLayer
  10
-132.6731265266270725
+35.2115554696970037
  20
-135.2567139842479378
+132.0667124992841082
  30
 0.0
  11
-134.0340764341756881
+35.5738894215428445
  21
-135.8261848563640228
+132.1331058202641771
  31
 0.0
   0
@@ -9047,15 +9097,15 @@ Motor Gear
   6
 ByLayer
  10
-134.0340764341756881
+35.5738894215428445
  20
-135.8261848563640228
+132.1331058202641771
  30
 0.0
  11
-135.0132148388535995
+35.3805743936690646
  21
-135.9866167673471296
+133.6025462658711831
  31
 0.0
   0
@@ -9075,15 +9125,15 @@ Motor Gear
   6
 ByLayer
  10
-135.0132148388535995
+35.3805743936690646
  20
-135.9866167673471296
+133.6025462658711831
  30
 0.0
  11
-135.3805743936690646
+35.0132148388535995
  21
-135.957085784037929
+133.5730152825619257
  31
 0.0
   0
@@ -9103,15 +9153,15 @@ Motor Gear
   6
 ByLayer
  10
-135.3805743936690646
+35.0132148388535995
  20
-135.957085784037929
+133.5730152825619257
  30
 0.0
  11
-135.5738894215428445
+34.0340764341756881
  21
-137.426526229644935
+133.7334471935450324
  31
 0.0
   0
@@ -9131,15 +9181,15 @@ Motor Gear
   6
 ByLayer
  10
-135.5738894215428445
+34.0340764341756881
  20
-137.426526229644935
+133.7334471935450324
  30
 0.0
  11
-135.2115554696970037
+32.6731265266270725
  21
-137.4929195506249471
+134.3029180656611743
  31
 0.0
   0
@@ -9159,15 +9209,15 @@ Motor Gear
   6
 ByLayer
  10
-135.2115554696970037
+32.6731265266270725
  20
-137.4929195506249471
+134.3029180656611743
  30
 0.0
  11
-134.3073973989881154
+32.6731265266270725
  21
-137.9013299403292194
+135.2567139842479378
  31
 0.0
   0
@@ -9187,15 +9237,15 @@ Motor Gear
   6
 ByLayer
  10
-134.3073973989881154
+32.6731265266270725
  20
-137.9013299403292194
+135.2567139842479378
  30
 0.0
  11
-133.1399710536361169
+34.0340764341756881
  21
-138.8036030388669815
+135.8261848563640228
  31
 0.0
   0
@@ -9215,15 +9265,15 @@ Motor Gear
   6
 ByLayer
  10
-133.1399710536361169
+34.0340764341756881
  20
-138.8036030388669815
+135.8261848563640228
  30
 0.0
  11
-133.3869024080528334
+35.0132148388535995
  21
-139.7251451541068263
+135.9866167673471296
  31
 0.0
   0
@@ -9243,15 +9293,15 @@ Motor Gear
   6
 ByLayer
  10
-133.3869024080528334
+35.0132148388535995
  20
-139.7251451541068263
+135.9866167673471296
  30
 0.0
  11
-134.8490122414132202
+35.3805743936690646
  21
-139.9228579556365162
+135.957085784037929
  31
 0.0
   0
@@ -9271,15 +9321,15 @@ Motor Gear
   6
 ByLayer
  10
-134.8490122414132202
+35.3805743936690646
  20
-139.9228579556365162
+135.957085784037929
  30
 0.0
  11
-135.8363191062043143
+35.5738894215428445
  21
-139.8244201077474145
+137.426526229644935
  31
 0.0
   0
@@ -9299,15 +9349,15 @@ Motor Gear
   6
 ByLayer
  10
-135.8363191062043143
+35.5738894215428445
  20
-139.8244201077474145
+137.426526229644935
  30
 0.0
  11
-136.1833632621282959
+35.2115554696970037
  21
-139.700849792320156
+137.4929195506249471
  31
 0.0
   0
@@ -9327,15 +9377,15 @@ Motor Gear
   6
 ByLayer
  10
-136.1833632621282959
+35.2115554696970037
  20
-139.700849792320156
+137.4929195506249471
  30
 0.0
  11
-136.7505306091975399
+34.3073973989881154
  21
-141.0699681599819542
+137.9013299403292194
  31
 0.0
   0
@@ -9355,15 +9405,15 @@ Motor Gear
   6
 ByLayer
  10
-136.7505306091975399
+34.3073973989881154
  20
-141.0699681599819542
+137.9013299403292194
  30
 0.0
  11
-136.4177283827758913
+33.1399710536361169
  21
-141.228096545918163
+138.8036030388669815
  31
 0.0
   0
@@ -9383,15 +9433,15 @@ Motor Gear
   6
 ByLayer
  10
-136.4177283827758913
+33.1399710536361169
  20
-141.228096545918163
+138.8036030388669815
  30
 0.0
  11
-135.6499161377013252
+33.3869024080528334
  21
-141.8564201082148202
+139.7251451541068263
  31
 0.0
   0
@@ -9411,15 +9461,15 @@ Motor Gear
   6
 ByLayer
  10
-135.6499161377013252
+33.3869024080528334
  20
-141.8564201082148202
+139.7251451541068263
  30
 0.0
  11
-134.75602077571466
+34.8490122414132202
  21
-143.0301299415089034
+139.9228579556365162
  31
 0.0
   0
@@ -9439,15 +9489,15 @@ Motor Gear
   6
 ByLayer
  10
-134.75602077571466
+34.8490122414132202
  20
-143.0301299415089034
+139.9228579556365162
  30
 0.0
  11
-135.2329187350080133
+35.8363191062043143
  21
-143.8563755817731362
+139.8244201077474145
  31
 0.0
   0
@@ -9467,15 +9517,15 @@ Motor Gear
   6
 ByLayer
  10
-135.2329187350080133
+35.8363191062043143
  20
-143.8563755817731362
+139.8244201077474145
  30
 0.0
  11
-136.6962849691108204
+36.1833632621282959
  21
-143.6689262310806612
+139.700849792320156
  31
 0.0
   0
@@ -9495,15 +9545,15 @@ Motor Gear
   6
 ByLayer
  10
-136.6962849691108204
+36.1833632621282959
  20
-143.6689262310806612
+139.700849792320156
  30
 0.0
  11
-137.6245291251684648
+36.7505306091975399
  21
-143.3183214072523128
+141.0699681599819542
  31
 0.0
   0
@@ -9523,15 +9573,15 @@ Motor Gear
   6
 ByLayer
  10
-137.6245291251684648
+36.7505306091975399
  20
-143.3183214072523128
+141.0699681599819542
  30
 0.0
  11
-137.9278003682809128
+36.4177283827758913
  21
-143.1090894962580364
+141.228096545918163
  31
 0.0
   0
@@ -9551,15 +9601,15 @@ Motor Gear
   6
 ByLayer
  10
-137.9278003682809128
+36.4177283827758913
  20
-143.1090894962580364
+141.228096545918163
  30
 0.0
  11
-138.8300734668186749
+35.6499161377013252
  21
-144.2848928360460832
+141.8564201082148202
  31
 0.0
   0
@@ -9579,15 +9629,15 @@ Motor Gear
   6
 ByLayer
  10
-138.8300734668186749
+35.6499161377013252
  20
-144.2848928360460832
+141.8564201082148202
  30
 0.0
  11
-138.5494226318747053
+34.75602077571466
  21
-144.523655730349617
+143.0301299415089034
  31
 0.0
   0
@@ -9607,15 +9657,15 @@ Motor Gear
   6
 ByLayer
  10
-138.5494226318747053
+34.75602077571466
  20
-144.523655730349617
+143.0301299415089034
  30
 0.0
  11
-137.9705261567879688
+35.2329187350080133
  21
-145.3293766952844521
+143.8563755817731362
  31
 0.0
   0
@@ -9635,15 +9685,15 @@ Motor Gear
   6
 ByLayer
  10
-137.9705261567879688
+35.2329187350080133
  20
-145.3293766952844521
+143.8563755817731362
  30
 0.0
  11
-137.4106894219652872
+36.6962849691108204
  21
-146.6945158421661404
+143.6689262310806612
  31
 0.0
   0
@@ -9663,15 +9713,15 @@ Motor Gear
   6
 ByLayer
  10
-137.4106894219652872
+36.6962849691108204
  20
-146.6945158421661404
+143.6689262310806612
  30
 0.0
  11
-138.0853001827883872
+37.6245291251684648
  21
-147.3691266029891835
+143.3183214072523128
  31
 0.0
   0
@@ -9691,15 +9741,15 @@ Motor Gear
   6
 ByLayer
  10
-138.0853001827883872
+37.6245291251684648
  20
-147.3691266029891835
+143.3183214072523128
  30
 0.0
  11
-139.4504393296700755
+37.9278003682809128
  21
-146.8092898681666156
+143.1090894962580364
  31
 0.0
   0
@@ -9719,15 +9769,15 @@ Motor Gear
   6
 ByLayer
  10
-139.4504393296700755
+37.9278003682809128
  20
-146.8092898681666156
+143.1090894962580364
  30
 0.0
  11
-140.2561602946049391
+38.8300734668186749
  21
-146.2303933930797939
+144.2848928360460832
  31
 0.0
   0
@@ -9747,15 +9797,15 @@ Motor Gear
   6
 ByLayer
  10
-140.2561602946049391
+38.8300734668186749
  20
-146.2303933930797939
+144.2848928360460832
  30
 0.0
  11
-140.4949231889084444
+38.5494226318747053
  21
-145.9497425581358243
+144.523655730349617
  31
 0.0
   0
@@ -9775,15 +9825,15 @@ Motor Gear
   6
 ByLayer
  10
-140.4949231889084444
+38.5494226318747053
  20
-145.9497425581358243
+144.523655730349617
  30
 0.0
  11
-141.6707265286965196
+37.9705261567879688
  21
-146.8520156566736432
+145.3293766952844521
  31
 0.0
   0
@@ -9803,15 +9853,15 @@ Motor Gear
   6
 ByLayer
  10
-141.6707265286965196
+37.9705261567879688
  20
-146.8520156566736432
+145.3293766952844521
  30
 0.0
  11
-141.4614946177021864
+37.4106894219652872
  21
-147.1552868997860628
+146.6945158421661404
  31
 0.0
   0
@@ -9831,15 +9881,15 @@ Motor Gear
   6
 ByLayer
  10
-141.4614946177021864
+37.4106894219652872
  20
-147.1552868997860628
+146.6945158421661404
  30
 0.0
  11
-141.1108897938738664
+38.0853001827883872
  21
-148.0835310558437072
+147.3691266029891835
  31
 0.0
   0
@@ -9859,15 +9909,15 @@ Motor Gear
   6
 ByLayer
  10
-141.1108897938738664
+38.0853001827883872
  20
-148.0835310558437072
+147.3691266029891835
  30
 0.0
  11
-140.9234404431814198
+39.4504393296700755
  21
-149.5468972899465143
+146.8092898681666156
  31
 0.0
   0
@@ -9887,15 +9937,15 @@ Motor Gear
   6
 ByLayer
  10
-140.9234404431814198
+39.4504393296700755
  20
-149.5468972899465143
+146.8092898681666156
  30
 0.0
  11
-141.7496860834456527
+40.2561602946049391
  21
-150.0237952492398676
+146.2303933930797939
  31
 0.0
   0
@@ -9915,15 +9965,15 @@ Motor Gear
   6
 ByLayer
  10
-141.7496860834456527
+40.2561602946049391
  20
-150.0237952492398676
+146.2303933930797939
  30
 0.0
  11
-142.9233959167397359
+40.4949231889084444
  21
-149.1298998872532025
+145.9497425581358243
  31
 0.0
   0
@@ -9943,15 +9993,15 @@ Motor Gear
   6
 ByLayer
  10
-142.9233959167397359
+40.4949231889084444
  20
-149.1298998872532025
+145.9497425581358243
  30
 0.0
  11
-143.5517194790363931
+41.6707265286965196
  21
-148.3620876421786647
+146.8520156566736432
  31
 0.0
   0
@@ -9971,15 +10021,15 @@ Motor Gear
   6
 ByLayer
  10
-143.5517194790363931
+41.6707265286965196
  20
-148.3620876421786647
+146.8520156566736432
  30
 0.0
  11
-143.7098478649725735
+41.4614946177021864
  21
-148.0292854157569877
+147.1552868997860628
  31
 0.0
   0
@@ -9999,15 +10049,15 @@ Motor Gear
   6
 ByLayer
  10
-143.7098478649725735
+41.4614946177021864
  20
-148.0292854157569877
+147.1552868997860628
  30
 0.0
  11
-145.0789662326344001
+41.1108897938738664
  21
-148.5964527628262317
+148.0835310558437072
  31
 0.0
   0
@@ -10027,15 +10077,15 @@ Motor Gear
   6
 ByLayer
  10
-145.0789662326344001
+41.1108897938738664
  20
-148.5964527628262317
+148.0835310558437072
  30
 0.0
  11
-144.9553959172070847
+40.9234404431814198
  21
-148.9434969187502134
+149.5468972899465143
  31
 0.0
   0
@@ -10055,15 +10105,15 @@ Motor Gear
   6
 ByLayer
  10
-144.9553959172070847
+40.9234404431814198
  20
-148.9434969187502134
+149.5468972899465143
  30
 0.0
  11
-144.8569580693180114
+41.7496860834456527
  21
-149.9308037835413074
+150.0237952492398676
  31
 0.0
   0
@@ -10083,15 +10133,15 @@ Motor Gear
   6
 ByLayer
  10
-144.8569580693180114
+41.7496860834456527
  20
-149.9308037835413074
+150.0237952492398676
  30
 0.0
  11
-145.0546708708477297
+42.9233959167397359
  21
-151.3929136169016942
+149.1298998872532025
  31
 0.0
   0
@@ -10111,15 +10161,15 @@ Motor Gear
   6
 ByLayer
  10
-145.0546708708477297
+42.9233959167397359
  20
-151.3929136169016942
+149.1298998872532025
  30
 0.0
  11
-145.9762129860875177
+43.5517194790363931
  21
-151.6398449713184391
+148.3620876421786647
  31
 0.0
   0
@@ -10139,15 +10189,15 @@ Motor Gear
   6
 ByLayer
  10
-145.9762129860875177
+43.5517194790363931
  20
-151.6398449713184391
+148.3620876421786647
  30
 0.0
  11
-146.8784860846252798
+43.7098478649725735
  21
-150.4724186259664407
+148.0292854157569877
  31
 0.0
   0
@@ -10167,15 +10217,15 @@ Motor Gear
   6
 ByLayer
  10
-146.8784860846252798
+43.7098478649725735
  20
-150.4724186259664407
+148.0292854157569877
  30
 0.0
  11
-147.2868964743295805
+45.0789662326344001
  21
-149.5682605552575524
+148.5964527628262317
  31
 0.0
   0
@@ -10195,15 +10245,15 @@ Motor Gear
   6
 ByLayer
  10
-147.2868964743295805
+45.0789662326344001
  20
-149.5682605552575524
+148.5964527628262317
  30
 0.0
  11
-147.353289795309621
+44.9553959172070847
  21
-149.2059266034116831
+148.9434969187502134
  31
 0.0
   0
@@ -10223,15 +10273,15 @@ Motor Gear
   6
 ByLayer
  10
-147.353289795309621
+44.9553959172070847
  20
-149.2059266034116831
+148.9434969187502134
  30
 0.0
  11
-148.8227302409165986
+44.8569580693180114
  21
-149.399241631285463
+149.9308037835413074
  31
 0.0
   0
@@ -10251,15 +10301,15 @@ Motor Gear
   6
 ByLayer
  10
-148.8227302409165986
+44.8569580693180114
  20
-149.399241631285463
+149.9308037835413074
  30
 0.0
  11
-148.7931992576074265
+45.0546708708477297
  21
-149.7666011861008997
+151.3929136169016942
  31
 0.0
   0
@@ -10279,15 +10329,15 @@ Motor Gear
   6
 ByLayer
  10
-148.7931992576074265
+45.0546708708477297
  20
-149.7666011861008997
+151.3929136169016942
  30
 0.0
  11
-148.9536311685905048
+45.9762129860875177
  21
-150.7457395907787827
+151.6398449713184391
  31
 0.0
   0
@@ -10307,15 +10357,15 @@ Motor Gear
   6
 ByLayer
  10
-148.9536311685905048
+45.9762129860875177
  20
-150.7457395907787827
+151.6398449713184391
  30
 0.0
  11
-149.5231020407066467
+46.8784860846252798
  21
-152.1066894983274551
+150.4724186259664407
  31
 0.0
   0
@@ -10335,15 +10385,15 @@ Motor Gear
   6
 ByLayer
  10
-149.5231020407066467
+46.8784860846252798
  20
-152.1066894983274551
+150.4724186259664407
  30
 0.0
  11
-150.4768979592933533
+47.2868964743295805
  21
-152.1066894983274551
+149.5682605552575524
  31
 0.0
   0
@@ -10363,15 +10413,15 @@ Motor Gear
   6
 ByLayer
  10
-150.4768979592933533
+47.2868964743295805
  20
-152.1066894983274551
+149.5682605552575524
  30
 0.0
  11
-151.0463688314094952
+47.353289795309621
  21
-150.7457395907787827
+149.2059266034116831
  31
 0.0
   0
@@ -10391,15 +10441,15 @@ Motor Gear
   6
 ByLayer
  10
-151.0463688314094952
+47.353289795309621
  20
-150.7457395907787827
+149.2059266034116831
  30
 0.0
  11
-151.2068007423925735
+48.8227302409165986
  21
-149.7666011861008997
+149.399241631285463
  31
 0.0
   0
@@ -10419,15 +10469,15 @@ Motor Gear
   6
 ByLayer
  10
-151.2068007423925735
+48.8227302409165986
  20
-149.7666011861008997
+149.399241631285463
  30
 0.0
  11
-151.1772697590833729
+48.7931992576074265
  21
-149.399241631285463
+149.7666011861008997
  31
 0.0
   0
@@ -10447,15 +10497,15 @@ Motor Gear
   6
 ByLayer
  10
-151.1772697590833729
+48.7931992576074265
  20
-149.399241631285463
+149.7666011861008997
  30
 0.0
  11
-152.646710204690379
+48.9536311685905048
  21
-149.2059266034116831
+150.7457395907787827
  31
 0.0
   0
@@ -10475,15 +10525,15 @@ Motor Gear
   6
 ByLayer
  10
-152.646710204690379
+48.9536311685905048
  20
-149.2059266034116831
+150.7457395907787827
  30
 0.0
  11
-152.713103525670391
+49.5231020407066467
  21
-149.5682605552575524
+152.1066894983274551
  31
 0.0
   0
@@ -10503,15 +10553,15 @@ Motor Gear
   6
 ByLayer
  10
-152.713103525670391
+49.5231020407066467
  20
-149.5682605552575524
+152.1066894983274551
  30
 0.0
  11
-153.1215139153747202
+50.4768979592933533
  21
-150.4724186259664407
+152.1066894983274551
  31
 0.0
   0
@@ -10531,15 +10581,15 @@ Motor Gear
   6
 ByLayer
  10
-153.1215139153747202
+50.4768979592933533
  20
-150.4724186259664407
+152.1066894983274551
  30
 0.0
  11
-154.0237870139124823
+51.0463688314094952
  21
-151.6398449713184391
+150.7457395907787827
  31
 0.0
   0
@@ -10559,15 +10609,15 @@ Motor Gear
   6
 ByLayer
  10
-154.0237870139124823
+51.0463688314094952
  20
-151.6398449713184391
+150.7457395907787827
  30
 0.0
  11
-154.9453291291522419
+51.2068007423925735
  21
-151.3929136169016942
+149.7666011861008997
  31
 0.0
   0
@@ -10587,15 +10637,15 @@ Motor Gear
   6
 ByLayer
  10
-154.9453291291522419
+51.2068007423925735
  20
-151.3929136169016942
+149.7666011861008997
  30
 0.0
  11
-155.1430419306819601
+51.1772697590833729
  21
-149.9308037835413074
+149.399241631285463
  31
 0.0
   0
@@ -10615,15 +10665,15 @@ Motor Gear
   6
 ByLayer
  10
-155.1430419306819601
+51.1772697590833729
  20
-149.9308037835413074
+149.399241631285463
  30
 0.0
  11
-155.0446040827929153
+52.646710204690379
  21
-148.9434969187502134
+149.2059266034116831
  31
 0.0
   0
@@ -10643,15 +10693,15 @@ Motor Gear
   6
 ByLayer
  10
-155.0446040827929153
+52.646710204690379
  20
-148.9434969187502134
+149.2059266034116831
  30
 0.0
  11
-154.9210337673655999
+52.713103525670391
  21
-148.5964527628262317
+149.5682605552575524
  31
 0.0
   0
@@ -10671,15 +10721,15 @@ Motor Gear
   6
 ByLayer
  10
-154.9210337673655999
+52.713103525670391
  20
-148.5964527628262317
+149.5682605552575524
  30
 0.0
  11
-156.2901521350274265
+53.1215139153747202
  21
-148.0292854157569877
+150.4724186259664407
  31
 0.0
   0
@@ -10699,15 +10749,15 @@ Motor Gear
   6
 ByLayer
  10
-156.2901521350274265
+53.1215139153747202
  20
-148.0292854157569877
+150.4724186259664407
  30
 0.0
  11
-156.4482805209636069
+54.0237870139124823
  21
-148.3620876421786647
+151.6398449713184391
  31
 0.0
   0
@@ -10727,15 +10777,15 @@ Motor Gear
   6
 ByLayer
  10
-156.4482805209636069
+54.0237870139124823
  20
-148.3620876421786647
+151.6398449713184391
  30
 0.0
  11
-157.0766040832602926
+54.9453291291522419
  21
-149.1298998872532025
+151.3929136169016942
  31
 0.0
   0
@@ -10755,15 +10805,15 @@ Motor Gear
   6
 ByLayer
  10
-157.0766040832602926
+54.9453291291522419
  20
-149.1298998872532025
+151.3929136169016942
  30
 0.0
  11
-158.2503139165543473
+55.1430419306819601
  21
-150.0237952492398676
+149.9308037835413074
  31
 0.0
   0
@@ -10783,15 +10833,15 @@ Motor Gear
   6
 ByLayer
  10
-158.2503139165543473
+55.1430419306819601
  20
-150.0237952492398676
+149.9308037835413074
  30
 0.0
  11
-159.0765595568185802
+55.0446040827929153
  21
-149.5468972899465143
+148.9434969187502134
  31
 0.0
   0
@@ -10811,15 +10861,15 @@ Motor Gear
   6
 ByLayer
  10
-159.0765595568185802
+55.0446040827929153
  20
-149.5468972899465143
+148.9434969187502134
  30
 0.0
  11
-158.8891102061261051
+54.9210337673655999
  21
-148.0835310558437072
+148.5964527628262317
  31
 0.0
   0
@@ -10839,15 +10889,15 @@ Motor Gear
   6
 ByLayer
  10
-158.8891102061261051
+54.9210337673655999
  20
-148.0835310558437072
+148.5964527628262317
  30
 0.0
  11
-158.5385053822978136
+56.2901521350274265
  21
-147.1552868997860628
+148.0292854157569877
  31
 0.0
   0
@@ -10867,15 +10917,15 @@ Motor Gear
   6
 ByLayer
  10
-158.5385053822978136
+56.2901521350274265
  20
-147.1552868997860628
+148.0292854157569877
  30
 0.0
  11
-158.3292734713034804
+56.4482805209636069
  21
-146.8520156566736432
+148.3620876421786647
  31
 0.0
   0
@@ -10895,15 +10945,15 @@ Motor Gear
   6
 ByLayer
  10
-158.3292734713034804
+56.4482805209636069
  20
-146.8520156566736432
+148.3620876421786647
  30
 0.0
  11
-159.5050768110915271
+57.0766040832602926
  21
-145.9497425581358243
+149.1298998872532025
  31
 0.0
   0
@@ -10923,15 +10973,15 @@ Motor Gear
   6
 ByLayer
  10
-159.5050768110915271
+57.0766040832602926
  20
-145.9497425581358243
+149.1298998872532025
  30
 0.0
  11
-159.7438397053950609
+58.2503139165543473
  21
-146.2303933930797939
+150.0237952492398676
  31
 0.0
   0
@@ -10951,15 +11001,15 @@ Motor Gear
   6
 ByLayer
  10
-159.7438397053950609
+58.2503139165543473
  20
-146.2303933930797939
+150.0237952492398676
  30
 0.0
  11
-160.5495606703299245
+59.0765595568185802
  21
-146.8092898681666156
+149.5468972899465143
  31
 0.0
   0
@@ -10979,15 +11029,15 @@ Motor Gear
   6
 ByLayer
  10
-160.5495606703299245
+59.0765595568185802
  20
-146.8092898681666156
+149.5468972899465143
  30
 0.0
  11
-161.9146998172116128
+58.8891102061261051
  21
-147.3691266029891835
+148.0835310558437072
  31
 0.0
   0
@@ -11007,15 +11057,15 @@ Motor Gear
   6
 ByLayer
  10
-161.9146998172116128
+58.8891102061261051
  20
-147.3691266029891835
+148.0835310558437072
  30
 0.0
  11
-162.5893105780346843
+58.5385053822978136
  21
-146.6945158421661404
+147.1552868997860628
  31
 0.0
   0
@@ -11035,15 +11085,15 @@ Motor Gear
   6
 ByLayer
  10
-162.5893105780346843
+58.5385053822978136
  20
-146.6945158421661404
+147.1552868997860628
  30
 0.0
  11
-162.0294738432120596
+58.3292734713034804
  21
-145.3293766952844521
+146.8520156566736432
  31
 0.0
   0
@@ -11063,15 +11113,15 @@ Motor Gear
   6
 ByLayer
  10
-162.0294738432120596
+58.3292734713034804
  20
-145.3293766952844521
+146.8520156566736432
  30
 0.0
  11
-161.4505773681252947
+59.5050768110915271
  21
-144.523655730349617
+145.9497425581358243
  31
 0.0
   0
@@ -11091,15 +11141,15 @@ Motor Gear
   6
 ByLayer
  10
-161.4505773681252947
+59.5050768110915271
  20
-144.523655730349617
+145.9497425581358243
  30
 0.0
  11
-161.1699265331813251
+59.7438397053950609
  21
-144.2848928360460832
+146.2303933930797939
  31
 0.0
   0
@@ -11119,15 +11169,15 @@ Motor Gear
   6
 ByLayer
  10
-161.1699265331813251
+59.7438397053950609
  20
-144.2848928360460832
+146.2303933930797939
  30
 0.0
  11
-162.0721996317190872
+60.5495606703299245
  21
-143.1090894962580364
+146.8092898681666156
  31
 0.0
   0
@@ -11147,15 +11197,15 @@ Motor Gear
   6
 ByLayer
  10
-162.0721996317190872
+60.5495606703299245
  20
-143.1090894962580364
+146.8092898681666156
  30
 0.0
  11
-162.3754708748315068
+61.9146998172116128
  21
-143.3183214072523128
+147.3691266029891835
  31
 0.0
   0
@@ -11175,15 +11225,15 @@ Motor Gear
   6
 ByLayer
  10
-162.3754708748315068
+61.9146998172116128
  20
-143.3183214072523128
+147.3691266029891835
  30
 0.0
  11
-163.3037150308891796
+62.5893105780346843
  21
-143.6689262310806612
+146.6945158421661404
  31
 0.0
   0
@@ -11203,15 +11253,15 @@ Motor Gear
   6
 ByLayer
  10
-163.3037150308891796
+62.5893105780346843
  20
-143.6689262310806612
+146.6945158421661404
  30
 0.0
  11
-164.7670812649919583
+62.0294738432120596
  21
-143.8563755817731362
+145.3293766952844521
  31
 0.0
   0
@@ -11231,15 +11281,15 @@ Motor Gear
   6
 ByLayer
  10
-164.7670812649919583
+62.0294738432120596
  20
-143.8563755817731362
+145.3293766952844521
  30
 0.0
  11
-165.2439792242853116
+61.4505773681252947
  21
-143.0301299415089034
+144.523655730349617
  31
 0.0
   0
@@ -11259,15 +11309,15 @@ Motor Gear
   6
 ByLayer
  10
-165.2439792242853116
+61.4505773681252947
  20
-143.0301299415089034
+144.523655730349617
  30
 0.0
  11
-164.3500838622986464
+61.1699265331813251
  21
-141.8564201082148202
+144.2848928360460832
  31
 0.0
   0
@@ -11287,15 +11337,15 @@ Motor Gear
   6
 ByLayer
  10
-164.3500838622986464
+61.1699265331813251
  20
-141.8564201082148202
+144.2848928360460832
  30
 0.0
  11
-163.5822716172241087
+62.0721996317190872
  21
-141.228096545918163
+143.1090894962580364
  31
 0.0
   0
@@ -11315,15 +11365,15 @@ Motor Gear
   6
 ByLayer
  10
-163.5822716172241087
+62.0721996317190872
  20
-141.228096545918163
+143.1090894962580364
  30
 0.0
  11
-163.2494693908024601
+62.3754708748315068
  21
-141.0699681599819542
+143.3183214072523128
  31
 0.0
   0
@@ -11343,15 +11393,15 @@ Motor Gear
   6
 ByLayer
  10
-163.2494693908024601
+62.3754708748315068
  20
-141.0699681599819542
+143.3183214072523128
  30
 0.0
  11
-163.8166367378717041
+63.3037150308891796
  21
-139.700849792320156
+143.6689262310806612
  31
 0.0
   0
@@ -11371,15 +11421,15 @@ Motor Gear
   6
 ByLayer
  10
-163.8166367378717041
+63.3037150308891796
  20
-139.700849792320156
+143.6689262310806612
  30
 0.0
  11
-164.1636808937956573
+64.7670812649919583
  21
-139.8244201077474145
+143.8563755817731362
  31
 0.0
   0
@@ -11399,15 +11449,15 @@ Motor Gear
   6
 ByLayer
  10
-164.1636808937956573
+64.7670812649919583
  20
-139.8244201077474145
+143.8563755817731362
  30
 0.0
  11
-165.1509877585867514
+65.2439792242853116
  21
-139.9228579556365162
+143.0301299415089034
  31
 0.0
   0
@@ -11427,15 +11477,15 @@ Motor Gear
   6
 ByLayer
  10
-165.1509877585867514
+65.2439792242853116
  20
-139.9228579556365162
+143.0301299415089034
  30
 0.0
  11
-166.6130975919471666
+64.3500838622986464
  21
-139.7251451541068263
+141.8564201082148202
  31
 0.0
   0
@@ -11455,15 +11505,15 @@ Motor Gear
   6
 ByLayer
  10
-166.6130975919471666
+64.3500838622986464
  20
-139.7251451541068263
+141.8564201082148202
  30
 0.0
  11
-166.8600289463638831
+63.5822716172241087
  21
-138.8036030388669815
+141.228096545918163
  31
 0.0
   0
@@ -11483,15 +11533,15 @@ Motor Gear
   6
 ByLayer
  10
-166.8600289463638831
+63.5822716172241087
  20
-138.8036030388669815
+141.228096545918163
  30
 0.0
  11
-165.6926026010118846
+63.2494693908024601
  21
-137.9013299403292194
+141.0699681599819542
  31
 0.0
   0
@@ -11511,15 +11561,15 @@ Motor Gear
   6
 ByLayer
  10
-165.6926026010118846
+63.2494693908024601
  20
-137.9013299403292194
+141.0699681599819542
  30
 0.0
  11
-164.7884445303029963
+63.8166367378717041
  21
-137.4929195506249471
+139.700849792320156
  31
 0.0
   0
@@ -11539,15 +11589,15 @@ Motor Gear
   6
 ByLayer
  10
-164.7884445303029963
+63.8166367378717041
  20
-137.4929195506249471
+139.700849792320156
  30
 0.0
  11
-164.4261105784571555
+64.1636808937956573
  21
-137.426526229644935
+139.8244201077474145
  31
 0.0
   0
@@ -11567,15 +11617,15 @@ Motor Gear
   6
 ByLayer
  10
-164.4261105784571555
+64.1636808937956573
  20
-137.426526229644935
+139.8244201077474145
  30
 0.0
  11
-164.6194256063309354
+65.1509877585867514
  21
-135.957085784037929
+139.9228579556365162
  31
 0.0
   0
@@ -11595,23 +11645,25 @@ Motor Gear
   6
 ByLayer
  10
-152.5405754879497522
+65.1509877585867514
  20
-136.9248160249545094
+139.9228579556365162
  30
 0.0
  11
-147.4593945228590428
+66.6130975919471666
  21
-136.9248160249545094
+139.7251451541068263
  31
 0.0
   0
-ARC
+LINE
   5
 1BD
 100
 AcDbEntity
+100
+AcDbLine
   8
 Motor Gear
  62
@@ -11620,28 +11672,26 @@ Motor Gear
 -1
   6
 ByLayer
-100
-AcDbCircle
  10
-149.9999850054043975
+66.6130975919471666
  20
-134.7798160249545276
+139.7251451541068263
  30
 0.0
- 40
-3.3250000000000002
-100
-AcDbArc
- 50
-319.8258680010101784
- 51
-40.1741319989898216
+ 11
+66.8600289463638831
+ 21
+138.8036030388669815
+ 31
+0.0
   0
-ARC
+LINE
   5
 1BE
 100
 AcDbEntity
+100
+AcDbLine
   8
 Motor Gear
  62
@@ -11650,22 +11700,18 @@ Motor Gear
 -1
   6
 ByLayer
-100
-AcDbCircle
  10
-149.9999850054043975
+66.8600289463638831
  20
-134.7798160249545276
+138.8036030388669815
  30
 0.0
- 40
-3.3250000000000002
-100
-AcDbArc
- 50
-139.8258680010101784
- 51
-220.1741319989898216
+ 11
+65.6926026010118846
+ 21
+137.9013299403292194
+ 31
+0.0
   0
 LINE
   5
@@ -11683,13 +11729,185 @@ Motor Gear
   6
 ByLayer
  10
-152.5405754879497522
+65.6926026010118846
+ 20
+137.9013299403292194
+ 30
+0.0
+ 11
+64.7884445303029963
+ 21
+137.4929195506249471
+ 31
+0.0
+  0
+LINE
+  5
+1C0
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Motor Gear
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+64.7884445303029963
+ 20
+137.4929195506249471
+ 30
+0.0
+ 11
+64.4261105784571555
+ 21
+137.426526229644935
+ 31
+0.0
+  0
+LINE
+  5
+1C1
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Motor Gear
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+64.4261105784571555
+ 20
+137.426526229644935
+ 30
+0.0
+ 11
+64.6194256063309354
+ 21
+135.957085784037929
+ 31
+0.0
+  0
+LINE
+  5
+1C2
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Motor Gear
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+52.5405754879497522
+ 20
+136.9248160249545094
+ 30
+0.0
+ 11
+47.459394522859057
+ 21
+136.9248160249545094
+ 31
+0.0
+  0
+ARC
+  5
+1C3
+100
+AcDbEntity
+  8
+Motor Gear
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+49.9999850054043975
+ 20
+134.7798160249545276
+ 30
+0.0
+ 40
+3.3250000000000002
+100
+AcDbArc
+ 50
+319.8258680010101784
+ 51
+40.1741319989898216
+  0
+ARC
+  5
+1C4
+100
+AcDbEntity
+  8
+Motor Gear
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+49.9999850054043975
+ 20
+134.7798160249545276
+ 30
+0.0
+ 40
+3.3250000000000002
+100
+AcDbArc
+ 50
+139.8258680010101784
+ 51
+220.1741319989898216
+  0
+LINE
+  5
+1C5
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Motor Gear
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+52.5405754879497522
  20
 132.6348160249545174
  30
 0.0
  11
-147.4593945228590428
+47.4593945228590428
  21
 132.6348160249545174
  31
@@ -11697,7 +11915,7 @@ ByLayer
   0
 MTEXT
   5
-1C0
+1C6
 100
 AcDbEntity
 100
@@ -11711,7 +11929,7 @@ Motor Gear Text
   6
 ByLayer
  10
-150.0
+50.0
  20
 130.1066894983274551
  30
@@ -11731,177 +11949,9 @@ standard
  50
 0.0
  73
-1
+0
  44
 1.0
-  0
-LINE
-  5
-1C1
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Rotor Gear
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-80.6357974552600467
- 20
-136.1598366065812229
- 30
-0.0
- 11
-81.9831340047350636
- 21
-135.8268251037217169
- 31
-0.0
-  0
-LINE
-  5
-1C2
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Rotor Gear
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-81.9831340047350636
- 20
-135.8268251037217169
- 30
-0.0
- 11
-83.3296327063434603
- 21
-135.2950536750279866
- 31
-0.0
-  0
-LINE
-  5
-1C3
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Rotor Gear
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-83.3296327063434603
- 20
-135.2950536750279866
- 30
-0.0
- 11
-83.3296327063434603
- 21
-134.264601726738988
- 31
-0.0
-  0
-LINE
-  5
-1C4
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Rotor Gear
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-83.3296327063434603
- 20
-134.264601726738988
- 30
-0.0
- 11
-81.9831340047350636
- 21
-133.7328302980452861
- 31
-0.0
-  0
-LINE
-  5
-1C5
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Rotor Gear
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-81.9831340047350636
- 20
-133.7328302980452861
- 30
-0.0
- 11
-80.6357974552600467
- 21
-133.3998187951857801
- 31
-0.0
-  0
-LINE
-  5
-1C6
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Rotor Gear
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-80.6357974552600467
- 20
-133.3998187951857801
- 30
-0.0
- 11
-80.5539058040352813
- 21
-132.149244397866596
- 31
-0.0
   0
 LINE
   5
@@ -11919,15 +11969,15 @@ Rotor Gear
   6
 ByLayer
  10
-80.5539058040352813
+280.6357974552600467
  20
-132.149244397866596
+51.1598366065812158
  30
 0.0
  11
-81.846159607672007
+281.9831340047350636
  21
-131.6432340081398138
+50.8268251037217169
  31
 0.0
   0
@@ -11947,15 +11997,15 @@ Rotor Gear
   6
 ByLayer
  10
-81.846159607672007
+281.9831340047350636
  20
-131.6432340081398138
+50.8268251037217169
  30
 0.0
  11
-83.1118130402450959
+283.3296327063434319
  21
-130.9403486647499619
+50.2950536750279937
  31
 0.0
   0
@@ -11975,15 +12025,15 @@ Rotor Gear
   6
 ByLayer
  10
-83.1118130402450959
+283.3296327063434319
  20
-130.9403486647499619
+50.2950536750279937
  30
 0.0
  11
-82.9771429103440141
+283.3296327063434319
  21
-129.9184844715650513
+49.2646017267389809
  31
 0.0
   0
@@ -12003,15 +12053,15 @@ Rotor Gear
   6
 ByLayer
  10
-82.9771429103440141
+283.3296327063434319
  20
-129.9184844715650513
+49.2646017267389809
  30
 0.0
  11
-81.5728386428596082
+281.9831340047350636
  21
-129.5670417998701112
+48.7328302980452932
  31
 0.0
   0
@@ -12031,15 +12081,15 @@ Rotor Gear
   6
 ByLayer
  10
-81.5728386428596082
+281.9831340047350636
  20
-129.5670417998701112
+48.7328302980452932
  30
 0.0
  11
-80.1936668429134727
+280.6357974552600467
  21
-129.4126833582761265
+48.3998187951857872
  31
 0.0
   0
@@ -12059,15 +12109,15 @@ Rotor Gear
   6
 ByLayer
  10
-80.1936668429134727
+280.6357974552600467
  20
-129.4126833582761265
+48.3998187951857872
  30
 0.0
  11
-79.9492490320965885
+280.5539058040352529
  21
-128.1836815027059231
+47.1492443978665889
  31
 0.0
   0
@@ -12087,15 +12137,15 @@ Rotor Gear
   6
 ByLayer
  10
-79.9492490320965885
+280.5539058040352529
  20
-128.1836815027059231
+47.1492443978665889
  30
 0.0
  11
-81.1642182346023731
+281.846159607672007
  21
-127.5132599812159242
+46.6432340081398067
  31
 0.0
   0
@@ -12115,15 +12165,15 @@ Rotor Gear
   6
 ByLayer
  10
-81.1642182346023731
+281.846159607672007
  20
-127.5132599812159242
+46.6432340081398067
  30
 0.0
  11
-82.327246064183413
+283.1118130402451243
  21
-126.6511991275853575
+45.940348664749969
  31
 0.0
   0
@@ -12143,15 +12193,15 @@ Rotor Gear
   6
 ByLayer
  10
-82.327246064183413
+283.1118130402451243
  20
-126.6511991275853575
+45.940348664749969
  30
 0.0
  11
-82.0606271401888705
+282.9771429103440141
  21
-125.6557245447961009
+44.9184844715650442
  31
 0.0
   0
@@ -12171,15 +12221,15 @@ Rotor Gear
   6
 ByLayer
  10
-82.0606271401888705
+282.9771429103440141
  20
-125.6557245447961009
+44.9184844715650442
  30
 0.0
  11
-80.6223933736243055
+281.5728386428596082
  21
-125.4906848416041782
+44.5670417998701183
  31
 0.0
   0
@@ -12199,15 +12249,15 @@ Rotor Gear
   6
 ByLayer
  10
-80.6223933736243055
+281.5728386428596082
  20
-125.4906848416041782
+44.5670417998701183
  30
 0.0
  11
-79.2348445792420932
+280.1936668429134443
  21
-125.5177030234285382
+44.4126833582761122
  31
 0.0
   0
@@ -12227,15 +12277,15 @@ Rotor Gear
   6
 ByLayer
  10
-79.2348445792420932
+280.1936668429134443
  20
-125.5177030234285382
+44.4126833582761122
  30
 0.0
  11
-78.8318790874982085
+279.9492490320965885
  21
-124.3310084034895624
+43.1836815027059231
  31
 0.0
   0
@@ -12255,15 +12305,15 @@ Rotor Gear
   6
 ByLayer
  10
-78.8318790874982085
+279.9492490320965885
  20
-124.3310084034895624
+43.1836815027059231
  30
 0.0
  11
-79.9492490320965885
+281.1642182346023446
  21
-123.5076941175858849
+42.5132599812159242
  31
 0.0
   0
@@ -12283,15 +12333,15 @@ Rotor Gear
   6
 ByLayer
  10
-79.9492490320965885
+281.1642182346023446
  20
-123.5076941175858849
+42.5132599812159242
  30
 0.0
  11
-80.9897536705548191
+282.3272460641834414
  21
-122.5011189782078276
+41.6511991275853646
  31
 0.0
   0
@@ -12311,15 +12361,15 @@ Rotor Gear
   6
 ByLayer
  10
-80.9897536705548191
+282.3272460641834414
  20
-122.5011189782078276
+41.6511991275853646
  30
 0.0
  11
-80.5953751917998886
+282.0606271401888989
  21
-121.5489987553543045
+40.6557245447960938
  31
 0.0
   0
@@ -12339,15 +12389,15 @@ Rotor Gear
   6
 ByLayer
  10
-80.5953751917998886
+282.0606271401888989
  20
-121.5489987553543045
+40.6557245447960938
  30
 0.0
  11
-79.1479265829326835
+280.622393373624277
  21
-121.5730840985880832
+40.4906848416041711
  31
 0.0
   0
@@ -12367,15 +12417,15 @@ Rotor Gear
   6
 ByLayer
  10
-79.1479265829326835
+280.622393373624277
  20
-121.5730840985880832
+40.4906848416041711
  30
 0.0
  11
-77.7756668423573387
+279.2348445792421217
  21
-121.7808503324021103
+40.5177030234285454
  31
 0.0
   0
@@ -12395,15 +12445,15 @@ Rotor Gear
   6
 ByLayer
  10
-77.7756668423573387
+279.2348445792421217
  20
-121.7808503324021103
+40.5177030234285454
  30
 0.0
  11
-77.2214850240480644
+278.8318790874982369
  21
-120.6571976419767083
+39.3310084034895553
  31
 0.0
   0
@@ -12423,15 +12473,15 @@ Rotor Gear
   6
 ByLayer
  10
-77.2214850240480644
+278.8318790874982369
  20
-120.6571976419767083
+39.3310084034895553
  30
 0.0
  11
-78.2217766754840511
+279.9492490320965885
  21
-119.6950239868388621
+38.507694117585892
  31
 0.0
   0
@@ -12451,15 +12501,15 @@ Rotor Gear
   6
 ByLayer
  10
-78.2217766754840511
+279.9492490320965885
  20
-119.6950239868388621
+38.507694117585892
  30
 0.0
  11
-79.1219555254128011
+280.9897536705548191
  21
-118.561317864129137
+37.5011189782078276
  31
 0.0
   0
@@ -12479,15 +12529,15 @@ Rotor Gear
   6
 ByLayer
  10
-79.1219555254128011
+280.9897536705548191
  20
-118.561317864129137
+37.5011189782078276
  30
 0.0
  11
-78.6067295512683302
+280.595375191799917
  21
-117.6686789028848779
+36.5489987553543045
  31
 0.0
   0
@@ -12507,15 +12557,15 @@ Rotor Gear
   6
 ByLayer
  10
-78.6067295512683302
+280.595375191799917
  20
-117.6686789028848779
+36.5489987553543045
  30
 0.0
  11
-77.1747792726458499
+279.147926582932655
  21
-117.8814707396685151
+36.5730840985880761
  31
 0.0
   0
@@ -12535,15 +12585,15 @@ Rotor Gear
   6
 ByLayer
  10
-77.1747792726458499
+279.147926582932655
  20
-117.8814707396685151
+36.5730840985880761
  30
 0.0
  11
-75.8412660997973944
+277.7756668423573387
  21
-118.2666336340057001
+36.7808503324021174
  31
 0.0
   0
@@ -12563,15 +12613,15 @@ Rotor Gear
   6
 ByLayer
  10
-75.8412660997973944
+277.7756668423573387
  20
-118.2666336340057001
+36.7808503324021174
  30
 0.0
  11
-75.1452928157782765
+277.2214850240480928
  21
-117.2248725948050492
+35.6571976419767083
  31
 0.0
   0
@@ -12591,15 +12641,15 @@ Rotor Gear
   6
 ByLayer
  10
-75.1452928157782765
+277.2214850240480928
  20
-117.2248725948050492
+35.6571976419767083
  30
 0.0
  11
-76.01133289018901
+278.2217766754840795
  21
-116.1403850249823506
+34.6950239868388621
  31
 0.0
   0
@@ -12619,15 +12669,15 @@ Rotor Gear
   6
 ByLayer
  10
-76.01133289018901
+278.2217766754840795
  20
-116.1403850249823506
+34.6950239868388621
  30
 0.0
  11
-76.7558968977814118
+279.1219555254127727
  21
-114.8988169356429694
+33.561317864129137
  31
 0.0
   0
@@ -12647,15 +12697,15 @@ Rotor Gear
   6
 ByLayer
  10
-76.7558968977814118
+279.1219555254127727
  20
-114.8988169356429694
+33.561317864129137
  30
 0.0
  11
-76.1284104412363263
+278.6067295512683586
  21
-114.0811575662526849
+32.6686789028848779
  31
 0.0
   0
@@ -12675,15 +12725,15 @@ Rotor Gear
   6
 ByLayer
  10
-76.1284104412363263
+278.6067295512683586
  20
-114.0811575662526849
+32.6686789028848779
  30
 0.0
  11
-74.736463131083184
+277.1747792726458783
  21
-114.4790959707969193
+32.8814707396685151
  31
 0.0
   0
@@ -12703,15 +12753,15 @@ Rotor Gear
   6
 ByLayer
  10
-74.736463131083184
+277.1747792726458783
  20
-114.4790959707969193
+32.8814707396685151
  30
 0.0
  11
-73.464944763443782
+275.8412660997973944
  21
-115.0349534848394057
+33.2666336340057001
  31
 0.0
   0
@@ -12731,15 +12781,15 @@ Rotor Gear
   6
 ByLayer
  10
-73.464944763443782
+275.8412660997973944
  20
-115.0349534848394057
+33.2666336340057001
  30
 0.0
  11
-72.6386983810644722
+275.145292815778248
  21
-114.0928866942702342
+32.2248725948050421
  31
 0.0
   0
@@ -12759,15 +12809,15 @@ Rotor Gear
   6
 ByLayer
  10
-72.6386983810644722
+275.145292815778248
  20
-114.0928866942702342
+32.2248725948050421
  30
 0.0
  11
-73.3558256539567139
+276.01133289018901
  21
-112.904725655035918
+31.1403850249823577
  31
 0.0
   0
@@ -12787,15 +12837,15 @@ Rotor Gear
   6
 ByLayer
  10
-73.3558256539567139
+276.01133289018901
  20
-112.904725655035918
+31.1403850249823577
  30
 0.0
  11
-73.9319985668907123
+276.7558968977814402
  21
-111.5766581222629128
+29.8988169356429658
  31
 0.0
   0
@@ -12815,15 +12865,15 @@ Rotor Gear
   6
 ByLayer
  10
-73.9319985668907123
+276.7558968977814402
  20
-111.5766581222629128
+29.8988169356429658
  30
 0.0
  11
-73.2031429080959981
+276.1284104412363263
  21
-110.8478024634682129
+29.0811575662526884
  31
 0.0
   0
@@ -12843,15 +12893,15 @@ Rotor Gear
   6
 ByLayer
  10
-73.2031429080959981
+276.1284104412363263
  20
-110.8478024634682129
+29.0811575662526884
  30
 0.0
  11
-71.8750753753230072
+274.7364631310831555
  21
-111.4239753764022112
+29.4790959707969193
  31
 0.0
   0
@@ -12871,15 +12921,15 @@ Rotor Gear
   6
 ByLayer
  10
-71.8750753753230072
+274.7364631310831555
  20
-111.4239753764022112
+29.4790959707969193
  30
 0.0
  11
-70.6869143360886767
+273.464944763443782
  21
-112.1411026492944529
+30.0349534848394093
  31
 0.0
   0
@@ -12899,15 +12949,15 @@ Rotor Gear
   6
 ByLayer
  10
-70.6869143360886767
+273.464944763443782
  20
-112.1411026492944529
+30.0349534848394093
  30
 0.0
  11
-69.744847545519491
+272.6386983810645006
  21
-111.3148562669151289
+29.0928866942702307
  31
 0.0
   0
@@ -12927,15 +12977,15 @@ Rotor Gear
   6
 ByLayer
  10
-69.744847545519491
+272.6386983810645006
  20
-111.3148562669151289
+29.0928866942702307
  30
 0.0
  11
-70.3007050595620058
+273.3558256539566855
  21
-110.0433378992757554
+27.904725655035918
  31
 0.0
   0
@@ -12955,15 +13005,15 @@ Rotor Gear
   6
 ByLayer
  10
-70.3007050595620058
+273.3558256539566855
  20
-110.0433378992757554
+27.904725655035918
  30
 0.0
  11
-70.698643464106226
+273.9319985668906838
  21
-108.6513905891225704
+26.5766581222629164
  31
 0.0
   0
@@ -12983,15 +13033,15 @@ Rotor Gear
   6
 ByLayer
  10
-70.698643464106226
+273.9319985668906838
  20
-108.6513905891225704
+26.5766581222629164
  30
 0.0
  11
-69.8809840947159273
+273.2031429080959697
  21
-108.0239041325775275
+25.8478024634682093
  31
 0.0
   0
@@ -13011,15 +13061,15 @@ Rotor Gear
   6
 ByLayer
  10
-69.8809840947159273
+273.2031429080959697
  20
-108.0239041325775275
+25.8478024634682093
  30
 0.0
  11
-68.6394160053765745
+271.8750753753230356
  21
-108.7684681401699436
+26.4239753764022041
  31
 0.0
   0
@@ -13039,15 +13089,15 @@ Rotor Gear
   6
 ByLayer
  10
-68.6394160053765745
+271.8750753753230356
  20
-108.7684681401699436
+26.4239753764022041
  30
 0.0
  11
-67.5549284355538475
+270.6869143360886483
  21
-109.6345082145806344
+27.1411026492944458
  31
 0.0
   0
@@ -13067,15 +13117,15 @@ Rotor Gear
   6
 ByLayer
  10
-67.5549284355538475
+270.6869143360886483
  20
-109.6345082145806344
+27.1411026492944458
  30
 0.0
  11
-66.5131673963532251
+269.7448475455195194
  21
-108.9385349305615449
+26.3148562669151325
  31
 0.0
   0
@@ -13095,15 +13145,15 @@ Rotor Gear
   6
 ByLayer
  10
-66.5131673963532251
+269.7448475455195194
  20
-108.9385349305615449
+26.3148562669151325
  30
 0.0
  11
-66.89833029069041
+270.3007050595620058
  21
-107.6050217577131036
+25.0433378992757518
  31
 0.0
   0
@@ -13123,15 +13173,15 @@ Rotor Gear
   6
 ByLayer
  10
-66.89833029069041
+270.3007050595620058
  20
-107.6050217577131036
+25.0433378992757518
  30
 0.0
  11
-67.1111221274740615
+270.698643464106226
  21
-106.1730714790906234
+23.6513905891225775
  31
 0.0
   0
@@ -13151,15 +13201,15 @@ Rotor Gear
   6
 ByLayer
  10
-67.1111221274740615
+270.698643464106226
  20
-106.1730714790906234
+23.6513905891225775
  30
 0.0
  11
-66.2184831662297597
+269.8809840947159273
  21
-105.657845504946124
+23.0239041325775275
  31
 0.0
   0
@@ -13179,15 +13229,15 @@ Rotor Gear
   6
 ByLayer
  10
-66.2184831662297597
+269.8809840947159273
  20
-105.657845504946124
+23.0239041325775275
  30
 0.0
  11
-65.0847770435200346
+268.6394160053765745
  21
-106.558024354874874
+23.7684681401699436
  31
 0.0
   0
@@ -13207,15 +13257,15 @@ Rotor Gear
   6
 ByLayer
  10
-65.0847770435200346
+268.6394160053765745
  20
-106.558024354874874
+23.7684681401699436
  30
 0.0
  11
-64.1226033883822311
+267.5549284355538475
  21
-107.558316006310875
+24.6345082145806309
  31
 0.0
   0
@@ -13235,15 +13285,15 @@ Rotor Gear
   6
 ByLayer
  10
-64.1226033883822311
+267.5549284355538475
  20
-107.558316006310875
+24.6345082145806309
  30
 0.0
  11
-62.9989506979568432
+266.5131673963531966
  21
-107.0041341880016006
+23.9385349305615449
  31
 0.0
   0
@@ -13263,15 +13313,15 @@ Rotor Gear
   6
 ByLayer
  10
-62.9989506979568432
+266.5131673963531966
  20
-107.0041341880016006
+23.9385349305615449
  30
 0.0
  11
-63.2067169317708419
+266.89833029069041
  21
-105.6318744474262559
+22.6050217577131107
  31
 0.0
   0
@@ -13291,15 +13341,15 @@ Rotor Gear
   6
 ByLayer
  10
-63.2067169317708419
+266.89833029069041
  20
-105.6318744474262559
+22.6050217577131107
  30
 0.0
  11
-63.230802275004578
+267.1111221274740615
  21
-104.1844258385590081
+21.1730714790906305
  31
 0.0
   0
@@ -13319,15 +13369,15 @@ Rotor Gear
   6
 ByLayer
  10
-63.230802275004578
+267.1111221274740615
  20
-104.1844258385590081
+21.1730714790906305
  30
 0.0
  11
-62.2786820521510549
+266.2184831662297597
  21
-103.790047359804106
+20.6578455049461276
  31
 0.0
   0
@@ -13347,15 +13397,15 @@ Rotor Gear
   6
 ByLayer
  10
-62.2786820521510549
+266.2184831662297597
  20
-103.790047359804106
+20.6578455049461276
  30
 0.0
  11
-61.2721069127729834
+265.0847770435200346
  21
-104.8305519982623366
+21.5580243548748669
  31
 0.0
   0
@@ -13375,15 +13425,15 @@ Rotor Gear
   6
 ByLayer
  10
-61.2721069127729834
+265.0847770435200346
  20
-104.8305519982623366
+21.5580243548748669
  30
 0.0
  11
-60.4487926268693627
+264.1226033883822311
  21
-105.9479219428607024
+22.558316006310875
  31
 0.0
   0
@@ -13403,15 +13453,15 @@ Rotor Gear
   6
 ByLayer
  10
-60.4487926268693627
+264.1226033883822311
  20
-105.9479219428607024
+22.558316006310875
  30
 0.0
  11
-59.2620980069303585
+262.9989506979568432
  21
-105.5449564511168461
+22.004134188001597
  31
 0.0
   0
@@ -13431,15 +13481,15 @@ Rotor Gear
   6
 ByLayer
  10
-59.2620980069303585
+262.9989506979568432
  20
-105.5449564511168461
+22.004134188001597
  30
 0.0
  11
-59.2891161887547753
+263.2067169317708704
  21
-104.1574076567346196
+20.6318744474262559
  31
 0.0
   0
@@ -13459,15 +13509,15 @@ Rotor Gear
   6
 ByLayer
  10
-59.2891161887547753
+263.2067169317708704
  20
-104.1574076567346196
+20.6318744474262559
  30
 0.0
  11
-59.1240764855628242
+263.230802275004578
  21
-102.7191738901700546
+19.1844258385590045
  31
 0.0
   0
@@ -13487,15 +13537,15 @@ Rotor Gear
   6
 ByLayer
  10
-59.1240764855628242
+263.230802275004578
  20
-102.7191738901700546
+19.1844258385590045
  30
 0.0
  11
-58.1286019027735392
+262.2786820521510549
  21
-102.4525549661755122
+18.7900473598041096
  31
 0.0
   0
@@ -13515,15 +13565,15 @@ Rotor Gear
   6
 ByLayer
  10
-58.1286019027735392
+262.2786820521510549
  20
-102.4525549661755122
+18.7900473598041096
  30
 0.0
  11
-57.2665410491430293
+261.2721069127729834
  21
-103.6155827957565663
+19.8305519982623437
  31
 0.0
   0
@@ -13543,15 +13593,15 @@ Rotor Gear
   6
 ByLayer
  10
-57.2665410491430293
+261.2721069127729834
  20
-103.6155827957565663
+19.8305519982623437
  30
 0.0
  11
-56.596119527653002
+260.4487926268693627
  21
-104.8305519982623508
+20.9479219428607024
  31
 0.0
   0
@@ -13571,15 +13621,15 @@ Rotor Gear
   6
 ByLayer
  10
-56.596119527653002
+260.4487926268693627
  20
-104.8305519982623508
+20.9479219428607024
  30
 0.0
  11
-55.3671176720827702
+259.2620980069303869
  21
-104.5861341874454808
+20.5449564511168425
  31
 0.0
   0
@@ -13599,15 +13649,15 @@ Rotor Gear
   6
 ByLayer
  10
-55.3671176720827702
+259.2620980069303869
  20
-104.5861341874454808
+20.5449564511168425
  30
 0.0
  11
-55.2127592304887855
+259.2891161887547469
  21
-103.2069623874993169
+19.1574076567346161
  31
 0.0
   0
@@ -13627,15 +13677,15 @@ Rotor Gear
   6
 ByLayer
  10
-55.2127592304887855
+259.2891161887547469
  20
-103.2069623874993169
+19.1574076567346161
  30
 0.0
  11
-54.8613165587938738
+259.1240764855627958
  21
-101.802658120014911
+17.7191738901700546
  31
 0.0
   0
@@ -13655,15 +13705,15 @@ Rotor Gear
   6
 ByLayer
  10
-54.8613165587938738
+259.1240764855627958
  20
-101.802658120014911
+17.7191738901700546
  30
 0.0
  11
-53.8394523656089348
+258.1286019027735392
  21
-101.667987990113815
+17.4525549661755193
  31
 0.0
   0
@@ -13683,15 +13733,15 @@ Rotor Gear
   6
 ByLayer
  10
-53.8394523656089348
+258.1286019027735392
  20
-101.667987990113815
+17.4525549661755193
  30
 0.0
  11
-53.1365670222190829
+257.2665410491430293
  21
-102.9336414226869181
+18.6155827957565698
  31
 0.0
   0
@@ -13711,15 +13761,15 @@ Rotor Gear
   6
 ByLayer
  10
-53.1365670222190829
+257.2665410491430293
  20
-102.9336414226869181
+18.6155827957565698
  30
 0.0
  11
-52.6305566324923291
+256.596119527653002
  21
-104.2258952263236438
+19.8305519982623473
  31
 0.0
   0
@@ -13739,15 +13789,15 @@ Rotor Gear
   6
 ByLayer
  10
-52.6305566324923291
+256.596119527653002
  20
-104.2258952263236438
+19.8305519982623473
  30
 0.0
  11
-51.3799822351731166
+255.3671176720827702
  21
-104.1440035750988926
+19.586134187445488
  31
 0.0
   0
@@ -13767,15 +13817,15 @@ Rotor Gear
   6
 ByLayer
  10
-51.3799822351731166
+255.3671176720827702
  20
-104.1440035750988926
+19.586134187445488
  30
 0.0
  11
-51.0469707323136106
+255.2127592304887855
  21
-102.7966670256238757
+18.2069623874993169
  31
 0.0
   0
@@ -13795,15 +13845,15 @@ Rotor Gear
   6
 ByLayer
  10
-51.0469707323136106
+255.2127592304887855
  20
-102.7966670256238757
+18.2069623874993169
  30
 0.0
  11
-50.5151993036198519
+254.8613165587938738
  21
-101.4501683240154648
+16.8026581200149181
  31
 0.0
   0
@@ -13823,15 +13873,15 @@ Rotor Gear
   6
 ByLayer
  10
-50.5151993036198519
+254.8613165587938738
  20
-101.4501683240154648
+16.8026581200149181
  30
 0.0
  11
-49.4847473553309385
+253.8394523656089348
  21
-101.4501683240154648
+16.667987990113815
  31
 0.0
   0
@@ -13851,15 +13901,15 @@ Rotor Gear
   6
 ByLayer
  10
-49.4847473553309385
+253.8394523656089348
  20
-101.4501683240154648
+16.667987990113815
  30
 0.0
  11
-48.9529759266371798
+253.1365670222190829
  21
-102.7966670256238757
+17.9336414226869181
  31
 0.0
   0
@@ -13879,15 +13929,15 @@ Rotor Gear
   6
 ByLayer
  10
-48.9529759266371798
+253.1365670222190829
  20
-102.7966670256238757
+17.9336414226869181
  30
 0.0
  11
-48.6199644237776738
+252.6305566324923291
  21
-104.1440035750988926
+19.2258952263236509
  31
 0.0
   0
@@ -13907,15 +13957,15 @@ Rotor Gear
   6
 ByLayer
  10
-48.6199644237776738
+252.6305566324923291
  20
-104.1440035750988926
+19.2258952263236509
  30
 0.0
  11
-47.3693900264584613
+251.3799822351731166
  21
-104.2258952263236438
+19.1440035750988891
  31
 0.0
   0
@@ -13935,15 +13985,15 @@ Rotor Gear
   6
 ByLayer
  10
-47.3693900264584613
+251.3799822351731166
  20
-104.2258952263236438
+19.1440035750988891
  30
 0.0
  11
-46.8633796367317359
+251.0469707323136106
  21
-102.9336414226869181
+17.7966670256238757
  31
 0.0
   0
@@ -13963,15 +14013,15 @@ Rotor Gear
   6
 ByLayer
  10
-46.8633796367317359
+251.0469707323136106
  20
-102.9336414226869181
+17.7966670256238757
  30
 0.0
  11
-46.160494293341884
+250.5151993036198519
  21
-101.667987990113815
+16.4501683240154648
  31
 0.0
   0
@@ -13991,15 +14041,15 @@ Rotor Gear
   6
 ByLayer
  10
-46.160494293341884
+250.5151993036198519
  20
-101.667987990113815
+16.4501683240154648
  30
 0.0
  11
-45.1386301001569166
+249.4847473553309385
  21
-101.802658120014911
+16.4501683240154648
  31
 0.0
   0
@@ -14019,15 +14069,15 @@ Rotor Gear
   6
 ByLayer
  10
-45.1386301001569166
+249.4847473553309385
  20
-101.802658120014911
+16.4501683240154648
  30
 0.0
  11
-44.7871874284620048
+248.9529759266371798
  21
-103.2069623874993169
+17.7966670256238757
  31
 0.0
   0
@@ -14047,15 +14097,15 @@ Rotor Gear
   6
 ByLayer
  10
-44.7871874284620048
+248.9529759266371798
  20
-103.2069623874993169
+17.7966670256238757
  30
 0.0
  11
-44.6328289868680486
+248.6199644237776738
  21
-104.5861341874454808
+19.1440035750988926
  31
 0.0
   0
@@ -14075,15 +14125,15 @@ Rotor Gear
   6
 ByLayer
  10
-44.6328289868680486
+248.6199644237776738
  20
-104.5861341874454808
+19.1440035750988926
  30
 0.0
  11
-43.4038271312977884
+247.3693900264584613
  21
-104.8305519982623508
+19.2258952263236509
  31
 0.0
   0
@@ -14103,15 +14153,15 @@ Rotor Gear
   6
 ByLayer
  10
-43.4038271312977884
+247.3693900264584613
  20
-104.8305519982623508
+19.2258952263236509
  30
 0.0
  11
-42.7334056098077895
+246.8633796367317359
  21
-103.6155827957565663
+17.9336414226869181
  31
 0.0
   0
@@ -14131,15 +14181,15 @@ Rotor Gear
   6
 ByLayer
  10
-42.7334056098077895
+246.8633796367317359
  20
-103.6155827957565663
+17.9336414226869181
  30
 0.0
  11
-41.8713447561772512
+246.160494293341884
  21
-102.4525549661755122
+16.667987990113815
  31
 0.0
   0
@@ -14159,15 +14209,15 @@ Rotor Gear
   6
 ByLayer
  10
-41.8713447561772512
+246.160494293341884
  20
-102.4525549661755122
+16.667987990113815
  30
 0.0
  11
-40.8758701733879946
+245.1386301001569166
  21
-102.7191738901700546
+16.8026581200149181
  31
 0.0
   0
@@ -14187,15 +14237,15 @@ Rotor Gear
   6
 ByLayer
  10
-40.8758701733879946
+245.1386301001569166
  20
-102.7191738901700546
+16.8026581200149181
  30
 0.0
  11
-40.7108304701960151
+244.7871874284620048
  21
-104.1574076567346196
+18.2069623874993205
  31
 0.0
   0
@@ -14215,15 +14265,15 @@ Rotor Gear
   6
 ByLayer
  10
-40.7108304701960151
+244.7871874284620048
  20
-104.1574076567346196
+18.2069623874993205
  30
 0.0
  11
-40.7378486520204603
+244.6328289868680486
  21
-105.5449564511168461
+19.586134187445488
  31
 0.0
   0
@@ -14243,15 +14293,15 @@ Rotor Gear
   6
 ByLayer
  10
-40.7378486520204603
+244.6328289868680486
  20
-105.5449564511168461
+19.586134187445488
  30
 0.0
  11
-39.5511540320814277
+243.4038271312977884
  21
-105.9479219428607166
+19.8305519982623544
  31
 0.0
   0
@@ -14271,15 +14321,15 @@ Rotor Gear
   6
 ByLayer
  10
-39.5511540320814277
+243.4038271312977884
  20
-105.9479219428607166
+19.8305519982623544
  30
 0.0
  11
-38.727839746177807
+242.7334056098077895
  21
-104.8305519982623508
+18.6155827957565698
  31
 0.0
   0
@@ -14299,15 +14349,15 @@ Rotor Gear
   6
 ByLayer
  10
-38.727839746177807
+242.7334056098077895
  20
-104.8305519982623508
+18.6155827957565698
  30
 0.0
  11
-37.7212646067997355
+241.8713447561772512
  21
-103.790047359804106
+17.4525549661755193
  31
 0.0
   0
@@ -14327,15 +14377,15 @@ Rotor Gear
   6
 ByLayer
  10
-37.7212646067997355
+241.8713447561772512
  20
-103.790047359804106
+17.4525549661755193
  30
 0.0
  11
-36.7691443839462409
+240.8758701733879946
  21
-104.1844258385590081
+17.7191738901700546
  31
 0.0
   0
@@ -14355,15 +14405,15 @@ Rotor Gear
   6
 ByLayer
  10
-36.7691443839462409
+240.8758701733879946
  20
-104.1844258385590081
+17.7191738901700546
  30
 0.0
  11
-36.7932297271799769
+240.7108304701960151
  21
-105.6318744474262559
+19.1574076567346196
  31
 0.0
   0
@@ -14383,15 +14433,15 @@ Rotor Gear
   6
 ByLayer
  10
-36.7932297271799769
+240.7108304701960151
  20
-105.6318744474262559
+19.1574076567346196
  30
 0.0
  11
-37.0009959609939756
+240.7378486520204603
  21
-107.0041341880016148
+20.5449564511168425
  31
 0.0
   0
@@ -14411,15 +14461,15 @@ Rotor Gear
   6
 ByLayer
  10
-37.0009959609939756
+240.7378486520204603
  20
-107.0041341880016148
+20.5449564511168425
  30
 0.0
  11
-35.8773432705685593
+239.5511540320814277
  21
-107.558316006310875
+20.9479219428607131
  31
 0.0
   0
@@ -14439,15 +14489,15 @@ Rotor Gear
   6
 ByLayer
  10
-35.8773432705685593
+239.5511540320814277
  20
-107.558316006310875
+20.9479219428607131
  30
 0.0
  11
-34.9151696154307558
+238.727839746177807
  21
-106.558024354874874
+19.8305519982623473
  31
 0.0
   0
@@ -14467,15 +14517,15 @@ Rotor Gear
   6
 ByLayer
  10
-34.9151696154307558
+238.727839746177807
  20
-106.558024354874874
+19.8305519982623473
  30
 0.0
  11
-33.7814634927210591
+237.7212646067997355
  21
-105.657845504946124
+18.7900473598041131
  31
 0.0
   0
@@ -14495,15 +14545,15 @@ Rotor Gear
   6
 ByLayer
  10
-33.7814634927210591
+237.7212646067997355
  20
-105.657845504946124
+18.7900473598041131
  30
 0.0
  11
-32.8888245314767573
+236.7691443839462409
  21
-106.1730714790906234
+19.1844258385590081
  31
 0.0
   0
@@ -14523,15 +14573,15 @@ Rotor Gear
   6
 ByLayer
  10
-32.8888245314767573
+236.7691443839462409
  20
-106.1730714790906234
+19.1844258385590081
  30
 0.0
  11
-33.1016163682604088
+236.7932297271799769
  21
-107.6050217577131178
+20.6318744474262594
  31
 0.0
   0
@@ -14551,15 +14601,15 @@ Rotor Gear
   6
 ByLayer
  10
-33.1016163682604088
+236.7932297271799769
  20
-107.6050217577131178
+20.6318744474262594
  30
 0.0
  11
-33.4867792625975937
+237.0009959609939756
  21
-108.9385349305615591
+22.0041341880016077
  31
 0.0
   0
@@ -14579,15 +14629,15 @@ Rotor Gear
   6
 ByLayer
  10
-33.4867792625975937
+237.0009959609939756
  20
-108.9385349305615591
+22.0041341880016077
  30
 0.0
  11
-32.4450182233969429
+235.8773432705685593
  21
-109.6345082145806344
+22.5583160063108785
  31
 0.0
   0
@@ -14607,15 +14657,15 @@ Rotor Gear
   6
 ByLayer
  10
-32.4450182233969429
+235.8773432705685593
  20
-109.6345082145806344
+22.5583160063108785
  30
 0.0
  11
-31.3605306535742443
+234.9151696154307558
  21
-108.7684681401699436
+21.5580243548748705
  31
 0.0
   0
@@ -14635,15 +14685,15 @@ Rotor Gear
   6
 ByLayer
  10
-31.3605306535742443
+234.9151696154307558
  20
-108.7684681401699436
+21.5580243548748705
  30
 0.0
  11
-30.1189625642348631
+233.7814634927210591
  21
-108.0239041325775418
+20.6578455049461276
  31
 0.0
   0
@@ -14663,15 +14713,15 @@ Rotor Gear
   6
 ByLayer
  10
-30.1189625642348631
+233.7814634927210591
  20
-108.0239041325775418
+20.6578455049461276
  30
 0.0
  11
-29.3013031948445644
+232.8888245314767573
  21
-108.6513905891225846
+21.1730714790906305
  31
 0.0
   0
@@ -14691,15 +14741,15 @@ Rotor Gear
   6
 ByLayer
  10
-29.3013031948445644
+232.8888245314767573
  20
-108.6513905891225846
+21.1730714790906305
  30
 0.0
  11
-29.6992415993887846
+233.1016163682604088
  21
-110.0433378992757696
+22.6050217577131214
  31
 0.0
   0
@@ -14719,15 +14769,15 @@ Rotor Gear
   6
 ByLayer
  10
-29.6992415993887846
+233.1016163682604088
  20
-110.0433378992757696
+22.6050217577131214
  30
 0.0
  11
-30.2550991134312994
+233.4867792625975937
  21
-111.3148562669151431
+23.938534930561552
  31
 0.0
   0
@@ -14747,15 +14797,15 @@ Rotor Gear
   6
 ByLayer
  10
-30.2550991134312994
+233.4867792625975937
  20
-111.3148562669151431
+23.938534930561552
  30
 0.0
  11
-29.3130323228621137
+232.4450182233969429
  21
-112.1411026492944529
+24.634508214580638
  31
 0.0
   0
@@ -14775,15 +14825,15 @@ Rotor Gear
   6
 ByLayer
  10
-29.3130323228621137
+232.4450182233969429
  20
-112.1411026492944529
+24.634508214580638
  30
 0.0
  11
-28.1248712836278116
+231.3605306535742443
  21
-111.4239753764022112
+23.7684681401699507
  31
 0.0
   0
@@ -14803,15 +14853,15 @@ Rotor Gear
   6
 ByLayer
  10
-28.1248712836278116
+231.3605306535742443
  20
-111.4239753764022112
+23.7684681401699507
  30
 0.0
  11
-26.7968037508548207
+230.1189625642348631
  21
-110.8478024634682129
+23.0239041325775382
  31
 0.0
   0
@@ -14831,15 +14881,15 @@ Rotor Gear
   6
 ByLayer
  10
-26.7968037508548207
+230.1189625642348631
  20
-110.8478024634682129
+23.0239041325775382
  30
 0.0
  11
-26.0679480920601065
+229.3013031948445644
  21
-111.576658122262927
+23.6513905891225846
  31
 0.0
   0
@@ -14859,15 +14909,15 @@ Rotor Gear
   6
 ByLayer
  10
-26.0679480920601065
+229.3013031948445644
  20
-111.576658122262927
+23.6513905891225846
  30
 0.0
  11
-26.6441210049941049
+229.6992415993887846
  21
-112.9047256550359322
+25.0433378992757625
  31
 0.0
   0
@@ -14887,15 +14937,15 @@ Rotor Gear
   6
 ByLayer
  10
-26.6441210049941049
+229.6992415993887846
  20
-112.9047256550359322
+25.0433378992757625
  30
 0.0
  11
-27.3612482778863182
+230.2550991134312994
  21
-114.0928866942702342
+26.314856266915136
  31
 0.0
   0
@@ -14915,15 +14965,15 @@ Rotor Gear
   6
 ByLayer
  10
-27.3612482778863182
+230.2550991134312994
  20
-114.0928866942702342
+26.314856266915136
  30
 0.0
  11
-26.5350018955070368
+229.3130323228621137
  21
-115.0349534848394057
+27.1411026492944565
  31
 0.0
   0
@@ -14943,15 +14993,15 @@ Rotor Gear
   6
 ByLayer
  10
-26.5350018955070368
+229.3130323228621137
  20
-115.0349534848394057
+27.1411026492944565
  30
 0.0
  11
-25.2634835278676348
+228.1248712836278116
  21
-114.4790959707969193
+26.4239753764022147
  31
 0.0
   0
@@ -14971,15 +15021,15 @@ Rotor Gear
   6
 ByLayer
  10
-25.2634835278676348
+228.1248712836278116
  20
-114.4790959707969193
+26.4239753764022147
  30
 0.0
  11
-23.8715362177144641
+226.7968037508548207
  21
-114.0811575662527133
+25.8478024634682093
  31
 0.0
   0
@@ -14999,15 +15049,15 @@ Rotor Gear
   6
 ByLayer
  10
-23.8715362177144641
+226.7968037508548207
  20
-114.0811575662527133
+25.8478024634682093
  30
 0.0
  11
-23.244049761169407
+226.0679480920601065
  21
-114.8988169356429694
+26.5766581222629199
  31
 0.0
   0
@@ -15027,15 +15077,15 @@ Rotor Gear
   6
 ByLayer
  10
-23.244049761169407
+226.0679480920601065
  20
-114.8988169356429694
+26.5766581222629199
  30
 0.0
  11
-23.9886137687618088
+226.6441210049941049
  21
-116.1403850249823648
+27.9047256550359286
  31
 0.0
   0
@@ -15055,15 +15105,15 @@ Rotor Gear
   6
 ByLayer
  10
-23.9886137687618088
+226.6441210049941049
  20
-116.1403850249823648
+27.9047256550359286
  30
 0.0
  11
-24.8546538431725139
+227.3612482778863182
  21
-117.2248725948050492
+29.0928866942702342
  31
 0.0
   0
@@ -15083,15 +15133,15 @@ Rotor Gear
   6
 ByLayer
  10
-24.8546538431725139
+227.3612482778863182
  20
-117.2248725948050492
+29.0928866942702342
  30
 0.0
  11
-24.1586805591534244
+226.5350018955070368
  21
-118.2666336340057143
+30.0349534848394057
  31
 0.0
   0
@@ -15111,15 +15161,15 @@ Rotor Gear
   6
 ByLayer
  10
-24.1586805591534244
+226.5350018955070368
  20
-118.2666336340057143
+30.0349534848394057
  30
 0.0
  11
-22.8251673863049689
+225.2634835278676348
  21
-117.8814707396685151
+29.4790959707969265
  31
 0.0
   0
@@ -15139,15 +15189,15 @@ Rotor Gear
   6
 ByLayer
  10
-22.8251673863049689
+225.2634835278676348
  20
-117.8814707396685151
+29.4790959707969265
  30
 0.0
  11
-21.3932171076824886
+223.8715362177144641
  21
-117.6686789028848636
+29.0811575662527098
  31
 0.0
   0
@@ -15167,15 +15217,15 @@ Rotor Gear
   6
 ByLayer
  10
-21.3932171076824886
+223.8715362177144641
  20
-117.6686789028848636
+29.0811575662527098
  30
 0.0
  11
-20.8779911335380177
+223.244049761169407
  21
-118.561317864129137
+29.8988169356429729
  31
 0.0
   0
@@ -15195,15 +15245,15 @@ Rotor Gear
   6
 ByLayer
  10
-20.8779911335380177
+223.244049761169407
  20
-118.561317864129137
+29.8988169356429729
  30
 0.0
  11
-21.7781699834667677
+223.9886137687618088
  21
-119.6950239868388621
+31.1403850249823648
  31
 0.0
   0
@@ -15223,15 +15273,15 @@ Rotor Gear
   6
 ByLayer
  10
-21.7781699834667677
+223.9886137687618088
  20
-119.6950239868388621
+31.1403850249823648
  30
 0.0
  11
-22.7784616349027544
+224.8546538431725139
  21
-120.6571976419767083
+32.2248725948050492
  31
 0.0
   0
@@ -15251,15 +15301,15 @@ Rotor Gear
   6
 ByLayer
  10
-22.7784616349027544
+224.8546538431725139
  20
-120.6571976419767083
+32.2248725948050492
  30
 0.0
  11
-22.2242798165934801
+224.1586805591534244
  21
-121.7808503324021103
+33.2666336340057143
  31
 0.0
   0
@@ -15279,15 +15329,15 @@ Rotor Gear
   6
 ByLayer
  10
-22.2242798165934801
+224.1586805591534244
  20
-121.7808503324021103
+33.2666336340057143
  30
 0.0
  11
-20.8520200760181353
+222.8251673863049689
  21
-121.5730840985880832
+32.8814707396685151
  31
 0.0
   0
@@ -15307,15 +15357,15 @@ Rotor Gear
   6
 ByLayer
  10
-20.8520200760181353
+222.8251673863049689
  20
-121.5730840985880832
+32.8814707396685151
  30
 0.0
  11
-19.4045714671509018
+221.3932171076824886
  21
-121.5489987553543187
+32.6686789028848636
  31
 0.0
   0
@@ -15335,15 +15385,15 @@ Rotor Gear
   6
 ByLayer
  10
-19.4045714671509018
+221.3932171076824886
  20
-121.5489987553543187
+32.6686789028848636
  30
 0.0
  11
-19.0101929883959713
+220.8779911335380177
  21
-122.5011189782078134
+33.561317864129137
  31
 0.0
   0
@@ -15363,15 +15413,15 @@ Rotor Gear
   6
 ByLayer
  10
-19.0101929883959713
+220.8779911335380177
  20
-122.5011189782078134
+33.561317864129137
  30
 0.0
  11
-20.0506976268542303
+221.7781699834667677
  21
-123.5076941175859133
+34.6950239868388692
  31
 0.0
   0
@@ -15391,15 +15441,15 @@ Rotor Gear
   6
 ByLayer
  10
-20.0506976268542303
+221.7781699834667677
  20
-123.5076941175859133
+34.6950239868388692
  30
 0.0
  11
-21.1680675714525819
+222.7784616349027544
  21
-124.3310084034895624
+35.6571976419767083
  31
 0.0
   0
@@ -15419,15 +15469,15 @@ Rotor Gear
   6
 ByLayer
  10
-21.1680675714525819
+222.7784616349027544
  20
-124.3310084034895624
+35.6571976419767083
  30
 0.0
  11
-20.7651020797087256
+222.2242798165934801
  21
-125.5177030234285667
+36.7808503324021174
  31
 0.0
   0
@@ -15447,15 +15497,15 @@ Rotor Gear
   6
 ByLayer
  10
-20.7651020797087256
+222.2242798165934801
  20
-125.5177030234285667
+36.7808503324021174
  30
 0.0
  11
-19.3775532853265133
+220.8520200760181353
  21
-125.4906848416041925
+36.5730840985880832
  31
 0.0
   0
@@ -15475,15 +15525,15 @@ Rotor Gear
   6
 ByLayer
  10
-19.3775532853265133
+220.8520200760181353
  20
-125.4906848416041925
+36.5730840985880832
  30
 0.0
  11
-17.9393195187619483
+219.4045714671509018
  21
-125.6557245447961009
+36.5489987553543259
  31
 0.0
   0
@@ -15503,15 +15553,15 @@ Rotor Gear
   6
 ByLayer
  10
-17.9393195187619483
+219.4045714671509018
  20
-125.6557245447961009
+36.5489987553543259
  30
 0.0
  11
-17.6727005947674058
+219.0101929883959713
  21
-126.6511991275853575
+37.5011189782078205
  31
 0.0
   0
@@ -15531,15 +15581,15 @@ Rotor Gear
   6
 ByLayer
  10
-17.6727005947674058
+219.0101929883959713
  20
-126.6511991275853575
+37.5011189782078205
  30
 0.0
  11
-18.8357284243484457
+220.0506976268542303
  21
-127.5132599812159384
+38.5076941175859062
  31
 0.0
   0
@@ -15559,15 +15609,15 @@ Rotor Gear
   6
 ByLayer
  10
-18.8357284243484457
+220.0506976268542303
  20
-127.5132599812159384
+38.5076941175859062
  30
 0.0
  11
-20.0506976268542303
+221.1680675714525819
  21
-128.1836815027059231
+39.3310084034895695
  31
 0.0
   0
@@ -15587,15 +15637,15 @@ Rotor Gear
   6
 ByLayer
  10
-20.0506976268542303
+221.1680675714525819
  20
-128.1836815027059231
+39.3310084034895695
  30
 0.0
  11
-19.8062798160373461
+220.7651020797087256
  21
-129.4126833582761265
+40.5177030234285667
  31
 0.0
   0
@@ -15615,15 +15665,15 @@ Rotor Gear
   6
 ByLayer
  10
-19.8062798160373461
+220.7651020797087256
  20
-129.4126833582761265
+40.5177030234285667
  30
 0.0
  11
-18.4271080160912106
+219.3775532853265133
  21
-129.5670417998701396
+40.4906848416041925
  31
 0.0
   0
@@ -15643,15 +15693,15 @@ Rotor Gear
   6
 ByLayer
  10
-18.4271080160912106
+219.3775532853265133
  20
-129.5670417998701396
+40.4906848416041925
  30
 0.0
  11
-17.0228037486068047
+217.9393195187619483
  21
-129.9184844715650513
+40.655724544796108
  31
 0.0
   0
@@ -15671,15 +15721,15 @@ Rotor Gear
   6
 ByLayer
  10
-17.0228037486068047
+217.9393195187619483
  20
-129.9184844715650513
+40.655724544796108
  30
 0.0
  11
-16.8881336187056945
+217.6727005947674058
  21
-130.9403486647499903
+41.6511991275853575
  31
 0.0
   0
@@ -15699,15 +15749,15 @@ Rotor Gear
   6
 ByLayer
  10
-16.8881336187056945
+217.6727005947674058
  20
-130.9403486647499903
+41.6511991275853575
  30
 0.0
  11
-18.1537870512788118
+218.8357284243484457
  21
-131.6432340081398138
+42.5132599812159384
  31
 0.0
   0
@@ -15727,15 +15777,15 @@ Rotor Gear
   6
 ByLayer
  10
-18.1537870512788118
+218.8357284243484457
  20
-131.6432340081398138
+42.5132599812159384
  30
 0.0
  11
-19.4460408549155375
+220.0506976268542303
  21
-132.149244397866596
+43.1836815027059302
  31
 0.0
   0
@@ -15755,15 +15805,15 @@ Rotor Gear
   6
 ByLayer
  10
-19.4460408549155375
+220.0506976268542303
  20
-132.149244397866596
+43.1836815027059302
  30
 0.0
  11
-19.3641492036907721
+219.8062798160373461
  21
-133.3998187951857801
+44.4126833582761407
  31
 0.0
   0
@@ -15783,15 +15833,15 @@ Rotor Gear
   6
 ByLayer
  10
-19.3641492036907721
+219.8062798160373461
  20
-133.3998187951857801
+44.4126833582761407
  30
 0.0
  11
-18.0168126542157552
+218.4271080160912106
  21
-133.7328302980453145
+44.5670417998701254
  31
 0.0
   0
@@ -15811,15 +15861,15 @@ Rotor Gear
   6
 ByLayer
  10
-18.0168126542157552
+218.4271080160912106
  20
-133.7328302980453145
+44.5670417998701254
  30
 0.0
  11
-16.6703139526073585
+217.0228037486068047
  21
-134.264601726738988
+44.9184844715650442
  31
 0.0
   0
@@ -15839,15 +15889,15 @@ Rotor Gear
   6
 ByLayer
  10
-16.6703139526073585
+217.0228037486068047
  20
-134.264601726738988
+44.9184844715650442
  30
 0.0
  11
-16.6703139526073585
+216.8881336187056945
  21
-135.295053675028015
+45.9403486647499832
  31
 0.0
   0
@@ -15867,15 +15917,15 @@ Rotor Gear
   6
 ByLayer
  10
-16.6703139526073585
+216.8881336187056945
  20
-135.295053675028015
+45.9403486647499832
  30
 0.0
  11
-18.0168126542157552
+218.1537870512788118
  21
-135.8268251037217169
+46.6432340081398209
  31
 0.0
   0
@@ -15895,15 +15945,15 @@ Rotor Gear
   6
 ByLayer
  10
-18.0168126542157552
+218.1537870512788118
  20
-135.8268251037217169
+46.6432340081398209
  30
 0.0
  11
-19.3641492036907721
+219.4460408549155375
  21
-136.1598366065812229
+47.1492443978666103
  31
 0.0
   0
@@ -15923,15 +15973,15 @@ Rotor Gear
   6
 ByLayer
  10
-19.3641492036907721
+219.4460408549155375
  20
-136.1598366065812229
+47.1492443978666103
  30
 0.0
  11
-19.4460408549155375
+219.3641492036907721
  21
-137.4104110039004638
+48.3998187951857872
  31
 0.0
   0
@@ -15951,15 +16001,15 @@ Rotor Gear
   6
 ByLayer
  10
-19.4460408549155375
+219.3641492036907721
  20
-137.4104110039004638
+48.3998187951857872
  30
 0.0
  11
-18.1537870512788118
+218.0168126542157552
  21
-137.9164213936272176
+48.7328302980453074
  31
 0.0
   0
@@ -15979,15 +16029,15 @@ Rotor Gear
   6
 ByLayer
  10
-18.1537870512788118
+218.0168126542157552
  20
-137.9164213936272176
+48.7328302980453074
  30
 0.0
  11
-16.8881336187056945
+216.6703139526073585
  21
-138.6193067370170979
+49.264601726738988
  31
 0.0
   0
@@ -16007,15 +16057,15 @@ Rotor Gear
   6
 ByLayer
  10
-16.8881336187056945
+216.6703139526073585
  20
-138.6193067370170979
+49.264601726738988
  30
 0.0
  11
-17.0228037486068047
+216.6703139526073585
  21
-139.6411709302019517
+50.2950536750280222
  31
 0.0
   0
@@ -16035,15 +16085,15 @@ Rotor Gear
   6
 ByLayer
  10
-17.0228037486068047
+216.6703139526073585
  20
-139.6411709302019517
+50.2950536750280222
  30
 0.0
  11
-18.4271080160912106
+218.0168126542157552
  21
-139.9926136018969487
+50.8268251037217169
  31
 0.0
   0
@@ -16063,15 +16113,15 @@ Rotor Gear
   6
 ByLayer
  10
-18.4271080160912106
+218.0168126542157552
  20
-139.9926136018969487
+50.8268251037217169
  30
 0.0
  11
-19.8062798160373461
+219.3641492036907721
  21
-140.1469720434908766
+51.1598366065812229
  31
 0.0
   0
@@ -16091,15 +16141,15 @@ Rotor Gear
   6
 ByLayer
  10
-19.8062798160373461
+219.3641492036907721
  20
-140.1469720434908766
+51.1598366065812229
  30
 0.0
  11
-20.0506976268542303
+219.4460408549155375
  21
-141.3759738990611368
+52.4104110039004567
  31
 0.0
   0
@@ -16119,15 +16169,15 @@ Rotor Gear
   6
 ByLayer
  10
-20.0506976268542303
+219.4460408549155375
  20
-141.3759738990611368
+52.4104110039004567
  30
 0.0
  11
-18.8357284243484457
+218.1537870512788118
  21
-142.0463954205511072
+52.9164213936272034
  31
 0.0
   0
@@ -16147,15 +16197,15 @@ Rotor Gear
   6
 ByLayer
  10
-18.8357284243484457
+218.1537870512788118
  20
-142.0463954205511072
+52.9164213936272034
  30
 0.0
  11
-17.6727005947674058
+216.8881336187056945
  21
-142.908456274181674
+53.6193067370170979
  31
 0.0
   0
@@ -16175,15 +16225,15 @@ Rotor Gear
   6
 ByLayer
  10
-17.6727005947674058
+216.8881336187056945
  20
-142.908456274181674
+53.6193067370170979
  30
 0.0
  11
-17.9393195187619483
+217.0228037486068047
  21
-143.903930856970959
+54.6411709302019446
  31
 0.0
   0
@@ -16203,15 +16253,15 @@ Rotor Gear
   6
 ByLayer
  10
-17.9393195187619483
+217.0228037486068047
  20
-143.903930856970959
+54.6411709302019446
  30
 0.0
  11
-19.3775532853265133
+218.4271080160912106
  21
-144.0689705601628532
+54.9926136018969629
  31
 0.0
   0
@@ -16231,15 +16281,15 @@ Rotor Gear
   6
 ByLayer
  10
-19.3775532853265133
+218.4271080160912106
  20
-144.0689705601628532
+54.9926136018969629
  30
 0.0
  11
-20.7651020797087256
+219.8062798160373461
  21
-144.0419523783384648
+55.1469720434908837
  31
 0.0
   0
@@ -16259,15 +16309,15 @@ Rotor Gear
   6
 ByLayer
  10
-20.7651020797087256
+219.8062798160373461
  20
-144.0419523783384648
+55.1469720434908837
  30
 0.0
  11
-21.1680675714525819
+220.0506976268542303
  21
-145.2286469982774975
+56.3759738990611368
  31
 0.0
   0
@@ -16287,15 +16337,15 @@ Rotor Gear
   6
 ByLayer
  10
-21.1680675714525819
+220.0506976268542303
  20
-145.2286469982774975
+56.3759738990611368
  30
 0.0
  11
-20.0506976268542303
+218.8357284243484457
  21
-146.0519612841811465
+57.0463954205511143
  31
 0.0
   0
@@ -16315,15 +16365,15 @@ Rotor Gear
   6
 ByLayer
  10
-20.0506976268542303
+218.8357284243484457
  20
-146.0519612841811465
+57.0463954205511143
  30
 0.0
  11
-19.0101929883959997
+217.6727005947674058
  21
-147.0585364235592181
+57.9084562741816811
  31
 0.0
   0
@@ -16343,15 +16393,15 @@ Rotor Gear
   6
 ByLayer
  10
-19.0101929883959997
+217.6727005947674058
  20
-147.0585364235592181
+57.9084562741816811
  30
 0.0
  11
-19.4045714671509018
+217.9393195187619483
  21
-148.0106566464127127
+58.903930856970959
  31
 0.0
   0
@@ -16371,15 +16421,15 @@ Rotor Gear
   6
 ByLayer
  10
-19.4045714671509018
+217.9393195187619483
  20
-148.0106566464127127
+58.903930856970959
  30
 0.0
  11
-20.8520200760181353
+219.3775532853265133
  21
-147.9865713031789483
+59.0689705601628461
  31
 0.0
   0
@@ -16399,15 +16449,15 @@ Rotor Gear
   6
 ByLayer
  10
-20.8520200760181353
+219.3775532853265133
  20
-147.9865713031789483
+59.0689705601628461
  30
 0.0
  11
-22.2242798165934801
+220.7651020797087256
  21
-147.7788050693649211
+59.041952378338479
  31
 0.0
   0
@@ -16427,15 +16477,15 @@ Rotor Gear
   6
 ByLayer
  10
-22.2242798165934801
+220.7651020797087256
  20
-147.7788050693649211
+59.041952378338479
  30
 0.0
  11
-22.7784616349027544
+221.1680675714525819
  21
-148.9024577597903374
+60.2286469982775046
  31
 0.0
   0
@@ -16455,15 +16505,15 @@ Rotor Gear
   6
 ByLayer
  10
-22.7784616349027544
+221.1680675714525819
  20
-148.9024577597903374
+60.2286469982775046
  30
 0.0
  11
-21.7781699834667677
+220.0506976268542303
  21
-149.8646314149281693
+61.0519612841811465
  31
 0.0
   0
@@ -16483,15 +16533,15 @@ Rotor Gear
   6
 ByLayer
  10
-21.7781699834667677
+220.0506976268542303
  20
-149.8646314149281693
+61.0519612841811465
  30
 0.0
  11
-20.8779911335380177
+219.0101929883959997
  21
-150.9983375376379229
+62.0585364235592252
  31
 0.0
   0
@@ -16511,15 +16561,15 @@ Rotor Gear
   6
 ByLayer
  10
-20.8779911335380177
+219.0101929883959997
  20
-150.9983375376379229
+62.0585364235592252
  30
 0.0
  11
-21.3932171076825171
+219.4045714671509018
  21
-151.8909764988821678
+63.0106566464127198
  31
 0.0
   0
@@ -16539,15 +16589,15 @@ Rotor Gear
   6
 ByLayer
  10
-21.3932171076825171
+219.4045714671509018
  20
-151.8909764988821678
+63.0106566464127198
  30
 0.0
  11
-22.8251673863049973
+220.8520200760181353
  21
-151.6781846620985448
+62.9865713031789554
  31
 0.0
   0
@@ -16567,15 +16617,15 @@ Rotor Gear
   6
 ByLayer
  10
-22.8251673863049973
+220.8520200760181353
  20
-151.6781846620985448
+62.9865713031789554
  30
 0.0
  11
-24.1586805591534244
+222.2242798165934801
  21
-151.2930217677613314
+62.7788050693649211
  31
 0.0
   0
@@ -16595,15 +16645,15 @@ Rotor Gear
   6
 ByLayer
  10
-24.1586805591534244
+222.2242798165934801
  20
-151.2930217677613314
+62.7788050693649211
  30
 0.0
  11
-24.8546538431725139
+222.7784616349027544
  21
-152.3347828069619823
+63.9024577597903374
  31
 0.0
   0
@@ -16623,15 +16673,15 @@ Rotor Gear
   6
 ByLayer
  10
-24.8546538431725139
+222.7784616349027544
  20
-152.3347828069619823
+63.9024577597903374
  30
 0.0
  11
-23.9886137687618373
+221.7781699834667677
  21
-153.4192703767846808
+64.8646314149281693
  31
 0.0
   0
@@ -16651,15 +16701,15 @@ Rotor Gear
   6
 ByLayer
  10
-23.9886137687618373
+221.7781699834667677
  20
-153.4192703767846808
+64.8646314149281693
  30
 0.0
  11
-23.244049761169407
+220.8779911335380177
  21
-154.6608384661240621
+65.9983375376379229
  31
 0.0
   0
@@ -16679,15 +16729,15 @@ Rotor Gear
   6
 ByLayer
  10
-23.244049761169407
+220.8779911335380177
  20
-154.6608384661240621
+65.9983375376379229
  30
 0.0
  11
-23.8715362177144925
+221.3932171076825171
  21
-155.4784978355143323
+66.8909764988821678
  31
 0.0
   0
@@ -16707,15 +16757,15 @@ Rotor Gear
   6
 ByLayer
  10
-23.8715362177144925
+221.3932171076825171
  20
-155.4784978355143323
+66.8909764988821678
  30
 0.0
  11
-25.2634835278676348
+222.8251673863049973
  21
-155.0805594309701405
+66.6781846620985448
  31
 0.0
   0
@@ -16735,15 +16785,15 @@ Rotor Gear
   6
 ByLayer
  10
-25.2634835278676348
+222.8251673863049973
  20
-155.0805594309701405
+66.6781846620985448
  30
 0.0
  11
-26.5350018955070368
+224.1586805591534244
  21
-154.5247019169276257
+66.2930217677613314
  31
 0.0
   0
@@ -16763,15 +16813,15 @@ Rotor Gear
   6
 ByLayer
  10
-26.5350018955070368
+224.1586805591534244
  20
-154.5247019169276257
+66.2930217677613314
  30
 0.0
  11
-27.3612482778863182
+224.8546538431725139
  21
-155.4667687074968114
+67.3347828069619823
  31
 0.0
   0
@@ -16791,15 +16841,15 @@ Rotor Gear
   6
 ByLayer
  10
-27.3612482778863182
+224.8546538431725139
  20
-155.4667687074968114
+67.3347828069619823
  30
 0.0
  11
-26.6441210049941049
+223.9886137687618373
  21
-156.6549297467311135
+68.4192703767846808
  31
 0.0
   0
@@ -16819,15 +16869,15 @@ Rotor Gear
   6
 ByLayer
  10
-26.6441210049941049
+223.9886137687618373
  20
-156.6549297467311135
+68.4192703767846808
  30
 0.0
  11
-26.0679480920601065
+223.244049761169407
  21
-157.9829972795041328
+69.6608384661240621
  31
 0.0
   0
@@ -16847,15 +16897,15 @@ Rotor Gear
   6
 ByLayer
  10
-26.0679480920601065
+223.244049761169407
  20
-157.9829972795041328
+69.6608384661240621
  30
 0.0
  11
-26.7968037508548207
+223.8715362177144925
  21
-158.7118529382988186
+70.4784978355143323
  31
 0.0
   0
@@ -16875,15 +16925,15 @@ Rotor Gear
   6
 ByLayer
  10
-26.7968037508548207
+223.8715362177144925
  20
-158.7118529382988186
+70.4784978355143323
  30
 0.0
  11
-28.1248712836278116
+225.2634835278676348
  21
-158.1356800253648203
+70.0805594309701405
  31
 0.0
   0
@@ -16903,15 +16953,15 @@ Rotor Gear
   6
 ByLayer
  10
-28.1248712836278116
+225.2634835278676348
  20
-158.1356800253648203
+70.0805594309701405
  30
 0.0
  11
-29.3130323228621137
+226.5350018955070368
  21
-157.4185527524726069
+69.5247019169276257
  31
 0.0
   0
@@ -16931,15 +16981,15 @@ Rotor Gear
   6
 ByLayer
  10
-29.3130323228621137
+226.5350018955070368
  20
-157.4185527524726069
+69.5247019169276257
  30
 0.0
  11
-30.2550991134312994
+227.3612482778863182
  21
-158.2447991348519167
+70.4667687074968114
  31
 0.0
   0
@@ -16959,15 +17009,15 @@ Rotor Gear
   6
 ByLayer
  10
-30.2550991134312994
+227.3612482778863182
  20
-158.2447991348519167
+70.4667687074968114
  30
 0.0
  11
-29.699241599388813
+226.6441210049941049
  21
-159.5163175024912903
+71.6549297467311135
  31
 0.0
   0
@@ -16987,15 +17037,15 @@ Rotor Gear
   6
 ByLayer
  10
-29.699241599388813
+226.6441210049941049
  20
-159.5163175024912903
+71.6549297467311135
  30
 0.0
  11
-29.3013031948445928
+226.0679480920601065
  21
-160.908264812644461
+72.9829972795041328
  31
 0.0
   0
@@ -17015,15 +17065,15 @@ Rotor Gear
   6
 ByLayer
  10
-29.3013031948445928
+226.0679480920601065
  20
-160.908264812644461
+72.9829972795041328
  30
 0.0
  11
-30.1189625642348631
+226.7968037508548207
  21
-161.5357512691895181
+73.7118529382988186
  31
 0.0
   0
@@ -17043,15 +17093,15 @@ Rotor Gear
   6
 ByLayer
  10
-30.1189625642348631
+226.7968037508548207
  20
-161.5357512691895181
+73.7118529382988186
  30
 0.0
  11
-31.3605306535742443
+228.1248712836278116
  21
-160.7911872615970879
+73.1356800253648203
  31
 0.0
   0
@@ -17071,15 +17121,15 @@ Rotor Gear
   6
 ByLayer
  10
-31.3605306535742443
+228.1248712836278116
  20
-160.7911872615970879
+73.1356800253648203
  30
 0.0
  11
-32.4450182233969429
+229.3130323228621137
  21
-159.9251471871864112
+72.4185527524726069
  31
 0.0
   0
@@ -17099,15 +17149,15 @@ Rotor Gear
   6
 ByLayer
  10
-32.4450182233969429
+229.3130323228621137
  20
-159.9251471871864112
+72.4185527524726069
  30
 0.0
  11
-33.4867792625975937
+230.2550991134312994
  21
-160.6211204712055007
+73.2447991348519167
  31
 0.0
   0
@@ -17127,15 +17177,15 @@ Rotor Gear
   6
 ByLayer
  10
-33.4867792625975937
+230.2550991134312994
  20
-160.6211204712055007
+73.2447991348519167
  30
 0.0
  11
-33.1016163682604088
+229.699241599388813
  21
-161.9546336440539278
+74.5163175024912903
  31
 0.0
   0
@@ -17155,15 +17205,15 @@ Rotor Gear
   6
 ByLayer
  10
-33.1016163682604088
+229.699241599388813
  20
-161.9546336440539278
+74.5163175024912903
  30
 0.0
  11
-32.8888245314767573
+229.3013031948445928
  21
-163.3865839226764081
+75.908264812644461
  31
 0.0
   0
@@ -17183,15 +17233,15 @@ Rotor Gear
   6
 ByLayer
  10
-32.8888245314767573
+229.3013031948445928
  20
-163.3865839226764081
+75.908264812644461
  30
 0.0
  11
-33.7814634927210307
+230.1189625642348631
  21
-163.9018098968209074
+76.5357512691895181
  31
 0.0
   0
@@ -17211,15 +17261,15 @@ Rotor Gear
   6
 ByLayer
  10
-33.7814634927210307
+230.1189625642348631
  20
-163.9018098968209074
+76.5357512691895181
  30
 0.0
  11
-34.9151696154307558
+231.3605306535742443
  21
-163.0016310468921574
+75.7911872615970879
  31
 0.0
   0
@@ -17239,15 +17289,15 @@ Rotor Gear
   6
 ByLayer
  10
-34.9151696154307558
+231.3605306535742443
  20
-163.0016310468921574
+75.7911872615970879
  30
 0.0
  11
-35.8773432705685877
+232.4450182233969429
  21
-162.0013393954561707
+74.9251471871864112
  31
 0.0
   0
@@ -17267,15 +17317,15 @@ Rotor Gear
   6
 ByLayer
  10
-35.8773432705685877
+232.4450182233969429
  20
-162.0013393954561707
+74.9251471871864112
  30
 0.0
  11
-37.000995960994004
+233.4867792625975937
  21
-162.5555212137654451
+75.6211204712055007
  31
 0.0
   0
@@ -17295,15 +17345,15 @@ Rotor Gear
   6
 ByLayer
  10
-37.000995960994004
+233.4867792625975937
  20
-162.5555212137654451
+75.6211204712055007
  30
 0.0
  11
-36.7932297271799769
+233.1016163682604088
  21
-163.9277809543407898
+76.9546336440539278
  31
 0.0
   0
@@ -17323,15 +17373,15 @@ Rotor Gear
   6
 ByLayer
  10
-36.7932297271799769
+233.1016163682604088
  20
-163.9277809543407898
+76.9546336440539278
  30
 0.0
  11
-36.7691443839462409
+232.8888245314767573
  21
-165.3752295632080518
+78.3865839226764081
  31
 0.0
   0
@@ -17351,15 +17401,15 @@ Rotor Gear
   6
 ByLayer
  10
-36.7691443839462409
+232.8888245314767573
  20
-165.3752295632080518
+78.3865839226764081
  30
 0.0
  11
-37.7212646067997355
+233.7814634927210307
  21
-165.7696080419629538
+78.9018098968209074
  31
 0.0
   0
@@ -17379,15 +17429,15 @@ Rotor Gear
   6
 ByLayer
  10
-37.7212646067997355
+233.7814634927210307
  20
-165.7696080419629538
+78.9018098968209074
  30
 0.0
  11
-38.727839746177807
+234.9151696154307558
  21
-164.7291034035046948
+78.0016310468921574
  31
 0.0
   0
@@ -17407,15 +17457,15 @@ Rotor Gear
   6
 ByLayer
  10
-38.727839746177807
+234.9151696154307558
  20
-164.7291034035046948
+78.0016310468921574
  30
 0.0
  11
-39.5511540320814561
+235.8773432705685877
  21
-163.6117334589063432
+77.0013393954561707
  31
 0.0
   0
@@ -17435,15 +17485,15 @@ Rotor Gear
   6
 ByLayer
  10
-39.5511540320814561
+235.8773432705685877
  20
-163.6117334589063432
+77.0013393954561707
  30
 0.0
  11
-40.7378486520204319
+237.000995960994004
  21
-164.0146989506501995
+77.5555212137654451
  31
 0.0
   0
@@ -17463,15 +17513,15 @@ Rotor Gear
   6
 ByLayer
  10
-40.7378486520204319
+237.000995960994004
  20
-164.0146989506501995
+77.5555212137654451
  30
 0.0
  11
-40.7108304701960435
+236.7932297271799769
  21
-165.4022477450324118
+78.9277809543407898
  31
 0.0
   0
@@ -17491,15 +17541,15 @@ Rotor Gear
   6
 ByLayer
  10
-40.7108304701960435
+236.7932297271799769
  20
-165.4022477450324118
+78.9277809543407898
  30
 0.0
  11
-40.8758701733879946
+236.7691443839462409
  21
-166.8404815115969768
+80.3752295632080518
  31
 0.0
   0
@@ -17519,15 +17569,15 @@ Rotor Gear
   6
 ByLayer
  10
-40.8758701733879946
+236.7691443839462409
  20
-166.8404815115969768
+80.3752295632080518
  30
 0.0
  11
-41.8713447561772512
+237.7212646067997355
  21
-167.1071004355914909
+80.7696080419629538
  31
 0.0
   0
@@ -17547,15 +17597,15 @@ Rotor Gear
   6
 ByLayer
  10
-41.8713447561772512
+237.7212646067997355
  20
-167.1071004355914909
+80.7696080419629538
  30
 0.0
  11
-42.7334056098078179
+238.727839746177807
  21
-165.9440726060105078
+79.7291034035046948
  31
 0.0
   0
@@ -17575,15 +17625,15 @@ Rotor Gear
   6
 ByLayer
  10
-42.7334056098078179
+238.727839746177807
  20
-165.9440726060105078
+79.7291034035046948
  30
 0.0
  11
-43.4038271312978168
+239.5511540320814561
  21
-164.7291034035046948
+78.6117334589063432
  31
 0.0
   0
@@ -17603,15 +17653,15 @@ Rotor Gear
   6
 ByLayer
  10
-43.4038271312978168
+239.5511540320814561
  20
-164.7291034035046948
+78.6117334589063432
  30
 0.0
  11
-44.6328289868680486
+240.7378486520204319
  21
-164.9735212143215506
+79.0146989506501995
  31
 0.0
   0
@@ -17631,15 +17681,15 @@ Rotor Gear
   6
 ByLayer
  10
-44.6328289868680486
+240.7378486520204319
  20
-164.9735212143215506
+79.0146989506501995
  30
 0.0
  11
-44.7871874284620048
+240.7108304701960435
  21
-166.3526930142677429
+80.4022477450324118
  31
 0.0
   0
@@ -17659,15 +17709,15 @@ Rotor Gear
   6
 ByLayer
  10
-44.7871874284620048
+240.7108304701960435
  20
-166.3526930142677429
+80.4022477450324118
  30
 0.0
  11
-45.138630100156945
+240.8758701733879946
  21
-167.7569972817521204
+81.8404815115969768
  31
 0.0
   0
@@ -17687,15 +17737,15 @@ Rotor Gear
   6
 ByLayer
  10
-45.138630100156945
+240.8758701733879946
  20
-167.7569972817521204
+81.8404815115969768
  30
 0.0
  11
-46.1604942933418556
+241.8713447561772512
  21
-167.8916674116532306
+82.1071004355914909
  31
 0.0
   0
@@ -17715,15 +17765,15 @@ Rotor Gear
   6
 ByLayer
  10
-46.1604942933418556
+241.8713447561772512
  20
-167.8916674116532306
+82.1071004355914909
  30
 0.0
  11
-46.8633796367317359
+242.7334056098078179
  21
-166.6260139790801134
+80.9440726060105078
  31
 0.0
   0
@@ -17743,15 +17793,15 @@ Rotor Gear
   6
 ByLayer
  10
-46.8633796367317359
+242.7334056098078179
  20
-166.6260139790801134
+80.9440726060105078
  30
 0.0
  11
-47.3693900264584897
+243.4038271312978168
  21
-165.3337601754433877
+79.7291034035046948
  31
 0.0
   0
@@ -17771,15 +17821,15 @@ Rotor Gear
   6
 ByLayer
  10
-47.3693900264584897
+243.4038271312978168
  20
-165.3337601754433877
+79.7291034035046948
  30
 0.0
  11
-48.6199644237776738
+244.6328289868680486
  21
-165.415651826668153
+79.9735212143215506
  31
 0.0
   0
@@ -17799,15 +17849,15 @@ Rotor Gear
   6
 ByLayer
  10
-48.6199644237776738
+244.6328289868680486
  20
-165.415651826668153
+79.9735212143215506
  30
 0.0
  11
-48.9529759266371798
+244.7871874284620048
  21
-166.7629883761431699
+81.3526930142677429
  31
 0.0
   0
@@ -17827,15 +17877,15 @@ Rotor Gear
   6
 ByLayer
  10
-48.9529759266371798
+244.7871874284620048
  20
-166.7629883761431699
+81.3526930142677429
  30
 0.0
  11
-49.4847473553309385
+245.138630100156945
  21
-168.1094870777515666
+82.7569972817521204
  31
 0.0
   0
@@ -17855,15 +17905,15 @@ Rotor Gear
   6
 ByLayer
  10
-49.4847473553309385
+245.138630100156945
  20
-168.1094870777515666
+82.7569972817521204
  30
 0.0
  11
-50.5151993036198803
+246.1604942933418556
  21
-168.1094870777515666
+82.8916674116532306
  31
 0.0
   0
@@ -17883,15 +17933,15 @@ Rotor Gear
   6
 ByLayer
  10
-50.5151993036198803
+246.1604942933418556
  20
-168.1094870777515666
+82.8916674116532306
  30
 0.0
  11
-51.0469707323136106
+246.8633796367317359
  21
-166.7629883761431699
+81.6260139790801134
  31
 0.0
   0
@@ -17911,15 +17961,15 @@ Rotor Gear
   6
 ByLayer
  10
-51.0469707323136106
+246.8633796367317359
  20
-166.7629883761431699
+81.6260139790801134
  30
 0.0
  11
-51.379982235173145
+247.3693900264584897
  21
-165.415651826668153
+80.3337601754433877
  31
 0.0
   0
@@ -17939,15 +17989,15 @@ Rotor Gear
   6
 ByLayer
  10
-51.379982235173145
+247.3693900264584897
  20
-165.415651826668153
+80.3337601754433877
  30
 0.0
  11
-52.6305566324923291
+248.6199644237776738
  21
-165.3337601754433877
+80.415651826668153
  31
 0.0
   0
@@ -17967,15 +18017,15 @@ Rotor Gear
   6
 ByLayer
  10
-52.6305566324923291
+248.6199644237776738
  20
-165.3337601754433877
+80.415651826668153
  30
 0.0
  11
-53.1365670222190829
+248.9529759266371798
  21
-166.6260139790801134
+81.7629883761431699
  31
 0.0
   0
@@ -17995,15 +18045,15 @@ Rotor Gear
   6
 ByLayer
  10
-53.1365670222190829
+248.9529759266371798
  20
-166.6260139790801134
+81.7629883761431699
  30
 0.0
  11
-53.8394523656089632
+249.4847473553309385
  21
-167.8916674116532306
+83.1094870777515666
  31
 0.0
   0
@@ -18023,15 +18073,15 @@ Rotor Gear
   6
 ByLayer
  10
-53.8394523656089632
+249.4847473553309385
  20
-167.8916674116532306
+83.1094870777515666
  30
 0.0
  11
-54.8613165587938738
+250.5151993036198803
  21
-167.7569972817521204
+83.1094870777515666
  31
 0.0
   0
@@ -18051,15 +18101,15 @@ Rotor Gear
   6
 ByLayer
  10
-54.8613165587938738
+250.5151993036198803
  20
-167.7569972817521204
+83.1094870777515666
  30
 0.0
  11
-55.212759230488814
+251.0469707323136106
  21
-166.3526930142677429
+81.7629883761431699
  31
 0.0
   0
@@ -18079,15 +18129,15 @@ Rotor Gear
   6
 ByLayer
  10
-55.212759230488814
+251.0469707323136106
  20
-166.3526930142677429
+81.7629883761431699
  30
 0.0
  11
-55.3671176720827702
+251.379982235173145
  21
-164.9735212143215506
+80.415651826668153
  31
 0.0
   0
@@ -18107,15 +18157,15 @@ Rotor Gear
   6
 ByLayer
  10
-55.3671176720827702
+251.379982235173145
  20
-164.9735212143215506
+80.415651826668153
  30
 0.0
  11
-56.596119527653002
+252.6305566324923291
  21
-164.7291034035046948
+80.3337601754433877
  31
 0.0
   0
@@ -18135,15 +18185,15 @@ Rotor Gear
   6
 ByLayer
  10
-56.596119527653002
+252.6305566324923291
  20
-164.7291034035046948
+80.3337601754433877
  30
 0.0
  11
-57.2665410491430009
+253.1365670222190829
  21
-165.9440726060105078
+81.6260139790801134
  31
 0.0
   0
@@ -18163,15 +18213,15 @@ Rotor Gear
   6
 ByLayer
  10
-57.2665410491430009
+253.1365670222190829
  20
-165.9440726060105078
+81.6260139790801134
  30
 0.0
  11
-58.1286019027735676
+253.8394523656089632
  21
-167.1071004355914909
+82.8916674116532306
  31
 0.0
   0
@@ -18191,15 +18241,15 @@ Rotor Gear
   6
 ByLayer
  10
-58.1286019027735676
+253.8394523656089632
  20
-167.1071004355914909
+82.8916674116532306
  30
 0.0
  11
-59.1240764855628242
+254.8613165587938738
  21
-166.8404815115969768
+82.7569972817521204
  31
 0.0
   0
@@ -18219,15 +18269,15 @@ Rotor Gear
   6
 ByLayer
  10
-59.1240764855628242
+254.8613165587938738
  20
-166.8404815115969768
+82.7569972817521204
  30
 0.0
  11
-59.2891161887547753
+255.212759230488814
  21
-165.4022477450324118
+81.3526930142677429
  31
 0.0
   0
@@ -18247,15 +18297,15 @@ Rotor Gear
   6
 ByLayer
  10
-59.2891161887547753
+255.212759230488814
  20
-165.4022477450324118
+81.3526930142677429
  30
 0.0
  11
-59.2620980069303869
+255.3671176720827702
  21
-164.0146989506501995
+79.9735212143215506
  31
 0.0
   0
@@ -18275,15 +18325,15 @@ Rotor Gear
   6
 ByLayer
  10
-59.2620980069303869
+255.3671176720827702
  20
-164.0146989506501995
+79.9735212143215506
  30
 0.0
  11
-60.4487926268693627
+256.596119527653002
  21
-163.6117334589063432
+79.7291034035046948
  31
 0.0
   0
@@ -18303,15 +18353,15 @@ Rotor Gear
   6
 ByLayer
  10
-60.4487926268693627
+256.596119527653002
  20
-163.6117334589063432
+79.7291034035046948
  30
 0.0
  11
-61.2721069127730118
+257.2665410491430293
  21
-164.7291034035046948
+80.9440726060105078
  31
 0.0
   0
@@ -18331,15 +18381,15 @@ Rotor Gear
   6
 ByLayer
  10
-61.2721069127730118
+257.2665410491430293
  20
-164.7291034035046948
+80.9440726060105078
  30
 0.0
  11
-62.2786820521510833
+258.1286019027735392
  21
-165.7696080419629538
+82.1071004355914909
  31
 0.0
   0
@@ -18359,15 +18409,15 @@ Rotor Gear
   6
 ByLayer
  10
-62.2786820521510833
+258.1286019027735392
  20
-165.7696080419629538
+82.1071004355914909
  30
 0.0
  11
-63.230802275004578
+259.1240764855627958
  21
-165.3752295632080234
+81.8404815115969768
  31
 0.0
   0
@@ -18387,15 +18437,15 @@ Rotor Gear
   6
 ByLayer
  10
-63.230802275004578
+259.1240764855627958
  20
-165.3752295632080234
+81.8404815115969768
  30
 0.0
  11
-63.2067169317708419
+259.2891161887547469
  21
-163.9277809543407898
+80.4022477450324118
  31
 0.0
   0
@@ -18415,15 +18465,15 @@ Rotor Gear
   6
 ByLayer
  10
-63.2067169317708419
+259.2891161887547469
  20
-163.9277809543407898
+80.4022477450324118
  30
 0.0
  11
-62.9989506979568148
+259.2620980069303869
  21
-162.5555212137654451
+79.0146989506501995
  31
 0.0
   0
@@ -18443,15 +18493,15 @@ Rotor Gear
   6
 ByLayer
  10
-62.9989506979568148
+259.2620980069303869
  20
-162.5555212137654451
+79.0146989506501995
  30
 0.0
  11
-64.1226033883822595
+260.4487926268693627
  21
-162.0013393954561707
+78.6117334589063432
  31
 0.0
   0
@@ -18471,15 +18521,15 @@ Rotor Gear
   6
 ByLayer
  10
-64.1226033883822595
+260.4487926268693627
  20
-162.0013393954561707
+78.6117334589063432
  30
 0.0
  11
-65.084777043520063
+261.2721069127729834
  21
-163.0016310468921574
+79.7291034035046948
  31
 0.0
   0
@@ -18499,15 +18549,15 @@ Rotor Gear
   6
 ByLayer
  10
-65.084777043520063
+261.2721069127729834
  20
-163.0016310468921574
+79.7291034035046948
  30
 0.0
  11
-66.2184831662297881
+262.2786820521511117
  21
-163.9018098968209074
+80.7696080419629538
  31
 0.0
   0
@@ -18527,15 +18577,15 @@ Rotor Gear
   6
 ByLayer
  10
-66.2184831662297881
+262.2786820521511117
  20
-163.9018098968209074
+80.7696080419629538
  30
 0.0
  11
-67.1111221274740615
+263.230802275004578
  21
-163.3865839226764081
+80.3752295632080234
  31
 0.0
   0
@@ -18555,15 +18605,15 @@ Rotor Gear
   6
 ByLayer
  10
-67.1111221274740615
+263.230802275004578
  20
-163.3865839226764081
+80.3752295632080234
  30
 0.0
  11
-66.89833029069041
+263.2067169317708704
  21
-161.9546336440539278
+78.9277809543407898
  31
 0.0
   0
@@ -18583,15 +18633,15 @@ Rotor Gear
   6
 ByLayer
  10
-66.89833029069041
+263.2067169317708704
  20
-161.9546336440539278
+78.9277809543407898
  30
 0.0
  11
-66.5131673963532251
+262.9989506979568432
  21
-160.6211204712055007
+77.5555212137654451
  31
 0.0
   0
@@ -18611,15 +18661,15 @@ Rotor Gear
   6
 ByLayer
  10
-66.5131673963532251
+262.9989506979568432
  20
-160.6211204712055007
+77.5555212137654451
  30
 0.0
  11
-67.5549284355538759
+264.1226033883822311
  21
-159.9251471871864112
+77.0013393954561707
  31
 0.0
   0
@@ -18639,15 +18689,15 @@ Rotor Gear
   6
 ByLayer
  10
-67.5549284355538759
+264.1226033883822311
  20
-159.9251471871864112
+77.0013393954561707
  30
 0.0
  11
-68.6394160053765745
+265.0847770435200346
  21
-160.7911872615970879
+78.0016310468921574
  31
 0.0
   0
@@ -18667,15 +18717,15 @@ Rotor Gear
   6
 ByLayer
  10
-68.6394160053765745
+265.0847770435200346
  20
-160.7911872615970879
+78.0016310468921574
  30
 0.0
  11
-69.8809840947159273
+266.2184831662298166
  21
-161.5357512691895181
+78.9018098968209074
  31
 0.0
   0
@@ -18695,15 +18745,15 @@ Rotor Gear
   6
 ByLayer
  10
-69.8809840947159273
+266.2184831662298166
  20
-161.5357512691895181
+78.9018098968209074
  30
 0.0
  11
-70.698643464106226
+267.1111221274740615
  21
-160.908264812644461
+78.3865839226764081
  31
 0.0
   0
@@ -18723,15 +18773,15 @@ Rotor Gear
   6
 ByLayer
  10
-70.698643464106226
+267.1111221274740615
  20
-160.908264812644461
+78.3865839226764081
  30
 0.0
  11
-70.3007050595620342
+266.89833029069041
  21
-159.5163175024912903
+76.9546336440539278
  31
 0.0
   0
@@ -18751,15 +18801,15 @@ Rotor Gear
   6
 ByLayer
  10
-70.3007050595620342
+266.89833029069041
  20
-159.5163175024912903
+76.9546336440539278
  30
 0.0
  11
-69.7448475455195194
+266.5131673963531966
  21
-158.2447991348519167
+75.6211204712055007
  31
 0.0
   0
@@ -18779,15 +18829,15 @@ Rotor Gear
   6
 ByLayer
  10
-69.7448475455195194
+266.5131673963531966
  20
-158.2447991348519167
+75.6211204712055007
  30
 0.0
  11
-70.6869143360886767
+267.5549284355538475
  21
-157.4185527524726069
+74.9251471871864112
  31
 0.0
   0
@@ -18807,15 +18857,15 @@ Rotor Gear
   6
 ByLayer
  10
-70.6869143360886767
+267.5549284355538475
  20
-157.4185527524726069
+74.9251471871864112
  30
 0.0
  11
-71.8750753753230072
+268.6394160053765745
  21
-158.1356800253648203
+75.7911872615970879
  31
 0.0
   0
@@ -18835,15 +18885,15 @@ Rotor Gear
   6
 ByLayer
  10
-71.8750753753230072
+268.6394160053765745
  20
-158.1356800253648203
+75.7911872615970879
  30
 0.0
  11
-73.2031429080959981
+269.8809840947159273
  21
-158.7118529382988186
+76.5357512691895181
  31
 0.0
   0
@@ -18863,15 +18913,15 @@ Rotor Gear
   6
 ByLayer
  10
-73.2031429080959981
+269.8809840947159273
  20
-158.7118529382988186
+76.5357512691895181
  30
 0.0
  11
-73.9319985668907123
+270.698643464106226
  21
-157.9829972795041328
+75.908264812644461
  31
 0.0
   0
@@ -18891,15 +18941,15 @@ Rotor Gear
   6
 ByLayer
  10
-73.9319985668907123
+270.698643464106226
  20
-157.9829972795041328
+75.908264812644461
  30
 0.0
  11
-73.3558256539567139
+270.3007050595620058
  21
-156.6549297467311135
+74.5163175024912903
  31
 0.0
   0
@@ -18919,15 +18969,15 @@ Rotor Gear
   6
 ByLayer
  10
-73.3558256539567139
+270.3007050595620058
  20
-156.6549297467311135
+74.5163175024912903
  30
 0.0
  11
-72.6386983810645006
+269.7448475455195194
  21
-155.4667687074968114
+73.2447991348519167
  31
 0.0
   0
@@ -18947,15 +18997,15 @@ Rotor Gear
   6
 ByLayer
  10
-72.6386983810645006
+269.7448475455195194
  20
-155.4667687074968114
+73.2447991348519167
  30
 0.0
  11
-73.464944763443782
+270.6869143360886483
  21
-154.5247019169276257
+72.4185527524726069
  31
 0.0
   0
@@ -18975,15 +19025,15 @@ Rotor Gear
   6
 ByLayer
  10
-73.464944763443782
+270.6869143360886483
  20
-154.5247019169276257
+72.4185527524726069
  30
 0.0
  11
-74.736463131083184
+271.8750753753230356
  21
-155.0805594309701121
+73.1356800253648203
  31
 0.0
   0
@@ -19003,15 +19053,15 @@ Rotor Gear
   6
 ByLayer
  10
-74.736463131083184
+271.8750753753230356
  20
-155.0805594309701121
+73.1356800253648203
  30
 0.0
  11
-76.1284104412363263
+273.2031429080959697
  21
-155.4784978355143323
+73.7118529382988186
  31
 0.0
   0
@@ -19031,15 +19081,15 @@ Rotor Gear
   6
 ByLayer
  10
-76.1284104412363263
+273.2031429080959697
  20
-155.4784978355143323
+73.7118529382988186
  30
 0.0
  11
-76.7558968977814118
+273.9319985668906838
  21
-154.6608384661240621
+72.9829972795041328
  31
 0.0
   0
@@ -19059,15 +19109,15 @@ Rotor Gear
   6
 ByLayer
  10
-76.7558968977814118
+273.9319985668906838
  20
-154.6608384661240621
+72.9829972795041328
  30
 0.0
  11
-76.01133289018901
+273.3558256539566855
  21
-153.4192703767846808
+71.6549297467311135
  31
 0.0
   0
@@ -19087,15 +19137,15 @@ Rotor Gear
   6
 ByLayer
  10
-76.01133289018901
+273.3558256539566855
  20
-153.4192703767846808
+71.6549297467311135
  30
 0.0
  11
-75.1452928157783049
+272.6386983810645006
  21
-152.3347828069619823
+70.4667687074968114
  31
 0.0
   0
@@ -19115,15 +19165,15 @@ Rotor Gear
   6
 ByLayer
  10
-75.1452928157783049
+272.6386983810645006
  20
-152.3347828069619823
+70.4667687074968114
  30
 0.0
  11
-75.8412660997973944
+273.464944763443782
  21
-151.2930217677613314
+69.5247019169276257
  31
 0.0
   0
@@ -19143,15 +19193,15 @@ Rotor Gear
   6
 ByLayer
  10
-75.8412660997973944
+273.464944763443782
  20
-151.2930217677613314
+69.5247019169276257
  30
 0.0
  11
-77.1747792726458499
+274.7364631310831555
  21
-151.6781846620985164
+70.0805594309701121
  31
 0.0
   0
@@ -19171,15 +19221,15 @@ Rotor Gear
   6
 ByLayer
  10
-77.1747792726458499
+274.7364631310831555
  20
-151.6781846620985164
+70.0805594309701121
  30
 0.0
  11
-78.6067295512683302
+276.1284104412363263
  21
-151.8909764988821678
+70.4784978355143323
  31
 0.0
   0
@@ -19199,15 +19249,15 @@ Rotor Gear
   6
 ByLayer
  10
-78.6067295512683302
+276.1284104412363263
  20
-151.8909764988821678
+70.4784978355143323
  30
 0.0
  11
-79.1219555254128011
+276.7558968977814402
  21
-150.9983375376379229
+69.6608384661240621
  31
 0.0
   0
@@ -19227,15 +19277,15 @@ Rotor Gear
   6
 ByLayer
  10
-79.1219555254128011
+276.7558968977814402
  20
-150.9983375376379229
+69.6608384661240621
  30
 0.0
  11
-78.2217766754840511
+276.01133289018901
  21
-149.8646314149281693
+68.4192703767846808
  31
 0.0
   0
@@ -19255,15 +19305,15 @@ Rotor Gear
   6
 ByLayer
  10
-78.2217766754840511
+276.01133289018901
  20
-149.8646314149281693
+68.4192703767846808
  30
 0.0
  11
-77.2214850240480644
+275.1452928157783049
  21
-148.9024577597903374
+67.3347828069619823
  31
 0.0
   0
@@ -19283,15 +19333,15 @@ Rotor Gear
   6
 ByLayer
  10
-77.2214850240480644
+275.1452928157783049
  20
-148.9024577597903374
+67.3347828069619823
  30
 0.0
  11
-77.7756668423573387
+275.8412660997973944
  21
-147.7788050693649211
+66.2930217677613314
  31
 0.0
   0
@@ -19311,15 +19361,15 @@ Rotor Gear
   6
 ByLayer
  10
-77.7756668423573387
+275.8412660997973944
  20
-147.7788050693649211
+66.2930217677613314
  30
 0.0
  11
-79.1479265829326835
+277.1747792726458783
  21
-147.9865713031789483
+66.6781846620985164
  31
 0.0
   0
@@ -19339,15 +19389,15 @@ Rotor Gear
   6
 ByLayer
  10
-79.1479265829326835
+277.1747792726458783
  20
-147.9865713031789483
+66.6781846620985164
  30
 0.0
  11
-80.595375191799917
+278.6067295512683586
  21
-148.0106566464127127
+66.8909764988821678
  31
 0.0
   0
@@ -19367,15 +19417,15 @@ Rotor Gear
   6
 ByLayer
  10
-80.595375191799917
+278.6067295512683586
  20
-148.0106566464127127
+66.8909764988821678
  30
 0.0
  11
-80.9897536705548191
+279.1219555254127727
  21
-147.0585364235592181
+65.9983375376379229
  31
 0.0
   0
@@ -19395,15 +19445,15 @@ Rotor Gear
   6
 ByLayer
  10
-80.9897536705548191
+279.1219555254127727
  20
-147.0585364235592181
+65.9983375376379229
  30
 0.0
  11
-79.9492490320965885
+278.2217766754840795
  21
-146.0519612841811465
+64.8646314149281693
  31
 0.0
   0
@@ -19423,15 +19473,15 @@ Rotor Gear
   6
 ByLayer
  10
-79.9492490320965885
+278.2217766754840795
  20
-146.0519612841811465
+64.8646314149281693
  30
 0.0
  11
-78.8318790874982085
+277.2214850240480928
  21
-145.2286469982774975
+63.9024577597903374
  31
 0.0
   0
@@ -19451,15 +19501,15 @@ Rotor Gear
   6
 ByLayer
  10
-78.8318790874982085
+277.2214850240480928
  20
-145.2286469982774975
+63.9024577597903374
  30
 0.0
  11
-79.2348445792420932
+277.7756668423573387
  21
-144.0419523783384648
+62.7788050693649353
  31
 0.0
   0
@@ -19479,15 +19529,15 @@ Rotor Gear
   6
 ByLayer
  10
-79.2348445792420932
+277.7756668423573387
  20
-144.0419523783384648
+62.7788050693649353
  30
 0.0
  11
-80.6223933736243055
+279.147926582932655
  21
-144.0689705601628532
+62.9865713031789554
  31
 0.0
   0
@@ -19507,15 +19557,15 @@ Rotor Gear
   6
 ByLayer
  10
-80.6223933736243055
+279.147926582932655
  20
-144.0689705601628532
+62.9865713031789554
  30
 0.0
  11
-82.0606271401888705
+280.595375191799917
  21
-143.903930856970959
+63.0106566464127198
  31
 0.0
   0
@@ -19535,15 +19585,15 @@ Rotor Gear
   6
 ByLayer
  10
-82.0606271401888705
+280.595375191799917
  20
-143.903930856970959
+63.0106566464127198
  30
 0.0
  11
-82.327246064183413
+280.9897536705548191
  21
-142.908456274181674
+62.058536423559211
  31
 0.0
   0
@@ -19563,15 +19613,15 @@ Rotor Gear
   6
 ByLayer
  10
-82.327246064183413
+280.9897536705548191
  20
-142.908456274181674
+62.058536423559211
  30
 0.0
  11
-81.1642182346023731
+279.9492490320965885
  21
-142.0463954205511072
+61.0519612841811394
  31
 0.0
   0
@@ -19591,15 +19641,15 @@ Rotor Gear
   6
 ByLayer
  10
-81.1642182346023731
+279.9492490320965885
  20
-142.0463954205511072
+61.0519612841811394
  30
 0.0
  11
-79.9492490320965885
+278.8318790874982369
  21
-141.3759738990611368
+60.2286469982774975
  31
 0.0
   0
@@ -19619,15 +19669,15 @@ Rotor Gear
   6
 ByLayer
  10
-79.9492490320965885
+278.8318790874982369
  20
-141.3759738990611368
+60.2286469982774975
  30
 0.0
  11
-80.1936668429134727
+279.2348445792421217
  21
-140.1469720434908766
+59.041952378338479
  31
 0.0
   0
@@ -19647,15 +19697,15 @@ Rotor Gear
   6
 ByLayer
  10
-80.1936668429134727
+279.2348445792421217
  20
-140.1469720434908766
+59.041952378338479
  30
 0.0
  11
-81.5728386428596082
+280.622393373624277
  21
-139.9926136018969487
+59.0689705601628461
  31
 0.0
   0
@@ -19675,15 +19725,15 @@ Rotor Gear
   6
 ByLayer
  10
-81.5728386428596082
+280.622393373624277
  20
-139.9926136018969487
+59.0689705601628461
  30
 0.0
  11
-82.9771429103440141
+282.0606271401888989
  21
-139.6411709302019517
+58.903930856970959
  31
 0.0
   0
@@ -19703,15 +19753,15 @@ Rotor Gear
   6
 ByLayer
  10
-82.9771429103440141
+282.0606271401888989
  20
-139.6411709302019517
+58.903930856970959
  30
 0.0
  11
-83.1118130402450959
+282.3272460641834414
  21
-138.6193067370170979
+57.9084562741816811
  31
 0.0
   0
@@ -19731,15 +19781,15 @@ Rotor Gear
   6
 ByLayer
  10
-83.1118130402450959
+282.3272460641834414
  20
-138.6193067370170979
+57.9084562741816811
  30
 0.0
  11
-81.846159607672007
+281.1642182346023446
  21
-137.9164213936271892
+57.0463954205511143
  31
 0.0
   0
@@ -19759,15 +19809,15 @@ Rotor Gear
   6
 ByLayer
  10
-81.846159607672007
+281.1642182346023446
  20
-137.9164213936271892
+57.0463954205511143
  30
 0.0
  11
-80.5539058040352813
+279.9492490320965885
  21
-137.4104110039004638
+56.3759738990611297
  31
 0.0
   0
@@ -19787,15 +19837,15 @@ Rotor Gear
   6
 ByLayer
  10
-80.5539058040352813
+279.9492490320965885
  20
-137.4104110039004638
+56.3759738990611297
  30
 0.0
  11
-80.6357974552600467
+280.1936668429134443
  21
-136.1598366065812229
+55.1469720434908766
  31
 0.0
   0
@@ -19815,15 +19865,15 @@ Rotor Gear
   6
 ByLayer
  10
-48.2118948056857874
+280.1936668429134443
  20
-141.8074234962780906
+55.1469720434908766
  30
 0.0
  11
-55.1920265035367095
+281.5728386428596082
  21
-139.8421512978305827
+54.9926136018969558
  31
 0.0
   0
@@ -19843,15 +19893,15 @@ Rotor Gear
   6
 ByLayer
  10
-55.1920265035367095
+281.5728386428596082
  20
-139.8421512978305827
+54.9926136018969558
  30
 0.0
  11
-56.9801167032552627
+282.9771429103440141
  21
-132.8145438265069629
+54.6411709302019446
  31
 0.0
   0
@@ -19871,15 +19921,15 @@ Rotor Gear
   6
 ByLayer
  10
-44.8079435072720571
+282.9771429103440141
  20
-129.7174807520784725
+54.6411709302019446
  30
 0.0
  11
-43.0198533075535181
+283.1118130402451243
  21
-136.7450882234020924
+53.6193067370170908
  31
 0.0
   0
@@ -19899,15 +19949,15 @@ Rotor Gear
   6
 ByLayer
  10
-43.0198533075534897
+283.1118130402451243
  20
-136.7450882234020355
+53.6193067370170908
  30
 0.0
  11
-48.211894805685759
+281.846159607672007
  21
-141.8074234962780338
+52.9164213936271963
  31
 0.0
   0
@@ -19927,15 +19977,15 @@ Rotor Gear
   6
 ByLayer
  10
-56.9801167032552343
+281.846159607672007
  20
-132.814543826506906
+52.9164213936271963
  30
 0.0
  11
-51.7880752051229081
+280.5539058040352529
  21
-127.7522085536307657
+52.4104110039004567
  31
 0.0
   0
@@ -19955,21 +20005,189 @@ Rotor Gear
   6
 ByLayer
  10
-51.7880752051229081
+280.5539058040352529
  20
-127.7522085536307657
+52.4104110039004567
  30
 0.0
  11
-44.8079435072720287
+280.6357974552600467
  21
-129.7174807520784157
+51.1598366065812158
+ 31
+0.0
+  0
+LINE
+  5
+2E7
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Rotor Gear
+ 62
+256
+370
+0
+  6
+ByLayer
+ 10
+248.2118948056858017
+ 20
+56.8074234962781048
+ 30
+0.0
+ 11
+255.1920265035367095
+ 21
+54.8421512978305685
+ 31
+0.0
+  0
+LINE
+  5
+2E8
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Rotor Gear
+ 62
+256
+370
+0
+  6
+ByLayer
+ 10
+255.1920265035367095
+ 20
+54.8421512978305685
+ 30
+0.0
+ 11
+256.9801167032552485
+ 21
+47.8145438265069771
+ 31
+0.0
+  0
+LINE
+  5
+2E9
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Rotor Gear
+ 62
+256
+370
+0
+  6
+ByLayer
+ 10
+244.8079435072720571
+ 20
+44.7174807520784796
+ 30
+0.0
+ 11
+243.0198533075535181
+ 21
+51.7450882234020852
+ 31
+0.0
+  0
+LINE
+  5
+2EA
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Rotor Gear
+ 62
+256
+370
+0
+  6
+ByLayer
+ 10
+243.0198533075534897
+ 20
+51.7450882234020284
+ 30
+0.0
+ 11
+248.2118948056857448
+ 21
+56.807423496278048
+ 31
+0.0
+  0
+LINE
+  5
+2EB
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Rotor Gear
+ 62
+256
+370
+0
+  6
+ByLayer
+ 10
+256.9801167032552485
+ 20
+47.8145438265069203
+ 30
+0.0
+ 11
+251.7880752051229081
+ 21
+42.7522085536307728
+ 31
+0.0
+  0
+LINE
+  5
+2EC
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Rotor Gear
+ 62
+256
+370
+0
+  6
+ByLayer
+ 10
+251.7880752051229081
+ 20
+42.7522085536307728
+ 30
+0.0
+ 11
+244.8079435072720287
+ 21
+44.7174807520784228
  31
 0.0
   0
 MTEXT
   5
-2E7
+2ED
 100
 AcDbEntity
 100
@@ -19983,9 +20201,9 @@ Rotor Gear Text
   6
 ByLayer
  10
-50.0
+250.0
  20
-120.0
+35.0
  30
 0.0
  40
@@ -20003,277 +20221,13 @@ standard
  50
 0.0
  73
-1
+0
  44
 1.0
   0
-CIRCLE
-  5
-2E8
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Rotor Plate
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-233.5455023335000249
- 20
-125.2798160249545276
- 30
-0.0
- 40
-4.0
-  0
-CIRCLE
-  5
-2E9
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Rotor Plate
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-266.4544676773086849
- 20
-125.2798160249545276
- 30
-0.0
- 40
-4.0
-  0
-CIRCLE
-  5
-2EA
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Rotor Plate
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-249.9999850054043691
- 20
-153.7798160249545276
- 30
-0.0
- 40
-4.0
-  0
-CIRCLE
-  5
-2EB
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Rotor Plate
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-249.9999850054043691
- 20
-134.7798160249545276
- 30
-0.0
- 40
-28.0
-  0
-LINE
-  5
-2EC
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Rotor Plate
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-243.0198533075534897
- 20
-136.7450882234020924
- 30
-0.0
- 11
-248.2118948056857448
- 21
-141.8074234962780906
- 31
-0.0
-  0
-LINE
-  5
-2ED
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Rotor Plate
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-256.9801167032552485
- 20
-132.8145438265069629
- 30
-0.0
- 11
-251.7880752051229081
- 21
-127.7522085536308225
- 31
-0.0
-  0
-LINE
-  5
-2EE
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Rotor Plate
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-251.7880752051229081
- 20
-127.7522085536308225
- 30
-0.0
- 11
-244.8079435072720287
- 21
-129.7174807520784725
- 31
-0.0
-  0
-LINE
-  5
-2EF
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Rotor Plate
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-248.2118948056857448
- 20
-141.8074234962780338
- 30
-0.0
- 11
-255.1920265035366526
- 21
-139.8421512978305259
- 31
-0.0
-  0
-LINE
-  5
-2F0
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Rotor Plate
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-255.1920265035366526
- 20
-139.8421512978305259
- 30
-0.0
- 11
-256.9801167032551916
- 21
-132.814543826506906
- 31
-0.0
-  0
-LINE
-  5
-2F1
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Rotor Plate
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-244.8079435072720003
- 20
-129.7174807520784157
- 30
-0.0
- 11
-243.0198533075534613
- 21
-136.7450882234020355
- 31
-0.0
-  0
 MTEXT
   5
-2F2
+2EE
 100
 AcDbEntity
 100
@@ -20287,7 +20241,7 @@ Rotor Plate Text
   6
 ByLayer
  10
-249.9999999999999716
+150.0
  20
 116.0
  30
@@ -20307,9 +20261,201 @@ standard
  50
 0.0
  73
-1
+0
  44
 1.0
+  0
+CIRCLE
+  5
+2EF
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Rotor Plate Text
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+149.9999850054043975
+ 20
+153.7798160249545276
+ 30
+0.0
+ 40
+8.0
+  0
+CIRCLE
+  5
+2F0
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Rotor Plate
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+149.9999850054043975
+ 20
+134.7798160249545276
+ 30
+0.0
+ 40
+27.0
+  0
+CIRCLE
+  5
+2F1
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Rotor Plate
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+149.9999850054043975
+ 20
+153.7798160249545276
+ 30
+0.0
+ 40
+3.9300000000000002
+  0
+CIRCLE
+  5
+2F2
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Rotor Plate
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+133.5455023335000533
+ 20
+125.2798160249545276
+ 30
+0.0
+ 40
+3.9300000000000002
+  0
+CIRCLE
+  5
+2F3
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Rotor Plate
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+166.4544676773087417
+ 20
+125.2798160249545276
+ 30
+0.0
+ 40
+3.9300000000000002
+  0
+CIRCLE
+  5
+2F4
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Rotor Plate Text
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+166.4544676773087417
+ 20
+125.2798160249545276
+ 30
+0.0
+ 40
+8.0
+  0
+CIRCLE
+  5
+2F5
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Rotor Plate Text
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+133.5455023335000533
+ 20
+125.2798160249545276
+ 30
+0.0
+ 40
+8.0
+  0
+CIRCLE
+  5
+2F6
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Rotor Plate
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+149.9999850054043691
+ 20
+134.7798160249545276
+ 30
+0.0
+ 40
+3.9300000000000002
   0
 ENDSEC
   0
@@ -20349,7 +20495,7 @@ E
   3
 AcDbVariableDictionary
 350
-2F3
+2F7
   0
 DICTIONARY
   5
@@ -20813,7 +20959,7 @@ Layout2
   0
 DICTIONARY
   5
-2F3
+2F7
 100
 AcDbDictionary
 281
@@ -20821,15 +20967,15 @@ AcDbDictionary
   3
 DIMASSOC
 350
-2F5
+2F9
   3
 HIDETEXT
 350
-2F4
+2F8
   0
 DICTIONARYVAR
   5
-2F4
+2F8
 100
 DictionaryVariables
 280
@@ -20839,7 +20985,7 @@ DictionaryVariables
   0
 DICTIONARYVAR
   5
-2F5
+2F9
 100
 DictionaryVariables
 280
