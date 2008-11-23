@@ -441,6 +441,9 @@ public class GCodeReaderAndWriter
 							responseAvailable = true;
 						} else
 							System.err.println("GCodeWriter.waitForOK(): temperature response returned when none expected.");
+					} else if (resp.startsWith("E:"))
+					{
+						System.err.println("GCodeWriter.waitForOK(): temperature error returned: " + resp);
 					} 
 					else if (resp.startsWith("start") || resp.contentEquals(""))
 					{	
