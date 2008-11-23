@@ -39,7 +39,7 @@ extruder::extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin,
 
         //these our the default values for the extruder.
         e_speed = 128;
-        target_celsius = -273;
+        target_celsius = 17;
         max_celsius = 0;
         heater_low = 64;
         heater_high = 255;
@@ -58,13 +58,11 @@ extruder::extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin,
         set_temperature(target_celsius);
 }
 
-void extruder::wait_for_heater()
-{
-  //warmup if we're too cold.
-  byte count = 0;
-  int oldT, newT;
+byte extruder::wait_till_hot()
+{  
+  count = 0;
   oldT = get_temperature();
-  while (get_temperature() < (target_celsius - 5))
+  while (get_temperature() < target_celsius - HALF_DEAD_ZONE)
   {
 	manage_all_extruders();
         count++;
@@ -72,25 +70,63 @@ void extruder::wait_for_heater()
         {
             newT = get_temperature();
             if(newT > oldT)
-            {
                oldT = newT;
-            } else
-            {
-                // Temp's stuck - dud heater or temperature sensor
-                // Tell the host and return.
-                Serial.print("E: ");
-                Serial.println(newT);
-                return;
-            }
+            else
+                return 1;
             count = 0;
         }
 	delay(1000);
-  }  
+  }
+  return 0;
+}
+
+/*
+byte extruder::wait_till_cool()
+{  
+  count = 0;
+  oldT = get_temperature();
+  while (get_temperature() > target_celsius + HALF_DEAD_ZONE)
+  {
+	manage_all_extruders();
+        count++;
+        if(count > 20)
+        {
+            newT = get_temperature();
+            if(newT < oldT)
+               oldT = newT;
+            else
+                return 1;
+            count = 0;
+        }
+	delay(1000);
+  }
+  return 0;
+}
+*/
+
+void extruder::temperature_error()
+{
+      Serial.print("E: ");
+      Serial.println(get_temperature());  
+}
+
+//warmup if we're too cold; cool down if we're too hot
+void extruder::wait_for_temperature()
+{
+/*
+  if(wait_till_cool())
+   {
+      temperature_error();
+      return;
+   }
+*/
+   if(wait_till_hot())
+     temperature_error();
 }
 
 void extruder::valve_set(bool open, int millis)
 {
-        wait_for_heater();
+        wait_for_temperature();
 	valve_open = open;
 	digitalWrite(valve_dir_pin, open);
         digitalWrite(valve_en_pin, 1);
@@ -109,7 +145,7 @@ void extruder::set_speed(byte sp)
 {
     e_speed = sp;
     if(e_speed > 0)
-          wait_for_heater();
+          wait_for_temperature();
     analogWrite(motor_speed_pin, e_speed);
 }
 
