@@ -156,7 +156,6 @@ bool testObservable()
         
         if (firedEvent != 4)
         {
-            printf("Unexpected number executed\n");
             return false;
         }
         
@@ -164,14 +163,12 @@ bool testObservable()
         watched.notifyObservers(ObservedEvent_TestEvent1);
         if (firedEvent != 5)
         {
-            printf("Unexpected number executed\n");
             return false;
         }
     }
     
     if (watched.hasObservers() == true)
     {
-        printf("should have no observers\n");
         return false;
     }
     

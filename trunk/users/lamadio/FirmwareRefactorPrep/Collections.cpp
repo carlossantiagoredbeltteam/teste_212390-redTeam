@@ -5,8 +5,7 @@
  *  Copyright 2008 OoeyGUI. All rights reserved.
  *
  */
-#include <stdlib.h>
-#include <strings.h>
+#include <WProgram.h>
 #include "Collections.h"
 
 
@@ -172,7 +171,10 @@ bool testCollections()
     while (a.count())
     {
         if (a.popValue() != --i)
+        {
+            Serial.println("DArray: poping not in order");
             return false;
+        }
     }
     
     a.insertValue(0, 3);
@@ -186,7 +188,10 @@ bool testCollections()
     for (int index = 0; index < a.count(); index++)
     {
         if (tests[index] != a.value(index))
+        {
+            Serial.println("DArray: inserted values not in order");
             return false;
+        }
     }
     
     DArray b;
@@ -199,6 +204,7 @@ bool testCollections()
     size_t index;
     if (b.findValue(1, &index) && index != 1)
     {
+        Serial.println("DArray: values not found correctly");
         return false;
     }
     

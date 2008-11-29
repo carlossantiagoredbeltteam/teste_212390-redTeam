@@ -8,6 +8,9 @@
 #ifndef EventLoop_h
 #define EventLoop_h
 
+typedef unsigned long milliclock_t;
+extern const unsigned long MILLICLOCK_MAX;
+
 //
 // Periodic Event Callback
 //  Derive from this class to implement a periodic servicing
@@ -15,8 +18,11 @@
 class PeriodicCallback
 {
 public:
+  // NOTE: This is a harmless warning: 
+  //  alignment of 'PeriodicCallback::_ZTV16PeriodicCallback' is greater than maximum object file alignment.
+  // Bug in avr-g++. See http://www.mail-archive.com/avr-chat@nongnu.org/msg00982.html
     PeriodicCallback();
-    virtual ~PeriodicCallback() { }
+    virtual ~PeriodicCallback();
     
     virtual void service() = 0;
 };
@@ -32,7 +38,7 @@ class EventLoopTimer
     milliclock_t _period;
 public:
     EventLoopTimer(unsigned long period);
-    virtual ~EventLoopTimer() { }
+    virtual ~EventLoopTimer();
     
     virtual void fire() = 0;
     

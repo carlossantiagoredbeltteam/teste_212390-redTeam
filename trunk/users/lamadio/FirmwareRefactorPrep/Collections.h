@@ -9,15 +9,9 @@
 #ifndef Collections_h
 #define Collections_h
 
-#ifndef max
-inline int max(int x, int y) 
-{
-    return (x > y)?x:y;
-}
-#endif
-
-typedef int (*DArraySortCallback)(const void* item1, const void* item2);
 typedef void (*DArrayForEach)(void* item, void* context);
+#undef int
+typedef int (*DArraySortCallback)(const void* item1, const void* item2);
 
 
 //
