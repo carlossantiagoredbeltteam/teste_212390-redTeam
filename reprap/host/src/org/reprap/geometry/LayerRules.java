@@ -185,8 +185,8 @@ public class LayerRules
 		{
 			if(getFoundationLayers() - getMachineLayer() == 2)
 				return e.getExtrusionFoundationWidth()*0.5;
-			else if(getMachineLayer() == getFoundationLayers()-1)
-				return e.getExtrusionInfillWidth();
+			//else if(getMachineLayer() == getFoundationLayers()-1)
+				//return e.getExtrusionInfillWidth();
 			
 			return e.getExtrusionFoundationWidth();
 		}
