@@ -581,12 +581,12 @@ public class LayerProducer {
 				}
 				
 				if(j > stopExtruding || j == p.size())
-					plot(p.point(i), next, lift, j == p.size());
+					plot(p.point(i), next, true, j == p.size()); //plot(p.point(i), next, lift, j == p.size());
 				else
 					plot(p.point(i), next, false, false);
 				
 				if(j > stopValve || j == p.size())
-					plot(p.point(i), next, j == p.size(), true);
+					plot(p.point(i), next, j == p.size(), true); //plot(p.point(i), next, lift, j == p.size());
 				else
 					plot(p.point(i), next, false, false);
 			}
@@ -609,7 +609,7 @@ public class LayerProducer {
 					plot(p.point(i), next, false, false);
 				
 				if(i > stopValve || i == p.size()-1)
-					plot(p.point(i), next, i == p.size()-1, lift);
+					plot(p.point(i), next, i == p.size()-1, true); //plot(p.point(i), next, i == p.size()-1, lift);
 				else
 					plot(p.point(i), next, false, false);
 			}
