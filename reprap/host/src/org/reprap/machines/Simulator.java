@@ -20,9 +20,9 @@ public class Simulator extends GenericRepRap {
 	
 	public void loadMotors()
 	{
-		motorX = new NullStepperMotor('X');
-		motorY = new NullStepperMotor('Y');
-		motorZ = new NullStepperMotor('Z');
+		motorX = new NullStepperMotor(1);
+		motorY = new NullStepperMotor(2);
+		motorZ = new NullStepperMotor(3);
 	}
 	
 	public Extruder extruderFactory(int count)
