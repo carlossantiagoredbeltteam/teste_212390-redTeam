@@ -11,6 +11,7 @@
 #define HALF_DEAD_ZONE 5
 
 // Thermistor lookup table for RepRap Temperature Sensor Boards (http://make.rrrf.org/ts)
+// See this page:  for details of what goes in this table.
 // Made with createTemperatureLookup.py (http://svn.reprap.org/trunk/reprap/firmware/Arduino/utilities/createTemperatureLookup.py)
 // ./createTemperatureLookup.py --r0=100000 --t0=25 --r1=0 --r2=4700 --beta=4066 --max-adc=1023
 // r0: 100000
