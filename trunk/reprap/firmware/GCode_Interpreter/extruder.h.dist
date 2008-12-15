@@ -20,6 +20,10 @@ private:
     byte heater_high;
     byte heater_current;
 
+// These are used for temperature control    
+    byte count ;
+    int oldT, newT;
+    
 //this is for doing encoder based extruder control
     int rpm;
     long e_delay;
@@ -35,7 +39,10 @@ private:
 public:
 
    extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin, byte vd_pin, byte ve_pin);
-   void wait_for_heater();
+   void wait_for_temperature();
+   //byte wait_till_cool();
+   byte wait_till_hot();
+   void temperature_error();  
    void valve_set(bool open, int millis);
    void set_direction(bool direction);
    void set_speed(byte e_speed);
