@@ -54,14 +54,16 @@ print "M103"
 print "M108 S130.0"
 print "M101"
 
-spiral(radius, radius, layer, feedrate, radius, density, 1)
+play = 5
+
+spiral(radius+play, radius+play, layer, feedrate, radius, density, 1)
 layer += layerheight
-spiral(radius, radius, layer, feedrate, radius, density, 0)
+spiral(radius+play, radius+play, layer, feedrate, radius, density, 0)
 layer += layerheight
-spiral(radius, radius, layer, feedrate, radius, density, 1)
+spiral(radius+play, radius+play, layer, feedrate, radius, density, 1)
 layer += layerheight
 for i in range(0, 40):
-    circle(radius, radius, layer, feedrate, radius, 1)
+    circle(radius+play, radius+play, layer, feedrate, radius+sin(i/30.0)*5, 1)
     layer += layerheight
 
 print "M103"
