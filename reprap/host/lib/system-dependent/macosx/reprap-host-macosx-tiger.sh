@@ -3,4 +3,4 @@
 export JAVA_HOME=/usr/local/soylatte16
 export PATH=$JAVA_HOME/bin:$PATH
 export 
-java -jar jar/reprap.jar
+java -jar reprap.jar

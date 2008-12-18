@@ -6,15 +6,15 @@ RELEASE=${1:-`date -u +%Y%m%d`}
 
 LINUXFILENAME="reprap-host-linux-$RELEASE"
 LINUXFILELIST="jar/reprap.jar lib/*.jar lib/reprap-wv.stl lib/rr-logo-green-url.png\
-    lib/reprap.properties.dist lib/system-dependent/linux-i386/* LICENSE"
+    lib/reprap-icon.png lib/reprap.properties.dist lib/system-dependent/linux-i386/* LICENSE"
 
 MACFILENAME="reprap-host-mac-$RELEASE"
 MACFILELIST="jar/reprap.jar lib/*.jar lib/reprap-wv.stl lib/rr-logo-green-url.png\
-    lib/reprap.properties.dist lib/system-dependent/macosx/* LICENSE"
+    lib/reprap-icon.png lib/reprap.properties.dist lib/system-dependent/macosx/* LICENSE"
 
 WINDOWSFILENAME="reprap-host-windows-$RELEASE"
 WINDOWSFILELIST="jar/reprap.jar lib/*.jar lib/reprap-wv.stl lib/rr-logo-green-url.png\
-    lib/reprap.properties.dist lib/system-dependent/windows-i586/* LICENSE"
+    lib/reprap-icon.png lib/reprap.properties.dist lib/system-dependent/windows-i586/* LICENSE"
 
 SRCFILENAME="reprap-host-src-$RELEASE"
 SRCFILELIST="src/* LICENSE build.xml build-user.xml .classpath .project \
