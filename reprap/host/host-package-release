@@ -5,16 +5,16 @@
 RELEASE=${1:-`date -u +%Y%m%d`}
 
 LINUXFILENAME="reprap-host-linux-$RELEASE"
-LINUXFILELIST="jar/reprap.jar lib/reprap-wv.stl \
-    reprap-host.sh reprap-host reprap-host.bat LICENSE"
+LINUXFILELIST="jar/reprap.jar lib/*.jar lib/reprap-wv.stl lib/rr-logo-green-url.png\
+    lib/reprap.properties.dist lib/system-dependent/linux-i386/* LICENSE"
 
 MACFILENAME="reprap-host-mac-$RELEASE"
-MACFILELIST="jar/reprap.jar lib/reprap-wv.stl \
-    reprap-host.sh reprap-host reprap-host.bat LICENSE"
+MACFILELIST="jar/reprap.jar lib/*.jar lib/reprap-wv.stl lib/rr-logo-green-url.png\
+    lib/reprap.properties.dist lib/system-dependent/macosx/* LICENSE"
 
 WINDOWSFILENAME="reprap-host-windows-$RELEASE"
-WINDOWSFILELIST="jar/reprap.jar lib/reprap-wv.stl \
-    reprap-host.sh reprap-host reprap-host.bat LICENSE"
+WINDOWSFILELIST="jar/reprap.jar lib/*.jar lib/reprap-wv.stl lib/rr-logo-green-url.png\
+    lib/reprap.properties.dist lib/system-dependent/windows-i586/* LICENSE"
 
 SRCFILENAME="reprap-host-src-$RELEASE"
 SRCFILELIST="src/* LICENSE build.xml build-user.xml .classpath .project \
@@ -60,14 +60,14 @@ sed -e "s/RELEASE/$RELEASE/g" -e "s/DATE/$NOW/g" README > "release/$MACFILENAME/
 sed -e 's/$/\r/' README > "release/$WINDOWSFILENAME/README.txt"
 
 # Copy Main class file, so we can use java -cp to run software
-mkdir -p "release/$MACFILENAME/org/reprap"
-cp -p bin/org/reprap/Main.class "release/$MACFILENAME/org/reprap/"
+#mkdir -p "release/$MACFILENAME/org/reprap"
+#cp -p bin/org/reprap/Main.class "release/$MACFILENAME/org/reprap/"
 
-mkdir -p "release/$LINUXFILENAME/org/reprap"
-cp -p bin/org/reprap/Main.class "release/$LINUXFILENAME/org/reprap/"
+#mkdir -p "release/$LINUXFILENAME/org/reprap"
+#cp -p bin/org/reprap/Main.class "release/$LINUXFILENAME/org/reprap/"
 
-mkdir -p "release/$WINDOWSFILENAME/org/reprap"
-cp -p bin/org/reprap/Main.class "release/$WINDOWSFILENAME/org/reprap/"
+#mkdir -p "release/$WINDOWSFILENAME/org/reprap"
+#cp -p bin/org/reprap/Main.class "release/$WINDOWSFILENAME/org/reprap/"
 
 # Now create the src archive
 for F in $SRCFILELIST

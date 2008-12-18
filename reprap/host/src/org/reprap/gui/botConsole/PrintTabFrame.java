@@ -144,7 +144,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-
+    	System.out.println("-- " + ClassLoader.getSystemResource("rr-logo-green-url.png").getFile());
         buttonGroup1 = new javax.swing.ButtonGroup();
         printButton = new java.awt.Button();
         pauseButton = new java.awt.Button();
@@ -219,13 +219,14 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
             }
         });
 
-        getWebPage.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/reprap/gui/botConsole/rr-logo-green-url.png"))); // NOI18N
+        getWebPage.setIcon(new javax.swing.ImageIcon(
+        		ClassLoader.getSystemResource("rr-logo-green-url.png"))); // NOI18N
         getWebPage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 getWebPageActionPerformed(evt);
             }
         });
-
+        
         expectedBuildTimeLabel.setFont(new java.awt.Font("Tahoma", 0, 12));
         expectedBuildTimeLabel.setText("Expected build time:"); // NOI18N
 

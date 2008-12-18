@@ -491,46 +491,63 @@ abstract public class Panel3D extends JPanel {
 		return 1.0;
 	}
 
+//	protected String getStlBackground() throws Exception {
+//		String path = getStlBackground("");
+//		if (path != null)
+//			return path;
+//		path = getStlBackground("lib/");
+//		if (path != null)
+//			return path;
+//                path = getStlBackground("../lib/");
+//		if (path != null)
+//			return path;
+//                
+//                // for eD's version of a NetBeans project - improvements welcome!
+//		path = getStlBackground("../host/lib/");
+//		if (path != null)
+//			return path;
+//		
+//		throw new Exception("Cannot locate background STL file");
+//	}
+	
 	protected String getStlBackground() throws Exception {
-		String path = getStlBackground("");
-		if (path != null)
-			return path;
-		path = getStlBackground("lib/");
-		if (path != null)
-			return path;
-                path = getStlBackground("../lib/");
-		if (path != null)
-			return path;
-                
-                // for eD's version of a NetBeans project - improvements welcome!
-		path = getStlBackground("../host/lib/");
-		if (path != null)
-			return path;
+		
+		URL u = ClassLoader.getSystemResource(wv_location);
+		if(u != null)
+		{
+			String name = u.toString();
+			//System.out.println("**- " + name);
+			return name;
+		}
 		
 		throw new Exception("Cannot locate background STL file");
 	}
 	
-	protected String getStlBackground(String subdir) {
-		URL codebase = null;
-		String stlURL = null;
-		String stlPath = null;
-
-		try {
-			codebase = Panel3D.getWorkingDirectory();
-			stlPath = codebase.getPath() + subdir + wv_location;
-			stlURL = codebase.toExternalForm() + subdir + wv_location;
-		} catch (Exception e) {
-			System.err
-					.println("createSceneBranchGroup(): Exception finding working directory: "
-							+ codebase.toExternalForm());
-			e.printStackTrace();
-		}
-		
-		File f = new File(stlPath);
-		if (f.exists())
-			return stlURL;
-		
-		return null;
-
-	}
+//	protected String getStlBackground(String subdir) {
+//		URL codebase = null;
+//		String stlURL = null;
+//		String stlPath = null;
+//
+//		try {
+////			codebase = Panel3D.getWorkingDirectory();
+////			stlPath = codebase.getPath() + subdir + wv_location;
+////			stlURL = codebase.toExternalForm() + subdir + wv_location;
+//			URL u = ClassLoader.getSystemResource(wv_location);
+//			stlPath = u.getPath();
+//			stlURL = u.toExternalForm();//u.getFile();
+////			System.out.println(stlPath + " : " + stlURL);
+//		} catch (Exception e) {
+//			System.err
+//					.println("createSceneBranchGroup(): Exception finding working directory: "
+//							+ codebase.toExternalForm());
+//			e.printStackTrace();
+//		}
+//		
+//		File f = new File(stlPath);
+//		if (f.exists())
+//			return stlURL;
+//		
+//		return null;
+//
+//	}
 }
