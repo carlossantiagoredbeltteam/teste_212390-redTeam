@@ -144,7 +144,6 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-    	System.out.println("-- " + ClassLoader.getSystemResource("rr-logo-green-url.png").getFile());
         buttonGroup1 = new javax.swing.ButtonGroup();
         printButton = new java.awt.Button();
         pauseButton = new java.awt.Button();
@@ -440,6 +439,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
 
 private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
     parentBotConsoleFrame.suspendPolling();
+    parentBotConsoleFrame.setFractionDone(-1);
     org.reprap.Main.gui.mouseToWorld();
     if(gCodeToFileRadioButton.isSelected())
     {

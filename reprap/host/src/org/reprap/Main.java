@@ -49,7 +49,9 @@ import org.reprap.utilities.ExtensionFileFilter;
 
 public class Main {
 
-    private static Communicator communicator;
+    private static Communicator communicator = null;
+    
+    private static boolean repRapAttached = false;
     
     private Producer producer = null;
     
@@ -703,6 +705,7 @@ public class Main {
 			@SuppressWarnings("unused")
 			Boolean use_serial = false;
 
+			repRapAttached = false;
 			try
 			{
 	            port = org.reprap.Preferences.loadGlobalString("Port(name)");
@@ -743,8 +746,19 @@ public class Main {
 				{
 					e.printStackTrace();
 				}
+				repRapAttached = true;
 			}
 		}
+        
+        public static void setRepRapPresent(boolean a)
+        {
+        	repRapAttached = a;
+        }
+        
+        public static boolean repRapPresent()
+        {
+        	return repRapAttached;
+        }
 
         
         public static Communicator getCommunicator() {
