@@ -227,7 +227,7 @@ public class GCodeReaderAndWriter
 						bufferQueue(line);
 						bytes += line.length();
 						fractionDone = (double)bytes/(double)fileInStreamLength;
-						org.reprap.gui.botConsole.BotConsoleFrame.getBotConsoleFrame().setFractionDone(fractionDone);
+						setFractionDone(fractionDone);
 						while(paused)
 						{
 							//System.err.println("Waiting for pause to end.");
@@ -245,6 +245,11 @@ public class GCodeReaderAndWriter
 		playFile.start();
 
 	    return true;
+	}
+	
+	public void setFractionDone(double fractionDone)
+	{
+		org.reprap.gui.botConsole.BotConsoleFrame.getBotConsoleFrame().setFractionDone(fractionDone);
 	}
 	
 	/**
@@ -328,7 +333,7 @@ public class GCodeReaderAndWriter
 		// Is the output thread running?
 		if(bufferThread == null)
 		{
-			System.err.println("bufferQueue: attempt to queue: " + cmd + " to a non-running output buffer.");
+			Debug.d("bufferQueue: attempt to queue: " + cmd + " to a non-running output buffer.");
 			return;
 		}
 		// Are we locked out by the transmit thread?
@@ -494,6 +499,11 @@ public class GCodeReaderAndWriter
 	 */
 	public String queueRespond(String cmd)
 	{
+		if(bufferThread == null)
+		{
+			Debug.d("queueRespond: attempt to queue: " + cmd + " to a non-running output buffer.");
+			return "0000";
+		}
 		//trim it and cleanup.
 		cmd = cmd.trim();
 		cmd = cmd.replaceAll("  ", " ");
@@ -528,6 +538,7 @@ public class GCodeReaderAndWriter
 		
 		//open our port.
 		Debug.d("GCode opening port " + portName);
+		org.reprap.Main.gui.setRepRapPresent(false);
 		try 
 		{
 			CommPortIdentifier commId = CommPortIdentifier.getPortIdentifier(portName);
@@ -540,7 +551,7 @@ public class GCodeReaderAndWriter
 			System.err.println("Port '" + portName + "' is already in use.");
 			return;			
 		}
-		
+		org.reprap.Main.gui.setRepRapPresent(true);		
 		//get our baudrate
 		try {
 			baudRate = Preferences.loadGlobalInt("BaudRate");
@@ -594,7 +605,7 @@ public class GCodeReaderAndWriter
 		}
 
 		//arduino bootloader skip.
-		Debug.d("Attempting to initialize Arduino");
+		Debug.d("Attempting to initialize Arduino/Sanguino");
         try {Thread.sleep(1000);} catch (Exception e) {}
         for(int i = 0; i < 10; i++)
                 serialOutStream.write('0');

@@ -15,20 +15,11 @@ public class Producer {
 	
 	private boolean paused = false;
 	
-	//int layerNumber = 0;
-	
-	//int layers = 0;
-	
 	private LayerProducer layer = null;
 	
 	protected LayerRules layerRules = null;
 	
 	private RrGraphics simulationPlot = null;
-	
-	/**
-	 * The machine doing the making
-	 */
-	//protected Printer reprap;
 	
 	/**
 	 * Line parallel to which odd-numbered layers will be hatched
@@ -45,22 +36,9 @@ public class Producer {
 	 */
 	protected RepRapBuild bld;
 	
-	
-	//protected int movementSpeedZ;
 	protected boolean interLayerCooling;
-	//protected double currentZ;
+
 	protected STLSlice stlc;
-	//protected double stepZ;
-	
-//	/**
-//	 * @param preview
-//	 * @param builder
-//	 * @throws Exception
-//	 */
-//	private Producer(PreviewPanel preview, RepRapBuild builder) throws Exception 
-//	{
-//		this(MachineFactory.create(), preview, builder);
-//	}
 	
 	/**
 	 * @param preview
@@ -69,10 +47,6 @@ public class Producer {
 	 */
 	public Producer(Printer pr, RepRapBuild builder) throws Exception 
 	{
-		
-//		pr.setPreviewer(preview);
-//		if(preview != null)
-//			preview.setMachine(pr);
 		bld = builder;
 
 		//		Original hatch vectors
@@ -187,12 +161,6 @@ public class Producer {
 	private void layFoundation() throws Exception
 	{
 		Printer reprap = layerRules.getPrinter();
-//		try {
-//			movementSpeedZ = Preferences.loadGlobalInt("MovementSpeedZ(0..255)");
-//		} catch (Exception ex) {
-//			movementSpeedZ = 212;
-//			System.err.println("Warning: could not load Z MovementSpeed, using default");
-//		}
 		
 		try {
 			interLayerCooling = Preferences.loadGlobalBool("InterLayerCooling");
@@ -201,7 +169,6 @@ public class Producer {
 			System.err.println("Warning: could not load InterLayerCooling flag, using default");
 		}
 		
-		//reprap.setSpeedZ(movementSpeedZ);
 		Debug.d("Intialising reprap");
 		reprap.startRun();
 		// By convention, extruder 0 has the support/foundation material
@@ -230,7 +197,6 @@ public class Producer {
 
 		waitWhilePaused();
 
-		//reprap.setSpeed(reprap.getExtruder().getXYSpeed());
 		reprap.setFeedrate(reprap.getExtruder().getXYFeedrate());
 		reprap.moveTo(1, 1, 0, false, false);
 
@@ -257,8 +223,6 @@ public class Producer {
 			reprap.getExtruder().setMotor(false);
 		}
 		reprap.setFeedrate(reprap.getFastFeedrateXY());
-		//reprap.setSpeed(reprap.getFastSpeed());
-
 
 		if(layerRules.getFoundationLayers() <= 0)
 		{
