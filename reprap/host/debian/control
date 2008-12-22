@@ -2,7 +2,7 @@ Source: reprap-host
 Section: misc
 Priority: optional
 Maintainer: Adrian Bowyer <A.Bowyer@bath.ac.uk>
-Uploader: Jonathan Marsden <jmarsden@fastmail.fm>, Petter Reinholdtsen <pere@debian.org>
+Uploaders: Jonathan Marsden <jmarsden@fastmail.fm>, Petter Reinholdtsen <pere@debian.org>
 Standards-Version: 3.8.0
 Build-Depends: debhelper (>= 5), cdbs, ant, libsun-vecmath-java, librxtx-java, libswing-layout-java, libjava3d-java | java3d
 # libj3d-org-java
