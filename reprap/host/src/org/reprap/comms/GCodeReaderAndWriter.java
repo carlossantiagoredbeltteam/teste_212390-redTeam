@@ -20,6 +20,7 @@ import gnu.io.UnsupportedCommOperationException;
 
 import org.reprap.utilities.Debug;
 import org.reprap.utilities.ExtensionFileFilter;
+import org.reprap.Main;
 import org.reprap.Preferences;
 
 public class GCodeReaderAndWriter
@@ -538,7 +539,7 @@ public class GCodeReaderAndWriter
 		
 		//open our port.
 		Debug.d("GCode opening port " + portName);
-		org.reprap.Main.gui.setRepRapPresent(false);
+		Main.setRepRapPresent(false);
 		try 
 		{
 			CommPortIdentifier commId = CommPortIdentifier.getPortIdentifier(portName);
@@ -551,7 +552,7 @@ public class GCodeReaderAndWriter
 			System.err.println("Port '" + portName + "' is already in use.");
 			return;			
 		}
-		org.reprap.Main.gui.setRepRapPresent(true);		
+		Main.setRepRapPresent(true);		
 		//get our baudrate
 		try {
 			baudRate = Preferences.loadGlobalInt("BaudRate");
