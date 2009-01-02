@@ -16,6 +16,7 @@ import org.reprap.comms.GCodeReaderAndWriter;
 import org.reprap.utilities.Debug;
 import org.reprap.devices.GCodeExtruder;
 import org.reprap.devices.GCodeStepperMotor;
+import org.reprap.geometry.LayerRules;
 
 import java.io.IOException;
 
@@ -172,8 +173,8 @@ public class GCodeRepRap extends GenericRepRap {
 	 */
 	public void printTo(double x, double y, double z, boolean stopExtruder, boolean closeValve) throws ReprapException, IOException
 	{
-		if (previewer != null)
-			previewer.addSegment(currentX, currentY, currentZ, x, y, z);
+		// if (previewer != null)
+		//	previewer.addSegment(currentX, currentY, currentZ, x, y, z);
 			
 		if (isCancelled())
 			return;
@@ -437,5 +438,11 @@ public class GCodeRepRap extends GenericRepRap {
 	public void resume()
 	{
 		gcode.resume();
+	}
+	
+	public void finishedLayer(LayerRules lc) throws Exception
+	{
+		super.finishedLayer(lc);
+		gcode.queue(";#!LAYER: " + lc.getMachineLayer() + "/" + lc.getMachineLayerMax());
 	}
 }

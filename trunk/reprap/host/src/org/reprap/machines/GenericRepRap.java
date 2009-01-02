@@ -16,7 +16,7 @@ import org.reprap.devices.GenericStepperMotor;
 import org.reprap.devices.NullStepperMotor;
 import org.reprap.geometry.LayerRules;
 import org.reprap.gui.ContinuationMesage;
-import org.reprap.gui.Previewer;
+//import org.reprap.gui.Previewer;
 import org.reprap.gui.StatusMessage;
 import org.reprap.Extruder;
 import org.reprap.utilities.Debug;
@@ -40,7 +40,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	/**
 	 * This is our previewer window
 	 */
-	protected Previewer previewer = null;
+	//protected Previewer previewer = null;
 
 	/**
 	 * How far have we moved, in mm.
@@ -211,8 +211,8 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 */
 	public void startRun() throws Exception
 	{
-		if (previewer != null)
-			previewer.reset();
+		//if (previewer != null)
+			//previewer.reset();
 				
 		Debug.d("Selecting material 0");
 		selectExtruder(0);
@@ -614,16 +614,16 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 */
 	public void setLowerShell(BranchGroup ls)
 	{
-		if (previewer != null)
-			previewer.setLowerShell(ls);
+//		if (previewer != null)
+//			previewer.setLowerShell(ls);
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#setPreviewer(org.reprap.gui.Previewer)
 	 */
-	public void setPreviewer(Previewer previewer) {
-		this.previewer = previewer;
-	}
+//	public void setPreviewer(Previewer previewer) {
+//		this.previewer = previewer;
+//	}
 	
 	public void setFeedrate(double feedrate)
 	{

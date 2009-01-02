@@ -63,7 +63,6 @@ public class BotConsoleFrame extends javax.swing.JFrame {
         			try 
         			{
         				Thread.sleep(5000);
-        				System.out.println("f: " + fractionDone);
         				updateProgress();
         				if(carryOnPolling)
         					updatePanels();   
