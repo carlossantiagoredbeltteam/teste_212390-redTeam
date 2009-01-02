@@ -42,8 +42,8 @@ public class Simulator extends GenericRepRap {
 
 	public void printTo(double x, double y, double z, boolean stopExtruder, boolean closeValve) 
 	{
-		if (previewer != null)
-			previewer.addSegment(currentX, currentY, currentZ, x, y, z);
+		//if (previewer != null)
+		//	previewer.addSegment(currentX, currentY, currentZ, x, y, z);
 		if (isCancelled())
 			return;
 

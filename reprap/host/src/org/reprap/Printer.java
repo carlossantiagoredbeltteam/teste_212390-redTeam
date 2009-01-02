@@ -6,7 +6,7 @@ import java.io.IOException;
 import javax.media.j3d.BranchGroup;
 import javax.swing.JCheckBoxMenuItem;
 import org.reprap.geometry.LayerRules;
-import org.reprap.gui.Previewer;
+//import org.reprap.gui.Previewer;
 //import org.reprap.devices.GenericExtruder;
 import org.reprap.devices.GenericStepperMotor;
 
@@ -142,7 +142,7 @@ public interface Printer {
 	/**
 	 * @param previewer
 	 */
-	public void setPreviewer(Previewer previewer);
+	//public void setPreviewer(Previewer previewer);
 	
 	/**
 	 * @return is cancelled when ...?

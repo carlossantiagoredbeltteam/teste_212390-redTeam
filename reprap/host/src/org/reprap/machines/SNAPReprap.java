@@ -220,10 +220,10 @@ public class SNAPReprap extends GenericRepRap
 		if ((stepperX != layerPrinter.getCurrentX() || stepperY != layerPrinter.getCurrentY()) && z != currentZ)
 			throw new ReprapException("Reprap cannot print a line across 3 axes simultaneously");
 
-		if (previewer != null)
-			previewer.addSegment(convertToPositionX(layerPrinter.getCurrentX()),
-					convertToPositionY(layerPrinter.getCurrentY()), currentZ,
-					x, y, z);
+//		if (previewer != null)
+//			previewer.addSegment(convertToPositionX(layerPrinter.getCurrentX()),
+//					convertToPositionY(layerPrinter.getCurrentY()), currentZ,
+//					x, y, z);
 
 		if (isCancelled()) return;
 		
