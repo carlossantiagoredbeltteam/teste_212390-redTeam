@@ -159,6 +159,7 @@ void dda_move(long micro_delay)
 	current_units.y = target_units.y;
 	current_units.z = target_units.z;
 	calculate_deltas();
+        disable_steppers();
 }
 
 bool can_step(byte min_pin, byte max_pin, long current, long target, byte direction)
@@ -353,7 +354,7 @@ void enable_steppers()
 
 void disable_steppers()
 {
- #ifdef SANGUINO 
+#ifdef SANGUINO 
 	//disable our steppers
 	digitalWrite(X_ENABLE_PIN, !ENABLE_ON);
 	digitalWrite(Y_ENABLE_PIN, !ENABLE_ON);
