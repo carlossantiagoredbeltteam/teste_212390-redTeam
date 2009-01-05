@@ -4,7 +4,6 @@
 #include "extruder.h"
 
 //our command string
-#define COMMAND_SIZE 128
 char word[COMMAND_SIZE];
 char c = '?';
 byte serial_count = 0;
@@ -150,9 +149,6 @@ int last_gcode_g = -1;
 #define GCODE_S	(1<<10)
 #define GCODE_Q	(1<<11)
 #define GCODE_R	(1<<12)
-
-#define TYPE_INT 1
-#define TYPE_FLOAT 2
 
 
 #define PARSE_INT(ch, str, len, val, seen, flag) \
