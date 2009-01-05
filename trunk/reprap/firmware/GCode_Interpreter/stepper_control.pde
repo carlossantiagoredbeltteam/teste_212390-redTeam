@@ -12,18 +12,11 @@ bool y_can_step;
 bool z_can_step;
 int milli_delay;
 
-#if INVERT_ENABLE_PINS == 1
-#define ENABLE_ON LOW
-#else
-#define ENABLE_ON HIGH
-#endif
 
-#define ENDSTOPS_MIN_ENABLED 1
 
 void init_steppers()
 {
-	//turn them off to start.
-	disable_steppers();
+
 	
 	//init our points.
 	current_units.x = 0.0;
@@ -48,11 +41,15 @@ void init_steppers()
 	pinMode(Z_ENABLE_PIN, OUTPUT);
 #endif
 
+	//turn them off to start.
+	disable_steppers();
+
 #if ENDSTOPS_MIN_ENABLED == 1
 	pinMode(X_MIN_PIN, INPUT);
 	pinMode(Y_MIN_PIN, INPUT);
 	pinMode(Z_MIN_PIN, INPUT);
 #endif
+
 #if ENDSTOPS_MAX_ENABLED == 1
 	pinMode(X_MAX_PIN, INPUT);
 	pinMode(Y_MAX_PIN, INPUT);
@@ -162,19 +159,21 @@ void dda_move(long micro_delay)
         disable_steppers();
 }
 
-bool can_step(byte min_pin, byte max_pin, long current, long target, byte direction)
+bool can_step(byte min_pin, byte max_pin, long current, long target, byte dir)
 {
 	//stop us if we're on target
 	if (target == current)
 		return false;
+
 #if ENDSTOPS_MIN_ENABLED == 1
-	//stop us if we're at home and still going 
-	else if (read_switch(min_pin) && !direction)
+	//stop us if we're home and still going 
+	else if (read_switch(min_pin) && !dir)
 		return false;
 #endif
+
 #if ENDSTOPS_MAX_ENABLED == 1
 	//stop us if we're at max and still going
- 	else if (read_switch(max_pin) && direction)
+ 	else if (read_switch(max_pin) && dir)
  		return false;
 #endif
 
@@ -253,11 +252,13 @@ void calculate_deltas()
 #else
 	digitalWrite(X_DIR_PIN, x_direction);
 #endif
+
 #if INVERT_Y_DIR == 1
 	digitalWrite(Y_DIR_PIN, !y_direction);
 #else
 	digitalWrite(Y_DIR_PIN, y_direction);
 #endif
+
 #if INVERT_Z_DIR == 1
 	digitalWrite(Z_DIR_PIN, !z_direction);
 #else
@@ -309,6 +310,19 @@ long getMaxSpeed()
 
 void enable_steppers()
 {
+#ifdef SANGUINO
+  if(target_units.x != current_units.x)
+    digitalWrite(X_ENABLE_PIN, ENABLE_ON);
+  if(target_units.y != current_units.y)    
+    digitalWrite(Y_ENABLE_PIN, ENABLE_ON);
+  if(target_units.z != current_units.z)
+    digitalWrite(Z_ENABLE_PIN, ENABLE_ON);
+#endif  
+}
+
+#if 0
+void enable_steppers()
+{
 	// Enable steppers only for axes which are moving
 	// taking account of the fact that some or all axes
 	// may share an enable line (check using macros at
@@ -351,6 +365,7 @@ void enable_steppers()
 		digitalWrite(Z_ENABLE_PIN, ENABLE_ON);
 #endif
 }
+#endif
 
 void disable_steppers()
 {
