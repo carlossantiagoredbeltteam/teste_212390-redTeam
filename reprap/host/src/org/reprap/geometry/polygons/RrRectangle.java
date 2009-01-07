@@ -58,7 +58,7 @@ package org.reprap.geometry.polygons;
 /**
  * A 2D box is an X and a Y interval
  */
-public class RrBox
+public class RrRectangle
 {
 	/**
 	 * Compass directions
@@ -118,7 +118,7 @@ public class RrBox
 	/**
 	 * Default is empty
 	 */ 
-	public RrBox()
+	public RrRectangle()
 	{
 		empty = true;
 	}
@@ -137,7 +137,7 @@ public class RrBox
 	/**
 	 * Copy constructor
 	 */
-	public RrBox(RrBox b)
+	public RrRectangle(RrRectangle b)
 	{
 		x = new RrInterval(b.x);
 		y = new RrInterval(b.y);
@@ -149,7 +149,7 @@ public class RrBox
 	 * @param sw
 	 * @param ne
 	 */
-	public RrBox(Rr2Point a, Rr2Point b)
+	public RrRectangle(Rr2Point a, Rr2Point b)
 	{
 		x = new RrInterval(Math.min(a.x(), b.x()), Math.max(a.x(), b.x()));
 		y = new RrInterval(Math.min(a.y(), b.y()), Math.max(a.y(), b.y()));
@@ -161,7 +161,7 @@ public class RrBox
 	 * @param sw
 	 * @param ne
 	 */
-	public RrBox(RrInterval xi, RrInterval yi)
+	public RrRectangle(RrInterval xi, RrInterval yi)
 	{
 		x = new RrInterval(xi);
 		y = new RrInterval(yi);
@@ -192,7 +192,7 @@ public class RrBox
 	 * Expand the box to incorporate another box or a point
 	 * @param a
 	 */
-	public void expand(RrBox a)
+	public void expand(RrRectangle a)
 	{
 		if(a.empty)
 			return;
@@ -270,9 +270,9 @@ public class RrBox
 	 * @param f
 	 * @return scaled box object
 	 */
-	public RrBox scale(double f)
+	public RrRectangle scale(double f)
 	{
-		RrBox r = new RrBox();
+		RrRectangle r = new RrRectangle();
 		if(empty)
 			return r;
 		f = 0.5*f;
@@ -416,9 +416,9 @@ public class RrBox
 	 * @param b
 	 * @return
 	 */
-	public static RrBox intersection(RrBox a, RrBox b)
+	public static RrRectangle intersection(RrRectangle a, RrRectangle b)
 	{
-		return new RrBox(RrInterval.intersection(a.x, b.x), RrInterval.intersection(a.y, b.y));	
+		return new RrRectangle(RrInterval.intersection(a.x, b.x), RrInterval.intersection(a.y, b.y));	
 	}
 	
 	/**
@@ -427,9 +427,9 @@ public class RrBox
 	 * @param b
 	 * @return
 	 */
-	public static RrBox union(RrBox a, RrBox b)
+	public static RrRectangle union(RrRectangle a, RrRectangle b)
 	{
-		return new RrBox(RrInterval.union(a.x, b.x), RrInterval.union(a.y, b.y));	
+		return new RrRectangle(RrInterval.union(a.x, b.x), RrInterval.union(a.y, b.y));	
 	}
 }
 

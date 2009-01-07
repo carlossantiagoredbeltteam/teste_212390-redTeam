@@ -65,7 +65,7 @@ public class TestMain
 			pold = p;
 		}
 		
-		return new RrCSGPolygon(r, new RrBox(new Rr2Point(hexX - hexSize, hexY - hexSize), 
+		return new RrCSGPolygon(r, new RrRectangle(new Rr2Point(hexX - hexSize, hexY - hexSize), 
 				new Rr2Point(hexX + hexSize, hexY + hexSize)),
 				new Attributes(null, null, null, null));
 	}
@@ -112,7 +112,7 @@ public class TestMain
 		ppc = RrCSG.difference(ppc, pc);
 		
 		return new RrCSGPolygon(ppc, new 
-				RrBox(new Rr2Point(-3.2,-1.76), new Rr2Point(131.7,112)),
+				RrRectangle(new Rr2Point(-3.2,-1.76), new Rr2Point(131.7,112)),
 				new Attributes(null, null, null, null));
 	}
 	

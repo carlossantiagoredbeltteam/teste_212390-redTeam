@@ -69,7 +69,7 @@ import java.util.List;
 
 import org.reprap.geometry.polygons.BooleanGrid;
 import org.reprap.geometry.polygons.Rr2Point;
-import org.reprap.geometry.polygons.RrBox;
+import org.reprap.geometry.polygons.RrRectangle;
 import org.reprap.geometry.polygons.RrCSGOp;
 import org.reprap.geometry.polygons.RrCSGPolygon;
 import org.reprap.geometry.polygons.RrHalfPlane;
@@ -158,7 +158,7 @@ public class RrGraphics
 	 */
 	private Rr2Point pos;
 	
-	private RrBox scaledBox, originalBox;
+	private RrRectangle scaledBox, originalBox;
 	
 	/**
 	 * 
@@ -179,7 +179,7 @@ public class RrGraphics
 	 * @param b
 	 * @param pb
 	 */
-	public RrGraphics(RrBox b, String t) 
+	public RrGraphics(RrRectangle b, String t) 
 	{
 		p_list = null;
 		csg_p = null;
@@ -272,7 +272,7 @@ public class RrGraphics
 	
 
 	
-	private void setScales(RrBox b)
+	private void setScales(RrRectangle b)
 	{
 		scaledBox = b.scale(1.2);
 		
@@ -306,7 +306,7 @@ public class RrGraphics
 	/**
 	 * @param b
 	 */
-	public void init(RrBox b, boolean waitTillDone)
+	public void init(RrRectangle b, boolean waitTillDone)
 	{
 		originalBox = b;
 		setScales(b);
@@ -444,9 +444,9 @@ public class RrGraphics
 	 * Plot a box
 	 * @param b
 	 */
-	private void plot(RrBox b)
+	private void plot(RrRectangle b)
 	{
-		if(RrBox.intersection(b, scaledBox).empty())
+		if(RrRectangle.intersection(b, scaledBox).empty())
 			return;
 		
 		g2d.setColor(boxes);
@@ -505,7 +505,7 @@ public class RrGraphics
 	 */
 	private void plot(RrPolygon p)
 	{
-		if(RrBox.intersection(p.getBox(), scaledBox).empty())
+		if(RrRectangle.intersection(p.getBox(), scaledBox).empty())
 			return;
 		
 		setColour(p.getAttributes());
@@ -535,7 +535,7 @@ public class RrGraphics
 	 */
 	private void fillCSG(RrCSGPolygon q)
 	{
-		if(RrBox.intersection(q.box(), scaledBox).empty())
+		if(RrRectangle.intersection(q.box(), scaledBox).empty())
 			return;
 		
 		if(q.c_1() != null)
@@ -599,7 +599,7 @@ public class RrGraphics
 	
 	private void boxCSG(RrCSGPolygon q)
 	{
-		if(RrBox.intersection(q.box(), scaledBox).empty())
+		if(RrRectangle.intersection(q.box(), scaledBox).empty())
 			return;
 		
 		if(q.c_1() != null)
@@ -619,7 +619,7 @@ public class RrGraphics
 	 */
 	private void plot(RrCSGPolygon q)
 	{
-		if(RrBox.intersection(q.box(), scaledBox).empty())
+		if(RrRectangle.intersection(q.box(), scaledBox).empty())
 			return;		
 		
 		if(q.c_1() != null)
@@ -647,7 +647,7 @@ public class RrGraphics
 	 */
 	private void boxSTL(STLSlice s)
 	{
-		if(RrBox.intersection(s.box(), scaledBox).empty())
+		if(RrRectangle.intersection(s.box(), scaledBox).empty())
 			return;
 		
 		if(s.leaf())
@@ -669,7 +669,7 @@ public class RrGraphics
 	 */
 	private void plot(STLSlice s)
 	{
-		if(RrBox.intersection(s.box(), scaledBox).empty())
+		if(RrRectangle.intersection(s.box(), scaledBox).empty())
 			return;
 		
 		if(s.leaf())
@@ -772,12 +772,12 @@ public class RrGraphics
 	 */
 	class myMouse implements MouseListener
 	{
-		private RrBox magBox(RrBox b, int ix, int iy)
+		private RrRectangle magBox(RrRectangle b, int ix, int iy)
 		{
 			Rr2Point cen = iTransform(ix, iy);
 			//System.out.println("Mouse: " + cen.toString() + "; box: " +  scaledBox.toString());
 			Rr2Point off = new Rr2Point(b.x().length()*0.05, b.y().length()*0.05);
-			return new RrBox(Rr2Point.sub(cen, off), Rr2Point.add(cen, off));
+			return new RrRectangle(Rr2Point.sub(cen, off), Rr2Point.add(cen, off));
 		}
 		
 		public void mousePressed(MouseEvent e) {

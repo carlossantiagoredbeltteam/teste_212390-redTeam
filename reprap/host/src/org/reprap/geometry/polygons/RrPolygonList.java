@@ -354,7 +354,7 @@ public class RrPolygonList
 	/**
 	 * 
 	 */
-	private RrBox box = null;
+	private RrRectangle box = null;
 	
 	/**
 	 * Flag to prevent cyclic graphs going round forever
@@ -400,7 +400,7 @@ public class RrPolygonList
 	public RrPolygonList()
 	{
 		polygons = new ArrayList<RrPolygon>();
-		box = new RrBox();
+		box = new RrRectangle();
 	}
 	
 	/**
@@ -424,7 +424,7 @@ public class RrPolygonList
 	/**
 	 * @return the current enclosing box
 	 */
-	public RrBox getBox() { return box; }
+	public RrRectangle getBox() { return box; }
 	
 	/**
 	 * Overwrite one of the polygons
@@ -452,7 +452,7 @@ public class RrPolygonList
 	public RrPolygonList(RrPolygonList lst)
 	{
 		polygons = new ArrayList<RrPolygon>();
-		box = new RrBox(lst.box);
+		box = new RrRectangle(lst.box);
 		for(int i = 0; i < lst.size(); i++)
 			polygons.add(new RrPolygon(lst.polygon(i)));
 	}
@@ -501,7 +501,7 @@ public class RrPolygonList
 		RrPolygonList result = new RrPolygonList();
 		for(int i = 0; i < size(); i++)
 			result.polygons.add(polygon(i).negate());
-		result.box = new RrBox(box);
+		result.box = new RrRectangle(box);
 		return result;
 	}
 	
