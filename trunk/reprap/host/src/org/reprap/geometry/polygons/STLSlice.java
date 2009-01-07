@@ -411,7 +411,7 @@ public class STLSlice
 	/**
 	 * Its enclosing box
 	 */
-	private RrBox box = null;
+	private RrRectangle box = null;
 	
 	/**
 	 * Quad tree division - NW, NE, SE, SW
@@ -531,7 +531,7 @@ public class STLSlice
 		edges = new ArrayList<LineSegment>();
 		xCoords = new ArrayList<Double>();
 		yCoords = new ArrayList<Double>();
-		box = new RrBox();
+		box = new RrRectangle();
 		triangles = new ArrayList<Point3d>();
 		beingDestroyed = false;
 	}
@@ -569,7 +569,7 @@ public class STLSlice
 		q4 = null;
 		xCoords = new ArrayList<Double>();
 		yCoords = new ArrayList<Double>();
-		box = new RrBox();
+		box = new RrRectangle();
 		triangles = new ArrayList<Point3d>();
 	}
 	
@@ -643,7 +643,7 @@ public class STLSlice
 	 * Return the box
 	 * @return 
 	 */
-	public RrBox box()
+	public RrRectangle box()
 	{
 		return box;
 	}
@@ -905,7 +905,7 @@ public class STLSlice
 	 * @param res
 	 * @param fac
 	 */
-	private STLSlice(List<LineSegment> pgl, RrBox b)
+	private STLSlice(List<LineSegment> pgl, RrRectangle b)
 	{
 		edges = pgl;
 		box = b;
@@ -1057,19 +1057,19 @@ public class STLSlice
 		
 //		 Put the results in the children
 		
-		RrBox b = new RrBox(nw, new Rr2Point(e, s));
+		RrRectangle b = new RrRectangle(nw, new Rr2Point(e, s));
 		q1 = new STLSlice(edges, b);
 		q1.prune();
 		
-		b = new RrBox(ne, new Rr2Point(w, s));
+		b = new RrRectangle(ne, new Rr2Point(w, s));
 		q2 = new STLSlice(edges, b);
 		q2.prune();
 		
-		b = new RrBox(se, new Rr2Point(w, n));
+		b = new RrRectangle(se, new Rr2Point(w, n));
 		q3 = new STLSlice(edges, b);
 		q3.prune();
 		
-		b = new RrBox(sw, new Rr2Point(e, n));
+		b = new RrRectangle(sw, new Rr2Point(e, n));
 		q4 = new STLSlice(edges, b);
 		q4.prune();
 	}

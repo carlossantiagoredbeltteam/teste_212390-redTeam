@@ -411,7 +411,7 @@ public class RrCSG
 	/**
 	 * Make a rectangle
 	 */
-	public static RrCSG RrCSGFromBox(RrBox b)
+	public static RrCSG RrCSGFromBox(RrRectangle b)
 	{
 		RrCSG r = new RrCSG(new RrHalfPlane(b.nw(), b.ne()));
 		r = RrCSG.intersection(r, new RrCSG(new RrHalfPlane(b.ne(), b.se())));
@@ -1240,7 +1240,7 @@ public class RrCSG
 	 * @param b
 	 * @return value of a box
 	 */
-	public RrInterval value(RrBox b)
+	public RrInterval value(RrRectangle b)
 	{
 		RrInterval result;
 		
@@ -1279,7 +1279,7 @@ public class RrCSG
 	 * @param b
 	 * @return pruned box as new CSG object
 	 */
-	public RrCSG prune(RrBox b)
+	public RrCSG prune(RrRectangle b)
 	{
 		RrCSG result = this;
 		

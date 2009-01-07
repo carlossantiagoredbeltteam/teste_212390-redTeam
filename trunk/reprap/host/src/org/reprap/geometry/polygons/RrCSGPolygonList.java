@@ -95,9 +95,9 @@ public class RrCSGPolygonList {
 	 * The minimum enclosing rectangle
 	 * @return
 	 */
-	public RrBox box()
+	public RrRectangle box()
 	{
-		RrBox result = new RrBox();
+		RrRectangle result = new RrRectangle();
 		for(int i = 0; i < size(); i++)
 			result.expand(get(i).box());
 		return result;
@@ -167,7 +167,7 @@ public class RrCSGPolygonList {
 		if(size() <= 0)
 			return result;
 		RrCSG contents = get(0).csg();
-		RrBox b = get(0).box();
+		RrRectangle b = get(0).box();
 		Attributes a = get(0).getAttributes();
 		Boolean foundAttribute0 = false;
 		if(a.getExtruder(es) == es[0])
@@ -183,7 +183,7 @@ public class RrCSGPolygonList {
 				}
 			}
 			contents = RrCSG.union(contents, get(i).csg());
-			b = RrBox.union(get(i).box(), b);
+			b = RrRectangle.union(get(i).box(), b);
 		}
 		if(!foundAttribute0)
 			System.err.println("RrCSGPolygonList.union(): Attribute of extruder 0 not found.");

@@ -143,7 +143,7 @@ public class RrCSGPolygon
 	/**
 	 * Its enclosing box
 	 */
-	private RrBox box = null;   
+	private RrRectangle box = null;   
 	
 	/**
 	 * Quad tree division, respectively: NW, NE, SE, SW 
@@ -277,11 +277,11 @@ public class RrCSGPolygon
 	 * @param p
 	 * @param bx
 	 */
-	public RrCSGPolygon(RrCSG p, RrBox bx, Attributes a)
+	public RrCSGPolygon(RrCSG p, RrRectangle bx, Attributes a)
 	{
 		if(a == null)
 			System.err.println("RrCSGPolygon(): null attributes!");
-		box = new RrBox(bx);
+		box = new RrRectangle(bx);
 		att = a;
 		q1 = null;
 		q2 = null;
@@ -309,7 +309,7 @@ public class RrCSGPolygon
 	public RrCSGPolygon c_3() { return q3; }
 	public RrCSGPolygon c_4() { return q4; }
 	public RrCSG csg() { return csg; }
-	public RrBox box() { return box; }
+	public RrRectangle box() { return box; }
 	public double resolution2() { return resolution_2; }
 	public double swell() { return sFactor; }
 	public int edges() { return edgeCount; }
@@ -435,21 +435,21 @@ public class RrCSGPolygon
 		
 		Rr2Point newSW = Rr2Point.mul(Rr2Point.add(sw, nw), 0.5);
 		Rr2Point newNE = Rr2Point.mul(Rr2Point.add(nw, ne), 0.5);
-		RrBox s = new RrBox(Rr2Point.add(newSW, new Rr2Point(0, -addY)), 
+		RrRectangle s = new RrRectangle(Rr2Point.add(newSW, new Rr2Point(0, -addY)), 
 				Rr2Point.add(newNE, new Rr2Point(addX, 0)));
 		q1 = new RrCSGPolygon(csg.prune(s), s, att);
 		
-		s = new RrBox(Rr2Point.add(cen, new Rr2Point(-addX, -addY)), 
+		s = new RrRectangle(Rr2Point.add(cen, new Rr2Point(-addX, -addY)), 
 				ne);
 		q2 = new RrCSGPolygon(csg.prune(s), s, att);
 		
 		newSW = Rr2Point.mul(Rr2Point.add(sw, se), 0.5);
 		newNE = Rr2Point.mul(Rr2Point.add(se, ne), 0.5);
-		s = new RrBox(Rr2Point.add(newSW, new Rr2Point(-addX, 0)), 
+		s = new RrRectangle(Rr2Point.add(newSW, new Rr2Point(-addX, 0)), 
 				Rr2Point.add(newNE, new Rr2Point(0, addY)));		
 		q3 = new RrCSGPolygon(csg.prune(s), s, att);
 		
-		s = new RrBox(sw, 
+		s = new RrRectangle(sw, 
 				Rr2Point.add(cen, new Rr2Point(addX, addY)));		
 		q4 = new RrCSGPolygon(csg.prune(s), s, att);
 		
@@ -641,14 +641,14 @@ public class RrCSGPolygon
 	 */
 	public RrCSGPolygon offset(double d)
 	{
-		RrBox b;
+		RrRectangle b;
 		if(-d >= 0.5*box.x().length() || -d >= 0.5*box.y().length())
 		{
-			b = new RrBox(new Rr2Point(0,0), new Rr2Point(1,1));
+			b = new RrRectangle(new Rr2Point(0,0), new Rr2Point(1,1));
 			return new RrCSGPolygon(RrCSG.nothing(), b, att);
 		}
 		Rr2Point p = new Rr2Point(d, d);
-		b = new RrBox( Rr2Point.sub(box.sw(), p), Rr2Point.add(box.ne(), p) );
+		b = new RrRectangle( Rr2Point.sub(box.sw(), p), Rr2Point.add(box.ne(), p) );
 		RrCSG expression = csg.offset(d);
 		expression = expression.simplify(Math.sqrt(resolution_2));
 		RrCSGPolygon result = new RrCSGPolygon(csg.offset(d), b, att);
@@ -993,7 +993,7 @@ public class RrCSGPolygon
 	 */
 	public RrPolygonList hatch(RrHalfPlane hp, double gap)
 	{
-		RrBox big = box.scale(1.1);
+		RrRectangle big = box.scale(1.1);
 		double d = Math.sqrt(big.dSquared());
 		
 		Rr2Point orth = hp.normal();

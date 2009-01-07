@@ -651,7 +651,7 @@ public class RrHalfPlane
 	 * @param b
 	 * @return potential interval of box b
 	 */
-	public RrInterval value(RrBox b)
+	public RrInterval value(RrRectangle b)
 	{
 		return RrInterval.add(RrInterval.add((RrInterval.mul(b.x(), normal.x())), 
 				(RrInterval.mul(b.y(), normal.y()))), offset);

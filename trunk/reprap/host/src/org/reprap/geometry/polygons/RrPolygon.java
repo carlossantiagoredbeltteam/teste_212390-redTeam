@@ -105,7 +105,7 @@ public class RrPolygon
 	/**
 	 * The minimum enclosing X-Y box round the polygon
 	 */
-	private RrBox box = null;
+	private RrRectangle box = null;
 	
 	/**
 	 * Flag to prevent cyclic graphs going round forever
@@ -163,7 +163,7 @@ public class RrPolygon
 			System.err.println("RrPolygon(): null attributes!");
 		points = new ArrayList<Rr2Point>();
 		att = a;
-		box = new RrBox();
+		box = new RrRectangle();
 	}
 	
 	/**
@@ -252,7 +252,7 @@ public class RrPolygon
 	/**
 	 * @return the current surrounding box
 	 */
-	public RrBox getBox() { return box; }
+	public RrRectangle getBox() { return box; }
 	
 	/**
 	 * Put a new polygon on the end
@@ -285,7 +285,7 @@ public class RrPolygon
 	 */
 	public void re_box()
 	{
-		box = new RrBox();
+		box = new RrRectangle();
 		int leng = size();
 		for(int i = 0; i < leng; i++)
 		{
@@ -1001,7 +1001,7 @@ public class RrPolygon
 		int [] flags = new int[copy.size()];
 		RrCSG expression = copy.toCSGRecursive(all, 0, true, flags);
 
-		RrBox b = copy.box.scale(1.1);
+		RrRectangle b = copy.box.scale(1.1);
 		//expression = expression.simplify(tolerance);
 		if(att == null)
 			System.err.println("toCSG(): null attribute!");
