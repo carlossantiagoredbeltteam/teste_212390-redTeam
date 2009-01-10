@@ -33,7 +33,7 @@ public class CSGEvaluatorTool implements ModellingTool
    */
   public String getName()
   {
-    return "CSGEvaluator...";
+    return "CSG Evaluator...";
   }
 
 
