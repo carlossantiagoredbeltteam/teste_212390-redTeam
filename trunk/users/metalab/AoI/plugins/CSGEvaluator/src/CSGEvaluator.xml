@@ -1,0 +1,14 @@
+<?xml version='1.0' standalone='yes' ?>
+
+<script>
+  <name>CSGEvaluator</name>
+  <author>Marius Kintel, Philipp Tiefenbacher and Stefan Farthofer (Metalab)</author>
+  <version>0.1</version>
+  <beta>1</beta>
+  <date>7/1/2009</date>
+  <description>
+  CSG Evaluator plugin. Metalab. RepRap.
+  </description>
+  <comments>
+  </comments>
+</script>
