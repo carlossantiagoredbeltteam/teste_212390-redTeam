@@ -73,6 +73,7 @@ public class TestMain
 	public static RrCSGPolygon testPol()
 	{
 		Rr2Point p = new Rr2Point(10, 15);
+		Rr2Point peps = new Rr2Point(10.0000001, 15);
 		Rr2Point q = new Rr2Point(20, 85);
 		Rr2Point r = new Rr2Point(97, 89);
 		Rr2Point s = new Rr2Point(95, 3);
@@ -83,6 +84,7 @@ public class TestMain
 		Rr2Point rr = new Rr2Point(35, 20);    
 		
 		RrHalfPlane ph = new RrHalfPlane(p, q);
+		RrHalfPlane pheps = new RrHalfPlane(peps, q);
 		RrHalfPlane qh = new RrHalfPlane(q, r);
 		RrHalfPlane rh = new RrHalfPlane(r, s);
 		RrHalfPlane sh = new RrHalfPlane(s, p);
@@ -92,6 +94,7 @@ public class TestMain
 		RrHalfPlane rrh = new RrHalfPlane(rr, pp);
 		
 		RrCSG pc = new RrCSG(ph);
+		RrCSG pceps = new RrCSG(pheps);
 		RrCSG qc = new RrCSG(qh);
 		RrCSG rc = new RrCSG(rh);
 		RrCSG sc = new RrCSG(sh);
@@ -110,6 +113,7 @@ public class TestMain
 		
 		pc = ppc.offset(-8);
 		ppc = RrCSG.difference(ppc, pc);
+		ppc = RrCSG.intersection(ppc, pceps);
 		
 		return new RrCSGPolygon(ppc, new 
 				RrRectangle(new Rr2Point(-3.2,-1.76), new Rr2Point(131.7,112)),
