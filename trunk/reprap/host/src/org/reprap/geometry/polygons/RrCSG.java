@@ -50,6 +50,9 @@
 
 package org.reprap.geometry.polygons;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * RepRap Constructive Solid Geometry class
  * 
@@ -419,6 +422,202 @@ public class RrCSG
 		r = RrCSG.intersection(r, new RrCSG(new RrHalfPlane(b.sw(), b.nw())));
 		return r;
 	}
+	
+	/**
+	 * This takes a complicated expression assumed to contain multiple instances of leafA
+	 * and returns the equivalent CSG expression involving just leafA.
+	 * @param leafA
+	 * @return equivalent CSG expression involving just leafA
+	 */
+	private RrCSG categorise(RrCSG leafA)
+	{
+		RrHalfPlane a = leafA.plane();
+		Rr2Point an = a.normal();
+		Rr2Point x = Rr2Point.add(a.pLine().origin(), an);
+		if(value(x) <= 0)
+			return leafA.complement();
+		else
+			return leafA;
+	}
+	
+	/**
+	 * This takes a complicated expression assumed to contain multiple instances of leafA
+	 * and leafB and returns the equivalent CSG expression involving at most leafA and leafB once 
+	 * (except for non-manifold shapes).
+	 * @param leafA
+	 * @param leafB
+	 * @return equivalent CSG expression involving at most leafA and leafB once
+	 */
+	private RrCSG crossCategorise(RrCSG leafA, RrCSG leafB)
+	{
+		RrHalfPlane a = leafA.plane();
+		RrHalfPlane b = leafB.plane();
+		Rr2Point an = a.normal();
+		Rr2Point bn = b.normal();
+		Rr2Point v02 = Rr2Point.add(an, bn);
+		Rr2Point v31 = Rr2Point.sub(bn, an);
+		Rr2Point x, x0, x1, x2, x3;
+		int category = 0;
+		try
+		{
+			x = a.cross_point(b);
+			v02 = v02.norm();
+			v31 = v31.norm();
+			x0 = Rr2Point.add(x, v02);
+			x2 = Rr2Point.sub(x, v02);
+			x1 = Rr2Point.add(x, v31);
+			x3 = Rr2Point.sub(x, v31);
+			if(value(x0) <= 0)
+				category |= 1;
+			if(value(x1) <= 0)
+				category |= 2;
+			if(value(x2) <= 0)
+				category |= 4;
+			if(value(x3) <= 0)
+				category |= 8;
+			
+			switch(category)
+			{
+			case 0:
+				return RrCSG.nothing();
+			case 1:
+				return RrCSG.intersection(leafA, leafB);
+			case 2:
+				return RrCSG.intersection(leafA, leafB.complement());
+			case 3:
+				return leafA;
+			case 4:
+				return RrCSG.intersection(leafA.complement(), leafB.complement());
+			case 5:
+				System.err.println("RrCSG crossCategorise: non-manifold shape (case 0101)!");
+				return RrCSG.union(RrCSG.intersection(leafA, leafB), RrCSG.intersection(leafA.complement(), leafB.complement()));
+			case 6:
+				return leafB.complement();
+			case 7:
+				return RrCSG.union(leafA, leafB.complement());
+			case 8:
+				return RrCSG.intersection(leafA.complement(), leafB);
+			case 9:
+				return leafB;
+			case 10:
+				System.err.println("RrCSG crossCategorise: non-manifold shape (case 1010)!");
+				return RrCSG.union(RrCSG.intersection(leafA.complement(), leafB), RrCSG.intersection(leafA, leafB.complement()));
+			case 11:
+				return RrCSG.union(leafA, leafB);
+			case 12:
+				return leafA.complement();
+			case 13:
+				return RrCSG.union(leafA.complement(), leafB);
+			case 14:
+				return RrCSG.union(leafA.complement(), leafB.complement());
+			case 15:
+				return RrCSG.universe();
+			default:
+				System.err.println("RrCSG crossCategorise: bitwise | doesn't seem to work...");
+				return RrCSG.nothing();
+			}
+		} catch (Exception e)
+		{
+			// leafA and leafB are parallel
+			
+			x0 = Rr2Point.mul(Rr2Point.add(a.pLine().origin(), b.pLine().origin()), 0.5);
+			x1 = Rr2Point.mul(Rr2Point.sub(a.pLine().origin(), b.pLine().origin()), 3);
+			x2 = Rr2Point.add(x0, x1);
+			x1 = Rr2Point.sub(x0, x1);
+			if(value(x0) <= 0)
+				category |= 1;
+			if(value(x1) <= 0)
+				category |= 2;
+			if(value(x2) <= 0)
+				category |= 4;
+			
+			if(leafA.value(x0) <= 0)
+				leafA = leafA.complement();
+			
+			if(leafB.value(x0) <= 0)
+				leafB = leafB.complement();			
+			
+			switch(category)
+			{
+			case 0:
+				return RrCSG.nothing();
+			case 1:
+				return RrCSG.intersection(leafA.complement(), leafB.complement());
+			case 2:
+				return leafB;
+			case 3:
+				return leafA.complement();
+			case 4:
+				return leafA;
+			case 5:
+				return RrCSG.union(leafA, leafB);
+			case 6:
+				return leafB.complement();
+			case 7:
+				return RrCSG.universe();
+			default:
+				System.err.println("RrCSG crossCategorise: bitwise | doesn't seem to work...");
+				return RrCSG.nothing();	
+			}
+		}
+
+
+	}
+	
+	/**
+	 * Run through a GSG expression looking at its leaves and return
+	 * a list of the distinct leaves.  Note: leaf and leaf.complement() are
+	 * not considered distinct.
+	 * Recursive internal call.
+	 * @param expression
+	 * @return
+	 */
+	private void uniqueList_r(ArrayList<RrCSG> list)
+	{
+		switch(op)
+		{
+		case LEAF:
+			RrCSG entry;
+			for(int i = 0; i < list.size(); i++)
+			{
+				entry = list.get(i);
+				if(this == entry || complement() == entry)
+					return;
+				list.add(this);
+			}
+			break;
+			
+		case NULL:			
+		case UNIVERSE:
+			System.err.println("uniqueList_r: null or universe at a leaf.");
+			break;
+			
+		case UNION:
+		case INTERSECTION:
+			c1.uniqueList_r(list);
+			c2.uniqueList_r(list);
+			break;
+			
+		default:
+			System.err.println("uniqueList_r: invalid operator.");
+		}		
+		
+		return;
+	}
+	
+	/**
+	 * Run through a GSG expression looking at its leaves and return
+	 * a list of the distinct leaves.  Note: leaf and leaf.complement() are
+	 * not considered distinct.
+	 * @param expression
+	 * @return
+	 */
+	private ArrayList<RrCSG> uniqueList()
+	{
+		ArrayList<RrCSG> result = new ArrayList<RrCSG>();
+		uniqueList_r(result);
+		return result;
+	}	
 	
 	/**
 	 * Regularise a set with a contents of 3
@@ -972,6 +1171,7 @@ public class RrCSG
 	 */		
 	private void replaceAllSameLeaves(RrCSG leaf, double tolerance)
 	{	
+		int same;
 		switch(op)
 		{
 		case LEAF:
@@ -985,15 +1185,21 @@ public class RrCSG
 			RrHalfPlane hp = leaf.hp;
 			if(c1.op == RrCSGOp.LEAF)
 			{
-				if(RrHalfPlane.same(hp, c1.hp, tolerance))
+				same = RrHalfPlane.same(hp, c1.hp, tolerance);
+				if(same == 0)
 					c1 = leaf;
+				if(same == -1)
+					c1 = leaf.complement();
 			} else
 				c1.replaceAllSameLeaves(leaf, tolerance);
 			
 			if(c2.op == RrCSGOp.LEAF)
 			{
-				if(RrHalfPlane.same(hp, c2.hp, tolerance))
-					c2 = leaf;                        
+				same = RrHalfPlane.same(hp, c2.hp, tolerance);
+				if(same == 0)
+					c2 = leaf;
+				if(same == -1)
+					c2 = leaf.complement();
 			} else
 				c2.replaceAllSameLeaves(leaf, tolerance);
 			break;

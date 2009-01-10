@@ -124,29 +124,103 @@ class BooleanExpression
 	 */
 	private int leafCount;
 	
+	
 	/**
-	 * Make an expression from three variables in an array.
+	 * Make an expression from three or four atomic expressions in an array.
 	 * exp decides the expression.
 	 * @param variables
 	 * @param exp
 	 */
-	public BooleanExpression(Variable [] variables, int exp)
+	private void makeFromSeveral(BooleanExpression[] be, int exp)
 	{
-		if(variables.length != 3)
-			System.err.println("BooleanExpression(...): variable array not length 3!");
-		leafCount = -1;
-		c1 = new BooleanExpression(variables[0]);
-		if((exp & 1) == 1)
-			c2 = new BooleanExpression(new BooleanExpression(variables[1]), 
-					new BooleanExpression(variables[2]), Bop.AND);
-		else
-			c2 = new BooleanExpression(new BooleanExpression(variables[1]), 
-					new BooleanExpression(variables[2]), Bop.OR);
-		if((exp & 2) == 2)
-			leafOp = Bop.AND;
-		else
-			leafOp = Bop.OR;
-		recordVariables();
+		BooleanExpression t1;
+		
+		switch(be.length)
+		{
+		// Bits in exp:  ba
+		// Expression = v[0] b (v[1] a v[2])
+		// a, b == 0 -> OR
+		// a, b == 1 -> AND
+		case 3:
+			leafCount = -1;
+			c1 = be[0];
+			if((exp & 1) == 1)
+				c2 = new BooleanExpression(be[1], be[2], Bop.AND);
+			else
+				c2 = new BooleanExpression(be[1], be[2], Bop.OR);
+			if((exp & 2) == 2)
+				leafOp = Bop.AND;
+			else
+				leafOp = Bop.OR;
+			recordVariables();
+			break;
+		
+		// Bits in exp:  dcba
+		// d == 0 -> Expression = v[0] c (v[1] b (v[2] a v[3]))
+		// d == 1 -> Expression = (v[0] b v[1]) c (v[2] a v[3])	
+		// a, b, c == 0 -> OR
+		// a, b, c == 1 -> AND	
+		case 4:
+			leafCount = -1;
+
+			if((exp & 8) == 8)
+			{
+				if((exp & 1) == 1)
+					c2 = new BooleanExpression(be[2], be[3], Bop.AND);
+				else
+					c2 = new BooleanExpression(be[2], be[3], Bop.OR);
+				if((exp & 2) == 2)
+					c1 = new BooleanExpression(be[0], be[1], Bop.AND);
+				else
+					c1 = new BooleanExpression(be[0], be[1], Bop.OR);
+			} else
+			{
+				c1 = be[0];
+				if((exp & 1) == 1)
+					t1 = new BooleanExpression(be[2], be[3], Bop.AND);
+				else
+					t1 = new BooleanExpression(be[2], be[3], Bop.OR);
+				if((exp & 2) == 2)
+					c2 = new BooleanExpression(be[1], t1, Bop.AND);
+				else
+					c2 = new BooleanExpression(be[1], t1, Bop.OR);
+				
+			}
+			if((exp & 4) == 4)
+				leafOp = Bop.AND;
+			else
+				leafOp = Bop.OR;
+			recordVariables();
+			break;			
+			
+		default:
+			System.err.println("BooleanExpression(...): variable number not 3 or 4!");	
+		}		
+	}
+	
+	/**
+	 * Make an expression from three or four atomic expressions in an array.
+	 * exp decides the expression.
+	 * @param variables
+	 * @param exp
+	 */
+	public BooleanExpression(BooleanExpression[] be, int exp)
+	{
+		makeFromSeveral(be, exp);
+	}
+	
+	/**
+	 * Make an expression from three or four variables in an array.
+	 * exp decides the expression.
+	 * @param variables
+	 * @param exp
+	 */
+	public BooleanExpression(Variable[] v, int exp)
+	{
+		BooleanExpression[] be = new BooleanExpression[v.length];
+		for(int i = 0; i < v.length; i++)
+			be[i] = new BooleanExpression(v[i]);
+		makeFromSeveral(be, exp);
 	}
 
 	/**
@@ -696,41 +770,129 @@ class FunctionTable
  */
 public class CodeGenerator 
 {
-	
-	static BooleanExpression findEqualTwo(FunctionTable f, Variable a, Variable b)
+	static Variable[] eliminate(Variable[] v, int k)
 	{
+		int len = v.length;
+		Variable[] result = new Variable[len - 1];
+		int count = 0;
+		for(int i = 0; i < len; i++)
+			if(i != k)
+				result[count++] = v[i];
+		return result;
+	}
+	
+	static List<BooleanExpression> generateAllPairs(BooleanExpression[] b2)
+	{
+		if(b2.length != 2)
+			System.err.println("generateAllPairs: array not of length 2: " + b2.length);
+		
+		List<BooleanExpression> bel2 = new ArrayList<BooleanExpression>();
+		
 		Bop[] bopValues = Bop.values();
 		for(int i = 0; i < bopValues.length; i++)
 		{
 			if(bopValues[i].diadic())
 			{
-				BooleanExpression be = new BooleanExpression(new BooleanExpression(a), 
-						new BooleanExpression(b), bopValues[i]);
-				FunctionTable g = new FunctionTable(be);
-				if(FunctionTable.same(f, g))
-					return be;
+				BooleanExpression be = new BooleanExpression(b2[0], b2[1], bopValues[i]);
+				bel2.add(be);
 				BooleanExpression bf = new BooleanExpression(be, Bop.NOT);
-				g = new FunctionTable(bf);
-				if(FunctionTable.same(f, g))
-					return bf;
-				BooleanExpression bg = new BooleanExpression(new BooleanExpression(new BooleanExpression(a),
-						Bop.NOT), 
-						new BooleanExpression(b), bopValues[i]);
-				g = new FunctionTable(bg);
-				if(FunctionTable.same(f, g))
-					return bg;				
-				BooleanExpression bh = new BooleanExpression(new BooleanExpression(a), 
-						new BooleanExpression(new BooleanExpression(b),Bop.NOT), bopValues[i]);
-				g = new FunctionTable(bh);
-				if(FunctionTable.same(f, g))
-					return bh;
-				BooleanExpression bi = new BooleanExpression(new BooleanExpression(new BooleanExpression(a),
-						Bop.NOT), 
-						new BooleanExpression(new BooleanExpression(b),Bop.NOT), bopValues[i]);
-				g = new FunctionTable(bi);
-				if(FunctionTable.same(f, g))
-					return bi;					
+				bel2.add(bf);
+				BooleanExpression bg = new BooleanExpression(new BooleanExpression(b2[0], Bop.NOT), b2[1], bopValues[i]);
+				bel2.add(bg);				
+				BooleanExpression bh = new BooleanExpression(b2[0], new BooleanExpression(b2[1], Bop.NOT), bopValues[i]);
+				bel2.add(bh);
+				BooleanExpression bi = new BooleanExpression(new BooleanExpression(b2[0], Bop.NOT), new BooleanExpression(b2[1], Bop.NOT), bopValues[i]);
+				bel2.add(bi);				
 			}
+		}
+		return bel2;
+	}	
+	
+	static List<BooleanExpression> generateAllTripples(BooleanExpression[] b3)
+	{
+		BooleanExpression[] b2a = new BooleanExpression[2];
+		BooleanExpression[] b2b = new BooleanExpression[2];
+		List<BooleanExpression> bel3 = new ArrayList<BooleanExpression>();
+		List<BooleanExpression> bel2a, bel2b;
+		int i, j;
+		
+		b2b[0] = b3[0];
+		b2a[0] = b3[1];
+		b2a[1] = b3[2];
+		bel2a = generateAllPairs(b2a);
+		for(i = 0; i < bel2a.size(); i++)
+		{
+			b2b[1] = bel2a.get(i);
+			bel2b = generateAllPairs(b2b);
+			for(j = 0; j < bel2b.size(); j++)
+				bel3.add(bel2b.get(i));
+		}
+		
+		b2b[0] = b3[1];
+		b2a[0] = b3[0];
+		b2a[1] = b3[2];
+		bel2a = generateAllPairs(b2a);
+		for(i = 0; i < bel2a.size(); i++)
+		{
+			b2b[1] = bel2a.get(i);
+			bel2b = generateAllPairs(b2b);
+			for(j = 0; j < bel2b.size(); j++)
+				bel3.add(bel2b.get(i));
+		}
+		
+		b2b[0] = b3[2];
+		b2a[0] = b3[0];
+		b2a[1] = b3[1];
+		bel2a = generateAllPairs(b2a);
+		for(i = 0; i < bel2a.size(); i++)
+		{
+			b2b[1] = bel2a.get(i);
+			bel2b = generateAllPairs(b2b);
+			for(j = 0; j < bel2b.size(); j++)
+				bel3.add(bel2b.get(i));
+		}
+		
+		return bel3;
+	}
+	
+	static BooleanExpression findEqualTwo(FunctionTable f, Variable[] v)
+	{
+		if(v.length != 2)
+			System.err.println("findEqualTwo: array not of length 2: " + v.length);
+		BooleanExpression[] b2 = new BooleanExpression[2];
+		b2[0] = new BooleanExpression(v[0]);
+		b2[1] = new BooleanExpression(v[1]);
+		List<BooleanExpression> bel = generateAllPairs(b2);
+		BooleanExpression be;
+		FunctionTable g;
+		for(int i = 0; i < bel.size(); i++)
+		{
+			be = bel.get(i);
+			g = new FunctionTable(be);
+			if(FunctionTable.same(f, g))
+				return be;
+		}
+		return null;
+	}
+	
+	
+	static BooleanExpression findEqualThree(FunctionTable f, Variable[] v)
+	{
+		if(v.length != 3)
+			System.err.println("findEqualThree: array not of length 3: " + v.length);
+		BooleanExpression[] b3 = new BooleanExpression[3];
+		b3[0] = new BooleanExpression(v[0]);
+		b3[1] = new BooleanExpression(v[1]);
+		b3[2] = new BooleanExpression(v[2]);
+		List<BooleanExpression> bel = generateAllTripples(b3);
+		BooleanExpression be;
+		FunctionTable g;
+		for(int i = 0; i < bel.size(); i++)
+		{
+			be = bel.get(i);
+			g = new FunctionTable(be);
+			if(FunctionTable.same(f, g))
+				return be;
 		}
 		return null;
 	}
@@ -744,17 +906,9 @@ public class CodeGenerator
 		
 		FunctionTable f = new FunctionTable(a, variables[j], variables[k], opposite);
 		
-//		int jj = j;
-//		int kk = 3-(j+k);
-//		if(jj > kk)
-//		{
-//			int swp = kk;
-//			kk = jj;
-//			jj = swp;
-//		}
-		
-		BooleanExpression g = findEqualTwo(f, variables[j], variables[3-(j+k)]);
-		
+		//BooleanExpression g = findEqualTwo(f, variables[j], variables[3-(j+k)]);
+		BooleanExpression g = findEqualTwo(f, eliminate(variables, k));
+				
 		int caseVal = 0;
 		if(opposite)
 			caseVal |= 1;
@@ -783,7 +937,7 @@ public class CodeGenerator
 				System.out.println("\t\tr = RrCSG.nothing();");
 			else
 				System.out.println("\t\t" + g.toJava());
-//			if(g != null && fts)
+//			if(fts)
 //			{
 //				FunctionTable h = new FunctionTable(g);
 //				System.out.println(h.toString());
@@ -793,7 +947,78 @@ public class CodeGenerator
 		System.out.println("\t\tbreak;\n");
 	}
 	
-	private static void allCases(Variable [] variables)
+	private static void oneCase4(Variable [] variables, int exp, int j, int k, boolean opposite, boolean fts)
+	{
+		BooleanExpression a = new BooleanExpression(variables, exp);
+		
+//		FunctionTable tt = new FunctionTable(a);
+//		System.out.println(tt.toString()+"\n\n");
+		
+		FunctionTable f = new FunctionTable(a, variables[j], variables[k], opposite);
+		
+		BooleanExpression g = findEqualThree(f, eliminate(variables, k));
+		
+		int caseVal = 0;
+		if(opposite)
+			caseVal |= 1;
+		switch(j)
+		{
+		case 0:
+			if(k == 2)
+				caseVal |= 2;
+			else if(k == 3)
+				caseVal |= 4;
+			break;
+			
+		case 1:
+			if(k == 2)
+				caseVal |= 6;
+			else if(k == 3)
+				caseVal |= 8;
+			break;
+			
+		case 2:
+			if(k == 3)
+				caseVal |= 10;
+			break;
+			
+		default:
+			
+		}
+		
+
+		caseVal |= exp << 4;
+
+		System.out.println("\tcase " + caseVal + ": ");
+		if(fts)
+		{
+			System.out.println("\t// " + a.toJava());
+			System.out.print("\t// " + variables[j].name() + " = ");
+			if(opposite)
+				System.out.print("!");	
+			System.out.println(variables[k].name() + " ->");
+			System.out.println(f.toString());
+		}
+
+		if(g != null || f.allOnes() || f.allZeros())
+		{
+			if(f.allOnes())
+				System.out.println("\t\tr = RrCSG.universe();");
+			else if(f.allZeros())
+				System.out.println("\t\tr = RrCSG.nothing();");
+			else
+				System.out.println("\t\t" + g.toJava());
+//			if(fts)
+//			{
+//				FunctionTable h = new FunctionTable(g);
+//				System.out.println(h.toString());
+//			}
+		} else
+			System.out.println("\t\t// No equivalence." + "\n");
+		System.out.println("\t\tbreak;\n");
+	}
+	
+	private static void allCases3(Variable [] variables)
 	{	
 		for(int exp = 0; exp < 4; exp++)
 		{
@@ -805,20 +1030,34 @@ public class CodeGenerator
 				}
 		}		
 	}
+	
+	private static void allCases4(Variable [] variables)
+	{	
+		for(int exp = 0; exp < 16; exp++)
+		{
+			for(int j = 0; j < 3; j++)
+				for(int k = j+1; k < 4; k++)
+				{
+					oneCase4(variables, exp, j, k, false, true);
+					oneCase4(variables, exp, j, k, true, true);
+				}
+		}		
+	}
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) 
 	{
-		Variable [] variables = new Variable[3];
+		Variable [] variables = new Variable[4];
 		variables[0] = new Variable("a");
 		variables[1] = new Variable("b");
 		variables[2] = new Variable("c");
-		//variables[3] = new variable("d");
+		variables[3] = new Variable("d");
 		
 		//oneCase3(variables, 2, 0, 2, false, true);
-		allCases(variables);
+		//allCases3(variables);
+		allCases4(variables);
 	}	
 
 }
