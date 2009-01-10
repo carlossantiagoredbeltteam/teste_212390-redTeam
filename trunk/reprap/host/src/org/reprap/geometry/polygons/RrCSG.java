@@ -463,8 +463,8 @@ public class RrCSG
 			x = a.cross_point(b);
 			v02 = v02.norm();
 			v31 = v31.norm();
-			x0 = Rr2Point.add(x, v02);
-			x2 = Rr2Point.sub(x, v02);
+			x2 = Rr2Point.add(x, v02);
+			x0 = Rr2Point.sub(x, v02);
 			x1 = Rr2Point.add(x, v31);
 			x3 = Rr2Point.sub(x, v31);
 			if(value(x0) <= 0)
@@ -583,10 +583,10 @@ public class RrCSG
 				entry = list.get(i);
 				if(this == entry || complement() == entry)
 					return;
-				list.add(this);
 			}
+			list.add(this);
 			break;
-			
+
 		case NULL:			
 		case UNIVERSE:
 			System.err.println("uniqueList_r: null or universe at a leaf.");
@@ -624,8 +624,39 @@ public class RrCSG
 	 * This assumes removeDuplicates has been run over this set
 	 * @return regularised CSG object
 	 */	
+	private RrCSG reg_3_new()
+	{
+		RrCSG r = this;
+		
+		if(complexity != 3)
+			return r;
+		
+		ArrayList<RrCSG> list = uniqueList();
+		switch(list.size())
+		{
+		case 0:
+			System.err.println("RrCSG.reg_3: 0-length leaf list!");
+			return r;
+			
+		case 1:
+			return categorise(list.get(0));
+			
+		case 2:
+			return crossCategorise(list.get(0), list.get(1));
+			
+		case 3:
+			return r;
+			
+		default:
+			System.err.println("RrCSG.reg_3: leaf list longer than 3: " + list.size());
+		return r;
+		
+		}
+	}
+	
 	private RrCSG reg_3()
 	{
+		
 		RrCSG r = this;
 		
 		if(complexity != 3)
