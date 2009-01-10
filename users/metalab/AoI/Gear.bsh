@@ -1,0 +1,99 @@
+/*
+<?xml version='1.0' standalone='yes' ?>
+
+<script>
+	<name>Gear</name>
+	<author>Metalab</author>
+	<version>0.1</version>
+	<date>20081008</date>
+	<description>This script creates a simple gear.</description>
+</script>
+*/
+
+scene = window.getScene();
+
+invertGearCheckbox = new BCheckBox( "", false );
+toothSizeField = new ValueField(1, ValueField.NONNEGATIVE);
+numTeethField = new ValueField(8, ValueField.NONNEGATIVE);
+
+dlg = new ComponentsDialog(window, "Gear" ,
+			   new Widget [] { toothSizeField, numTeethField, invertGearCheckbox },
+			   new String [] { "Tooth size:", "# teeth:", "inverted gear" });
+
+if (!dlg.clickedOk()) return;
+
+toothSize = toothSizeField.getValue();
+numTeeth = (int)Math.round(numTeethField.getValue());
+boolean invertedGear = invertGearCheckbox.getState();
+
+float innerradius = numTeeth * toothSize / 2;
+float pitchradius = innerradius + toothSize * 1.25;
+float outerradius = innerradius + toothSize * 2.25;
+float toothangle = 2*Math.PI/numTeeth;
+
+
+
+
+int PROTOSIZE = 7;
+Vec3[] protoTooth = new Vec3[PROTOSIZE];
+
+/* // standard teeth (but in practice they are too small
+
+protoTooth[0] = new Vec3(-Math.PI/2, (double)innerradius, 0.0);
+protoTooth[1] = new Vec3(-Math.PI/4 -1.25*Math.tan(Math.PI*20/180), innerradius, 0.0);
+protoTooth[2] = new Vec3(-Math.PI/4, pitchradius, 0.0);
+protoTooth[3] = new Vec3(-Math.PI/4 + Math.tan(Math.PI*20/180), outerradius, 0.0);
+protoTooth[4] = new Vec3(Math.PI/4 - Math.tan(Math.PI*20/180), outerradius, 0.0);
+protoTooth[5] = new Vec3(Math.PI/4, pitchradius, 0.0);
+protoTooth[6] = new Vec3(Math.PI/4 + 1.25*Math.tan(Math.PI*20/180), innerradius, 0.0);
+*/ 
+
+if (invertedGear) {
+	outerradius = (float)(numTeeth * toothSize / 2);
+	pitchradius = (float)(innerradius + toothSize * 1.25);
+	innerradius = (float)(innerradius + toothSize * 2.25);
+	
+	protoTooth[0] = new Vec3(-Math.PI/2, innerradius, 0.0);
+	protoTooth[1] = new Vec3(-Math.PI/4 - 0.2, innerradius, 0.0);
+	protoTooth[2] = new Vec3(-Math.PI/4 + 0.3, pitchradius, 0.0);
+	protoTooth[3] = new Vec3(-Math.PI/4 + 0.6, outerradius, 0.0);
+	protoTooth[4] = new Vec3(Math.PI/4 - 0.6, outerradius, 0.0);
+	protoTooth[5] = new Vec3(Math.PI/4 - 0.3, pitchradius, 0.0);
+	protoTooth[6] = new Vec3(Math.PI/4 + 0.2, innerradius, 0.0);
+
+}
+else
+{
+	protoTooth[0] = new Vec3(-Math.PI/2, innerradius, 0.0);
+	protoTooth[1] = new Vec3(-Math.PI/4 - 0.2, innerradius, 0.0);
+	protoTooth[2] = new Vec3(-Math.PI/4 + 0.3, pitchradius, 0.0);
+	protoTooth[3] = new Vec3(-Math.PI/4 + 0.6, outerradius, 0.0);
+	protoTooth[4] = new Vec3(Math.PI/4 - 0.6, outerradius, 0.0);
+	protoTooth[5] = new Vec3(Math.PI/4 - 0.3, pitchradius, 0.0);
+	protoTooth[6] = new Vec3(Math.PI/4 + 0.2, innerradius, 0.0);
+}
+
+Vec3[] polaroutline = new Vec3[numTeeth * PROTOSIZE];
+float startangle = 0;
+for (int i=0;i<numTeeth;i++) {
+    for (int j=0;j<PROTOSIZE;j++) {
+	polaroutline[PROTOSIZE*i+j] = new Vec3((i + protoTooth[j].x/Math.PI) * toothangle,
+					       protoTooth[j].y,
+					       0);
+    }
+}
+
+Vec3[] cartesianoutline = new Vec3[numTeeth * PROTOSIZE];
+	float[] smoothness = new float[numTeeth * PROTOSIZE];
+
+
+for (int i=0;i<numTeeth*PROTOSIZE;i++) {
+    cartesianoutline[i] = new Vec3(polaroutline[i].y * Math.cos(polaroutline[i].x),
+				   polaroutline[i].y * Math.sin(polaroutline[i].x),
+				   0.0);
+    smoothness[i] = 0;
+}
+
+
+curve = new Curve(cartesianoutline, smoothness, Mesh.INTERPOLATING, true);
+window.addObject(curve, new CoordinateSystem(), "Gear", null);
