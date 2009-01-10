@@ -88,6 +88,7 @@ public class TestMain
 		RrHalfPlane qh = new RrHalfPlane(q, r);
 		RrHalfPlane rh = new RrHalfPlane(r, s);
 		RrHalfPlane sh = new RrHalfPlane(s, p);
+		RrHalfPlane sheps = new RrHalfPlane(s, peps);		
 		
 		/* RrHalfPlane pph = */ new RrHalfPlane(pp, qq);
 		RrHalfPlane qqh = new RrHalfPlane(qq, rr);
@@ -98,6 +99,7 @@ public class TestMain
 		RrCSG qc = new RrCSG(qh);
 		RrCSG rc = new RrCSG(rh);
 		RrCSG sc = new RrCSG(sh);
+		RrCSG sceps = new RrCSG(sheps);		
 		
 		pc = RrCSG.intersection(pc, qc);
 		rc = RrCSG.intersection(sc, rc);		
@@ -114,6 +116,7 @@ public class TestMain
 		pc = ppc.offset(-8);
 		ppc = RrCSG.difference(ppc, pc);
 		ppc = RrCSG.intersection(ppc, pceps);
+		//ppc = RrCSG.intersection(ppc, sceps);
 		
 		return new RrCSGPolygon(ppc, new 
 				RrRectangle(new Rr2Point(-3.2,-1.76), new Rr2Point(131.7,112)),

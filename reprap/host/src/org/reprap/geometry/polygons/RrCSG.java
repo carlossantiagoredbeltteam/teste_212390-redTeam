@@ -1158,6 +1158,21 @@ public class RrCSG
 //		return result;
 //	}
 	
+	public RrCSG regularise_new()
+	{	
+		RrCSG r = this;
+
+		if(complexity < 3 || complexity > 4)
+			return r;
+
+		ArrayList<RrCSG> list = uniqueList();
+		if(list.size() == 1)
+			return categorise(list.get(0));
+		if(list.size() == 2)
+			return crossCategorise(list.get(0), list.get(1));
+		
+		return r;
+	}
 	/**
 	 * Regularise a set with simple contents ( < 4 )
 	 * This assumes simplify has been run over the set
