@@ -587,26 +587,52 @@ public class RrHalfPlane
 	public double offset() { return offset; }
 	
 	/**
-	 * TODO: make this spot complements too.
 	 * Is another line the same within a tolerance?
 	 * @param a
 	 * @param b
 	 * @param tolerance
-	 * @return true if the distance between halfplane a and b is less then the tolerance, otherwise false
+	 * @return 0 if the distance between halfplane a and b is less then the tolerance, -1 if one
+	 * is the complement of the other within the tolerance, otherwise 1
 	 */
-	public static boolean same(RrHalfPlane a, RrHalfPlane b, double tolerance)
+	public static int same(RrHalfPlane a, RrHalfPlane b, double tolerance)
 	{
+		if(a == b)
+			return 0;
+		
+		int result = 0;
 		if(Math.abs(a.normal.x() - b.normal.x()) > tolerance)
-			return false;
+		{
+			if(Math.abs(a.normal.x() + b.normal.x()) > tolerance)
+				return 1;
+			result = -1;
+		}
 		if(Math.abs(a.normal.y() - b.normal.y()) > tolerance)
-			return false;
+		{
+			if(Math.abs(a.normal.y() + b.normal.y()) > tolerance || result != -1)
+				return 1;
+		}
 		double rms = Math.sqrt((a.offset*a.offset + b.offset*b.offset)*0.5);
 		if(Math.abs(a.offset - b.offset) > tolerance*rms)
-			return false;
+		{
+			if(Math.abs(a.offset + b.offset) > tolerance*rms || result != -1)
+				return 1;
+		}
 		
-		return true;
+		return result;
 	}
 	
+//	public static boolean same(RrHalfPlane a, RrHalfPlane b, double tolerance)
+//	{
+//		if(Math.abs(a.normal.x() - b.normal.x()) > tolerance)
+//			return false;
+//		if(Math.abs(a.normal.y() - b.normal.y()) > tolerance)
+//			return false;
+//		double rms = Math.sqrt((a.offset*a.offset + b.offset*b.offset)*0.5);
+//		if(Math.abs(a.offset - b.offset) > tolerance*rms)
+//			return false;
+//		
+//		return true;
+//	}
 	
 	/**
 	 * Change the sense
