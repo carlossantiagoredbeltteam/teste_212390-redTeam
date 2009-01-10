@@ -32,13 +32,20 @@ class CSGEvaluatorDialog extends BDialog
   public CSGEvaluatorDialog(LayoutWindow window)
   {
     super(window, "CSG Evaluator", false); // Modeless
+    setResizable(false);
+
+    
+    
+    CSGEvaluatorEngine engine = new CSGEvaluatorEngine(window);
+
     BorderContainer bc = new BorderContainer();
     this.setContent(bc);
+
     bc.setDefaultLayout(new LayoutInfo(LayoutInfo.CENTER, 
         LayoutInfo.NONE, 
         new Insets(10, 10, 10, 10), 
         null));
-    bc.add(new BLabel("CSG Evaluator Control Panel"), BorderContainer.NORTH);
+    bc.add(new BLabel("<html>CSG Evaluator Control Panel <font size=1>V0.1</font></html>"), BorderContainer.NORTH);
     FormContainer fc = new FormContainer(2, 5);
     bc.add(fc, BorderContainer.CENTER);
     RowContainer buttons = new RowContainer();
@@ -68,7 +75,6 @@ class CSGEvaluatorDialog extends BDialog
     buttons.add(closeButton = new BButton("close"));
 
     // Events
-    CSGEvaluatorEngine engine = new CSGEvaluatorEngine(window);
     evaluateButton.addEventLink(CommandEvent.class, engine, "evaluate");
     devaluateButton.addEventLink(CommandEvent.class, engine, "devaluate");
     unionButton.addEventLink(CommandEvent.class, engine, "union");
@@ -81,10 +87,9 @@ class CSGEvaluatorDialog extends BDialog
     addEventLink(WindowClosingEvent.class, this, "closeWindow");
     setDefaultButton(closeButton);
     pack();
-    setResizable(false);
     UIUtilities.centerDialog(this, window);
     setVisible(true);
-  }
+}
 
   /** Pressing Return and Escape are equivalent to clicking OK and Cancel. */
   public void keyPressed(KeyPressedEvent ev)
