@@ -1,0 +1,44 @@
+/*
+<?xml version='1.0' standalone='yes' ?>
+<!--  xml header for scripts & plugin manager --> 
+<script>
+	<name>JMeta Union</name>
+	<author>Philipp Tiefenbacher</author>
+	<version>0.1</version>
+    <beta>1</beta>
+	<date>23/10/2008</date>
+	<description>
+This script unions all selected Objects
+    </description>
+    <comments>
+    </comments>
+</script>
+*/
+
+
+scene=window.getScene();
+sel=window.getSelectedIndices();
+
+//
+// make sure at least 2 objects have been selected
+if (sel.length<2) 
+{
+	new MessageDialog(window,"Select at least 2 objects");
+	return;
+}
+
+
+o1 = scene.getObject(sel[0]);
+
+for(int i=1;i<sel.length;i++)
+{
+	o1 = new CSGObject(o1, scene.getObject(sel[i]), CSGObject.UNION);  // get the ith ObjInfo
+	o1 = new ObjectInfo(o1, new CoordinateSystem(), "MetaUnion");
+}
+for(int i=0;i<sel.length;i++) {
+	scene.getObject(sel[i]).setVisible(false);
+}
+window.clearSelection();
+
+window.addObject(o1, null);
+window.addToSelection(scene.indexOf(o1));
