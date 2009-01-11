@@ -8,8 +8,12 @@
  */
 package at.metalab.artofillusion;
 
+import java.awt.event.KeyEvent;
+
 import artofillusion.LayoutWindow;
 import artofillusion.ModellingTool;
+import artofillusion.keystroke.KeystrokeManager;
+import artofillusion.keystroke.KeystrokeRecord;
 
 
 /**
@@ -23,8 +27,13 @@ public class CSGEvaluatorTool implements ModellingTool
    *  instance this tool,load it in memory
    */
 
-  public CSGEvaluatorTool() { }
-
+  public CSGEvaluatorTool()
+  { 
+    KeystrokeManager.addRecord(new KeystrokeRecord(KeyEvent.VK_C, 0, "CSG Evaluator",
+        "ModellingTool plugin = (ModellingTool)" +
+        "PluginRegistry.getPluginObject(\"at.metalab.artofillusion.CSGEvaluatorTool\");" +
+        "plugin.commandSelected(window);"));
+  }
 
   /**
    *  Get the text that appear as the menu item.
