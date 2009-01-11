@@ -20,9 +20,15 @@ import artofillusion.keystroke.KeystrokeRecord;
  * 
  * Plugin interface for CSGEvaluator
  *
+ * TODO:
+ * o How should we handle materials when combining objects?
+ *
  */
 public class CSGEvaluatorTool implements ModellingTool
 {
+  CSGEvaluatorDialog dialog;
+
+
   /**
    *  instance this tool,load it in memory
    */
@@ -53,7 +59,14 @@ public class CSGEvaluatorTool implements ModellingTool
    */
   public void commandSelected(LayoutWindow window)
   {
-    new CSGEvaluatorDialog(window);
+    // Light check for whether the dialog is already visible and to then close it.
+    // FIXME: Should be done better, but then we need to keep track of the dialog per window.
+    if (this.dialog != null && this.dialog.isVisible() && this.dialog.getParent() == window) {
+      this.dialog.closeWindow();
+    }
+    else {
+      this.dialog = new CSGEvaluatorDialog(window);
+    }
     //this class should do no more because it's always loaded.
   }
 }
