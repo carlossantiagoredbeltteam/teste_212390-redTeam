@@ -293,7 +293,9 @@ class CSGEvaluatorEngine
 
     // add the object info to the window (which adds it to the scene and the item tree
     // and creates the proper undo record commands)
-    this.window.getScene().addObject(resultinfo, undo);
+    // FIXME: The index is sometimes wrong since moving objects with the mouse confuses AoI's index system.
+    // Don't know how to get around this, so keep it like this for now.
+    this.window.getScene().addObject(resultinfo, this.window.getScene().indexOf(objects[0]), undo);
 
     // reparent children
     for (int i=0;i<objects.length;i++) {

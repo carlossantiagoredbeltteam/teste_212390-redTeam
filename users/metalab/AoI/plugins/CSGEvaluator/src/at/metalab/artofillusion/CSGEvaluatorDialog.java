@@ -27,10 +27,13 @@ import buoy.widget.LayoutInfo;
  */
 class CSGEvaluatorDialog extends BDialog
 {
+  LayoutWindow window;
+  
   public CSGEvaluatorDialog(LayoutWindow window)
   {
     super(window, "CSG Evaluator", false); // Modeless
-    setResizable(false);
+    this.window = window;
+    this.setResizable(false);
     
     CSGEvaluatorEngine engine = new CSGEvaluatorEngine(window);
 
@@ -55,11 +58,12 @@ class CSGEvaluatorDialog extends BDialog
     }
     */
     bc.add(new BLabel("<html>CSG Evaluator Control Panel <font size=1>V"+versionstr+"</font></html>"), BorderContainer.NORTH);
-    FormContainer fc = new FormContainer(2, 5);
-    bc.add(fc, BorderContainer.CENTER);
 
     String[] buttons = new String [] {"evaluate", "devaluate", "union", "intersect", "subtract"};
     String[] labels = new String [] {"Actions", null, "Boolean Op", null, null};
+
+    FormContainer fc = new FormContainer(2, buttons.length+1);
+    bc.add(fc, BorderContainer.CENTER);
 
     for (int i = 0; i < buttons.length; i++) {
       if (labels[i] != null) {
@@ -70,12 +74,17 @@ class CSGEvaluatorDialog extends BDialog
       button.addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
       button.addEventLink(CommandEvent.class, engine, buttons[i]);
     }
+    BButton button = new BButton("test");
+    fc.add(button, 1, buttons.length);
+    button.addEventLink(CommandEvent.class, this, "test");
 
     // Close button
     BButton closeButton;
     bc.add(closeButton = new BButton("close"), BorderContainer.SOUTH);
     closeButton.addEventLink(CommandEvent.class, this, "closeWindow");
     closeButton.addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
+    // FIXME: Other events (most noticeably Cmd-Z (undo)) are consumed and won't reach our
+    // parent window.
     setDefaultButton(closeButton);
 
     addEventLink(WindowClosingEvent.class, this, "closeWindow");
@@ -101,5 +110,13 @@ class CSGEvaluatorDialog extends BDialog
   public void closeWindow()
   {
     dispose();
+  }
+  
+  public void test()
+  {
+    int[] selidx = this.window.getSelectedIndices(); 
+    for (int i : selidx) {
+      System.out.println("sel: " + i);
+    }
   }
 }
