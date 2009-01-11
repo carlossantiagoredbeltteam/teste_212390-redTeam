@@ -104,7 +104,8 @@ class CSGEvaluatorDialog extends BDialog
   /** Pressing Escape are equivalent to clicking close */
   public void keyPressed(KeyPressedEvent ev)
   {
-    if (ev.getKeyCode() == KeyPressedEvent.VK_ESCAPE) closeWindow();
+    if (ev.getKeyCode() == KeyPressedEvent.VK_ESCAPE ||
+        ev.getKeyCode() == KeyPressedEvent.VK_C) closeWindow();
   }
 
   public void closeWindow()
