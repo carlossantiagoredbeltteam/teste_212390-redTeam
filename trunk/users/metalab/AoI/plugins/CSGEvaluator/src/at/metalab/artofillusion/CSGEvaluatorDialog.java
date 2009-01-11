@@ -11,12 +11,6 @@ package at.metalab.artofillusion;
 import java.awt.Insets;
 import java.awt.Rectangle;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import artofillusion.LayoutWindow;
 import buoy.event.CommandEvent;
 import buoy.event.KeyPressedEvent;
