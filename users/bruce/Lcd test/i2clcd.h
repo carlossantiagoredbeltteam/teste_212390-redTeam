@@ -36,18 +36,20 @@
 #define		GPPUB		0x0D		// MCP23017 1= Pulled HIgh via internal 100k
 
 // LCD
-#define		ClrLCD		0x01		// clear the LCD
-#define		CrsrHm		0x02		// move cursor to home position
+#define		CMD_CLR		0x01		// clear the LCD
+#define		CMD_HOME	0x02		// move cursor to home position
 #define		CrsrLf		0x10		// move cursor left
 #define		CrsrRt		0x14		// move cursor right
-#define		DispLf		0x18		// shift displayed chars left
-#define		DispRt		0x1C		// shift displayed chars right
+#define		CMD_LEFT	0x18		// shift displayed chars left
+#define		CMD_RIGHT	0x1C		// shift displayed chars right
 #define		DDRam		0x80		// Display Data RAM control
 #define		ddram2		0xC0		// 9th position of display (not in next 
 
 #define		RS_pin		B00000100
 #define		RW_pin		B00000010
 #define		E_pin		B00000001
+
+#define         screen_lines    2               // this is the amount of lines the LCD screen has 
 
 
 #endif

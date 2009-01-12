@@ -35,10 +35,10 @@ void setup()
          Wire.begin();                   //this is to start the initilize the lcd screen                                     
          portexpanderinit();
          delay(200);
-         lcdinit();
+         LCDinit();
          delay(500);
-         LCDcmd(ClrLCD); 
-         LCDwr("start"[5]);
+         LCDclear(); 
+         LCDprint("start"[5]);
 
 
 }
