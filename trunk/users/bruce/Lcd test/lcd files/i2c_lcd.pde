@@ -184,33 +184,16 @@ void LCDprintIn(char msg[])
   }
 }
 
-// this is to display a number
-  
-void LCDdispnumb(int numbvar)
-{
-  //int THUS= abs(numbvar/1000);
-  int HUNDS= abs(numbvar/100);
-  int TENS = abs((numbvar - (HUNDS*100))/10);
-  int ONES = abs(numbvar-(HUNDS*100)-(TENS*10));
-
-  NUMB[0] =  HUNDS+48;                                                        // +48 for ASCII conversion
-  NUMB[1] =  TENS+48;
-  NUMB[2] =  ONES+48;
-
-  for(i=0;i<3;i++)
-  {
-    LCDprint(NUMB[i]);                                                           // Print-Out 3 digit number at cursor
-  }
 
 
 // this command is to check for a button press  
   
-void LCDcheckbutton()                            // Use serial monitor at 9600bps to see buttons that are pressed
-{
-  I2C_RX(MCP23017,GPIOB);
-  buttonPress = int(button);
-  switch (buttonPress)                        
-  {
+//void LCDcheckbutton()                            // Use serial monitor at 9600bps to see buttons that are pressed
+//{
+//  I2C_RX(MCP23017,GPIOB);
+//  buttonPress = int(button);
+//  switch (buttonPress)                        
+//}
 
 
 // note to be added BUTTON interface commands for the 5 buttons
