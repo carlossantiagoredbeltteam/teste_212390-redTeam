@@ -164,7 +164,7 @@ class CSGEvaluatorEngine
     if (lower.startsWith("union") || lower.startsWith("+")) {
       return CSGObject.UNION;
     }
-    else if (lower.startsWith("intersection") || lower.startsWith("/")) {
+    else if (lower.startsWith("intersection") || lower.startsWith("/") || lower.startsWith("&")) {
       return CSGObject.INTERSECTION;
     }
     else if (lower.startsWith("difference") || lower.startsWith("-")) {

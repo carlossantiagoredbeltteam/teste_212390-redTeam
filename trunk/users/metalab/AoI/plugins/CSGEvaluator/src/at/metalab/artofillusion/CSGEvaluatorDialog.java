@@ -59,7 +59,7 @@ class CSGEvaluatorDialog extends BDialog
     */
     bc.add(new BLabel("<html>CSG Evaluator Control Panel <font size=1>V"+versionstr+"</font></html>"), BorderContainer.NORTH);
 
-    String[] buttons = new String [] {"evaluate", "devaluate", "union", "intersect", "subtract"};
+    String[] buttons = new String [] {"evaluate", "devaluate", "union", "intersection", "difference"};
     String[] labels = new String [] {"Actions", null, "Boolean Op", null, null};
 
     FormContainer fc = new FormContainer(2, buttons.length+1);
