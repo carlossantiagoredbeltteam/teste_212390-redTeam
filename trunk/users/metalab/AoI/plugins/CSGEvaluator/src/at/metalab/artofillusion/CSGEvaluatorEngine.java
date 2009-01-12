@@ -127,7 +127,7 @@ class CSGEvaluatorEngine
   /**
    * Performs the intersect operation on the currently selected objects
    */
-  public void intersect()
+  public void intersection()
   {
     execute(CSGObject.INTERSECTION);
   }
@@ -135,7 +135,7 @@ class CSGEvaluatorEngine
   /**
    * Performs the subtract operation on the currently selected objects
    */
-  public void subtract()
+  public void difference()
   {
     execute(CSGObject.DIFFERENCE12);
   }
