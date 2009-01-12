@@ -1,7 +1,7 @@
 #include "parameters.h"
 #include "pins.h"
 #include "extruder.h"
-#include "i2clcd.h"
+#include "i2c_lcd.h"
 
 
 
