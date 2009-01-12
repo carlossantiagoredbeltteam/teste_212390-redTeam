@@ -47,7 +47,7 @@ Standard
   9
 $CLAYER
   8
-Retainer Plate Text
+Filament Guide Middle
   9
 $DIMEXO
  40
@@ -923,9 +923,9 @@ AcDbLayerTableRecord
   2
 0
  70
-1
+0
  62
--7
+7
 420
 0
   6
@@ -945,9 +945,9 @@ AcDbLayerTableRecord
   2
 Drawings
  70
-1
+0
  62
--5
+5
 420
 255
   6
@@ -967,9 +967,9 @@ AcDbLayerTableRecord
   2
 Motor Plate
  70
-1
+0
  62
--7
+7
 420
 0
   6
@@ -989,9 +989,9 @@ AcDbLayerTableRecord
   2
 Motor Plate Text
  70
-1
+0
  62
--4
+4
 420
 65535
   6
@@ -1011,9 +1011,9 @@ AcDbLayerTableRecord
   2
 Idler Wheel
  70
-1
+0
  62
--7
+7
 420
 0
   6
@@ -1033,9 +1033,9 @@ AcDbLayerTableRecord
   2
 Idler Wheel Text
  70
-1
+0
  62
--4
+4
 420
 65535
   6
@@ -1055,9 +1055,9 @@ AcDbLayerTableRecord
   2
 Spacer Plate
  70
-1
+0
  62
--7
+7
 420
 0
   6
@@ -1077,9 +1077,9 @@ AcDbLayerTableRecord
   2
 Spacer Plate Text
  70
-1
+0
  62
--4
+4
 420
 65535
   6
@@ -1099,9 +1099,9 @@ AcDbLayerTableRecord
   2
 Filament Guide Bottom
  70
-1
+0
  62
--7
+7
 420
 0
   6
@@ -1143,9 +1143,9 @@ AcDbLayerTableRecord
   2
 Text
  70
-1
+0
  62
--7
+7
 420
 0
   6
@@ -1165,9 +1165,9 @@ AcDbLayerTableRecord
   2
 Retainer Plate
  70
-1
+0
  62
--7
+7
 420
 0
   6
@@ -1187,9 +1187,9 @@ AcDbLayerTableRecord
   2
 Retainer Plate Text
  70
-1
+0
  62
--4
+4
 420
 65535
   6
@@ -1209,9 +1209,9 @@ AcDbLayerTableRecord
   2
 Filament Guide Bottom Text
  70
-1
+0
  62
--4
+4
 420
 65535
   6
@@ -1253,9 +1253,9 @@ AcDbLayerTableRecord
   2
 Filament Guide Top
  70
-1
+0
  62
--7
+7
 420
 0
   6
@@ -1275,9 +1275,9 @@ AcDbLayerTableRecord
   2
 Filament Guide Top Text
  70
-1
+0
  62
--4
+4
 420
 65535
   6
@@ -1719,7 +1719,7 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
@@ -1759,7 +1759,7 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
@@ -3975,7 +3975,7 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
@@ -4295,7 +4295,7 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
@@ -4335,7 +4335,7 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
@@ -4375,7 +4375,7 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
@@ -4415,7 +4415,7 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
@@ -4455,7 +4455,7 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
@@ -4495,7 +4495,7 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
@@ -4535,7 +4535,7 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
@@ -4939,7 +4939,7 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
@@ -4979,7 +4979,7 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
@@ -5165,7 +5165,7 @@ standard
  50
 0.0
  73
-0
+1
  44
 1.0
   0
