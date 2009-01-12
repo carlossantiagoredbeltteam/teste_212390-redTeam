@@ -12,8 +12,8 @@
 #include "parameters.h"
 #include "pins.h"
 #include "extruder.h"
-
-
+#include "i2clcd.h"
+#include <Wire.h>
 
 byte extruder_in_use = 0;
 extruder ex0(EXTRUDER_0_MOTOR_DIR_PIN, EXTRUDER_0_MOTOR_SPEED_PIN , EXTRUDER_0_HEATER_PIN,
@@ -27,10 +27,20 @@ void setup()
         ex[0] = &ex0;
 	Serial.begin(19200);
 	Serial.println("start");
-	
+        
 	//other initialization.
 	init_process_string();
 	init_steppers();
+        
+         Wire.begin();                   //this is to start the initilize the lcd screen                                     
+         portexpanderinit();
+         delay(200);
+         lcdinit();
+         delay(500);
+         LCDcmd(ClrLCD); 
+         LCDwr("start"[5]);
+
+
 }
 
 void loop()
