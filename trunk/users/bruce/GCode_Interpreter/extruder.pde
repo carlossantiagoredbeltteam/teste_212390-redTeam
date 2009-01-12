@@ -3,6 +3,7 @@
 #include "pins.h"
 #include "ThermistorTable.h"
 #include "extruder.h" 
+#include "i2clcd.h"
 
 void manage_all_extruders()
 {
