@@ -12,7 +12,7 @@
 #include "parameters.h"
 #include "pins.h"
 #include "extruder.h"
-#include "i2clcd.h"
+#include "i2c_lcd.h"
 #include <Wire.h>
 
 byte extruder_in_use = 0;

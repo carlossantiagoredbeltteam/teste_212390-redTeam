@@ -1,6 +1,6 @@
 
 
-#include "i2clcd.h"
+#include "i2c_lcd.h"
 #include <Wire.h>   // REQUIRED                                                   Used for the I2C Communications
 
 

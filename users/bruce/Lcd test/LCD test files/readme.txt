@@ -15,7 +15,8 @@ i2clcd.h   //this is the hex file that contains the settings for the I2c files
 i2c_lcd.pde  // this is the file that contains the commands that are available 
 to control the LCD
 lcd_test.pde  // this is a simple test program to test the function of your LCD 
-and board 
+and board it uses the serial port and will show what is typed into the keyboard onto
+the LCD screen it uses 19200 baud
 
 
 Commands
@@ -40,7 +41,7 @@ LCDleftscroll  this command will scroll the display to the left
 
 LCDcursorTo  this command will position the cursor to the position that is called out
 
-
+LCDcheckbutton   this command is used to scan for a button press it is displayed with a command buttonPress
 
 
 Using

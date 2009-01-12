@@ -1,5 +1,5 @@
 #include <Wire.h>
-#include "i2clcd.h"
+#include "i2c_lcd.h"
 
 
 void setup()
