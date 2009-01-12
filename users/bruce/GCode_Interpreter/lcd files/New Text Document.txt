@@ -1,0 +1,93 @@
+
+
+
+// SIZER        "0123456789012345678901234567890123456789"
+char mess[16] = "I2C LCD ";  // Hello style it's working message
+char mess1[16] ="Button: ";  // Part of the "a button is being pressed" message
+char NUMB[4] =  "000";
+
+
+//*******************************************************************************************************************
+//								                                        MAIN LOOP
+//*******************************************************************************************************************
+
+void loop()
+{
+  for (i=0;i<8;i++)
+  {
+    LCDwr(mess[i]);                                    // Print-out Hello style message to display one letter at a time
+  }
+  dispnumb(count);                                     // Print-out counter value to display
+  count = count +1;
+
+
+
+  
+  I2C_RX(MCP23017,GPIOB);                                              // Check if Option buttons 1 to 5 are pressed
+  if (int(button)>0)
+  {
+    for (i=0;i<8;i++)
+    {
+      LCDwr(mess1[i]);                                                 // Print out button pressed message with number
+    }
+
+    dispnumb(int(button)); 
+  }
+  
+  
+  delay(2000);                                                         // Delay and do it again
+  LCDcmd(ClrLCD);
+  delay(200);
+
+  checkbutton();
+
+
+}
+
+
+//*******************************************************************************************************************
+//								                   SEND DECIMAL NUMBER TO DISPLAY
+//*******************************************************************************************************************
+void dispnumb(int numbvar)
+{
+  //int THUS= abs(numbvar/1000);
+  int HUNDS= abs(numbvar/100);
+  int TENS = abs((numbvar - (HUNDS*100))/10);
+  int ONES = abs(numbvar-(HUNDS*100)-(TENS*10));
+
+  NUMB[0] =  HUNDS+48;                                                        // +48 for ASCII conversion
+  NUMB[1] =  TENS+48;
+  NUMB[2] =  ONES+48;
+
+  for(i=0;i<3;i++)
+  {
+    LCDwr(NUMB[i]);                                                           // Print-Out 3 digit number at cursor
+  }
+}
+
+//*******************************************************************************************************************
+//								                 READ IF BUTTONS ARE BEING PRESSED
+//*******************************************************************************************************************
+void checkbutton()                            // Use serial monitor at 9600bps to see buttons that are pressed
+{
+  I2C_RX(MCP23017,GPIOB);
+  buttonPress = int(button);
+  switch (buttonPress)                        
+  {
+  case 1:
+    Serial.println("Button-One");
+    break;
+  case 2:
+    Serial.println("Button-Two");
+    break;
+  case 4:
+    Serial.println("Button-Three");
+    break;
+  case 8:
+    Serial.println("Button-Four");
+    break;
+  case 16:
+    Serial.println("Button-Five");
+    break; 
+  }
+}
