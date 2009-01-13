@@ -59,7 +59,7 @@ $DIMTXT
   9
 $CLAYER
   8
-Filament Guide Top
+Filament Guide Middle
   0
 ENDSEC
   0
@@ -6813,6 +6813,54 @@ standard
  44
 1.0
   0
+CIRCLE
+  5
+10C
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Filament Guide Middle
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+30.0
+ 20
+41.2399745962155677
+ 30
+0.0
+ 40
+1.45
+  0
+CIRCLE
+  5
+10D
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+Filament Guide Middle
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+30.0
+ 20
+23.7599745962155637
+ 30
+0.0
+ 40
+1.45
+  0
 ENDSEC
   0
 SECTION
@@ -6851,7 +6899,7 @@ E
   3
 AcDbVariableDictionary
 350
-10C
+10E
   0
 DICTIONARY
   5
@@ -7315,7 +7363,7 @@ Layout2
   0
 DICTIONARY
   5
-10C
+10E
 100
 AcDbDictionary
 281
@@ -7323,15 +7371,15 @@ AcDbDictionary
   3
 DIMASSOC
 350
-10E
+110
   3
 HIDETEXT
 350
-10D
+10F
   0
 DICTIONARYVAR
   5
-10D
+10F
 100
 DictionaryVariables
 280
@@ -7341,7 +7389,7 @@ DictionaryVariables
   0
 DICTIONARYVAR
   5
-10E
+110
 100
 DictionaryVariables
 280
