@@ -38,7 +38,7 @@ public class CSGEvaluatorTool implements ModellingTool
   { 
     KeystrokeManager.addRecord(new KeystrokeRecord(KeyEvent.VK_C, 0, "CSG Evaluator",
         "ModellingTool plugin = (ModellingTool)" +
-        "PluginRegistry.getPluginObject(\"at.metalab.artofillusion.CSGEvaluatorTool\");" +
+        "PluginRegistry.getPluginObject(\"org.reprap.artofillusion.CSGEvaluatorTool\");" +
         "plugin.commandSelected(window);"));
   }
 
