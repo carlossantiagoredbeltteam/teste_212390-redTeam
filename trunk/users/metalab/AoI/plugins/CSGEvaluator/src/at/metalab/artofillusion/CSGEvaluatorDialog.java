@@ -42,7 +42,7 @@ class CSGEvaluatorDialog extends BDialog
 
     bc.setDefaultLayout(new LayoutInfo());
 
-    String versionstr = "0.2";
+    String versionstr = "1.0";
     // FIXME: This was an attempt to pick up the version from the extensions.xml file,
     // but it didn't work out since the classloader found the wrong file.
     /*
@@ -74,9 +74,9 @@ class CSGEvaluatorDialog extends BDialog
       button.addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
       button.addEventLink(CommandEvent.class, engine, buttons[i]);
     }
-    BButton button = new BButton("test");
-    fc.add(button, 1, buttons.length);
-    button.addEventLink(CommandEvent.class, this, "test");
+//    BButton button = new BButton("test");
+//    fc.add(button, 1, buttons.length);
+//    button.addEventLink(CommandEvent.class, this, "test");
 
     // Close button
     BButton closeButton;

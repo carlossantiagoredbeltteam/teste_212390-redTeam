@@ -23,6 +23,7 @@ import artofillusion.keystroke.KeystrokeRecord;
  * TODO:
  * o How should we handle materials when combining objects?
  * o Idea: Don't hide negative object, but set them to transparent.
+ * o Make window dockable
  */
 public class CSGEvaluatorTool implements ModellingTool
 {
