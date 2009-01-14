@@ -174,7 +174,7 @@ class CSGEvaluatorEngine
   }
 
 
-
+  
 
   /*
       Recursively (Re-)evaluates the object tree rooted at the given root object
