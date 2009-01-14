@@ -1,4 +1,4 @@
-package at.metalab.artofillusion;
+package org.reprap.artofillusion;
 
 import artofillusion.Plugin;
 
