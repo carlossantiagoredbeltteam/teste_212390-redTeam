@@ -1,4 +1,4 @@
-package at.metalab.artofillusion;
+package org.reprap.artofillusion;
 
 import java.util.Collection;
 import java.util.Iterator;
