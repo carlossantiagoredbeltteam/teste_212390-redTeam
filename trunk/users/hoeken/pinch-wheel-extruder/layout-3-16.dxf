@@ -911,7 +911,7 @@ LAYER
 100
 AcDbSymbolTable
  70
-5
+6
   0
 LAYER
   5
@@ -1010,6 +1010,28 @@ AcDbSymbolTableRecord
 AcDbLayerTableRecord
   2
 Idler Wheel
+ 70
+0
+ 62
+7
+420
+0
+  6
+CONTINUOUS
+370
+0
+390
+F
+  0
+LAYER
+  5
+47
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
+Filament Guide Middle Honeycomb
  70
 0
  62
@@ -1349,7 +1371,7 @@ ENTITIES
   0
 CIRCLE
   5
-47
+48
 100
 AcDbEntity
 100
@@ -1373,7 +1395,7 @@ ByLayer
   0
 CIRCLE
   5
-48
+49
 100
 AcDbEntity
 100
@@ -1397,7 +1419,7 @@ ByLayer
   0
 CIRCLE
   5
-49
+4A
 100
 AcDbEntity
 100
@@ -1421,7 +1443,7 @@ ByLayer
   0
 CIRCLE
   5
-4A
+4B
 100
 AcDbEntity
 100
@@ -1445,7 +1467,7 @@ ByLayer
   0
 LINE
   5
-4B
+4C
 100
 AcDbEntity
 100
@@ -1473,7 +1495,7 @@ ByLayer
   0
 ARC
   5
-4C
+4D
 100
 AcDbEntity
   8
@@ -1503,7 +1525,7 @@ AcDbArc
   0
 LINE
   5
-4D
+4E
 100
 AcDbEntity
 100
@@ -1531,7 +1553,7 @@ ByLayer
   0
 ARC
   5
-4E
+4F
 100
 AcDbEntity
   8
@@ -1559,89 +1581,9 @@ AcDbArc
  51
 180.0
   0
-MTEXT
-  5
-4F
-100
-AcDbEntity
-100
-AcDbMText
-  8
-Filament Guide Middle Text
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-55.0
- 20
-69.1500000000000341
- 30
-0.0
- 40
-2.0
- 41
-100.0
- 71
-5
- 72
-2
-  1
-Filament\~Guide\~Middle
-  7
-standard
- 50
-0.0
- 73
-1
- 44
-1.0
-  0
-MTEXT
-  5
-50
-100
-AcDbEntity
-100
-AcDbMText
-  8
-Filament Guide Middle Text
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-18.0000000000000107
- 20
-60.1500000000000341
- 30
-0.0
- 40
-2.0
- 41
-100.0
- 71
-5
- 72
-2
-  1
-Filament\~Guide\PMiddle
-  7
-standard
- 50
-0.0
- 73
-1
- 44
-1.0
-  0
 CIRCLE
   5
-51
+50
 100
 AcDbEntity
 100
@@ -1665,7 +1607,7 @@ ByLayer
   0
 CIRCLE
   5
-52
+51
 100
 AcDbEntity
 100
@@ -1689,7 +1631,7 @@ ByLayer
   0
 LINE
   5
-53
+52
 100
 AcDbEntity
 100
@@ -1717,7 +1659,7 @@ ByLayer
   0
 LINE
   5
-54
+53
 100
 AcDbEntity
 100
@@ -1745,7 +1687,7 @@ ByLayer
   0
 LINE
   5
-55
+54
 100
 AcDbEntity
 100
@@ -1773,7 +1715,7 @@ ByLayer
   0
 LINE
   5
-56
+55
 100
 AcDbEntity
 100
@@ -1801,7 +1743,7 @@ ByLayer
   0
 LINE
   5
-57
+56
 100
 AcDbEntity
 100
@@ -1829,7 +1771,7 @@ ByLayer
   0
 LINE
   5
-58
+57
 100
 AcDbEntity
 100
@@ -1857,7 +1799,7 @@ ByLayer
   0
 LINE
   5
-59
+58
 100
 AcDbEntity
 100
@@ -1885,7 +1827,7 @@ ByLayer
   0
 LINE
   5
-5A
+59
 100
 AcDbEntity
 100
@@ -1913,7 +1855,7 @@ ByLayer
   0
 LINE
   5
-5B
+5A
 100
 AcDbEntity
 100
@@ -1941,7 +1883,7 @@ ByLayer
   0
 LINE
   5
-5C
+5B
 100
 AcDbEntity
 100
@@ -1969,7 +1911,7 @@ ByLayer
   0
 LINE
   5
-5D
+5C
 100
 AcDbEntity
 100
@@ -1997,7 +1939,7 @@ ByLayer
   0
 LINE
   5
-5E
+5D
 100
 AcDbEntity
 100
@@ -2025,7 +1967,7 @@ ByLayer
   0
 LINE
   5
-5F
+5E
 100
 AcDbEntity
 100
@@ -2053,7 +1995,7 @@ ByLayer
   0
 LINE
   5
-60
+5F
 100
 AcDbEntity
 100
@@ -2081,7 +2023,7 @@ ByLayer
   0
 LINE
   5
-61
+60
 100
 AcDbEntity
 100
@@ -2109,7 +2051,7 @@ ByLayer
   0
 LINE
   5
-62
+61
 100
 AcDbEntity
 100
@@ -2137,7 +2079,7 @@ ByLayer
   0
 LINE
   5
-63
+62
 100
 AcDbEntity
 100
@@ -2165,7 +2107,7 @@ ByLayer
   0
 LINE
   5
-64
+63
 100
 AcDbEntity
 100
@@ -2193,7 +2135,7 @@ ByLayer
   0
 LINE
   5
-65
+64
 100
 AcDbEntity
 100
@@ -2221,7 +2163,7 @@ ByLayer
   0
 LINE
   5
-66
+65
 100
 AcDbEntity
 100
@@ -2249,7 +2191,7 @@ ByLayer
   0
 LINE
   5
-67
+66
 100
 AcDbEntity
 100
@@ -2277,7 +2219,7 @@ ByLayer
   0
 LINE
   5
-68
+67
 100
 AcDbEntity
 100
@@ -2305,7 +2247,7 @@ ByLayer
   0
 LINE
   5
-69
+68
 100
 AcDbEntity
 100
@@ -2333,7 +2275,7 @@ ByLayer
   0
 LINE
   5
-6A
+69
 100
 AcDbEntity
 100
@@ -2361,7 +2303,7 @@ ByLayer
   0
 LINE
   5
-6B
+6A
 100
 AcDbEntity
 100
@@ -2389,7 +2331,7 @@ ByLayer
   0
 LINE
   5
-6C
+6B
 100
 AcDbEntity
 100
@@ -2417,7 +2359,7 @@ ByLayer
   0
 LINE
   5
-6D
+6C
 100
 AcDbEntity
 100
@@ -2445,7 +2387,7 @@ ByLayer
   0
 LINE
   5
-6E
+6D
 100
 AcDbEntity
 100
@@ -2471,155 +2413,9 @@ ByLayer
  31
 0.0
   0
-LINE
-  5
-6F
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Filament Guide Middle
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-29.3750000000000142
- 20
-77.25
- 30
-0.0
- 11
-29.3750000000000142
- 21
-42.3032982808340634
- 31
-0.0
-  0
 ARC
   5
-70
-100
-AcDbEntity
-  8
-Filament Guide Middle
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-25.0
- 20
-35.2499745962156084
- 30
-0.0
- 40
-8.3000000000000007
-100
-AcDbArc
- 50
-58.1897092727741381
- 51
-291.2786004774289381
-  0
-LINE
-  5
-71
-100
-AcDbEntity
-100
-AcDbLine
-  8
-Filament Guide Middle
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-29.3750000000000071
- 20
-26.5839850393329087
- 30
-0.0
- 11
-29.3749999999999893
- 21
-2.7500000000000071
- 31
-0.0
-  0
-ARC
-  5
-72
-100
-AcDbEntity
-  8
-Filament Guide Middle
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-28.3750000000000036
- 20
-26.5839850393329087
- 30
-0.0
- 40
-1.0
-100
-AcDbArc
- 50
-0.0
- 51
-111.2786004774291229
-  0
-ARC
-  5
-73
-100
-AcDbEntity
-  8
-Filament Guide Middle
- 62
-256
-370
--1
-  6
-ByLayer
-100
-AcDbCircle
- 10
-55.5
- 20
-35.2499745962155799
- 30
-0.0
- 40
-22.0
-100
-AcDbArc
- 50
-270.0
- 51
-90.0
-  0
-ARC
-  5
-74
+6E
 100
 AcDbEntity
   8
@@ -2649,7 +2445,7 @@ AcDbArc
   0
 LINE
   5
-75
+6F
 100
 AcDbEntity
 100
@@ -2677,7 +2473,7 @@ ByLayer
   0
 LINE
   5
-76
+70
 100
 AcDbEntity
 100
@@ -2705,7 +2501,7 @@ ByLayer
   0
 ARC
   5
-77
+71
 100
 AcDbEntity
   8
@@ -2735,7 +2531,7 @@ AcDbArc
   0
 ARC
   5
-78
+72
 100
 AcDbEntity
   8
@@ -2765,7 +2561,123 @@ AcDbArc
   0
 LINE
   5
-79
+73
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Filament Guide Middle
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+29.3750000000000142
+ 20
+77.25
+ 30
+0.0
+ 11
+29.3750000000000142
+ 21
+42.5375925197897757
+ 31
+0.0
+  0
+ARC
+  5
+74
+100
+AcDbEntity
+  8
+Filament Guide Middle
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+25.0
+ 20
+35.2499745962156084
+ 30
+0.0
+ 40
+8.5
+100
+AcDbArc
+ 50
+59.0222022193676281
+ 51
+290.8095735776764172
+  0
+LINE
+  5
+75
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Filament Guide Middle
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+29.3750000000000071
+ 20
+26.3696944767599106
+ 30
+0.0
+ 11
+29.3749999999999893
+ 21
+2.7500000000000071
+ 31
+0.0
+  0
+ARC
+  5
+76
+100
+AcDbEntity
+  8
+Filament Guide Middle
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+28.3750000000000071
+ 20
+26.3696944767599177
+ 30
+0.0
+ 40
+1.0
+100
+AcDbArc
+ 50
+0.0
+ 51
+110.809573577676602
+  0
+LINE
+  5
+77
 100
 AcDbEntity
 100
@@ -2785,15 +2697,15 @@ ByLayer
  30
 0.0
  11
-55.5
+53.5
  21
-57.2499745962155799
+57.249974596215587
  31
 0.0
   0
 LINE
   5
-7A
+78
 100
 AcDbEntity
 100
@@ -2807,9 +2719,9 @@ Filament Guide Middle
   6
 ByLayer
  10
-55.5
+53.4999999999999929
  20
-13.249974596215587
+13.2499745962155835
  30
 0.0
  11
@@ -2819,15 +2731,73 @@ ByLayer
  31
 0.0
   0
-MTEXT
+ARC
+  5
+79
+100
+AcDbEntity
+  8
+Filament Guide Middle
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+53.5
+ 20
+35.249974596215587
+ 30
+0.0
+ 40
+22.0
+100
+AcDbArc
+ 50
+270.0
+ 51
+90.0
+  0
+LINE
+  5
+7A
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Filament Guide Middle Honeycomb
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+16.4492247596125942
+ 20
+72.2500000000000284
+ 30
+0.0
+ 11
+24.3750000000000142
+ 21
+72.2500000000000284
+ 31
+0.0
+  0
+LINE
   5
 7B
 100
 AcDbEntity
 100
-AcDbMText
+AcDbLine
   8
-Idler Wheel Text
+Filament Guide Middle Honeycomb
  62
 256
 370
@@ -2835,13 +2805,591 @@ Idler Wheel Text
   6
 ByLayer
  10
-56.0
+24.3750000000000142
  20
-20.7500000000000142
+72.2500000000000284
+ 30
+0.0
+ 11
+24.3750000000000142
+ 21
+48.7354992430359886
+ 31
+0.0
+  0
+LINE
+  5
+7C
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Filament Guide Middle Honeycomb
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+5.0
+ 20
+68.0753834536241698
+ 30
+0.0
+ 11
+5.0
+ 21
+50.4399745962156061
+ 31
+0.0
+  0
+LINE
+  5
+7D
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Filament Guide Middle Honeycomb
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+10.2549881065517212
+ 20
+40.2499745962152247
+ 30
+0.0
+ 11
+12.4600637960155467
+ 21
+40.2499745962153384
+ 31
+0.0
+  0
+LINE
+  5
+7E
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Filament Guide Middle Honeycomb
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+10.254988106551707
+ 20
+30.2499745962156048
+ 30
+0.0
+ 11
+12.4600637960155467
+ 21
+30.2499745962155941
+ 31
+0.0
+  0
+LINE
+  5
+7F
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Filament Guide Middle Honeycomb
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+5.0
+ 20
+20.0599745962155858
+ 30
+0.0
+ 11
+5.0
+ 21
+11.8246165463758963
+ 31
+0.0
+  0
+LINE
+  5
+80
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Filament Guide Middle Honeycomb
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+24.375
+ 20
+21.764449949395221
+ 30
+0.0
+ 11
+24.375
+ 21
+14.1000000000000263
+ 31
+0.0
+  0
+LINE
+  5
+81
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Filament Guide Middle Honeycomb
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+37.6250000000000142
+ 20
+58.4121069462389855
+ 30
+0.0
+ 11
+37.6250000000000142
+ 21
+72.2500000000000284
+ 31
+0.0
+  0
+LINE
+  5
+82
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Filament Guide Middle Honeycomb
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+37.6250000000000142
+ 20
+72.2500000000000284
+ 30
+0.0
+ 11
+65.7007752403875287
+ 21
+72.2500000000000284
+ 31
+0.0
+  0
+LINE
+  5
+83
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Filament Guide Middle Honeycomb
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+75.0
+ 20
+66.3638095434042441
+ 30
+0.0
+ 11
+75.0
+ 21
+51.5824575672766699
+ 31
+0.0
+  0
+ARC
+  5
+84
+100
+AcDbEntity
+  8
+Filament Guide Middle Honeycomb
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+10.0000000000000107
+ 20
+72.1500000000000341
  30
 0.0
  40
-3.0
+6.4499999999999948
+100
+AcDbArc
+ 50
+219.1773936864241819
+ 51
+0.8883422500379582
+  0
+ARC
+  5
+85
+100
+AcDbEntity
+  8
+Filament Guide Middle Honeycomb
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+5.0
+ 20
+43.9899745962155748
+ 30
+0.0
+ 40
+6.4500000000000099
+100
+AcDbArc
+ 50
+324.560361221903861
+ 51
+90.0
+  0
+ARC
+  5
+86
+100
+AcDbEntity
+  8
+Filament Guide Middle Honeycomb
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+25.0
+ 20
+35.2499745962156084
+ 30
+0.0
+ 40
+13.5000000000000107
+100
+AcDbArc
+ 50
+92.6535308674057916
+ 51
+158.2615392084795189
+  0
+ARC
+  5
+87
+100
+AcDbEntity
+  8
+Filament Guide Middle Honeycomb
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+4.9999999999999929
+ 20
+26.5099745962156028
+ 30
+0.0
+ 40
+6.4500000000000011
+100
+AcDbArc
+ 50
+270.0
+ 51
+35.4396387780963877
+  0
+ARC
+  5
+88
+100
+AcDbEntity
+  8
+Filament Guide Middle Honeycomb
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+25.0
+ 20
+35.2499745962156084
+ 30
+0.0
+ 40
+13.5000000000000018
+100
+AcDbArc
+ 50
+201.7384607915204811
+ 51
+267.3464691325941658
+  0
+ARC
+  5
+89
+100
+AcDbEntity
+  8
+Filament Guide Middle Honeycomb
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+53.5
+ 20
+35.249974596215587
+ 30
+0.0
+ 40
+27.0000000000000036
+100
+AcDbArc
+ 50
+37.2221338960613224
+ 51
+90.0
+  0
+ARC
+  5
+8A
+100
+AcDbEntity
+  8
+Filament Guide Middle Honeycomb
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+51.5
+ 20
+35.2499745962155799
+ 30
+0.0
+ 40
+27.0
+100
+AcDbArc
+ 50
+90.0
+ 51
+120.92321565535525
+  0
+ARC
+  5
+8B
+100
+AcDbEntity
+  8
+Filament Guide Middle Honeycomb
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+72.1500000000000057
+ 20
+72.1500000000000199
+ 30
+0.0
+ 40
+6.4499999999998918
+100
+AcDbArc
+ 50
+179.1116577499624611
+ 51
+296.2226465049216131
+  0
+ARC
+  5
+8C
+100
+AcDbEntity
+  8
+Filament Guide Middle Honeycomb
+ 62
+256
+370
+-1
+  6
+ByLayer
+100
+AcDbCircle
+ 10
+9.9999999999999893
+ 20
+7.7500000000000284
+ 30
+0.0
+ 40
+6.4500000000000002
+100
+AcDbArc
+ 50
+79.8976949439641686
+ 51
+140.8226063135757045
+  0
+LINE
+  5
+8D
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Filament Guide Middle Honeycomb
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+24.375
+ 20
+14.1000000000000263
+ 30
+0.0
+ 11
+11.1313708498984703
+ 21
+14.1000000000000263
+ 31
+0.0
+  0
+LINE
+  5
+8E
+100
+AcDbEntity
+100
+AcDbLine
+  8
+Filament Guide Middle Honeycomb
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+51.5
+ 20
+62.249974596215587
+ 30
+0.0
+ 11
+53.5
+ 21
+62.2499745962155941
+ 31
+0.0
+  0
+MTEXT
+  5
+8F
+100
+AcDbEntity
+100
+AcDbMText
+  8
+Filament Guide Middle Text
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+53.0
+ 20
+74.7500000000000284
+ 30
+0.0
+ 40
+2.0
  41
 100.0
  71
@@ -2849,7 +3397,7 @@ ByLayer
  72
 2
   1
-Wheel
+Filament\~Guide\~Middle
   7
 standard
  50
@@ -2861,13 +3409,13 @@ standard
   0
 MTEXT
   5
-7C
+90
 100
 AcDbEntity
 100
 AcDbMText
   8
-Idler Wheel Text
+Filament Guide Middle Text
  62
 256
 370
@@ -2875,21 +3423,21 @@ Idler Wheel Text
   6
 ByLayer
  10
-56.0
+1.0
  20
-49.7500000000000142
+35.7500000000000284
  30
 0.0
  40
-3.0
+2.0
  41
 100.0
  71
-5
+4
  72
 2
   1
-Idler
+Filament\PGuide\PMiddle
   7
 standard
  50
@@ -2898,54 +3446,6 @@ standard
 1
  44
 1.0
-  0
-CIRCLE
-  5
-7D
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Idler Wheel
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-55.5
- 20
-35.2499745962155799
- 30
-0.0
- 40
-10.9499999999999993
-  0
-CIRCLE
-  5
-7E
-100
-AcDbEntity
-100
-AcDbCircle
-  8
-Idler Wheel
- 62
-256
-370
--1
-  6
-ByLayer
- 10
-55.5
- 20
-35.2499745962155799
- 30
-0.0
- 40
-20.5
   0
 ENDSEC
   0
@@ -2985,7 +3485,7 @@ E
   3
 AcDbVariableDictionary
 350
-7F
+91
   0
 DICTIONARY
   5
@@ -3449,7 +3949,7 @@ Layout2
   0
 DICTIONARY
   5
-7F
+91
 100
 AcDbDictionary
 281
@@ -3457,15 +3957,15 @@ AcDbDictionary
   3
 DIMASSOC
 350
-81
+93
   3
 HIDETEXT
 350
-80
+92
   0
 DICTIONARYVAR
   5
-80
+92
 100
 DictionaryVariables
 280
@@ -3475,7 +3975,7 @@ DictionaryVariables
   0
 DICTIONARYVAR
   5
-81
+93
 100
 DictionaryVariables
 280
