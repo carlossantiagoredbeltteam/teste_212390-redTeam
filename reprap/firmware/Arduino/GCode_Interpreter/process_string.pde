@@ -140,13 +140,11 @@ int parse_string(struct GcodeParser * gc, char instruction[], int size)
 	}
 }
 
+GcodeParser gc;	/* string parse result */
 
 //Read the string and execute instructions
 void process_string(char instruction[], int size)
 {
-
-	GcodeParser gc;	/* string parse result */
-
 	//the character / means delete block... used for comments and stuff.
 	if (instruction[0] == '/')
 	{
@@ -215,88 +213,19 @@ void process_string(char instruction[], int size)
 				//set our target.
 				set_target(fp.x, fp.y, fp.z);
 
-				// Use currently set feedrate if doing a G1
-				if (gc.G == 1)
-					feedrate_micros = calculate_feedrate_delay(feedrate);
-				// Use our max for G0
-				else
-					feedrate_micros = getMaxSpeed();
-
-				//finally move.
-				dda_move(feedrate_micros);
-				break;
-
-			//Clockwise arc
-			case 2:
-			//Counterclockwise arc
-			case 3:
-			{
-				FloatPoint cent;
-
-				// Centre coordinates are always relative
-				if (gc.seen & GCODE_I) cent.x = current_units.x + gc.I;
-				else cent.x = current_units.x;
-				if (gc.seen & GCODE_J) cent.y = current_units.y + gc.J;
-
-				float angleA, angleB, angle, radius, length, aX, aY, bX, bY;
-
-				aX = (current_units.x - cent.x);
-				aY = (current_units.y - cent.y);
-				bX = (fp.x - cent.x);
-				bY = (fp.y - cent.y);
-
-				// Clockwise
-				if (gc.G == 2)
+				//split up xy and z moves
+				if (delta_steps.z && (delta_steps.x || delta_steps.y))
 				{
-					angleA = atan2(bY, bX);
-					angleB = atan2(aY, aX);
-				}
-				// Counterclockwise
-				else
-				{
-					angleA = atan2(aY, aX);
-					angleB = atan2(bY, bX);
-				}
-
-				// Make sure angleB is always greater than angleA
-				// and if not add 2PI so that it is (this also takes
-				// care of the special case of angleA == angleB,
-				// ie we want a complete circle)
-				if (angleB <= angleA)
-					angleB += 2 * M_PI;
-				angle = angleB - angleA;
-
-				radius = sqrt(aX * aX + aY * aY);
-				length = radius * angle;
-				int steps, s, step;
-
-				// Maximum of either 2.4 times the angle in radians or the length of the curve divided by the constant specified in _init.pde
-				steps = (int) ceil(max(angle * 2.4, length / curve_section));
-
-				FloatPoint newPoint;
-				float arc_start_z = current_units.z;
-				for (s = 1; s <= steps; s++)
-				{
-					step = (gc.G == 3) ? s : steps - s; // Work backwards for CW
-					newPoint.x = cent.x + radius * cos(angleA + angle
-							* ((float) step / steps));
-					newPoint.y = cent.y + radius * sin(angleA + angle
-							* ((float) step / steps));
-					set_target(newPoint.x, newPoint.y, arc_start_z + (fp.z
-							- arc_start_z) * s / steps);
-
-					// Need to calculate rate for each section of curve
-					if (feedrate > 0)
-						feedrate_micros = calculate_feedrate_delay(feedrate);
-					else
-						feedrate_micros = getMaxSpeed();
-
-					// Make step
+					set_target(current_units.x, current_units.y, fp.z);
+					figure_feedrate(gc.G);
 					dda_move(feedrate_micros);
 				}
-			}
-			break;
-
+				
+				//do the last move
+				set_target(fp.x, fp.y, fp.z);
+				figure_feedrate(gc.G);
+				dda_move(feedrate_micros);
+				break;
 			
 			case 4: //Dwell
 				delay((int)(gc.P * 1000));
@@ -340,7 +269,7 @@ void process_string(char instruction[], int size)
 				set_target(0.0, 0.0, 0.0);
 				dda_move(getMaxSpeed());
 				break;
-
+/*
 			// Drilling canned cycles
 			case 81: // Without dwell
 			case 82: // With dwell
@@ -398,7 +327,7 @@ void process_string(char instruction[], int size)
 				} while (target_z > fp.z);
 			}
 			break;
-
+*/
 			
 			case 90: //Absolute Positioning
 				abs_mode = true;
@@ -558,4 +487,38 @@ int scan_int(char *str, int *valp, unsigned int *seen, unsigned int flag)
 		*valp = 0;
 
 	return len;	/* length of number */
+}
+
+void figure_feedrate(byte code)
+{
+	//do we have a set speed?
+	if (gc.seen & GCODE_G)
+	{
+		//adjust if we have a specific feedrate.
+		if (code == 1)
+		{
+			//how fast do we move?
+			feedrate = gc.F;
+			if (feedrate > 0)
+				feedrate_micros = calculate_feedrate_delay(feedrate);
+			//nope, no feedrate
+			else
+				feedrate_micros = getMaxSpeed();
+		}
+		//use our max for normal moves.
+		else
+			feedrate_micros = getMaxSpeed();
+	}
+	//nope, just coordinates!
+	else
+	{
+		//do we have a feedrate yet?
+		if (feedrate > 0)
+			feedrate_micros = calculate_feedrate_delay(feedrate);
+		//nope, no feedrate
+		else
+			feedrate_micros = getMaxSpeed();
+	}
+
+        feedrate_micros = max(feedrate_micros, getMaxSpeed());
 }
