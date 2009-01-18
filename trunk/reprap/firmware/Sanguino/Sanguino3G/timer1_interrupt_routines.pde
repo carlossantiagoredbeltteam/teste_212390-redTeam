@@ -94,7 +94,7 @@ byte getTimer1Resolution(unsigned long ticks)
 
 void setTimer1Ticks(unsigned long ticks)
 {
-	// ticks is the delay between interrupts in 4 microsecond ticks.
+	// ticks is the delay between interrupts in 62.5 nanosecond ticks.
 	//
 	// we break it into 5 different resolutions based on the delay. 
 	// then we set the resolution based on the size of the delay.
