@@ -1,5 +1,5 @@
 //initialize the firmware to deefault state.
-void initCommands()
+void init_commands()
 {
   commandBufferHead = 0;
   commandBufferTail = 0;
@@ -7,7 +7,7 @@ void initCommands()
   finishedCommands = 0;
 }
 
-void handleCommands()
+void handle_commands()
 {
   
 }

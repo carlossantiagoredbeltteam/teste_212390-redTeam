@@ -42,14 +42,14 @@ void setup()
 //this function takes us back to our default state.
 void initialize()
 {
-  initSerial();
-  initCommands();
-  initSteppers();
-  initTools();
+  init_serial();
+  init_commands();
+  init_steppers();
+  init_tools();
 }
 
 //start our hardware serial drivers
-void initSerial()
+void init_serial()
 {
    Serial.begin(38400);
    Serial1.begin(115200);
@@ -59,5 +59,5 @@ void initSerial()
 //handle various things we're required to do.
 void loop()
 {
-  handleCommands();
+  handle_commands();
 }
