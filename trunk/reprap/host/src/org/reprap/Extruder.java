@@ -418,4 +418,18 @@ public interface Extruder
 	 */
 	public String getMaterial();
 	
+	/**
+	 * The direction to hatch even-numbered layers in degrees anticlockwise
+	 * from the X axis
+	 * @return
+	 */
+	public double getEvenHatchDirection();
+
+	/**
+	 * The direction to hatch odd-numbered layers in degrees anticlockwise
+	 * from the X axis
+	 * @return
+	 */
+	public double getOddHatchDirection();
+	
 }

@@ -349,6 +349,7 @@ public class RrPolygon
 		int i = lc.getModelLayer() % size();
 		for(int j = 0; j < size(); j++)
 		{
+			//System.err.println("i, j and size(): " + i + ", " + j + ", " + size());
 			result.add(new Rr2Point(point(i))); 
 			i++;
 			if(i >= size())

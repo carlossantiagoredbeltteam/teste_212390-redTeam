@@ -285,6 +285,9 @@ public abstract class GenericExtruder implements Extruder
 	private double arcCompensationFactor;
 	private double arcShortSides;
 	
+	private double evenHatchDirection;
+	private double oddHatchDirection;
+	
 	/**
 	* Our printer object.
 	*/
@@ -358,7 +361,10 @@ public abstract class GenericExtruder implements Extruder
 			extrusionLastFoundationWidth = Preferences.loadGlobalDouble(prefName + "ExtrusionLastFoundationWidth(mm)");
 			separationFraction = Preferences.loadGlobalDouble(prefName + "SeparationFraction(0..1)");
 			arcCompensationFactor = Preferences.loadGlobalDouble(prefName + "ArcCompensationFactor(0..)");
-			arcShortSides = Preferences.loadGlobalDouble(prefName + "ArcShortSides(0..)");			
+			arcShortSides = Preferences.loadGlobalDouble(prefName + "ArcShortSides(0..)");
+			
+			evenHatchDirection = Preferences.loadGlobalDouble(prefName + "EvenHatchDirection(degrees)");
+			oddHatchDirection = Preferences.loadGlobalDouble(prefName + "OddHatchDirection(degrees)");			
 			
 			Color3f col = new Color3f((float)Preferences.loadGlobalDouble(prefName + "ColourR(0..1)"), 
 					(float)Preferences.loadGlobalDouble(prefName + "ColourG(0..1)"), 
@@ -951,6 +957,26 @@ public abstract class GenericExtruder implements Extruder
 	public double getArcShortSides()
 	{
 		return arcShortSides;
+	}
+	
+	/**
+	 * The direction to hatch even-numbered layers in degrees anticlockwise
+	 * from the X axis
+	 * @return
+	 */
+	public double getEvenHatchDirection()
+	{
+		return evenHatchDirection;
+	}
+
+	/**
+	 * The direction to hatch odd-numbered layers in degrees anticlockwise
+	 * from the X axis
+	 * @return
+	 */
+	public double getOddHatchDirection()
+	{
+		return oddHatchDirection;		
 	}
     
 }
