@@ -237,7 +237,7 @@ public class RrCSGPolygonList {
 //				width = e.getExtrusionFoundationWidth();
 //			else
 //				width = e.getExtrusionInfillWidth();
-			result.add(get(i).hatch(lc.getHatchDirection(), lc.getHatchWidth(e)));
+			result.add(get(i).hatch(lc.getHatchDirection(e), lc.getHatchWidth(e)));
 		}
 		return result;
 	}

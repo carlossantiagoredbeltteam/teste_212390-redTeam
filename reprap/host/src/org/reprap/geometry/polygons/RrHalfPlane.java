@@ -317,7 +317,6 @@ public class RrHalfPlane
 	 * duplicate parameter values if need be to ensure this,
 	 * or - if two are very close - delete one. 
 	 * @param p
-
 	 */
 	public void solidSet(RrCSGPolygon p)
 	{

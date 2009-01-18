@@ -115,7 +115,9 @@ public class TestMain
 		
 		pc = ppc.offset(-8);
 		ppc = RrCSG.difference(ppc, pc);
-		ppc = RrCSG.intersection(ppc, pceps);
+		RrCSG ppceps = ppc.offset(-0.001);
+		//ppc = RrCSG.intersection(ppc, ppceps);
+		//ppc = RrCSG.intersection(ppc, pceps);
 		//ppc = RrCSG.intersection(ppc, sceps);
 		
 		return new RrCSGPolygon(ppc, new 
@@ -126,6 +128,7 @@ public class TestMain
 	public static void rrCSGTest()
 	{
 		RrCSGPolygon cp = testPol();
+
 		//RrCSGPolygon cp = hex();
 		cp.divide(1.0e-6, 1.03);
 		
