@@ -17,10 +17,10 @@
 
 //we store all queueable commands in one big giant buffer.
 #define COMMAND_BUFFER_SIZE 2048
-byte commandBuffer[COMMAND_BUFFER_SIZE];
-unsigned int commandBufferHead = 0;
-unsigned int commandBufferTail = 0;
-unsigned int commandBufferSize = 0;
+#include "CircularBuffer.h"
+// Explicitly allocate memory at compile time for buffer.
+byte underlyingBuffer[COMMAND_BUFFER_SIZE];
+CircularBuffer commandBuffer(COMMAND_BUFFER_SIZE, underlyingBuffer);
 
 //how many queued commands have we processed?
 //this will be used to keep track of our current progress.
@@ -59,5 +59,6 @@ void init_serial()
 //handle various things we're required to do.
 void loop()
 {
+  process_packets();
   handle_commands();
 }
