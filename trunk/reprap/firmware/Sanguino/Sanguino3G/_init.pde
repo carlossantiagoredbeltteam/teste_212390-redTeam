@@ -5,20 +5,20 @@
 //
 // CHOOSE WHICH MOTHERBOARD YOU'RE USING:
 //
-//#define REPRAP_MOTHERBOARD_VERSION_1_0
+#define REPRAP_MOTHERBOARD_VERSION_1_0
 //#define REPRAP_MOTHERBOARD_VERSION_1_1
 
 //
 // CHOOSE WHICH FAMILY OF STEPPER DRIVER YOU'RE USING:
 //
 //#define STEPPER_DRIVER_VERSION_1_X
-//#define STEPPER_DRIVER_VERSION_2_X
+#define STEPPER_DRIVER_VERSION_2_X
 
 //
 // CHOOSE WHICH FAMILY OF OPTO ENDSTOP YOU'RE USING:
 //
 //#define OPTO_ENDSTOP_1_X
-//#define OPTO_ENDSTOP_2_X
+#define OPTO_ENDSTOP_2_X
 
 
 /****************************************************************************************
@@ -116,11 +116,13 @@
 ****************************************************************************************/
 
 #ifdef STEPPER_DRIVER_VERSION_1_X
-#define ENABLE_INVERTING 0
+#define STEPPER_ENABLE	1
+#define STEPPER_DISABLE	0
 #endif
 
 #ifdef STEPPER_DRIVER_VERSION_2_X
-#define ENABLE_INVERTING 1
+#define STEPPER_ENABLE	0
+#define STEPPER_DISABLE	1
 #endif
 
 /****************************************************************************************

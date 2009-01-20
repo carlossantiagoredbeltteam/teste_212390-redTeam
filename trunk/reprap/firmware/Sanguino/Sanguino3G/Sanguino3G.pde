@@ -18,13 +18,10 @@
 //we store all queueable commands in one big giant buffer.
 #define COMMAND_BUFFER_SIZE 2048
 #include "CircularBuffer.h"
+
 // Explicitly allocate memory at compile time for buffer.
 byte underlyingBuffer[COMMAND_BUFFER_SIZE];
 CircularBuffer commandBuffer(COMMAND_BUFFER_SIZE, underlyingBuffer);
-
-//how many queued commands have we processed?
-//this will be used to keep track of our current progress.
-unsigned long finishedCommands = 0;
 
 //set up our firmware for actual usage.
 void setup()

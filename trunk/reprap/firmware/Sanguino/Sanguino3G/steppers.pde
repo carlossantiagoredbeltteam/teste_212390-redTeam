@@ -29,7 +29,10 @@ LongPoint range_steps;
 //initialize our stepper drivers
 void init_steppers()
 {
-  //load the range from EEPROM?
+	//TODO: load the range from EEPROM?
+	
+	//prep timer 1 for handling DDA stuff.
+	setupTimer1Interrupt();
 
 	//initialize all our pins.
 	pinMode(X_STEP_PIN, OUTPUT);
@@ -60,9 +63,12 @@ void init_steppers()
 void prepare_dda()
 {
 	//enable our steppers
-	digitalWrite(X_ENABLE_PIN, HIGH);
-	digitalWrite(Y_ENABLE_PIN, HIGH);
-	digitalWrite(Z_ENABLE_PIN, HIGH);
+	if (delta_steps.x > 0)
+		digitalWrite(X_ENABLE_PIN, STEPPER_ENABLE);
+	if (delta_steps.y > 0)
+		digitalWrite(Y_ENABLE_PIN, STEPPER_ENABLE);
+	if (delta_steps.z > 0)
+		digitalWrite(Z_ENABLE_PIN, STEPPER_ENABLE);
 	
 	//figure out our deltas
 	max_delta = 0;
@@ -75,13 +81,15 @@ void prepare_dda()
 	z_counter = -max_delta/2;
 }
 
+//do a single step on our DDA line!
 void dda_step()
 {
-	//do a single step on our DDA line!
+	//check endstops, position, etc.
 	x_can_step = can_step(X_MIN_PIN, X_MAX_PIN, current_steps.x, target_steps.x, x_direction);
 	y_can_step = can_step(Y_MIN_PIN, Y_MAX_PIN, current_steps.y, target_steps.y, y_direction);
 	z_can_step = can_step(Z_MIN_PIN, Z_MAX_PIN, current_steps.z, target_steps.z, z_direction);
 
+	//increment our x counter, and take steps if required.
 	if (x_can_step)
 	{
 		x_counter += delta_steps.x;
@@ -98,6 +106,7 @@ void dda_step()
 		}
 	}
 
+	//increment our y counter, and take steps if required.
 	if (y_can_step)
 	{
 		y_counter += delta_steps.y;
@@ -114,6 +123,7 @@ void dda_step()
 		}
 	}
 	
+	//increment our z counter, and take steps if required.
 	if (z_can_step)
 	{
 		z_counter += delta_steps.z;
@@ -153,6 +163,7 @@ bool can_step(byte min_pin, byte max_pin, long current, long target, byte direct
 	return true;
 }
 
+//actually send a step signal.
 void do_step(byte step_pin)
 {
 	digitalWrite(step_pin, HIGH);
@@ -160,15 +171,17 @@ void do_step(byte step_pin)
 	digitalWrite(step_pin, LOW);
 }
 
+//figure out if we're at a switch or not
 bool read_switch(byte pin)
 {
 	//dual read as crude debounce
-	if ( SENSORS_INVERTING )
+	if (SENSORS_INVERTING)
 		return !digitalRead(pin) && !digitalRead(pin);
 	else
 		return digitalRead(pin) && digitalRead(pin);
 }
 
+//prepare our deltas and such for our DDA action
 void calculate_deltas()
 {
 	//figure our deltas.
@@ -187,11 +200,12 @@ void calculate_deltas()
 	digitalWrite(Z_DIR_PIN, z_direction);
 }
 
+//turn off steppers to save juice / keep things cool.
 void disable_steppers()
 {
 	//disable our steppers
-	digitalWrite(X_ENABLE_PIN, LOW);
-	digitalWrite(Y_ENABLE_PIN, LOW);
-	digitalWrite(Z_ENABLE_PIN, LOW);
+	digitalWrite(X_ENABLE_PIN, STEPPER_DISABLE);
+	digitalWrite(Y_ENABLE_PIN, STEPPER_DISABLE);
+	digitalWrite(Z_ENABLE_PIN, STEPPER_DISABLE);
 }
 
