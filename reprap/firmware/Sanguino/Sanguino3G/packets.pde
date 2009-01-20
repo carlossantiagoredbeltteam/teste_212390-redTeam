@@ -47,8 +47,15 @@ bool process_packet_byte(byte b)
     {
       //update our status and response code.
       packet_state = PS_LEN;
-      response_packet_code = RC_OK;
+      packet_target_len = 0;
+      packet_len = 0;
       packet_crc = 0;
+
+      //init our response packet as well.
+      response_packet_len = 0;
+      response_packet_code = RC_OK;
+      response_packet_crc = 0;
+
       is_command_packet = false;
     }
     else
@@ -151,6 +158,20 @@ void process_packets()
 			break;		
 		}
 	}
+}
+
+//add a byte to our reply.
+void add_reply_byte(byte b)
+{
+  //only add it if it will fit.
+  if (response_packet_len < MAX_PACKET_LENGTH)
+  {
+    response_packet_data[response_packet_len] = b;
+    response_packet_len++;
+    return true;
+  }
+  
+  return false;
 }
 
 //send a response back to the host.
