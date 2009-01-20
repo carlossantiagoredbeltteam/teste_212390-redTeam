@@ -1,11 +1,18 @@
-
+/*
+ * Sketch to read and print the file
+ * "PRINT00.TXT" created by printExample.pde or
+ * "WRITE00.TXT" created by writeExample.pde
+ */
+#include "Fat16.h"
+#include "SdCard.h"
 #include "parameters.h"
 #include "pins.h"
 #include "extruder.h"
-#include "i2c_lcd.h"
+
+SdCard card;
+Fat16 file;
 
 //our command string
-#define COMMAND_SIZE 128
 char word[COMMAND_SIZE];
 char c = '?';
 byte serial_count = 0;
@@ -77,14 +84,34 @@ void init_process_string()
         comment = false;
 }
 
+
+void error(char *str)
+{
+  Serial.print("error: ");
+  Serial.println(str);
+  while(1);
+}
 // Get a command and process it
 
 void get_and_do_command()
 {
-	//read in characters if we got them.
-	if (Serial.available())
-	{
-		c = Serial.read();
+ // initialize the SD card
+  if (!card.init()) error("card.init");
+  
+  // initialize a FAT16 volume
+  // try partition one
+  if (!Fat16::init(card, 1)) {
+    // try super floppy format
+    if (!Fat16::init(card, 0)) error("Fat16.init");
+  }
+  
+  // open a file
+  if (!file.open("TEST000.TXT")) {
+    // try the other file
+    if (!file.open("WRITE00.TXT")) error("file.open");
+  }	
+		uint16_t c;
+  while ((c = file.read()) >= 0) ;
                 if(c == '\r')
                   c = '\n';
                 // Throw away control chars except \n
@@ -104,7 +131,7 @@ void get_and_do_command()
 		  }
 
                 }
-	}
+	
 
         // Data runaway?
         if(serial_count >= COMMAND_SIZE)
@@ -151,9 +178,6 @@ int last_gcode_g = -1;
 #define GCODE_S	(1<<10)
 #define GCODE_Q	(1<<11)
 #define GCODE_R	(1<<12)
-
-#define TYPE_INT 1
-#define TYPE_FLOAT 2
 
 
 #define PARSE_INT(ch, str, len, val, seen, flag) \

@@ -49,12 +49,12 @@
 *
 ****************************************************************************************/
 
-#define X_STEP_PIN (byte)2
+#define X_STEP_PIN (byte)2  
 #define X_DIR_PIN (byte)3
 #define X_MIN_PIN (byte)4
 #define X_MAX_PIN (byte)9
 
-#define Y_STEP_PIN (byte)10
+#define Y_STEP_PIN (byte)10 
 #define Y_DIR_PIN (byte)7
 #define Y_MIN_PIN (byte)8
 #define Y_MAX_PIN (byte)13
