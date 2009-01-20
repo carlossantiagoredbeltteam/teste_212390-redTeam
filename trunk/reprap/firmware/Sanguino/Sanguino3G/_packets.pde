@@ -161,7 +161,7 @@ void process_packets()
 }
 
 //add a byte to our reply.
-void add_reply_byte(byte b)
+bool add_reply_byte(byte b)
 {
   //only add it if it will fit.
   if (response_packet_len < MAX_PACKET_LENGTH)
