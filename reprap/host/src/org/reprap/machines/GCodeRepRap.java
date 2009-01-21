@@ -234,7 +234,7 @@ public class GCodeRepRap extends GenericRepRap {
 	 */
 	public void dispose() {
 		// TODO: fix this to be more flexible
-		
+		gcode.startingEpilogue();
 		try
 		{
 			// Fan off
@@ -250,6 +250,7 @@ public class GCodeRepRap extends GenericRepRap {
 		}
 		//write/close our file/serial port
 		gcode.finish();
+		gcode.reverseLayers();
 		super.dispose();
 	}
 
@@ -371,6 +372,8 @@ public class GCodeRepRap extends GenericRepRap {
 	 */
 	public void machineWait(double milliseconds)
 	{
+		if(milliseconds <= 0)
+			return;
 		delay((long)milliseconds);
 	}
 	
@@ -407,9 +410,9 @@ public class GCodeRepRap extends GenericRepRap {
 	 * Set an output file
 	 * @return
 	 */
-	public String setGCodeFileForOutput()
+	public String setGCodeFileForOutput(boolean topDown)
 	{
-		return gcode.setGCodeFileForOutput();
+		return gcode.setGCodeFileForOutput(topDown);
 	}
 	
 	/**
@@ -440,9 +443,16 @@ public class GCodeRepRap extends GenericRepRap {
 		gcode.resume();
 	}
 	
+	public void startingLayer(LayerRules lc) throws Exception
+	{
+		gcode.startingLayer(lc);
+		gcode.queue(";#!LAYER: " + (lc.getMachineLayer() + 1) + "/" + lc.getMachineLayerMax());		
+		super.startingLayer(lc);
+	}
+	
 	public void finishedLayer(LayerRules lc) throws Exception
 	{
 		super.finishedLayer(lc);
-		gcode.queue(";#!LAYER: " + lc.getMachineLayer() + "/" + lc.getMachineLayerMax());
+		gcode.finishedLayer();
 	}
 }

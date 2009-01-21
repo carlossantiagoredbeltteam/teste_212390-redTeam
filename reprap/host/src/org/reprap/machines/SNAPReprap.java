@@ -13,6 +13,7 @@ import org.reprap.devices.pseudo.LinePrinter;
 import org.reprap.gui.CalibrateZAxis;
 import org.reprap.Extruder;
 import org.reprap.utilities.Debug;
+import org.reprap.geometry.LayerRules;
 
 /**
  * 
@@ -471,6 +472,8 @@ public class SNAPReprap extends GenericRepRap
 	 */
 	public void machineWait(double milliseconds)
 	{
+		if(milliseconds <= 0)
+			return;
 		try {
 			Thread.sleep((long)milliseconds);
 		} catch (InterruptedException e) {
@@ -504,7 +507,7 @@ public class SNAPReprap extends GenericRepRap
 	 * Set an output file
 	 * @return
 	 */
-	public String setGCodeFileForOutput()
+	public String setGCodeFileForOutput(boolean topDown)
 	{
 		System.err.println("SNAP RepRap: cannot generate GCode file.");
 		return null;		

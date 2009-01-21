@@ -22,6 +22,7 @@ import org.reprap.utilities.Debug;
 import org.reprap.utilities.ExtensionFileFilter;
 import org.reprap.Main;
 import org.reprap.Preferences;
+import org.reprap.geometry.LayerRules;
 
 public class GCodeReaderAndWriter
 {
@@ -55,6 +56,36 @@ public class GCodeReaderAndWriter
 	 */
 	private InputStream serialInStream = null;
 	
+	/**
+	 * The root file name for output (without ".gcode" on the end)
+	 */
+	private String opFileName;
+	
+	/**
+	 * List of file names - used to reverse layer order when layers are done top-down
+	 */
+	private String[] opFileArray;
+	
+	/**
+	 * Index into opFileArray
+	 */
+	private int opFileIndex;
+	
+	/**
+	 * How does the first file name in a multiple set end?
+	 */
+	private static final String gcodeExtension = ".gcode";
+	
+	/**
+	 * How does the first file name in a multiple set end?
+	 */
+	private static final String firstEnding = "_prologue";
+	
+	/**
+	 * How does the last file name in a multiple set end?
+	 */
+	private static final String lastEnding = "_epilogue";
+		
 	/**
 	 * This is used for file input
 	 */
@@ -615,38 +646,7 @@ public class GCodeReaderAndWriter
         return;
 	}
 	
-	public String setGCodeFileForOutput()
-	{
-		JFileChooser chooser = new JFileChooser();
-		FileFilter filter;
-		filter = new ExtensionFileFilter("G Code file to write to", new String[] { "gcode" });
-		chooser.setFileFilter(filter);
-		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		//chooser.setCurrentDirectory();
 
-		int result = chooser.showSaveDialog(null);
-		if (result == JFileChooser.APPROVE_OPTION)
-		{
-			String name = chooser.getSelectedFile().getAbsolutePath();
-
-			try
-			{
-				Debug.d("opening: " + name);
-				FileOutputStream fileStream = new FileOutputStream(name);
-				fileOutStream = new PrintStream(fileStream);
-				return chooser.getSelectedFile().getName();
-			} catch (FileNotFoundException e) 
-			{
-				System.err.println("Can't write to file '" + name);
-				fileOutStream = null;
-			}
-		}
-		else
-		{
-			fileOutStream = null;
-		}
-		return null;
-	}
 	
 	public String loadGCodeFileForMaking()
 	{
@@ -680,5 +680,144 @@ public class GCodeReaderAndWriter
 		}
 
 		return null;
+	}
+	
+	public String setGCodeFileForOutput(boolean topDown)
+	{
+		JFileChooser chooser = new JFileChooser();
+		FileFilter filter;
+		filter = new ExtensionFileFilter("G Code file to write to", new String[] { "gcode" });
+		chooser.setFileFilter(filter);
+		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+		opFileName = null;
+		opFileArray = null;
+		opFileIndex = -1;
+		int result = chooser.showSaveDialog(null);
+		if (result == JFileChooser.APPROVE_OPTION)
+		{
+			opFileName = chooser.getSelectedFile().getAbsolutePath();
+			if(opFileName.endsWith(gcodeExtension))
+				opFileName = opFileName.substring(0, opFileName.length() - 6);
+
+			try
+			{
+				String fn = opFileName;
+				if(topDown)
+				{
+					opFileIndex = 0;
+					fn += firstEnding;
+				}
+				fn += gcodeExtension;
+				
+				Debug.d("opening: " + fn);
+				FileOutputStream fileStream = new FileOutputStream(fn);
+				fileOutStream = new PrintStream(fileStream);
+				String shortName = chooser.getSelectedFile().getName();
+				if(!shortName.endsWith(gcodeExtension))
+					shortName += gcodeExtension;
+				return shortName;
+			} catch (FileNotFoundException e) 
+			{
+				opFileArray = null;
+				opFileIndex = -1;
+				System.err.println("Can't write to file '" + opFileName);
+				opFileName = null;
+				fileOutStream = null;
+			}
+		}
+		else
+		{
+			fileOutStream = null;
+		}
+		return null;
+	}
+	
+	public void startingLayer(LayerRules lc)
+	{
+		if(opFileIndex < 0)
+			return;
+		
+		if(opFileArray == null)
+		{
+			if(lc.getTopDown())
+			{
+				opFileIndex = 0;
+				opFileArray = new String[lc.getMachineLayerMax() + 2];
+				opFileArray[opFileIndex] = opFileName + firstEnding + gcodeExtension;
+				opFileIndex++;
+			}
+		}
+		
+		opFileArray[opFileIndex] = opFileName + lc.getMachineLayer() + gcodeExtension;
+		try
+		{
+			FileOutputStream fileStream = new FileOutputStream(opFileArray[opFileIndex]);
+			fileOutStream = new PrintStream(fileStream);
+		} catch (Exception e)
+		{
+			System.err.println("Can't write to file " + opFileArray[opFileIndex]);
+		}
+	}
+	
+	public void startingEpilogue()
+	{
+		if(opFileArray == null)
+			return;
+		opFileArray[opFileIndex] = opFileName + lastEnding + gcodeExtension;
+		try
+		{
+			FileOutputStream fileStream = new FileOutputStream(opFileArray[opFileIndex]);
+			fileOutStream = new PrintStream(fileStream);
+		} catch (Exception e)
+		{
+			System.err.println("Can't write to file " + opFileArray[opFileIndex]);
+		}
+	}
+	
+	public void finishedLayer()
+	{
+		if(opFileArray == null)
+			return;
+		fileOutStream.close();
+		opFileIndex++;
+	}
+	
+	private void copyFile(PrintStream ps, String ip)
+	{
+		String line;
+		try 
+		{
+			fileInStream = new BufferedReader(new FileReader(ip));
+				
+			while ((line = fileInStream.readLine()) != null) 
+				ps.println(line);
+
+			fileInStream.close();
+			fileInStream = null;
+		} catch (Exception e) 
+		{  
+			System.err.println("Error copying file: " + e.toString());
+		}		
+	}
+	
+	public void reverseLayers()
+	{
+		if(opFileArray == null)
+			return;
+		try
+		{
+			FileOutputStream fileStream = new FileOutputStream(opFileName + gcodeExtension);
+			fileOutStream = new PrintStream(fileStream);
+		} catch (Exception e)
+		{
+			System.err.println("Can't write to file " + opFileName + gcodeExtension);
+		}
+		copyFile(fileOutStream, opFileArray[0]);
+		for(int i = opFileIndex - 1; i > 0; i--)
+			copyFile(fileOutStream, opFileArray[i]);
+		copyFile(fileOutStream, opFileArray[opFileIndex]);
+		fileOutStream.close();
+		fileOutStream = null;
 	}
 }

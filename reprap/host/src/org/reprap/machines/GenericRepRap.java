@@ -133,7 +133,6 @@ public abstract class GenericRepRap implements CartesianPrinter
 	
 	private int foundationLayers = 0;
 
-	
 	/**
 	 * Stepper motors for the 3 axis 
 	 */
@@ -143,8 +142,9 @@ public abstract class GenericRepRap implements CartesianPrinter
 	
 	public GenericRepRap() throws Exception
 	{
+
 		startTime = System.currentTimeMillis();
-		
+		startCooling = -1;
 		statusWindow = new StatusMessage(new JFrame());
 		
 		//load extruder prefs
@@ -244,6 +244,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 */
 	public void terminate() throws Exception
 	{
+		moveTo(0.5, 0.5, getZ(), true, true);
 		extruders[extruder].setMotor(false);
 		extruders[extruder].setValve(false);
 		extruders[extruder].setTemperature(0);
@@ -708,22 +709,17 @@ public abstract class GenericRepRap implements CartesianPrinter
 	
 	/**
 	 * Just finished a layer
-	 * @param layerNumber
+	 * @param lc
 	 */
 	public void finishedLayer(LayerRules lc) throws Exception
 	{
-		double datumX = getExtruder().getNozzleWipeDatumX();
-		double datumY = getExtruder().getNozzleWipeDatumY();
-//		double strokeX = getExtruder().getNozzleWipeStrokeX();
-//		double strokeY = getExtruder().getNozzleWipeStrokeY();
 		double coolTime = getExtruder().getCoolingPeriod();
 		
 		startCooling = -1;
 		
-		if(coolTime > 0 && (lc.getMachineLayer() != 0)) {
+		if(coolTime > 0 && !lc.notStartedYet()) {
 			getExtruder().setCooler(true);
 			Debug.d("Start of cooling period");
-			//setSpeed(getFastSpeed());
 			setFeedrate(getFastFeedrateXY());
 			
 			// Go home. Seek (0,0) then callibrate X first
@@ -731,45 +727,17 @@ public abstract class GenericRepRap implements CartesianPrinter
 			homeToZeroY();
 			startCooling = Timer.elapsed();
 		}
-		
-		// If wiping, nudge the clearer blade
-		if (getExtruder().getNozzleWipeEnabled())
-		{
 
-			// Now hunt down the wiper.
-			moveTo(datumX, datumY, currentZ, false, false);
-
-			
-			//setSpeed(getExtruder().getXYSpeed());
-			//setFeedrate(getExtruder().getXYFeedrate());
-			
-			//moveTo(datumX + strokeX, datumY+strokeY, currentZ, false, false);
-			//moveTo(datumX, datumY, currentZ, false, false);
-		}
 	}
 	
 	/**
 	 * Deals with all the actions that need to be done between one layer
 	 * and the next.
+	 * THIS FUNCTION MUST NOT MAKE THE REPRAP MACHINE DO ANYTHING (LIKE MOVE).
+	 * @param lc
 	 */
 	public void betweenLayers(LayerRules lc) throws Exception
 	{
-//		double clearTime = getExtruder().getNozzleClearTime();
-				
-		// Do half the extrusion between layers now
-		
-//		if (getExtruder().getNozzleWipeEnabled())
-//		{
-//			if(clearTime > 0)
-//			{
-//				getExtruder().setValve(true);
-//				getExtruder().setMotor(true);
-//				machineWait(500*clearTime);
-//				getExtruder().setMotor(false);
-//				getExtruder().setValve(false);
-//			}
-//		}
-		
 		// Now is a good time to garbage collect
 		
 		System.gc();
@@ -777,7 +745,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	
 	/**
 	 * Just about to start the next layer
-	 * @param layerNumber
+	 * @param lc
 	 */
 	public void startingLayer(LayerRules lc) throws Exception
 	{
@@ -794,6 +762,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		if(isCancelled())
 		{
 			getExtruder().setCooler(false);
+			getExtruder().stopExtruding(); // Shouldn't be needed, but no harm
 			return;
 		}
 		// Cooling period
@@ -808,9 +777,10 @@ public abstract class GenericRepRap implements CartesianPrinter
 		
 		// Wait the remainder of the cooling period
 		
-		if(coolTime > cool && (lc.getMachineLayer() != 0))
+		if(startCooling >= 0)
 		{	
 			cool = coolTime - cool;
+			// NB - if cool is -ve macineWait will return immediately
 			machineWait(1000*cool);
 		}
 		// Fan off
@@ -819,7 +789,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		
 		// If we were cooling, wait for warm-up
 		
-		if(coolTime > 0 && (lc.getMachineLayer() != 0))
+		if(startCooling >= 0)
 		{
 			machineWait(200 * coolTime);			
 			Debug.d("End of cooling period");			
@@ -828,8 +798,13 @@ public abstract class GenericRepRap implements CartesianPrinter
 		// Do the clearing extrude then
 		// Wipe the nozzle on the doctor blade
 
-		if (getExtruder().getNozzleWipeEnabled())
+		if(getExtruder().getNozzleWipeEnabled())
 		{
+			setFeedrate(getExtruder().getOutlineFeedrate());
+			
+			// Now hunt down the wiper.
+			moveTo(datumX, datumY, currentZ, false, false);
+			
 			if(clearTime > 0)
 			{
 				getExtruder().setValve(true);
@@ -839,14 +814,12 @@ public abstract class GenericRepRap implements CartesianPrinter
 				getExtruder().setValve(false);
 				machineWait(1000*waitTime);
 			}
-			//setSpeed(LinePrinter.speedFix(getExtruder().getXYSpeed(), 
-			//		getExtruder().getOutlineSpeed(lc)));
-			//setFeedrate(getExtruder().getOutlineFeedrate());
+
 			moveTo(datumX, datumY + strokeY, currentZ, false, false);
 		}
 		
 		setFeedrate(getFastFeedrateXY());
-		//setSpeed(getFastSpeed());
+
 	}
 
 	
@@ -1075,4 +1048,6 @@ public abstract class GenericRepRap implements CartesianPrinter
 	public void resume()
 	{
 	}
+	
+
 }
