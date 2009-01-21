@@ -65,7 +65,10 @@ import javax.media.j3d.Group;
 import javax.media.j3d.SceneGraphObject;
 import javax.media.j3d.Shape3D;
 import javax.media.j3d.Transform3D;
+import javax.media.j3d.Bounds;
+import javax.media.j3d.BoundingBox;
 import javax.vecmath.Point3d;
+import javax.vecmath.Vector3d;
 import javax.vecmath.Tuple3d;
 
 import com.sun.j3d.utils.geometry.GeometryInfo;
@@ -647,6 +650,40 @@ public class STLSlice
 	{
 		return box;
 	}
+	
+	public RrRectangle ObjectPlanRectangle()
+	{
+		BoundingBox r = null;
+		
+		for(int mat = 0; mat < mls.getExtruderCount(); mat++)
+		{
+			ArrayList<AandT> aats = mls.getAandTs(mat);
+
+			if(aats.size() > 0)
+			{
+				for(int obj = 0; obj < aats.size(); obj++)
+				{
+					AandT aat = aats.get(obj);
+					Transform3D trans = aat.trans;
+					Attributes attr = aat.att;
+					BranchGroup bg = attr.getPart();
+					Bounds bd = bg.getBounds();
+					bd.transform(trans);
+					BoundingBox bx = new BoundingBox(bd);
+					if(r == null)
+						r = bx;
+					else
+						r.combine(bx);
+				}
+			}
+		}
+		Point3d p1 = new Point3d();
+		r.getLower(p1); 
+		Point3d p2 = new Point3d();
+		r.getUpper(p2);
+		return new RrRectangle(new Rr2Point(p1.x, p1.y), new Rr2Point(p2.x, p2.y));
+	}
+
 	
 	/**
 	 * @return the edges of the STL slice

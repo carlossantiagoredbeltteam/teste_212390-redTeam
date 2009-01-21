@@ -78,16 +78,29 @@ public class LayerRules
 	 */
 	private boolean topDown = false;
 	
+	/**
+	 * This is true until it is first read, when it becomes false
+	 */
+	private boolean notStartedYet;
+	
+	/**
+	 * 
+	 * @param p
+	 * @param modZMax
+	 * @param macZMax
+	 * @param modLMax
+	 * @param macLMax
+	 * @param found
+	 */
 	public LayerRules(Printer p, double modZMax, double macZMax,
 			int modLMax, int macLMax, boolean found)
 	{
-		try
-		{
-			topDown = Preferences.loadGlobalBool("PlanFromTopDown");
-		} catch (Exception e)
-		{
-			topDown = false;
-		}
+		printer = p;
+		
+		notStartedYet = true;
+
+		topDown = false;
+
 		modelZMax = modZMax;
 		machineZMax = macZMax;
 		modelLayerMax = modLMax;
@@ -106,7 +119,7 @@ public class LayerRules
 			machineLayer = 0;			
 		}
 		addToStep = 0;
-		printer = p;
+
 		layingSupport = found;
 		Extruder[] es = printer.getExtruders();
 		zStep = es[0].getExtrusionHeight();
@@ -147,6 +160,16 @@ public class LayerRules
 	public double getMachineZMAx() { return machineZMax; }
 	
 	public double getZStep() { return zStep; }
+	
+	public boolean notStartedYet()
+	{
+		if(notStartedYet)
+		{
+			notStartedYet = false;
+			return true;
+		}
+		return false;
+	}
 	
 	
 	public void setLayingSupport(boolean lf) { layingSupport = lf; }
@@ -273,6 +296,6 @@ public class LayerRules
 		}
 		addToStep = 0;
 		stepMachine(e);
-	}	
+	}
 	
 }

@@ -382,7 +382,7 @@ public interface Printer {
 	 * Set an output file
 	 * @return
 	 */
-	public String setGCodeFileForOutput();
+	public String setGCodeFileForOutput(boolean topDown);
 	
 	/**
 	 * If a file replay is being done, do it and return true

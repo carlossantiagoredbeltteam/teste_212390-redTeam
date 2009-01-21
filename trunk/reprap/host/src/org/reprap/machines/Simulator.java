@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.reprap.Extruder;
 import org.reprap.devices.NullStepperMotor;
 import org.reprap.devices.NullExtruder;
+import org.reprap.geometry.LayerRules;
 
 /**
  *
@@ -110,7 +111,7 @@ public class Simulator extends GenericRepRap {
 	 * Set an output file
 	 * @return
 	 */
-	public String setGCodeFileForOutput()
+	public String setGCodeFileForOutput(boolean topDown)
 	{
 		System.err.println("Simulator: cannot generate GCode file.");
 		return null;		
