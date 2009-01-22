@@ -68,7 +68,6 @@ import javax.media.j3d.Transform3D;
 import javax.media.j3d.Bounds;
 import javax.media.j3d.BoundingBox;
 import javax.vecmath.Point3d;
-import javax.vecmath.Vector3d;
 import javax.vecmath.Tuple3d;
 
 import com.sun.j3d.utils.geometry.GeometryInfo;
