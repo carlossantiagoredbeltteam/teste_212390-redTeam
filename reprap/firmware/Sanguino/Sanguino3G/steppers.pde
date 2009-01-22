@@ -1,30 +1,3 @@
-//init our variables
-volatile long max_delta;
-
-volatile long x_counter;
-volatile bool x_can_step;
-volatile bool x_direction;
-
-volatile long y_counter;
-volatile bool y_can_step;
-volatile bool y_direction;
-
-volatile long z_counter;
-volatile bool z_can_step;
-volatile bool z_direction;
-
-//our position tracking variables
-volatile LongPoint current_steps;
-volatile LongPoint target_steps;
-volatile LongPoint delta_steps;
-volatile LongPoint range_steps;
-
-//our point queue variables
-#define POINT_QUEUE_SIZE 32
-#define POINT_SIZE 9
-byte rawPointBuffer[POINT_QUEUE_SIZE * POINT_SIZE];
-CircularBuffer pointBuffer(POINT_QUEUE_SIZE * POINT_SIZE, rawPointBuffer);
-
 //initialize our stepper drivers
 void init_steppers()
 {
@@ -66,14 +39,9 @@ void init_steppers()
 //prepare our variables for a bresenham DDA run.
 void prepare_dda()
 {
-	//enable our steppers
-	if (delta_steps.x > 0)
-		digitalWrite(X_ENABLE_PIN, STEPPER_ENABLE);
-	if (delta_steps.y > 0)
-		digitalWrite(Y_ENABLE_PIN, STEPPER_ENABLE);
-	if (delta_steps.z > 0)
-		digitalWrite(Z_ENABLE_PIN, STEPPER_ENABLE);
-	
+	//enable our steppers if needed.
+	enable_steppers();
+		
 	//figure out our deltas
 	max_delta = 0;
 	max_delta = max(delta_steps.x, delta_steps.y);
@@ -147,12 +115,38 @@ inline void dda_step()
 	//we're either at our target, or we're stuck.
 	if (!x_can_step && !y_can_step && !z_can_step)
 	{
-		//grab next point?
-		if (pointBuffer.size() >= POINT_SIZE)
-		{
-			
-		}
+		//set us to be at our target.
+		current_steps.x = target_steps.x;
+		current_steps.y = target_steps.y;
+		current_steps.z = target_steps.z;
+		
+		//where to next, boss?
+		grab_next_point();
 	}
+}
+
+void grab_next_point()
+{
+  //can we even step to this?
+  if (pointBuffer.size() >= POINT_SIZE)
+  {
+    //make it so we dont interrupt ourself.
+    disableTimer1Interrupt();
+  	
+  	//grab our new target
+  	target_steps.x += make_uint16_t(pointBuffer.remove(), pointBuffer.remove());
+  	target_steps.y += make_uint16_t(pointBuffer.remove(), pointBuffer.remove());
+  	target_steps.z += make_uint16_t(pointBuffer.remove(), pointBuffer.remove());
+  
+  	//figure out stuff for the move.
+    calculate_deltas();
+    prepare_dda();
+    
+    //start the move!
+    setTimer1Resolution(pointBuffer.remove());
+    setTimer1Ceiling(make_uint16_t(pointBuffer.remove(), pointBuffer.remove()));
+    enableTimer1Interrupt();
+  }
 }
 
 bool can_step(byte min_pin, byte max_pin, long current, long target, byte direction)
@@ -206,6 +200,17 @@ void calculate_deltas()
 	digitalWrite(X_DIR_PIN, x_direction);
 	digitalWrite(Y_DIR_PIN, y_direction);
 	digitalWrite(Z_DIR_PIN, z_direction);
+}
+
+//enable our steppers so we can move them.
+void enable_steppers()
+{
+	if (delta_steps.x > 0)
+		digitalWrite(X_ENABLE_PIN, STEPPER_ENABLE);
+	if (delta_steps.y > 0)
+		digitalWrite(Y_ENABLE_PIN, STEPPER_ENABLE);
+	if (delta_steps.z > 0)
+		digitalWrite(Z_ENABLE_PIN, STEPPER_ENABLE);
 }
 
 //turn off steppers to save juice / keep things cool.
@@ -322,3 +327,22 @@ int get_increment_from_absolute(unsigned long delta, long current, long target)
 	}
 }
 
+boolean is_point_buffer_empty()
+{
+	//okay, we got points in the buffer.
+	if (pointBuffer.size() > 0)
+		return false;
+	
+	//still working on a point.
+	if (current_steps.x != target_steps.x && current_steps.y != target_steps.y && current_steps.z != target_steps.z)
+		return false;
+		
+	//nope, we're done.
+	return true;
+}
+
+void wait_until_target_reached()
+{
+	while(!is_point_buffer_empty())
+		delayMicrosecondsInterruptible(500);
+}

@@ -14,6 +14,8 @@
 
 //include some basic libraries.
 #include <stdint.h>
+#include "_misc.h"
+#include "CircularBuffer.h"
 
 //this is our firmware version
 #define VERSION_MAJOR 0
@@ -24,16 +26,41 @@ byte host_version_major = 0;
 byte host_version_minor = 0;
 
 //we store all queueable commands in one big giant buffer.
-#define COMMAND_BUFFER_SIZE 2048
-#include "CircularBuffer.h"
-
 // Explicitly allocate memory at compile time for buffer.
+#define COMMAND_BUFFER_SIZE 2048
 byte underlyingBuffer[COMMAND_BUFFER_SIZE];
 CircularBuffer commandBuffer(COMMAND_BUFFER_SIZE, underlyingBuffer);
 
 //are we paused?
 boolean is_machine_paused = false;
 boolean is_machine_aborted = false;
+
+//init our variables
+volatile long max_delta;
+
+volatile long x_counter;
+volatile bool x_can_step;
+volatile bool x_direction;
+
+volatile long y_counter;
+volatile bool y_can_step;
+volatile bool y_direction;
+
+volatile long z_counter;
+volatile bool z_can_step;
+volatile bool z_direction;
+
+//our position tracking variables
+volatile LongPoint current_steps;
+volatile LongPoint target_steps;
+volatile LongPoint delta_steps;
+volatile LongPoint range_steps;
+
+//our point queue variables
+#define POINT_QUEUE_SIZE 32
+#define POINT_SIZE 9
+byte rawPointBuffer[POINT_QUEUE_SIZE * POINT_SIZE];
+CircularBuffer pointBuffer(POINT_QUEUE_SIZE * POINT_SIZE, rawPointBuffer);
 
 //set up our firmware for actual usage.
 void setup()
