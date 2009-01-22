@@ -40,10 +40,9 @@ byte response_packet_crc = 0;
 //process a byte from our packet
 bool process_packet_byte(byte b)
 {
-  //is this our first byte?
-  if (packet_state == PS_START)
+  if (packet_state == PS_START)  // process start byte
   {
-  	//cool!  its the start of a packet.
+    //cool!  its the start of a packet.
     if (b == START_BYTE)
     {
       //update our status and response code.
@@ -51,12 +50,12 @@ bool process_packet_byte(byte b)
       packet_target_len = 0;
       packet_len = 0;
       packet_crc = 0;
-
+      
       //init our response packet as well.
       response_packet_len = 0;
       response_packet_code = RC_OK;
       response_packet_crc = 0;
-
+      
       is_command_packet = false;
     }
     else
@@ -65,40 +64,37 @@ bool process_packet_byte(byte b)
       // nah, ignore it as garbage.
     }
   }
-  //okay, next up is length... what you got?
-  else if (packet_state == PS_LEN)
+  else if (packet_state == PS_LEN) // process length byte
   {
-	//figure out how much data is coming.
-	//please note: data may go into command buffer
-	//instead of query packet buffer, so don't check the size
+    //figure out how much data is coming.
+    //please note: data may go into command buffer
+    //instead of query packet buffer, so don't check the size
     packet_target_len = b;
     packet_len = 0;
     packet_state = PS_PAYLOAD;
   }
-  //alright, lets read our payload.
-  else if (packet_state == PS_PAYLOAD)
+  else if (packet_state == PS_PAYLOAD)  // process payload byte
   {
-  	//the first byte determines command vs query
-  	if (packet_len == 0)
+    //the first byte determines command vs query
+    if (packet_len == 0)
     {
       // top bit high == bufferable command packet (eg. #128-255)
-	  if (b & 1 << 7)
-	    is_command_packet = true;
-	  // top bit low == reply needed query packet (eg. #0-127)
-	  else
-	    is_command_packet = false;
-  	}
-
-  	//just keep reading bytes while we got them.
+      if (b & 1 << 7)
+	is_command_packet = true;
+      // top bit low == reply needed query packet (eg. #0-127)
+      else
+	is_command_packet = false;
+    }
+    //just keep reading bytes while we got them.
     if (packet_len < packet_target_len)
     {
       //keep track of CRC.
-      _crc_ibutton_update(packet_crc, b);
+      packet_crc = _crc_ibutton_update(packet_crc, b);
 
       //we put different things in different buffers.  (query vs command)
       if (is_command_packet)
       {
-        //will it fit?
+	//will it fit?
         if (commandBuffer.remainingCapacity() == 0)
           response_packet_code = RC_BUFFER_OVERFLOW;
         else
@@ -108,9 +104,9 @@ bool process_packet_byte(byte b)
       {
         //will it fit?
         if (packet_len < MAX_PACKET_LENGTH)
-	        packet_data[packet_len] = b;
-	    else
-	    	response_packet_code = RC_PACKET_TOO_BIG;
+	  packet_data[packet_len] = b;
+	else
+	  response_packet_code = RC_PACKET_TOO_BIG;
       }
       
       packet_len++;
@@ -120,8 +116,7 @@ bool process_packet_byte(byte b)
     if (packet_len >= packet_target_len)
       packet_state = PS_CRC;
   }
-  //alrighty then, check the CRC.
-  else if (packet_state == PS_CRC)
+  else if (packet_state == PS_CRC)  // check crc
   {
     // did the packet check out?
     if (packet_crc != b)
@@ -146,7 +141,7 @@ void process_packets()
 		if (packet_state == PS_LAST)
 		{
 			//are we cool?
-			if (packet_state == RC_OK && !is_command_packet)
+			if (response_packet_code == RC_OK && !is_command_packet)
 				handle_query();		
 
 			//okay, send our response
@@ -193,7 +188,7 @@ void send_reply_packet()
 {
 	//initialize our response CRC
 	response_packet_crc = 0;
-    _crc_ibutton_update(response_packet_code, response_packet_code);
+	response_packet_crc = _crc_ibutton_update(response_packet_crc, response_packet_code);
 	
 	//actually send our response.
 	Serial.print(START_BYTE, BYTE);
@@ -203,8 +198,8 @@ void send_reply_packet()
 	//loop through our reply packet payload and send it.
 	for (byte i=0; i<response_packet_len; i++)
 	{
-		Serial.print(response_packet_data[i], BYTE);
-	    _crc_ibutton_update(response_packet_code, response_packet_data[i]);
+	  Serial.print(response_packet_data[i], BYTE);
+	  response_packet_crc = _crc_ibutton_update(response_packet_crc, response_packet_data[i]);
 	}
 
 	//okay, send our CRC.
