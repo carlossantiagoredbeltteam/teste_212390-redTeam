@@ -1,35 +1,38 @@
-// our point structure to make things nice.
-struct LongPoint {
-	long x;
-	long y;
- 	long z;
-};
-
 //init our variables
-long max_delta;
+volatile long max_delta;
 
-long x_counter;
-bool x_can_step;
-bool x_direction;
+volatile long x_counter;
+volatile bool x_can_step;
+volatile bool x_direction;
 
-long y_counter;
-bool y_can_step;
-bool y_direction;
+volatile long y_counter;
+volatile bool y_can_step;
+volatile bool y_direction;
 
-long z_counter;
-bool z_can_step;
-bool z_direction;
+volatile long z_counter;
+volatile bool z_can_step;
+volatile bool z_direction;
 
 //our position tracking variables
-LongPoint current_steps;
-LongPoint target_steps;
-LongPoint delta_steps;
-LongPoint range_steps;
+volatile LongPoint current_steps;
+volatile LongPoint target_steps;
+volatile LongPoint delta_steps;
+volatile LongPoint range_steps;
+
+//our point queue variables
+#define POINT_QUEUE_SIZE 32
+#define POINT_SIZE 9
+byte rawPointBuffer[POINT_QUEUE_SIZE * POINT_SIZE];
+CircularBuffer pointBuffer(POINT_QUEUE_SIZE * POINT_SIZE, rawPointBuffer);
 
 //initialize our stepper drivers
 void init_steppers()
 {
-	//TODO: load the range from EEPROM?
+	//clear our point buffer
+	pointBuffer.clear();
+	
+	//pull in our saved values.
+	read_range_from_eeprom();
 	
 	//prep timer 1 for handling DDA stuff.
 	setupTimer1Interrupt();
@@ -60,6 +63,7 @@ void init_steppers()
 	calculate_deltas();
 }
 
+//prepare our variables for a bresenham DDA run.
 void prepare_dda()
 {
 	//enable our steppers
@@ -82,7 +86,7 @@ void prepare_dda()
 }
 
 //do a single step on our DDA line!
-void dda_step()
+inline void dda_step()
 {
 	//check endstops, position, etc.
 	x_can_step = can_step(X_MIN_PIN, X_MAX_PIN, current_steps.x, target_steps.x, x_direction);
@@ -143,7 +147,11 @@ void dda_step()
 	//we're either at our target, or we're stuck.
 	if (!x_can_step && !y_can_step && !z_can_step)
 	{
-		//grab next point or something?
+		//grab next point?
+		if (pointBuffer.size() >= POINT_SIZE)
+		{
+			
+		}
 	}
 }
 
@@ -207,5 +215,110 @@ void disable_steppers()
 	digitalWrite(X_ENABLE_PIN, STEPPER_DISABLE);
 	digitalWrite(Y_ENABLE_PIN, STEPPER_DISABLE);
 	digitalWrite(Z_ENABLE_PIN, STEPPER_DISABLE);
+}
+
+//read all of our states into a single byte.
+byte get_endstop_states()
+{
+	byte state = 0;
+	
+	//each one is its own bit in the byte.
+	state |= read_switch(Z_MAX_PIN) << 5;
+	state |= read_switch(Z_MIN_PIN) << 4;
+	state |= read_switch(Y_MAX_PIN) << 3;
+	state |= read_switch(Y_MIN_PIN) << 2;
+	state |= read_switch(X_MAX_PIN) << 1;
+	state |= read_switch(X_MIN_PIN);
+	
+	return state;
+}
+
+//TODO: make me work!
+void write_range_to_eeprom()
+{
+
+}
+
+//TODO: make me work!
+void read_range_from_eeprom()
+{
+
+}
+
+//queue a point for us to move to
+void queue_incremental_point(int x, int y, int z, byte prescaler, unsigned int count)
+{
+	//wait until we have free space
+	while (pointBuffer.remainingCapacity() > POINT_SIZE)
+		delayMicrosecondsInterruptible(500);
+		
+	//okay, add in our points.
+	// x
+	pointBuffer.append(x & 0xff);
+	pointBuffer.append(x >> 8);
+	// y
+	pointBuffer.append(y & 0xff);
+	pointBuffer.append(y >> 8);
+	// z
+	pointBuffer.append(z & 0xff);
+	pointBuffer.append(z >> 8);
+	// prescaler
+	pointBuffer.append(prescaler);
+	// counter
+	pointBuffer.append(count & 0xff);
+	pointBuffer.append(count >> 8);
+
+	//turn our interrupt on.
+	enableTimer1Interrupt();
+}
+
+//TODO: make this proportional based on the delta proportions.
+//queue a point for us to move to
+void queue_absolute_point(long x, long y, long z, byte prescaler, unsigned int count)
+{
+	//calculate our total travel in steps
+	unsigned long delta_x = abs(x - current_steps.x);
+	unsigned long delta_y = abs(y - current_steps.y);
+	unsigned long delta_z = abs(z - current_steps.z);
+
+	//setup some variables.
+	int x_inc = 0;
+	int y_inc = 0;
+	int z_inc = 0;
+
+	//keep queueing points while we can.
+	while (delta_x >= 0 || delta_y >= 0 || delta_z >= 0)
+	{
+		//figure out our incremental points.
+		x_inc = get_increment_from_absolute(delta_x, current_steps.x, x);
+		y_inc = get_increment_from_absolute(delta_y, current_steps.y, y);
+		z_inc = get_increment_from_absolute(delta_z, current_steps.z, z);
+
+		//queue our point.
+		queue_incremental_point(x_inc, y_inc, z_inc, prescaler, count);
+
+		//remove them from our deltas.
+		delta_x -= x_inc;
+		delta_x -= y_inc;
+		delta_x -= z_inc;
+	}
+}
+
+int get_increment_from_absolute(unsigned long delta, long current, long target)
+{
+	if (delta > 32767)
+	{
+		if (target < current)
+			return -32767;
+		else
+			return 32767;
+	}
+	else
+	{
+		if (target < current)
+			return -((int)delta);
+		else
+			return (int)delta;
+	}
 }
 

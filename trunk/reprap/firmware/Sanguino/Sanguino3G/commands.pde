@@ -37,44 +37,88 @@ void handle_query()
   switch (packet_data[0])
   {
     case HOST_CMD_VERSION:
-	  add_reply_byte(VERSION_MAJOR);
-	  add_reply_byte(VERSION_MINOR);
+      //get our host version
+      host_version_major = packet_data[2];
+      host_version_minor = packet_data[1];
+      
+      //send our version back.
+	  add_reply_8(VERSION_MINOR);
+	  add_reply_8(VERSION_MAJOR);
 	  break;
 
     case HOST_CMD_INIT:
+      //just initialize
       initialize();
       break;
       
     case HOST_CMD_GET_BUFFER_SIZE:
-      //TODO: send this:
-      //commandBuffer.remainingCapacity();
+      //send our remaining buffer size.
+      add_reply_16(commandBuffer.remainingCapacity());
       break;
 
     case HOST_CMD_CLEAR_BUFFER:
+      //just clear it.
       commandBuffer.clear();
       break;
 
     case HOST_CMD_GET_POSITION:
-      //TODO: send current position
+      //send our position
+      add_reply_32(current_steps.x);
+      add_reply_32(current_steps.y);
+      add_reply_32(current_steps.z);
+      add_reply_8(get_endstop_states());
       break;
 
     case HOST_CMD_GET_RANGE:
-      //TODO: send range.
+      //send our range
+      add_reply_32(range_steps.x);
+      add_reply_32(range_steps.y);
+      add_reply_32(range_steps.z);
       break;
 
     case HOST_CMD_SET_RANGE:
-      //TODO: get range.
+      //set our range to what the host tells us
+      range_steps.x = make_uint32_t(packet_data[1], packet_data[2], packet_data[3], packet_data[4]);
+      range_steps.x = make_uint32_t(packet_data[5], packet_data[6], packet_data[7], packet_data[8]);
+      range_steps.x = make_uint32_t(packet_data[9], packet_data[10], packet_data[11], packet_data[12]);
+      
+      //write it back to eeprom
+      write_range_to_eeprom();
       break;
 
     case HOST_CMD_ABORT:
-      //TODO: abort our job!
+      //support a microcontrollers right to choice.
+      abort_print();
       break;
 
     case HOST_CMD_PAUSE:
-      //TODO: pause the machine.
+      if (is_machine_paused)
+      {
+        //unpause our machine.
+	    is_machine_paused = false;
+
+	    //TODO: unpause our tool?
+	    
+	    //resume stepping.
+	    enableTimer1Interrupt();
+        enable_steppers();
+      }
+      else
+      {
+        //pause our activity.
+        is_machine_paused = true;
+
+	    //TODO: pause our tool?
+        
+        //pause stepping
+        disableTimer1Interrupt();
+        disable_steppers();
+      }
       break;
 
     case HOST_CMD_PROBE:
+      //we dont support this yet.
+      response_packet_code = RC_CMD_UNSUPPORTED;
       break;
   }
 }
@@ -90,10 +134,23 @@ void handle_commands()
     switch(cmd)
     {
       case HOST_CMD_QUEUE_POINT_INC:
+		queue_incremental_point(
+			make_uint16_t(commandBuffer.remove(), commandBuffer.remove()),
+			make_uint16_t(commandBuffer.remove(), commandBuffer.remove()),
+			make_uint16_t(commandBuffer.remove(), commandBuffer.remove()),
+			commandBuffer.remove(),
+			make_uint16_t(commandBuffer.remove(), commandBuffer.remove())			
+		);
         break;
 
       case HOST_CMD_QUEUE_POINT_ABS:
-        initialize();
+		queue_absolute_point(
+			make_uint32_t(commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove()),
+			make_uint32_t(commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove()),
+			make_uint32_t(commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove()),
+			commandBuffer.remove(),
+			make_uint16_t(commandBuffer.remove(), commandBuffer.remove())			
+		);
         break;
       
       case HOST_CMD_SET_POSITION:

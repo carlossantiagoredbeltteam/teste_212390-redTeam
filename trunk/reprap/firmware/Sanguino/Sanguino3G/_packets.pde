@@ -19,7 +19,8 @@ typedef enum {
   RC_OK              = 1,
   RC_BUFFER_OVERFLOW = 2,
   RC_CRC_MISMATCH    = 3,
-  RC_PACKET_TOO_BIG  = 4
+  RC_PACKET_TOO_BIG  = 4,
+  RC_CMD_UNSUPPORTED = 5
 } ResponseCode;
 
 //variable to keep track of our packet.
@@ -160,18 +161,31 @@ void process_packets()
 	}
 }
 
+//add a four byte chunk of data to our reply
+void add_reply_32(uint32_t data)
+{
+	add_reply_8(data & 0xff);
+	add_reply_8(data >> 8);
+	add_reply_8(data >> 16);
+	add_reply_8(data >> 24);
+}
+
+//add a two byte chunk of data to our reply
+void add_reply_16(uint16_t data)
+{
+	add_reply_8(data & 0xff);
+	add_reply_8(data >> 8);
+}
+
 //add a byte to our reply.
-bool add_reply_byte(byte b)
+void add_reply_8(uint8_t data)
 {
   //only add it if it will fit.
   if (response_packet_len < MAX_PACKET_LENGTH)
   {
-    response_packet_data[response_packet_len] = b;
+    response_packet_data[response_packet_len] = data;
     response_packet_len++;
-    return true;
   }
-  
-  return false;
 }
 
 //send a response back to the host.
