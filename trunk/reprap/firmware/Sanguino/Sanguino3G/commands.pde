@@ -79,8 +79,8 @@ void handle_query()
     case HOST_CMD_SET_RANGE:
       //set our range to what the host tells us
       range_steps.x = make_uint32_t(packet_data[1], packet_data[2], packet_data[3], packet_data[4]);
-      range_steps.x = make_uint32_t(packet_data[5], packet_data[6], packet_data[7], packet_data[8]);
-      range_steps.x = make_uint32_t(packet_data[9], packet_data[10], packet_data[11], packet_data[12]);
+      range_steps.y = make_uint32_t(packet_data[5], packet_data[6], packet_data[7], packet_data[8]);
+      range_steps.z = make_uint32_t(packet_data[9], packet_data[10], packet_data[11], packet_data[12]);
       
       //write it back to eeprom
       write_range_to_eeprom();
@@ -154,21 +154,48 @@ void handle_commands()
         break;
       
       case HOST_CMD_SET_POSITION:
+      	wait_until_target_reached(); //dont want to get hasty.
+      	
+      	current_steps.x = make_uint32_t(commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove());
+      	current_steps.y = make_uint32_t(commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove());
+      	current_steps.z = make_uint32_t(commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove());
         break;
 
       case HOST_CMD_FIND_AXES_MINIMUM:
+      	wait_until_target_reached(); //dont want to get hasty.
+
+		//TODO: implement this.
         break;
 
       case HOST_CMD_FIND_AXES_MAXIMUM:
+      	wait_until_target_reached(); //dont want to get hasty.
+
+        //TODO: implement this.
         break;
 
       case HOST_CMD_DELAY:
+      	wait_until_target_reached(); //dont want to get hasty.
+
+        //take it easy.
+		delay(make_uint32_t(commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove()));
         break;
 
       case HOST_CMD_CHANGE_TOOL:
+      	wait_until_target_reached(); //dont want to get hasty.
+
+        //extruder, i choose you!
+		select_tool(commandBuffer.remove());
         break;
 
       case HOST_CMD_WAIT_FOR_TOOL:
+      	wait_until_target_reached(); //dont want to get hasty.
+
+        //get your temp in gear, you lazy bum.
+        wait_for_tool_ready_state(
+        	commandBuffer.remove(),
+        	make_uint16_t(commandBuffer.remove(), commandBuffer.remove()),
+        	make_uint16_t(commandBuffer.remove(), commandBuffer.remove())
+        );
         break;
     }
   }

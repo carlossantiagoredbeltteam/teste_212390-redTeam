@@ -3,6 +3,7 @@
 //this handles the timer interrupt event
 SIGNAL(SIG_OUTPUT_COMPARE1A)
 {
+  dda_step();
 }
 
 void enableTimer1Interrupt()
