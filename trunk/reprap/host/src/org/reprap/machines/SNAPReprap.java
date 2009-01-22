@@ -13,7 +13,6 @@ import org.reprap.devices.pseudo.LinePrinter;
 import org.reprap.gui.CalibrateZAxis;
 import org.reprap.Extruder;
 import org.reprap.utilities.Debug;
-import org.reprap.geometry.LayerRules;
 
 /**
  * 

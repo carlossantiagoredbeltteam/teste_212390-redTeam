@@ -51,7 +51,6 @@
 package org.reprap.geometry.polygons;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * RepRap Constructive Solid Geometry class
