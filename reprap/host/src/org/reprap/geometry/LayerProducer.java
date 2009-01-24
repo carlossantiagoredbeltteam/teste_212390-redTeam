@@ -133,7 +133,6 @@ public class LayerProducer {
 	 */	
 	RrCSGPolygonList offHatch = null;
 	
-	
 	/**
 	 * Counters use so that each material is plotted completely before
 	 * moving on to the next.

@@ -110,7 +110,7 @@ public class Simulator extends GenericRepRap {
 	 * Set an output file
 	 * @return
 	 */
-	public String setGCodeFileForOutput(boolean topDown)
+	public String setGCodeFileForOutput()
 	{
 		System.err.println("Simulator: cannot generate GCode file.");
 		return null;		

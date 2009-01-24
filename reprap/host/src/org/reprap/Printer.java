@@ -382,7 +382,7 @@ public interface Printer {
 	 * Set an output file
 	 * @return
 	 */
-	public String setGCodeFileForOutput(boolean topDown);
+	public String setGCodeFileForOutput();
 	
 	/**
 	 * If a file replay is being done, do it and return true
@@ -402,4 +402,15 @@ public interface Printer {
 	 *
 	 */
 	public void resume();
+	
+	/**
+	 * Set the flag that decided which direction to compute the layers
+	 * @param td
+	 */
+	public void setTopDown(boolean td);
+	
+	/**
+	 * @return the flag that decided which direction to compute the layers
+	 */
+	public boolean getTopDown();
 }

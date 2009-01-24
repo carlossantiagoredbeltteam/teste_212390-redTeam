@@ -346,6 +346,8 @@ public class RrPolygon
 	public RrPolygon incrementedStart(LayerRules lc)
 	{
 		RrPolygon result = new RrPolygon(att);
+		if(size() == 0 || lc.getModelLayer() < 0)
+			return this;
 		int i = lc.getModelLayer() % size();
 		for(int j = 0; j < size(); j++)
 		{
