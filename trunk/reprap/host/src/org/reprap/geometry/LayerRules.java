@@ -99,7 +99,7 @@ public class LayerRules
 		
 		notStartedYet = true;
 
-		topDown = false;
+		topDown = printer.getTopDown();
 
 		modelZMax = modZMax;
 		machineZMax = macZMax;
@@ -145,7 +145,7 @@ public class LayerRules
 	public double getMachineZ() { return machineZ; }
 	
 	//private void setModelLayer(int ml) { modelLayer = ml; }
-	public int getModelLayer() { return Math.max(modelLayer, 0); }
+	public int getModelLayer() { return modelLayer; }
 	
 	public int getModelLayerMax() { return modelLayerMax; }
 	
@@ -279,11 +279,7 @@ public class LayerRules
 	 * @param e
 	 */
 	public void step(Extruder e)
-	{
-		// modelLayer < 0 when we're building foundations
-		if(modelLayer < 0)
-			modelLayer = 0;
-		
+	{		
 		double sZ = e.getExtrusionHeight();
 		if(topDown)
 		{
@@ -296,6 +292,13 @@ public class LayerRules
 		}
 		addToStep = 0;
 		stepMachine(e);
+		
+//		// modelLayer < 0 when we're building foundations
+//		if(modelLayer < 0)
+//		{
+//			modelLayer = 0;
+//			modelZ = 0;
+//		}
 	}
 	
 }

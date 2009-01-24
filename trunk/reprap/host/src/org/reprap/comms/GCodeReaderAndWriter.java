@@ -3,6 +3,7 @@ package org.reprap.comms;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -30,6 +31,11 @@ public class GCodeReaderAndWriter
 	 * Stop sending a file (if we are).
 	 */
 	private boolean paused = false;
+	
+	/**
+	 * Not quite sure why this is needed...
+	 */
+	private boolean alreadyReversed = false;
 	
 	/**
 	 * The name of the port talking to the RepRap machine
@@ -85,6 +91,11 @@ public class GCodeReaderAndWriter
 	 * How does the last file name in a multiple set end?
 	 */
 	private static final String lastEnding = "_epilogue";
+	
+	/**
+	 * Flag for temporary files
+	 */
+	private static final String tmpString = "_TeMpOrArY_";
 		
 	/**
 	 * This is used for file input
@@ -130,6 +141,7 @@ public class GCodeReaderAndWriter
 	public GCodeReaderAndWriter()
 	{
 		paused = false;
+		alreadyReversed = false;
 		ringBuffer = new String[buflen];
 		head = 0;
 		tail = 0;
@@ -325,7 +337,9 @@ public class GCodeReaderAndWriter
 			
 			if (fileOutStream != null)
 				fileOutStream.close();
+			
 		} catch (Exception e) {}
+		
 	}
 	
 	/**
@@ -689,7 +703,7 @@ public class GCodeReaderAndWriter
 		filter = new ExtensionFileFilter("G Code file to write to", new String[] { "gcode" });
 		chooser.setFileFilter(filter);
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-
+		
 		opFileName = null;
 		opFileArray = null;
 		opFileIndex = -1;
@@ -702,16 +716,21 @@ public class GCodeReaderAndWriter
 
 			try
 			{
+				boolean doe = false;
 				String fn = opFileName;
 				if(topDown)
 				{
 					opFileIndex = 0;
 					fn += firstEnding;
+					fn += tmpString;
+					doe = true;
 				}
 				fn += gcodeExtension;
 				
 				Debug.d("opening: " + fn);
-				FileOutputStream fileStream = new FileOutputStream(fn);
+				File fl = new File(fn);
+				if(doe) fl.deleteOnExit();
+				FileOutputStream fileStream = new FileOutputStream(fl);
 				fileOutStream = new PrintStream(fileStream);
 				String shortName = chooser.getSelectedFile().getName();
 				if(!shortName.endsWith(gcodeExtension))
@@ -743,16 +762,18 @@ public class GCodeReaderAndWriter
 			if(lc.getTopDown())
 			{
 				opFileIndex = 0;
-				opFileArray = new String[lc.getMachineLayerMax() + 2];
-				opFileArray[opFileIndex] = opFileName + firstEnding + gcodeExtension;
-				opFileIndex++;
+				opFileArray = new String[lc.getMachineLayerMax() + 3];
+				opFileArray[opFileIndex] = opFileName + firstEnding + tmpString + gcodeExtension;
+				finishedLayer();
 			}
 		}
 		
-		opFileArray[opFileIndex] = opFileName + lc.getMachineLayer() + gcodeExtension;
+		opFileArray[opFileIndex] = opFileName + lc.getMachineLayer() + tmpString + gcodeExtension;
 		try
 		{
-			FileOutputStream fileStream = new FileOutputStream(opFileArray[opFileIndex]);
+			File fl = new File(opFileArray[opFileIndex]);
+			fl.deleteOnExit();
+			FileOutputStream fileStream = new FileOutputStream(fl);
 			fileOutStream = new PrintStream(fileStream);
 		} catch (Exception e)
 		{
@@ -764,10 +785,12 @@ public class GCodeReaderAndWriter
 	{
 		if(opFileArray == null)
 			return;
-		opFileArray[opFileIndex] = opFileName + lastEnding + gcodeExtension;
+		opFileArray[opFileIndex] = opFileName + lastEnding + tmpString + gcodeExtension;
 		try
 		{
-			FileOutputStream fileStream = new FileOutputStream(opFileArray[opFileIndex]);
+			File fl = new File(opFileArray[opFileIndex]);
+			fl.deleteOnExit();
+			FileOutputStream fileStream = new FileOutputStream(fl);
 			fileOutStream = new PrintStream(fileStream);
 		} catch (Exception e)
 		{
@@ -785,26 +808,32 @@ public class GCodeReaderAndWriter
 	
 	private void copyFile(PrintStream ps, String ip)
 	{
-		String line;
+		File f = null;
 		try 
 		{
-			fileInStream = new BufferedReader(new FileReader(ip));
-				
-			while ((line = fileInStream.readLine()) != null) 
-				ps.println(line);
-
-			fileInStream.close();
-			fileInStream = null;
+			f = new File(ip);
+			FileReader fr = new FileReader(f);
+			int character;
+			while ((character = fr.read()) >= 0) 
+				ps.print((char)character);
+			
+			ps.flush();
+			fr.close();
 		} catch (Exception e) 
 		{  
 			System.err.println("Error copying file: " + e.toString());
-		}		
+		}
 	}
 	
 	public void reverseLayers()
 	{
-		if(opFileArray == null)
+		if(opFileArray == null || alreadyReversed)
 			return;
+		
+		// Stop this being called twice...
+		
+		alreadyReversed = true;
+		
 		try
 		{
 			FileOutputStream fileStream = new FileOutputStream(opFileName + gcodeExtension);
@@ -813,11 +842,10 @@ public class GCodeReaderAndWriter
 		{
 			System.err.println("Can't write to file " + opFileName + gcodeExtension);
 		}
+		
 		copyFile(fileOutStream, opFileArray[0]);
 		for(int i = opFileIndex - 1; i > 0; i--)
 			copyFile(fileOutStream, opFileArray[i]);
 		copyFile(fileOutStream, opFileArray[opFileIndex]);
-		fileOutStream.close();
-		fileOutStream = null;
 	}
 }

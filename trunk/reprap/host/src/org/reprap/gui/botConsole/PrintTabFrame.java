@@ -443,7 +443,8 @@ private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     org.reprap.Main.gui.mouseToWorld();
     if(gCodeToFileRadioButton.isSelected())
     {
-    	if(printer.setGCodeFileForOutput(false) == null)
+    	printer.setTopDown(true);
+    	if(printer.setGCodeFileForOutput() == null)
     		return;
     }
     if(printer.filePlay())

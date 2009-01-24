@@ -132,6 +132,8 @@ public abstract class GenericRepRap implements CartesianPrinter
 	protected boolean excludeZ = false;
 	
 	private int foundationLayers = 0;
+	
+	private boolean topDown;
 
 	/**
 	 * Stepper motors for the 3 axis 
@@ -142,7 +144,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	
 	public GenericRepRap() throws Exception
 	{
-
+		topDown = false;
 		startTime = System.currentTimeMillis();
 		startCooling = -1;
 		statusWindow = new StatusMessage(new JFrame());
@@ -1049,5 +1051,16 @@ public abstract class GenericRepRap implements CartesianPrinter
 	{
 	}
 	
-
+	public void setTopDown(boolean td)
+	{
+		topDown = td;
+	}
+	
+	/**
+	 * @return the flag that decided which direction to compute the layers
+	 */
+	public boolean getTopDown()
+	{
+		return topDown;
+	}
 }
