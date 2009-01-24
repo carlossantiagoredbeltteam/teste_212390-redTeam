@@ -16,6 +16,7 @@
 #define SNAP_h
 
 // include types & constants of Wiring core API
+#include "WProgram.h" // Fix for Arduino-0012 compile error (see http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1232533589)
 #include "WConstants.h"
 #include "HardwareSerial.h"
 
