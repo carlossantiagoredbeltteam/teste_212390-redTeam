@@ -21,6 +21,7 @@
 #ifndef THERMOPLASTEXTRUDER_H
 #define THERMOPLASTEXTRUDER_H
 
+#include "WProgram.h" // Fix for Arduino-0012 compile error (see http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1232533589)
 #include "WConstants.h"
 
 class ThermoplastExtruder
