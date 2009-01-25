@@ -328,6 +328,22 @@ public class RrCSGPolygon
 		return q1 == null;
 	}
 	
+	/**
+	 * Set a new attribute (recursively if need be)
+	 * @param a
+	 */
+	public void setAttributes(Attributes a) 
+	{
+		att = a;
+		if(!leaf())
+		{
+			q1.setAttributes(a);
+			q2.setAttributes(a);
+			q3.setAttributes(a);
+			q4.setAttributes(a);
+		}
+	}
+	
 	private String toString_r(String quad)
 	{
 		quad = quad + csg.toString() + "\n";
@@ -598,6 +614,62 @@ public class RrCSGPolygon
 		}
 		
 		return this;
+	}
+	
+	/**
+	 * CSG operations on RrCSGPolygons - union
+	 * Note: this ignores the attribute of the second argument
+	 * It also ignores whether either argument is divided
+	 * The returned result is undivided
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static RrCSGPolygon union(RrCSGPolygon a, RrCSGPolygon b)
+	{
+		return new RrCSGPolygon(RrCSG.union(a.csg(), b.csg()), RrRectangle.union(a.box(), b.box()), a.getAttributes());
+	}
+	
+	/**
+	 * CSG operations on RrCSGPolygons - intersection
+	 * Note: this ignores the attribute of the second argument
+	 * It also ignores whether either argument is divided
+	 * The returned result is undivided
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static RrCSGPolygon intersection(RrCSGPolygon a, RrCSGPolygon b)
+	{
+		return new RrCSGPolygon(RrCSG.intersection(a.csg(), b.csg()), RrRectangle.intersection(a.box(), b.box()), a.getAttributes());
+	}
+	
+	/**
+	 * CSG operations on RrCSGPolygons - difference
+	 * Note: this ignores the attribute of the second argument
+	 * It also ignores whether either argument is divided
+	 * The returned result is undivided
+	 * The rectangle of the first argument is used for the result
+	 * @param a
+	 * @param b
+	 * @return
+	 */
+	public static RrCSGPolygon difference(RrCSGPolygon a, RrCSGPolygon b)
+	{
+		return new RrCSGPolygon(RrCSG.difference(a.csg(), b.csg()), a.box(), a.getAttributes());
+	}
+	
+	/**
+	 * Convert to boundary and back again - this removes 
+	 * coincident half-planes and degeneracies
+	 * @return
+	 */
+	public RrCSGPolygon reEvaluate()
+	{
+		if(leaf())
+			divide(Preferences.tiny(), 1.01);
+		RrPolygonList pgl = megList();
+		return pgl.toCSG(Preferences.tiny());
 	}
 	
 	

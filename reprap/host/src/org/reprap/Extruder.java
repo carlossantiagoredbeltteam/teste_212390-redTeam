@@ -419,6 +419,12 @@ public interface Extruder
 	public String getMaterial();
 	
 	/**
+	 * What stuff are we supporting with?
+	 * @return
+	 */
+	public String getSupportMaterial();
+	
+	/**
 	 * The direction to hatch even-numbered layers in degrees anticlockwise
 	 * from the X axis
 	 * @return

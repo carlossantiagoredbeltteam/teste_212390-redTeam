@@ -82,6 +82,7 @@ public class Preferences {
 		fallbackPreferences = new Properties();
 		mainPreferences = new Properties();
 		URL fallbackUrl = ClassLoader.getSystemResource(propsFileDist);
+		//System.out.println("++++ " + fallbackUrl.toString());
 
 		// Construct URL of user properties file
 		String path = new String(System.getProperty("user.home") + File.separatorChar + 

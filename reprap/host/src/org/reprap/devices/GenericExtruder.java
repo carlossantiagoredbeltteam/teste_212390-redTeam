@@ -287,7 +287,7 @@ public abstract class GenericExtruder implements Extruder
 	
 	private double evenHatchDirection;
 	private double oddHatchDirection;
-	
+	private String supportMaterial;
 	/**
 	* Our printer object.
 	*/
@@ -330,6 +330,7 @@ public abstract class GenericExtruder implements Extruder
 			asLength = Preferences.loadGlobalDouble(prefName + "AngleSpeedLength(mm)");
 			asFactor = Preferences.loadGlobalDouble(prefName + "AngleSpeedFactor(0..1)");
 			material = Preferences.loadGlobalString(prefName + "MaterialType(name)");
+			supportMaterial = Preferences.loadGlobalString(prefName + "SupportMaterialType(name)");
 			offsetX = Preferences.loadGlobalDouble(prefName + "OffsetX(mm)");
 			offsetY = Preferences.loadGlobalDouble(prefName + "OffsetY(mm)");
 			offsetZ = Preferences.loadGlobalDouble(prefName + "OffsetZ(mm)");
@@ -669,6 +670,15 @@ public abstract class GenericExtruder implements Extruder
 	public String getMaterial()
 	{
 		return material;
+	}
+	
+	/**
+	 * What stuff are we working with?
+	 * @return
+	 */
+	public String getSupportMaterial()
+	{
+		return supportMaterial;
 	}
     
     /**
