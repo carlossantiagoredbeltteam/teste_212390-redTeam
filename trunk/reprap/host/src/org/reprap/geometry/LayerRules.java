@@ -5,6 +5,7 @@ import org.reprap.Printer;
 import org.reprap.Extruder;
 import org.reprap.geometry.polygons.RrHalfPlane;
 import org.reprap.geometry.polygons.Rr2Point;
+import org.reprap.geometry.polygons.RrCSGPolygonList;
 import org.reprap.Preferences;
 
 /**
@@ -84,6 +85,21 @@ public class LayerRules
 	private boolean notStartedYet;
 	
 	/**
+	 * layers above and below where we are for infill and support calculations
+	 */
+	private RrCSGPolygonList [] layerRecord;
+	
+	/**
+	 * The machineLayer value for each entry in layerRecord
+	 */
+	private int [] recordNumber;
+	
+	/**
+	 * index into layerRecord
+	 */
+	private int layerPointer;
+	
+	/**
 	 * 
 	 * @param p
 	 * @param modZMax
@@ -132,6 +148,52 @@ public class LayerRules
 							zStep + " and " + es[i].getExtrusionHeight());
 			}
 		}
+		
+		layerRecord = new RrCSGPolygonList[3];
+		recordNumber = new int[3];
+		layerPointer = 0;
+		for(int i = 0; i < layerRecord.length; i++)
+		{
+			layerRecord[i] = null;
+			recordNumber[i] = -1;
+		}
+	}
+	
+	public void recordThisLayer(RrCSGPolygonList pl)
+	{
+		//if(layerRecord[layerPointer] != null)
+		//	layerRecord[layerPointer].destroy();
+		layerRecord[layerPointer] = pl;
+		recordNumber[layerPointer] = machineLayer;
+		layerPointer++;
+		if(layerPointer >= layerRecord.length)
+			layerPointer = 0;
+	}
+	
+	/**
+	 * Return the layer i above where we are (if i < 0 give layer i below).
+	 * @param i
+	 * @return
+	 */
+	public RrCSGPolygonList getLayer(int i)
+	{
+		if(i == 0)
+			System.out.println("LayerRules.getLayer: asking for current layer (probably) before it has been set.");
+		
+		if(topDown)
+			i = -i;
+		
+		i = layerPointer + i;
+		
+		if(i < 0)
+			i = layerRecord.length - i;
+		else if(i > layerRecord.length - 1)
+			i = i - layerRecord.length;
+		
+		if(i < 0 || i > layerRecord.length - 1)
+			return null;
+		
+		return layerRecord[i];
 	}
 	
 	public boolean getTopDown() { return topDown; }
@@ -188,10 +250,10 @@ public class LayerRules
 	 * The hatch pattern is:
 	 * 
 	 *  Foundation:
-	 *   All evenHatchDirection except for the penultimate hatch layer
+	 *   X and Y rectangle
 	 *   
 	 *  Model:
-	 *   Alternate even then odd
+	 *   Alternate even then odd (which can be set to the same angle if wanted).
 	 *   
 	 * @return
 	 */

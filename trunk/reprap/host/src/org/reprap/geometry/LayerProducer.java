@@ -10,12 +10,14 @@ import java.io.IOException;
 import javax.media.j3d.BranchGroup;
 
 import org.reprap.Printer;
+import org.reprap.Extruder;
 import org.reprap.Attributes;
 import org.reprap.Preferences;
 import org.reprap.ReprapException;
 import org.reprap.devices.pseudo.LinePrinter;
 import org.reprap.geometry.polygons.Rr2Point;
 import org.reprap.geometry.polygons.RrCSGPolygonList;
+import org.reprap.geometry.polygons.RrCSGPolygon;
 import org.reprap.geometry.polygons.RrPolygon;
 import org.reprap.geometry.polygons.RrPolygonList;
 import org.reprap.utilities.Debug;
@@ -239,6 +241,8 @@ public class LayerProducer {
 		
 		csgP = csgPols;
 		
+		//supportCalculations();
+		
 		offHatch = csgPols.offset(layerConditions, false);
 		
 		//RrGraphics g = new RrGraphics(offBorder, true);
@@ -288,6 +292,49 @@ public class LayerProducer {
 		
 //		double width = big.x().length();
 //		double height = big.y().length();
+	}
+	
+	private void supportCalculations()
+	{
+		if(!layerConditions.getTopDown())
+			return;
+		RrCSGPolygonList above = layerConditions.getLayer(1);
+		if(above == null)
+		{
+			layerConditions.recordThisLayer(csgP);
+			return;
+		}
+		Extruder [] es = layerConditions.getPrinter().getExtruders();
+		
+		RrCSGPolygonList supports = new RrCSGPolygonList();
+		RrCSGPolygonList thisForTheRecord = new RrCSGPolygonList();
+		
+		for(int i = 0; i < csgP.size(); i++)
+		{
+			RrCSGPolygon pgThisLevel = csgP.get(i);
+			Attributes aThisLevel = pgThisLevel.getAttributes();
+			Extruder eThisLevel = aThisLevel.getExtruder(es);
+			String supportName = eThisLevel.getSupportMaterial();
+			if(!supportName.contentEquals("null"))
+			{
+				RrCSGPolygon aboveLevel = above.find(aThisLevel);
+				if(aboveLevel != null)
+				{
+					RrCSGPolygon toRemember = RrCSGPolygon.union(aboveLevel, pgThisLevel);
+					toRemember = toRemember.reEvaluate();
+					thisForTheRecord.add(toRemember);
+					RrCSGPolygon grown = pgThisLevel.offset(layerConditions.getZStep());
+					RrCSGPolygon sup = RrCSGPolygon.difference(aboveLevel, grown);
+					sup = sup.reEvaluate();
+					sup.setAttributes(new Attributes(supportName, null, null, null));
+					supports.add(sup);
+				}
+			}
+		}
+		
+		layerConditions.recordThisLayer(thisForTheRecord);
+		csgP.add(supports);
+		
 	}
 	
 	/**

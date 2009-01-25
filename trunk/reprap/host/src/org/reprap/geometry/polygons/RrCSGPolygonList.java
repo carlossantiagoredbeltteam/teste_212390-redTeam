@@ -73,6 +73,16 @@ public class RrCSGPolygonList {
 	}
 	
 	/**
+	 * Add polygon list ls
+	 * @param ls
+	 */
+	public void add(RrCSGPolygonList ls)
+	{
+		for(int i = 0; i < ls.size(); i ++)
+			csgPolygons.add(ls.get(i));
+	}
+	
+	/**
 	 * Get the ith polygon in the list
 	 * @param i
 	 * @return
@@ -101,6 +111,21 @@ public class RrCSGPolygonList {
 		for(int i = 0; i < size(); i++)
 			result.expand(get(i).box());
 		return result;
+	}
+	
+	/**
+	 * Find the polygon in the list with a given attribute
+	 * @param a
+	 * @return
+	 */
+	public RrCSGPolygon find(Attributes a)
+	{
+		for(int i = 0; i < size(); i++)
+		{
+			if(get(i).getAttributes() == a)
+				return get(i);
+		}
+		return null;
 	}
 	
 	/**
