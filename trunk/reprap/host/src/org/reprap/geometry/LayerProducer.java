@@ -318,17 +318,20 @@ public class LayerProducer {
 			if(!supportName.contentEquals("null"))
 			{
 				RrCSGPolygon aboveLevel = above.find(aThisLevel);
+				//System.out.println("here 1");
 				if(aboveLevel != null)
 				{
+					//System.out.println("here 2");
 					RrCSGPolygon toRemember = RrCSGPolygon.union(aboveLevel, pgThisLevel);
 					toRemember = toRemember.reEvaluate();
 					thisForTheRecord.add(toRemember);
 					RrCSGPolygon grown = pgThisLevel.offset(layerConditions.getZStep());
 					RrCSGPolygon sup = RrCSGPolygon.difference(aboveLevel, grown);
 					sup = sup.reEvaluate();
-					sup.setAttributes(new Attributes(supportName, null, null, null));
+					//sup.setAttributes(new Attributes(supportName, null, null, proper appearance for support));
 					supports.add(sup);
-				}
+				} else
+					thisForTheRecord.add(pgThisLevel);
 			}
 		}
 		

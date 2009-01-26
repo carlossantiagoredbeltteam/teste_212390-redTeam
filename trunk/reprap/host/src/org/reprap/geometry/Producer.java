@@ -364,7 +364,7 @@ public class Producer {
 			if(layer != null)
 			{
 				layer.plot();
-				layer.destroy();
+				//layer.destroy();
 			} else
 				Debug.d("Null layer at model Z = " + layerRules.getModelZ());
 			
@@ -372,8 +372,8 @@ public class Producer {
 			reprap.betweenLayers(layerRules);
 			layer = null;
 			
-			slice.destroy();
-			stlc.destroyLayer();
+			//slice.destroy();
+			//stlc.destroyLayer();
 
 			layerRules.step(reprap.getExtruder());
 		}
