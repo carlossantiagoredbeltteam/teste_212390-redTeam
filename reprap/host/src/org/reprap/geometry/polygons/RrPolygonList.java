@@ -60,6 +60,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.reprap.Extruder;
+import org.reprap.Attributes;
 
 /**
  * chPair - small class to hold double pointers for convex hull calculations.
@@ -856,7 +857,18 @@ public class RrPolygonList
 	 * @return CSG representation
 	 */
 	public RrCSGPolygon toCSG(double tolerance)
-	{		
+	{	
+		if(size() == 0)
+		{
+			return new RrCSGPolygon(RrCSG.nothing(), 
+					new RrRectangle(new RrInterval(0, 1), new RrInterval(0, 1)), 
+					new Attributes(null, null, null, null));
+		}
+		if(size() == 1)
+		{
+			return polygon(0).toCSG(tolerance);
+		}
+		
 		List<RrCSG> csgPols = new ArrayList<RrCSG>();
 		
 		for(int i = 0; i < size(); i++)

@@ -193,6 +193,7 @@ public class RrCSG
 	{
 		if(c == u || c == n)
 			System.err.println("RrCSG deep copy: copying null or universal set.");
+			
 		
 		if(c.hp != null)
 			hp = new RrHalfPlane(c.hp);

@@ -505,11 +505,17 @@ public class RrGraphics
 	 */
 	private void plot(RrPolygon p)
 	{
+		if(p.size() <= 0)
+			return;
 		if(RrRectangle.intersection(p.getBox(), scaledBox).empty())
 			return;
-		
-		setColour(p.getAttributes());
-		
+	    if(p.getAttributes().getAppearance() == null)
+	    {
+	    	System.err.println("RrGraphics: polygon with size > 0 has null appearance.");
+	    	return;
+	    }
+	    
+	    setColour(p.getAttributes());
 		move(p.point(0));
 		for(int i = 1; i < p.size(); i++)	
 				plot(p.point(i));
