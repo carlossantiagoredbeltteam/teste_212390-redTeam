@@ -6,9 +6,9 @@ HOWTO build from source:
 
 0) Check out reprap/miscellaneous/AoI/plugins
 
-1) Edit CSGEvaluator.xml: Set this dir to point to your AOI install dir (this dir should
+1) Edit build.properties: Set this dir to point to your AOI install dir (this dir should
   contain artofillusion.jar)
-  <property name="aoidir" value="/Applications/Art of Illusion" />
+  aoidir=/Applications/Art of Illusion
 
 2) ant -f CSGEvaluator.xml
 
