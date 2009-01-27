@@ -860,9 +860,7 @@ public class RrPolygonList
 	{	
 		if(size() == 0)
 		{
-			return new RrCSGPolygon(RrCSG.nothing(), 
-					new RrRectangle(new RrInterval(0, 1), new RrInterval(0, 1)), 
-					new Attributes(null, null, null, null));
+			return new RrCSGPolygon();
 		}
 		if(size() == 1)
 		{

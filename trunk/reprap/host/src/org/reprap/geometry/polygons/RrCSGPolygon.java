@@ -273,6 +273,31 @@ public class RrCSGPolygon
 	}
 	
 	/**
+	 * Null constructor give a valid structure with the null set in.
+	 *
+	 */
+	public RrCSGPolygon()
+	{
+		box = new RrRectangle(new RrInterval(0, 1), new RrInterval(0, 1));
+		att = new Attributes(null, null, null, null);
+		q1 = null;
+		q2 = null;
+		q3 = null;
+		q4 = null;
+		resolution_2 = box.dSquared()*Preferences.tiny();
+		csg = RrCSG.nothing();
+		visit1 = false;
+		visit2 = false;
+		sFactor = Preferences.swell();
+		edgeCount = 0;
+		corner = false;
+		vertex = null;
+		i1 = new RrInterval();
+		i2 = new RrInterval();
+		grid = null;
+	}
+	
+	/**
 	 * Set one up
 	 * @param p
 	 * @param bx

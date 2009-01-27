@@ -15,6 +15,7 @@ import org.reprap.Attributes;
 import org.reprap.Preferences;
 import org.reprap.ReprapException;
 import org.reprap.devices.pseudo.LinePrinter;
+import org.reprap.devices.GenericExtruder;
 import org.reprap.geometry.polygons.Rr2Point;
 import org.reprap.geometry.polygons.RrCSGPolygonList;
 import org.reprap.geometry.polygons.RrCSGPolygon;
@@ -309,26 +310,34 @@ public class LayerProducer {
 		RrCSGPolygonList supports = new RrCSGPolygonList();
 		RrCSGPolygonList thisForTheRecord = new RrCSGPolygonList();
 		
+		RrCSGPolygon allThisLayerGrown = new RrCSGPolygon();
+		for(int i = 0; i < csgP.size(); i++)
+		{
+			allThisLayerGrown = RrCSGPolygon.union(csgP.get(i), allThisLayerGrown);
+			if(i > 0)
+				allThisLayerGrown = allThisLayerGrown.reEvaluate();
+		}
+		allThisLayerGrown = allThisLayerGrown.offset(layerConditions.getZStep());
+		
 		for(int i = 0; i < csgP.size(); i++)
 		{
 			RrCSGPolygon pgThisLevel = csgP.get(i);
 			Attributes aThisLevel = pgThisLevel.getAttributes();
 			Extruder eThisLevel = aThisLevel.getExtruder(es);
 			String supportName = eThisLevel.getSupportMaterial();
+			Extruder supportExtruder = es[GenericExtruder.getNumberFromMaterial(supportName)];
 			if(!supportName.contentEquals("null"))
 			{
 				RrCSGPolygon aboveLevel = above.find(aThisLevel);
-				//System.out.println("here 1");
 				if(aboveLevel != null)
 				{
-					//System.out.println("here 2");
 					RrCSGPolygon toRemember = RrCSGPolygon.union(aboveLevel, pgThisLevel);
 					toRemember = toRemember.reEvaluate();
 					thisForTheRecord.add(toRemember);
-					RrCSGPolygon grown = pgThisLevel.offset(layerConditions.getZStep());
-					RrCSGPolygon sup = RrCSGPolygon.difference(aboveLevel, grown);
+					RrCSGPolygon sup = RrCSGPolygon.difference(aboveLevel, allThisLayerGrown);
 					sup = sup.reEvaluate();
-					//sup.setAttributes(new Attributes(supportName, null, null, proper appearance for support));
+					sup.setAttributes(new Attributes(supportName, null, null, 
+							supportExtruder.getAppearance()));
 					supports.add(sup);
 				} else
 					thisForTheRecord.add(pgThisLevel);
