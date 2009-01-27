@@ -14,6 +14,7 @@ import artofillusion.LayoutWindow;
 import artofillusion.ModellingTool;
 import artofillusion.keystroke.KeystrokeManager;
 import artofillusion.keystroke.KeystrokeRecord;
+import artofillusion.ui.Translate;
 
 
 /**
@@ -49,7 +50,7 @@ public class CSGEvaluatorTool implements ModellingTool
    */
   public String getName()
   {
-    return "CSG Evaluator...";
+    return Translate.text("CSGEvaluator:name", "...");
   }
 
 

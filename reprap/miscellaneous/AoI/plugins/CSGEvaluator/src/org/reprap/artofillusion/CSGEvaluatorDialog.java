@@ -12,6 +12,7 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 
 import artofillusion.LayoutWindow;
+import artofillusion.ui.Translate;
 import buoy.event.CommandEvent;
 import buoy.event.KeyPressedEvent;
 import buoy.event.WindowClosingEvent;
@@ -27,11 +28,20 @@ import buoy.widget.LayoutInfo;
  */
 class CSGEvaluatorDialog extends BDialog
 {
-  LayoutWindow window;
+  protected LayoutWindow window;
+  protected String[] buttons = new String [] {
+	  Translate.text("CSGEvaluator:evaluate"), Translate.text("CSGEvaluator:devaluate"),
+	  Translate.text("CSGEvaluator:union"), Translate.text("CSGEvaluator:intersection"),
+	  Translate.text("CSGEvaluator:difference")
+  };
+  
+  protected String[] labels = new String [] {
+	  Translate.text("CSGEvaluator:Actions"), null, Translate.text("CSGEvaluator:BooleanOp"), null, null
+  };
   
   public CSGEvaluatorDialog(LayoutWindow window)
   {
-    super(window, "CSG Evaluator", false); // Modeless
+    super(window, Translate.text("CSGEvaluator:name"), false); // Modeless
     this.window = window;
     this.setResizable(false);
     
@@ -42,25 +52,9 @@ class CSGEvaluatorDialog extends BDialog
 
     bc.setDefaultLayout(new LayoutInfo());
 
-    String versionstr = "1.0";
-    // FIXME: This was an attempt to pick up the version from the extensions.xml file,
-    // but it didn't work out since the classloader found the wrong file.
-    /*
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    DocumentBuilder builder;
-    try {
-      builder = factory.newDocumentBuilder();
-      Document doc = builder.parse(CSGEvaluatorDialog.class.getResourceAsStream("/extensions.xml"));
-      Element extensions = doc.getDocumentElement();
-      versionstr = extensions.getAttribute("version");
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    */
-    bc.add(new BLabel("<html>CSG Evaluator Control Panel <font size=1>V"+versionstr+"</font></html>"), BorderContainer.NORTH);
+    String versionstr = CSGEvaluatorPlugin.getVersion();
+    bc.add(new BLabel(Translate.text("CSGEvaluator:title", versionstr)), BorderContainer.NORTH);
 
-    String[] buttons = new String [] {"evaluate", "devaluate", "union", "intersection", "difference"};
-    String[] labels = new String [] {"Actions", null, "Boolean Op", null, null};
 
     FormContainer fc = new FormContainer(2, buttons.length+1);
     bc.add(fc, BorderContainer.CENTER);
@@ -80,9 +74,9 @@ class CSGEvaluatorDialog extends BDialog
 
     // Close button
     BButton closeButton;
-    bc.add(closeButton = new BButton("close"), BorderContainer.SOUTH);
-    closeButton.addEventLink(CommandEvent.class, this, "closeWindow");
-    closeButton.addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
+    bc.add(closeButton = Translate.button("close", this, "closeWindow"), BorderContainer.SOUTH);
+    //closeButton.addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
+    addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
     // FIXME: Other events (most noticeably Cmd-Z (undo)) are consumed and won't reach our
     // parent window.
     setDefaultButton(closeButton);

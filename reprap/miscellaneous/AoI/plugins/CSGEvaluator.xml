@@ -2,15 +2,15 @@
 
 <project name="CSGEvaluator" default="dist" basedir=".">
 
+  <property file="build.properties" />
+
   <!-- set global properties for this build -->
-  <property name="aoidir" value="/Applications/Art of Illusion" />
-  <property name="src" value="CSGEvaluator/src" />
-  <property name="build" value="CSGEvaluator/build" />
-  <property name="docs" value="CSGEvaluator/docs" />
+  <property name="package" value="${ant.project.name}" />
+  <property name="src" value="${package}/src" />
+  <property name="build" value="${package}/build" />
+  <property name="docs" value="${package}/docs" />
   <property name="dist" value="Plugins" />
   <property name="aoijar" value="${aoidir}/ArtOfIllusion.jar" />
-  <property name="buoyjar" value="Buoy.jar" />
-
 
   <target name="init">
     <!-- Create the time stamp -->
@@ -23,16 +23,31 @@
 
   <target name="compile" depends="init">
     <!-- Compile the java code from ${src} into ${build} -->
-    <javac source="1.5" target="1.5" srcdir="${src}" destdir="${build}" classpath="${aoijar}:${buoyjar}" debug="on" extdirs="" />
+    <javac source="1.5" target="1.5" srcdir="${src}" destdir="${build}"
+	   classpath="${aoijar}" debug="on" extdirs="" />
   </target>
 
   <target name="dist" depends="compile">
-    <!-- Copy all necessary files into ${build}, then create the jar file -->
-    <copy file="${src}/extensions.xml" todir="${build}" />
-    <copy todir="${build}">
-      <fileset dir="${src}" includes="*.properties" />
-    </copy>
-    <jar jarfile="${dist}/CSGEvaluator.jar" basedir="${build}" />
+    <!-- create the jar, including all required files -->
+    <jar jarfile="${dist}/${package}.jar" basedir="${build}" >
+    	<fileset dir="${src}" includes="extensions.xml, *.properties, icons/**" />
+<!--        <zipfileset prefix="help" dir="${help}/help" />  -->
+    </jar>	
+  </target>
+
+  <target name="source">
+    <property name="src-name" value="${package}-src-${version}" />
+
+    <!-- create the source archives  -->
+    <zip file="./${src-name}.zip" >
+       <zipfileset prefix="${package}/${package}/src" dir="${src}" />
+       <zipfileset prefix="${package}" dir="." includes="*.xml, *.properties" />
+    </zip>
+       
+    <tar tarfile="./${src-name}.tz" compression="gzip">
+       <tarfileset prefix="${package}/${package}/src" dir="${src}" />
+       <tarfileset prefix="${package}" dir="." includes="*.xml, *.properties" />
+    </tar>
   </target>
 
   <target name="docs" depends="init">
@@ -44,9 +59,9 @@
         author="true"
         version="true"
         use="true"
-        windowtitle="CSGEvaluator Documentation"
+        windowtitle="${package} Documentation"
 	public="true">
-      <doctitle><![CDATA[<h1>CSGEvaluator</h1>]]></doctitle>
+      <doctitle><![CDATA[<h1>${package}</h1>]]></doctitle>
       <bottom><![CDATA[<i>Copyright &#169; 2009 by Marius Kintel.</i>]]></bottom>
     </javadoc>
   </target>
@@ -55,6 +70,7 @@
     <!-- Delete the ${build} and ${docs} directory trees -->
     <delete dir="${build}" />
     <delete dir="${docs}" />
+    <delete file="${dist}/${package}.jar" />
   </target>
 </project>
 
