@@ -175,25 +175,12 @@ public class LayerRules
 	 * @param i
 	 * @return
 	 */
-	public RrCSGPolygonList getLayer(int i)
+	public RrCSGPolygonList getLayerAbove()
 	{
-		if(i == 0)
-			System.out.println("LayerRules.getLayer: asking for current layer (probably) before it has been set.");
-		
-		if(topDown)
-			i = -i;
-		
-		i = layerPointer + i;
-		
-		if(i < 0)
-			i = layerRecord.length - i;
-		else if(i > layerRecord.length - 1)
-			i = i - layerRecord.length;
-		
-		if(i < 0 || i > layerRecord.length - 1)
-			return null;
-		
-		return layerRecord[i];
+		if(layerPointer == 0)
+			return layerRecord[layerRecord.length - 1];
+		else
+			return layerRecord[layerPointer - 1];
 	}
 	
 	public boolean getTopDown() { return topDown; }
