@@ -60,7 +60,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.reprap.Extruder;
-import org.reprap.Attributes;
 
 /**
  * chPair - small class to hold double pointers for convex hull calculations.
