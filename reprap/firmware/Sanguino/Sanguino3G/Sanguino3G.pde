@@ -94,7 +94,7 @@ void loop()
   if (!is_machine_aborted)
   {
     //check for and handle any packets that come in.
-    process_packets();
+    process_host_packets();
  
     //only handle our buffer if we're unpaused. 
     if (!is_machine_paused && !is_machine_aborted)
