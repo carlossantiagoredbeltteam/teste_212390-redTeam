@@ -66,4 +66,10 @@ public:
   }
 };
 
+//we store all queueable commands in one big giant buffer.
+// Explicitly allocate memory at compile time for buffer.
+#define COMMAND_BUFFER_SIZE 2048
+uint8_t underlyingBuffer[COMMAND_BUFFER_SIZE];
+CircularBuffer commandBuffer(COMMAND_BUFFER_SIZE, underlyingBuffer);
+
 #endif // _CIRCULAR_BUFFER_H_
