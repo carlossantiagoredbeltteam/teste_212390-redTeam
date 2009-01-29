@@ -13,10 +13,9 @@
  *********************************************************************************************************/
 
 //include some basic libraries.
-#include <stdint.h>
+#include <WProgram.h>
 #include "_misc.h"
-#include "CircularBuffer.h"
-#include "MasterPacketProcessor.h"
+#include "Packet.h"
 
 //this is our firmware version
 #define FIRMWARE_VERSION 0001
@@ -24,11 +23,9 @@
 //this is the version of our host software
 unsigned int host_version = 0;
 
-//we store all queueable commands in one big giant buffer.
-// Explicitly allocate memory at compile time for buffer.
-#define COMMAND_BUFFER_SIZE 2048
-byte underlyingBuffer[COMMAND_BUFFER_SIZE];
-CircularBuffer commandBuffer(COMMAND_BUFFER_SIZE, underlyingBuffer);
+//these are our packet classes
+Packet hostPacket(0);
+Packet slavePacket(1);
 
 //are we paused?
 boolean is_machine_paused = false;
@@ -69,9 +66,7 @@ void setup()
 
   //this is a simple text string that identifies us.
   Serial.print("S3G v");
-  Serial.print(VERSION_MAJOR);
-  Serial.print(',');
-  Serial.println(VERSION_MINOR);
+  Serial.print(FIRMWARE_VERSION);
 }
 
 //this function takes us back to our default state.

@@ -34,16 +34,14 @@ void init_commands()
 void handle_query()
 {
   //which one did we get?
-  switch (packet_data[0])
+  switch (hostPacket.getData(0))
   {
     case HOST_CMD_VERSION:
       //get our host version
-      host_version_major = packet_data[2];
-      host_version_minor = packet_data[1];
+      host_version = make_uint16_t(hostPacket.getData(1), hostPacket.getData(2));
       
       //send our version back.
-	  add_reply_8(VERSION_MINOR);
-	  add_reply_8(VERSION_MAJOR);
+	  hostPacket.add_reply_16(FIRMWARE_VERSION);
 	  break;
 
     case HOST_CMD_INIT:
@@ -53,7 +51,7 @@ void handle_query()
       
     case HOST_CMD_GET_BUFFER_SIZE:
       //send our remaining buffer size.
-      add_reply_16(commandBuffer.remainingCapacity());
+      hostPacket.add_reply_16(commandBuffer.remainingCapacity());
       break;
 
     case HOST_CMD_CLEAR_BUFFER:
@@ -63,24 +61,24 @@ void handle_query()
 
     case HOST_CMD_GET_POSITION:
       //send our position
-      add_reply_32(current_steps.x);
-      add_reply_32(current_steps.y);
-      add_reply_32(current_steps.z);
-      add_reply_8(get_endstop_states());
+      hostPacket.add_reply_32(current_steps.x);
+      hostPacket.add_reply_32(current_steps.y);
+      hostPacket.add_reply_32(current_steps.z);
+      hostPacket.add_reply_8(get_endstop_states());
       break;
 
     case HOST_CMD_GET_RANGE:
       //send our range
-      add_reply_32(range_steps.x);
-      add_reply_32(range_steps.y);
-      add_reply_32(range_steps.z);
+      hostPacket.add_reply_32(range_steps.x);
+      hostPacket.add_reply_32(range_steps.y);
+      hostPacket.add_reply_32(range_steps.z);
       break;
 
     case HOST_CMD_SET_RANGE:
       //set our range to what the host tells us
-      range_steps.x = make_uint32_t(packet_data[1], packet_data[2], packet_data[3], packet_data[4]);
-      range_steps.y = make_uint32_t(packet_data[5], packet_data[6], packet_data[7], packet_data[8]);
-      range_steps.z = make_uint32_t(packet_data[9], packet_data[10], packet_data[11], packet_data[12]);
+      range_steps.x = make_uint32_t(hostPacket.getData(1), hostPacket.getData(2), hostPacket.getData(3), hostPacket.getData(4));
+      range_steps.y = make_uint32_t(hostPacket.getData(5), hostPacket.getData(6), hostPacket.getData(7), hostPacket.getData(8));
+      range_steps.z = make_uint32_t(hostPacket.getData(9), hostPacket.getData(10), hostPacket.getData(11), hostPacket.getData(12));
       
       //write it back to eeprom
       write_range_to_eeprom();
@@ -118,8 +116,8 @@ void handle_query()
 
     case HOST_CMD_PROBE:
       //we dont support this yet.
-      response_packet_code = RC_CMD_UNSUPPORTED;
-      break;
+	  hostPacket.unsupported();
+	  break;
   }
 }
 
