@@ -37,10 +37,12 @@ private:
   //variables for our incoming packet.
   PacketState state;
   uint8_t target_length;
-  uint8_t length;
+  uint8_t rx_length;
+  uint8_t rx_data[MAX_PACKET_LENGTH];
+  uint8_t rx_crc;
   uint8_t tx_length;
-  uint8_t data[MAX_PACKET_LENGTH];
-  uint8_t crc;
+  uint8_t tx_data[MAX_PACKET_LENGTH];
+  uint8_t tx_crc;
   uint8_t is_command_packet;
   ResponseCode response_code;
 
@@ -59,10 +61,11 @@ public:
   {
     state = PS_START;
     response_code = RC_OK;
-    length = 0;
-    target_length = 0;
+	target_length = 0;
+    rx_length = 0;
+	rx_crc = 0;
     tx_length = 0;
-    crc = 0;
+	tx_crc = 0;
     is_command_packet = false;
   }
 
@@ -89,13 +92,13 @@ public:
       //please note: data may go into command buffer
       //instead of query packet buffer, so don't check the size
       target_length = b;
-      length = 0;
+      rx_length = 0;
       state = PS_PAYLOAD;
     }
     else if (state == PS_PAYLOAD)  // process payload byte
     {
       //the first byte determines command vs query
-      if (length == 0)
+      if (rx_length == 0)
       {
         // top bit high == bufferable command packet (eg. #128-255)
         if (b & 1 << 7)
@@ -105,10 +108,10 @@ public:
           is_command_packet = false;
       }
       //just keep reading bytes while we got them.
-      if (length < target_length)
+      if (rx_length < target_length)
       {
         //keep track of CRC.
-        crc = _crc_ibutton_update(crc, b);
+        rx_crc = _crc_ibutton_update(rx_crc, b);
 
         //we put different things in different buffers.  (query vs command)
         if (is_command_packet)
@@ -122,23 +125,23 @@ public:
         else
         {
           //will it fit?
-          if (length < MAX_PACKET_LENGTH)
-            data[length] = b;
+          if (rx_length < MAX_PACKET_LENGTH)
+            rx_data[rx_length] = b;
           else
             response_code = RC_PACKET_TOO_BIG;
         }
 
-        length++;
+        rx_length++;
       }
 
       //are we done?
-      if (length >= target_length)
+      if (rx_length >= target_length)
         state = PS_CRC;
     }
     else if (state == PS_CRC)  // check crc
     {
       // did the packet check out?
-      if (crc != b)
+      if (rx_crc != b)
         response_code = RC_CRC_MISMATCH;
 
       //okay, the packet is done.
@@ -156,9 +159,14 @@ public:
     return (response_code == RC_OK && !is_command_packet);
   }
 
+  uint8_t getLength()
+  {
+	return rx_length;
+  }
+
   uint8_t getData(uint8_t i)
   {
-	return data[i];
+	return rx_data[i];
   }
 
   void unsupported()
@@ -169,66 +177,81 @@ public:
   void sendReply()
   {
     //initialize our response CRC
-    crc = 0;
-    crc = _crc_ibutton_update(crc, response_code);
+    tx_crc = 0;
+    tx_crc = _crc_ibutton_update(tx_crc, response_code);
 
     //actually send our response.
     transmit(START_BYTE);
-	transmit(length+1);
+	transmit(tx_length+1);
     transmit(response_code);
 
     //loop through our reply packet payload and send it.
-    for (uint8_t i=0; i<length; i++)
+    for (uint8_t i=0; i<tx_length; i++)
     {
-      transmit(data[i]);
-      crc = _crc_ibutton_update(crc, data[i]);
+      transmit(tx_data[i]);
+      tx_crc = _crc_ibutton_update(tx_crc, tx_data[i]);
     }
 
     //okay, send our CRC.
-    transmit(crc);
+    transmit(tx_crc);
 
     //okay, now reset.
     init();
   }
 
-  void transmit(uint8_t data)
+  void sendPacket()
+  {
+	tx_crc = 0;
+    transmit(START_BYTE);
+	transmit(tx_length);
+
+    //loop through our reply packet payload and send it.
+    for (uint8_t i=0; i<tx_length; i++)
+    {
+      transmit(tx_data[i]);
+      tx_crc = _crc_ibutton_update(tx_crc, tx_data[i]);
+    }
+
+    //okay, send our CRC.
+    transmit(tx_crc);
+  }
+
+  void transmit(uint8_t d)
   {
 	if (uart == 0)
-		Serial.print(data, BYTE);
+		Serial.print(d, BYTE);
 	else
-		Serial1.print(data, BYTE);
+		Serial1.print(d, BYTE);
   }
 
   //add a four byte chunk of data to our reply
-  void add_32(uint32_t data)
+  void add_32(uint32_t d)
   {
-    add_8(data & 0xff);
-    add_8(data >> 8);
-    add_8(data >> 16);
-    add_8(data >> 24);
+    add_16(d);
+    add_16(d >> 16);
   }
 
   //add a two byte chunk of data to our reply
-  void add_16(uint16_t data)
+  void add_16(uint16_t d)
   {
-    add_8(data & 0xff);
-    add_8(data >> 8);
+    add_8(d & 0xff);
+    add_8(d >> 8);
   }
 
   //add a byte to our reply.
-  void add_8(uint8_t b)
+  void add_8(uint8_t d)
   {
     //only add it if it will fit.
     if (tx_length < MAX_PACKET_LENGTH)
     {
-      data[tx_length] = b;
+      tx_data[tx_length] = d;
       tx_length++;
     }
   }
 
   uint8_t get_8(uint8_t idx)
   {
-	return data[idx];
+	return rx_data[idx];
   }
 
   uint16_t get_16(uint8_t idx)
