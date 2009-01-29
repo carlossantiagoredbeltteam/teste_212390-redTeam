@@ -36,6 +36,166 @@ void init_steppers()
 	calculate_deltas();
 }
 
+void seek_minimums(boolean find_x, boolean find_y, boolean find_z, unsigned long step_delay, unsigned int timeout_seconds)
+{
+	unsigned long start = millis();
+	unsigned long end = millis() + (timeout_seconds*1000);
+	
+	enable_steppers();
+
+	boolean found_x = false;
+	boolean found_y = false;
+	boolean found_z = false;
+
+	//do it until we time out.
+	while (millis() < end)
+	{
+		//do our steps and check for mins.
+		if (find_x && !found_x)
+		{
+			found_x = find_axis_min(X_STEP_PIN, X_DIR_PIN, X_MIN_PIN);
+			current_steps.x = 0;
+		}
+		if (find_y && !found_y)
+		{
+			found_y = find_axis_min(Y_STEP_PIN, Y_DIR_PIN, Y_MIN_PIN);
+			current_steps.y = 0;
+		}
+		if (find_z && !found_z)
+		{
+			found_z = find_axis_min(Z_STEP_PIN, Z_DIR_PIN, Z_MIN_PIN);
+			current_steps.z = 0;
+		}
+
+		//check to see if we've found all required switches.
+		if (find_x && !found_x)
+			true;
+		else if (find_y && !found_y)
+			true;
+		else if (find_z && !found_z)
+			true;
+		//found them all.
+		else
+			break;
+		
+		//do our delay for our axes.
+		if (step_delay <= 65535)
+			delayMicrosecondsInterruptible(step_delay);
+		else
+			delay(step_delay/1000);
+	}
+}
+
+boolean find_axis_min(byte step_pin, byte dir_pin, byte min_pin)
+{
+	//are we at the minimum?
+	if (read_switch(min_pin))
+	{
+		//move forward until the switch goes open. (slowly)
+		digitalWrite(dir_pin, HIGH);
+		while (read_switch(min_pin))
+		{
+ 			do_step(step_pin);
+			delay(500);
+ 		}
+
+		//okay, now move us back one step.
+		digitalWrite(dir_pin, LOW);
+		do_step(step_pin);
+		
+		return true;
+	}
+	else
+	{
+		digitalWrite(dir_pin, LOW);
+		do_step(step_pin);
+	}
+	
+	return false;
+}
+
+void seek_maximums(boolean find_x, boolean find_y, boolean find_z, unsigned long step_delay, unsigned int timeout_seconds)
+{
+	unsigned long start = millis();
+	unsigned long end = millis() + (timeout_seconds*1000);
+	
+	enable_steppers();
+
+	boolean found_x = false;
+	boolean found_y = false;
+	boolean found_z = false;
+
+	//do it until we time out.
+	while (millis() < end)
+	{
+		//do our steps and check for mins.
+		if (find_x && !found_x)
+		{
+			found_x = find_axis_max(X_STEP_PIN, X_DIR_PIN, X_MAX_PIN);
+			range_steps.x = current_steps.x;
+		}
+		if (find_y && !found_y)
+		{
+			found_y = find_axis_max(Y_STEP_PIN, Y_DIR_PIN, Y_MAX_PIN);
+			range_steps.x = current_steps.x;
+		}
+		if (find_z && !found_z)
+		{
+			found_z = find_axis_max(Z_STEP_PIN, Z_DIR_PIN, Z_MAX_PIN);
+			range_steps.x = current_steps.x;
+		}
+
+		//check to see if we've found all required switches.
+		if (find_x && !found_x)
+			true;
+		else if (find_y && !found_y)
+			true;
+		else if (find_z && !found_z)
+			true;
+		//found them all.
+		else
+		{
+			write_range_to_eeprom();
+			break;
+		}
+		
+		//do our delay for our axes.
+		if (step_delay <= 65535)
+			delayMicrosecondsInterruptible(step_delay);
+		else
+			delay(step_delay/1000);
+	}
+}
+
+boolean find_axis_max(byte step_pin, byte dir_pin, byte max_pin)
+{
+	//are we at the minimum?
+	if (read_switch(max_pin))
+	{
+		//move forward until the switch goes open. (slowly)
+		digitalWrite(dir_pin, LOW);
+		while (read_switch(max_pin))
+		{
+ 			do_step(step_pin);
+			delay(500);
+ 		}
+
+		//okay, now move us back one step.
+		digitalWrite(dir_pin, HIGH);
+		do_step(step_pin);
+		
+		return true;
+	}
+	else
+	{
+		digitalWrite(dir_pin, HIGH);
+		do_step(step_pin);
+	}
+	
+	return false;
+}
+
+
 //prepare our variables for a bresenham DDA run.
 void prepare_dda()
 {

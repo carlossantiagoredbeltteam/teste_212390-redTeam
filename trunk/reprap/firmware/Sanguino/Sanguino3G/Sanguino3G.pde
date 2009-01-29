@@ -1,5 +1,5 @@
 /*********************************************************************************************************
- *  Sanguino 3rd Generation Firmware
+ *  Sanguino 3rd Generation Firmware (S3G)
  *
  *  Specification for this protocol is located at: http://docs.google.com/Doc?id=dd5prwmp_14ggw37mfp
  *  
@@ -8,7 +8,7 @@
  *
  *  Version History:
  *
- *  0.1: Initial structure and basic layout of the firmware
+ *  0001: Initial release of the protocol and firmware.
  *
  *********************************************************************************************************/
 
