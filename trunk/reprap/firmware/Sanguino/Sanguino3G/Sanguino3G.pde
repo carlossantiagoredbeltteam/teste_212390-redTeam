@@ -16,14 +16,13 @@
 #include <stdint.h>
 #include "_misc.h"
 #include "CircularBuffer.h"
+#include "MasterPacketProcessor.h"
 
 //this is our firmware version
-#define VERSION_MAJOR 0
-#define VERSION_MINOR 1
+#define FIRMWARE_VERSION 0001
 
 //this is the version of our host software
-byte host_version_major = 0;
-byte host_version_minor = 0;
+unsigned int host_version = 0;
 
 //we store all queueable commands in one big giant buffer.
 // Explicitly allocate memory at compile time for buffer.
