@@ -53,7 +53,6 @@ public:
   Packet(uint8_t uart)
   {
 	this->uart = uart;
-	
     init();
   }
 

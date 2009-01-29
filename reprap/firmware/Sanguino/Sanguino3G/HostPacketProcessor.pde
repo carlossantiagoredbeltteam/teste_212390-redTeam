@@ -122,9 +122,10 @@ void handle_query()
       {
         //unpause our machine.
 	    is_machine_paused = false;
-
-	    //TODO: unpause our tool?
 	    
+		//unpause our tools
+		set_tool_pause_state(false);
+	
 	    //resume stepping.
 	    enableTimer1Interrupt();
         enable_steppers();
@@ -134,8 +135,9 @@ void handle_query()
         //pause our activity.
         is_machine_paused = true;
 
-	    //TODO: pause our tool?
-        
+		//pause our tools
+		set_tool_pause_state(true);
+
         //pause stepping
         disableTimer1Interrupt();
         disable_steppers();
@@ -156,6 +158,8 @@ void handle_query()
 //this is for handling buffered commands with no response
 void handle_commands()
 {
+	byte flags = 0;
+	
   //do we have any commands?
   if (commandBuffer.size())
   {
@@ -163,6 +167,7 @@ void handle_commands()
 	byte cmd = commandBuffer.remove_8();
     switch(cmd)
     {
+	  //add it to our poitn queue.
       case HOST_CMD_QUEUE_POINT_INC:
 		queue_incremental_point(
 			commandBuffer.remove_16(),
@@ -173,6 +178,7 @@ void handle_commands()
 		);
         break;
 
+	  //add it to our point queue.
       case HOST_CMD_QUEUE_POINT_ABS:
 		queue_absolute_point(
 			commandBuffer.remove_32(),
@@ -183,6 +189,7 @@ void handle_commands()
 		);
         break;
       
+	  //update our current point to where we're told.
       case HOST_CMD_SET_POSITION:
       	wait_until_target_reached(); //dont want to get hasty.
       	
@@ -191,12 +198,31 @@ void handle_commands()
       	current_steps.z = commandBuffer.remove_32();
         break;
 
+      //figure out our minimums.
       case HOST_CMD_FIND_AXES_MINIMUM:
       	wait_until_target_reached(); //dont want to get hasty.
 
-		//TODO: implement this.
-        break;
+		//no dda interrupts.
+		disableTimer1Interrupt();
+		
+		//which ones are we going to?
+		flags = commandBuffer.remove_8();
+		
+		//find them!
+		seek_minimums(
+			flags & 1,
+			flags & (1 << 1),
+			flags & (1 << 2),
+			commandBuffer.remove_32(),
+			commandBuffer.remove_16()
+		);
+		
+		//turn on point seekign agian.
+		enableTimer1Interrupt();
+		
+		break;
 
+      //gotta know your limits.
       case HOST_CMD_FIND_AXES_MAXIMUM:
       	wait_until_target_reached(); //dont want to get hasty.
 
