@@ -58,11 +58,19 @@ public:
     
   /// Remove and return a character from the start of the
   /// circular buffer.
-  const uint8_t remove() {
+  const uint8_t remove_8() {
     const uint8_t c = buffer[start];
     start = (start+1)%capacity;
     count--;
     return c;
+  }
+
+  const uint16_t remove_16() {
+	return (remove_8() << 8) & remove_8();
+  }
+
+  const uint32_t remove_32() {
+	return (remove_16() << 16) & remove_16();
   }
 };
 

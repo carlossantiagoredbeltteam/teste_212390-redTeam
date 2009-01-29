@@ -38,7 +38,7 @@ private:
   PacketState state;
   uint8_t target_length;
   uint8_t length;
-  uint8_t response_length;
+  uint8_t tx_length;
   uint8_t data[MAX_PACKET_LENGTH];
   uint8_t crc;
   uint8_t is_command_packet;
@@ -61,7 +61,7 @@ public:
     response_code = RC_OK;
     length = 0;
     target_length = 0;
-    response_length = 0;
+    tx_length = 0;
     crc = 0;
     is_command_packet = false;
   }
@@ -200,30 +200,45 @@ public:
   }
 
   //add a four byte chunk of data to our reply
-  void add_reply_32(uint32_t data)
+  void add_32(uint32_t data)
   {
-    add_reply_8(data & 0xff);
-    add_reply_8(data >> 8);
-    add_reply_8(data >> 16);
-    add_reply_8(data >> 24);
+    add_8(data & 0xff);
+    add_8(data >> 8);
+    add_8(data >> 16);
+    add_8(data >> 24);
   }
 
   //add a two byte chunk of data to our reply
-  void add_reply_16(uint16_t data)
+  void add_16(uint16_t data)
   {
-    add_reply_8(data & 0xff);
-    add_reply_8(data >> 8);
+    add_8(data & 0xff);
+    add_8(data >> 8);
   }
 
   //add a byte to our reply.
-  void add_reply_8(uint8_t b)
+  void add_8(uint8_t b)
   {
     //only add it if it will fit.
-    if (response_length < MAX_PACKET_LENGTH)
+    if (tx_length < MAX_PACKET_LENGTH)
     {
-      data[response_length] = b;
-      response_length++;
+      data[tx_length] = b;
+      tx_length++;
     }
+  }
+
+  uint8_t get_8(uint8_t idx)
+  {
+	return data[idx];
+  }
+
+  uint16_t get_16(uint8_t idx)
+  {
+	return (get_8(idx+1) << 8) & get_8(idx);
+  }
+
+  uint32_t get_32(uint8_t idx)
+  {
+	return (get_16(idx+2) << 16) & get_16(idx);
   }
 };
 

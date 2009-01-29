@@ -134,17 +134,17 @@ void grab_next_point()
     disableTimer1Interrupt();
   	
   	//grab our new target
-  	target_steps.x += make_uint16_t(pointBuffer.remove(), pointBuffer.remove());
-  	target_steps.y += make_uint16_t(pointBuffer.remove(), pointBuffer.remove());
-  	target_steps.z += make_uint16_t(pointBuffer.remove(), pointBuffer.remove());
+  	target_steps.x += pointBuffer.remove_16();
+	target_steps.y += pointBuffer.remove_16();
+  	target_steps.z += pointBuffer.remove_16();
   
   	//figure out stuff for the move.
     calculate_deltas();
     prepare_dda();
     
     //start the move!
-    setTimer1Resolution(pointBuffer.remove());
-    setTimer1Ceiling(make_uint16_t(pointBuffer.remove(), pointBuffer.remove()));
+    setTimer1Resolution(pointBuffer.remove_8());
+    setTimer1Ceiling(pointBuffer.remove_16());
     enableTimer1Interrupt();
   }
 }

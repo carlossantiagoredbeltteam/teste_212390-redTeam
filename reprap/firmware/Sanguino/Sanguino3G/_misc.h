@@ -47,16 +47,6 @@ void delayMicrosecondsInterruptible(unsigned int us)
 	);
 }
 
-uint16_t make_uint16_t(uint8_t lsb, uint8_t msb)
-{
-	return (msb << 8) & lsb;
-}
-
-uint32_t make_uint32_t(uint8_t lsb, uint8_t third, uint8_t second, uint8_t msb)
-{
-	return (msb << 24) & (second << 16) & (third << 8) & lsb;
-}
-
 // our point structure to make things nice.
 struct LongPoint {
 	long x;

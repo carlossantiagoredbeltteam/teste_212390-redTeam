@@ -38,10 +38,10 @@ void handle_query()
   {
     case HOST_CMD_VERSION:
       //get our host version
-      host_version = make_uint16_t(hostPacket.getData(1), hostPacket.getData(2));
+      host_version = hostPacket.get_16(1);
       
       //send our version back.
-	  hostPacket.add_reply_16(FIRMWARE_VERSION);
+	  hostPacket.add_16(FIRMWARE_VERSION);
 	  break;
 
     case HOST_CMD_INIT:
@@ -51,7 +51,7 @@ void handle_query()
       
     case HOST_CMD_GET_BUFFER_SIZE:
       //send our remaining buffer size.
-      hostPacket.add_reply_16(commandBuffer.remainingCapacity());
+      hostPacket.add_16(commandBuffer.remainingCapacity());
       break;
 
     case HOST_CMD_CLEAR_BUFFER:
@@ -61,24 +61,24 @@ void handle_query()
 
     case HOST_CMD_GET_POSITION:
       //send our position
-      hostPacket.add_reply_32(current_steps.x);
-      hostPacket.add_reply_32(current_steps.y);
-      hostPacket.add_reply_32(current_steps.z);
-      hostPacket.add_reply_8(get_endstop_states());
+      hostPacket.add_32(current_steps.x);
+      hostPacket.add_32(current_steps.y);
+      hostPacket.add_32(current_steps.z);
+      hostPacket.add_8(get_endstop_states());
       break;
 
     case HOST_CMD_GET_RANGE:
       //send our range
-      hostPacket.add_reply_32(range_steps.x);
-      hostPacket.add_reply_32(range_steps.y);
-      hostPacket.add_reply_32(range_steps.z);
+      hostPacket.add_32(range_steps.x);
+      hostPacket.add_32(range_steps.y);
+      hostPacket.add_32(range_steps.z);
       break;
 
     case HOST_CMD_SET_RANGE:
       //set our range to what the host tells us
-      range_steps.x = make_uint32_t(hostPacket.getData(1), hostPacket.getData(2), hostPacket.getData(3), hostPacket.getData(4));
-      range_steps.y = make_uint32_t(hostPacket.getData(5), hostPacket.getData(6), hostPacket.getData(7), hostPacket.getData(8));
-      range_steps.z = make_uint32_t(hostPacket.getData(9), hostPacket.getData(10), hostPacket.getData(11), hostPacket.getData(12));
+      range_steps.x = hostPacket.get_32(1);
+      range_steps.y = hostPacket.get_32(5);
+      range_steps.z = hostPacket.get_32(9);
       
       //write it back to eeprom
       write_range_to_eeprom();
@@ -128,35 +128,35 @@ void handle_commands()
   if (commandBuffer.size())
   {
     //okay, which command are we handling?
-	byte cmd = commandBuffer.remove();
+	byte cmd = commandBuffer.remove_8();
     switch(cmd)
     {
       case HOST_CMD_QUEUE_POINT_INC:
 		queue_incremental_point(
-			make_uint16_t(commandBuffer.remove(), commandBuffer.remove()),
-			make_uint16_t(commandBuffer.remove(), commandBuffer.remove()),
-			make_uint16_t(commandBuffer.remove(), commandBuffer.remove()),
-			commandBuffer.remove(),
-			make_uint16_t(commandBuffer.remove(), commandBuffer.remove())			
+			commandBuffer.remove_16(),
+			commandBuffer.remove_16(),
+			commandBuffer.remove_16(),
+			commandBuffer.remove_8(),
+			commandBuffer.remove_16()			
 		);
         break;
 
       case HOST_CMD_QUEUE_POINT_ABS:
 		queue_absolute_point(
-			make_uint32_t(commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove()),
-			make_uint32_t(commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove()),
-			make_uint32_t(commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove()),
-			commandBuffer.remove(),
-			make_uint16_t(commandBuffer.remove(), commandBuffer.remove())			
+			commandBuffer.remove_32(),
+			commandBuffer.remove_32(),
+			commandBuffer.remove_32(),
+			commandBuffer.remove_8(),
+			commandBuffer.remove_16()			
 		);
         break;
       
       case HOST_CMD_SET_POSITION:
       	wait_until_target_reached(); //dont want to get hasty.
       	
-      	current_steps.x = make_uint32_t(commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove());
-      	current_steps.y = make_uint32_t(commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove());
-      	current_steps.z = make_uint32_t(commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove());
+      	current_steps.x = commandBuffer.remove_32();
+      	current_steps.y = commandBuffer.remove_32();
+      	current_steps.z = commandBuffer.remove_32();
         break;
 
       case HOST_CMD_FIND_AXES_MINIMUM:
@@ -175,14 +175,14 @@ void handle_commands()
       	wait_until_target_reached(); //dont want to get hasty.
 
         //take it easy.
-		delay(make_uint32_t(commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove(), commandBuffer.remove()));
+		delay(commandBuffer.remove_32());
         break;
 
       case HOST_CMD_CHANGE_TOOL:
       	wait_until_target_reached(); //dont want to get hasty.
 
         //extruder, i choose you!
-		select_tool(commandBuffer.remove());
+		select_tool(commandBuffer.remove_8());
         break;
 
       case HOST_CMD_WAIT_FOR_TOOL:
@@ -190,9 +190,9 @@ void handle_commands()
 
         //get your temp in gear, you lazy bum.
         wait_for_tool_ready_state(
-        	commandBuffer.remove(),
-        	make_uint16_t(commandBuffer.remove(), commandBuffer.remove()),
-        	make_uint16_t(commandBuffer.remove(), commandBuffer.remove())
+        	commandBuffer.remove_8(),
+        	commandBuffer.remove_16(),
+        	commandBuffer.remove_16()
         );
         break;
     }
