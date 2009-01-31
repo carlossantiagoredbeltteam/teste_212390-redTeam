@@ -32,6 +32,39 @@ Packet masterPacket(0);
 //are we paused?
 boolean is_tool_paused = false;
 
+#include <Servo.h>
+
+int current_temperature;
+int target_temperature;
+
+// motor control states.
+typedef enum {
+  MC_PWM = 0,
+  MC_ENCODER
+} 
+MotorControlStyle;
+
+typedef enum {
+	MC_FORWARD = 0,
+	MC_REVERSE = 1
+}
+MotorControlDirection;
+
+MotorControlStyle motor1_control = MC_PWM;
+MotorControlDirection motor1_dir = MC_FORWARD;
+byte motor1_pwm = 0;
+long motor1_target_rpm = 0;
+long motor1_current_rpm = 0;
+
+MotorControlStyle motor2_control = MC_PWM;
+MotorControlDirection motor2_dir = MC_FORWARD;
+byte motor2_pwm = 0;
+long motor2_target_rpm = 0;
+long motor2_current_rpm = 0;
+
+Servo servo1;
+Servo servo2;
+
 //set up our firmware for actual usage.
 void setup()
 {

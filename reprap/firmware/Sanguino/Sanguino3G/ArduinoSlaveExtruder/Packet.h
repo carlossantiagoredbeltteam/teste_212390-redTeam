@@ -187,8 +187,8 @@ public:
   {
 	if (uart == 0)
 		Serial.print(d, BYTE);
-	else
-		Serial1.print(d, BYTE);
+//	else
+//		Serial1.print(d, BYTE);
   }
 
   //add a four byte chunk of data to our reply

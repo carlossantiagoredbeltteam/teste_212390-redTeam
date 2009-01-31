@@ -108,19 +108,27 @@ void handle_query()
     break;
 
   case SLAVE_CMD_SET_MOTOR_1_DIR:
-    motor1_dir = masterPacket.get_8(1);
+    temp = masterPacket.get_8(1);
+    if (temp & 1)
+      motor1_dir = MC_FORWARD;
+    else
+      motor1_dir = MC_REVERSE;    
     break;
 
   case SLAVE_CMD_SET_MOTOR_2_DIR:
-    motor2_dir = masterPacket.get_8(1);
+    temp = masterPacket.get_8(1);
+    if (temp & 1)
+      motor2_dir = MC_FORWARD;
+    else
+      motor2_dir = MC_REVERSE;    
     break;
 
   case SLAVE_CMD_TOGGLE_MOTOR_1:
     temp = masterPacket.get_8(1);
     if (temp & 1<<2)
-      motor_1_dir = MC_FORWARD;
+      motor1_dir = MC_FORWARD;
     else
-      motor_1_dir = MC_REVERSE;
+      motor1_dir = MC_REVERSE;
 
     if (temp & 1)
       enable_motor_1();
@@ -131,9 +139,9 @@ void handle_query()
   case SLAVE_CMD_TOGGLE_MOTOR_2:
     temp = masterPacket.get_8(1);
     if (temp & 1<<2)
-      motor_2_dir = MC_FORWARD;
+      motor2_dir = MC_FORWARD;
     else
-      motor_2_dir = MC_REVERSE;
+      motor2_dir = MC_REVERSE;
 
     if (temp & 1)
       enable_motor_2();
@@ -158,12 +166,12 @@ void handle_query()
     break;
 
   case SLAVE_CMD_SET_SERVO_1_POS:
-    servo1.attach();
+    servo1.attach(9);
     servo1.write(masterPacket.get_8(1));
     break;
 
   case SLAVE_CMD_SET_SERVO_2_POS:
-    servo2.attach();
+    servo2.attach(10);
     servo2.write(masterPacket.get_8(1));
     break;
 
