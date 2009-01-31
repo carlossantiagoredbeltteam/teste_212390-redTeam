@@ -1,6 +1,6 @@
 /****************************************************************************************
-* Here's where you define the overall electronics setup for your machine.
-****************************************************************************************/
+ * Here's where you define the overall electronics setup for your machine.
+ ****************************************************************************************/
 
 //
 // CHOOSE WHICH MOTHERBOARD YOU'RE USING:
@@ -21,8 +21,8 @@
 #define OPTO_ENDSTOP_2_X
 
 /****************************************************************************************
-* Sanguino Pin Assignment
-****************************************************************************************/
+ * Sanguino Pin Assignment
+ ****************************************************************************************/
 
 //these are the pins for the v1.0 Motherboard.
 #ifdef REPRAP_MOTHERBOARD_VERSION_1_0
@@ -50,11 +50,6 @@
 
 //our pin for debugging.
 #define DEBUG_PIN		0
-
-//various SPI select pins
-#define SPI_SELECT_1	?
-#define SPI_SELECT_2	?
-#define SPI_SELECT_3	?
 
 //our SD card pins
 #define SD_CARD_SELECT	?
@@ -111,8 +106,8 @@
 #endif
 
 /****************************************************************************************
-* Stepper Driver Behaviour Definition
-****************************************************************************************/
+ * Stepper Driver Behaviour Definition
+ ****************************************************************************************/
 
 #ifdef STEPPER_DRIVER_VERSION_1_X
 #define STEPPER_ENABLE	1
@@ -125,8 +120,8 @@
 #endif
 
 /****************************************************************************************
-* Opto Endstop Behaviour Definition
-****************************************************************************************/
+ * Opto Endstop Behaviour Definition
+ ****************************************************************************************/
 
 #ifdef OPTO_ENDSTOP_1_X
 #define SENSORS_INVERTING 0
@@ -135,3 +130,14 @@
 #ifdef OPTO_ENDSTOP_2_X
 #define SENSORS_INVERTING 1
 #endif
+
+
+/****************************************************************************************
+ * Various Buffer Size Declarations
+ ****************************************************************************************/
+//we store all queueable commands in one big giant buffer.
+// Explicitly allocate memory at compile time for buffer.
+#define COMMAND_BUFFER_SIZE 2048
+#define POINT_QUEUE_SIZE 32
+#define POINT_SIZE 9
+#define MAX_PACKET_LENGTH 32
