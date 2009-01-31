@@ -65,7 +65,7 @@ void setup()
   initialize();
 
   //this is a simple text string that identifies us.
-  Serial.print("S3G v");
+  Serial.print("R3G Master v");
   Serial.print(FIRMWARE_VERSION);
 }
 

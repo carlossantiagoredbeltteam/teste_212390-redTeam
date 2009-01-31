@@ -45,10 +45,21 @@ void process_host_packets()
     //do we have a finished packet?
     if (hostPacket.isFinished())
     {
-      //are we cool?
-      if (hostPacket.isQuery())
-        handle_query();		
-
+		byte b = hostPacket.get_8(0);
+        // top bit high == bufferable command packet (eg. #128-255)
+        if (b & 1 << 7)
+		{
+			//okay, throw it in the buffer.
+			for (int i=1; i<hostPacket.getLength(); i++)
+				commandBuffer.append(hostPacket.get_8(i));
+		}
+        // top bit low == reply needed query packet (eg. #0-127)
+        else
+		{
+	        handle_query(b);		
+		}
+      }
+    
       //okay, send our response
       hostPacket.sendReply();
 
@@ -59,10 +70,10 @@ void process_host_packets()
 }
 
 //this is for handling query commands that need a response.
-void handle_query()
+void handle_query(byte cmd)
 {
   //which one did we get?
-  switch (hostPacket.getData(0))
+  switch (cmd)
   {
     case HOST_CMD_VERSION:
       //get our host version

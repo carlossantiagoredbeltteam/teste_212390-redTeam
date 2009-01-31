@@ -31,7 +31,6 @@ Packet masterPacket(0);
 
 //are we paused?
 boolean is_tool_paused = false;
-boolean is_tool_aborted = false;
 
 //set up our firmware for actual usage.
 void setup()
@@ -50,7 +49,7 @@ void initialize()
   is_tool_paused = false;
   
   init_serial();
-  init_tool();
+  init_extruder();
 }
 
 //start our hardware serial drivers
@@ -63,15 +62,17 @@ void init_serial()
 void loop()
 {
   //check for and handle any packets that come in.
-  process_master_packets();
+  process_packets();
+
+  //manage our extruder stuff.
+  manage_temperature();
 }
 
 //handle the abortion of a print job
 void abort_print()
 {
-  //yes, we're done here.
-  is_tool_aborted = true;
-  
+  //TODO: shut down all things
+
   //initalize everything to the beginning
   initialize();
 }
