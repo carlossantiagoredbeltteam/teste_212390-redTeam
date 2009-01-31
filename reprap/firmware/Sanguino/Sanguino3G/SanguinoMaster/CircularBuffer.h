@@ -29,7 +29,7 @@ public:
 
   ~CircularBuffer() {
   }
-  
+
   /// Reset buffer.  (Note: does not zero data.)
   void clear() {
     start = count = 0;
@@ -55,7 +55,7 @@ public:
     buffer[(start+count)%capacity] = datum;
     count++;
   }
-    
+
   /// Remove and return a character from the start of the
   /// circular buffer.
   const uint8_t remove_8() {
@@ -66,18 +66,12 @@ public:
   }
 
   const uint16_t remove_16() {
-	return (remove_8() << 8) & remove_8();
+    return (remove_8() << 8) & remove_8();
   }
 
   const uint32_t remove_32() {
-	return (remove_16() << 16) & remove_16();
+    return (remove_16() << 16) & remove_16();
   }
 };
-
-//we store all queueable commands in one big giant buffer.
-// Explicitly allocate memory at compile time for buffer.
-#define COMMAND_BUFFER_SIZE 2048
-uint8_t underlyingBuffer[COMMAND_BUFFER_SIZE];
-CircularBuffer commandBuffer(COMMAND_BUFFER_SIZE, underlyingBuffer);
 
 #endif // _CIRCULAR_BUFFER_H_
