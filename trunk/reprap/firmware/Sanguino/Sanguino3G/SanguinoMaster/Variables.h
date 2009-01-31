@@ -43,3 +43,13 @@ CircularBuffer commandBuffer(COMMAND_BUFFER_SIZE, underlyingBuffer);
 unsigned long finishedCommands = 0;
 
 byte currentToolIndex = 0;
+
+//SD CARD STUFF.
+RepRapSDCard card;
+File f;
+
+//our buffer of bytes.
+#define BUFFSIZE 64
+char buffer[BUFFSIZE];
+byte bufferIndex = 0;
+byte error = 0;
