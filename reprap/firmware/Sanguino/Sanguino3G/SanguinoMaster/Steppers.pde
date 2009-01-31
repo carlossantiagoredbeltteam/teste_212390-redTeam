@@ -1,4 +1,4 @@
-t//initialize our stepper drivers
+//initialize our stepper drivers
 void init_steppers()
 {
   //clear our point buffer

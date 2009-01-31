@@ -14,10 +14,10 @@
 
 //include some basic libraries.
 #include <WProgram.h>
+#include <RepRapSDCard.h>
 
 #include "Configuration.h"
 #include "Datatypes.h"
-#include "RepRapSDCard.h"
 #include "CircularBuffer.h"
 #include "Packet.h"
 #include "Variables.h"
