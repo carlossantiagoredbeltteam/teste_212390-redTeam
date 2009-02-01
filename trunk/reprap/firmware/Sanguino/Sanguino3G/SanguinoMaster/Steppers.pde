@@ -502,7 +502,7 @@ boolean is_point_buffer_empty()
   return true;
 }
 
-void wait_until_target_reached()
+inline void wait_until_target_reached()
 {
   while(!is_point_buffer_empty())
     delayMicrosecondsInterruptible(500);
