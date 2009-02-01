@@ -23,6 +23,7 @@
 #include "Datatypes.h"
 #include "Packet.h"
 #include "Variables.h"
+#include "ThermistorTable.h"
 
 //this is our firmware version
 #define FIRMWARE_VERSION 0001
