@@ -23,18 +23,6 @@ RepStepper::RepStepper(int number_of_steps, byte dir_pin, byte step_pin, byte en
 	this->setDirection(RS_FORWARD);
 }
 
-/*
-  Sets the speed in ticks per step
-*/
-void RepStepper::setSpeed(long speed)
-{
-	step_delay = speed;
-	
-	if (step_delay > 0)
-		rpm = 960000000UL / (step_delay * number_of_steps);
-	else
-		rpm = 0;
-}
 
 /*
   Sets the speed in revs per minute
@@ -57,24 +45,11 @@ void RepStepper::setRPM(int new_rpm)
 	}
 }
 
-void RepStepper::setSteps(int steps)
-{
-	number_of_steps = steps;
-	
-	//recalculate our speed.
-	this->setRPM(this->rpm);
-}
-
 void RepStepper::setDirection(bool direction)
 {
 	digitalWrite(this->direction_pin, direction);
 	delayMicroseconds(10); //make sure it stabilizes..
 	this->direction = direction; //save our direction.
-}
-
-int RepStepper::getMicros()
-{
-	return step_delay / 16;
 }
 
 void RepStepper::enable()

@@ -35,11 +35,26 @@ class RepStepper {
 
     // various setters methods
 	void setRPM(int rpm);
-    void setSpeed(long speed);
-	void setDirection(bool direction);
-	void setSteps(int steps);
+    // Sets the speed in ticks per step
+    void setSpeed(long speed) {
+      step_delay = speed;
+      
+      if (step_delay > 0)
+        rpm = 960000000UL / (step_delay * number_of_steps);
+      else
+        rpm = 0;
+    }
+    void setDirection(bool direction);
+	void setSteps(int steps) {
+          number_of_steps = steps;
+          //recalculate our speed.
+          this->setRPM(this->rpm);
+        }
+
 	
-	int getMicros();
+	int getMicros() {
+          return step_delay / 16;
+        }
 	
     //various methods dealing with stepping.
 	void pulse();

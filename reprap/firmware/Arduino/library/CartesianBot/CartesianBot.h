@@ -58,19 +58,41 @@ class CartesianBot {
 	void setCurrentPoint(Point &point);
 	void getNextPoint();
 	void calculateDDA();
-	bool atTarget();
-	bool atHome();
+	bool atTarget() {
+          return ((x.current == x.target) && 
+                  (y.current == y.target) &&
+                  (z.current == z.target));
+        }
+
+	bool atHome() {
+          return (x.atMin() && y.atMin() && z.atMin());
+        }
 	
 	//our interface methods
-	void readState();
+	void readState() {
+          x.readState();
+          y.readState();
+          z.readState();
+        }
 	
 	//our timer interrupt interface functions.
 	void setupTimerInterrupt();
-	void enableTimerInterrupt();
-	void disableTimerInterrupt();
+	void enableTimerInterrupt() {
+          //reset our timer to 0 for reliable timing TODO: is this needed?
+          //TCNT1 = 0;
+          
+          //then enable our interrupt!
+          TIMSK1 |= (1<<OCIE1A);
+        }
+	void disableTimerInterrupt() {
+          TIMSK1 &= ~(1<<OCIE1A);
+        }
+        
 	void setTimer(unsigned long delay);
 	void setTimerResolution(byte r);
-	void setTimerCeiling(unsigned int c);
+	void setTimerCeiling(unsigned int c) {
+          OCR1A = c;
+        }
 	byte getTimerResolution(unsigned long delay);
 	unsigned int getTimerCeiling(unsigned long delay);
 	
