@@ -46,6 +46,8 @@ void init_extruder()
 	
 	//default to room temp.
 	set_temperature(21);
+	
+	setupTimer1Interrupt();
 }
 
 void read_quadrature()
@@ -72,21 +74,48 @@ void read_quadrature()
 
 void enable_motor_1()
 {
+	if (motor1_control == MC_PWM)
+		analogWrite(MOTOR_1_SPEED_PIN, motor1_pwm);
+	else if (motor1_control == MC_ENCODER)
+	{
+		speed_error = 0;
+		setTimer1Ticks(motor1_target_rpm/16);
+		enableTimer1Interrupt();
+	}
 }
 
 void disable_motor_1()
 {
-	
+	if (motor1_control == MC_PWM)
+		analogWrite(MOTOR_1_SPEED_PIN, 0);
+	else if (motor1_control == MC_ENCODER)
+	{
+		speed_error = 0;
+		disableTimer1Interrupt();
+	}
 }
 
 void enable_motor_2()
 {
-	
+	if (motor2_control == MC_PWM)
+		analogWrite(MOTOR_2_SPEED_PIN, motor2_pwm);
+	else if (motor2_control == MC_ENCODER)
+	{
+		speed_error = 0;
+		setTimer1Ticks(motor2_target_rpm/16);
+		enableTimer1Interrupt();
+	}
 }
 
 void disable_motor_2()
 {
-	
+	if (motor2_control == MC_PWM)
+		analogWrite(MOTOR_2_SPEED_PIN, 0);
+	else if (motor2_control == MC_ENCODER)
+	{
+		speed_error = 0;
+		disableTimer1Interrupt();
+	}
 }
 
 void enable_fan()
@@ -236,71 +265,45 @@ void manage_motor1_speed()
 	int dTerm = 0;
 	int speed = 0;
 
-/*
-	//THIS WAS WAY MORE TROUBLE THAN IT WAS WORTH. ABORTED PRINTS 3/4 OF THE WAY THROUGH. ARGH.
-	
-	//if our error is too high, it means we cant keep up.  bail to protect the extruder motor
-	if (abs_error > 750)
+	//hack for extruder not keeping up, overflowing, then shutting off.
+	if (speed_error < -5000)
+		speed_error = -500;
+	if (speed_error > 5000)
+		speed_error = 500;
+
+	if (speed_error < 0)
 	{
-		disableTimer1Interrupt();
-		disableTimer2Interrupt();
-		speed_error = 0;
-		analogWrite(MOTOR_1_SPEED_PIN, 0);
-		Serial.println("Extruder Fail");
+		//calculate our P term
+		pTerm = abs_error / pGain;
+
+		//calculate our I term
+		iState += abs_error;
+		iState = constrain(iState, iMin, iMax);
+		iTerm = iState / iGain;
+
+		//calculate our D term
+		dTerm = (abs_error - dState) * dGain;
+		dState = abs_error;
+
+		//calculate our PWM, within bounds.
+		speed = pTerm + iTerm - dTerm;
 	}
-	else
+
+	//our debug loop checker thingie
+	/*
+	cnt++;
+	if (cnt > 250)
 	{
-*/
-		//hack for extruder not keeping up, overflowing, then shutting off.
-		if (speed_error < -5000)
-			speed_error = -500;
-		if (speed_error > 5000)
-			speed_error = 500;
+		Serial.print("e:");
+		Serial.println(speed_error);
+		Serial.print("spd:");
+		Serial.println(speed);
+		cnt = 0;
+	}
+	*/
 
-		if (speed_error < 0)
-		{
-			//calculate our P term
-			pTerm = abs_error / pGain;
-	
-			//calculate our I term
-			iState += abs_error;
-			iState = constrain(iState, iMin, iMax);
-			iTerm = iState / iGain;
-	
-			//calculate our D term
-			dTerm = (abs_error - dState) * dGain;
-			dState = abs_error;
+	//figure out our real speed and use it.
+	motor1_pwm = constrain(speed, MIN_SPEED, MAX_SPEED);
 
-			//calculate our PWM, within bounds.
-			speed = pTerm + iTerm - dTerm;
-		}
-
-		//our debug loop checker thingie
-		/*
-		cnt++;
-		if (cnt > 250)
-		{
-			Serial.print("e:");
-			Serial.println(speed_error);
-			Serial.print("spd:");
-			Serial.println(speed);
-			cnt = 0;
-		}
-		*/
-
-		//figure out our real speed and use it.
-		speed = constrain(speed, MIN_SPEED, MAX_SPEED);
-
-                //debug
-                //if (foo2 > 1000)
-                //{
-                //  foo2 = 0;
-                //  Serial.print(speed_error);
-                //  Serial.print("/");
-                //  Serial.println(speed);
-                //}
-                //foo2++;
-
-		analogWrite(MOTOR_1_SPEED_PIN, speed);
-//	}
+	analogWrite(MOTOR_1_SPEED_PIN, motor1_pwm);
 }

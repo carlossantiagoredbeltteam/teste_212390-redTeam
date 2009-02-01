@@ -8,21 +8,18 @@
 #define EXTRUDER_CONTROLLER_VERSION_2_0
 
 #define TEMPERATURE_SAMPLES 5
+#define SERIAL_SPEED 76800
 
 /****************************************************************************************
 * Here's where you define the speed PID behavior
 ****************************************************************************************/
+//#define INVERT_QUADRATURE
 #define MIN_SPEED 50				//minimum PWM speed to use
 #define MAX_SPEED 255				//maximum PWM speed to use
 #define SPEED_ERROR_MARGIN 10		//our error margin (to prevent constant seeking)
 #define SPEED_INITIAL_PGAIN 1		//our proportional gain.
 #define SPEED_INITIAL_IGAIN 100		//our integral gain.
 #define SPEED_INITIAL_DGAIN 10		//our derivative gain.
-
-/****************************************************************************************
-* Here's where you define the quadrature behavior
-****************************************************************************************/
-//#define INVERT_QUADRATURE
 
 /****************************************************************************************
 * Sanguino Pin Assignment

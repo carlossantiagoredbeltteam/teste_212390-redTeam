@@ -36,7 +36,7 @@ void setup()
 
   //this is a simple text string that identifies us.
   Serial.print("R3G Slave v");
-  Serial.print(FIRMWARE_VERSION);
+  Serial.println(FIRMWARE_VERSION, DEC);
 }
 
 //this function takes us back to our default state.
@@ -51,7 +51,7 @@ void initialize()
 //start our hardware serial drivers
 void init_serial()
 {
-   Serial.begin(115200);
+   Serial.begin(SERIAL_SPEED);
 }
 
 //handle various things we're required to do.
@@ -61,7 +61,8 @@ void loop()
   process_packets();
 
   //manage our extruder stuff.
-  manage_temperature();
+  if (!is_tool_paused)
+  	manage_temperature();
 }
 
 //handle the abortion of a print job
