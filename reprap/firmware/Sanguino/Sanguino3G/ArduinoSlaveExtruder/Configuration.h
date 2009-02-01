@@ -10,6 +10,10 @@
 #define TEMPERATURE_SAMPLES 5
 #define SERIAL_SPEED 76800
 
+//the address for commands to listen to
+#define RS485_ADDRESS 1
+#define PACKET_TIMEOUT 10
+
 /****************************************************************************************
 * Here's where you define the speed PID behavior
 ****************************************************************************************/

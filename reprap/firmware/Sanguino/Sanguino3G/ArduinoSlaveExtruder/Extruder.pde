@@ -11,13 +11,6 @@ void init_extruder()
 	//attach our interrupt handler
 	attachInterrupt(0, read_quadrature, CHANGE);
 	
-	//turn our RS485 pins on
-	pinMode(RX_ENABLE_PIN, OUTPUT);
-	pinMode(TX_ENABLE_PIN, OUTPUT);
-
-	//disable TX, enable RX
-	//TODO
-
 	//setup our motor control pins.
 	pinMode(MOTOR_1_SPEED_PIN, OUTPUT);
 	pinMode(MOTOR_2_SPEED_PIN, OUTPUT);

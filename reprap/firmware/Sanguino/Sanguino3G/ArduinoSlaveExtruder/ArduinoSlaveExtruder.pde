@@ -51,6 +51,14 @@ void initialize()
 //start our hardware serial drivers
 void init_serial()
 {
+	//turn our RS485 control pins on
+	pinMode(RX_ENABLE_PIN, OUTPUT);
+	pinMode(TX_ENABLE_PIN, OUTPUT);
+
+	//disable TX, enable RX
+	rs485_disable_tx();
+	rs485_enable_rx();
+
    Serial.begin(SERIAL_SPEED);
 }
 
@@ -62,7 +70,9 @@ void loop()
 
   //manage our extruder stuff.
   if (!is_tool_paused)
+  {
   	manage_temperature();
+  }
 }
 
 //handle the abortion of a print job
