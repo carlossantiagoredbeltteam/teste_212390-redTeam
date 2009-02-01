@@ -1,6 +1,8 @@
 #ifndef EXTRUDER_H
 #define EXTRUDER_H
 
+#include "WProgram.h"
+
 #define EXTRUDER_FORWARD true
 #define EXTRUDER_REVERSE false
 
