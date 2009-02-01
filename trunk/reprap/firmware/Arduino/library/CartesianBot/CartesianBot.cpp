@@ -67,23 +67,6 @@ void CartesianBot::calculateDDA()
 	z.initDDA(this->max_delta);
 }
 
-bool CartesianBot::atHome()
-{
-	return (x.atMin() && y.atMin() && z.atMin());
-}
-
-void CartesianBot::readState()
-{
-	x.readState();
-	y.readState();
-	z.readState();
-}
-
-bool CartesianBot::atTarget()
-{
-	return ((x.current == x.target) && (y.current == y.target) && (z.current == z.target));
-}
-
 void CartesianBot::setupTimerInterrupt()
 {
 	//clear the registers
@@ -107,21 +90,6 @@ void CartesianBot::setupTimerInterrupt()
 	//start off with a slow frequency.
 	this->setTimerResolution(4);
 	this->setTimerCeiling(65535);
-}
-
-void CartesianBot::enableTimerInterrupt()
-{
-	//reset our timer to 0 for reliable timing TODO: is this needed?
-	//TCNT1 = 0;
-
-	//then enable our interrupt!
-	TIMSK1 |= (1<<OCIE1A);
-}
-
-void CartesianBot::disableTimerInterrupt()
-{
-	TIMSK1 &= ~(1<<ICIE1);
-	TIMSK1 &= ~(1<<OCIE1A);
 }
 
 void CartesianBot::setTimerResolution(byte r)
@@ -172,11 +140,6 @@ void CartesianBot::setTimerResolution(byte r)
 		TCCR1B &= ~(1<<CS11);
 		TCCR1B |=  (1<<CS10);
 	}
-}
-
-void CartesianBot::setTimerCeiling(unsigned int c)
-{
-	OCR1A = c;
 }
 
 void CartesianBot::setTimer(unsigned long delay)

@@ -1,4 +1,3 @@
-#include "WConstants.h"
 #include "ThermoplastExtruder.h"
 
 // Pick up the thermistor table from the file - makes it easier to customise
