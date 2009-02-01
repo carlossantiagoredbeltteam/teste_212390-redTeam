@@ -175,7 +175,7 @@ bool read_tool_response(int timeout)
   while (!slavePacket.isFinished())
   {
     //read through our available data
-    if (Serial.available() > 0)
+    if (Serial1.available() > 0)
     {
       //grab a byte and process it.
       byte d = Serial1.read();
