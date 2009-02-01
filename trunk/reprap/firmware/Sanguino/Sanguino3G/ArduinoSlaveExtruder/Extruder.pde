@@ -1,0 +1,306 @@
+void init_extruder()
+{
+	//encoder pins are for reading.
+	pinMode(ENCODER_A_PIN, INPUT);
+	pinMode(ENCODER_B_PIN, INPUT);
+	
+	//pullups on our encoder pins
+	digitalWrite(ENCODER_A_PIN, HIGH);
+	digitalWrite(ENCODER_B_PIN, HIGH);
+	
+	//attach our interrupt handler
+	attachInterrupt(0, read_quadrature, CHANGE);
+	
+	//turn our RS485 pins on
+	pinMode(RX_ENABLE_PIN, OUTPUT);
+	pinMode(TX_ENABLE_PIN, OUTPUT);
+
+	//disable TX, enable RX
+	//TODO
+
+	//setup our motor control pins.
+	pinMode(MOTOR_1_SPEED_PIN, OUTPUT);
+	pinMode(MOTOR_2_SPEED_PIN, OUTPUT);
+	pinMode(MOTOR_1_DIR_PIN, OUTPUT);
+	pinMode(MOTOR_2_DIR_PIN, OUTPUT);
+
+	//turn them off and forward.
+	analogWrite(MOTOR_1_SPEED_PIN, 0);
+	analogWrite(MOTOR_2_SPEED_PIN, 0);
+	digitalWrite(MOTOR_1_DIR_PIN, HIGH);
+	digitalWrite(MOTOR_2_DIR_PIN, HIGH);
+
+	//setup our various accessory pins.
+	pinMode(HEATER_PIN, OUTPUT);
+	pinMode(FAN_PIN, OUTPUT);
+	pinMode(VALVE_PIN, OUTPUT);
+	
+	//turn them all off
+	digitalWrite(HEATER_PIN, LOW);
+	digitalWrite(FAN_PIN, LOW);
+	digitalWrite(VALVE_PIN, LOW);
+	
+	//setup our debug pin.
+	pinMode(DEBUG_PIN, OUTPUT);
+	digitalWrite(DEBUG_PIN, LOW);
+	
+	//default to room temp.
+	set_temperature(21);
+}
+
+void read_quadrature()
+{  
+  // found a low-to-high on channel A
+  if (digitalRead(ENCODER_A_PIN) == HIGH)
+  {   
+    // check channel B to see which way
+    if (digitalRead(ENCODER_B_PIN) == LOW)
+        QUADRATURE_INCREMENT
+    else
+        QUADRATURE_DECREMENT
+  }
+  // found a high-to-low on channel A
+  else                                        
+  {
+    // check channel B to see which way
+    if (digitalRead(ENCODER_B_PIN) == LOW)
+        QUADRATURE_DECREMENT
+    else
+        QUADRATURE_INCREMENT
+  }
+}
+
+void enable_motor_1()
+{
+}
+
+void disable_motor_1()
+{
+	
+}
+
+void enable_motor_2()
+{
+	
+}
+
+void disable_motor_2()
+{
+	
+}
+
+void enable_fan()
+{
+	digitalWrite(FAN_PIN, HIGH);
+}
+
+void disable_fan()
+{
+	digitalWrite(FAN_PIN, LOW);
+}
+
+void open_valve()
+{
+	digitalWrite(VALVE_PIN, HIGH);
+}
+
+void close_valve()
+{
+	digitalWrite(VALVE_PIN, LOW);
+}
+
+byte is_tool_ready()
+{
+	//are we within 5% of the temperature?
+	if (current_temperature > (int)(target_temperature * 0.95))
+		return 1;
+	else
+		return 0;
+}
+
+void set_temperature(int temp)
+{
+	target_temperature = temp;
+	max_temperature = (int)((float)temp * 1.1);
+}
+
+/**
+*  Samples the temperature and converts it to degrees celsius.
+*  Returns degrees celsius.
+*/
+int get_temperature()
+{
+#ifdef THERMISTOR_PIN
+	return read_thermistor();
+#endif
+#ifdef THERMOCOUPLE_PIN
+	return read_thermocouple();
+#endif
+}
+
+/*
+* This function gives us the temperature from the thermistor in Celsius
+*/
+#ifdef THERMISTOR_PIN
+int read_thermistor()
+{
+	int raw = sample_temperature(THERMISTOR_PIN);
+
+	int celsius = 0;
+	byte i;
+
+	for (i=1; i<NUMTEMPS; i++)
+	{
+		if (temptable[i][0] > raw)
+		{
+			celsius  = temptable[i-1][1] + 
+				(raw - temptable[i-1][0]) * 
+				(temptable[i][1] - temptable[i-1][1]) /
+				(temptable[i][0] - temptable[i-1][0]);
+
+			if (celsius > 255)
+				celsius = 255; 
+
+			break;
+		}
+	}
+
+	// Overflow: We just clamp to 0 degrees celsius
+	if (i == NUMTEMPS)
+		celsius = 0;
+
+	return celsius;
+}
+#endif
+
+/*
+* This function gives us the temperature from the thermocouple in Celsius
+*/
+#ifdef THERMOCOUPLE_PIN
+int read_thermocouple()
+{
+	return ( 5.0 * sample_temperature(THERMOCOUPLE_PIN) * 100.0) / 1024.0;
+}
+#endif
+
+/*
+* This function gives us an averaged sample of the analog temperature pin.
+*/
+int sample_temperature(byte pin)
+{
+	int raw = 0;
+	
+	//read in a certain number of samples
+	for (byte i=0; i<TEMPERATURE_SAMPLES; i++)
+		raw += analogRead(pin);
+		
+	//average the samples
+	raw = raw/TEMPERATURE_SAMPLES;
+
+	//send it back.
+	return raw;
+}
+
+
+/*!
+  Manages motor and heater based on measured temperature:
+  o If temp is too low, don't start the motor
+  o Adjust the heater power to keep the temperature at the target
+ */
+void manage_temperature()
+{
+	//make sure we know what our temp is.
+	int current_temperature = get_temperature();
+
+	//put the heater into high mode if we're not at our target.
+	if (current_temperature < target_temperature)
+		analogWrite(HEATER_PIN, heater_high);
+	//put the heater on low if we're at our target.
+	else if (current_temperature < max_temperature)
+		analogWrite(HEATER_PIN, heater_low);
+	//turn the heater off if we're above our max.
+	else
+		analogWrite(HEATER_PIN, 0);
+}
+
+
+//this handles the timer interrupt event
+void manage_motor1_speed()
+{
+  	// somewhat hacked implementation of a PID algorithm as described at:
+	// http://www.embedded.com/2000/0010/0010feat3.htm - PID Without a PhD, Tim Wescott 
+	
+	int abs_error = abs(speed_error);
+	int pTerm = 0;
+	int iTerm = 0;
+	int dTerm = 0;
+	int speed = 0;
+
+/*
+	//THIS WAS WAY MORE TROUBLE THAN IT WAS WORTH. ABORTED PRINTS 3/4 OF THE WAY THROUGH. ARGH.
+	
+	//if our error is too high, it means we cant keep up.  bail to protect the extruder motor
+	if (abs_error > 750)
+	{
+		disableTimer1Interrupt();
+		disableTimer2Interrupt();
+		speed_error = 0;
+		analogWrite(MOTOR_1_SPEED_PIN, 0);
+		Serial.println("Extruder Fail");
+	}
+	else
+	{
+*/
+		//hack for extruder not keeping up, overflowing, then shutting off.
+		if (speed_error < -5000)
+			speed_error = -500;
+		if (speed_error > 5000)
+			speed_error = 500;
+
+		if (speed_error < 0)
+		{
+			//calculate our P term
+			pTerm = abs_error / pGain;
+	
+			//calculate our I term
+			iState += abs_error;
+			iState = constrain(iState, iMin, iMax);
+			iTerm = iState / iGain;
+	
+			//calculate our D term
+			dTerm = (abs_error - dState) * dGain;
+			dState = abs_error;
+
+			//calculate our PWM, within bounds.
+			speed = pTerm + iTerm - dTerm;
+		}
+
+		//our debug loop checker thingie
+		/*
+		cnt++;
+		if (cnt > 250)
+		{
+			Serial.print("e:");
+			Serial.println(speed_error);
+			Serial.print("spd:");
+			Serial.println(speed);
+			cnt = 0;
+		}
+		*/
+
+		//figure out our real speed and use it.
+		speed = constrain(speed, MIN_SPEED, MAX_SPEED);
+
+                //debug
+                //if (foo2 > 1000)
+                //{
+                //  foo2 = 0;
+                //  Serial.print(speed_error);
+                //  Serial.print("/");
+                //  Serial.println(speed);
+                //}
+                //foo2++;
+
+		analogWrite(MOTOR_1_SPEED_PIN, speed);
+//	}
+}
