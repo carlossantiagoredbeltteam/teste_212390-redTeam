@@ -1,3 +1,4 @@
+// Yep, this is actually -*- c++ -*-
 // These are our query commands from the host
 #define HOST_CMD_VERSION			0
 #define HOST_CMD_INIT				1

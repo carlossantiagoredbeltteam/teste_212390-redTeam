@@ -1,3 +1,4 @@
+// Yep, this is actually -*- c++ -*-
 //initialize our stepper drivers
 void init_steppers()
 {
