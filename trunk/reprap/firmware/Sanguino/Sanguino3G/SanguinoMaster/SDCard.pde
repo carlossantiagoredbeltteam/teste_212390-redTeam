@@ -1,3 +1,4 @@
+// Yep, this is actually -*- c++ -*-
 #ifdef USE_SD_CARD
 
 void init_sd_card()

@@ -1,3 +1,4 @@
+// Yep, this is actually -*- c++ -*-
 void init_extruder()
 {
 	//encoder pins are for reading.

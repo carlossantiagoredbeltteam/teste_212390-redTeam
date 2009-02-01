@@ -1,3 +1,4 @@
+// Yep, this is actually -*- c++ -*-
 void rs485_transmit(byte b)
 {
   //set our proper lines

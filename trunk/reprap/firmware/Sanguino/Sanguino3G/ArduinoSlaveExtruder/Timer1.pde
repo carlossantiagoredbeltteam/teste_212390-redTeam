@@ -1,3 +1,4 @@
+// Yep, this is actually -*- c++ -*-
 //these routines provide an easy interface for controlling timer1 interrupts
 
 //this handles the timer interrupt event
