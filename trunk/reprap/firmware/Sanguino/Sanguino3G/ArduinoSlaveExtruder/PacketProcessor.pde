@@ -32,25 +32,51 @@ void init_commands()
 //handle our packets.
 void process_packets()
 {
-  //read through our available data
-  while (Serial.available() > 0)
+  unsigned long start = millis();
+  unsigned long end = start + PACKET_TIMEOUT;
+
+  //is there serial data available?
+  if (Serial.available() > 0)
   {
-    //grab a byte and process it.
-    byte d = Serial.read();
-    masterPacket.process_byte(d);
+    //read through our available data
+    while (!masterPacket.isFinished())
+    {
+      //only try to grab it if theres something in the queue.
+      if (Serial.available() > 0)
+      {
+        //grab a byte and process it.
+        byte d = Serial.read();
+        masterPacket.process_byte(d);
+
+		//keep us goign while we have data coming in.
+		start = millis();
+		end = start + PACKET_TIMEOUT;
+      }
+
+      //have we timed out?
+      if (millis() >= end)
+        return;
+    }
 
     //do we have a finished packet?
     if (masterPacket.isFinished())
     {
-		//take some action.
+      //only process packets intended for us.
+      if (masterPacket.get_8(0) == RS485_ADDRESS)
+      {
+        //take some action.
         handle_query();		
 
-      //okay, send our response
-      masterPacket.sendReply();
+        //okay, send our response
+        masterPacket.sendReply();
 
-      //only process one packet at a time.
-      break;
+        //how many have we processed?
+        finishedCommands++;
+      }
     }
+
+	//always clean up the packet.
+    masterPacket.init();
   }
 }
 
@@ -60,11 +86,11 @@ void handle_query()
   byte temp;
 
   //which one did we get?
-  switch (masterPacket.getData(0))
+  switch (masterPacket.getData(1))
   {
   case SLAVE_CMD_VERSION:
     //get our host version
-    master_version = masterPacket.get_16(1);
+    master_version = masterPacket.get_16(2);
 
     //send our version back.
     masterPacket.add_16(FIRMWARE_VERSION);
@@ -80,31 +106,31 @@ void handle_query()
     break;
 
   case SLAVE_CMD_SET_TEMP:
-    target_temperature = masterPacket.get_16(1);
+    target_temperature = masterPacket.get_16(2);
     break;
 
   case SLAVE_CMD_SET_MOTOR_1_PWM:
     motor1_control = MC_PWM;
-    motor1_pwm = masterPacket.get_8(1);
+    motor1_pwm = masterPacket.get_8(2);
     break;
 
   case SLAVE_CMD_SET_MOTOR_2_PWM:
     motor2_control = MC_PWM;
-    motor2_pwm = masterPacket.get_8(1);
+    motor2_pwm = masterPacket.get_8(2);
     break;
 
   case SLAVE_CMD_SET_MOTOR_1_RPM:
     motor1_control = MC_ENCODER;
-    motor1_target_rpm = masterPacket.get_32(1);
+    motor1_target_rpm = masterPacket.get_32(2);
     break;
 
   case SLAVE_CMD_SET_MOTOR_2_RPM:
     motor2_control = MC_ENCODER;
-    motor2_target_rpm = masterPacket.get_32(1);
+    motor2_target_rpm = masterPacket.get_32(2);
     break;
 
   case SLAVE_CMD_SET_MOTOR_1_DIR:
-    temp = masterPacket.get_8(1);
+    temp = masterPacket.get_8(2);
     if (temp & 1)
       motor1_dir = MC_FORWARD;
     else
@@ -112,7 +138,7 @@ void handle_query()
     break;
 
   case SLAVE_CMD_SET_MOTOR_2_DIR:
-    temp = masterPacket.get_8(1);
+    temp = masterPacket.get_8(2);
     if (temp & 1)
       motor2_dir = MC_FORWARD;
     else
@@ -120,7 +146,7 @@ void handle_query()
     break;
 
   case SLAVE_CMD_TOGGLE_MOTOR_1:
-    temp = masterPacket.get_8(1);
+    temp = masterPacket.get_8(2);
     if (temp & 1<<2)
       motor1_dir = MC_FORWARD;
     else
@@ -133,7 +159,7 @@ void handle_query()
     break;
 
   case SLAVE_CMD_TOGGLE_MOTOR_2:
-    temp = masterPacket.get_8(1);
+    temp = masterPacket.get_8(2);
     if (temp & 1<<2)
       motor2_dir = MC_FORWARD;
     else
@@ -146,7 +172,7 @@ void handle_query()
     break;
 
   case SLAVE_CMD_TOGGLE_FAN:
-    temp = masterPacket.get_8(1);
+    temp = masterPacket.get_8(2);
     if (temp & 1)
       enable_fan();
     else
@@ -154,7 +180,7 @@ void handle_query()
     break;
 
   case SLAVE_CMD_TOGGLE_VALVE:
-    temp = masterPacket.get_8(1);
+    temp = masterPacket.get_8(2);
     if (temp & 1)
       open_valve();
     else
@@ -163,12 +189,12 @@ void handle_query()
 
   case SLAVE_CMD_SET_SERVO_1_POS:
     servo1.attach(9);
-    servo1.write(masterPacket.get_8(1));
+    servo1.write(masterPacket.get_8(2));
     break;
 
   case SLAVE_CMD_SET_SERVO_2_POS:
     servo2.attach(10);
-    servo2.write(masterPacket.get_8(1));
+    servo2.write(masterPacket.get_8(2));
     break;
 
   case SLAVE_CMD_FILAMENT_STATUS:
