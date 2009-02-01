@@ -44,9 +44,11 @@ unsigned long finishedCommands = 0;
 
 byte currentToolIndex = 0;
 
+#ifdef USE_SD_CARD
 //SD CARD STUFF.
 RepRapSDCard card;
 File f;
+#endif
 
 //our buffer of bytes.
 #define BUFFSIZE 64

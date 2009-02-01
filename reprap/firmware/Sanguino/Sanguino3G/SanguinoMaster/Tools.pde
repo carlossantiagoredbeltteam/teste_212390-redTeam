@@ -49,7 +49,7 @@ bool ping_tool(byte i)
   slavePacket.add_16(FIRMWARE_VERSION);
   slavePacket.sendPacket();
 
-  return read_tool_response(1);
+  return read_tool_response(PACKET_TIMEOUT);
 }
 
 //initialize a tool to its default state.
@@ -61,7 +61,7 @@ void init_tool(byte i)
   slavePacket.add_8(SLAVE_CMD_INIT);
   slavePacket.sendPacket();
 
-  read_tool_response(1);
+  read_tool_response(PACKET_TIMEOUT);
 }
 
 //select a tool as our current tool, and let it know.
@@ -75,7 +75,7 @@ void select_tool(byte tool)
   slavePacket.add_8(SLAVE_CMD_SELECT_TOOL);
   slavePacket.sendPacket();
 
-  read_tool_response(1);
+  read_tool_response(PACKET_TIMEOUT);
 }
 
 //ping the tool until it tells us its ready
@@ -88,8 +88,7 @@ void wait_for_tool_ready_state(byte tool, int delay_millis, int timeout_seconds)
     timeout_seconds = 60;
 
   //check for our end time.
-  unsigned long now = millis();
-  unsigned long end = now + (timeout_seconds * 1000);
+  unsigned long end = millis() + (timeout_seconds * 1000);
 
   //do it until we hear something, or time out.
   while (1)
@@ -117,7 +116,7 @@ bool is_tool_ready(byte tool)
   slavePacket.sendPacket();
 
   //did we get a response?
-  if (read_tool_response(1))
+  if (read_tool_response(PACKET_TIMEOUT))
   {
     //is it true?
     if (slavePacket.get_8(1) == 1)
@@ -139,7 +138,7 @@ void send_tool_query()
 
   //send it and then get our response
   slavePacket.sendPacket();
-  read_tool_response(60000);
+  read_tool_response(PACKET_TIMEOUT);
 
   //now load it up into the host.
   for (byte i=0; i<slavePacket.getLength(); i++)
@@ -161,7 +160,7 @@ void send_tool_command()
 
   //send it and then get our response
   slavePacket.sendPacket();
-  read_tool_response(60000);
+  read_tool_response(PACKET_TIMEOUT);
 }
 
 bool read_tool_response(int timeout)
@@ -180,10 +179,14 @@ bool read_tool_response(int timeout)
       byte d = Serial1.read();
       slavePacket.process_byte(d);
 
-      //our timeout guy.
-      if (millis() > end)
-        return false;
+	//keep processing while there's data. 
+	start = millis();
+	end = start + timeout;
     }
+
+    //our timeout guy.
+    if (millis() > end)
+      return false;
   }
 
   return true;
