@@ -55,7 +55,7 @@ void open_file()
     card.close_file(f);
   }
 
-  read_first_file();	
+  read_first_file();        
 }
 
 void open_new_file()
