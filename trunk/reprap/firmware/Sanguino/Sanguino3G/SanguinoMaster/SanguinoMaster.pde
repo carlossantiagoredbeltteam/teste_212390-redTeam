@@ -14,13 +14,15 @@
 
 //include some basic libraries.
 #include <WProgram.h>
-#include <RepRapSDCard.h>
 
 #include "Configuration.h"
 #include "Datatypes.h"
 #include "CircularBuffer.h"
 #include "Packet.h"
 #include "Variables.h"
+#ifdef USE_SD_CARD
+#include <RepRapSDCard.h>
+#endif
 
 //this is our firmware version
 #define FIRMWARE_VERSION 0001

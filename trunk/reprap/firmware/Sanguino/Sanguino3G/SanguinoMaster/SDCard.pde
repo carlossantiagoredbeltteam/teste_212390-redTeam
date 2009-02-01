@@ -1,3 +1,5 @@
+#ifdef USE_SD_CARD
+
 void init_sd_card()
 {
   if (!card.init_card())
@@ -123,3 +125,5 @@ void read_first_file()
     }
   }
 }
+
+#endif
