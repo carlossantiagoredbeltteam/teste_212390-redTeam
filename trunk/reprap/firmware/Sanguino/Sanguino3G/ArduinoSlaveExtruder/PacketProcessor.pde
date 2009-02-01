@@ -23,10 +23,6 @@
 #define SLAVE_CMD_SELECT_TOOL		21
 #define SLAVE_CMD_IS_TOOL_READY		22
 
-//how many queued commands have we processed?
-//this will be used to keep track of our current progress.
-unsigned long finishedCommands = 0;
-
 //initialize the firmware to default state.
 void init_commands()
 {

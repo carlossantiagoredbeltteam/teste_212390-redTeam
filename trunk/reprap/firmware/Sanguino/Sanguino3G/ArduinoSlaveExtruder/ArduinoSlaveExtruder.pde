@@ -17,53 +17,15 @@
 
 //include some basic libraries.
 #include <WProgram.h>
-#include "_misc.h"
+#include <Servo.h>
+
+#include "Configuration.h"
+#include "Datatypes.h"
 #include "Packet.h"
+#include "Variables.h"
 
 //this is our firmware version
 #define FIRMWARE_VERSION 0001
-
-//this is the version of our host software
-unsigned int master_version = 0;
-
-//these are our packet classes
-Packet masterPacket(0);
-
-//are we paused?
-boolean is_tool_paused = false;
-
-#include <Servo.h>
-
-int current_temperature;
-int target_temperature;
-
-// motor control states.
-typedef enum {
-  MC_PWM = 0,
-  MC_ENCODER
-} 
-MotorControlStyle;
-
-typedef enum {
-	MC_FORWARD = 0,
-	MC_REVERSE = 1
-}
-MotorControlDirection;
-
-MotorControlStyle motor1_control = MC_PWM;
-MotorControlDirection motor1_dir = MC_FORWARD;
-byte motor1_pwm = 0;
-long motor1_target_rpm = 0;
-long motor1_current_rpm = 0;
-
-MotorControlStyle motor2_control = MC_PWM;
-MotorControlDirection motor2_dir = MC_FORWARD;
-byte motor2_pwm = 0;
-long motor2_target_rpm = 0;
-long motor2_current_rpm = 0;
-
-Servo servo1;
-Servo servo2;
 
 //set up our firmware for actual usage.
 void setup()
@@ -108,4 +70,26 @@ void abort_print()
 
   //initalize everything to the beginning
   initialize();
+}
+
+void delayMicrosecondsInterruptible(unsigned int us)
+{
+	// for a one-microsecond delay, simply return.  the overhead
+	// of the function call yields a delay of approximately 1 1/8 us.
+	if (--us == 0)
+		return;
+
+	// the following loop takes a quarter of a microsecond (4 cycles)
+	// per iteration, so execute it four times for each microsecond of
+	// delay requested.
+	us <<= 2;
+
+	// account for the time taken in the preceeding commands.
+	us -= 2;
+
+	// busy wait
+	__asm__ __volatile__ (
+		"1: sbiw %0,1" "\n\t" // 2 cycles
+		"brne 1b" : "=w" (us) : "0" (us) // 2 cycles
+	);
 }
