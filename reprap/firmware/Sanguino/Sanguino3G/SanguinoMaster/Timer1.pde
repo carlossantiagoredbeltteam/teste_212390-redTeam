@@ -1,25 +1,24 @@
 // Yep, this is actually -*- c++ -*-
+
 //these routines provide an easy interface for controlling timer1 interrupts
 
 //this handles the timer interrupt event
-SIGNAL(SIG_OUTPUT_COMPARE1A)
+ISR(SIG_OUTPUT_COMPARE1A)
 {
   dda_step();
 }
 
-void enableTimer1Interrupt()
+inline void enableTimer1Interrupt()
 {
-  //enable our interrupt!
   TIMSK1 |= (1<<OCIE1A);
 }
 
-void disableTimer1Interrupt()
+inline void disableTimer1Interrupt()
 {
-  TIMSK1 &= ~(1<<ICIE1);
   TIMSK1 &= ~(1<<OCIE1A);
 }
 
-void setTimer1Resolution(byte r)
+inline void setTimer1Resolution(byte r)
 {
   //from table 15-5 in that atmega168 datasheet:
   // we're setting CS12 - CS10 which correspond to the binary numbers 0-5
@@ -37,7 +36,7 @@ void setTimer1Resolution(byte r)
   TCCR1B |= r;
 }
 
-void setTimer1Ceiling(unsigned int c)
+inline void setTimer1Ceiling(unsigned int c)
 {
   OCR1A = c;
 }
@@ -94,7 +93,7 @@ byte getTimer1Resolution(unsigned long ticks)
     return 5;
 }
 
-void setTimer1Ticks(unsigned long ticks)
+inline void setTimer1Ticks(unsigned long ticks)
 {
   // ticks is the delay between interrupts in 62.5 nanosecond ticks.
   //

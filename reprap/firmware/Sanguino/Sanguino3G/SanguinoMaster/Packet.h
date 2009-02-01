@@ -56,6 +56,7 @@ public:
       {
         // throw an error message?
         // nah, ignore it as garbage.
+        // FIXME: Consider reporting such error in a special debug mode
       }
     }
     else if (state == PS_LEN) // process length byte
@@ -103,6 +104,7 @@ public:
     return (state == PS_LAST);	
   }
 
+  // Length of the payload 
   uint8_t getLength()
   {
     return rx_length;
@@ -160,23 +162,15 @@ public:
     transmit(tx_crc);
   }
 
-#ifdef __ATMEGA644P__
   void transmit(uint8_t d)
   {
     if (uart == 0)
       Serial.print(d, BYTE);
+#if defined(__AVR_ATmega644P__)
     else
       Serial1.print(d, BYTE);
-  }
-#else
-  void transmit(uint8_t d)
-  {
-    if (uart == 0)
-      Serial.print(d, BYTE);
-    else
-      Serial1.print(d, BYTE);
-  }
 #endif
+  }
 
   //add a four byte chunk of data to our reply
   void add_32(uint32_t d)
@@ -198,8 +192,7 @@ public:
     //only add it if it will fit.
     if (tx_length < MAX_PACKET_LENGTH)
     {
-      tx_data[tx_length] = d;
-      tx_length++;
+      tx_data[tx_length++] = d;
     }
   }
 

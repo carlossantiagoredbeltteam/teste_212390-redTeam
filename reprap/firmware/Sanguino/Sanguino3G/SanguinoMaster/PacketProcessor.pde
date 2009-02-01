@@ -25,7 +25,7 @@
 #define HOST_CMD_TOOL_COMMAND      136
 
 //initialize the firmware to default state.
-void init_commands()
+inline void init_commands()
 {
   finishedCommands = 0;
 }
@@ -45,7 +45,7 @@ void process_host_packets()
     {
       byte b = hostPacket.get_8(0);
       // top bit high == bufferable command packet (eg. #128-255)
-      if (b & 1 << 7)
+      if (b & 0x80)
       {
         //okay, throw it in the buffer.
         for (int i=1; i<hostPacket.getLength(); i++)
@@ -175,26 +175,22 @@ void handle_commands()
     byte cmd = commandBuffer.remove_8();
     switch(cmd)
     {
-      //add it to our poitn queue.
+      //add it to our point queue.
     case HOST_CMD_QUEUE_POINT_INC:
-      queue_incremental_point(
-      commandBuffer.remove_16(),
-      commandBuffer.remove_16(),
-      commandBuffer.remove_16(),
-      commandBuffer.remove_8(),
-      commandBuffer.remove_16()                        
-        );
+      queue_incremental_point(commandBuffer.remove_16(),
+                              commandBuffer.remove_16(),
+                              commandBuffer.remove_16(),
+                              commandBuffer.remove_8(),
+                              commandBuffer.remove_16());
       break;
 
       //add it to our point queue.
     case HOST_CMD_QUEUE_POINT_ABS:
-      queue_absolute_point(
-      commandBuffer.remove_32(),
-      commandBuffer.remove_32(),
-      commandBuffer.remove_32(),
-      commandBuffer.remove_8(),
-      commandBuffer.remove_16()                        
-        );
+      queue_absolute_point(commandBuffer.remove_32(),
+                           commandBuffer.remove_32(),
+                           commandBuffer.remove_32(),
+                           commandBuffer.remove_8(),
+                           commandBuffer.remove_16());
       break;
 
       //update our current point to where we're told.
@@ -217,13 +213,11 @@ void handle_commands()
       flags = commandBuffer.remove_8();
 
       //find them!
-      seek_minimums(
-      flags & 1,
-      flags & (1 << 1),
-      flags & (1 << 2),
-      commandBuffer.remove_32(),
-      commandBuffer.remove_16()
-        );
+      seek_minimums(flags & 1,
+                    flags & (1 << 1),
+                    flags & (1 << 2),
+                    commandBuffer.remove_32(),
+                    commandBuffer.remove_16());
 
       //turn on point seekign agian.
       enableTimer1Interrupt();
@@ -255,11 +249,9 @@ void handle_commands()
       wait_until_target_reached(); //dont want to get hasty.
 
       //get your temp in gear, you lazy bum.
-      wait_for_tool_ready_state(
-      commandBuffer.remove_8(),
-      commandBuffer.remove_16(),
-      commandBuffer.remove_16()
-        );
+      wait_for_tool_ready_state(commandBuffer.remove_8(),
+                                commandBuffer.remove_16(),
+                                commandBuffer.remove_16());
       break;
 
     case HOST_CMD_TOOL_QUERY:
