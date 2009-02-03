@@ -415,7 +415,7 @@ void read_range_from_eeprom()
 void queue_incremental_point(int x, int y, int z, byte prescaler, unsigned int count)
 {
   //wait until we have free space
-  while (pointBuffer.remainingCapacity() > POINT_SIZE)
+  while (pointBuffer.remainingCapacity() < POINT_SIZE)
     delayMicrosecondsInterruptible(500);
 
   //okay, add in our points.

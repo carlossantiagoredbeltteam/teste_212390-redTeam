@@ -53,23 +53,23 @@ void initialize()
 //start our hardware serial drivers
 void init_serial()
 {
-  Serial.begin(38400);
-  Serial1.begin(115200);
+  Serial.begin(HOST_SERIAL_SPEED);
+  Serial1.begin(SLAVE_SERIAL_SPEED);
 }
 
 //handle various things we're required to do.
 void loop()
 {
   //if we've aborted, dont do anything.
-  if (!is_machine_aborted)
-  {
+  //if (!is_machine_aborted)
+  //{
     //check for and handle any packets that come in.
     process_host_packets();
 
     //only handle our buffer if we're unpaused. 
     if (!is_machine_paused && !is_machine_aborted)
       handle_commands();
-  }
+  //}
 }
 
 //handle the abortion of a print job

@@ -32,7 +32,7 @@ volatile LongPoint range_steps;
 
 //our point queue variables
 byte rawPointBuffer[POINT_QUEUE_SIZE * POINT_SIZE];
-CircularBuffer pointBuffer(POINT_QUEUE_SIZE * POINT_SIZE, rawPointBuffer);
+CircularBuffer pointBuffer((POINT_QUEUE_SIZE * POINT_SIZE), rawPointBuffer);
 
 //buffer for our commands
 uint8_t underlyingBuffer[COMMAND_BUFFER_SIZE];
