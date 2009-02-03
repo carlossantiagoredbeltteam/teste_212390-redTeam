@@ -129,7 +129,8 @@ void process_string(char instruction[], int size)
 
   //the character / means delete block... used for comments and stuff.
   if (instruction[0] == '/') {
-    Serial.println("ok");
+    Serial.print("ok:");
+    Serial.println(128-Serial.available(), DEC);
     return;
   }
 
@@ -419,10 +420,11 @@ void process_string(char instruction[], int size)
       */
 
     default:
-      Serial.print("huh? G");
+      Serial.print("Unsupported G-Code: G");
       Serial.println(gc.G, DEC);
     }
-    Serial.println("ok");
+    Serial.print("ok:");
+    Serial.println(128-Serial.available(), DEC);
     return;
   }
 
@@ -523,17 +525,18 @@ void process_string(char instruction[], int size)
       break;
 
     default:
-      Serial.print("Huh? M");
+      Serial.print("Unsupported M-Code: M");
       Serial.println(gc.M, DEC);
     }
-    Serial.println("ok");
+    Serial.print("ok:");
+    Serial.println(128-Serial.available(), DEC);
     return;
   }
 
   // Something wrong happened
-  // 	Serial.print("error: ");
-  //         instruction[size] = '\0';
-  //  Serial.println(instruction);
+  Serial.print("error: ");
+  instruction[size] = '\0';
+  Serial.println(instruction);
 }
 
 int scan_float(char *str, float *valp, unsigned int *seen, unsigned int flag)
