@@ -43,10 +43,12 @@ void process_host_packets()
     //do we have a finished packet?
     if (hostPacket.isFinished())
     {
+      //Serial.println("got packet");
       byte b = hostPacket.get_8(0);
       // top bit high == bufferable command packet (eg. #128-255)
       if (b & 0x80)
       {
+        //Serial.println("command");
         //okay, throw it in the buffer.
         for (int i=1; i<hostPacket.getLength(); i++)
           commandBuffer.append(hostPacket.get_8(i));
@@ -54,7 +56,8 @@ void process_host_packets()
       // top bit low == reply needed query packet (eg. #0-127)
       else
       {
-        handle_query(b);                
+        //Serial.println("query");
+        handle_query(b);		
       }
 
       //okay, send our response

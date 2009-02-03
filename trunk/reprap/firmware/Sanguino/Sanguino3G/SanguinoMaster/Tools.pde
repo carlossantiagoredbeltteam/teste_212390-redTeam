@@ -31,6 +31,7 @@ void init_tools()
   //do a scan of tools from address 0-255?
   //with a 1 millisecond timeout, this takes ~0.256 seconds.
   //we may also want to store which tools are available in eeprom?
+#ifdef SCAN_TOOLS_ON_STARTUP
   for (int i=0; i<256; i++)
   {
     //are you out there?
@@ -39,6 +40,7 @@ void init_tools()
       init_tool(i);
     }
   }
+#endif
 }
 
 //ask a tool if its there.

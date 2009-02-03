@@ -21,6 +21,10 @@
 #define OPTO_ENDSTOP_2_X
 
 #define PACKET_TIMEOUT 10
+#define HOST_SERIAL_SPEED 38400
+#define SLAVE_SERIAL_SPEED 76800
+
+//#define SCAN_TOOLS_ON_STARTUP
 
 /****************************************************************************************
  * Sanguino Pin Assignment
@@ -47,8 +51,8 @@
 #define Z_STEP_PIN		29
 #define Z_DIR_PIN		30
 #define Z_ENABLE_PIN	31
-#define Z_MIN_PIN		2
-#define Z_MAX_PIN		1
+#define Z_MIN_PIN		1
+#define Z_MAX_PIN		2
 
 //our pin for debugging.
 #define DEBUG_PIN		0
