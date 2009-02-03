@@ -5,7 +5,7 @@
 // v1.1 by Zach Hoeken - cleaned up and did lots of tweaks (hoeken@gmail.com)
 // v1.2 by Chris Meighan - cleanup / G2&G3 support (cmeighan@gmail.com)
 // v1.3 by Zach Hoeken - added thermocouple support and multi-sample temp readings. (hoeken@gmail.com)
-// vX.X by Marius Kintel - refactored a bit to safe space and clarify code (kintel@sim.no)
+// vX.X by Marius Kintel - refactored a bit to save space and clarify code (kintel@sim.no)
 #include <HardwareSerial.h>
 
 #include "_init.h"
@@ -17,10 +17,12 @@ AxisConfig axes[3] = {
 
 //our command string
 #define COMMAND_SIZE 128
-char word[COMMAND_SIZE];
+char cmdbuffer[COMMAND_SIZE];
 byte serial_count;
 int no_data = 0;
+long old_idle_time;
 long idle_time;
+int delta;
 boolean comment = false;
 boolean bytes_received = false;
 
@@ -39,7 +41,7 @@ void setup()
 void clear_process_string()
 {
 	//init our command buffer
-	for (uint8_t i=0; i<COMMAND_SIZE; i++) word[i] = 0;
+	for (uint8_t i=0; i<COMMAND_SIZE; i++) cmdbuffer[i] = 0;
 	serial_count = 0;
 	bytes_received = false;
 
@@ -61,6 +63,10 @@ void loop()
 		no_data = 0;
 		idle_time = millis();
 		
+		if (c == '\r') {
+			Serial.println("debug: linefeed ?!");
+		}
+		else
 		//  commands end with newlines
 		if (c != '\n')
 		{
@@ -70,7 +76,7 @@ void loop()
 			// If we're not in comment mode, add it to our array.
 			if (!comment)
 			{
-				word[serial_count] = c;
+				cmdbuffer[serial_count] = c;
 				serial_count++;
 			}
 			
@@ -82,9 +88,12 @@ void loop()
 	else
 	{
 		// mark no_data if nothing heard for 100 milliseconds
-		if ((millis() - idle_time) >= 100)
+		delta = millis() - idle_time;
+		if (delta >= 100)
+// 		if ((millis() - idle_time) >= 100)
 		{	
 			no_data++;
+			old_idle_time = idle_time;
 			idle_time = millis();
 		}
 	}
@@ -92,12 +101,29 @@ void loop()
 	// if there's a pause or we got a real command, do it
 	if (bytes_received && (c == '\n' || no_data))
 	{
-		//     if (no_data) Serial.print("NODATA ");
-		//     Serial.print("debug: ");
-		//     Serial.println(word);
+		if (no_data)
+		{
+			Serial.print("NODATA(");
+			Serial.print(no_data);
+			Serial.print(" ");
+			Serial.print((long)millis());
+			Serial.print(" ");
+			Serial.print(old_idle_time);
+			Serial.print(" ");
+			Serial.print(idle_time);
+			Serial.print(" ");
+			Serial.print(delta);
+			Serial.print("): ");
+			Serial.println(cmdbuffer);
+		}
+		else
+		{
+			Serial.print("debug: ");
+			Serial.println(cmdbuffer);
+		}
 
 		//process our command!
-		process_string(word, serial_count);
+		process_string(cmdbuffer, serial_count);
 
 		//clear command.
 		clear_process_string();
