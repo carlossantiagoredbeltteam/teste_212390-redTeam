@@ -52,7 +52,7 @@
 // for the axes which should be inverted.
 // RepRap stepper boards are *not* inverting.
 #define INVERT_X_DIR 0
-#define INVERT_Y_DIR 0
+#define INVERT_Y_DIR 1
 #define INVERT_Z_DIR 0
 
 // Defines in which logical direction to move when using the G30 command
