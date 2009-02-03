@@ -116,11 +116,13 @@ void loop()
 			Serial.print("): ");
 			Serial.println(cmdbuffer);
 		}
-		else
-		{
-			Serial.print("debug: ");
-			Serial.println(cmdbuffer);
-		}
+#if (DEBUG == 1)
+ 		else
+ 		{
+ 			Serial.print("debug: ");
+ 			Serial.println(cmdbuffer);
+ 		}
+#endif
 
 		//process our command!
 		process_string(cmdbuffer, serial_count);
