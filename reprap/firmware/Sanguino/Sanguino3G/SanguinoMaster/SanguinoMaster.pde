@@ -22,6 +22,7 @@
 #include "CircularBuffer.h"
 #include "Packet.h"
 #include "Variables.h"
+#include "Commands.h"
 #ifdef USE_SD_CARD
 #include <RepRapSDCard.h>
 #endif

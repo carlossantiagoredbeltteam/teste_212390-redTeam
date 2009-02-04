@@ -1,29 +1,5 @@
 // Yep, this is actually -*- c++ -*-
 
-// These are our query commands from the host
-#define HOST_CMD_VERSION         0
-#define HOST_CMD_INIT            1
-#define HOST_CMD_GET_BUFFER_SIZE 2
-#define HOST_CMD_CLEAR_BUFFER    3
-#define HOST_CMD_GET_POSITION    4
-#define HOST_CMD_GET_RANGE       5
-#define HOST_CMD_SET_RANGE       6
-#define HOST_CMD_ABORT           7
-#define HOST_CMD_PAUSE           8
-#define HOST_CMD_PROBE           9
-#define HOST_CMD_TOOL_QUERY     10
-
-// These are our bufferable commands from the host
-#define HOST_CMD_QUEUE_POINT_INC   128
-#define HOST_CMD_QUEUE_POINT_ABS   129
-#define HOST_CMD_SET_POSITION      130
-#define HOST_CMD_FIND_AXES_MINIMUM 131
-#define HOST_CMD_FIND_AXES_MAXIMUM 132
-#define HOST_CMD_DELAY             133
-#define HOST_CMD_CHANGE_TOOL       134
-#define HOST_CMD_WAIT_FOR_TOOL     135
-#define HOST_CMD_TOOL_COMMAND      136
-
 //initialize the firmware to default state.
 inline void init_commands()
 {

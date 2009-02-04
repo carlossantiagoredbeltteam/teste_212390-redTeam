@@ -24,9 +24,9 @@ private:
 
 public:
 
-  Packet(uint8_t uart)
+  Packet(uint8_t my_uart)
   {
-    this->uart = uart;
+    uart = my_uart;
     init();
   }
 
@@ -167,7 +167,7 @@ public:
     if (uart == 0)
       Serial.print(d, BYTE);
 #if defined(__AVR_ATmega644P__)
-    else
+    else if(uart == 1)
       Serial1.print(d, BYTE);
 #endif
   }
