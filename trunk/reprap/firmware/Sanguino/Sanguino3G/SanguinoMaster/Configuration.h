@@ -20,9 +20,12 @@
 //#define OPTO_ENDSTOP_1_X
 #define OPTO_ENDSTOP_2_X
 
-#define PACKET_TIMEOUT 10
+#define PACKET_TIMEOUT 100
 #define HOST_SERIAL_SPEED 38400
 #define SLAVE_SERIAL_SPEED 76800
+
+//uncomment to enable debugging functions
+#define ENABLE_DEBUG 1
 
 //#define SCAN_TOOLS_ON_STARTUP
 

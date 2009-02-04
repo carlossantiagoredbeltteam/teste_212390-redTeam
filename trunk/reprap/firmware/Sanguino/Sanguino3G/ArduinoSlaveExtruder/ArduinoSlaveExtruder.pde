@@ -66,6 +66,9 @@ void init_serial()
 //handle various things we're required to do.
 void loop()
 {
+  digitalWrite(MOTOR_1_DIR_PIN, HIGH);
+  analogWrite(MOTOR_1_SPEED_PIN, 255);
+/*
   //check for and handle any packets that come in.
   process_packets();
 
@@ -74,6 +77,7 @@ void loop()
   {
     manage_temperature();
   }
+*/
 }
 
 //handle the abortion of a print job
