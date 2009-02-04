@@ -13,7 +13,7 @@ void rs485_transmit(byte b)
     true;
 
   //disable transmit.
-  rs485_disable_tx();	
+  rs485_disable_tx();        
 }
 
 void rs485_enable_tx()

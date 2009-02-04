@@ -1,28 +1,28 @@
 // Yep, this is actually -*- c++ -*-
 // These are our query commands from the host
-#define SLAVE_CMD_VERSION			0
-#define SLAVE_CMD_INIT				1
-#define SLAVE_CMD_GET_TEMP			2
-#define SLAVE_CMD_SET_TEMP			3
-#define SLAVE_CMD_SET_MOTOR_1_PWM	4
-#define SLAVE_CMD_SET_MOTOR_2_PWM	5
-#define SLAVE_CMD_SET_MOTOR_1_RPM	6
-#define SLAVE_CMD_SET_MOTOR_2_RPM	7
-#define SLAVE_CMD_SET_MOTOR_1_DIR	8
-#define SLAVE_CMD_SET_MOTOR_2_DIR	9
-#define SLAVE_CMD_TOGGLE_MOTOR_1	10
-#define SLAVE_CMD_TOGGLE_MOTOR_2	11
-#define SLAVE_CMD_TOGGLE_FAN		12
-#define SLAVE_CMD_TOGGLE_VALVE		13
-#define SLAVE_CMD_SET_SERVO_1_POS	14
-#define SLAVE_CMD_SET_SERVO_2_POS	15
-#define SLAVE_CMD_FILAMENT_STATUS	16
-#define SLAVE_CMD_GET_MOTOR_1_PWM	17
-#define SLAVE_CMD_GET_MOTOR_2_PWM	18
-#define SLAVE_CMD_GET_MOTOR_1_RPM	19
-#define SLAVE_CMD_GET_MOTOR_2_RPM	20
-#define SLAVE_CMD_SELECT_TOOL		21
-#define SLAVE_CMD_IS_TOOL_READY		22
+#define SLAVE_CMD_VERSION                0
+#define SLAVE_CMD_INIT                   1
+#define SLAVE_CMD_GET_TEMP               2
+#define SLAVE_CMD_SET_TEMP               3
+#define SLAVE_CMD_SET_MOTOR_1_PWM        4
+#define SLAVE_CMD_SET_MOTOR_2_PWM        5
+#define SLAVE_CMD_SET_MOTOR_1_RPM        6
+#define SLAVE_CMD_SET_MOTOR_2_RPM        7
+#define SLAVE_CMD_SET_MOTOR_1_DIR        8
+#define SLAVE_CMD_SET_MOTOR_2_DIR        9
+#define SLAVE_CMD_TOGGLE_MOTOR_1        10
+#define SLAVE_CMD_TOGGLE_MOTOR_2        11
+#define SLAVE_CMD_TOGGLE_FAN            12
+#define SLAVE_CMD_TOGGLE_VALVE          13
+#define SLAVE_CMD_SET_SERVO_1_POS       14
+#define SLAVE_CMD_SET_SERVO_2_POS       15
+#define SLAVE_CMD_FILAMENT_STATUS       16
+#define SLAVE_CMD_GET_MOTOR_1_PWM       17
+#define SLAVE_CMD_GET_MOTOR_2_PWM       18
+#define SLAVE_CMD_GET_MOTOR_1_RPM       19
+#define SLAVE_CMD_GET_MOTOR_2_RPM       20
+#define SLAVE_CMD_SELECT_TOOL           21
+#define SLAVE_CMD_IS_TOOL_READY         22
 
 //initialize the firmware to default state.
 void init_commands()
@@ -49,9 +49,9 @@ void process_packets()
         byte d = Serial.read();
         masterPacket.process_byte(d);
 
-		//keep us goign while we have data coming in.
-		start = millis();
-		end = start + PACKET_TIMEOUT;
+        //keep us goign while we have data coming in.
+        start = millis();
+        end = start + PACKET_TIMEOUT;
       }
 
       //have we timed out?
@@ -66,7 +66,7 @@ void process_packets()
       if (masterPacket.get_8(0) == RS485_ADDRESS)
       {
         //take some action.
-        handle_query();		
+        handle_query();                
 
         //okay, send our response
         masterPacket.sendReply();
@@ -76,7 +76,7 @@ void process_packets()
       }
     }
 
-	//always clean up the packet.
+        //always clean up the packet.
     masterPacket.init();
   }
 }

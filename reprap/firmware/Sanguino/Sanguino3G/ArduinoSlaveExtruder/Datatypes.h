@@ -6,8 +6,8 @@ typedef enum {
 MotorControlStyle;
 
 typedef enum {
-	MC_FORWARD = 0,
-	MC_REVERSE = 1
+  MC_FORWARD = 0,
+  MC_REVERSE = 1
 }
 MotorControlDirection;
 
