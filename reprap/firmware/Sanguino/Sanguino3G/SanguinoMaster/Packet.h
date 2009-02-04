@@ -101,7 +101,7 @@ public:
 
   bool isFinished()
   {
-    return (state == PS_LAST);	
+    return (state == PS_LAST);    
   }
 
   // Length of the payload 

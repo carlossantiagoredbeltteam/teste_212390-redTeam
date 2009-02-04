@@ -33,7 +33,7 @@ void process_host_packets()
       else
       {
         //Serial.println("query");
-        handle_query(b);		
+        handle_query(b);        
       }
 
       //okay, send our response
