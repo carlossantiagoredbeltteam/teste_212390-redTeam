@@ -233,7 +233,7 @@ int sample_temperature(byte pin)
 void manage_temperature()
 {
   //make sure we know what our temp is.
-  int current_temperature = get_temperature();
+  current_temperature = get_temperature();
 
   //put the heater into high mode if we're not at our target.
   if (current_temperature < target_temperature)

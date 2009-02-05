@@ -35,6 +35,7 @@
 void setup()
 {
   //setup our firmware to a default state.
+  init_serial();
   initialize();
 
   //this is a simple text string that identifies us.
@@ -47,7 +48,6 @@ void initialize()
 {
   is_machine_paused = false;
 
-  init_serial();
   init_commands();
   init_steppers();
   init_tools();
@@ -81,8 +81,13 @@ void loop()
    */
 
   check_tool_version(1);
-  delay(1000);
-
+  set_tool_temp(1, 100);
+  
+  while (1)
+  {
+	  get_tool_temp(1);
+	  delay(1000);
+  }
 }
 
 //handle the abortion of a print job

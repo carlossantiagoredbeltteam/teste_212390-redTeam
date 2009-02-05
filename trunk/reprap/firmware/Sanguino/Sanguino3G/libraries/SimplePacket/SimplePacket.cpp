@@ -8,6 +8,13 @@ SimplePacket::SimplePacket(txFuncPtr myPtr)
 
 void SimplePacket::init()
 {
+	//zero out our data arrays.
+	for (rx_length = 0; rx_length < MAX_PACKET_LENGTH; rx_length++)
+		rx_data[rx_length] = 0;
+	for (tx_length = 0; tx_length < MAX_PACKET_LENGTH; tx_length++)
+		tx_data[tx_length] = 0;
+	
+	//init our other variables.
 	state = PS_START;
 	response_code = RC_OK;
 	target_length = 0;
