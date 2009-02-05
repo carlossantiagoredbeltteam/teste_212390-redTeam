@@ -135,14 +135,10 @@ void send_tool_command()
 
 boolean send_packet()
 {
-#ifdef ENABLE_COMMS_DEBUG
-  Serial.println("sending packet.");
-#endif
-
   slavePacket.sendPacket();
   
   //wait for guy to catch up?
-  delayMicrosecondsInterruptible(50);
+  delayMicrosecondsInterruptible(100);
   
   return read_tool_response(PACKET_TIMEOUT);
 }
@@ -152,10 +148,6 @@ bool read_tool_response(int timeout)
   //figure out our timeout stuff.
   long start = millis();
   long end = start + timeout;
-
-#ifdef ENABLE_COMMS_DEBUG
-  Serial.println("reading response.");
-#endif
 
   //keep reading until we got it.
   while (!slavePacket.isFinished())
@@ -168,10 +160,12 @@ bool read_tool_response(int timeout)
       slavePacket.process_byte(d);
 
 #ifdef ENABLE_COMMS_DEBUG
+/*
       Serial.print("IN:");
       Serial.print(d, HEX);
       Serial.print("/");
       Serial.println(d, BIN);
+*/
 #endif
       //keep processing while there's data. 
       start = millis();
@@ -180,8 +174,13 @@ bool read_tool_response(int timeout)
 
     //not sure if we need this yet.
     //our timeout guy.
-    //if (millis() > end)
-    //  return false;
+    if (millis() > end)
+    {
+#ifdef ENABLE_COMMS_DEBUG
+  Serial.println("Slave Timeout");
+#endif
+      return false;
+    }
   }
 
   return true;

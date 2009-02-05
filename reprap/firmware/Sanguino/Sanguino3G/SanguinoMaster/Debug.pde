@@ -18,15 +18,6 @@ void print_tool(byte id)
   Serial.print(" ");
 }
 
-void stress_test_tool(byte id)
-{
-  for (int i=0; i<30000; i++)
-  {
-    check_tool_version(id);
-    delay(250);
-  }
-}
-
 void get_tool_temp(byte id)
 {
   slavePacket.init();
@@ -55,8 +46,30 @@ void set_tool_temp(byte id, unsigned int temp)
 
 void set_motor1_pwm(byte id, byte pwm)
 {
+  slavePacket.init();
+  slavePacket.add_8(id);
+  slavePacket.add_8(SLAVE_CMD_SET_MOTOR_1_PWM);
+  slavePacket.add_8(pwm);
+  send_packet();
 
+  //print_tool(id);
+  //Serial.print("set motor1 pwm to: ");
+  Serial.println(pwm, DEC);
 }
+
+void set_motor2_pwm(byte id, byte pwm)
+{
+  slavePacket.init();
+  slavePacket.add_8(id);
+  slavePacket.add_8(SLAVE_CMD_SET_MOTOR_2_PWM);
+  slavePacket.add_8(pwm);
+  send_packet();
+
+  //print_tool(id);
+  //Serial.print("set motor2 pwm to: ");
+  Serial.println(pwm, DEC);
+}
+
 
 void set_motor1_rpm(byte id, int rpm)
 {
@@ -65,7 +78,36 @@ void set_motor1_rpm(byte id, int rpm)
 
 void toggle_motor1(byte id, boolean dir, boolean enable)
 {
+  byte flags = 0;
 
+  if (enable)
+	flags += 1;
+
+  if (dir)
+	flags += 2;
+	
+  slavePacket.init();
+  slavePacket.add_8(id);
+  slavePacket.add_8(SLAVE_CMD_TOGGLE_MOTOR_1);
+  slavePacket.add_8(flags);
+  send_packet();
+}
+
+void toggle_motor2(byte id, boolean dir, boolean enable)
+{
+  byte flags = 0;
+
+  if (enable)
+	flags += 1;
+
+  if (dir)
+	flags += 2;
+	
+  slavePacket.init();
+  slavePacket.add_8(id);
+  slavePacket.add_8(SLAVE_CMD_TOGGLE_MOTOR_2);
+  slavePacket.add_8(flags);
+  send_packet();
 }
 
 void toggle_fan(byte id, boolean enable)

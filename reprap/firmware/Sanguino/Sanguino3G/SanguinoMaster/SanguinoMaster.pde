@@ -64,6 +64,8 @@ void init_serial()
   Serial1.begin(SLAVE_SERIAL_SPEED);
 }
 
+boolean dir = true;
+
 //handle various things we're required to do.
 void loop()
 {
@@ -81,13 +83,26 @@ void loop()
    */
 
   check_tool_version(1);
+
+  /*
   set_tool_temp(1, 100);
-  
-  while (1)
+   while (1)
+   {
+   	  get_tool_temp(1);
+   	  delay(1000);
+   }
+   */
+
+  for (int i=0; i<256; i++)
   {
-	  get_tool_temp(1);
-	  delay(1000);
+    set_motor1_pwm(1, i);
+    toggle_motor1(1, dir, 1);
+    set_motor2_pwm(1, i);
+    toggle_motor2(1, dir, 1);
+    delay(250);
   }
+
+  dir = !dir;
 }
 
 //handle the abortion of a print job

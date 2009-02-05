@@ -19,7 +19,6 @@ void process_host_packets()
     //do we have a finished packet?
     if (hostPacket.isFinished())
     {
-      //Serial.println("got packet");
       byte b = hostPacket.get_8(0);
       // top bit high == bufferable command packet (eg. #128-255)
       if (b & 0x80)
