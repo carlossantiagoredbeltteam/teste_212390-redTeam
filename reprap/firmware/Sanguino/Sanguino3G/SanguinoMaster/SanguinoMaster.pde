@@ -64,8 +64,6 @@ void init_serial()
   Serial1.begin(SLAVE_SERIAL_SPEED);
 }
 
-boolean dir = true;
-
 //handle various things we're required to do.
 void loop()
 {
@@ -74,7 +72,7 @@ void loop()
    //if (!is_machine_aborted)
    //{
    //check for and handle any packets that come in.
-	if (Serial.available())
+   	if (Serial.available())
    		process_host_packets();
    
    //only handle our buffer if we're unpaused. 
@@ -84,26 +82,6 @@ void loop()
    */
 
   check_tool_version(1);
-
-  /*
-  set_tool_temp(1, 100);
-   while (1)
-   {
-   	  get_tool_temp(1);
-   	  delay(1000);
-   }
-   */
-
-  for (int i=0; i<256; i++)
-  {
-    set_motor1_pwm(1, i);
-    toggle_motor1(1, dir, 1);
-    set_motor2_pwm(1, i);
-    toggle_motor2(1, dir, 1);
-    //delay(100);
-  }
-
-  dir = !dir;
 }
 
 //handle the abortion of a print job
