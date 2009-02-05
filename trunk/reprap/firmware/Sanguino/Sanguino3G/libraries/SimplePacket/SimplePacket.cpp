@@ -92,6 +92,11 @@ void SimplePacket::init()
     return rx_length;
   }
 
+  PacketState SimplePacket::getState()
+  {
+	return state;
+  }
+
   void SimplePacket::unsupported()
   {
     response_code = RC_CMD_UNSUPPORTED;

@@ -56,6 +56,7 @@ public:
 	void process_byte(unsigned char b);
 	bool isFinished();
 	unsigned char getLength();
+	PacketState getState();
 
 	void unsupported();
 
