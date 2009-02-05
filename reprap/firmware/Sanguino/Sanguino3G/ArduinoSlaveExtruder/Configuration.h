@@ -1,6 +1,6 @@
 /****************************************************************************************
-* Here's where you define the overall electronics setup for your machine.
-****************************************************************************************/
+ * Here's where you define the overall electronics setup for your machine.
+ ****************************************************************************************/
 
 //
 // CHOOSE WHICH EXTRUDER YOU'RE USING:
@@ -15,8 +15,8 @@
 #define PACKET_TIMEOUT 10
 
 /****************************************************************************************
-* Here's where you define the speed PID behavior
-****************************************************************************************/
+ * Here's where you define the speed PID behavior
+ ****************************************************************************************/
 //#define INVERT_QUADRATURE
 #define MIN_SPEED 50              //minimum PWM speed to use
 #define MAX_SPEED 255             //maximum PWM speed to use
@@ -26,8 +26,8 @@
 #define SPEED_INITIAL_DGAIN 10    //our derivative gain.
 
 /****************************************************************************************
-* Sanguino Pin Assignment
-****************************************************************************************/
+ * Sanguino Pin Assignment
+ ****************************************************************************************/
 
 //these are the pins for the v2.0 Extruder Controller
 #ifdef EXTRUDER_CONTROLLER_VERSION_2_0
