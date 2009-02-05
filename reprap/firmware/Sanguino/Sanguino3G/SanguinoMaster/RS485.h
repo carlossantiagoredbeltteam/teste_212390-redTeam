@@ -9,3 +9,8 @@ void rs485_tx(byte b)
 
   digitalWrite(TX_ENABLE_PIN, LOW); //disable tx
 }
+
+void serial_tx(byte b)
+{
+	Serial.print(b, BYTE);
+}
