@@ -4,14 +4,14 @@ void init_extruder()
   //encoder pins are for reading.
   pinMode(ENCODER_A_PIN, INPUT);
   pinMode(ENCODER_B_PIN, INPUT);
-        
+
   //pullups on our encoder pins
   digitalWrite(ENCODER_A_PIN, HIGH);
   digitalWrite(ENCODER_B_PIN, HIGH);
-        
+
   //attach our interrupt handler
   attachInterrupt(0, read_quadrature, CHANGE);
-        
+
   //setup our motor control pins.
   pinMode(MOTOR_1_SPEED_PIN, OUTPUT);
   pinMode(MOTOR_2_SPEED_PIN, OUTPUT);
@@ -28,19 +28,19 @@ void init_extruder()
   pinMode(HEATER_PIN, OUTPUT);
   pinMode(FAN_PIN, OUTPUT);
   pinMode(VALVE_PIN, OUTPUT);
-        
+
   //turn them all off
   digitalWrite(HEATER_PIN, LOW);
   digitalWrite(FAN_PIN, LOW);
   digitalWrite(VALVE_PIN, LOW);
-        
+
   //setup our debug pin.
   pinMode(DEBUG_PIN, OUTPUT);
   digitalWrite(DEBUG_PIN, LOW);
-        
+
   //default to zero.
   set_temperature(0);
-        
+
   setupTimer1Interrupt();
 }
 
@@ -51,19 +51,19 @@ void read_quadrature()
   {   
     // check channel B to see which way
     if (digitalRead(ENCODER_B_PIN) == LOW)
-        QUADRATURE_INCREMENT
-    else
-        QUADRATURE_DECREMENT
-  }
-  // found a high-to-low on channel A
+      QUADRATURE_INCREMENT
+else
+  QUADRATURE_DECREMENT
+}
+// found a high-to-low on channel A
   else                                        
   {
     // check channel B to see which way
     if (digitalRead(ENCODER_B_PIN) == LOW)
-        QUADRATURE_DECREMENT
-    else
-        QUADRATURE_INCREMENT
-  }
+      QUADRATURE_DECREMENT
+else
+  QUADRATURE_INCREMENT
+}
 }
 
 void enable_motor_1()
@@ -148,9 +148,9 @@ void set_temperature(int temp)
 }
 
 /**
-*  Samples the temperature and converts it to degrees celsius.
-*  Returns degrees celsius.
-*/
+ *  Samples the temperature and converts it to degrees celsius.
+ *  Returns degrees celsius.
+ */
 int get_temperature()
 {
 #ifdef THERMISTOR_PIN
@@ -163,15 +163,15 @@ int get_temperature()
 
 /*
 * This function gives us the temperature from the thermistor in Celsius
-*/
+ */
 #ifdef THERMISTOR_PIN
 int read_thermistor()
 {
   int raw = sample_temperature(THERMISTOR_PIN);
-  
+
   int celsius = 0;
   byte i;
-  
+
   for (i=1; i<NUMTEMPS; i++)
   {
     if (temptable[i][0] > raw)
@@ -180,25 +180,25 @@ int read_thermistor()
         (raw - temptable[i-1][0]) * 
         (temptable[i][1] - temptable[i-1][1]) /
         (temptable[i][0] - temptable[i-1][0]);
-      
+
       if (celsius > 255)
         celsius = 255; 
-      
+
       break;
     }
   }
-  
+
   // Overflow: We just clamp to 0 degrees celsius
   if (i == NUMTEMPS)
     celsius = 0;
-  
+
   return celsius;
 }
 #endif
 
 /*
 * This function gives us the temperature from the thermocouple in Celsius
-*/
+ */
 #ifdef THERMOCOUPLE_PIN
 int read_thermocouple()
 {
@@ -208,33 +208,33 @@ int read_thermocouple()
 
 /*
 * This function gives us an averaged sample of the analog temperature pin.
-*/
+ */
 int sample_temperature(byte pin)
 {
   int raw = 0;
-  
+
   //read in a certain number of samples
   for (byte i=0; i<TEMPERATURE_SAMPLES; i++)
     raw += analogRead(pin);
-  
+
   //average the samples
   raw = raw/TEMPERATURE_SAMPLES;
-  
+
   //send it back.
   return raw;
 }
 
 
 /*!
-  Manages motor and heater based on measured temperature:
-  o If temp is too low, don't start the motor
-  o Adjust the heater power to keep the temperature at the target
+ Manages motor and heater based on measured temperature:
+ o If temp is too low, don't start the motor
+ o Adjust the heater power to keep the temperature at the target
  */
 void manage_temperature()
 {
   //make sure we know what our temp is.
   int current_temperature = get_temperature();
-  
+
   //put the heater into high mode if we're not at our target.
   if (current_temperature < target_temperature)
     analogWrite(HEATER_PIN, heater_high);
@@ -252,52 +252,52 @@ void manage_motor1_speed()
 {
   // somewhat hacked implementation of a PID algorithm as described at:
   // http://www.embedded.com/2000/0010/0010feat3.htm - PID Without a PhD, Tim Wescott 
-  
+
   int abs_error = abs(speed_error);
   int pTerm = 0;
   int iTerm = 0;
   int dTerm = 0;
   int speed = 0;
-  
+
   //hack for extruder not keeping up, overflowing, then shutting off.
   if (speed_error < -5000)
     speed_error = -500;
   if (speed_error > 5000)
     speed_error = 500;
-  
+
   if (speed_error < 0)
   {
     //calculate our P term
     pTerm = abs_error / pGain;
-    
+
     //calculate our I term
     iState += abs_error;
     iState = constrain(iState, iMin, iMax);
     iTerm = iState / iGain;
-    
+
     //calculate our D term
     dTerm = (abs_error - dState) * dGain;
     dState = abs_error;
-    
+
     //calculate our PWM, within bounds.
     speed = pTerm + iTerm - dTerm;
   }
-  
+
   //our debug loop checker thingie
   /*
     cnt++;
-    if (cnt > 250)
-    {
-    Serial.print("e:");
-    Serial.println(speed_error);
-    Serial.print("spd:");
-    Serial.println(speed);
-    cnt = 0;
-    }
-  */
-  
+   if (cnt > 250)
+   {
+   Serial.print("e:");
+   Serial.println(speed_error);
+   Serial.print("spd:");
+   Serial.println(speed);
+   cnt = 0;
+   }
+   */
+
   //figure out our real speed and use it.
   motor1_pwm = constrain(speed, MIN_SPEED, MAX_SPEED);
-  
+
   analogWrite(MOTOR_1_SPEED_PIN, motor1_pwm);
 }

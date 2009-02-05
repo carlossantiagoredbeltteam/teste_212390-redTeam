@@ -28,10 +28,10 @@ void setTimer1Resolution(byte r)
   // 3 = clock/64
   // 4 = clock/256
   // 5 = clock/1024
-  
+
   if (r > 5)
     r = 5;
-  
+
   TCCR1B &= B11111000;
   TCCR1B |= r;
 }
@@ -67,7 +67,7 @@ unsigned int getTimer1Ceiling(unsigned long ticks)
 byte getTimer1Resolution(unsigned long ticks)
 {
   // these also represent frequency: 1000000 / ticks / 2 = frequency in hz.
-  
+
   // our slowest speed at our highest resolution ( (2^16-1) * 0.0625 usecs = 4095 usecs (4 millisecond max))
   // range: 8Mhz max - 122hz min
   if (ticks <= 65535L)
@@ -101,7 +101,7 @@ void setTimer1Ticks(unsigned long ticks)
   // then we set the resolution based on the size of the delay.
   // we also then calculate the timer ceiling required. (ie what the counter counts to)
   // the result is the timer counts up to the appropriate time and then fires an interrupt.
-  
+
   setTimer1Ceiling(getTimer1Ceiling(ticks));
   setTimer1Resolution(getTimer1Resolution(ticks));
 }
@@ -113,19 +113,19 @@ void setupTimer1Interrupt()
   TCCR1B = 0;
   TCCR1C = 0;
   TIMSK1 = 0;
-  
+
   //waveform generation = 0100 = CTC
   TCCR1B &= ~(1<<WGM13);
   TCCR1B |=  (1<<WGM12);
   TCCR1A &= ~(1<<WGM11); 
   TCCR1A &= ~(1<<WGM10);
-  
+
   //output mode = 00 (disconnected)
   TCCR1A &= ~(1<<COM1A1); 
   TCCR1A &= ~(1<<COM1A0);
   TCCR1A &= ~(1<<COM1B1); 
   TCCR1A &= ~(1<<COM1B0);
-  
+
   //start off with a slow frequency.
   setTimer1Resolution(5);
   setTimer1Ceiling(65535);
