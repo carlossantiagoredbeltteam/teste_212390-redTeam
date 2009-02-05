@@ -110,7 +110,7 @@ void send_tool_query()
 
   //send it and then get our response
   send_packet();
-  
+
   //now load it up into the host.
   for (byte i=0; i<slavePacket.getLength(); i++)
     hostPacket.add_8(slavePacket.get_8(i));
@@ -138,10 +138,10 @@ boolean send_packet()
   slavePacket.sendPacket();
 
   rs485_packet_count++;
-  
+
   //wait for guy to catch up?
   delayMicrosecondsInterruptible(100);
-  
+
   return read_tool_response(PACKET_TIMEOUT);
 }
 
@@ -164,36 +164,36 @@ bool read_tool_response(int timeout)
       rs485_rx_count++;
 
 #ifdef ENABLE_COMMS_DEBUG
-/*
+      /*
       Serial.print("IN:");
-      Serial.print(d, HEX);
-      Serial.print("/");
-      Serial.println(d, BIN);
-*/
+       Serial.print(d, HEX);
+       Serial.print("/");
+       Serial.println(d, BIN);
+       */
 #endif
       //keep processing while there's data. 
       start = millis();
       end = start + timeout;
 
       if (slavePacket.getState() == RC_CRC_MISMATCH)
-	  {
-		slave_crc_errors++;
+      {
+        slave_crc_errors++;
 
 #ifdef ENABLE_COMMS_DEBUG
-	    Serial.println("Slave CRC Mismatch");
+        Serial.println("Slave CRC Mismatch");
 #endif
-		//retransmit?
-	  }
+        //retransmit?
+      }
     }
 
     //not sure if we need this yet.
     //our timeout guy.
     if (millis() > end)
     {
-		slave_timeouts++;
+      slave_timeouts++;
 
 #ifdef ENABLE_COMMS_DEBUG
-  Serial.println("Slave Timeout");
+      Serial.println("Slave Timeout");
 #endif
       return false;
     }

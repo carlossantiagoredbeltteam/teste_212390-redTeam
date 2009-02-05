@@ -11,6 +11,47 @@ void check_tool_version(byte id)
   //Serial.println(version);
 }
 
+void exercise_heater()
+{
+  set_tool_temp(1, 100);
+  while (1)
+  {
+    get_tool_temp(1);
+    delay(500);
+  }
+}
+
+void exercise_motors()
+{
+  boolean dir = true;
+
+  for (int i=0; i<256; i++)
+  {
+    set_motor1_pwm(1, i);
+    toggle_motor1(1, dir, 1);
+    set_motor2_pwm(1, i);
+    toggle_motor2(1, dir, 1);
+    //delay(100);
+  }
+
+  dir = !dir;
+}
+
+void print_stats()
+{
+  Serial.println("Stats:");
+  Serial.print("Slave TX Count:");
+  Serial.println(rs485_tx_count, DEC);
+  Serial.print("Slave RX Count:");
+  Serial.println(rs485_tx_count, DEC);
+  Serial.print("Slave Packet Count: ");
+  Serial.println(rs485_packet_count, DEC);
+  Serial.print("Slave CRC Errors: ");
+  Serial.println(slave_crc_errors, DEC);
+  Serial.print("Slave timeouts: ");
+  Serial.println(slave_timeouts, DEC);
+}
+
 void print_tool(byte id)
 {
   Serial.print("tool #");
@@ -81,11 +122,11 @@ void toggle_motor1(byte id, boolean dir, boolean enable)
   byte flags = 0;
 
   if (enable)
-	flags += 1;
+    flags += 1;
 
   if (dir)
-	flags += 2;
-	
+    flags += 2;
+
   slavePacket.init();
   slavePacket.add_8(id);
   slavePacket.add_8(SLAVE_CMD_TOGGLE_MOTOR_1);
@@ -98,11 +139,11 @@ void toggle_motor2(byte id, boolean dir, boolean enable)
   byte flags = 0;
 
   if (enable)
-	flags += 1;
+    flags += 1;
 
   if (dir)
-	flags += 2;
-	
+    flags += 2;
+
   slavePacket.init();
   slavePacket.add_8(id);
   slavePacket.add_8(SLAVE_CMD_TOGGLE_MOTOR_2);
