@@ -1,5 +1,18 @@
+unsigned long rs485_tx_count = 0;
+unsigned long rs485_rx_count = 0;
+unsigned long rs485_packet_count = 0;
+unsigned long rs485_loopback_fails = 0;
+
+unsigned long slave_crc_errors = 0;
+unsigned long slave_timeouts = 0;
+unsigned long serial_tx_count = 0;
+unsigned long serial_rx_count = 0;
+unsigned long serial_packet_count = 0;
+
 void rs485_tx(byte b)
 {
+  rs485_tx_count++;
+	
   digitalWrite(TX_ENABLE_PIN, HIGH); //enable tx
   Serial1.print(b, BYTE);
 
@@ -12,6 +25,7 @@ void rs485_tx(byte b)
     tmp = Serial1.read();
 	if (millis() > end)
 	{
+		rs485_loopback_fails++;
 #ifdef ENABLE_COMMS_DEBUG
   Serial.println("Loopback Fail");
 #endif
@@ -24,5 +38,7 @@ void rs485_tx(byte b)
 
 void serial_tx(byte b)
 {
+	serial_tx_count++;
+	
 	Serial.print(b, BYTE);
 }

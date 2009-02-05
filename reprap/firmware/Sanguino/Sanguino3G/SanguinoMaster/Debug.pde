@@ -6,9 +6,9 @@ void check_tool_version(byte id)
 
   int version = slavePacket.get_16(1);
 
-  print_tool(id);
-  Serial.print("version: ");
-  Serial.println(version);
+  //print_tool(id);
+  //Serial.print("version: ");
+  //Serial.println(version);
 }
 
 void print_tool(byte id)
@@ -54,7 +54,7 @@ void set_motor1_pwm(byte id, byte pwm)
 
   //print_tool(id);
   //Serial.print("set motor1 pwm to: ");
-  Serial.println(pwm, DEC);
+  //Serial.println(pwm, DEC);
 }
 
 void set_motor2_pwm(byte id, byte pwm)
@@ -67,7 +67,7 @@ void set_motor2_pwm(byte id, byte pwm)
 
   //print_tool(id);
   //Serial.print("set motor2 pwm to: ");
-  Serial.println(pwm, DEC);
+  //Serial.println(pwm, DEC);
 }
 
 

@@ -9,39 +9,58 @@ inline void init_commands()
 //handle our packets.
 void process_host_packets()
 {
-  //read through our available data
-  while (Serial.available() > 0)
+  unsigned long start = millis();
+  unsigned long end = start + PACKET_TIMEOUT;
+
+  //do we have a finished packet?
+  while (!hostPacket.isFinished())
   {
-    //grab a byte and process it.
-    byte d = Serial.read();
-    hostPacket.process_byte(d);
-
-    //do we have a finished packet?
-    if (hostPacket.isFinished())
+    if (Serial.available() > 0)
     {
-      byte b = hostPacket.get_8(0);
-      // top bit high == bufferable command packet (eg. #128-255)
-      if (b & 0x80)
-      {
-        //Serial.println("command");
-        //okay, throw it in the buffer.
-        for (int i=1; i<hostPacket.getLength(); i++)
-          commandBuffer.append(hostPacket.get_8(i));
-      }
-      // top bit low == reply needed query packet (eg. #0-127)
-      else
-      {
-        //Serial.println("query");
-        handle_query(b);        
-      }
+      digitalWrite(DEBUG_PIN, HIGH);
 
-      //okay, send our response
-      hostPacket.sendReply();
+      //grab a byte and process it.
+      byte d = Serial.read();
+      hostPacket.process_byte(d);
 
-      //only process one packet at a time.
-      return;
+      serial_rx_count++;
+
+      //keep us goign while we have data coming in.
+      start = millis();
+      end = start + PACKET_TIMEOUT;
+
+      digitalWrite(DEBUG_PIN, LOW);
+    }
+
+    //are we sure we wanna break mid-packet?
+    //have we timed out?
+    if (millis() >= end)
+    {
+      //wanna set a 'timeout' error?
+      break;    
     }
   }
+
+  if (hostPacket.isFinished())
+  {
+    serial_packet_count++;
+
+    byte b = hostPacket.get_8(0);
+    // top bit high == bufferable command packet (eg. #128-255)
+    if (b & 0x80)
+    {
+      //okay, throw it in the buffer.
+      for (int i=1; i<hostPacket.getLength(); i++)
+        commandBuffer.append(hostPacket.get_8(i));
+    }
+    // top bit low == reply needed query packet (eg. #0-127)
+    else
+      handle_query(b);        
+
+  }
+
+  //okay, send our response
+  hostPacket.sendReply();
 }
 
 //this is for handling query commands that need a response.
@@ -156,19 +175,19 @@ void handle_commands()
       //add it to our point queue.
     case HOST_CMD_QUEUE_POINT_INC:
       queue_incremental_point(commandBuffer.remove_16(),
-                              commandBuffer.remove_16(),
-                              commandBuffer.remove_16(),
-                              commandBuffer.remove_8(),
-                              commandBuffer.remove_16());
+      commandBuffer.remove_16(),
+      commandBuffer.remove_16(),
+      commandBuffer.remove_8(),
+      commandBuffer.remove_16());
       break;
 
       //add it to our point queue.
     case HOST_CMD_QUEUE_POINT_ABS:
       queue_absolute_point(commandBuffer.remove_32(),
-                           commandBuffer.remove_32(),
-                           commandBuffer.remove_32(),
-                           commandBuffer.remove_8(),
-                           commandBuffer.remove_16());
+      commandBuffer.remove_32(),
+      commandBuffer.remove_32(),
+      commandBuffer.remove_8(),
+      commandBuffer.remove_16());
       break;
 
       //update our current point to where we're told.
@@ -192,10 +211,10 @@ void handle_commands()
 
       //find them!
       seek_minimums(flags & 1,
-                    flags & (1 << 1),
-                    flags & (1 << 2),
-                    commandBuffer.remove_32(),
-                    commandBuffer.remove_16());
+      flags & (1 << 1),
+      flags & (1 << 2),
+      commandBuffer.remove_32(),
+      commandBuffer.remove_16());
 
       //turn on point seekign agian.
       enableTimer1Interrupt();
@@ -228,8 +247,8 @@ void handle_commands()
 
       //get your temp in gear, you lazy bum.
       wait_for_tool_ready_state(commandBuffer.remove_8(),
-                                commandBuffer.remove_16(),
-                                commandBuffer.remove_16());
+      commandBuffer.remove_16(),
+      commandBuffer.remove_16());
       break;
 
     case HOST_CMD_TOOL_QUERY:

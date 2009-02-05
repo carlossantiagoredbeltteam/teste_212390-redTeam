@@ -74,7 +74,8 @@ void loop()
    //if (!is_machine_aborted)
    //{
    //check for and handle any packets that come in.
-   process_host_packets();
+	if (Serial.available())
+   		process_host_packets();
    
    //only handle our buffer if we're unpaused. 
    if (!is_machine_paused && !is_machine_aborted)
@@ -99,7 +100,7 @@ void loop()
     toggle_motor1(1, dir, 1);
     set_motor2_pwm(1, i);
     toggle_motor2(1, dir, 1);
-    delay(250);
+    //delay(100);
   }
 
   dir = !dir;
