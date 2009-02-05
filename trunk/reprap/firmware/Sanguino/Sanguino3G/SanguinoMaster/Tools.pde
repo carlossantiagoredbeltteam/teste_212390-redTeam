@@ -26,7 +26,7 @@ bool ping_tool(byte i)
   slavePacket.add_8(i);
   slavePacket.add_8(SLAVE_CMD_VERSION);
   slavePacket.add_16(FIRMWARE_VERSION);
-  slavePacket.sendPacket();
+  send_packet();
 
   return read_tool_response(PACKET_TIMEOUT);
 }
@@ -38,7 +38,7 @@ void init_tool(byte i)
 
   slavePacket.add_8(i);
   slavePacket.add_8(SLAVE_CMD_INIT);
-  slavePacket.sendPacket();
+  send_packet();
 
   read_tool_response(PACKET_TIMEOUT);
 }
@@ -52,7 +52,7 @@ void select_tool(byte tool)
 
   slavePacket.add_8(tool);
   slavePacket.add_8(SLAVE_CMD_SELECT_TOOL);
-  slavePacket.sendPacket();
+  send_packet();
 
   read_tool_response(PACKET_TIMEOUT);
 }
@@ -92,7 +92,7 @@ bool is_tool_ready(byte tool)
 
   slavePacket.add_8(tool);
   slavePacket.add_8(SLAVE_CMD_IS_TOOL_READY);
-  slavePacket.sendPacket();
+  send_packet();
 
   //did we get a response?
   if (read_tool_response(PACKET_TIMEOUT))
@@ -116,7 +116,7 @@ void send_tool_query()
     slavePacket.add_8(hostPacket.get_8(i));
 
   //send it and then get our response
-  slavePacket.sendPacket();
+  send_packet();
   read_tool_response(PACKET_TIMEOUT);
 
   //now load it up into the host.
@@ -138,8 +138,26 @@ void send_tool_command()
     slavePacket.add_8(commandBuffer.remove_8());
 
   //send it and then get our response
-  slavePacket.sendPacket();
+  send_packet();
   read_tool_response(PACKET_TIMEOUT);
+}
+
+void send_packet()
+{
+#ifdef ENABLE_COMMS_DEBUG
+  Serial.println("sending packet.");
+#endif
+
+  rs485_disable_rx();
+  rs485_enable_tx();
+
+  slavePacket.sendPacket();
+
+  rs485_enable_rx();
+  rs485_disable_tx();
+
+  //wait for guy to catch up?
+  delayMicrosecondsInterruptible(100);
 }
 
 bool read_tool_response(int timeout)
@@ -147,6 +165,10 @@ bool read_tool_response(int timeout)
   //figure out our timeout stuff.
   long start = millis();
   long end = start + timeout;
+
+#ifdef ENABLE_COMMS_DEBUG
+  Serial.println("reading response.");
+#endif
 
   //keep reading until we got it.
   while (!slavePacket.isFinished())
@@ -158,14 +180,21 @@ bool read_tool_response(int timeout)
       byte d = Serial1.read();
       slavePacket.process_byte(d);
 
-        //keep processing while there's data. 
-        start = millis();
-        end = start + timeout;
+#ifdef ENABLE_COMMS_DEBUG
+      Serial.print("IN:");
+      Serial.print(d, HEX);
+      Serial.print("/");
+      Serial.println(d, BIN);
+#endif
+      //keep processing while there's data. 
+      start = millis();
+      end = start + timeout;
     }
 
+    //not sure if we need this yet.
     //our timeout guy.
-    if (millis() > end)
-      return false;
+    //if (millis() > end)
+    //  return false;
   }
 
   return true;

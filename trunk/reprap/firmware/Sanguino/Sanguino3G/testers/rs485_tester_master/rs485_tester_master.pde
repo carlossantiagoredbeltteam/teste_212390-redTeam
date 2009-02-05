@@ -9,8 +9,8 @@ void setup()
   pinMode(TX_ENABLE_PIN, OUTPUT);
   pinMode(DEBUG_PIN, OUTPUT);
 
-  Serial.begin(9600);
-  Serial1.begin(9600);
+  Serial.begin(38400);
+  Serial1.begin(38400);
 }
 
 void loop()
@@ -31,4 +31,6 @@ void loop()
     digitalWrite(DEBUG_PIN, HIGH);
     Serial.println("RS485 active.");
   }
+  
+  delay(2000);
 }

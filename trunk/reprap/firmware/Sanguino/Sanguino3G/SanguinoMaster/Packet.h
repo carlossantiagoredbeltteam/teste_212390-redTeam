@@ -166,10 +166,18 @@ public:
   {
     if (uart == 0)
       Serial.print(d, BYTE);
-#if defined(__AVR_ATmega644P__)
+//#if defined(__AVR_ATmega644P__)
     else if(uart == 1)
+    {
+#ifdef ENABLE_COMMS_DEBUG
+      Serial.print("OUT:");
+      Serial.print(d, HEX);
+      Serial.print("/");
+      Serial.println(d, BIN);
+#endif      
       Serial1.print(d, BYTE);
-#endif
+    }
+//#endif
   }
 
   //add a four byte chunk of data to our reply

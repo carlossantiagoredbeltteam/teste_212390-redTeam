@@ -38,8 +38,8 @@ void init_extruder()
   pinMode(DEBUG_PIN, OUTPUT);
   digitalWrite(DEBUG_PIN, LOW);
         
-  //default to room temp.
-  set_temperature(21);
+  //default to zero.
+  set_temperature(0);
         
   setupTimer1Interrupt();
 }

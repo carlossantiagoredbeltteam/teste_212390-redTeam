@@ -28,6 +28,7 @@
 void init_commands()
 {
   finishedCommands = 0;
+  masterPacket.init();
 }
 
 //handle our packets.
@@ -45,6 +46,10 @@ void process_packets()
       //only try to grab it if theres something in the queue.
       if (Serial.available() > 0)
       {
+        digitalWrite(DEBUG_PIN, HIGH);
+        delay(1);
+        digitalWrite(DEBUG_PIN, LOW);
+
         //grab a byte and process it.
         byte d = Serial.read();
         masterPacket.process_byte(d);
@@ -54,31 +59,49 @@ void process_packets()
         end = start + PACKET_TIMEOUT;
       }
 
+      //are we sure we wanna break mid-packet?
       //have we timed out?
-      if (millis() >= end)
-        return;
+      //if (millis() >= end)
+      //  return;
     }
-
-    //do we have a finished packet?
-    if (masterPacket.isFinished())
-    {
-      //only process packets intended for us.
-      if (masterPacket.get_8(0) == RS485_ADDRESS)
-      {
-        //take some action.
-        handle_query();                
-
-        //okay, send our response
-        masterPacket.sendReply();
-
-        //how many have we processed?
-        finishedCommands++;
-      }
-    }
-
-        //always clean up the packet.
-    masterPacket.init();
   }
+
+  //do we have a finished packet?
+  if (masterPacket.isFinished())
+  {
+    //only process packets intended for us.
+    if (masterPacket.get_8(0) == RS485_ADDRESS)
+    {
+      //might be needed to allow for pin switching / etc.  testing needed.
+      delayMicrosecondsInterruptible(250);
+
+      //take some action.
+      handle_query();                
+
+      //send reply over RS485
+      send_reply();
+
+      //how many have we processed?
+      finishedCommands++;
+    }
+  }
+
+  //always clean up the packet.
+  masterPacket.init();
+}
+
+void send_reply()
+{
+  //rs485 crap
+  rs485_disable_rx();
+  rs485_enable_tx();
+
+  //okay, send our response
+  masterPacket.sendReply();
+
+  //rs485 crap
+  rs485_disable_tx();
+  rs485_enable_rx();
 }
 
 //this is for handling query commands that need a response.
@@ -90,6 +113,11 @@ void handle_query()
   switch (masterPacket.getData(1))
   {
   case SLAVE_CMD_VERSION:
+
+    digitalWrite(DEBUG_PIN, HIGH);
+    delayMicrosecondsInterruptible(100);
+    digitalWrite(DEBUG_PIN, LOW);
+
     //get our host version
     master_version = masterPacket.get_16(2);
 
