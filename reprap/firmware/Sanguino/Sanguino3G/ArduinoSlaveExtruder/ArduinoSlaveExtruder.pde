@@ -23,6 +23,7 @@
 #include "Configuration.h"
 #include "Datatypes.h"
 #include "Packet.h"
+#include "RS485.h"
 #include "Variables.h"
 #include "ThermistorTable.h"
 
