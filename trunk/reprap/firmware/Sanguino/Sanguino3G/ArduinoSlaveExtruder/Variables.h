@@ -40,4 +40,4 @@ volatile int iState = 0;                   // Integrator state
 volatile int dState = 0;                   // Last position input
 
 //these are our packet classes
-Packet masterPacket(rs485_tx);
+SimplePacket masterPacket(rs485_tx);
