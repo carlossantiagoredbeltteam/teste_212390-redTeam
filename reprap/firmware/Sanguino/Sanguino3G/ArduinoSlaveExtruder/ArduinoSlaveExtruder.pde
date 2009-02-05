@@ -35,6 +35,7 @@
 void setup()
 {
   //setup our firmware to a default state.
+  init_serial(); //dont want to re-initialize serial!
   initialize();
 
   //this is a simple text string that identifies us.
@@ -46,8 +47,6 @@ void setup()
 void initialize()
 {
   is_tool_paused = false;
-
-  init_serial();
   init_extruder();
 }
 
@@ -69,9 +68,7 @@ void loop()
 
   //manage our extruder stuff.
   if (!is_tool_paused)
-  {
     manage_temperature();
-  }
 }
 
 //handle the abortion of a print job

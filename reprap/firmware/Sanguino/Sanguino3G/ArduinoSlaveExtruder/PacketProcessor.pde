@@ -61,8 +61,8 @@ void process_packets()
 
       //are we sure we wanna break mid-packet?
       //have we timed out?
-      //if (millis() >= end)
-      //  return;
+      if (millis() >= end)
+        return;
     }
   }
 
@@ -83,6 +83,9 @@ void process_packets()
 
       //how many have we processed?
       finishedCommands++;
+
+      //okay, we'll come back later.
+      return;
     }
   }
 

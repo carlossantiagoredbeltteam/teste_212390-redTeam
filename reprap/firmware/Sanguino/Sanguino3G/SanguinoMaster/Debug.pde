@@ -2,8 +2,6 @@
 
 void check_tool_version(byte id)
 {
-  Serial.println("checking version");
-
   ping_tool(id);
 
   int version = slavePacket.get_16(1);
@@ -11,17 +9,6 @@ void check_tool_version(byte id)
   print_tool(id);
   Serial.print("version: ");
   Serial.println(version);
-
-  Serial.print("Length: ");
-  Serial.println(slavePacket.getLength(), DEC);
-
-  Serial.print("Data: ");
-  for (byte i=0; i<3; i++)
-  {
-	Serial.print(slavePacket.get_8(i), DEC);
-	Serial.print(" ");
-  }
-  Serial.println(".");
 }
 
 void print_tool(byte id)
@@ -45,20 +32,12 @@ void get_tool_temp(byte id)
   slavePacket.init();
   slavePacket.add_8(id);
   slavePacket.add_8(SLAVE_CMD_GET_TEMP);
-  slavePacket.sendPacket();
+  send_packet();
 
-  if (read_tool_response(PACKET_TIMEOUT))
-  {
-    int temp = slavePacket.get_16(1);
-    print_tool(id);
-    Serial.print("temp: ");
-    Serial.println(temp, DEC);
-  }
-  else
-  {
-    print_tool(id);
-    Serial.println("failed to get temp!");
-  }
+  int temp = slavePacket.get_16(1);
+  print_tool(id);
+  Serial.print("temp: ");
+  Serial.println(temp, DEC);
 }
 
 void set_tool_temp(byte id, unsigned int temp)
@@ -67,7 +46,7 @@ void set_tool_temp(byte id, unsigned int temp)
   slavePacket.add_8(id);
   slavePacket.add_8(SLAVE_CMD_SET_TEMP);
   slavePacket.add_16(temp);
-  slavePacket.sendPacket();
+  send_packet();
 
   print_tool(id);
   Serial.print("set temp to: ");

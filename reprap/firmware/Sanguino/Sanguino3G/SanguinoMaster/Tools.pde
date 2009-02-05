@@ -26,9 +26,7 @@ bool ping_tool(byte i)
   slavePacket.add_8(i);
   slavePacket.add_8(SLAVE_CMD_VERSION);
   slavePacket.add_16(FIRMWARE_VERSION);
-  send_packet();
-
-  return read_tool_response(PACKET_TIMEOUT);
+  return send_packet();
 }
 
 //initialize a tool to its default state.
@@ -39,8 +37,6 @@ void init_tool(byte i)
   slavePacket.add_8(i);
   slavePacket.add_8(SLAVE_CMD_INIT);
   send_packet();
-
-  read_tool_response(PACKET_TIMEOUT);
 }
 
 //select a tool as our current tool, and let it know.
@@ -53,8 +49,6 @@ void select_tool(byte tool)
   slavePacket.add_8(tool);
   slavePacket.add_8(SLAVE_CMD_SELECT_TOOL);
   send_packet();
-
-  read_tool_response(PACKET_TIMEOUT);
 }
 
 //ping the tool until it tells us its ready
@@ -92,10 +86,9 @@ bool is_tool_ready(byte tool)
 
   slavePacket.add_8(tool);
   slavePacket.add_8(SLAVE_CMD_IS_TOOL_READY);
-  send_packet();
 
   //did we get a response?
-  if (read_tool_response(PACKET_TIMEOUT))
+  if (send_packet())
   {
     //is it true?
     if (slavePacket.get_8(1) == 1)
@@ -117,8 +110,7 @@ void send_tool_query()
 
   //send it and then get our response
   send_packet();
-  read_tool_response(PACKET_TIMEOUT);
-
+  
   //now load it up into the host.
   for (byte i=0; i<slavePacket.getLength(); i++)
     hostPacket.add_8(slavePacket.get_8(i));
@@ -139,10 +131,9 @@ void send_tool_command()
 
   //send it and then get our response
   send_packet();
-  read_tool_response(PACKET_TIMEOUT);
 }
 
-void send_packet()
+boolean send_packet()
 {
 #ifdef ENABLE_COMMS_DEBUG
   Serial.println("sending packet.");
@@ -151,7 +142,9 @@ void send_packet()
   slavePacket.sendPacket();
   
   //wait for guy to catch up?
-  //delayMicrosecondsInterruptible(100);
+  delayMicrosecondsInterruptible(50);
+  
+  return read_tool_response(PACKET_TIMEOUT);
 }
 
 bool read_tool_response(int timeout)

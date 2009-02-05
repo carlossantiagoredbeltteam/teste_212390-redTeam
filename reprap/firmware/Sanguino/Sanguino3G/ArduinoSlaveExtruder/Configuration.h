@@ -12,7 +12,7 @@
 
 //the address for commands to listen to
 #define RS485_ADDRESS 1
-#define PACKET_TIMEOUT 10
+#define PACKET_TIMEOUT 100
 
 /****************************************************************************************
  * Here's where you define the speed PID behavior
