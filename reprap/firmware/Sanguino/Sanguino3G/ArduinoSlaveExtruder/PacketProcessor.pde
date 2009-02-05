@@ -102,7 +102,7 @@ void handle_query()
   byte temp;
 
   //which one did we get?
-  switch (masterPacket.getData(1))
+  switch (masterPacket.get_8(1))
   {
   case SLAVE_CMD_VERSION:
 

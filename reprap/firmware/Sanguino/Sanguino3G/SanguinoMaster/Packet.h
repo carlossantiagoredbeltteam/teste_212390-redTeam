@@ -199,9 +199,7 @@ public:
   {
     //only add it if it will fit.
     if (tx_length < MAX_PACKET_LENGTH)
-    {
       tx_data[tx_length++] = d;
-    }
   }
 
   uint8_t get_8(uint8_t idx)

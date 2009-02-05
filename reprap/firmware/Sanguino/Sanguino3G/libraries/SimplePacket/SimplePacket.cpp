@@ -1,53 +1,24 @@
-#ifndef _PACKET_H_
-#define _PACKET_H_
+#include <SimplePacket.h>
 
-//include our various libraries.
-#include <util/crc16.h>
-#include <stdint.h>
-#include "HardwareSerial.h"
-
-typedef void (*txFuncPtr)(byte);
-
-#define START_BYTE 0xD5
-#define MAX_PACKET_LENGTH 32
-
-class Packet {
-private:
-  //variables for our incoming packet.
-  PacketState state;
-  uint8_t target_length;
-  uint8_t rx_length;
-  uint8_t rx_data[MAX_PACKET_LENGTH];
-  uint8_t rx_crc;
-  uint8_t tx_length;
-  uint8_t tx_data[MAX_PACKET_LENGTH];
-  uint8_t tx_crc;
-  ResponseCode response_code;
-
-  txFuncPtr txFunc;
-
-public:
-
-  Packet(txFuncPtr myPtr)
-  {
+SimplePacket::SimplePacket(txFuncPtr myPtr)
+{
 	txFunc = myPtr;
-	
-    init();
-  }
+	init();
+}
 
-  void init()
-  {
-    state = PS_START;
-    response_code = RC_OK;
-    target_length = 0;
-    rx_length = 0;
-    rx_crc = 0;
-    tx_length = 0;
-    tx_crc = 0;
-  }
+void SimplePacket::init()
+{
+	state = PS_START;
+	response_code = RC_OK;
+	target_length = 0;
+	rx_length = 0;
+	rx_crc = 0;
+	tx_length = 0;
+	tx_crc = 0;
+}
 
   //process a byte from our packet
-  bool process_byte(uint8_t b)
+  void SimplePacket::process_byte(unsigned char b)
   {
     if (state == PS_START)  // process start byte
     {
@@ -104,27 +75,22 @@ public:
     }
   }
 
-  bool isFinished()
+  bool SimplePacket::isFinished()
   {
     return (state == PS_LAST);        
   }
 
-  uint8_t getLength()
+  unsigned char SimplePacket::getLength()
   {
     return rx_length;
   }
 
-  uint8_t getData(uint8_t i)
-  {
-    return rx_data[i];
-  }
-
-  void unsupported()
+  void SimplePacket::unsupported()
   {
     response_code = RC_CMD_UNSUPPORTED;
   }
 
-  void sendReply()
+  void SimplePacket::sendReply()
   {
     //initialize our response CRC
     tx_crc = 0;
@@ -136,7 +102,7 @@ public:
     transmit(response_code);
 
     //loop through our reply packet payload and send it.
-    for (uint8_t i=0; i<tx_length; i++)
+    for (unsigned char i=0; i<tx_length; i++)
     {
       transmit(tx_data[i]);
       tx_crc = _crc_ibutton_update(tx_crc, tx_data[i]);
@@ -149,14 +115,14 @@ public:
     init();
   }
 
-  void sendPacket()
+  void SimplePacket::sendPacket()
   {
     tx_crc = 0;
     transmit(START_BYTE);
     transmit(tx_length);
 
     //loop through our reply packet payload and send it.
-    for (uint8_t i=0; i<tx_length; i++)
+    for (unsigned char i=0; i<tx_length; i++)
     {
       transmit(tx_data[i]);
       tx_crc = _crc_ibutton_update(tx_crc, tx_data[i]);
@@ -166,47 +132,44 @@ public:
     transmit(tx_crc);
   }
 
-  void transmit(uint8_t d)
+  void SimplePacket::transmit(unsigned char d)
   {
 	txFunc(d);
   }
 
   //add a four byte chunk of data to our reply
-  void add_32(uint32_t d)
+  void SimplePacket::add_32(uint32_t d)
   {
     add_16(d);
     add_16(d >> 16);
   }
 
   //add a two byte chunk of data to our reply
-  void add_16(uint16_t d)
+  void SimplePacket::add_16(uint16_t d)
   {
     add_8(d & 0xff);
     add_8(d >> 8);
   }
 
   //add a byte to our reply.
-  void add_8(uint8_t d)
+  void SimplePacket::add_8(unsigned char d)
   {
     //only add it if it will fit.
     if (tx_length < MAX_PACKET_LENGTH)
       tx_data[tx_length++] = d;
   }
 
-  uint8_t get_8(uint8_t idx)
+  unsigned char SimplePacket::get_8(unsigned char idx)
   {
     return rx_data[idx];
   }
 
-  uint16_t get_16(uint8_t idx)
+  uint16_t SimplePacket::get_16(unsigned char idx)
   {
     return (get_8(idx+1) << 8) & get_8(idx);
   }
 
-  uint32_t get_32(uint8_t idx)
+  uint32_t SimplePacket::get_32(unsigned char idx)
   {
-    return (get_16(idx+2) << 16) & get_16(idx);
+    return ((uint32_t)get_16(idx+2) << 16) & get_16(idx);
   }
-};
-
-#endif // _PACKET_H_

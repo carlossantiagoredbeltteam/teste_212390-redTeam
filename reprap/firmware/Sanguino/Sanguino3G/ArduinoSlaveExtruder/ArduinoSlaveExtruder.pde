@@ -19,10 +19,11 @@
 //include some basic libraries.
 #include <WProgram.h>
 #include <Servo.h>
+#include <SimplePacket.h>
+#include <stdint.h>
 
 #include "Configuration.h"
 #include "Datatypes.h"
-#include "Packet.h"
 #include "RS485.h"
 #include "Variables.h"
 #include "ThermistorTable.h"
