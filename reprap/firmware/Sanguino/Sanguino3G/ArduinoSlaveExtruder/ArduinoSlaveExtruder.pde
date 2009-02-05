@@ -36,8 +36,8 @@ void setup()
   initialize();
 
   //this is a simple text string that identifies us.
-  Serial.print("R3G Slave v");
-  Serial.println(FIRMWARE_VERSION, DEC);
+  //Serial.print("R3G Slave v");
+  //Serial.println(FIRMWARE_VERSION, DEC);
 }
 
 //this function takes us back to our default state.
@@ -52,10 +52,8 @@ void initialize()
 //start our hardware serial drivers
 void init_serial()
 {
-  //turn our RS485 control pins on
-  pinMode(RX_ENABLE_PIN, OUTPUT);
-  pinMode(TX_ENABLE_PIN, OUTPUT);
-  
+	pinMode(RX_ENABLE_PIN, OUTPUT);
+	pinMode(TX_ENABLE_PIN, OUTPUT);
   //disable TX, enable RX
   rs485_disable_tx();
   rs485_enable_rx();
@@ -66,9 +64,6 @@ void init_serial()
 //handle various things we're required to do.
 void loop()
 {
-  digitalWrite(MOTOR_1_DIR_PIN, HIGH);
-  analogWrite(MOTOR_1_SPEED_PIN, 255);
-/*
   //check for and handle any packets that come in.
   process_packets();
 
@@ -77,7 +72,6 @@ void loop()
   {
     manage_temperature();
   }
-*/
 }
 
 //handle the abortion of a print job

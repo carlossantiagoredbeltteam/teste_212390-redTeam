@@ -22,10 +22,11 @@
 
 #define PACKET_TIMEOUT 100
 #define HOST_SERIAL_SPEED 38400
-#define SLAVE_SERIAL_SPEED 76800
+#define SLAVE_SERIAL_SPEED 38400
 
 //uncomment to enable debugging functions
 #define ENABLE_DEBUG 1
+#define ENABLE_COMMS_DEBUG 1
 
 //#define SCAN_TOOLS_ON_STARTUP
 
@@ -61,13 +62,15 @@
 #define DEBUG_PIN        0
 
 //our SD card pins
-#define SD_CARD_SELECT   ?
-#define SD_CARD_WRITE    ?
-#define SD_CARD_DETECT   ?
+#define SD_CARD_SELECT	4
+#define SD_CARD_WRITE	28
+#define SD_CARD_DETECT	24
+
 
 //our RS485 pins
-#define RS485_TX_ENABLE  ?
-#define RS485_RX_ENABLE  ?
+#define RX_ENABLE_PIN	13
+#define TX_ENABLE_PIN	12
+
 
 #endif
 
@@ -109,8 +112,8 @@
 #define SD_CARD_DETECT   3
 
 //our RS485 pins
-#define RS485_TX_ENABLE 12
-#define RS485_RX_ENABLE 13
+#define RX_ENABLE_PIN	13
+#define TX_ENABLE_PIN	12
 
 #endif
 

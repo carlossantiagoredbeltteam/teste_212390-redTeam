@@ -55,6 +55,12 @@ void initialize()
 //start our hardware serial drivers
 void init_serial()
 {
+  pinMode(RX_ENABLE_PIN, OUTPUT);
+  pinMode(TX_ENABLE_PIN, OUTPUT);
+
+  rs485_enable_tx();
+  rs485_enable_rx();
+
   Serial.begin(HOST_SERIAL_SPEED);
   Serial1.begin(SLAVE_SERIAL_SPEED);
 }
@@ -62,16 +68,22 @@ void init_serial()
 //handle various things we're required to do.
 void loop()
 {
+  /*
   //if we've aborted, dont do anything.
-  //if (!is_machine_aborted)
-  //{
-    //check for and handle any packets that come in.
-    process_host_packets();
+   //if (!is_machine_aborted)
+   //{
+   //check for and handle any packets that come in.
+   process_host_packets();
+   
+   //only handle our buffer if we're unpaused. 
+   if (!is_machine_paused && !is_machine_aborted)
+   handle_commands();
+   //}
+   */
 
-    //only handle our buffer if we're unpaused. 
-    if (!is_machine_paused && !is_machine_aborted)
-      handle_commands();
-  //}
+  check_tool_version(1);
+  delay(1000);
+
 }
 
 //handle the abortion of a print job

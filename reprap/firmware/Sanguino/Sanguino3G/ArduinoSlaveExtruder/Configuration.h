@@ -8,7 +8,7 @@
 #define EXTRUDER_CONTROLLER_VERSION_2_0
 
 #define TEMPERATURE_SAMPLES 5
-#define SERIAL_SPEED 76800
+#define SERIAL_SPEED 38400
 
 //the address for commands to listen to
 #define RS485_ADDRESS 1

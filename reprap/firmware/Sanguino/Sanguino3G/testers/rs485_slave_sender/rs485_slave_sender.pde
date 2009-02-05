@@ -8,18 +8,25 @@ void setup()
   pinMode(TX_ENABLE_PIN, OUTPUT);
   pinMode(DEBUG_PIN, OUTPUT);
 
-  digitalWrite(TX_ENABLE_PIN, LOW); //disable tx
-  digitalWrite(RX_ENABLE_PIN, LOW); //enable rx
+  digitalWrite(TX_ENABLE_PIN, HIGH); //enable tx
+  digitalWrite(RX_ENABLE_PIN, HIGH); //disable rx
   digitalWrite(DEBUG_PIN, LOW); //disable led
-  
+
   Serial.begin(38400);
 }
 
 void loop()
 {
-  if (Serial.available() > 0)
+  for (int i=32; i<127; i++)
   {
+    Serial.print(i, BYTE);
+    Serial.print(i, BYTE);
+    Serial.print(i, BYTE);
+    Serial.print(i, BYTE);
+
     digitalWrite(DEBUG_PIN, HIGH);
-    Serial.println("RS485 active.");
+    delay(100);
+    digitalWrite(DEBUG_PIN, LOW);
+    delay(900);
   }
 }
