@@ -16,11 +16,11 @@
 
 //include some basic libraries.
 #include <WProgram.h>
+#include <SimplePacket.h>
 
 #include "Configuration.h"
 #include "Datatypes.h"
 #include "CircularBuffer.h"
-#include "Packet.h"
 #include "Variables.h"
 #include "Commands.h"
 #ifdef USE_SD_CARD
