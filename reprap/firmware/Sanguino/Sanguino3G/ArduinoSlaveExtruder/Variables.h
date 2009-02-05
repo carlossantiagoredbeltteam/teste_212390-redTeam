@@ -5,9 +5,6 @@ unsigned int master_version = 0;
 //this will be used to keep track of our current progress.
 unsigned long finishedCommands = 0;
 
-//these are our packet classes
-Packet masterPacket(0);
-
 //are we paused?
 boolean is_tool_paused = false;
 
@@ -41,3 +38,6 @@ volatile int iMax = 500;                   // Integrator max
 volatile int iMin = -500;                  // Integrator min
 volatile int iState = 0;                   // Integrator state
 volatile int dState = 0;                   // Last position input
+
+//these are our packet classes
+Packet masterPacket(rs485_tx);
