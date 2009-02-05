@@ -10,7 +10,18 @@ void check_tool_version(byte id)
 
   print_tool(id);
   Serial.print("version: ");
-  Serial.println(version, DEC);
+  Serial.println(version);
+
+  Serial.print("Length: ");
+  Serial.println(slavePacket.getLength(), DEC);
+
+  Serial.print("Data: ");
+  for (byte i=0; i<3; i++)
+  {
+	Serial.print(slavePacket.get_8(i), DEC);
+	Serial.print(" ");
+  }
+  Serial.println(".");
 }
 
 void print_tool(byte id)

@@ -148,16 +148,10 @@ void send_packet()
   Serial.println("sending packet.");
 #endif
 
-  rs485_disable_rx();
-  rs485_enable_tx();
-
   slavePacket.sendPacket();
-
-  rs485_enable_rx();
-  rs485_disable_tx();
-
+  
   //wait for guy to catch up?
-  delayMicrosecondsInterruptible(100);
+  //delayMicrosecondsInterruptible(100);
 }
 
 bool read_tool_response(int timeout)

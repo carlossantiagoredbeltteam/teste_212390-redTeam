@@ -166,10 +166,10 @@ void SimplePacket::init()
 
   uint16_t SimplePacket::get_16(unsigned char idx)
   {
-    return (get_8(idx+1) << 8) & get_8(idx);
+    return (((int16_t)get_8(idx+1)) << 8) | get_8(idx);
   }
 
   uint32_t SimplePacket::get_32(unsigned char idx)
   {
-    return ((uint32_t)get_16(idx+2) << 16) & get_16(idx);
+    return (((uint32_t)get_16(idx+2)) << 16) | get_16(idx);
   }

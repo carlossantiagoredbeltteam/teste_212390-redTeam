@@ -21,6 +21,7 @@
 #include "Configuration.h"
 #include "Datatypes.h"
 #include "CircularBuffer.h"
+#include "RS485.h"
 #include "Variables.h"
 #include "Commands.h"
 #ifdef USE_SD_CARD
@@ -57,9 +58,7 @@ void init_serial()
 {
   pinMode(RX_ENABLE_PIN, OUTPUT);
   pinMode(TX_ENABLE_PIN, OUTPUT);
-
-  rs485_enable_tx();
-  rs485_enable_rx();
+  digitalWrite(RX_ENABLE_PIN, LOW); //always listen.
 
   Serial.begin(HOST_SERIAL_SPEED);
   Serial1.begin(SLAVE_SERIAL_SPEED);
