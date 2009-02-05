@@ -44,7 +44,7 @@ void setup()
 void initialize()
 {
   is_tool_paused = false;
-  
+
   init_serial();
   init_extruder();
 }
@@ -52,12 +52,10 @@ void initialize()
 //start our hardware serial drivers
 void init_serial()
 {
-	pinMode(RX_ENABLE_PIN, OUTPUT);
-	pinMode(TX_ENABLE_PIN, OUTPUT);
-  //disable TX, enable RX
-  rs485_disable_tx();
-  rs485_enable_rx();
-  
+  pinMode(RX_ENABLE_PIN, OUTPUT);
+  pinMode(TX_ENABLE_PIN, OUTPUT);
+  digitalWrite(RX_ENABLE_PIN, LOW); //always listen
+
   Serial.begin(SERIAL_SPEED);
 }
 

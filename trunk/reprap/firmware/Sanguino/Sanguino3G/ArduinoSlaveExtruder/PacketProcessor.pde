@@ -92,16 +92,8 @@ void process_packets()
 
 void send_reply()
 {
-  //rs485 crap
-  rs485_disable_rx();
-  rs485_enable_tx();
-
   //okay, send our response
   masterPacket.sendReply();
-
-  //rs485 crap
-  rs485_disable_tx();
-  rs485_enable_rx();
 }
 
 //this is for handling query commands that need a response.

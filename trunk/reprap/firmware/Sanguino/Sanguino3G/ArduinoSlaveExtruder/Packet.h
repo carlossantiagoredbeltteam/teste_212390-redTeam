@@ -6,6 +6,8 @@
 #include <stdint.h>
 #include "HardwareSerial.h"
 
+typedef void (*txFuncPtr)(byte);
+
 #define START_BYTE 0xD5
 #define MAX_PACKET_LENGTH 32
 
@@ -22,13 +24,14 @@ private:
   uint8_t tx_crc;
   ResponseCode response_code;
 
-  uint8_t uart;
+  txFuncPtr txFunc;
 
 public:
 
-  Packet(uint8_t uart)
+  Packet(txFuncPtr myPtr)
   {
-    this->uart = uart;
+	txFunc = myPtr;
+	
     init();
   }
 
@@ -164,10 +167,7 @@ public:
 
   void transmit(uint8_t d)
   {
-    if (uart == 0)
-      Serial.print(d, BYTE);
-//        else
-//                Serial1.print(d, BYTE);
+	txFunc(d);
   }
 
   //add a four byte chunk of data to our reply

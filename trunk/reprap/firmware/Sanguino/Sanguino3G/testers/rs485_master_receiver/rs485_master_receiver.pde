@@ -23,6 +23,8 @@ void loop()
     int b = Serial1.read();
     
     Serial.print("IN: ");
+    Serial.print(b, BYTE);
+    Serial.print(" / ");
     Serial.print(b, DEC);
     Serial.print(" / ");
     Serial.print(b, HEX);
