@@ -2,8 +2,8 @@
 unsigned int host_version = 0;
 
 //these are our packet classes
-Packet hostPacket(0);
-Packet slavePacket(1);
+SimplePacket hostPacket(serial_tx);
+SimplePacket slavePacket(rs485_tx);
 
 //are we paused?
 boolean is_machine_paused = false;
