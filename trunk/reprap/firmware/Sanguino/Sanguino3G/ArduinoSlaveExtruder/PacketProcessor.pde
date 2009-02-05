@@ -47,8 +47,6 @@ void process_packets()
       if (Serial.available() > 0)
       {
         digitalWrite(DEBUG_PIN, HIGH);
-        delay(1);
-        digitalWrite(DEBUG_PIN, LOW);
 
         //grab a byte and process it.
         byte d = Serial.read();
@@ -57,6 +55,8 @@ void process_packets()
         //keep us goign while we have data coming in.
         start = millis();
         end = start + PACKET_TIMEOUT;
+
+        digitalWrite(DEBUG_PIN, LOW);
       }
 
       //are we sure we wanna break mid-packet?
@@ -108,11 +108,6 @@ void handle_query()
   switch (masterPacket.get_8(1))
   {
   case SLAVE_CMD_VERSION:
-
-    digitalWrite(DEBUG_PIN, HIGH);
-    delayMicrosecondsInterruptible(100);
-    digitalWrite(DEBUG_PIN, LOW);
-
     //get our host version
     master_version = masterPacket.get_16(2);
 

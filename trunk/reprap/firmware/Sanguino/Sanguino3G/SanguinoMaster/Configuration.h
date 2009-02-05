@@ -26,7 +26,7 @@
 
 //uncomment to enable debugging functions
 #define ENABLE_DEBUG 1
-//#define ENABLE_COMMS_DEBUG 1
+#define ENABLE_COMMS_DEBUG 1
 
 //#define SCAN_TOOLS_ON_STARTUP
 
