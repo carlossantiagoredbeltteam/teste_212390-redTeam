@@ -255,7 +255,15 @@ void get_motor1_rpm(byte id)
 
 void get_filament_status(byte id)
 {
+  slavePacket.init();
+  slavePacket.add_8(id);
+  slavePacket.add_8(SLAVE_CMD_FILAMENT_STATUS);
+  send_packet();
 
+  byte temp = slavePacket.get_8(1);
+  print_tool(id);
+  Serial.print("filament: ");
+  Serial.println(temp, DEC);
 }
 
 #endif
