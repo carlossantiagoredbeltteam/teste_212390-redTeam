@@ -135,12 +135,20 @@ void send_tool_command()
 
 boolean send_packet()
 {
+  //take it easy.  no stomping on each other.
+  delayMicrosecondsInterruptible(50);
+
+  digitalWrite(TX_ENABLE_PIN, HIGH); //enable tx
+
+  //take it easy.  no stomping on each other.
+  delayMicrosecondsInterruptible(10);
+
   slavePacket.sendPacket();
+
+  digitalWrite(TX_ENABLE_PIN, LOW); //disable tx
 
   rs485_packet_count++;
 
-  //wait for guy to catch up?
-  delayMicrosecondsInterruptible(100);
 
   return read_tool_response(PACKET_TIMEOUT);
 }
@@ -175,7 +183,7 @@ bool read_tool_response(int timeout)
       start = millis();
       end = start + timeout;
 
-      if (slavePacket.getState() == RC_CRC_MISMATCH)
+      if (slavePacket.getResponseCode() == RC_CRC_MISMATCH)
       {
         slave_crc_errors++;
 

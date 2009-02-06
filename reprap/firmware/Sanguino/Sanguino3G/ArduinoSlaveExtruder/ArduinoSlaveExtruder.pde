@@ -64,7 +64,8 @@ void init_serial()
 void loop()
 {
   //check for and handle any packets that come in.
-  process_packets();
+  if (Serial.available() > 0)
+  	process_packets();
 
   //manage our extruder stuff.
   if (!is_tool_paused)

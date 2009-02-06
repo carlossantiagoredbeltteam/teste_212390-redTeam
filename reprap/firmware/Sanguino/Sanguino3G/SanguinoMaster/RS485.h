@@ -13,7 +13,6 @@ void rs485_tx(byte b)
 {
   rs485_tx_count++;
 
-  digitalWrite(TX_ENABLE_PIN, HIGH); //enable tx
   Serial1.print(b, BYTE);
 
   //read for our own byte.
@@ -32,8 +31,6 @@ void rs485_tx(byte b)
       break;		
     }
   }
-
-  digitalWrite(TX_ENABLE_PIN, LOW); //disable tx
 }
 
 void serial_tx(byte b)
