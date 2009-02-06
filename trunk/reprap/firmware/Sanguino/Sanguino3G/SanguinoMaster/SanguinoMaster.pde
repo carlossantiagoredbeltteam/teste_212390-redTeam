@@ -82,20 +82,26 @@ void loop()
    */
 
   check_tool_version(1);
+  init_tool(1);
+  get_motor1_pwm(1);
   set_motor1_pwm(1, 255);
-  set_motor2_pwm(1, 255);
-  toggle_motor1(1, true, true);
-  toggle_motor2(1, true, true);
-  delay(3000); 
-  toggle_motor1(1, true, false);
-  toggle_motor2(1, true, false);
-  delay(3000); 
-  toggle_motor1(1, false, true);
-  toggle_motor2(1, false, true);
-  delay(3000); 
-  toggle_motor1(1, false, false);
-  toggle_motor2(1, false, false);
-  delay(3000); 
+  get_motor1_pwm(1);
+
+  toggle_fan(1, true);
+  delay(1000);
+  toggle_fan(1, false);
+  delay(1000);
+  toggle_valve(1, true);
+  delay(1000);
+  toggle_valve(1, false);
+  delay(1000);
+
+  for (byte i=0; i< 180; i++)
+  {
+	set_servo1_position(1, i);
+	set_servo2_position(1, 180-i);
+	delay(25);
+  }
 }
 
 //handle the abortion of a print job
