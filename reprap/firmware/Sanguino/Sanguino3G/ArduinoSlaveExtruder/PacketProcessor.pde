@@ -110,6 +110,7 @@ void handle_query()
   //which one did we get?
   switch (masterPacket.get_8(1))
   {
+  //WORKING
   case SLAVE_CMD_VERSION:
     //get our host version
     master_version = masterPacket.get_16(2);
@@ -118,39 +119,47 @@ void handle_query()
     masterPacket.add_16(FIRMWARE_VERSION);
     break;
 
+  //WORKING
   case SLAVE_CMD_INIT:
     //just initialize
     initialize();
     break;
 
+  //WORKING
   case SLAVE_CMD_GET_TEMP:
     masterPacket.add_16(current_temperature);
     break;
 
+  //WORKING
   case SLAVE_CMD_SET_TEMP:
     target_temperature = masterPacket.get_16(2);
     break;
 
+  //WORKING
   case SLAVE_CMD_SET_MOTOR_1_PWM:
     motor1_control = MC_PWM;
     motor1_pwm = masterPacket.get_8(2);
     break;
 
+  //WORKING
   case SLAVE_CMD_SET_MOTOR_2_PWM:
     motor2_control = MC_PWM;
     motor2_pwm = masterPacket.get_8(2);
     break;
 
+  //NEEDS TESTING
   case SLAVE_CMD_SET_MOTOR_1_RPM:
     motor1_control = MC_ENCODER;
     motor1_target_rpm = masterPacket.get_32(2);
     break;
 
+  //NEEDS TESTING
   case SLAVE_CMD_SET_MOTOR_2_RPM:
     motor2_control = MC_ENCODER;
     motor2_target_rpm = masterPacket.get_32(2);
     break;
 
+  //WORKING
   case SLAVE_CMD_SET_MOTOR_1_DIR:
     temp = masterPacket.get_8(2);
     if (temp & 1)
@@ -159,6 +168,7 @@ void handle_query()
       motor1_dir = MC_REVERSE;    
     break;
 
+  //WORKING
   case SLAVE_CMD_SET_MOTOR_2_DIR:
     temp = masterPacket.get_8(2);
     if (temp & 1)
@@ -167,6 +177,7 @@ void handle_query()
       motor2_dir = MC_REVERSE;    
     break;
 
+  //WORKING
   case SLAVE_CMD_TOGGLE_MOTOR_1:
     temp = masterPacket.get_8(2);
     if (temp & 2)
@@ -180,6 +191,7 @@ void handle_query()
       disable_motor_1();
     break;
 
+  //WORKING
   case SLAVE_CMD_TOGGLE_MOTOR_2:
     temp = masterPacket.get_8(2);
     if (temp & 2)
@@ -193,6 +205,7 @@ void handle_query()
       disable_motor_2();
     break;
 
+  //WORKING
   case SLAVE_CMD_TOGGLE_FAN:
     temp = masterPacket.get_8(2);
     if (temp & 1)
@@ -201,6 +214,7 @@ void handle_query()
       disable_fan();
     break;
 
+  //WORKING
   case SLAVE_CMD_TOGGLE_VALVE:
     temp = masterPacket.get_8(2);
     if (temp & 1)
@@ -209,41 +223,50 @@ void handle_query()
       close_valve();
     break;
 
+  //WORKING
   case SLAVE_CMD_SET_SERVO_1_POS:
     servo1.attach(9);
     servo1.write(masterPacket.get_8(2));
     break;
 
+  //WORKING
   case SLAVE_CMD_SET_SERVO_2_POS:
     servo2.attach(10);
     servo2.write(masterPacket.get_8(2));
     break;
 
+  //WORKING
   case SLAVE_CMD_FILAMENT_STATUS:
     //TODO: figure out how to detect this.
     masterPacket.add_8(255);
     break;
 
+  //WORKING
   case SLAVE_CMD_GET_MOTOR_1_PWM:
     masterPacket.add_8(motor1_pwm);
     break;
 
+  //WORKING
   case SLAVE_CMD_GET_MOTOR_2_PWM:
     masterPacket.add_8(motor2_pwm);
     break;
 
+  //NEEDS TESTING
   case SLAVE_CMD_GET_MOTOR_1_RPM:
     masterPacket.add_32(motor1_current_rpm);
     break;
 
+  //NEEDS TESTING
   case SLAVE_CMD_GET_MOTOR_2_RPM:
     masterPacket.add_32(motor1_current_rpm);
     break;
 
+  //WORKING
   case SLAVE_CMD_SELECT_TOOL:
     //do we do anything?
     break;
 
+  //WORKING
   case SLAVE_CMD_IS_TOOL_READY:
     masterPacket.add_8(is_tool_ready());
     break;

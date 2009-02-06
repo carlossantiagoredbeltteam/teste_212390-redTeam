@@ -83,25 +83,20 @@ void loop()
 
   check_tool_version(1);
   init_tool(1);
-  get_motor1_pwm(1);
-  set_motor1_pwm(1, 255);
-  get_motor1_pwm(1);
+  select_tool(1);
 
-  toggle_fan(1, true);
-  delay(1000);
-  toggle_fan(1, false);
-  delay(1000);
-  toggle_valve(1, true);
-  delay(1000);
-  toggle_valve(1, false);
-  delay(1000);
-
-  for (byte i=0; i< 180; i++)
+  set_tool_temp(1, 150);
+  while (!is_tool_ready(1))
   {
-	set_servo1_position(1, i);
-	set_servo2_position(1, 180-i);
-	delay(25);
+	get_tool_temp(1);
+	delay(250);
   }
+
+  Serial.println("ready!");
+
+  get_filament_status(1);
+
+  while(1);
 }
 
 //handle the abortion of a print job
