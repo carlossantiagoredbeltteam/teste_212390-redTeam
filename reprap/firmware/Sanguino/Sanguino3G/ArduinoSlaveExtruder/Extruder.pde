@@ -1,6 +1,32 @@
 // Yep, this is actually -*- c++ -*-
 void init_extruder()
 {
+  //reset motor1
+  motor1_control = MC_PWM;
+  motor1_dir = MC_FORWARD;
+  motor1_pwm = 0;
+  motor1_target_rpm = 0;
+  motor1_current_rpm = 0;
+  
+  //reset motor2
+  motor2_control = MC_PWM;
+  motor2_dir = MC_FORWARD;
+  motor2_pwm = 0;
+  motor2_target_rpm = 0;
+  motor2_current_rpm = 0;
+	
+  //free up 9/10
+  servo1.detach();
+  servo2.detach();
+
+  //init our PID stuff.
+  speed_error = 0;
+  iState = 0;
+  dState = 0;
+  pGain = SPEED_INITIAL_PGAIN;
+  iGain = SPEED_INITIAL_IGAIN;
+  dGain = SPEED_INITIAL_DGAIN;
+	
   //encoder pins are for reading.
   pinMode(ENCODER_A_PIN, INPUT);
   pinMode(ENCODER_B_PIN, INPUT);

@@ -188,17 +188,64 @@ void toggle_motor2(byte id, boolean dir, boolean enable)
 
 void toggle_fan(byte id, boolean enable)
 {
-
+  slavePacket.init();
+  slavePacket.add_8(id);
+  slavePacket.add_8(SLAVE_CMD_TOGGLE_FAN);
+  slavePacket.add_8(enable);
+  send_packet();
 }
 
 void toggle_valve(byte id, boolean open)
 {
-
+  slavePacket.init();
+  slavePacket.add_8(id);
+  slavePacket.add_8(SLAVE_CMD_TOGGLE_VALVE);
+  slavePacket.add_8(open);
+  send_packet();
 }
 
 void get_motor1_pwm(byte id)
 {
+  slavePacket.init();
+  slavePacket.add_8(id);
+  slavePacket.add_8(SLAVE_CMD_GET_MOTOR_1_PWM);
+  send_packet();
 
+  byte temp = slavePacket.get_8(1);
+  print_tool(id);
+  Serial.print("m1 pwm: ");
+  Serial.println(temp, DEC);
+}
+
+void get_motor2_pwm(byte id)
+{
+  slavePacket.init();
+  slavePacket.add_8(id);
+  slavePacket.add_8(SLAVE_CMD_GET_MOTOR_2_PWM);
+  send_packet();
+
+  byte temp = slavePacket.get_8(1);
+  print_tool(id);
+  Serial.print("m2 pwm: ");
+  Serial.println(temp, DEC);
+}
+
+void set_servo1_position(byte id, byte pos)
+{
+  slavePacket.init();
+  slavePacket.add_8(id);
+  slavePacket.add_8(SLAVE_CMD_SET_SERVO_1_POS);
+  slavePacket.add_8(pos);
+  send_packet();
+}
+
+void set_servo2_position(byte id, byte pos)
+{
+  slavePacket.init();
+  slavePacket.add_8(id);
+  slavePacket.add_8(SLAVE_CMD_SET_SERVO_2_POS);
+  slavePacket.add_8(pos);
+  send_packet();
 }
 
 void get_motor1_rpm(byte id)
