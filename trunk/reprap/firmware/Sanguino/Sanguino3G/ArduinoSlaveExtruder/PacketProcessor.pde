@@ -169,7 +169,7 @@ void handle_query()
 
   case SLAVE_CMD_TOGGLE_MOTOR_1:
     temp = masterPacket.get_8(2);
-    if (temp & 1<<2)
+    if (temp & 2)
       motor1_dir = MC_FORWARD;
     else
       motor1_dir = MC_REVERSE;
@@ -182,7 +182,7 @@ void handle_query()
 
   case SLAVE_CMD_TOGGLE_MOTOR_2:
     temp = masterPacket.get_8(2);
-    if (temp & 1<<2)
+    if (temp & 2)
       motor2_dir = MC_FORWARD;
     else
       motor2_dir = MC_REVERSE;

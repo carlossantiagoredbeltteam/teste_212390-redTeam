@@ -69,7 +69,14 @@ else
 void enable_motor_1()
 {
   if (motor1_control == MC_PWM)
+  {
+    if (motor1_dir == MC_FORWARD)
+      digitalWrite(MOTOR_1_DIR_PIN, HIGH);
+    else
+      digitalWrite(MOTOR_1_DIR_PIN, LOW);
+
     analogWrite(MOTOR_1_SPEED_PIN, motor1_pwm);
+  }
   else if (motor1_control == MC_ENCODER)
   {
     speed_error = 0;
@@ -92,7 +99,14 @@ void disable_motor_1()
 void enable_motor_2()
 {
   if (motor2_control == MC_PWM)
+  {
+    if (motor2_dir == MC_FORWARD)
+      digitalWrite(MOTOR_2_DIR_PIN, HIGH);
+    else
+      digitalWrite(MOTOR_2_DIR_PIN, LOW);
+
     analogWrite(MOTOR_2_SPEED_PIN, motor2_pwm);
+  }
   else if (motor2_control == MC_ENCODER)
   {
     speed_error = 0;

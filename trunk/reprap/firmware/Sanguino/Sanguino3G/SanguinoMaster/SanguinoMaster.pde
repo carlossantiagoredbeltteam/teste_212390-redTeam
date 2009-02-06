@@ -81,26 +81,21 @@ void loop()
    //}
    */
 
-  long start = millis();
-
-  Serial.println("Running tests.");
-
   check_tool_version(1);
-
-  for (byte i=0; i<25; i++)
-    exercise_motors();
-  print_stats();
-
-  long end = millis();
-  long total_time = end - start;
-
-  Serial.print("In ");
-  Serial.print(total_time);
-  Serial.println(" millis.");
-
-  while(1)
-    true;
-
+  set_motor1_pwm(1, 255);
+  set_motor2_pwm(1, 255);
+  toggle_motor1(1, true, true);
+  toggle_motor2(1, true, true);
+  delay(3000); 
+  toggle_motor1(1, true, false);
+  toggle_motor2(1, true, false);
+  delay(3000); 
+  toggle_motor1(1, false, true);
+  toggle_motor2(1, false, true);
+  delay(3000); 
+  toggle_motor1(1, false, false);
+  toggle_motor2(1, false, false);
+  delay(3000); 
 }
 
 //handle the abortion of a print job
