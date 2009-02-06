@@ -57,6 +57,7 @@ public:
 	bool isFinished();
 	unsigned char getLength();
 	PacketState getState();
+	ResponseCode getResponseCode();
 
 	void unsupported();
 

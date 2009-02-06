@@ -1,6 +1,5 @@
 void rs485_tx(byte b)
 {
-  digitalWrite(TX_ENABLE_PIN, HIGH); //enable tx
   Serial.print(b, BYTE);
 
   //read for our own byte.
@@ -13,6 +12,4 @@ void rs485_tx(byte b)
 	if (millis() > tmp)
 		break;
   }
-
-  digitalWrite(TX_ENABLE_PIN, LOW); //disable tx
 }

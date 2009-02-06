@@ -31,7 +31,6 @@ void exercise_motors()
     toggle_motor1(1, dir, 1);
     set_motor2_pwm(1, i);
     toggle_motor2(1, dir, 1);
-    //delay(100);
   }
 
   dir = !dir;
@@ -43,7 +42,7 @@ void print_stats()
   Serial.print("Slave TX Count:");
   Serial.println(rs485_tx_count, DEC);
   Serial.print("Slave RX Count:");
-  Serial.println(rs485_tx_count, DEC);
+  Serial.println(rs485_rx_count, DEC);
   Serial.print("Slave Packet Count: ");
   Serial.println(rs485_packet_count, DEC);
   Serial.print("Slave CRC Errors: ");

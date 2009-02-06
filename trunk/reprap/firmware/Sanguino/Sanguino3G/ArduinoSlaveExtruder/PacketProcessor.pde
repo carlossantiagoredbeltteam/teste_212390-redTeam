@@ -38,32 +38,29 @@ void process_packets()
   unsigned long end = start + PACKET_TIMEOUT;
 
   //is there serial data available?
-  if (Serial.available() > 0)
+  //read through our available data
+  while (!masterPacket.isFinished())
   {
-    //read through our available data
-    while (!masterPacket.isFinished())
+    //only try to grab it if theres something in the queue.
+    if (Serial.available() > 0)
     {
-      //only try to grab it if theres something in the queue.
-      if (Serial.available() > 0)
-      {
-        digitalWrite(DEBUG_PIN, HIGH);
+      digitalWrite(DEBUG_PIN, HIGH);
 
-        //grab a byte and process it.
-        byte d = Serial.read();
-        masterPacket.process_byte(d);
+      //grab a byte and process it.
+      byte d = Serial.read();
+      masterPacket.process_byte(d);
 
-        //keep us goign while we have data coming in.
-        start = millis();
-        end = start + PACKET_TIMEOUT;
+      //keep us goign while we have data coming in.
+      start = millis();
+      end = start + PACKET_TIMEOUT;
 
-        digitalWrite(DEBUG_PIN, LOW);
-      }
-
-      //are we sure we wanna break mid-packet?
-      //have we timed out?
-      if (millis() >= end)
-        return;
+      digitalWrite(DEBUG_PIN, LOW);
     }
+
+    //are we sure we wanna break mid-packet?
+    //have we timed out?
+    if (millis() >= end)
+      return;
   }
 
   //do we have a finished packet?
@@ -72,9 +69,6 @@ void process_packets()
     //only process packets intended for us.
     if (masterPacket.get_8(0) == RS485_ADDRESS)
     {
-      //might be needed to allow for pin switching / etc.  testing needed.
-      delayMicrosecondsInterruptible(250);
-
       //take some action.
       handle_query();                
 
@@ -95,8 +89,17 @@ void process_packets()
 
 void send_reply()
 {
+  //might be needed to allow for pin switching / etc.  testing needed.
+  delayMicrosecondsInterruptible(50);
+  
+  digitalWrite(TX_ENABLE_PIN, HIGH); //enable tx
+
+  delayMicrosecondsInterruptible(10);
+
   //okay, send our response
   masterPacket.sendReply();
+
+  digitalWrite(TX_ENABLE_PIN, LOW); //disable tx
 }
 
 //this is for handling query commands that need a response.

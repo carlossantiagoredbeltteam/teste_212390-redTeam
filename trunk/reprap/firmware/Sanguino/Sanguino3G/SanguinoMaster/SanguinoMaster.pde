@@ -81,7 +81,26 @@ void loop()
    //}
    */
 
+  long start = millis();
+
+  Serial.println("Running tests.");
+
   check_tool_version(1);
+
+  for (byte i=0; i<25; i++)
+    exercise_motors();
+  print_stats();
+
+  long end = millis();
+  long total_time = end - start;
+
+  Serial.print("In ");
+  Serial.print(total_time);
+  Serial.println(" millis.");
+
+  while(1)
+    true;
+
 }
 
 //handle the abortion of a print job
