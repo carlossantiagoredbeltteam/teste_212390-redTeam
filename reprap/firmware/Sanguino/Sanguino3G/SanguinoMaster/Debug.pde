@@ -25,15 +25,49 @@ void exercise_motors()
 {
   boolean dir = true;
 
+  Serial.println("forward");
+  Serial.println("up");
   for (int i=0; i<256; i++)
   {
     set_motor1_pwm(1, i);
     toggle_motor1(1, dir, 1);
     set_motor2_pwm(1, i);
     toggle_motor2(1, dir, 1);
+	Serial.println(i, DEC);
   }
 
-  dir = !dir;
+  Serial.println("down");
+  for (int i=255; i>=0; i--)
+  {
+    set_motor1_pwm(1, i);
+    toggle_motor1(1, dir, 1);
+    set_motor2_pwm(1, i);
+    toggle_motor2(1, dir, 1);
+	Serial.println(i, DEC);
+  }
+
+  dir = false;
+
+  Serial.println("forward");
+  Serial.println("up");
+  for (int i=0; i<256; i++)
+  {
+    set_motor1_pwm(1, i);
+    toggle_motor1(1, dir, 1);
+    set_motor2_pwm(1, i);
+    toggle_motor2(1, dir, 1);
+	Serial.println(i, DEC);
+  }
+
+  Serial.println("down");
+  for (int i=255; i>=0; i--)
+  {
+    set_motor1_pwm(1, i);
+    toggle_motor1(1, dir, 1);
+    set_motor2_pwm(1, i);
+    toggle_motor2(1, dir, 1);
+	Serial.println(i, DEC);
+  }
 }
 
 void print_stats()
@@ -125,6 +159,8 @@ void toggle_motor1(byte id, boolean dir, boolean enable)
 
   if (dir)
     flags += 2;
+
+  Serial.println(flags, BIN);
 
   slavePacket.init();
   slavePacket.add_8(id);
