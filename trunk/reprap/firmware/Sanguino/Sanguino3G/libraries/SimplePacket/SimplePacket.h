@@ -9,7 +9,7 @@
 #define START_BYTE 0xD5
 #define MAX_PACKET_LENGTH 32
 
-typedef void (*txFuncPtr)(unsigned char);
+typedef void (*txFuncPtr)(uint8_t);
 
 // packet states
 typedef enum {
@@ -36,42 +36,42 @@ class SimplePacket {
 private:
   //variables for our incoming packet.
   PacketState state;
-  unsigned char target_length;
-  unsigned char rx_length;
-  unsigned char rx_data[MAX_PACKET_LENGTH];
-  unsigned char rx_crc;
-  unsigned char tx_length;
-  unsigned char tx_data[MAX_PACKET_LENGTH];
-  unsigned char tx_crc;
+  uint8_t target_length;
+  uint8_t rx_length;
+  uint8_t rx_data[MAX_PACKET_LENGTH];
+  uint8_t rx_crc;
+  uint8_t tx_length;
+  uint8_t tx_data[MAX_PACKET_LENGTH];
+  uint8_t tx_crc;
   ResponseCode response_code;
 
   txFuncPtr txFunc;
 
 public:
 
-	SimplePacket(txFuncPtr myPtr);
-	void init();
+  SimplePacket(txFuncPtr myPtr);
+  void init();
 
-	//process a byte from our packet
-	void process_byte(unsigned char b);
-	bool isFinished();
-	unsigned char getLength();
-	PacketState getState();
-	ResponseCode getResponseCode();
+  //process a byte from our packet
+  void process_byte(uint8_t b);
+  bool isFinished();
+  uint8_t getLength();
+  PacketState getState();
+  ResponseCode getResponseCode();
 
-	void unsupported();
+  void unsupported();
 
-	void sendReply();
-	void sendPacket();
-	void transmit(unsigned char d);
+  void sendReply();
+  void sendPacket();
+  void transmit(uint8_t d);
 
-	void add_32(uint32_t d);
-	void add_16(uint16_t d);
-	void add_8(unsigned char d);
+  void add_32(uint32_t d);
+  void add_16(uint16_t d);
+  void add_8(uint8_t d);
 
-	unsigned char get_8(unsigned char idx);
-	uint16_t get_16(unsigned char idx);
-	uint32_t get_32(unsigned char idx);
+  uint8_t get_8(uint8_t idx);
+  uint16_t get_16(uint8_t idx);
+  uint32_t get_32(uint8_t idx);
 };
 
 #endif // _SIMPLE_PACKET_H_
