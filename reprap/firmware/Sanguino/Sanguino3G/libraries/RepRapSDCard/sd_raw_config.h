@@ -82,7 +82,7 @@
     #define configure_pin_ss() DDRB |= (1 << DDB0)
     #define configure_pin_miso() DDRB &= ~(1 << DDB3)
 
-	//TODO: update with real values.
+  //TODO: update with real values.
     #define select_card() PORTB &= ~(1 << PB0)
     #define unselect_card() PORTB |= (1 << PB0)
 #else

@@ -397,8 +397,8 @@ uint8_t sd_raw_read(uint32_t offset, uint8_t* buffer, uint16_t length)
     while(sd_raw_rec_byte() != 0xfe) {
       i++;
       if (i == 0) {
-	unselect_card();
-	return 0;
+  unselect_card();
+  return 0;
       }
     }
 
@@ -586,10 +586,10 @@ uint8_t sd_raw_write(uint32_t offset, const uint8_t* buffer, uint16_t length)
 
     if(get_pin_locked())
     {
-    	//Serial.println("locked.");
+      //Serial.println("locked.");
         return 0;
-	}
-	
+  }
+  
     uint32_t block_address;
     uint16_t block_offset;
     uint16_t write_length;
