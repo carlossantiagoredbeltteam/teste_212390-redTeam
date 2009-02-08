@@ -21,6 +21,15 @@ SRCFILELIST="src/* LICENSE build.xml build-user.xml .classpath .project \
 	host-package-release README"
 LIBFILES="lib/*"
 
+CLASSPATH=$CLASSPATH:./lib/j3dcore.jar
+CLASSPATH=$CLASSPATH:./lib/j3d-org-java3d-all.jar
+CLASSPATH=$CLASSPATH:./lib/j3dutils.jar
+CLASSPATH=$CLASSPATH:./lib/vecmath.jar
+CLASSPATH=$CLASSPATH:./lib/RXTXcomm.jar
+CLASSPATH=$CLASSPATH:./lib/swing-layout-1.0.3.jar
+CLASSPATH=$CLASSPATH:.
+export CLASSPATH
+
 # Remove any old jar directory
 [ -d jar ] && rm -rf jar
 
