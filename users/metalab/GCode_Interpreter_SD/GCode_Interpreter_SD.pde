@@ -15,6 +15,8 @@ AxisConfig axes[3] = {
 	{Z_STEP_PIN, Z_DIR_PIN, Z_MIN_PIN, Z_MAX_PIN, Z_ENABLE_PIN, INVERT_Z_DIR, REFERENCE_Z_DIR, ENDSTOP_Z_MIN_ENABLED, ENDSTOP_Z_MAX_ENABLED, Z_STEPS_PER_INCH, Z_STEPS_PER_MM, Z_MOTOR_STEPS}
 };
 
+#include "RepRapSDCard.h"
+
 //our command string
 #define COMMAND_SIZE 128
 char cmdbuffer[COMMAND_SIZE];
@@ -26,11 +28,52 @@ int delta;
 boolean comment = false;
 boolean bytes_received = false;
 bool use_sd_card = false;
+RepRapSDCard sdcard;
+fat_file_struct *file;
+bool eof = false;
+
+uint8_t init_sd_card()
+{
+  if (!sdcard.init_card())
+  {
+    if (!sdcard.isAvailable())
+    {
+      Serial.println("No card present"); 
+      return 1;
+    }
+    else
+    {
+      Serial.println("Card init failed"); 
+      return 2;
+    }
+  }
+  else if (!sdcard.open_partition())
+  {
+    Serial.println("No partition"); 
+    return 3;
+  }
+  else if (!sdcard.open_filesys())
+  {
+    Serial.println("Can't open filesys"); 
+    return 4;
+  }
+  else if (!sdcard.open_dir("/"))
+  {
+    Serial.println("Can't open /");
+    return 5;
+  }
+//   else if (sdcard.isLocked())
+//   {
+//     Serial.println("Card is locked");
+//     return 6;
+//   }
+  return 0;
+}
 
 void setup()
 {
 	//Do startup stuff here
-	Serial.begin(19200);
+	Serial.begin(115200);
 	Serial.println("start");
 	
 	//other initialization.
@@ -38,9 +81,32 @@ void setup()
 	init_extruder();
 	clear_process_string();
 
-	//SD: Check for card
 	// Open first file, validate contents
 	// Decide whether to read from serial or SD-card; print debug to serial
+	if (init_sd_card() == 0) {
+                struct fat_dir_entry_struct dir_entry;
+		while (fat_read_dir(sdcard.cwd, &dir_entry)) {
+			if (dir_entry.attributes & 
+			    (FAT_ATTRIB_DIR |
+			     FAT_ATTRIB_SYSTEM |
+			     FAT_ATTRIB_HIDDEN |
+			     FAT_ATTRIB_VOLUME)) {
+				continue;
+			}
+			Serial.print("First file: ");
+			Serial.print(dir_entry.attributes, HEX);
+			Serial.print(" ");
+			Serial.println(dir_entry.long_name);
+			file = fat_open_file(sdcard.filesystem, &dir_entry);
+			if (!file) {
+				Serial.println("Unable to open file.");
+			}
+			else {
+				use_sd_card = true;
+			}
+			break;
+                }
+	}
 }
 
 void clear_process_string()
@@ -55,14 +121,33 @@ void clear_process_string()
 
 int input_available()
 {
-	if (use_sd_card) return 0;
-	else return Serial.available();
+	if (use_sd_card) {
+		if (!eof) return 1;
+	}
+	else {
+		return Serial.available();
+	}
 }
 
 uint8_t input_read()
 {
-	if (use_sd_card) return 0;
-	else return Serial.read();
+	if (use_sd_card) {
+		uint8_t c;
+		intptr_t ret = fat_read_file(file, &c, 1);
+		if (ret == 0) {
+			eof = true;
+			c = '\n';
+		}
+		if (ret == -1) {
+			Serial.println("Read error.");
+			eof = true;
+			c = '\n';
+		}
+		return c;
+	}
+	else {
+		return Serial.read();
+	}
 }
 
 void loop()

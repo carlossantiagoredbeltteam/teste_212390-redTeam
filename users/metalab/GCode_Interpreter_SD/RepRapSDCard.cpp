@@ -11,7 +11,7 @@
 
 void RepRapSDCard::print_disk_info()
 {
-  if (!fs) return;
+  if (!filesystem) return;
 
   struct sd_raw_info disk_info;
   if (!sd_raw_get_info(&disk_info)) return;
@@ -40,11 +40,14 @@ void RepRapSDCard::print_disk_info()
     Serial.print("format: ");
     Serial.println(disk_info.format, DEC);
     Serial.print("free:   ");
-    Serial.print(fat_get_fs_free(fs));
+    Serial.print(fat_get_fs_free(filesystem));
     Serial.print("/");
-    Serial.println(fat_get_fs_size(fs), DEC);
+    Serial.println(fat_get_fs_size(filesystem), DEC);
 }
 
+/*!
+  Opens the first partition and stores it in the partition instance variable.
+*/
 bool RepRapSDCard::open_partition(void)
 {
   // open first partition
@@ -68,20 +71,28 @@ bool RepRapSDCard::open_partition(void)
   return true;
 }
 
+
+/*!
+  Open file system. A partition must be opened first.
+  Stores the filesystem in the filesystem instance variable.
+*/
 bool RepRapSDCard::open_filesys(void)
 {
-  fs = fat_open(partition);
-  if (!fs) return false;
+  filesystem = fat_open(partition);
+  if (!filesystem) return false;
   return true;
 }
 
+/*!
+  Opens the given directory and stores the open dir in the cwd instance variable.
+*/
 bool RepRapSDCard::open_dir(char *path)
 {
   struct fat_dir_entry_struct dir;
 
-  fat_get_dir_entry_of_path(fs, path, &dir);
-  dd = fat_open_dir(fs, &dir);
-  if (!dd) return false;
+  fat_get_dir_entry_of_path(filesystem, path, &dir);
+  cwd = fat_open_dir(filesystem, &dir);
+  if (!cwd) return false;
   return true;
 }
 
@@ -117,5 +128,5 @@ struct fat_file_struct* open_file_in_dir(struct fat_fs_struct* fs, struct fat_di
 uint8_t RepRapSDCard::create_file(char *name)
 {
   struct fat_dir_entry_struct file_entry;
-  return fat_create_file(dd, name, &file_entry);
+  return fat_create_file(cwd, name, &file_entry);
 }
