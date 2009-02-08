@@ -29,6 +29,7 @@ volatile LongPoint current_steps;
 volatile LongPoint target_steps;
 volatile LongPoint delta_steps;
 volatile LongPoint range_steps;
+volatile LongPoint eventual_steps; //eventual position at end of point queue.
 
 //our point queue variables
 byte rawPointBuffer[POINT_QUEUE_SIZE * POINT_SIZE];

@@ -67,44 +67,18 @@ void init_serial()
 //handle various things we're required to do.
 void loop()
 {
-  /*
-  //if we've aborted, dont do anything.
-   //if (!is_machine_aborted)
-   //{
-   //check for and handle any packets that come in.
-   	if (Serial.available())
-   		process_host_packets();
-   
-   //only handle our buffer if we're unpaused. 
-   if (!is_machine_paused && !is_machine_aborted)
-   handle_commands();
-   //}
-   */
+  //check for and handle any packets that come in.
+  if (Serial.available())
+    process_host_packets();
 
-  check_tool_version(1);
-  init_tool(1);
-  select_tool(1);
-
-  set_tool_temp(1, 150);
-  while (!is_tool_ready(1))
-  {
-	get_tool_temp(1);
-	delay(250);
-  }
-
-  Serial.println("ready!");
-
-  get_filament_status(1);
-
-  while(1);
+  //only handle our buffer if we're unpaused. 
+  if (!is_machine_paused)
+    handle_commands();
 }
 
 //handle the abortion of a print job
 void abort_print()
 {
-  //yes, we're done here.
-  is_machine_aborted = true;
-
   //TODO: turn off all of our tools.
 
   //turn off steppers too.

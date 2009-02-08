@@ -121,6 +121,9 @@
  * Stepper Driver Behaviour Definition
  ****************************************************************************************/
 
+//do we want a step delay (ie: length of pulse in microseconds) comment out to disable.
+#define STEP_DELAY 5
+
 #ifdef STEPPER_DRIVER_VERSION_1_X
 #define STEPPER_ENABLE    1
 #define STEPPER_DISABLE   0

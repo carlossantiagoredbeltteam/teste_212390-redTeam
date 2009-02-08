@@ -55,8 +55,7 @@ void process_host_packets()
     }
     // top bit low == reply needed query packet (eg. #0-127)
     else
-      handle_query(b);        
-
+      handle_query(b);
   }
 
   //okay, send our response
@@ -132,8 +131,8 @@ void handle_query(byte cmd)
       set_tool_pause_state(false);
 
       //resume stepping.
-      enableTimer1Interrupt();
       enable_steppers();
+      enableTimer1Interrupt();
     }
     else
     {
@@ -172,31 +171,37 @@ void handle_commands()
     byte cmd = commandBuffer.remove_8();
     switch(cmd)
     {
-      //add it to our point queue.
+    //add it to our point queue.
     case HOST_CMD_QUEUE_POINT_INC:
-      queue_incremental_point(commandBuffer.remove_16(),
-      commandBuffer.remove_16(),
-      commandBuffer.remove_16(),
-      commandBuffer.remove_8(),
-      commandBuffer.remove_16());
+      queue_incremental_point(
+        commandBuffer.remove_16(),
+        commandBuffer.remove_16(),
+        commandBuffer.remove_16(),
+        commandBuffer.remove_8(),
+        commandBuffer.remove_16());
       break;
 
-      //add it to our point queue.
+    //add it to our point queue.
     case HOST_CMD_QUEUE_POINT_ABS:
-      queue_absolute_point(commandBuffer.remove_32(),
-      commandBuffer.remove_32(),
-      commandBuffer.remove_32(),
-      commandBuffer.remove_8(),
-      commandBuffer.remove_16());
+      queue_absolute_point(
+        commandBuffer.remove_32(),
+        commandBuffer.remove_32(),
+        commandBuffer.remove_32(),
+        commandBuffer.remove_8(),
+        commandBuffer.remove_16());
       break;
 
-      //update our current point to where we're told.
+    //update our current point to where we're told.
     case HOST_CMD_SET_POSITION:
       wait_until_target_reached(); //dont want to get hasty.
 
       current_steps.x = commandBuffer.remove_32();
       current_steps.y = commandBuffer.remove_32();
       current_steps.z = commandBuffer.remove_32();
+
+      eventual_steps.x = current_steps.x;
+      eventual_steps.y = current_steps.y;
+      eventual_steps.z = current_steps.z;
       break;
 
       //figure out our minimums.
@@ -210,11 +215,12 @@ void handle_commands()
       flags = commandBuffer.remove_8();
 
       //find them!
-      seek_minimums(flags & 1,
-      flags & (1 << 1),
-      flags & (1 << 2),
-      commandBuffer.remove_32(),
-      commandBuffer.remove_16());
+      seek_minimums(
+        flags & 1,
+        flags & 2,
+        flags & 4,
+        commandBuffer.remove_32(),
+        commandBuffer.remove_16());
 
       //turn on point seekign agian.
       enableTimer1Interrupt();
@@ -225,7 +231,13 @@ void handle_commands()
     case HOST_CMD_FIND_AXES_MAXIMUM:
       wait_until_target_reached(); //dont want to get hasty.
 
-      //TODO: implement this.
+      //find them!
+      seek_maximums(
+        flags & 1,
+        flags & 2,
+        flags & 4,
+        commandBuffer.remove_32(),
+        commandBuffer.remove_16());
       break;
 
     case HOST_CMD_DELAY:
