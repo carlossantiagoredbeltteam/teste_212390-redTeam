@@ -131,8 +131,9 @@ public class Producer {
 	{
 		RrRectangle gp = stlc.ObjectPlanRectangle();
 		
-		gp = new RrRectangle(new Rr2Point(gp.x().low() - 4, gp.y().low() - 4), 
-				new Rr2Point(gp.x().high() + 4, gp.y().high() + 4));
+		gp = new RrRectangle(new Rr2Point(gp.x().low() - 6, gp.y().low() - 6), 
+				new Rr2Point(gp.x().high() + 6, gp.y().high() + 6));
+		
 		
 		layerRules.getPrinter().startRun();
 		
