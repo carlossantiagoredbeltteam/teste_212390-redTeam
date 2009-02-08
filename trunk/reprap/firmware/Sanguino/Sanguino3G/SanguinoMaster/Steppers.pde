@@ -33,8 +33,20 @@ void init_steppers()
   //turn them off to start.
   disable_steppers();
 
-  //figure our stuff.
-  calculate_deltas();
+  //zero our deltas.
+  delta_steps.x = 0;
+  delta_steps.y = 0;
+  delta_steps.z = 0;
+  
+  //zero our posison.
+  current_steps.x = 0;
+  current_steps.y = 0;
+  current_steps.z = 0;
+  
+  //zero our mega position.
+  eventual_steps.x = 0;
+  eventual_steps.y = 0;
+  eventual_steps.z = 0;
 }
 
 void seek_minimums(boolean find_x, boolean find_y, boolean find_z, unsigned long step_delay, unsigned int timeout_seconds)
@@ -56,16 +68,19 @@ void seek_minimums(boolean find_x, boolean find_y, boolean find_z, unsigned long
     {
       found_x = find_axis_min(X_STEP_PIN, X_DIR_PIN, X_MIN_PIN);
       current_steps.x = 0;
+      eventual_steps.x = 0;
     }
     if (find_y && !found_y)
     {
       found_y = find_axis_min(Y_STEP_PIN, Y_DIR_PIN, Y_MIN_PIN);
       current_steps.y = 0;
+      eventual_steps.y = 0;
     }
     if (find_z && !found_z)
     {
       found_z = find_axis_min(Z_STEP_PIN, Z_DIR_PIN, Z_MIN_PIN);
       current_steps.z = 0;
+      eventual_steps.z = 0;
     }
 
     //check to see if we've found all required switches.
@@ -134,16 +149,19 @@ void seek_maximums(boolean find_x, boolean find_y, boolean find_z, unsigned long
     {
       found_x = find_axis_max(X_STEP_PIN, X_DIR_PIN, X_MAX_PIN);
       range_steps.x = current_steps.x;
+      eventual_steps.x = current_steps.x;
     }
     if (find_y && !found_y)
     {
       found_y = find_axis_max(Y_STEP_PIN, Y_DIR_PIN, Y_MAX_PIN);
-      range_steps.x = current_steps.x;
+      range_steps.y = current_steps.y;
+      eventual_steps.y = current_steps.y;
     }
     if (find_z && !found_z)
     {
       found_z = find_axis_max(Z_STEP_PIN, Z_DIR_PIN, Z_MAX_PIN);
-      range_steps.x = current_steps.x;
+      range_steps.z = current_steps.z;
+      eventual_steps.z = current_steps.z;
     }
 
     //check to see if we've found all required switches.
@@ -200,6 +218,21 @@ boolean find_axis_max(byte step_pin, byte dir_pin, byte max_pin)
 //prepare our variables for a bresenham DDA run.
 void prepare_dda()
 {
+  //whats our target?
+  target_steps.x += current_steps.x + delta_steps.x;
+  target_steps.y += current_steps.y + delta_steps.y;
+  target_steps.z += current_steps.z + delta_steps.z;
+
+  //what is our direction
+  x_direction = (target_steps.x >= current_steps.x);
+  y_direction = (target_steps.y >= current_steps.y);
+  z_direction = (target_steps.z >= current_steps.z);
+
+  //set our direction pins as well
+  digitalWrite(X_DIR_PIN, x_direction);
+  digitalWrite(Y_DIR_PIN, y_direction);
+  digitalWrite(Z_DIR_PIN, z_direction);
+
   //enable our steppers if needed.
   enable_steppers();
 
@@ -295,12 +328,11 @@ void grab_next_point()
     disableTimer1Interrupt();
 
     //grab our new target
-    target_steps.x += pointBuffer.remove_16();
-    target_steps.y += pointBuffer.remove_16();
-    target_steps.z += pointBuffer.remove_16();
+    delta_steps.x = pointBuffer.remove_16();
+    delta_steps.y = pointBuffer.remove_16();
+    delta_steps.z = pointBuffer.remove_16();
 
     //figure out stuff for the move.
-    calculate_deltas();
     prepare_dda();
 
     //start the move!
@@ -330,7 +362,9 @@ bool can_step(byte min_pin, byte max_pin, long current, long target, byte direct
 void do_step(byte step_pin)
 {
   digitalWrite(step_pin, HIGH);
-  delayMicrosecondsInterruptible(5);
+#ifdef STEP_DELAY
+  delayMicrosecondsInterruptible(STEP_DELAY);
+#endif
   digitalWrite(step_pin, LOW);
 }
 
@@ -342,25 +376,6 @@ bool read_switch(byte pin)
     return !digitalRead(pin) && !digitalRead(pin);
   else
     return digitalRead(pin) && digitalRead(pin);
-}
-
-//prepare our deltas and such for our DDA action
-void calculate_deltas()
-{
-  //figure our deltas.
-  delta_steps.x = abs(target_steps.x - current_steps.x);
-  delta_steps.y = abs(target_steps.y - current_steps.y);
-  delta_steps.z = abs(target_steps.z - current_steps.z);
-
-  //what is our direction
-  x_direction = (target_steps.x >= current_steps.x);
-  y_direction = (target_steps.y >= current_steps.y);
-  z_direction = (target_steps.z >= current_steps.z);
-
-  //set our direction pins as well
-  digitalWrite(X_DIR_PIN, x_direction);
-  digitalWrite(Y_DIR_PIN, y_direction);
-  digitalWrite(Z_DIR_PIN, z_direction);
 }
 
 //enable our steppers so we can move them.
@@ -414,6 +429,10 @@ void read_range_from_eeprom()
 //queue a point for us to move to
 void queue_incremental_point(int x, int y, int z, byte prescaler, unsigned int count)
 {
+  eventual_steps.x += x;
+  eventual_steps.y += y;
+  eventual_steps.z += z;
+
   //wait until we have free space
   while (pointBuffer.remainingCapacity() < POINT_SIZE)
     delayMicrosecondsInterruptible(500);
