@@ -12,10 +12,10 @@ typedef struct fat_file_struct * File;
 
 class RepRapSDCard
 {
-  //private?
+ public:
   struct partition_struct *partition;
-  struct fat_fs_struct* fs;
-  struct fat_dir_struct* dd;
+  struct fat_fs_struct *filesystem;
+  struct fat_dir_struct *cwd;
   struct fat_dir_entry_struct file_entry;
 
  public:
