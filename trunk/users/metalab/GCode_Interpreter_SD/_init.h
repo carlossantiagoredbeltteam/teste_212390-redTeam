@@ -86,7 +86,7 @@
 #define Z_MAX_PIN 1
 
 //extruder pins
-#define EXTRUDER_MOTOR_SPEED_PIN   13
+#define EXTRUDER_MOTOR_SPEED_PIN   14
 #define EXTRUDER_MOTOR_DIR_PIN     10
 #define EXTRUDER_HEATER_PIN        12
 #define EXTRUDER_FAN_PIN           3
