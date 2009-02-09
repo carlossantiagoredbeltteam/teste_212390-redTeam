@@ -29,46 +29,8 @@ boolean comment = false;
 boolean bytes_received = false;
 bool use_sd_card = false;
 RepRapSDCard sdcard;
-fat_file_struct *file;
+File *file;
 bool eof = false;
-
-uint8_t init_sd_card()
-{
-  if (!sdcard.init_card())
-  {
-    if (!sdcard.isAvailable())
-    {
-      Serial.println("No card present"); 
-      return 1;
-    }
-    else
-    {
-      Serial.println("Card init failed"); 
-      return 2;
-    }
-  }
-  else if (!sdcard.open_partition())
-  {
-    Serial.println("No partition"); 
-    return 3;
-  }
-  else if (!sdcard.open_filesys())
-  {
-    Serial.println("Can't open filesys"); 
-    return 4;
-  }
-  else if (!sdcard.open_dir("/"))
-  {
-    Serial.println("Can't open /");
-    return 5;
-  }
-//   else if (sdcard.isLocked())
-//   {
-//     Serial.println("Card is locked");
-//     return 6;
-//   }
-  return 0;
-}
 
 void setup()
 {
@@ -83,28 +45,17 @@ void setup()
 
 	// Open first file, validate contents
 	// Decide whether to read from serial or SD-card; print debug to serial
-	if (init_sd_card() == 0) {
-                struct fat_dir_entry_struct dir_entry;
-		while (fat_read_dir(sdcard.cwd, &dir_entry)) {
-			if (dir_entry.attributes & 
-			    (FAT_ATTRIB_DIR |
-			     FAT_ATTRIB_SYSTEM |
-			     FAT_ATTRIB_HIDDEN |
-			     FAT_ATTRIB_VOLUME)) {
-				continue;
-			}
+	if (sdcard.init() == RepRapSDCard::SDOK) {
+		char filename[12];
+		if (sdcard.getNextEntry(filename)) {
 			Serial.print("First file: ");
-			Serial.print(dir_entry.attributes, HEX);
-			Serial.print(" ");
-			Serial.println(dir_entry.long_name);
-			file = fat_open_file(sdcard.filesystem, &dir_entry);
-			if (!file) {
+			Serial.println(filename);
+			if (!(file = sdcard.openFile(filename))) {
 				Serial.println("Unable to open file.");
 			}
 			else {
 				use_sd_card = true;
 			}
-			break;
                 }
 	}
 }
@@ -133,7 +84,7 @@ uint8_t input_read()
 {
 	if (use_sd_card) {
 		uint8_t c;
-		intptr_t ret = fat_read_file(file, &c, 1);
+		intptr_t ret = sdcard.readFile(file, &c, 1);
 		if (ret == 0) {
 			eof = true;
 			c = '\n';
