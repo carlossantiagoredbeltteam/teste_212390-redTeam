@@ -515,9 +515,9 @@ void process_string(char instruction[], int size)
       Serial.print(")");
 
       Serial.print(" [");
-      Serial.print(read_switch(X_MIN_PIN)?"1":"0");
-      Serial.print(read_switch(Y_MIN_PIN)?"1":"0");
-      Serial.print(read_switch(Z_MAX_PIN)?"1":"0");
+      Serial.print(read_switch(X_MIN_PIN)?'1':'0');
+      Serial.print(read_switch(Y_MIN_PIN)?'1':'0');
+      Serial.print(read_switch(Z_MAX_PIN)?'1':'0');
       Serial.print("]");
 
       Serial.println();
