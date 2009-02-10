@@ -100,7 +100,7 @@ void RepRapSDCard::printInfo()
   Serial.println(disk_info.serial, HEX);
   Serial.print("date:   ");
   Serial.print(disk_info.manufacturing_month, DEC);
-  Serial.println(disk_info.manufacturing_year);
+  Serial.println(disk_info.manufacturing_year, DEC);
   Serial.print("size:   ");
   Serial.print(disk_info.capacity / 1024 / 1024, DEC);
   Serial.println("MB");
@@ -112,7 +112,7 @@ void RepRapSDCard::printInfo()
   Serial.print("format: ");
   Serial.println(disk_info.format, DEC);
   Serial.print("free:   ");
-  Serial.print(fat_get_fs_free(this->filesystem));
+  Serial.print(fat_get_fs_free(this->filesystem), DEC);
   Serial.print("/");
   Serial.println(fat_get_fs_size(this->filesystem), DEC);
 }
