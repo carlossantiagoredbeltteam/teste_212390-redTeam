@@ -5,10 +5,6 @@
 #include "partition.h"
 #include <string.h>
 
-#if !USE_DYNAMIC_MEMORY
-  struct partition_struct partition_handles[PARTITION_COUNT];
-#endif
-
 /*!
   Initializes SD card, returns an SDStatus (SDOK or an error).
   Will also open a partition, filesystem and root dir.
@@ -123,11 +119,14 @@ void RepRapSDCard::printInfo()
 
 /*!
   Opens the given directory and stores the open dir in this->cwd.
+  If cwd already points to an open dir, this will be closed prior
+  to opening the given dir.
 */
 bool RepRapSDCard::openDir(const char *path)
 {
   struct fat_dir_entry_struct dir;
 
+  if (this->cwd) fat_close_dir(this->cwd);
   fat_get_dir_entry_of_path(this->filesystem, path, &dir);
   this->cwd = fat_open_dir(this->filesystem, &dir);
   if (!this->cwd) return false;
@@ -154,6 +153,11 @@ RepRapSDCard::getNextEntry(char *name)
   return true;
 }
 
+/*!
+  Opens the given file.
+  NB! Since the max number of allowed open files may be 1, make sure to
+  close all open files before calling this method.
+*/
 File *RepRapSDCard::openFile(const char* name)
 {
   struct fat_dir_entry_struct file_entry;
