@@ -6,6 +6,7 @@ void init_tools()
   //do a scan of tools from address 0-255?
   //with a 1 millisecond timeout, this takes ~0.256 seconds.
   //we may also want to store which tools are available in eeprom?
+/*
 #ifdef SCAN_TOOLS_ON_STARTUP
   for (int i=0; i<256; i++)
   {
@@ -16,6 +17,7 @@ void init_tools()
     }
   }
 #endif
+*/
 }
 
 //ask a tool if its there.
@@ -111,8 +113,9 @@ void send_tool_query()
   //send it and then get our response
   send_packet();
 
-  //now load it up into the host.
-  for (byte i=0; i<slavePacket.getLength(); i++)
+  //now load it up into the host. (skip the response code)
+  //TODO: check the response code
+  for (byte i=1; i<slavePacket.getLength(); i++)
     hostPacket.add_8(slavePacket.get_8(i));
 }
 
@@ -122,7 +125,8 @@ void send_tool_command()
   slavePacket.init();
 
   //add in our tool id and command.
-  slavePacket.add_16(commandBuffer.remove_16());
+  slavePacket.add_8(commandBuffer.remove_8());
+  slavePacket.add_8(commandBuffer.remove_8());
 
   //load up our packet.
   byte len = commandBuffer.remove_8();
@@ -148,7 +152,6 @@ boolean send_packet()
   digitalWrite(TX_ENABLE_PIN, LOW); //disable tx
 
   rs485_packet_count++;
-
 
   return read_tool_response(PACKET_TIMEOUT);
 }

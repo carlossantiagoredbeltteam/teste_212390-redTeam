@@ -72,7 +72,7 @@ void loop()
     process_host_packets();
 
   //only handle our buffer if we're unpaused. 
-  if (!is_machine_paused)
+  //if (!is_machine_paused)
     handle_commands();
 }
 

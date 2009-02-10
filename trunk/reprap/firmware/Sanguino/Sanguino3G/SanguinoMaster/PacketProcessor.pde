@@ -50,7 +50,7 @@ void process_host_packets()
     if (b & 0x80)
     {
       //okay, throw it in the buffer.
-      for (int i=1; i<hostPacket.getLength(); i++)
+      for (byte i=0; i<hostPacket.getLength(); i++)
         commandBuffer.append(hostPacket.get_8(i));
     }
     // top bit low == reply needed query packet (eg. #0-127)
@@ -165,10 +165,18 @@ void handle_commands()
   byte flags = 0;
 
   //do we have any commands?
-  if (commandBuffer.size())
+  if (commandBuffer.size() > 0)
   {
+    Serial.print("size: ");
+    Serial.println(commandBuffer.size(), DEC);
+
+        
     //okay, which command are we handling?
     byte cmd = commandBuffer.remove_8();
+
+    Serial.print("cmd: ");
+    Serial.println(cmd, DEC);
+
     switch(cmd)
     {
     //add it to our point queue.
@@ -263,7 +271,7 @@ void handle_commands()
       commandBuffer.remove_16());
       break;
 
-    case HOST_CMD_TOOL_QUERY:
+    case HOST_CMD_TOOL_COMMAND:
       send_tool_command();
       break;
     }

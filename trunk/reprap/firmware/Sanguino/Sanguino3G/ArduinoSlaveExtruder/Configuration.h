@@ -11,7 +11,7 @@
 #define SERIAL_SPEED 38400
 
 //the address for commands to listen to
-#define RS485_ADDRESS 1
+#define RS485_ADDRESS 0
 #define PACKET_TIMEOUT 100
 
 /****************************************************************************************
