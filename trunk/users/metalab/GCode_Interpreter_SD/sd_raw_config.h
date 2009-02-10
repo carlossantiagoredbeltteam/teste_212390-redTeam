@@ -81,6 +81,7 @@
 #elif defined(__AVR_ATmega16__) || \
       defined(__AVR_ATmega32__) || \
       defined(__AVR_ATmega644__) || \
+      defined(__AVR_ATmega324P__) || \
       defined(__AVR_ATmega644P__)
     #define configure_pin_mosi() DDRB |= (1 << DDB5)
     #define configure_pin_sck() DDRB |= (1 << DDB7)
