@@ -47,6 +47,11 @@ void init_steppers()
   eventual_steps.x = 0;
   eventual_steps.y = 0;
   eventual_steps.z = 0;
+  
+  //probably not needed, but lets do it anyway.
+  x_can_step = false;
+  y_can_step = false;
+  z_can_step = false;
 }
 
 void seek_minimums(boolean find_x, boolean find_y, boolean find_z, unsigned long step_delay, unsigned int timeout_seconds)
@@ -219,10 +224,28 @@ boolean find_axis_max(byte step_pin, byte dir_pin, byte max_pin)
 void prepare_dda()
 {
   //whats our target?
-  target_steps.x += current_steps.x + delta_steps.x;
-  target_steps.y += current_steps.y + delta_steps.y;
-  target_steps.z += current_steps.z + delta_steps.z;
+  target_steps.x = current_steps.x + delta_steps.x;
+  target_steps.y = current_steps.y + delta_steps.y;
+  target_steps.z = current_steps.z + delta_steps.z;
+  
+  /*
+  Serial.print("t:");
+  Serial.print(target_steps.x, DEC);
+  Serial.print(",");
+  Serial.print(target_steps.y, DEC);
+  Serial.print(",");
+  Serial.print(target_steps.z, DEC);
+  Serial.print(".");
 
+  Serial.print("c:");
+  Serial.print(current_steps.x, DEC);
+  Serial.print(",");
+  Serial.print(current_steps.y, DEC);
+  Serial.print(",");
+  Serial.print(current_steps.z, DEC);
+  Serial.print(".");
+  */
+  
   //what is our direction
   x_direction = (target_steps.x >= current_steps.x);
   y_direction = (target_steps.y >= current_steps.y);
@@ -233,6 +256,11 @@ void prepare_dda()
   digitalWrite(Y_DIR_PIN, y_direction);
   digitalWrite(Z_DIR_PIN, z_direction);
 
+  //now get us absolute coords
+  delta_steps.x = abs(delta_steps.x);
+  delta_steps.y = abs(delta_steps.y);
+  delta_steps.z = abs(delta_steps.z);
+
   //enable our steppers if needed.
   enable_steppers();
 
@@ -240,7 +268,7 @@ void prepare_dda()
   max_delta = 0;
   max_delta = max(delta_steps.x, delta_steps.y);
   max_delta = max(delta_steps.z, max_delta);
-
+  
   //init stuff.
   x_counter = -max_delta/2;
   y_counter = -max_delta/2;
@@ -309,6 +337,8 @@ inline void dda_step()
   //we're either at our target, or we're stuck.
   if (!x_can_step && !y_can_step && !z_can_step)
   {
+//    Serial.print("cant step");
+    
     //set us to be at our target.
     current_steps.x = target_steps.x;
     current_steps.y = target_steps.y;
@@ -324,13 +354,10 @@ void grab_next_point()
   //can we even step to this?
   if (pointBuffer.size() >= POINT_SIZE)
   {
-    //make it so we dont interrupt ourself.
-    disableTimer1Interrupt();
-
     //grab our new target
-    delta_steps.x = pointBuffer.remove_16();
-    delta_steps.y = pointBuffer.remove_16();
-    delta_steps.z = pointBuffer.remove_16();
+    delta_steps.x = (int)pointBuffer.remove_16();
+    delta_steps.y = (int)pointBuffer.remove_16();
+    delta_steps.z = (int)pointBuffer.remove_16();
 
     //figure out stuff for the move.
     prepare_dda();
@@ -338,8 +365,10 @@ void grab_next_point()
     //start the move!
     setTimer1Resolution(pointBuffer.remove_8());
     setTimer1Ceiling(pointBuffer.remove_16());
-    enableTimer1Interrupt();
   }
+  //no more points?  why not bail.
+  else
+    disableTimer1Interrupt();
 }
 
 bool can_step(byte min_pin, byte max_pin, long current, long target, byte direction)
@@ -438,20 +467,27 @@ void queue_incremental_point(int x, int y, int z, byte prescaler, unsigned int c
     delayMicrosecondsInterruptible(500);
 
   //okay, add in our points.
-  // x
-  pointBuffer.append(x & 0xff);
-  pointBuffer.append(x >> 8);
-  // y
-  pointBuffer.append(y & 0xff);
-  pointBuffer.append(y >> 8);
-  // z
-  pointBuffer.append(z & 0xff);
-  pointBuffer.append(z >> 8);
+  pointBuffer.append_16(x);
+  pointBuffer.append_16(y);
+  pointBuffer.append_16(z);
+
+  Serial.print("Queued:");
+  Serial.print(x, DEC);
+  Serial.print(",");
+  Serial.print(y, DEC);
+  Serial.print(",");
+  Serial.print(z, DEC);
+  Serial.print(",");
+  Serial.print(prescaler, DEC);
+  Serial.print(",");
+  Serial.print(count, DEC);
+  Serial.print(".");
+  
   // prescaler
   pointBuffer.append(prescaler);
+
   // counter
-  pointBuffer.append(count & 0xff);
-  pointBuffer.append(count >> 8);
+  pointBuffer.append_16(count);
 
   //turn our interrupt on.
   enableTimer1Interrupt();
