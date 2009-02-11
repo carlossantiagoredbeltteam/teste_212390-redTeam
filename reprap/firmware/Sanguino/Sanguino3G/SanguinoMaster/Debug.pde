@@ -4,10 +4,14 @@ void square_move()
 {
   queue_absolute_point(100, -100, 0, 2, 20833);
   Serial.println("Bottom right");
-  queue_absolute_point(100, 100, 0, 2, 20833);
+  queue_absolute_point(100, -100, 300, 2, 10000);
+  Serial.println("Up");
+  queue_absolute_point(100, 100, 300, 2, 20833);
   Serial.println("Top right");
-  queue_absolute_point(-100, 100, 0, 2, 20833);
+  queue_absolute_point(-100, 100, 300, 2, 20833);
   Serial.println("Top left");
+  queue_absolute_point(-100, 100, 0, 2, 10000);
+  Serial.println("Down");
   queue_absolute_point(-100, -100, 0, 2, 20833);
   Serial.println("Bottom left");
 }

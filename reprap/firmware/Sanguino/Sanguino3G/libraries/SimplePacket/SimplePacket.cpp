@@ -107,6 +107,11 @@ void SimplePacket::unsupported()
   response_code = RC_CMD_UNSUPPORTED;
 }
 
+void SimplePacket::overflow()
+{
+  response_code = RC_BUFFER_OVERFLOW;
+}
+
 void SimplePacket::sendReply()
 {
   //initialize our response CRC

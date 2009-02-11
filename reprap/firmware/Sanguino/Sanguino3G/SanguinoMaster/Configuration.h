@@ -122,7 +122,7 @@
  ****************************************************************************************/
 
 //do we want a step delay (ie: length of pulse in microseconds) comment out to disable.
-#define STEP_DELAY 5
+#define STEP_DELAY 10
 
 #ifdef STEPPER_DRIVER_VERSION_1_X
 #define STEPPER_ENABLE    1
@@ -152,7 +152,7 @@
  ****************************************************************************************/
 //we store all queueable commands in one big giant buffer.
 // Explicitly allocate memory at compile time for buffer.
-#define COMMAND_BUFFER_SIZE 2048
+#define COMMAND_BUFFER_SIZE 256
 #define POINT_QUEUE_SIZE 32
 #define POINT_SIZE 9
 #define MAX_PACKET_LENGTH 32
