@@ -35,18 +35,18 @@ public:
     start = count = 0;
   }
 
-  uint8_t operator[](const size_t i) const {
+  uint8_t operator[](const size_t i) {
     const size_t idx = (i+start)%capacity;
     return buffer[idx];
   }
 
   /// Check remaining capacity of this vector.
-  size_t remainingCapacity() const {
+  size_t remainingCapacity() {
     return capacity-count;
   }
 
   /// Get the current number of elements in the buffer.
-  size_t size() const {
+  size_t size() {
     return count;
   }
 

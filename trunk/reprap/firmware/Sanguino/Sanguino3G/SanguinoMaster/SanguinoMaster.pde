@@ -70,10 +70,8 @@ void loop()
   //check for and handle any packets that come in.
   if (Serial.available())
     process_host_packets();
-
-  //only handle our buffer if we're unpaused. 
-  //if (!is_machine_paused)
-    handle_commands();
+  
+  handle_commands();
 }
 
 //handle the abortion of a print job
