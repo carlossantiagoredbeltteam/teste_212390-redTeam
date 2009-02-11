@@ -55,6 +55,11 @@ public:
     buffer[(start+count)%capacity] = datum;
     count++;
   }
+  
+  bool append_16(const uint16_t datum) {
+    append(datum & 0xff);
+    append(datum >> 8);
+  }
 
   /// Remove and return a character from the start of the
   /// circular buffer.
@@ -66,11 +71,13 @@ public:
   }
 
   const uint16_t remove_16() {
-    return (remove_8() << 8) & remove_8();
+    //order is important here!
+    return remove_8() | ((int16_t)remove_8() << 8);
   }
 
   const uint32_t remove_32() {
-    return (remove_16() << 16) & remove_16();
+    //order is important here!
+    return remove_16() | ((int32_t)remove_16() << 16);
   }
 };
 

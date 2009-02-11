@@ -163,30 +163,43 @@ void handle_query(byte cmd)
 void handle_commands()
 {
   byte flags = 0;
+  
+  long x;
+  long y;
+  long z;
+  byte prescaler;
+  unsigned int count;
 
   //do we have any commands?
   if (commandBuffer.size() > 0)
   {
+    /*
     Serial.print("size: ");
     Serial.println(commandBuffer.size(), DEC);
-
+    */
         
     //okay, which command are we handling?
     byte cmd = commandBuffer.remove_8();
 
+    /*
     Serial.print("cmd: ");
     Serial.println(cmd, DEC);
-
+    */
+    
     switch(cmd)
     {
+      
     //add it to our point queue.
     case HOST_CMD_QUEUE_POINT_INC:
-      queue_incremental_point(
-        commandBuffer.remove_16(),
-        commandBuffer.remove_16(),
-        commandBuffer.remove_16(),
-        commandBuffer.remove_8(),
-        commandBuffer.remove_16());
+
+      x = (int)commandBuffer.remove_16();
+      y = (int)commandBuffer.remove_16();
+      z = (int)commandBuffer.remove_16();
+      prescaler = commandBuffer.remove_8();
+      count = commandBuffer.remove_16();
+
+      queue_incremental_point(x, y, z, prescaler, count);
+
       break;
 
     //add it to our point queue.
