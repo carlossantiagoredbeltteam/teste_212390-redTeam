@@ -1,5 +1,17 @@
 #ifdef ENABLE_DEBUG
 
+void square_move()
+{
+  queue_absolute_point(100, -100, 0, 2, 20833);
+  Serial.println("Bottom right");
+  queue_absolute_point(100, 100, 0, 2, 20833);
+  Serial.println("Top right");
+  queue_absolute_point(-100, 100, 0, 2, 20833);
+  Serial.println("Top left");
+  queue_absolute_point(-100, -100, 0, 2, 20833);
+  Serial.println("Bottom left");
+}
+
 void check_tool_version(byte id)
 {
   ping_tool(id);

@@ -337,7 +337,9 @@ inline void dda_step()
   //we're either at our target, or we're stuck.
   if (!x_can_step && !y_can_step && !z_can_step)
   {
-//    Serial.print("cant step");
+    finishedPoints++;
+    Serial.print("Finished:");
+    Serial.println(finishedPoints, DEC);
     
     //set us to be at our target.
     current_steps.x = target_steps.x;
@@ -377,11 +379,11 @@ bool can_step(byte min_pin, byte max_pin, long current, long target, byte direct
   if (target == current)
     return false;
   //stop us if we're at home and still going 
-  else if (read_switch(min_pin) && !direction)
-    return false;
+//  else if (read_switch(min_pin) && !direction)
+//    return false;
   //stop us if we're at max and still going
-  else if (read_switch(max_pin) && direction)
-    return false;
+//  else if (read_switch(max_pin) && direction)
+//    return false;
 
   //default to being able to step
   return true;
@@ -464,7 +466,7 @@ void queue_incremental_point(int x, int y, int z, byte prescaler, unsigned int c
 
   //wait until we have free space
   while (pointBuffer.remainingCapacity() < POINT_SIZE)
-    delayMicrosecondsInterruptible(500);
+    delay(1);
 
   //okay, add in our points.
   pointBuffer.append_16(x);
@@ -481,7 +483,7 @@ void queue_incremental_point(int x, int y, int z, byte prescaler, unsigned int c
   Serial.print(prescaler, DEC);
   Serial.print(",");
   Serial.print(count, DEC);
-  Serial.print(".");
+  Serial.println(".");
   
   // prescaler
   pointBuffer.append(prescaler);
@@ -498,49 +500,71 @@ void queue_incremental_point(int x, int y, int z, byte prescaler, unsigned int c
 void queue_absolute_point(long x, long y, long z, byte prescaler, unsigned int count)
 {
   //calculate our total travel in steps
-  unsigned long delta_x = abs(x - current_steps.x);
-  unsigned long delta_y = abs(y - current_steps.y);
-  unsigned long delta_z = abs(z - current_steps.z);
+  unsigned long delta_x = abs(x - eventual_steps.x);
+  unsigned long delta_y = abs(y - eventual_steps.y);
+  unsigned long delta_z = abs(z - eventual_steps.z);
+  
+  Serial.print("Deltas:");
+  Serial.print(delta_x, DEC);
+  Serial.print(",");
+  Serial.print(delta_y, DEC);
+  Serial.print(",");
+  Serial.print(delta_z, DEC);
+  Serial.println(".");
+
+  //which is our longest?
+  unsigned long max_delta = max(delta_x, delta_y);
+  max_delta = max(max_delta, delta_z);
+
+  //zero movement?  bail.
+  if (max_delta == 0)
+    return;
+
+  //figure our ratios
+  double x_ratio = delta_x / max_delta;
+  double y_ratio = delta_y / max_delta;
+  double z_ratio = delta_z / max_delta;
 
   //setup some variables.
-  int x_inc = 0;
-  int y_inc = 0;
-  int z_inc = 0;
+  int x_inc, y_inc, z_inc;
 
   //keep queueing points while we can.
-  while (delta_x >= 0 || delta_y >= 0 || delta_z >= 0)
+  int segments = 0;
+  while (delta_x > 0 || delta_y > 0 || delta_z > 0)
   {
     //figure out our incremental points.
-    x_inc = get_increment_from_absolute(delta_x, current_steps.x, x);
-    y_inc = get_increment_from_absolute(delta_y, current_steps.y, y);
-    z_inc = get_increment_from_absolute(delta_z, current_steps.z, z);
+    x_inc = get_increment_from_absolute(delta_x, x_ratio, current_steps.x, x);
+    y_inc = get_increment_from_absolute(delta_y, y_ratio, current_steps.y, y);
+    z_inc = get_increment_from_absolute(delta_z, z_ratio, current_steps.z, z);
+
+    //remove them from our deltas.
+    delta_x -= abs(x_inc);
+    delta_y -= abs(y_inc);
+    delta_z -= abs(z_inc);
+
+    //how many have we done?
+    segments++;
+    //Serial.print("Segments: ");
+    //Serial.println(segments, DEC);
 
     //queue our point.
     queue_incremental_point(x_inc, y_inc, z_inc, prescaler, count);
-
-    //remove them from our deltas.
-    delta_x -= x_inc;
-    delta_x -= y_inc;
-    delta_x -= z_inc;
   }
 }
 
-int get_increment_from_absolute(unsigned long delta, long current, long target)
+int get_increment_from_absolute(long delta, double ratio, long current, long target)
 {
-  if (delta > 32767)
-  {
-    if (target < current)
-      return -32767;
-    else
-      return 32767;
-  }
+  //get a proportional point.
+  int increment = ceil(ratio * 32767);
+
+  //make sure its within the proper range.
+  increment = min(delta, increment);
+
+  //which direction?
+  if (target < current)
+    return -increment;
   else
-  {
-    if (target < current)
-      return -((int)delta);
-    else
-      return (int)delta;
-  }
+    return increment;
 }
 
 boolean is_point_buffer_empty()
