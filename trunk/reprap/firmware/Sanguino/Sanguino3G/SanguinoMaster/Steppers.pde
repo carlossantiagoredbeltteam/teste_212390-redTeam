@@ -337,16 +337,15 @@ inline void dda_step()
   //we're either at our target, or we're stuck.
   if (!x_can_step && !y_can_step && !z_can_step)
   {
-    finishedPoints++;
-    Serial.print("Finished:");
-    Serial.println(finishedPoints, DEC);
+//    finishedPoints++;
+//    Serial.print("Finished:");
+//    Serial.println(finishedPoints, DEC);
     
     //set us to be at our target.
     current_steps.x = target_steps.x;
     current_steps.y = target_steps.y;
     current_steps.z = target_steps.z;
 
-    //where to next, boss?
     grab_next_point();
   }
 }
@@ -365,8 +364,10 @@ void grab_next_point()
     prepare_dda();
 
     //start the move!
+    disableTimer1Interrupt();
     setTimer1Resolution(pointBuffer.remove_8());
     setTimer1Ceiling(pointBuffer.remove_16());
+    enableTimer1Interrupt();
   }
   //no more points?  why not bail.
   else
@@ -490,6 +491,13 @@ void queue_incremental_point(int x, int y, int z, byte prescaler, unsigned int c
 
   // counter
   pointBuffer.append_16(count);
+  
+  //first point? give us the right timer.
+  if (pointBuffer.size() == POINT_SIZE)
+  {
+    setTimer1Resolution(prescaler);
+    setTimer1Ceiling(count);
+  }
 
   //turn our interrupt on.
   enableTimer1Interrupt();
@@ -504,14 +512,10 @@ void queue_absolute_point(long x, long y, long z, byte prescaler, unsigned int c
   unsigned long delta_y = abs(y - eventual_steps.y);
   unsigned long delta_z = abs(z - eventual_steps.z);
   
-  Serial.print("Deltas:");
-  Serial.print(delta_x, DEC);
-  Serial.print(",");
-  Serial.print(delta_y, DEC);
-  Serial.print(",");
-  Serial.print(delta_z, DEC);
-  Serial.println(".");
-
+  boolean x_dir = (x > eventual_steps.x);
+  boolean y_dir = (y > eventual_steps.y);
+  boolean z_dir = (z > eventual_steps.z);
+  
   //which is our longest?
   unsigned long max_delta = max(delta_x, delta_y);
   max_delta = max(max_delta, delta_z);
@@ -521,9 +525,9 @@ void queue_absolute_point(long x, long y, long z, byte prescaler, unsigned int c
     return;
 
   //figure our ratios
-  double x_ratio = delta_x / max_delta;
-  double y_ratio = delta_y / max_delta;
-  double z_ratio = delta_z / max_delta;
+  double x_ratio = (double)delta_x / (double)max_delta;
+  double y_ratio = (double)delta_y / (double)max_delta;
+  double z_ratio = (double)delta_z / (double)max_delta;
 
   //setup some variables.
   int x_inc, y_inc, z_inc;
@@ -532,10 +536,18 @@ void queue_absolute_point(long x, long y, long z, byte prescaler, unsigned int c
   int segments = 0;
   while (delta_x > 0 || delta_y > 0 || delta_z > 0)
   {
+    Serial.print("Deltas:");
+    Serial.print(delta_x, DEC);
+    Serial.print(",");
+    Serial.print(delta_y, DEC);
+    Serial.print(",");
+    Serial.print(delta_z, DEC);
+    Serial.println(".");
+
     //figure out our incremental points.
-    x_inc = get_increment_from_absolute(delta_x, x_ratio, current_steps.x, x);
-    y_inc = get_increment_from_absolute(delta_y, y_ratio, current_steps.y, y);
-    z_inc = get_increment_from_absolute(delta_z, z_ratio, current_steps.z, z);
+    x_inc = get_increment_from_absolute(delta_x, x_ratio, x_dir);
+    y_inc = get_increment_from_absolute(delta_y, y_ratio, y_dir);
+    z_inc = get_increment_from_absolute(delta_z, z_ratio, y_dir);
 
     //remove them from our deltas.
     delta_x -= abs(x_inc);
@@ -552,19 +564,19 @@ void queue_absolute_point(long x, long y, long z, byte prescaler, unsigned int c
   }
 }
 
-int get_increment_from_absolute(long delta, double ratio, long current, long target)
+int get_increment_from_absolute(long delta, double ratio, boolean dir)
 {
   //get a proportional point.
-  int increment = ceil(ratio * 32767);
+  int increment = ceil(ratio * 32767.0);
 
   //make sure its within the proper range.
   increment = min(delta, increment);
 
   //which direction?
-  if (target < current)
-    return -increment;
-  else
+  if (dir)
     return increment;
+  else
+    return -increment;
 }
 
 boolean is_point_buffer_empty()
@@ -574,15 +586,23 @@ boolean is_point_buffer_empty()
     return false;
 
   //still working on a point.
-  if (current_steps.x != target_steps.x && current_steps.y != target_steps.y && current_steps.z != target_steps.z)
+  if (!at_target())
     return false;
 
   //nope, we're done.
   return true;
 }
 
+boolean at_target()
+{
+  if (current_steps.x == target_steps.x && current_steps.y == current_steps.y && current_steps.z == current_steps.z)
+    return true;
+  else
+    return false;
+}
+
 inline void wait_until_target_reached()
 {
   while(!is_point_buffer_empty())
-    delayMicrosecondsInterruptible(500);
+    delay(1);
 }

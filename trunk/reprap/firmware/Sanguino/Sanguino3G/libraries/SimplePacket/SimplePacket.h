@@ -60,6 +60,7 @@ public:
   ResponseCode getResponseCode();
 
   void unsupported();
+  void overflow();
 
   void sendReply();
   void sendPacket();
