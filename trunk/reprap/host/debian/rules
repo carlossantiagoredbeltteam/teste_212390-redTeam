@@ -8,7 +8,7 @@ VERSION = $(shell dpkg-parsechangelog | egrep '^Version' | \
 	sed -r 's/Version:\s*//' | sed -r 's/^[0-9]+://' | \
 	sed -r 's/(\.dfsg)?-[0-9.]+//')
 
-JAVA_HOME_DIRS       := /usr/lib/jvm/java-6-openjdk /usr/lib/jvm/default-java /usr/lib/jvm/java-6-sun
+JAVA_HOME_DIRS       := /usr/lib/jvm/java-6-openjdk /usr/lib/jvm/default-java /usr/lib/jvm/java-6-sun .
 DEB_JARS             := ant-launcher.jar RXTXcomm.jar swing-layout.jar \
 			vecmath.jar j3dcore.jar j3dutils.jar j3d-org-java3d-all.jar
 DEB_ANT_BUILD_TARGET := jar
@@ -18,13 +18,17 @@ print-version:
 	echo $(VERSION)
 
 install/reprap-host::
-	# Script to run RepRap Host program
-	install -D -m755 reprap-host debian/reprap-host/usr/bin/reprap-host
-
-	# Program directory
-	install -D -m644 bin/org/reprap/Main.class debian/reprap-host/usr/lib/reprap/org/reprap/Main.class
-	install -D -m644 jar/reprap.jar debian/reprap-host/usr/lib/reprap/jar/reprap.jar
-	install -m644 lib/reprap-wv.stl debian/reprap-host/usr/lib/reprap/
+	# Install sundry files - most of these should go somewhere else, but where?
+	install -D -m644 reprap.properties.dist debian/reprap-host/usr/lib/reprap/reprap.properties.dist
+	install -D -m644 *.png debian/reprap-host/usr/lib/reprap
+	install -D -m644 reprap-wv.stl debian/reprap-host/usr/lib/reprap/reprap-wv.stl
+	
+	# Install Libraries - most of these should be in their own .deb files in the future
+	install -D -m644 *.jar debian/reprap-host/usr/lib/reprap
+	install -D -m644 *.so debian/reprap-host/usr/lib/reprap
+	
+	# Script to run RepRap Host program - currently needs to be in same place as the libraries, needs to be changed
+	install -D -m755 reprap debian/reprap-host/usr/lib/reprap/reprap
 
 	# man page
 	install -D -m644 reprap-host.1 debian/reprap-host/usr/share/man/man1/reprap-host.1

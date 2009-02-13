@@ -1,8 +1,10 @@
 #!/bin/bash
-# host-package-release -- Packages Reprap host software into a .zip file
+# host-package-release -- Packages Reprap host software into a .zip file and .deb package
+
 
 # init
 RELEASE=${1:-`date -u +%Y%m%d`}
+
 
 LINUXFILENAME="reprap-host-linux-$RELEASE"
 LINUXFILELIST="jar/reprap.jar lib/*.jar lib/reprap-wv.stl lib/rr-logo-green-url.png\
@@ -20,6 +22,10 @@ SRCFILENAME="reprap-host-src-$RELEASE"
 SRCFILELIST="src/* LICENSE build.xml build-user.xml .classpath .project \
 	host-package-release README"
 LIBFILES="lib/*"
+
+DEBFILENAME="reprap-host-deb-$RELEASE"
+DEBFILELIST="release/"$LINUXFILENAME"/* debian/ src/ lib/ build.xml build-user.xml reprap-host.1"
+
 
 CLASSPATH=$CLASSPATH:./lib/j3dcore.jar
 CLASSPATH=$CLASSPATH:./lib/j3d-org-java3d-all.jar
@@ -39,7 +45,7 @@ ant clean jar || exit 1
 # Delete and then create temporary package directories
 rm -rf "release"
 mkdir "release"
-mkdir "release/$LINUXFILENAME" "release/$MACFILENAME" "release/$WINDOWSFILENAME" "release/$SRCFILENAME"
+mkdir "release/$LINUXFILENAME" "release/$MACFILENAME" "release/$WINDOWSFILENAME" "release/$SRCFILENAME" "release/$DEBFILENAME"
 
 # Copy linux files into binary package directory
 for F in $LINUXFILELIST
@@ -106,4 +112,20 @@ zip -qr "$WINDOWSFILENAME.zip" "$WINDOWSFILENAME"
 zip -qr "$SRCFILENAME.zip" "$SRCFILENAME"
 cd ..
 
+
+echo "Zip files created. Now creating .deb package"
+# copy files and folders into temporary deb package directory
+for F in $DEBFILELIST
+do
+  cp -rp $F "release/$DEBFILENAME"
+done
+cd release/$DEBFILENAME
+
+debuild
+#Note that I (Reece) took out dependencies from control file for packages currently included as part of the package:
+# From Build-Depends: libsun-vecmath-java, librxtx-java, libswing-layout-java, libjava3d-java  | java3d
+# From reprap-host Depends: librxtx-java, libjava3d-java | java3d
+# In the future these should be included back in.
+
 echo "RepRap Host Software Release $RELEASE created."
+
