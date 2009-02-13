@@ -1,3 +1,10 @@
+reprap-host (1.0.0.20090213) intrepid; urgency=low
+
+  * Packaged as part of build script which builds zip files and
+  * includes some .jar files which should be included as dependencies
+
+ -- Reece Arnott <rarnott@business.otago.ac.nz>  Fri, 13 Feb 2009 13:30:00 +0000
+
 reprap-host (0.8.2.20071214) hardy; urgency=low
 
   * New approach to library dependencies, using classpath and

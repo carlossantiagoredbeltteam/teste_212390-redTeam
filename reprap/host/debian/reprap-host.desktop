@@ -1,8 +1,9 @@
 [Desktop Entry]
+Version=1.0
 Encoding=UTF-8
 Name=RepRap Host
 Comment=RepRap 3D Printer Control Application
-Exec=reprap-host
+Exec=/usr/lib/reprap/reprap
 Icon=reprap.xpm
 Terminal=false
 Type=Application
