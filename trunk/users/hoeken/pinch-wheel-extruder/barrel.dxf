@@ -63,6 +63,10 @@ $LUPREC
  70
 4
   9
+$CLAYER
+  8
+0
+  9
 $DIMAUNIT
  70
 0
@@ -1571,7 +1575,7 @@ AcDbDimension
  71
 5
  72
-1
+0
  41
 1.0
  42
@@ -1615,46 +1619,6 @@ AcDbMText
   6
 ByLayer
  10
--15.5
- 20
--2.0
- 30
-0.0
- 40
-2.0
- 41
-100.0
- 71
-1
- 72
-2
-  1
-drill\~3\Pentrance\~hole\Pno\~bevel
-  7
-
- 50
-0.0
- 73
-1
- 44
-1.0
-  0
-MTEXT
-  5
-4D
-100
-AcDbEntity
-100
-AcDbMText
-  8
-0
- 62
-256
-370
-5
-  6
-ByLayer
- 10
 9.4998950257062003
  20
 -3.1666327949540864
@@ -1675,13 +1639,13 @@ normallatin1
  50
 0.0
  73
-1
+0
  44
 1.0
   0
 LEADER
   5
-4E
+4D
   8
 0
  62
@@ -1727,7 +1691,7 @@ Standard
   0
 MTEXT
   5
-4F
+4E
 100
 AcDbEntity
 100
@@ -1753,7 +1717,7 @@ ByLayer
  71
 1
  72
-0
+2
   1
 exit\~hole\Poptional\~bevel
   7
@@ -1761,13 +1725,13 @@ standard
  50
 0.0
  73
-1
+0
  44
 1.0
   0
 LEADER
   5
-50
+4F
   8
 0
  62
@@ -1811,6 +1775,86 @@ Standard
  20
 0.0
   0
+MTEXT
+  5
+50
+100
+AcDbEntity
+100
+AcDbMText
+  8
+0
+ 62
+256
+370
+5
+  6
+ByLayer
+ 10
+-15.5
+ 20
+-2.0
+ 30
+0.0
+ 40
+2.0
+ 41
+100.0
+ 71
+1
+ 72
+2
+  1
+drill\~3.125\~(1/8")\Pentrance\~hole\Pno\~bevel
+  7
+
+ 50
+0.0
+ 73
+0
+ 44
+1.0
+  0
+MTEXT
+  5
+51
+100
+AcDbEntity
+100
+AcDbMText
+  8
+0
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+-10.0
+ 20
+25.0
+ 30
+0.0
+ 40
+3.0
+ 41
+100.0
+ 71
+1
+ 72
+0
+  1
+Brass\~Heater\~Barrel
+  7
+standard
+ 50
+0.0
+ 73
+1
+ 44
+1.0
+  0
 ENDSEC
   0
 SECTION
@@ -1849,7 +1893,7 @@ E
   3
 AcDbVariableDictionary
 350
-51
+52
   0
 DICTIONARY
   5
@@ -2313,7 +2357,7 @@ Layout2
   0
 DICTIONARY
   5
-51
+52
 100
 AcDbDictionary
 281
@@ -2321,15 +2365,15 @@ AcDbDictionary
   3
 DIMASSOC
 350
-53
+54
   3
 HIDETEXT
 350
-52
+53
   0
 DICTIONARYVAR
   5
-52
+53
 100
 DictionaryVariables
 280
@@ -2339,7 +2383,7 @@ DictionaryVariables
   0
 DICTIONARYVAR
   5
-53
+54
 100
 DictionaryVariables
 280
