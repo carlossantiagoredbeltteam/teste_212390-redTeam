@@ -2,24 +2,24 @@ EAGLE AutoRouter Statistics:
 
 Job           : /home/hoeken/Desktop/reprap/trunk/reprap/electronics/Arduino-Sanguino/extruder-controller/extruder-controller.brd
 
-Start at      : 10:50:35 (1/10/09)
-End at        : 10:50:40 (1/10/09)
-Elapsed time  : 00:00:05
+Start at      : 18:49:00 (2/16/09)
+End at        : 18:49:30 (2/16/09)
+Elapsed time  : 00:00:30
 
-Signals       :    58   RoutingGrid: 5 mil  Layers: 2
-Connections   :   160   predefined:  149 ( 34 Vias )
+Signals       :    60   RoutingGrid: 5 mil  Layers: 2
+Connections   :   169   predefined:  0 ( 0 Vias )
 
-Router memory :   1386388
+Router memory :   1487360
 
 Passname          :     Route Optimize1 Optimize2 Optimize3 Optimize4
 
-Time per pass     :  00:00:01  00:00:01  00:00:01  00:00:01  00:00:01
+Time per pass     :  00:00:06  00:00:06  00:00:06  00:00:06  00:00:06
 Number of Ripups  :         0         0         0         0         0
 max. Level        :         0         0         0         0         0
 max. Total        :         0         0         0         0         0
 
-Routed            :        11        11        11        11        11
-Vias              :         8         8         8         8         8
+Routed            :       169       169       169       169       169
+Vias              :        81        58        52        41        42
 Resolution        :   100.0 %   100.0 %   100.0 %   100.0 %   100.0 %
 
 Final             : 100.0% finished
