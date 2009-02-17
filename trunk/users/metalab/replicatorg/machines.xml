@@ -9,7 +9,7 @@
 			<axis id="z" length="300" maxfeedrate="100" scale="320"/>
 		</geometry>
 		<tools>
-			<tool name="Generic Extruder" type="extruder" material="abs" motor="true" floodcoolant="true" mistcoolant="true" fan="true" valve="true" collet="true" heater="true"/>
+			<tool name="Generic Extruder" type="extruder" material="abs" motor="true" floodcoolant="true" mistcoolant="true" fan="true" valve="true" collet="true" heater="true" motor_encoder_ppr="512" spindle_encoder_ppr="512"/>
 		</tools>
 		<clamps></clamps>
 		<driver name="null"> <!-- use a fake driver -->
@@ -18,7 +18,7 @@
 	</machine>
 	<!-- end protected configuration -->
 	<machine>
-		<name>Darwin</name>
+		<name>GCode Interpreter</name>
 		<geometry type="cartesian">
 			<axis id="x" length="300" maxfeedrate="1000" scale="11.4485"/>
 			<axis id="y" length="300" maxfeedrate="1000" scale="11.4485"/>
@@ -50,14 +50,25 @@
 		<warmup>
 		  M103 (extruder off)
 		  G90 (abs)
-		  G30 F780
-		  M104 S225.0 (heat)
-		  G0 X120.00 Y110.00 Z-82.65 F780
+		  G30 X0 Z0 F780
+		  G0 Y0 F780
+		  M104 S220.0 (heat)
+		  G0 X30.00 Z-101.15 F780
+          M108 S130
+          M101
+          G91
+		  G1 Z0.12 F780
+		  G1 X20.00 F240
+		  G1 Z-0.12 F780
+          G90
 		  G92 (Metalab define current as home)
 		</warmup>
 		<cooldown>
 		  G91 (Metalab relative positioning)
 		  G1 Z10 F780 (move up)
+          G90
+		  G0 Y0 F780
+		  G92 (Metalab define current as home)
 		</cooldown>
 		<driver name="serialpassthrough">
 			<portname>/dev/tty.usbserial-A10&#16;15F9</portname>
@@ -66,5 +77,78 @@
 			<!-- optional, defaults to 1.                          <databits>1</databits> -->
 			<!-- optional, defaults to N.                          <stopbits>N</stopbits> -->
 		</driver>
+	</machine>
+	<machine>
+		<name>Metalab ShotBot</name>
+		<geometry type="cartesian">
+			<axis id="x" length="300" maxfeedrate="780" scale="267"/>
+			<axis id="y" length="300" maxfeedrate="780" scale="267"/>
+			<axis id="z" length="300" maxfeedrate="780" scale="267"/>
+		</geometry>
+		<tools>
+			<tool name="Custom extruder" type="extruder" material="hdpe" motor="true" floodcoolant="false" mistcoolant="false" fan="false" valve="false" collet="false" heater="true"/>
+		</tools>
+		<clamps></clamps>
+		<warmup>
+		  M103 (extruder off)
+		  G90 (abs)
+		  G30 X0 Y0 Z0 F240
+		  M104 S220.0 (heat)
+		  G0 X10.00 Y15.00 Z-64.15 F240
+		  G92 (Metalab define current as home)
+		</warmup>
+		<cooldown>
+		  G91 (Metalab relative positioning)
+		  G1 Z10 F240 (move up)
+		</cooldown>
+		<driver name="serialpassthrough">
+			<!-- optional, defaults to 19200.                      <rate>19200</rate> -->
+			<!-- optional, defaults to 8.                          <parity>8</parity> -->
+			<!-- optional, defaults to 1.                          <databits>1</databits> -->
+			<!-- optional, defaults to N.                          <stopbits>N</stopbits> -->
+		</driver>
+	</machine>
+	<machine>
+		<name>RepRap 3G</name>
+		<geometry type="cartesian">
+			<axis id="x" length="300" maxfeedrate="1000" scale="11.7892"/>
+			<axis id="y" length="300" maxfeedrate="1000" scale="11.0716"/>
+			<axis id="z" length="300" maxfeedrate="100" scale="320"/>
+		</geometry>
+		<tools>
+			<tool name="Pinch Wheel Extruder v1.1" type="extruder" material="abs" motor="true" floodcoolant="false" mistcoolant="false" fan="true" valve="false" collet="false" heater="true"/>
+		</tools>
+		<clamps></clamps>
+		<driver name="sanguino3g">
+			<!-- optional, defaults to first serial port found.    <portname>COM1</portname> -->
+			<!-- required: we need 8 bit and 38400 baud. -->
+			<rate>38400</rate>
+			<parity>8</parity>
+			<!-- optional, defaults to 1.                          <databits>1</databits> -->
+			<!-- optional, defaults to N.                          <stopbits>N</stopbits> -->
+			<debuglevel>2</debuglevel>
+		</driver>
+		<!--
+			(homing routing)
+			G91
+			G1 Z10 F100
+			#G92 X0 Y0 (set xy as home)
+			M104 S210
+			M108 S255
+			M101
+			G04 P10000
+			M103
+			G04 P5000
+			G1 Z-10 F100
+			G92 X0 Y0 Z0
+			(ready to print)
+		-->
+		<warmup>
+		</warmup>
+		<cooldown>
+			M104 S20
+			G91
+			G1 Z10 F50
+		</cooldown>
 	</machine>
 </machines>
