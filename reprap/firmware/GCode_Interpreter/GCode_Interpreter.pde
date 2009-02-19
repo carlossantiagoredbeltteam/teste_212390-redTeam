@@ -18,9 +18,18 @@
 byte extruder_in_use = 0;
 extruder ex0(EXTRUDER_0_MOTOR_DIR_PIN, EXTRUDER_0_MOTOR_SPEED_PIN , EXTRUDER_0_HEATER_PIN,
             EXTRUDER_0_FAN_PIN,  EXTRUDER_0_TEMPERATURE_PIN, EXTRUDER_0_VALVE_DIR_PIN,
-            EXTRUDER_0_VALVE_ENABLE_PIN);
+            EXTRUDER_0_VALVE_ENABLE_PIN, EXTRUDER_0_STEP_ENABLE_PIN);
                      
 extruder* ex[EXTRUDER_COUNT];
+
+// Our interrupt function
+
+#ifdef SANGUINO
+SIGNAL(SIG_OUTPUT_COMPARE1A)
+{
+  ex[extruder_in_use]->interrupt();
+}
+#endif
 
 void setup()
 {

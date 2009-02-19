@@ -35,6 +35,14 @@
 #define Z_MOTOR_STEPS    400
 #define INVERT_Z_DIR 0
 
+// For when we have a stepper-driven extruder
+// E_STEPS_PER_MM is the number of steps needed to 
+// extrude 1mm out of the nozzle.
+
+#define E_STEPS_PER_MM   0.52   // 5mm drive - empirically adjusted
+#define E_STEPS_PER_INCH (E_STEPS_PER_MM*INCHES_TO_MM)
+#define E_MOTOR_STEPS    400
+
 //our maximum feedrates
 #define FAST_XY_FEEDRATE 1600.0
 #define FAST_Z_FEEDRATE  50.0

@@ -1,8 +1,6 @@
 #ifndef EXTRUDER_H
 #define EXTRUDER_H
 
-#include "WProgram.h"
-
 #define EXTRUDER_FORWARD true
 #define EXTRUDER_REVERSE false
 
@@ -15,12 +13,13 @@ class extruder
 private:
 
 //these our the default values for the extruder.
-    int e_speed;
+    byte e_speed;
     int target_celsius;
     int max_celsius;
     byte heater_low;
     byte heater_high;
     byte heater_current;
+    int extrude_step_count;
 
 // These are used for temperature control    
     byte count ;
@@ -36,29 +35,44 @@ private:
     bool valve_open;
 
 // The pins we control
-    byte motor_dir_pin, motor_speed_pin, heater_pin, fan_pin, temp_pin, valve_dir_pin, valve_en_pin;
+    byte motor_dir_pin, motor_speed_pin, heater_pin, fan_pin, temp_pin, valve_dir_pin, valve_en_pin, step_en_pin;
     
 public:
 
-   extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin, byte vd_pin, byte ve_pin);
+   extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin, byte vd_pin, byte ve_pin, byte se_pin);
    void wait_for_temperature();
    //byte wait_till_cool();
    byte wait_till_hot();
    void temperature_error();  
    void valve_set(bool open, int millis);
    void set_direction(bool direction);
-   void set_speed(byte e_speed);
+   void set_speed(float es);
    void set_cooler(byte e_speed);
    void set_temperature(int temp);
    int get_temperature();
    int sample_temperature(byte pin);
    void manage();
    
+#ifdef SANGUINO
+   // Interrupt setup and handling functions
+   
+   void interrupt();
+   void enableTimerInterrupt(); 	
+   void disableTimerInterrupt(); 
+   void setTimerCeiling(unsigned int c); 
+   void setupTimerInterrupt();
+   void setTimerResolution(byte r);
+   void setTimer(long delay);
+   unsigned int getTimerCeiling(long delay);
+   byte getTimerResolution(long delay);
+   
+#endif
+
 #ifdef TEST_MACHINE
-  void heater_test();
-  void drive_test();
-  void valve_test();
-  void fan_test();
+   void heater_test();
+   void drive_test();
+   void valve_test();
+   void fan_test();
 #endif
    
 };

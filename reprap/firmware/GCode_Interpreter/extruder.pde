@@ -10,7 +10,7 @@ void manage_all_extruders()
        ex[i]->manage();
 }
    
-extruder::extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin, byte vd_pin, byte ve_pin)
+extruder::extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin, byte vd_pin, byte ve_pin, byte se_pin)
 {
          motor_dir_pin = md_pin;
          motor_speed_pin = ms_pin;
@@ -19,6 +19,7 @@ extruder::extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin,
          temp_pin = t_pin;
          valve_dir_pin = vd_pin;
          valve_en_pin = ve_pin;
+         step_en_pin = se_pin;
          
 	//setup our pins
 	pinMode(motor_dir_pin, OUTPUT);
@@ -37,8 +38,20 @@ extruder::extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin,
 	digitalWrite(valve_dir_pin, false);
 	digitalWrite(valve_en_pin, 0);
 
+        if(step_en_pin >= 0)
+        {
+          pinMode(step_en_pin, OUTPUT);
+	  digitalWrite(step_en_pin, 1); // N.B. Active low.
+        }
+#ifdef SANGUINO
+
+        setupTimerInterrupt();
+	disableTimerInterrupt();
+
+#endif
+
         //these our the default values for the extruder.
-        e_speed = 128;
+        e_speed = 0;
         target_celsius = 17;
         max_celsius = 0;
         heater_low = 64;
@@ -141,14 +154,6 @@ void extruder::set_direction(bool dir)
 	digitalWrite(motor_dir_pin, e_direction);
 }
 
-void extruder::set_speed(byte sp)
-{
-    e_speed = sp;
-    if(e_speed > 0)
-          wait_for_temperature();
-    analogWrite(motor_speed_pin, e_speed);
-}
-
 void extruder::set_cooler(byte sp)
 {
 	analogWrite(fan_pin, sp);
@@ -243,6 +248,225 @@ void extruder::manage()
                 analogWrite(heater_pin, heater_current);
         }
 }
+
+
+
+void extruder::set_speed(float sp)
+{
+  // DC motor?
+    if(step_en_pin < 0)
+    {
+      e_speed = (byte)sp;
+      if(e_speed > 0)
+          wait_for_temperature();
+      analogWrite(motor_speed_pin, e_speed);
+      return;
+    }
+    
+#ifdef SANGUINO    
+    // No - stepper
+  disableTimerInterrupt();
+  
+  if(sp <= 1.0e-4)
+  {
+    digitalWrite(step_en_pin, 1); // N.B. Active low.
+    e_speed = 0; // Just use this as a flag
+    return;
+  } else
+  {
+    wait_for_temperature();
+    digitalWrite(step_en_pin, 0);
+    e_speed = 1;
+  }
+    
+  extrude_step_count = 0;
+  
+  float milliseconds_per_step = 60000.0/(E_STEPS_PER_MM*sp);
+  long thousand_ticks_per_step = 4*(long)(milliseconds_per_step);
+  setupTimerInterrupt();
+  setTimer(thousand_ticks_per_step);
+  enableTimerInterrupt();
+#endif
+}
+
+#ifdef SANGUINO
+
+void extruder::interrupt()
+{
+    if(!e_speed)
+      return;
+    extrude_step_count++;
+    if(extrude_step_count > 1000)
+    {
+      digitalWrite(motor_speed_pin, HIGH);
+      delayMicroseconds(5);
+      digitalWrite(motor_speed_pin, LOW);
+      extrude_step_count = 0;
+    }
+}
+
+void extruder::enableTimerInterrupt() 
+{
+   //reset our timer to 0 for reliable timing TODO: is this needed?
+   //TCNT1 = 0;
+          
+   //then enable our interrupt!
+   TIMSK1 |= (1<<OCIE1A);
+ }
+	
+void extruder::disableTimerInterrupt() 
+{
+     TIMSK1 &= ~(1<<OCIE1A);
+}
+        
+void extruder::setTimerCeiling(unsigned int c) 
+{
+    OCR1A = c;
+}
+
+void extruder::setupTimerInterrupt()
+{
+	//clear the registers
+	TCCR1A = 0;
+	TCCR1B = 0;
+	TCCR1C = 0;
+	TIMSK1 = 0;
+	
+	//waveform generation = 0100 = CTC
+	TCCR1B &= ~(1<<WGM13);
+	TCCR1B |=  (1<<WGM12);
+	TCCR1A &= ~(1<<WGM11); 
+	TCCR1A &= ~(1<<WGM10);
+
+	//output mode = 00 (disconnected)
+	TCCR1A &= ~(1<<COM1A1); 
+	TCCR1A &= ~(1<<COM1A0);
+	TCCR1A &= ~(1<<COM1B1); 
+	TCCR1A &= ~(1<<COM1B0);
+
+	//start off with a slow frequency.
+	setTimerResolution(4);
+	setTimerCeiling(65535);
+}
+
+void extruder::setTimerResolution(byte r)
+{
+	//here's how you figure out the tick size:
+	// 1000000 / ((16000000 / prescaler))
+	// 1000000 = microseconds in 1 second
+	// 16000000 = cycles in 1 second
+	// prescaler = your prescaler
+
+	// no prescaler == 0.0625 usec tick
+	if (r == 0)
+	{
+		// 001 = clk/1
+		TCCR1B &= ~(1<<CS12);
+		TCCR1B &= ~(1<<CS11);
+		TCCR1B |=  (1<<CS10);
+	}	
+	// prescale of /8 == 0.5 usec tick
+	else if (r == 1)
+	{
+		// 010 = clk/8
+		TCCR1B &= ~(1<<CS12);
+		TCCR1B |=  (1<<CS11);
+		TCCR1B &= ~(1<<CS10);
+	}
+	// prescale of /64 == 4 usec tick
+	else if (r == 2)
+	{
+		// 011 = clk/64
+		TCCR1B &= ~(1<<CS12);
+		TCCR1B |=  (1<<CS11);
+		TCCR1B |=  (1<<CS10);
+	}
+	// prescale of /256 == 16 usec tick
+	else if (r == 3)
+	{
+		// 100 = clk/256
+		TCCR1B |=  (1<<CS12);
+		TCCR1B &= ~(1<<CS11);
+		TCCR1B &= ~(1<<CS10);
+	}
+	// prescale of /1024 == 64 usec tick
+	else
+	{
+		// 101 = clk/1024
+		TCCR1B |=  (1<<CS12);
+		TCCR1B &= ~(1<<CS11);
+		TCCR1B |=  (1<<CS10);
+	}
+}
+
+void extruder::setTimer(long delay)
+{
+	// delay is the delay between steps in microsecond ticks.
+	//
+	// we break it into 5 different resolutions based on the delay. 
+	// then we set the resolution based on the size of the delay.
+	// we also then calculate the timer ceiling required. (ie what the counter counts to)
+	// the result is the timer counts up to the appropriate time and then fires an interrupt.
+
+	disableTimerInterrupt();
+	setTimerCeiling(getTimerCeiling(delay));
+	setTimerResolution(getTimerResolution(delay));
+	//enableTimerInterrupt();
+}
+
+unsigned int extruder::getTimerCeiling(long delay)
+{
+	// our slowest speed at our highest resolution ( (2^16-1) * 0.0625 usecs = 4095 usecs)
+	if (delay <= 65535L)
+		return (delay & 0xffff);
+	// our slowest speed at our next highest resolution ( (2^16-1) * 0.5 usecs = 32767 usecs)
+	else if (delay <= 524280L)
+		return ((delay / 8) & 0xffff);
+	// our slowest speed at our medium resolution ( (2^16-1) * 4 usecs = 262140 usecs)
+	else if (delay <= 4194240L)
+		return ((delay / 64) & 0xffff);
+	// our slowest speed at our medium-low resolution ( (2^16-1) * 16 usecs = 1048560 usecs)
+	else if (delay <= 16776960L)
+		return ((delay / 256) & 0xffff);
+	// our slowest speed at our lowest resolution ((2^16-1) * 64 usecs = 4194240 usecs)
+	else if (delay <= 67107840L)
+		return ((delay / 1024) & 0xffff);
+	//its really slow... hopefully we can just get by with super slow.
+	else
+		return 65535;
+}
+
+byte extruder::getTimerResolution(long delay)
+{
+	// these also represent frequency: 1000000 / delay / 2 = frequency in hz.
+	
+	// our slowest speed at our highest resolution ( (2^16-1) * 0.0625 usecs = 4095 usecs (4 millisecond max))
+	// range: 8Mhz max - 122hz min
+	if (delay <= 65535L)
+		return 0;
+	// our slowest speed at our next highest resolution ( (2^16-1) * 0.5 usecs = 32767 usecs (32 millisecond max))
+	// range:1Mhz max - 15.26hz min
+	else if (delay <= 524280L)
+		return 1;
+	// our slowest speed at our medium resolution ( (2^16-1) * 4 usecs = 262140 usecs (0.26 seconds max))
+	// range: 125Khz max - 1.9hz min
+	else if (delay <= 4194240L)
+		return 2;
+	// our slowest speed at our medium-low resolution ( (2^16-1) * 16 usecs = 1048560 usecs (1.04 seconds max))
+	// range: 31.25Khz max - 0.475hz min
+	else if (delay <= 16776960L)
+		return 3;
+	// our slowest speed at our lowest resolution ((2^16-1) * 64 usecs = 4194240 usecs (4.19 seconds max))
+	// range: 7.812Khz max - 0.119hz min
+	else if (delay <= 67107840L)
+		return 4;
+	//its really slow... hopefully we can just get by with super slow.
+	else
+		return 4;
+}
+
+
+#endif
 
 #ifdef TEST_MACHINE
 
