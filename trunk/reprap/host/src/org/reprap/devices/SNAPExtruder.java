@@ -316,7 +316,7 @@ public class SNAPExtruder extends GenericExtruder
 	 * @param reverse If set, run extruder in reverse
 	 * @throws IOException
 	 */
-	public void setExtrusion(int speed, boolean reverse) throws IOException {
+	public void setExtrusion(double speed, boolean reverse) throws IOException {
 		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent extruder for " + material);

@@ -17,25 +17,27 @@ public interface Extruder
 	public void refreshPreferences();
 
 	/**
-	 * Start the extruder motor at a given speed.  This ranges from 0
+	 * Start the extruder motor at a given speed.  For old extruders this ranges from 0
 	 * to 255 but is scaled by maxSpeed and t0, so that 255 corresponds to the
 	 * highest permitted speed.  It is also scaled so that 0 would correspond
 	 * with the lowest extrusion speed.
+	 * For new extruders this is in mm/minute
 	 * @param speed The speed to drive the motor at (0-255)
 	 * @throws IOException
 	 */
-	public void setExtrusion(int speed) throws IOException;
+	public void setExtrusion(double speed) throws IOException;
 	
 	/**
-	 * Start the extruder motor at a given speed.  This ranges from 0
+	 * Start the extruder motor at a given speed.  For old extruders this ranges from 0
 	 * to 255 but is scaled by maxSpeed and t0, so that 255 corresponds to the
 	 * highest permitted speed.  It is also scaled so that 0 would correspond
 	 * with the lowest extrusion speed.
+	 * For new extruders this is in mm/minute
 	 * @param speed The speed to drive the motor at (0-255)
 	 * @param reverse If set, run extruder in reverse
 	 * @throws IOException
 	 */
-	public void setExtrusion(int speed, boolean reverse) throws IOException;
+	public void setExtrusion(double speed, boolean reverse) throws IOException;
 	
 	/**
 	* start extruding at the normal rate.
@@ -172,7 +174,7 @@ public interface Extruder
     /**
      * @return the extruder speeds
      */
-    public int getExtruderSpeed();
+    public double getExtruderSpeed();
 
     /**
      * @return the extrusion size in millimeters
