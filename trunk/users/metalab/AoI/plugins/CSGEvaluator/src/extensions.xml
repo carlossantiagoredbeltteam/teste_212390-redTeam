@@ -1,0 +1,15 @@
+<?xml version='1.0'?>
+
+<extension name="CSGEvaluator" version="1.0">
+  <plugin class="org.reprap.artofillusion.CSGEvaluatorTool"/> 
+
+  <author>Marius Kintel, Philipp Tiefenbacher, Stefan Farthofer (Metalab)</author>
+  <date>2009/1/14</date>
+  <description>CSG Evaluator plugin. Simplifies building objects based on boolean operations.</description>
+  <history> 
+    <log version="0.2" date="11 january 2009" author="all">initial release</log> 
+    <log version="1.0" date="14 january 2009" author="all">minor tweaks</log> 
+  </history>
+  <comments>
+  </comments>
+</extension>
