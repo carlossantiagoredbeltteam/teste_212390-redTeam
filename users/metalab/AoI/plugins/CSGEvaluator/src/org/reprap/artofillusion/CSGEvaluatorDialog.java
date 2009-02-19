@@ -51,7 +51,7 @@ class CSGEvaluatorDialog extends BDialog
     this.window = window;
     this.setResizable(false);
     
-    CSGEvaluatorEngine engine = new CSGEvaluatorEngine(window);
+    CSGEvaluatorEngine engine = new MetaCADEvaluatorEngine(window); // new CSGEvaluatorEngine(window);
 
     BorderContainer bc = new BorderContainer();
     this.setContent(bc);
@@ -82,8 +82,8 @@ class CSGEvaluatorDialog extends BDialog
     catch (Exception ex)
     {}
     
-    String[] buttons = new String [] {"evaluate", "devaluate", "union", "intersection", "difference"};
-    String[] labels = new String [] {"Actions", null, "Boolean Op", null, null};
+    String[] buttons = new String [] {"evaluate", "devaluate", "union", "intersection", "difference", "readParameters"};
+    String[] labels = new String [] {"Actions", null, "Boolean Op", null, null, null};
 
     FormContainer fc = new FormContainer(2, buttons.length+1);
     bc.add(fc, BorderContainer.CENTER);

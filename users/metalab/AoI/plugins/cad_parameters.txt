@@ -1,0 +1,7 @@
+scaling=2
+radius=scaling*10
+dicke=scaling*5
+hoehe=scaling*5
+kugelradius=scaling*9
+
+cut= (radius+dicke+kugelradius+1)*2
