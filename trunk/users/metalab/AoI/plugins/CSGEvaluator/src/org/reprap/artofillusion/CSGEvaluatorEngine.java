@@ -14,7 +14,7 @@ import artofillusion.ui.MessageDialog;
 
 
 
-class CSGEvaluatorEngine
+public class CSGEvaluatorEngine
 {
   LayoutWindow window;
 
