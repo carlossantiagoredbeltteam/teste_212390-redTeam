@@ -39,7 +39,7 @@ public abstract class GenericExtruder implements Extruder
 	/**
 	 * The actual extrusion speed
 	 */
-	protected int extrusionSpeed;
+	protected double extrusionSpeed;
 	
 	/**
 	 * The extrusion temperature
@@ -314,7 +314,7 @@ public abstract class GenericExtruder implements Extruder
 		try
 		{
 			maxExtruderSpeed = Preferences.loadGlobalInt(prefName + "MaxSpeed(0..255)");
-			extrusionSpeed = Preferences.loadGlobalInt(prefName + "ExtrusionSpeed(0..255)");
+			extrusionSpeed = Preferences.loadGlobalDouble(prefName + "ExtrusionSpeed(mm/minute)");
 			extrusionTemp = Preferences.loadGlobalDouble(prefName + "ExtrusionTemp(C)");
 			extrusionSize = Preferences.loadGlobalDouble(prefName + "ExtrusionSize(mm)");
 			extrusionHeight = Preferences.loadGlobalDouble(prefName + "ExtrusionHeight(mm)");
@@ -414,7 +414,7 @@ public abstract class GenericExtruder implements Extruder
 	 * @param speed The speed to drive the motor at (0-255)
 	 * @throws IOException
 	 */
-	public void setExtrusion(int speed) throws IOException
+	public void setExtrusion(double speed) throws IOException
 	{
 		if (speed > 0)
 			isExtruding = true;
@@ -568,7 +568,7 @@ public abstract class GenericExtruder implements Extruder
     /* (non-Javadoc)
      * @see org.reprap.Extruder#getExtruderSpeed()
      */
-    public int getExtruderSpeed()
+    public double getExtruderSpeed()
     {
     	return extrusionSpeed;
     } 

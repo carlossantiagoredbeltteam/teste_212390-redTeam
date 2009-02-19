@@ -195,7 +195,7 @@ public class LinePrinter {
 	 * @throws IOException
 	 */
 	public void printTo(int endX, int endY, int movementSpeed, 
-			int extruderSpeed, boolean stopExt, boolean closeV) throws IOException {
+			double extruderSpeed, boolean stopExt, boolean closeV) throws IOException {
 		// Determine the extruder speed, based on the geometry of the line
 		// to be printed
 		double dx = endX - currentX;

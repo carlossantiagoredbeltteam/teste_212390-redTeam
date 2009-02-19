@@ -19,7 +19,7 @@ public class NullExtruder extends GenericExtruder
 		super(extruderId);
 	}
 	
-	public void setExtrusion(int speed, boolean reverse) throws IOException {}
+	public void setExtrusion(double speed, boolean reverse) throws IOException {}
 	public void setCooler(boolean f) throws IOException {}
 	public void setValve(boolean valveOpen) throws IOException {}
 	public void heatOn() throws Exception {}

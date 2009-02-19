@@ -9,7 +9,7 @@ public class GCodeExtruder extends GenericExtruder
 {
 	GCodeReaderAndWriter gcode;
 	
-	int currentSpeed = 0;
+	double currentSpeed = 0;
 	
 	/**
 	 * @param prefs
@@ -34,7 +34,7 @@ public class GCodeExtruder extends GenericExtruder
 		return Double.parseDouble(gcode.queueRespond("M105; get temperature").substring(2)); // Throw away "T:"
 	}
 	
-	public void setExtrusion(int speed, boolean reverse) throws IOException
+	public void setExtrusion(double speed, boolean reverse) throws IOException
 	{
 		if(extrusionSpeed < 0)
 			return;

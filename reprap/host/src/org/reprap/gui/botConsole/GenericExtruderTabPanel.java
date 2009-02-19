@@ -276,10 +276,10 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
         motorSpeedField.setText("000");
 
         jLabel12.setFont(new java.awt.Font("Tahoma", 0, 12));
-        jLabel12.setText("Rpm");
+        jLabel12.setText("mm/min");
 
         jLabel11.setFont(new java.awt.Font("Tahoma", 0, 12));
-        jLabel11.setText("Motor speed:");
+        jLabel11.setText("Extrude speed:");
 
         extrudeButton.setText("Extrude");
         extrudeButton.addActionListener(new java.awt.event.ActionListener() {
@@ -541,7 +541,7 @@ private void moveToSwapPointAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:
 
     private void setExtruderSpeed() {
         try {
-                extruder.setExtrusion(extruding?Integer.parseInt(motorSpeedField.getText()):0, motorReverseCheck.isSelected());
+                extruder.setExtrusion(extruding?Double.parseDouble(motorSpeedField.getText()):0, motorReverseCheck.isSelected());
         } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, "Extruder exception: " + ex);
                 ex.printStackTrace();
@@ -551,7 +551,7 @@ private void moveToSwapPointAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:
     public void setPrefs() throws Exception {
                 
         setMaterialLabel(Preferences.loadGlobalString(prefix + "MaterialType(name)"));
-        setMotorSpeedField(Preferences.loadGlobalInt(prefix + "ExtrusionSpeed(0..255)"));
+        setMotorSpeedField(Preferences.loadGlobalInt(prefix + "ExtrusionSpeed(mm/minute)"));
         setTargetTempField(Preferences.loadGlobalInt(prefix + "ExtrusionTemp(C)"));
     } 
     
