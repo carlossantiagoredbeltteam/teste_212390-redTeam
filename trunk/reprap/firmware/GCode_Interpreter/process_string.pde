@@ -63,7 +63,7 @@ byte x_direction = 1;
 byte y_direction = 1;
 byte z_direction = 1;
 
-int extruder_speed = 0;
+float extruder_speed = 0;
 
 int scan_int(char *str, int *valp);
 int scan_float(char *str, float *valp);
@@ -557,7 +557,7 @@ void process_string(char instruction[], int size)
 				//set max extruder speed, 0-255 PWM
 			case 108:
 				if (gc.seen & GCODE_S)
-					extruder_speed = (int)gc.S;
+					extruder_speed = gc.S;
 				break;
 
                                 // Open the valve
