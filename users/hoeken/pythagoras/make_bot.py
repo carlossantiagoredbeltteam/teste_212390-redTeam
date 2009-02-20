@@ -17,7 +17,20 @@ Options:
   --nut-height=...			the height of the nut in mm. default = 6.5mm (M8 nut)
   --washer-height=... 		the height of the washer in mm. default = 1.6 (M8 washer)
   --block-width=...			the width of the block you're using. default = 20mm
+  --use-thread-locker		do you want to use a thread locking compound?  default = no
+  --use-nut-starter			do you want to use an automatic nut starting device?  default = no
 """
+
+#global variables
+x = 330.0
+y = 330.0
+z = 330.0
+feedrate = 1000.0
+nutHeight = 6.5
+washerHeight = 1.6
+blockSize = 19.056
+useThreadLocker = False
+useNutStarter = False
 
 from math import *
 import sys
@@ -55,16 +68,8 @@ class CartesianFrame:
 
 def main(argv):
 
-	x = 330.0
-	y = 330.0
-	z = 330.0
+	global x, y, z, feedrate, nutHeight, washerHeight, blockSize, useThreadLocker, useNutStarter
 
-	feedrate = 1000.0
-
-	nutHeight = 6.5
-	washerHeight = 1.6
-	blockSize = 20.0
-	
 	xRods = 4
 	yRods = 4
 	zRods = 4
@@ -80,11 +85,11 @@ def main(argv):
 	totalWashers = totalRods * washersPerKebab
 
 	try:
-		opts, args = getopt.getopt(argv, "h", ["help", "x=", "y=", "z=", "feedrate=", "nut-height=", "washer-height=", "block-width="])
+		opts, args = getopt.getopt(argv, "h", ["help", "x=", "y=", "z=", "feedrate=", "nut-height=", "washer-height=", "block-width=", "use-thread-locker", "use-nut-starter"])
 	except getopt.GetoptError:
 		usage()
 		sys.exit(2)
-        
+  
 	for opt, arg in opts:
 		if opt in ("-h", "--help"):
 			usage()
@@ -103,6 +108,12 @@ def main(argv):
 			washerHeight = float(arg)
 		elif opt == "--block-width":
 			blockSize = float(arg)
+		elif opt == "--use-thread-locker":
+			useThreadLocker = True
+		elif opt == "--use-nut-starter":
+			useNutStarter = True
+		else:
+			print "(Huh? %s:%s)" % (opt,arg)
 			
 	bot = CartesianFrame(x, y, z)
 
@@ -119,6 +130,84 @@ def main(argv):
 	print "(Total nuts required: %d)" % (totalNuts)
 	print "(Total washers required: %d)" % (totalNuts)
 	#TODO: print the total number of whole rods required.
+	print "(GCODE STARTS BELOW)"
+	print "G90 (Absolute Mode)"
+	print "G21 (Metric Units)"
+	
+	print "M00 (Starting X kebabs)"
+	for i in range(0, xRods):
+		build_frame_kebab(x)
+
+	print "M00 (Starting Y kebabs)"
+	for i in range(0, yRods):
+		build_frame_kebab(y)
+
+	print "M00 (Starting Z kebabs)"
+	for i in range(0, zRods):
+		build_frame_kebab(z)
+		
+	print "M00 (Starting XY kebabs)"
+	for i in range(0, xyRods):
+		build_diagonal_kebab(bot.getXY())
+
+	print "M00 (Starting XZ kebabs)"
+	for i in range(0, xzRods):
+		build_diagonal_kebab(bot.getXZ())
+
+	print "M00 (Starting YZ kebabs)"
+	for i in range(0, yzRods):
+		build_diagonal_kebab(bot.getYZ())
+
+
+def build_frame_kebab(length):
+
+	#user prompt for raw materials
+	print "M00 (Grab a %6.2fmm rod, 4 nuts, and 2 frame brackets)" % (length)
+
+	#the first nut on the rod.
+	nutPosition = length - blockSize*3 + nutHeight + washerHeight
+	thread_nut(nutPosition);
+	
+	#prompt the user for assembly
+	print "M00 (Slide on a washer / frame bracket / washer sandwich)"
+	
+	#the second nut on the rod
+	nutPosition = nutPosition - nutHeight - washerHeight*2 - blockSize
+	thread_nut(nutPosition)
+	print "M00 (Tighten them together.)"
+	
+	#the 3rd nut on the rod
+	nutPosition = blockSize*4 + washerHeight + nutHeight;
+	thread_nut(nutPosition)
+
+	#prompt the user for assembly
+	print "M00 (Slide on a washer / frame bracket / washer sandwich)"
+
+	#the 4th nut on the rod
+	nutPosition = blockSize*3 - washerHeight;
+	thread_nut(nutPosition)
+	print "M00 (Tighten them together.)"
+
+def build_diagonal_kebab(length):
+	print "(TODO: make diagonal rod)"	
+	
+def thread_nut(position):
+	"Thread the front of a nut to a position on the rod"
+	print "M00 (Thread a nut on the rod)"
+	
+	#do we wanna use our nut starting device?
+	if useNutStarter:
+		print "G1 Z10 F%6.2f" % (feedrate)
+
+	#zero us out.
+	print "G92 Z0"
+
+	#do we wanna use thread locking compound?
+	if useThreadLocker:
+		print "G1 Z%6.2f F%6.2f" % (position-nutHeight, feedrate)
+		print "M00 (Apply thread locker just in front of the nut.)"
+		
+	print "G1 Z%6.2f F%6.2f" % (position, feedrate)
 	
 def usage():
     print __doc__
