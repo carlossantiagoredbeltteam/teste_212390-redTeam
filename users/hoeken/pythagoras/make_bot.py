@@ -200,9 +200,9 @@ def build_frame_kebab(length):
 
   #the 3rd nut on the rod
   if useWashers:
-    nutPosition = washerSize + rodSize + blockSize + nutHeight
+    nutPosition = washerSize + rodSize + blockSize + nutHeight + washerHeight + blockSize + washerHeight + nutHeight
   else:
-    nutPosition = rodSize + blockSize + nutHeight
+    nutPosition = rodSize + blockSize + nutHeight + blockSize + nutHeight
   thread_nut(nutPosition)
 
   #prompt the user for assembly
@@ -210,9 +210,10 @@ def build_frame_kebab(length):
 
   #the 4th nut on the rod
   if useWashers:
-    nutPosition = nutPosition + washerSize + blockSize + washerHeight + nutHeight
+    nutPosition = washerSize + rodSize + blockSize + nutHeight
   else:
-    nutPosition = nutPosition + blockSize + nutHeight
+    nutPosition = rodSize + blockSize + nutHeight
+  thread_nut(nutPosition)
   print "M00 (Tighten them together.)"
 
 def build_diagonal_kebab(length):
