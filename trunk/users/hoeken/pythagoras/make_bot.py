@@ -177,9 +177,11 @@ def build_frame_kebab(length):
 	  print "M00 (Grab a %6.2fmm rod, 4 nuts, and 2 frame brackets)" % (length)
 
 	#the first nut on the rod.
-  nutPosition = length - nutHeight - blockSize - rodSize
+	nutPosition = length - nutHeight - nutHeight
   if useWashers:
-    nutPosition -= washerHeight
+    nutPosition = nutPosition - washerHeight - rodSize - blockSize
+  else
+    nutPosition = nutPosition - rodSize - blockSize
   thread_nut(nutPosition)
 
   #prompt the user for assembly
@@ -189,26 +191,28 @@ def build_frame_kebab(length):
     print "M00 (Slide on a frame bracket)"
 
 	#the second nut on the rod
-  nutPosition = nutPosition - nutHeight - blockSize
   if useWashers:
-    nutPosition -= washerHeight * 2
+    nutPosition = nutPosition - nutHeight - washerHeight - blockSize - washerHeight
+  else:
+    nutPosition = nutPosition - nutHeight - blockSize
   thread_nut(nutPosition)
   print "M00 (Tighten them together.)"
 
   #the 3rd nut on the rod
-  nutPosition = blockSize + rodSize + nutHeight + blockSize + nutHeight
   if useWashers:
-    nutPosition += washerHeight * 2
+    nutPosition = washerSize + rodSize + blockSize + nutHeight
+  else:
+    nutPosition = rodSize + blockSize + nutHeight
   thread_nut(nutPosition)
 
   #prompt the user for assembly
   print "M00 (Slide on a washer / frame bracket / washer sandwich)"
 
   #the 4th nut on the rod
-  nutPosition = nutHeight + blockSize + rodSize + nutHeight
   if useWashers:
-    nutPosition += washerHeight
-  thread_nut(nutPosition)
+    nutPosition = nutPosition + washerSize + blockSize + washerHeight + nutHeight
+  else:
+    nutPosition = nutPosition + blockSize + nutHeight
   print "M00 (Tighten them together.)"
 
 def build_diagonal_kebab(length):
@@ -236,4 +240,5 @@ def usage():
     print __doc__
 
 if __name__ == "__main__":
-	main(sys.argv[1:])
+	main(sys.argv[1:])  if useWashers:
+
