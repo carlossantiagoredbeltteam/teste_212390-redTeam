@@ -9,28 +9,32 @@ Creates a gcode file and list of rod lengths to build an auto-assembling frame b
 Usage: python make_bot.py [options]
 
 Options:
-  -h, --help				show this help
-  --x=... 					the desired maximum outside X width of your machine. default = 330mm.
-  --y=... 					the desired maximum outside Y width of your machine. default = 330mm.
-  --z=...					the desired maximum outside Z height of your machine. default = 330mm.
-  --feedrate=...			the desired feedrate for threading nuts (in mm/minute) default = 1000mm/min.
+  -h, --help				    show this help
+  --x=... 					    the desired maximum outside X width of your machine. default = 330mm.
+  --y=... 					    the desired maximum outside Y width of your machine. default = 330mm.
+  --z=...					      the desired maximum outside Z height of your machine. default = 330mm.
+  --feedrate=...		  	the desired feedrate for threading nuts (in mm/minute) default = 300mm/min.
   --nut-height=...			the height of the nut in mm. default = 6.5mm (M8 nut)
-  --washer-height=... 		the height of the washer in mm. default = 1.6 (M8 washer)
-  --block-width=...			the width of the block you're using. default = 20mm
+  --washer-height=... 	the height of the washer in mm. default = 1.6 (M8 washer)
+  --block-size=...			the width of the block you're using. default = 19.05mm
+  --rod-size=...        the size of the rod you're using.  default = 8mm
   --use-thread-locker		do you want to use a thread locking compound?  default = no
   --use-nut-starter			do you want to use an automatic nut starting device?  default = no
+  --dont-use-washers         do you want to use washers?  default = yes
 """
 
 #global variables
 x = 330.0
 y = 330.0
 z = 330.0
-feedrate = 1000.0
+feedrate = 300.0
 nutHeight = 6.5
 washerHeight = 1.6
-blockSize = 19.056
+blockSize = 19.05
+rodSize = 8.0
 useThreadLocker = False
 useNutStarter = False
+useWashers = True
 
 from math import *
 import sys
@@ -68,7 +72,7 @@ class CartesianFrame:
 
 def main(argv):
 
-	global x, y, z, feedrate, nutHeight, washerHeight, blockSize, useThreadLocker, useNutStarter
+	global x, y, z, feedrate, nutHeight, washerHeight, rodSize, blockSize, useThreadLocker, useNutStarter, useWashers
 
 	xRods = 4
 	yRods = 4
@@ -85,7 +89,7 @@ def main(argv):
 	totalWashers = totalRods * washersPerKebab
 
 	try:
-		opts, args = getopt.getopt(argv, "h", ["help", "x=", "y=", "z=", "feedrate=", "nut-height=", "washer-height=", "block-width=", "use-thread-locker", "use-nut-starter"])
+		opts, args = getopt.getopt(argv, "h", ["help", "x=", "y=", "z=", "feedrate=", "nut-height=", "washer-height=", "rod-size=", "block-size=", "use-thread-locker", "use-nut-starter", "dont-use-washers"])
 	except getopt.GetoptError:
 		usage()
 		sys.exit(2)
@@ -106,12 +110,16 @@ def main(argv):
 			nutHeight = float(arg)
 		elif opt == "--washer-height":
 			washerHeight = float(arg)
-		elif opt == "--block-width":
+		elif opt == "--block-size":
 			blockSize = float(arg)
+		elif opt == "--rod-size":
+			rodSize = float(arg)
 		elif opt == "--use-thread-locker":
 			useThreadLocker = True
 		elif opt == "--use-nut-starter":
 			useNutStarter = True
+		elif opt == "--dont-use-washers":
+		  useWashers = False
 		else:
 			print "(Huh? %s:%s)" % (opt,arg)
 			
@@ -128,7 +136,8 @@ def main(argv):
 	print "(Total Volume: %6.2fm^3)" % (bot.getVolume())
 	print "(Total kebabs: %d)" % (totalRods)
 	print "(Total nuts required: %d)" % (totalNuts)
-	print "(Total washers required: %d)" % (totalNuts)
+	if useWashers:
+	  print "(Total washers required: %d)" % (totalNuts)
 	#TODO: print the total number of whole rods required.
 	print "(GCODE STARTS BELOW)"
 	print "G90 (Absolute Mode)"
@@ -162,31 +171,45 @@ def main(argv):
 def build_frame_kebab(length):
 
 	#user prompt for raw materials
-	print "M00 (Grab a %6.2fmm rod, 4 nuts, and 2 frame brackets)" % (length)
+  if useWashers:
+	  print "M00 (Grab a %6.2fmm rod, 4 nuts, 4 washers, and 2 frame brackets)" % (length)
+  else:
+	  print "M00 (Grab a %6.2fmm rod, 4 nuts, and 2 frame brackets)" % (length)
 
 	#the first nut on the rod.
-	nutPosition = length - blockSize*3 + nutHeight + washerHeight
-	thread_nut(nutPosition);
-	
-	#prompt the user for assembly
-	print "M00 (Slide on a washer / frame bracket / washer sandwich)"
-	
+  nutPosition = length - nutHeight - blockSize - rodSize
+  if useWashers:
+    nutPosition -= washerHeight
+  thread_nut(nutPosition)
+
+  #prompt the user for assembly
+  if useWashers:
+	  print "M00 (Slide on a washer / frame bracket / washer sandwich)"
+  else:
+    print "M00 (Slide on a frame bracket)"
+
 	#the second nut on the rod
-	nutPosition = nutPosition - nutHeight - washerHeight*2 - blockSize
-	thread_nut(nutPosition)
-	print "M00 (Tighten them together.)"
-	
-	#the 3rd nut on the rod
-	nutPosition = blockSize*4 + washerHeight + nutHeight;
-	thread_nut(nutPosition)
+  nutPosition = nutPosition - nutHeight - blockSize
+  if useWashers:
+    nutPosition -= washerHeight * 2
+  thread_nut(nutPosition)
+  print "M00 (Tighten them together.)"
 
-	#prompt the user for assembly
-	print "M00 (Slide on a washer / frame bracket / washer sandwich)"
+  #the 3rd nut on the rod
+  nutPosition = blockSize + rodSize + nutHeight + blockSize + nutHeight
+  if useWashers:
+    nutPosition += washerHeight * 2
+  thread_nut(nutPosition)
 
-	#the 4th nut on the rod
-	nutPosition = blockSize*3 - washerHeight;
-	thread_nut(nutPosition)
-	print "M00 (Tighten them together.)"
+  #prompt the user for assembly
+  print "M00 (Slide on a washer / frame bracket / washer sandwich)"
+
+  #the 4th nut on the rod
+  nutPosition = nutHeight + blockSize + rodSize + nutHeight
+  if useWashers:
+    nutPosition += washerHeight
+  thread_nut(nutPosition)
+  print "M00 (Tighten them together.)"
 
 def build_diagonal_kebab(length):
 	print "(TODO: make diagonal rod)"	
