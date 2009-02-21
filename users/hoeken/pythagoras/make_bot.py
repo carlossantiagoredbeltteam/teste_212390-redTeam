@@ -20,7 +20,7 @@ Options:
   --rod-size=...        the size of the rod you're using.  default = 8mm
   --use-thread-locker		do you want to use a thread locking compound?  default = no
   --use-nut-starter			do you want to use an automatic nut starting device?  default = no
-  --dont-use-washers         do you want to use washers?  default = yes
+  --no-washers         do you want to use washers?  default = yes
 """
 
 #global variables
@@ -89,7 +89,7 @@ def main(argv):
 	totalWashers = totalRods * washersPerKebab
 
 	try:
-		opts, args = getopt.getopt(argv, "h", ["help", "x=", "y=", "z=", "feedrate=", "nut-height=", "washer-height=", "rod-size=", "block-size=", "use-thread-locker", "use-nut-starter", "dont-use-washers"])
+		opts, args = getopt.getopt(argv, "h", ["help", "x=", "y=", "z=", "feedrate=", "nut-height=", "washer-height=", "rod-size=", "block-size=", "use-thread-locker", "use-nut-starter", "no-washers"])
 	except getopt.GetoptError:
 		usage()
 		sys.exit(2)
@@ -118,7 +118,7 @@ def main(argv):
 			useThreadLocker = True
 		elif opt == "--use-nut-starter":
 			useNutStarter = True
-		elif opt == "--dont-use-washers":
+		elif opt == "--no-washers":
 		  useWashers = False
 		else:
 			print "(Huh? %s:%s)" % (opt,arg)
@@ -176,11 +176,11 @@ def build_frame_kebab(length):
   else:
 	  print "M00 (Grab a %6.2fmm rod, 4 nuts, and 2 frame brackets)" % (length)
 
-	#the first nut on the rod.
-	nutPosition = length - nutHeight - nutHeight
+  #the first nut on the rod.
+  nutPosition = length - nutHeight - nutHeight
   if useWashers:
     nutPosition = nutPosition - washerHeight - rodSize - blockSize
-  else
+  else:
     nutPosition = nutPosition - rodSize - blockSize
   thread_nut(nutPosition)
 
@@ -200,7 +200,7 @@ def build_frame_kebab(length):
 
   #the 3rd nut on the rod
   if useWashers:
-    nutPosition = washerSize + rodSize + blockSize + nutHeight + washerHeight + blockSize + washerHeight + nutHeight
+    nutPosition = washerHeight + rodSize + blockSize + nutHeight + washerHeight + blockSize + washerHeight + nutHeight
   else:
     nutPosition = rodSize + blockSize + nutHeight + blockSize + nutHeight
   thread_nut(nutPosition)
@@ -210,7 +210,7 @@ def build_frame_kebab(length):
 
   #the 4th nut on the rod
   if useWashers:
-    nutPosition = washerSize + rodSize + blockSize + nutHeight
+    nutPosition = washerHeight + rodSize + blockSize + nutHeight
   else:
     nutPosition = rodSize + blockSize + nutHeight
   thread_nut(nutPosition)
@@ -241,5 +241,4 @@ def usage():
     print __doc__
 
 if __name__ == "__main__":
-	main(sys.argv[1:])  if useWashers:
-
+	main(sys.argv[1:])
