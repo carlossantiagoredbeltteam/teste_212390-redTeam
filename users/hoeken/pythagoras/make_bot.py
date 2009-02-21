@@ -176,9 +176,9 @@ def build_frame_kebab(length):
 
   #user prompt for raw materials
   if useWashers:
-    print "M00 (Grab a %6.2fmm rod, 4 nuts, 4 washers, and 2 frame brackets)" % (length)
+    print "M00 (Grab a %6.2fmm rod, 4 nuts, 4 washers, and 2 frame brackets.  Thread it into the nut winder.)" % (length)
   else:
-    print "M00 (Grab a %6.2fmm rod, 4 nuts, and 2 frame brackets)" % (length)
+    print "M00 (Grab a %6.2fmm rod, 4 nuts, and 2 frame brackets.  Thread it into the nut winder.)" % (length)
 
   #the first nut on the rod.
   nutPosition = length - nutHeight - nutHeight
@@ -200,7 +200,7 @@ def build_frame_kebab(length):
   else:
     nutPosition = nutPosition - nutHeight - blockSize
   thread_nut(nutPosition)
-  print "M00 (Tighten them together.)"
+  print "M00 (Tighten them together by hand.)"
 
   #the 3rd nut on the rod
   if useWashers:
@@ -210,7 +210,10 @@ def build_frame_kebab(length):
   thread_nut(nutPosition)
 
   #prompt the user for assembly
-  print "M00 (Slide on a washer / frame bracket / washer sandwich)"
+  if useWashers:
+    print "M00 (Slide on a washer / frame bracket / washer sandwich)"
+  else:
+    print "M00 (Slide on a frame bracket)"
 
   #the 4th nut on the rod
   if useWashers:
