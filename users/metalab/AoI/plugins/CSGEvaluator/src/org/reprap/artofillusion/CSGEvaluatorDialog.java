@@ -28,10 +28,6 @@ import buoy.widget.LayoutInfo;
 import java.util.*;
 import java.io.*;
 
-import org.cheffo.jeplite.*;
-import org.cheffo.jeplite.util.*;
-import org.cheffo.jeplite.optimizer.*;
-
 
 /**
  * CSGEvaluator dialog
@@ -39,14 +35,10 @@ import org.cheffo.jeplite.optimizer.*;
 class CSGEvaluatorDialog extends BDialog
 {
   LayoutWindow window;
-  JEP jep = new JEP();
-  
+
   public CSGEvaluatorDialog(LayoutWindow window)
   {
     super(window, "CSG Evaluator ", false); // Modeless
-
-    jep.addVariable("x", 22.5);
-    jep.parseExpression("x*2-3");
 
     this.window = window;
     this.setResizable(false);
@@ -74,13 +66,8 @@ class CSGEvaluatorDialog extends BDialog
     }
     */
     
-    try {
-      
    
-      bc.add(new BLabel("<html>CSG Evaluator Control Panel <font size=1>V"+versionstr+"</font>" + jep.getValue() + "</html>"), BorderContainer.NORTH);
-    }
-    catch (Exception ex)
-    {}
+    bc.add(new BLabel("<html>CSG Evaluator Control Panel <font size=1>V"+versionstr+"</font></html>"), BorderContainer.NORTH);
     
     String[] buttons = new String [] {"evaluate", "devaluate", "union", "intersection", "difference", "readParameters"};
     String[] labels = new String [] {"Actions", null, "Boolean Op", null, null, null};
