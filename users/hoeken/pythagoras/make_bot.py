@@ -36,6 +36,9 @@ useThreadLocker = False
 useNutStarter = False
 useWashers = True
 
+#z bearing holders made from lasercut acrylic
+zBearingHolderHeight = 5.45*3
+
 from math import *
 import sys
 import getopt
@@ -273,9 +276,9 @@ def build_z_kebab(length):
 
   #the third nut on the rod
   if useWashers:
-    nutPosition = washerHeight + blockSize + rodSize + blockSize + blockSize + washerHeight + nutHeight + nutHeight
+    nutPosition = washerHeight + blockSize + rodSize + blockSize + blockSize + zBearingHolderHeight + washerHeight + nutHeight + nutHeight
   else:
-    nutPosition = blockSize + rodSize + blockSize + blockSize + nutHeight + nutHeight
+    nutPosition = blockSize + rodSize + blockSize + blockSize + zBearingHolderHeight + nutHeight + nutHeight
   thread_nut(nutPosition)
   
   #the fourth nut on the rod
