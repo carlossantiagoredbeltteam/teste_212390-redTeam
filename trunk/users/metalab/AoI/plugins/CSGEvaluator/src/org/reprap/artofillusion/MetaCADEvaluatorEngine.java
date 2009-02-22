@@ -31,12 +31,15 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
 	
 	public void readParameters()
 	{
-		JEP jep = new JEP();
+		jep = new JEP();
+		jep.addStandardConstants();
+		jep.addStandardFunctions();
 		EvaluateFile("cad_parameters.txt");
 	}
 	
 	 public ObjectInfo evaluateNode(ObjectInfo parent, UndoRecord undo)
 	 {
+	   readParameters();
 		 ParseFunction(parent, undo);
 		 
 		 return super.evaluateNode(parent, undo);
@@ -145,6 +148,10 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
 		    	  dy = Evaluate(splitParameters[7]);
 		    	  dz = Evaluate(splitParameters[8]);
 		    	
+		    	  Cube newCube =new Cube(1,2,3);
+		    	  
+		    	  parent.setObject(newCube);
+		    	  
 		    	  obj.setSize(dx, dy, dz);
 		    	  parent.setCoords(new CoordinateSystem(new Vec3(x, y, z), rotx, roty, rotz));
 		    	  
