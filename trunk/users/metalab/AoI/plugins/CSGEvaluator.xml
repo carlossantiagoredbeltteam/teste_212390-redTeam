@@ -3,7 +3,7 @@
 <project name="CSGEvaluator" default="dist" basedir=".">
 
   <!-- set global properties for this build -->
-  <property name="aoidir" value="/home/wizard23/software/ArtOfIllusion261" />
+  <property name="aoidir" value="C:/Programme/ArtOfIllusion" />
   <property name="src" value="CSGEvaluator/src" />
   <property name="build" value="CSGEvaluator/build" />
   <property name="docs" value="CSGEvaluator/docs" />
