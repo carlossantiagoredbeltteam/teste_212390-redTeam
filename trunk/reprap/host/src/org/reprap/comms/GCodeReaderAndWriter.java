@@ -754,7 +754,8 @@ public class GCodeReaderAndWriter
 	
 	public void startingLayer(LayerRules lc)
 	{
-		if(opFileIndex < 0)
+		// If no filename or the index is not set, forget about the start layer. - Vik, 23-Feb-2009
+		if((opFileIndex < 0)  || (opFileName == null))
 			return;
 		
 		if(opFileArray == null)
