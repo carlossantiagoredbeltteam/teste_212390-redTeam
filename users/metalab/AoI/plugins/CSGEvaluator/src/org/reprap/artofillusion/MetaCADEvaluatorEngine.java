@@ -37,6 +37,138 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 	}
 
 	public ObjectInfo evaluateNode(ObjectInfo parent, UndoRecord undo) {
+		if (evaluateLoop(parent, undo))
+			return parent;
+		
+		if (evaluateObject(parent, undo))
+			return parent;
+			
+		return super.evaluateNode(parent, undo);
+	}
+	
+	public Boolean evaluateLoop(ObjectInfo parent, UndoRecord undo) {
+		String line = parent.name;
+		int booleanOp=this.stringToOp(line);
+		
+		if (booleanOp==-1)
+			return false;
+		
+		MetaCADParser forExpr = new MetaCADParser(line, ";");
+		
+		// no loop but a limple boolean op let base class do that
+		if (forExpr.parseError && forExpr.parameters.length != 3)
+		{
+			return false;
+		}
+		else
+		{
+			CSGHelper helper = new CSGHelper(booleanOp);
+			
+			// evaluate first part of for loop i.e. i=0
+			EvaluateLine(forExpr.parameters[0]);
+			
+			// security count to exit loop even if wee fuck up exit condition
+			int count = 0;
+			
+			// condition loop evaluate the condition i.e. i < 10
+			while (Evaluate(forExpr.parameters[1]) != 0 && count < 100) {
+				ObjectInfo[] objects = parent.children;
+				
+				for (int i = 0; i < objects.length; i++)
+				{
+					helper.Add(evaluateNode(objects[i], undo).duplicate());
+				}
+				
+				// "increment" evaluate 3rd for parameter i.e. i=i+1
+				EvaluateLine(forExpr.parameters[2]);
+				count++;
+			}
+			
+			if (helper.sum != null)
+			{
+				Texture tex = parent.object.getTexture();
+				TextureMapping map = parent.object.getTextureMapping();
+				//parent.setCoords(new CoordinateSystem(new Vec3(x, y, z), rotx, roty, rotz));
+				parent.setObject(helper.sum);
+				parent.object.setTexture(tex, map);	
+				
+				parent.clearCachedMeshes();
+				this.window.updateImage();
+				this.window.updateMenus();
+			}
+		}
+		
+		return true;
+	}
+	
+	public Boolean evaluateObject(ObjectInfo parent, UndoRecord undo) {
+		String line = parent.name;
+		
+		MetaCADParser objExpr = new MetaCADParser(line, ",");
+		
+		if (objExpr.parseError)
+			return false;
+		
+		if (objExpr.parameters.length >= 9)
+		{
+			double x, y, z, rotx, roty, rotz, a, b, c;
+			
+			x = Evaluate(objExpr.parameters[0]);
+			y = Evaluate(objExpr.parameters[1]);
+			z = Evaluate(objExpr.parameters[2]);
+
+			rotx = Evaluate(objExpr.parameters[3]);
+			roty = Evaluate(objExpr.parameters[4]);
+			rotz = Evaluate(objExpr.parameters[5]);
+
+			a = Evaluate(objExpr.parameters[6]);
+			b = Evaluate(objExpr.parameters[7]);
+			c = Evaluate(objExpr.parameters[8]);
+			
+
+			Object3D obj3D=null;
+			
+			if (objExpr.name.startsWith("cube")) {
+				obj3D = new Cube(a, b, c);
+			}
+			if (objExpr.name.startsWith("sphere")) {
+				obj3D = new Sphere(a/2.0, b/2.0, c/2.0);
+			}
+			if (objExpr.name.startsWith("cylinder")) {
+				double ratio = 1;
+				
+				if (objExpr.parameters.length >= 10)
+				{
+					ratio = Evaluate(objExpr.parameters[9]);
+					if (ratio > 1) ratio = 1;
+					if (ratio < 0) ratio = 0;
+				}	
+				obj3D = new Cylinder(a, b/2.0, c/2.0, ratio);
+			}
+			
+			if (obj3D!=null)
+			{
+				Texture tex = parent.object.getTexture();
+				TextureMapping map = parent.object.getTextureMapping();
+				
+				parent.setCoords(new CoordinateSystem(new Vec3(x, y, z), rotx, roty, rotz));
+				parent.setObject(obj3D);
+				parent.object.setTexture(tex, map);	
+				
+				parent.clearCachedMeshes();
+				this.window.updateImage();
+				this.window.updateMenus();
+			}
+			else
+			{
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	public ObjectInfo evaluateNodeOld(ObjectInfo parent, UndoRecord undo) {
 		readParameters();
 		ParseFunction(parent, undo);
 
