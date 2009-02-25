@@ -5,26 +5,29 @@
  *  Copyright 2008 OoeyGUI. All rights reserved.
  *
  */
-#include <WProgram.h>
+#include <stdlib.h>
+#include <strings.h>
 #include "Collections.h"
+
+#define ARRAY_GROWTH_COUNT 3
 
 
 DArray::DArray()
 : _array(NULL)
 , _count(0)
+, _allocated(0)
 {
     
 }
 
 DArray::~DArray()
 {
-    if (_array)
-        free(_array);
+	free(_array);
 }
 
-void* DArray::item(size_t i)
+void* DArray::item(int i)
 {
-    if (i < _count)
+    if (i >= 0 && i < _count)
     {
         return _array[i];
     }
@@ -62,31 +65,42 @@ void* DArray::pop()
     return item;
 }
 
-void DArray::set(size_t i, void* item)
+void DArray::set(int i, void* item)
 {
+    if (i < 0)
+        i = 0;
     if (i < _count)
     {
         _array[i] = item;
     }
 }
 
-bool DArray::insert(size_t i, void* item)
+bool DArray::insert(int i, void* item)
 {
-    size_t needed = max(i, _count + 1);
-    
-    if (_array)
+    if (i < 0)
+        i = 0;
+    int needed = max(i, _count + 1);
+    if (needed > _allocated)
     {
-        void** newArray = (void**)realloc(_array, needed * sizeof(void*));
+        _allocated += ARRAY_GROWTH_COUNT;
+		
+		void** newArray = (void**)malloc(_allocated * sizeof(void*));
+		if (newArray)
+		{
+			memmove(newArray, _array, _count * sizeof(void*));
+			free(_array);
+			_array = newArray;
+		}
+		else
+			return false;
+		/*
+
+        void** newArray = (void**)realloc(_array, _allocated * sizeof(void*));
         if (newArray)
             _array = newArray;
         else
             return false;
-    }
-    else
-    {
-        _array = (void**)malloc(needed * sizeof(void*));
-        if (!_array)
-            return false;
+        */
     }
     
     
@@ -102,15 +116,24 @@ bool DArray::insert(size_t i, void* item)
     return true;
 }
 
-void DArray::remove(size_t i)
+void DArray::remove(int i)
 {
-    if (i < _count)
+    if (i < 0)
+        return;
+    
+    if (i < _count - 1)
     {
-        memmove(&_array[i], &_array[i + 1], (_count - i) * sizeof(void*));
-
-        // We don't need to reallocate this, because realloc will handle this correctly.
-        _count--;
+        memmove(&_array[i], &_array[i + 1], (_count - i - 1) * sizeof(void*));
     }
+    
+    _count--;
+	
+	if (_count == 0)
+	{
+        _allocated = 0;
+		free(_array);
+		_array = NULL;
+	}
 }
 
 bool DArray::find(void* item, size_t* at)
@@ -129,6 +152,7 @@ bool DArray::find(void* item, size_t* at)
     return false;
 }
 
+
 void DArray::foreach(DArrayForEach cb, void* context)
 {
     for (size_t index = 0; index < count(); index++)
@@ -136,6 +160,8 @@ void DArray::foreach(DArrayForEach cb, void* context)
         cb(_array[index], context);
     }
 }
+
+
 
 void DArray::sort(DArraySortCallback cb)
 {
@@ -159,8 +185,8 @@ DArray* DArray::shallowClone()
 }
 
 bool testCollections()
-{
-    int i = 0;
+{    
+    int i = 0x12121212;
     DArray a;
     a.pushValue(i++);
     a.pushValue(i++);
@@ -171,43 +197,22 @@ bool testCollections()
     while (a.count())
     {
         if (a.popValue() != --i)
-        {
-            Serial.println("DArray: poping not in order");
             return false;
-        }
     }
     
-    a.insertValue(0, 3);
-    a.insertValue(0, 3);
-    a.insertValue(0, 1);
-    a.insertValue(0, 1);
-    a.insertValue(0, 4);
-    a.insertValue(0, 4);
+    a.insertValue(0, 0xaaaaaab0);
+    a.insertValue(0, 0xaaaaaab1);
+    a.insertValue(0, 0xaaaaaab2);
+    a.insertValue(0, 0xaaaaaab3);
+    a.insertValue(0, 0xaaaaaab4);
+    a.insertValue(0, 0xaaaaaab5);
     
-    int tests[] = { 4, 4, 1, 1, 3, 3};
+    int tests[] = { 0xaaaaaab5, 0xaaaaaab4, 0xaaaaaab3, 0xaaaaaab2, 0xaaaaaab1, 0xaaaaaab0};
     for (int index = 0; index < a.count(); index++)
     {
         if (tests[index] != a.value(index))
-        {
-            Serial.println("DArray: inserted values not in order");
             return false;
-        }
     }
-    
-    DArray b;
-    b.pushValue(0);
-    b.pushValue(1);
-    b.pushValue(2);
-    b.pushValue(3);
-    b.pushValue(4);
-    
-    size_t index;
-    if (b.findValue(1, &index) && index != 1)
-    {
-        Serial.println("DArray: values not found correctly");
-        return false;
-    }
-    
     
     return true;
 }

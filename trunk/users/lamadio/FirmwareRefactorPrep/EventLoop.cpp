@@ -5,36 +5,30 @@
  *  Copyright 2008 OoeyGUI. All rights reserved.
  *
  */
-#define __STDC_LIMIT_MACROS
-#include <stdint.h>
-
+#include <stdlib.h>
+#include <stdio.h>
 #include "WProgram.h"
 #include "Collections.h"
 #include "EventLoop.h"
 
-const unsigned long MILLICLOCK_MAX = UINT32_MAX;
 
 PeriodicCallback::PeriodicCallback()
 {
     
 }
 
-PeriodicCallback::~PeriodicCallback()
-{
-  
-}
-
-
-EventLoopTimer::EventLoopTimer(unsigned long period)
+EventLoopTimer::EventLoopTimer()
 : _lastTimeout(0)
-, _period(period)
+, _period(0)
 {
     
 }
 
-EventLoopTimer::~EventLoopTimer()
+EventLoopTimer::EventLoopTimer(milliclock_t period)
+: _lastTimeout(0)
+, _period(period)
 {
-  
+    
 }
 
 milliclock_t EventLoopTimer::nextTimeout() const
@@ -96,6 +90,7 @@ void EventLoop::run()
     _running = true;
     while (_running)
     {
+        incrementMillis();
         // This clone prevents changes to the event loop during a pass from interrupting the run.
         if (_periodicEvents.count())
         {
@@ -200,15 +195,13 @@ public:
     {
         if (_num-- == 0)
         {
+            printf("Serviced\n");
             EventLoop::current()->removePeriodicCallback(this);
-            EventLoop::current()->exit();
             
             delete this;
         }
     }
 };
-
-static bool s_success = true;
 
 class EventTimerTest : public EventLoopTimer
 {
@@ -231,8 +224,10 @@ public:
         }
         if (delta != period())
         {
-          s_success = false;
+            printf("Epic Failure");
         }
+        
+        printf("Timer %u - Delta %u\n", millis(), delta);
     }
     
 };
@@ -240,29 +235,12 @@ public:
 bool eventLoopTest()
 {
     EventLoop loop;
-    loop.addPeriodicCallback(new EventCallbackTest(5000));
+//    loop.addPeriodicCallback(new EventCallbackTest(5000));
+//    loop.addPeriodicCallback(new EventCallbackTest(2000));
+//    loop.addPeriodicCallback(new EventCallbackTest(4000));
+//    loop.addPeriodicCallback(new EventCallbackTest(8000));
     loop.addTimer(new EventTimerTest(3));
     loop.run();
-    return s_success;
+    return true;
 }
 
-
-
-
-void* operator new(size_t size)
-{
-  return malloc(size);
-}
-
-void operator delete(void* p)
-{
-  free(p);
-}
-
-extern "C" void __cxa_pure_virtual()
-{
-    while (1)
-    {
-      // Hard lock?
-    }
-}
