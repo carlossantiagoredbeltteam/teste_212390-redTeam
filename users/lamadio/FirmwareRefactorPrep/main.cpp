@@ -1,27 +1,20 @@
-#include <WProgram.h>
+#include "WProgram.h"
 #include "Collections.h"
 #include "EventLoop.h"
+#include "EventLoop.h"
+#include "Collections.h"
 #include "Observable.h"
-
-
-const int GOOD_PIN = 12;
-const int BAD_PIN = 13;
+#include "Device.h"
+#include "OpticalInterrupt.h"
+#include "StepperDevice.h"
+#include "LinearActuator.h"
 
 int main (int argc, char * const argv[]) 
 {
-    Serial.begin(9600);
-    pinMode(GOOD_PIN, OUTPUT);
-    pinMode(BAD_PIN, OUTPUT);
-
-    digitalWrite(BAD_PIN, HIGH);
-    if (testObservable() && testCollections())
-    //eventLoopTest())
-    {
-        digitalWrite(GOOD_PIN, HIGH);
-        digitalWrite(BAD_PIN, LOW);
-    }
-    
-    return 0;
+	StepperDevice xAxisStepper(1, 2, 300, 20);
+	OpticalInterrupt xAxisFar(10);
+	OpticalInterrupt xAxisNear(11);
+	StepperLinearActuator linearActuator(4.5f, xAxisStepper, xAxisFar, xAxisNear);
+	
+	return 0;
 }
-
-
