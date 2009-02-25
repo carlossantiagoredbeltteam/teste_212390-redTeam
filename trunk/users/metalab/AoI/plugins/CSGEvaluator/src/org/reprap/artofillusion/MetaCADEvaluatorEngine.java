@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 
+import javax.print.DocFlavor.STRING;
+
 import org.cheffo.jeplite.JEP;
 
 import artofillusion.LayoutWindow;
@@ -24,19 +26,17 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 
 	public MetaCADEvaluatorEngine(LayoutWindow window) {
 		super(window);
-		// TODO Auto-generated constructor stub
-
 		readParameters();
 	}
-
+	
 	public void readParameters() {
 		jep = new JEP();
 		jep.addStandardConstants();
 		jep.addStandardFunctions();
-		EvaluateFile("cad_parameters.txt");
+		evaluateParametersFile("cad_parameters.txt");
 	}
 
-	public ObjectInfo evaluateNode(ObjectInfo parent, UndoRecord undo) {
+	public ObjectInfo evaluateNode(ObjectInfo parent, UndoRecord undo) throws Exception {
 		if (evaluateLoop(parent, undo))
 			return parent;
 		
@@ -46,12 +46,21 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 		return super.evaluateNode(parent, undo);
 	}
 	
-	public Boolean evaluateLoop(ObjectInfo parent, UndoRecord undo) {
+	public Boolean evaluateLoop(ObjectInfo parent, UndoRecord undo) throws Exception {
 		String line = parent.name;
 		int booleanOp=this.stringToOp(line);
 		
 		if (booleanOp==-1)
 			return false;
+		
+		MetaCADParser coordExpr = null;
+		
+		String []subParam = line.split("\\)\\s*\\(");
+		if (subParam.length==2)
+		{
+			coordExpr=new MetaCADParser("dummy(" + subParam[1], ",");
+			line=subParam[0] + ")";
+		}
 		
 		MetaCADParser forExpr = new MetaCADParser(line, ";");
 		
@@ -65,13 +74,13 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 			CSGHelper helper = new CSGHelper(booleanOp);
 			
 			// evaluate first part of for loop i.e. i=0
-			EvaluateLine(forExpr.parameters[0]);
+			evaluateAssignment(forExpr.parameters[0]);
 			
 			// security count to exit loop even if wee fuck up exit condition
 			int count = 0;
 			
 			// condition loop evaluate the condition i.e. i < 10
-			while (Evaluate(forExpr.parameters[1]) != 0 && count < 100) {
+			while (evaluateExpresion(forExpr.parameters[1]) != 0 && count < 100) {
 				ObjectInfo[] objects = parent.children;
 				
 				for (int i = 0; i < objects.length; i++)
@@ -80,7 +89,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 				}
 				
 				// "increment" evaluate 3rd for parameter i.e. i=i+1
-				EvaluateLine(forExpr.parameters[2]);
+				evaluateAssignment(forExpr.parameters[2]);
 				count++;
 			}
 			
@@ -88,7 +97,24 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 			{
 				Texture tex = parent.object.getTexture();
 				TextureMapping map = parent.object.getTextureMapping();
-				//parent.setCoords(new CoordinateSystem(new Vec3(x, y, z), rotx, roty, rotz));
+				
+				// use coordinate system paramaters from loop if user gave one
+				if (coordExpr != null && !coordExpr.parseError)
+				{
+					double x, y, z, rotx, roty, rotz;
+					
+					x = evaluateExpresion(coordExpr.parameters[0]);
+					y = evaluateExpresion(coordExpr.parameters[1]);
+					z = evaluateExpresion(coordExpr.parameters[2]);
+
+					rotx = evaluateExpresion(coordExpr.parameters[3]);
+					roty = evaluateExpresion(coordExpr.parameters[4]);
+					rotz = evaluateExpresion(coordExpr.parameters[5]);
+					
+					parent.setCoords(new CoordinateSystem(new Vec3(x, y, z), rotx, roty, rotz));
+				}
+				
+				
 				parent.setObject(helper.sum);
 				parent.object.setTexture(tex, map);	
 				
@@ -101,7 +127,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 		return true;
 	}
 	
-	public Boolean evaluateObject(ObjectInfo parent, UndoRecord undo) {
+	public Boolean evaluateObject(ObjectInfo parent, UndoRecord undo) throws Exception {
 		String line = parent.name;
 		
 		MetaCADParser objExpr = new MetaCADParser(line, ",");
@@ -113,17 +139,17 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 		{
 			double x, y, z, rotx, roty, rotz, a, b, c;
 			
-			x = Evaluate(objExpr.parameters[0]);
-			y = Evaluate(objExpr.parameters[1]);
-			z = Evaluate(objExpr.parameters[2]);
+			x = evaluateExpresion(objExpr.parameters[0]);
+			y = evaluateExpresion(objExpr.parameters[1]);
+			z = evaluateExpresion(objExpr.parameters[2]);
 
-			rotx = Evaluate(objExpr.parameters[3]);
-			roty = Evaluate(objExpr.parameters[4]);
-			rotz = Evaluate(objExpr.parameters[5]);
+			rotx = evaluateExpresion(objExpr.parameters[3]);
+			roty = evaluateExpresion(objExpr.parameters[4]);
+			rotz = evaluateExpresion(objExpr.parameters[5]);
 
-			a = Evaluate(objExpr.parameters[6]);
-			b = Evaluate(objExpr.parameters[7]);
-			c = Evaluate(objExpr.parameters[8]);
+			a = evaluateExpresion(objExpr.parameters[6]);
+			b = evaluateExpresion(objExpr.parameters[7]);
+			c = evaluateExpresion(objExpr.parameters[8]);
 			
 
 			Object3D obj3D=null;
@@ -139,7 +165,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 				
 				if (objExpr.parameters.length >= 10)
 				{
-					ratio = Evaluate(objExpr.parameters[9]);
+					ratio = evaluateExpresion(objExpr.parameters[9]);
 					if (ratio > 1) ratio = 1;
 					if (ratio < 0) ratio = 0;
 				}	
@@ -167,185 +193,41 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 		
 		return true;
 	}
-	
-	public ObjectInfo evaluateNodeOld(ObjectInfo parent, UndoRecord undo) {
-		readParameters();
-		ParseFunction(parent, undo);
 
-		return super.evaluateNode(parent, undo);
-	}
-
-	void ParseFunction(ObjectInfo parent, UndoRecord undo) {
-		String line = parent.name;
-		String functionName;
-		String parameters;
-		String[] splitParameters;
-
-		String lineParts[];
-		String forPart;
-		MetaCADParser forExpr = null;
-
-		lineParts = line.split(":");
-		if (lineParts.length == 2) {
-			forExpr = new MetaCADParser(lineParts[0], ";");
-			line = lineParts[1];
-		}
-
-		MetaCADParser myExpr = new MetaCADParser(line, ",");
-		if (!myExpr.parseError) {
-			functionName = myExpr.name;
-			splitParameters = myExpr.parameters;
-
-			if (parent.object.getClass().equals(Sphere.class)
-					&& splitParameters.length >= 9) {
-				try {
-					double x, y, z, rotx, roty, rotz, dx, dy, dz;
-
-					Sphere obj = (Sphere) parent.object;
-
-					x = Evaluate(splitParameters[0]);
-					y = Evaluate(splitParameters[1]);
-					z = Evaluate(splitParameters[2]);
-
-					rotx = Evaluate(splitParameters[3]);
-					roty = Evaluate(splitParameters[4]);
-					rotz = Evaluate(splitParameters[5]);
-
-					dx = Evaluate(splitParameters[6]) * 2;
-					dy = Evaluate(splitParameters[7]) * 2;
-					dz = Evaluate(splitParameters[8]) * 2;
-
-					obj.setSize(dx, dy, dz);
-					parent.setCoords(new CoordinateSystem(new Vec3(x, y, z),
-							rotx, roty, rotz));
-
-					parent.clearCachedMeshes();
-					this.window.updateImage();
-					this.window.updateMenus();
-				} catch (Exception ex) {
-					System.out.println(ex);
-				}
-			}
-
-			if (parent.object.getClass().equals(Cylinder.class)
-					&& splitParameters.length >= 9) {
-				try {
-					double x, y, z, rotx, roty, rotz, dx, height, dz;
-
-					Cylinder obj = (Cylinder) parent.object;
-
-					x = Evaluate(splitParameters[0]);
-					y = Evaluate(splitParameters[1]);
-					z = Evaluate(splitParameters[2]);
-
-					rotx = Evaluate(splitParameters[3]);
-					roty = Evaluate(splitParameters[4]);
-					rotz = Evaluate(splitParameters[5]);
-
-					dx = Evaluate(splitParameters[6]) * 2;
-					dz = Evaluate(splitParameters[7]) * 2;
-					height = Evaluate(splitParameters[8]);
-
-					obj.setSize(dx, height, dz);
-					parent.setCoords(new CoordinateSystem(new Vec3(x, y, z),
-							rotx, roty, rotz));
-
-					parent.clearCachedMeshes();
-					this.window.updateImage();
-					this.window.updateMenus();
-				} catch (Exception ex) {
-					System.out.println(ex);
-				}
-			}
-
-			if (functionName.toLowerCase().startsWith("cube") && splitParameters.length >= 9) {
-				double x, y, z, rotx, roty, rotz, dx, dy, dz;
-
-				CSGHelper helper = new CSGHelper(CSGObject.UNION);
-
-				if (forExpr != null && !forExpr.parseError) {
-					// evaluate frst part of for loop i.e. i=0
-					EvaluateLine(forExpr.parameters[0]);
-
-					int count = 0;
-					// condition loop evaluate the condition i.e. i < 10
-					while (Evaluate(forExpr.parameters[1]) != 0 && count < 10) {
-						x = Evaluate(splitParameters[0]);
-						y = Evaluate(splitParameters[1]);
-						z = Evaluate(splitParameters[2]);
-
-						rotx = Evaluate(splitParameters[3]);
-						roty = Evaluate(splitParameters[4]);
-						rotz = Evaluate(splitParameters[5]);
-
-						dx = Evaluate(splitParameters[6]);
-						dy = Evaluate(splitParameters[7]);
-						dz = Evaluate(splitParameters[8]);
-
-						//
-						// newCube.setTexture(parent.object.getTexture(),
-						// parent.object.getTextureMapping());
-
-						Cube newCube = new Cube(dx, dy, dz);
-						ObjectInfo objInfo = new ObjectInfo(newCube,
-								new CoordinateSystem(new Vec3(x, y, z), rotx,
-										roty, rotz), "dummy");
-						helper.Add(objInfo);
-
-						// "increment" evaluate 3rd for parameter i.e. i=i+1
-						EvaluateLine(forExpr.parameters[2]);
-					}
-					if (helper.GetObject() != null) {
-						Texture tex = parent.object.getTexture();
-						TextureMapping map = parent.object.getTextureMapping();
-
-						parent.setObject(helper.GetObject());
-						parent.object.setTexture(tex, map);
-					}
-
-					parent.clearCachedMeshes();
-					this.window.updateImage();
-					this.window.updateMenus();
-				}
-			}
-		}
-	}
-
-	double Evaluate(String expr) {
+	// Evaluates an Expression like 3*x+sin(a) and returns the value of it or 0 if any error occured
+	double evaluateExpresion(String expr) throws Exception {
 		try {
 			jep.parseExpression(expr);
 			return jep.getValue();
 		} catch (Exception ex) {
-			System.out.println(ex);
-			return 0;
+			System.out.println("Error while evaluating Expression: \"" + expr + "\" Syntax Error or unknown variable?");
+			throw(ex);
+			//return 0;
 		}
 	}
 
 	// Evaluates Expressions like x=2*radius and assigns the value to the given
 	// variable
-	void EvaluateLine(String curLine) {
-		int mark = curLine.indexOf("=");
-
-		if (mark > 0) {
+	void evaluateAssignment(String curLine) throws Exception {
+		try
+		{		
+			int mark = curLine.indexOf("=");
+	
 			String name = curLine.substring(0, mark).trim();
 			String formula = curLine.substring(mark + 1);
-
 			jep.parseExpression(formula);
-			try {
-				double value;
-
-				System.out.println(value = jep.getValue());
-				jep.addVariable(name, value);
-			} catch (Exception ex) {
-				System.out.println(ex);
-			}
-
-		} else {
-			System.out.println("! Invalid Line Expression: " + curLine);
+			double value = jep.getValue();
+			//System.out.println(value);
+			jep.addVariable(name, value);
+		}
+		catch (Exception ex)
+		{
+			System.out.println("Invalid Assignment: \"" + curLine +"\" syntax error?");
+			throw(ex);
 		}
 	}
 
-	void EvaluateFile(String fileName) {
+	void evaluateParametersFile(String fileName) {
 		try {
 			File inFile = new File(fileName);
 			BufferedReader fr = new BufferedReader(new FileReader(inFile));
@@ -355,7 +237,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 				curLine = curLine.trim();
 				if (curLine.length() == 0 || curLine.startsWith("#"))
 					continue;
-				EvaluateLine(curLine);
+				evaluateAssignment(curLine);
 			}
 		} catch (Exception ex) {
 			System.out.println(System.getProperty("user.dir"));

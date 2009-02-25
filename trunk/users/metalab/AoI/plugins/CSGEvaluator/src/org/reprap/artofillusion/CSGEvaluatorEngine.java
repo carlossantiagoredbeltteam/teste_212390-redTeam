@@ -69,7 +69,8 @@ public class CSGEvaluatorEngine
       }
     }
     catch (Exception ex) {
-      //            this.debug("exception in evaluate: " + ex.toString());
+    	System.out.println("Exception in evaluate: " + ex.toString());
+    	//throw(ex);
     }
   }
 
@@ -97,27 +98,33 @@ public class CSGEvaluatorEngine
    */
   public void execute(int operation)
   {
-    UndoRecord undo = new UndoRecord(this.window, false);
-    ObjectInfo[] objects = getSelection();
-    if (objects == null || objects.length < 2) {
-      new MessageDialog(this.window, "Minimum two objects must be selected.");
-      return;
-    }
-
-    // Selection undo
-    int[] oldSelection = this.window.getSelectedIndices();
-    undo.addCommand(UndoRecord.SET_SCENE_SELECTION, new Object[] {oldSelection});
-
-    ObjectInfo newobjinfo = this.createNewObject(objects, operation, undo);
-    // Must rebuild before updating the selection to rebuild indices.
-    this.window.rebuildItemList();
-    this.window.setSelection(this.window.getScene().indexOf(newobjinfo));
-
-    this.window.setUndoRecord(undo);
-
-    // FIXME: Not sure if these are needed..
-    this.window.updateImage();
-    this.window.setModified();
+	try {
+		 UndoRecord undo = new UndoRecord(this.window, false);
+		ObjectInfo[] objects = getSelection();
+		if (objects == null || objects.length < 2) {
+		  new MessageDialog(this.window, "Minimum two objects must be selected.");
+		  return;
+		}
+		
+		// Selection undo
+		int[] oldSelection = this.window.getSelectedIndices();
+		undo.addCommand(UndoRecord.SET_SCENE_SELECTION, new Object[] {oldSelection});
+		
+		ObjectInfo newobjinfo = this.createNewObject(objects, operation, undo);
+		// Must rebuild before updating the selection to rebuild indices.
+		this.window.rebuildItemList();
+		this.window.setSelection(this.window.getScene().indexOf(newobjinfo));
+		
+		this.window.setUndoRecord(undo);
+		
+		// FIXME: Not sure if these are needed..
+		this.window.updateImage();
+		this.window.setModified();
+	}
+    catch (Exception ex) {
+      	System.out.println("Exception in evaluate: " + ex.toString());
+      	//throw(ex);
+      }
   }
 
   /**
@@ -194,7 +201,7 @@ public class CSGEvaluatorEngine
       The result should be one CSG object where the entire child tree is disabled.
       If the operation is none or unknown, the parent will be returned unchanged.
    */
-  public ObjectInfo evaluateNode(ObjectInfo parent, UndoRecord undo)
+  public ObjectInfo evaluateNode(ObjectInfo parent, UndoRecord undo) throws Exception
   {
     int op = stringToOp(parent.name);
     if (op == -1) return parent;
@@ -261,7 +268,7 @@ public class CSGEvaluatorEngine
       Calls evaluateNode() on each child before performing the operation.
       Hides the children.
    */
-  public ObjectInfo combine(ObjectInfo[] objects, int operation, UndoRecord undo)
+  public ObjectInfo combine(ObjectInfo[] objects, int operation, UndoRecord undo) throws Exception
   {
     if (objects.length < 1) return null;    
     if (objects.length < 2) return objects[0];
@@ -296,7 +303,7 @@ public class CSGEvaluatorEngine
       Inserts the new object into the scene and makes the original objects
       children of the new object. Also hides the children.
    */
-  public ObjectInfo createNewObject(ObjectInfo[] objects, int operation, UndoRecord undo)
+  public ObjectInfo createNewObject(ObjectInfo[] objects, int operation, UndoRecord undo) throws Exception
   {
     ObjectInfo granddad = objects[0].parent;
     // create ObjectInfo for combined object

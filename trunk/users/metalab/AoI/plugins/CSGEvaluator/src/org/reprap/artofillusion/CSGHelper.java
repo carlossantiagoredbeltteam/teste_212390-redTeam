@@ -5,6 +5,8 @@ import artofillusion.object.CSGObject;
 import artofillusion.object.Object3D;
 import artofillusion.object.ObjectInfo;
 
+// Allows easy boolean modelling of multiple objects 
+// takes 
 public class CSGHelper {
 	int count;
 	int operation;

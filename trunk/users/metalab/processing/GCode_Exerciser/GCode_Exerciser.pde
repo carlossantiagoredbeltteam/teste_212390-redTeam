@@ -30,7 +30,7 @@ void setup()
   // List all the available serial ports
   println(Serial.list());
   //open the first port...
-  myPort = new Serial(this, Serial.list()[0], 19200);
+  myPort = new Serial(this, Serial.list()[1], 19200);
 
   //load our gcode lines
   //  gcode = loadStrings("/home/wizard23/projects/reprap/downloads/gcodestuff/cooled_rings.gcode");
@@ -219,7 +219,7 @@ String getNextCommand()
 
       // Temp    
     case 'u':
-      targetTemp = 225;
+      targetTemp = 205;
       c = "M104 S" + targetTemp;
       break;
     case 'p':
