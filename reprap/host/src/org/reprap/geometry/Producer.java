@@ -216,7 +216,7 @@ public class Producer {
 			reprap.startingLayer(layerRules);
 			// Change Z height
 			reprap.moveTo(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), false, false);
-			fillFoundationRectangle(reprap, gp, layerRules.getMachineLayer() != layerRules.getFoundationLayers() - 2);			
+			fillFoundationRectangle(reprap, gp, layerRules.getMachineLayer() != layerRules.getFoundationLayers() - 1);			
 			reprap.finishedLayer(layerRules);
 			reprap.betweenLayers(layerRules);
 			layerRules.stepMachine(reprap.getExtruder());

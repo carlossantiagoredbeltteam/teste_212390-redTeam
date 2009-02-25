@@ -193,7 +193,6 @@ public class RrCSG
 	{
 		if(c == u || c == n)
 			System.err.println("RrCSG deep copy: copying null or universal set.");
-			
 		
 		if(c.hp != null)
 			hp = new RrHalfPlane(c.hp);
@@ -1147,6 +1146,20 @@ public class RrCSG
 	}
 	
 	/**
+	 * Force an approximation to the regulariseing of a set
+	 * This assumes simplify has been run over the set
+	 * @return regularised CSG object
+	 */	
+	public RrCSG forceRegularise()
+	{	
+		ArrayList<RrCSG> list = uniqueList();
+		if(list.size() == 1)
+			return categorise(list.get(0));
+		
+		return crossCategorise(list.get(0), list.get(1));
+	}
+	
+	/**
 	 * Regularise a set with simple contents ( < 4 )
 	 * This assumes simplify has been run over the set
 	 * @return regularised CSG object
@@ -1267,6 +1280,9 @@ public class RrCSG
 	 */		
 	public RrCSG simplify(double tolerance)
 	{
+		if(this == u || this == n)
+			return this;
+		
 		RrCSG root = new RrCSG(this);
 		simplify_r(root, tolerance);
 		return root;

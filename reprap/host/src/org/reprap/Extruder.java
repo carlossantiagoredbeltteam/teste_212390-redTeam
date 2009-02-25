@@ -427,6 +427,12 @@ public interface Extruder
 	public String getSupportMaterial();
 	
 	/**
+	 * What are the dimensions for infill?
+	 * @return
+	 */
+	public String getBroadInfillMaterial();
+	
+	/**
 	 * The direction to hatch even-numbered layers in degrees anticlockwise
 	 * from the X axis
 	 * @return

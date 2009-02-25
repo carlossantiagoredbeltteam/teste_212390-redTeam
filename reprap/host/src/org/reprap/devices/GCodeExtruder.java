@@ -3,7 +3,7 @@ package org.reprap.devices;
 import java.io.IOException;
 
 import org.reprap.comms.GCodeReaderAndWriter;
-
+import org.reprap.Preferences;
 
 public class GCodeExtruder extends GenericExtruder
 {
@@ -39,9 +39,10 @@ public class GCodeExtruder extends GenericExtruder
 		if(extrusionSpeed < 0)
 			return;
 		
-		if (speed == 0)
+		if (speed < Preferences.tiny())
 		{
 			gcode.queue("M103" + " ;extruder off");
+			currentSpeed = 0;
 			isExtruding = false;
 		}
 		else

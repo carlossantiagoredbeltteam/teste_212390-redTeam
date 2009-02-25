@@ -242,26 +242,20 @@ public class LayerProducer {
 		
 		csgP = csgPols;
 		
-		supportCalculations();
+		// The next two are experimental for the moment...
 		
-		offHatch = csgPols.offset(layerConditions, false);
+		//inFillCalculations();
+		//supportCalculations();
 		
-		//RrGraphics g = new RrGraphics(offBorder, true);
+		offHatch = csgP.offset(layerConditions, false);
 		
 		if(layerConditions.getLayingSupport())
 		{
 			borderPolygons = null;
 			offHatch = offHatch.union(lc.getPrinter().getExtruders());
-//			hatchedPolygons = offHatch.megList();
-//			RrPolygon allHatch = new RrPolygon(hatchedPolygons.polygon(0).getAttributes());
-//			for(int i = 0; i < hatchedPolygons.size(); i++)
-//				allHatch.add(hatchedPolygons.polygon(i));
-//			offHatch = new RrCSGPolygonList();
-//			offHatch.add(new RrCSGPolygon(allHatch.CSGConvexHull(), hatchedPolygons.getBox(), hatchedPolygons.polygon(0).getAttributes()));
-//			offHatch.divide(Preferences.tiny(), 1.01);
 		} else
 		{
-			offBorder = csgPols.offset(layerConditions, true);
+			offBorder = csgP.offset(layerConditions, true);
 			offBorder.divide(Preferences.tiny(), 1.01);
 			borderPolygons = offBorder.megList();
 			borderPolygons.setClosed(true);
@@ -282,17 +276,6 @@ public class LayerProducer {
 				simulationPlot.init(pl.getBox(), false);
 			simulationPlot.add(pl);
 		}
-	
-//		RrPolygonList pllist = new RrPolygonList();
-//		if(!layerConditions.getLayingFoundations())
-//			pllist.add(borderPolygons);
-//		pllist.add(hatchedPolygons);
-//		RrGraphics g = new RrGraphics(pllist);
-		
-//		RrBox big = csgPols.box().scale(1.1);
-		
-//		double width = big.x().length();
-//		double height = big.y().length();
 	}
 	
 	/**
@@ -309,7 +292,7 @@ public class LayerProducer {
 		
 		// Get the layer immediately above
 		
-		RrCSGPolygonList above = layerConditions.getLayerAbove();
+		RrCSGPolygonList above = layerConditions.getLayerAbove(1);
 		
 		// If there was no layer immediately above, record this layer to 
 		// be the one above for the next layer down and return.
@@ -390,7 +373,6 @@ public class LayerProducer {
 					
 					RrCSGPolygon toRemember = RrCSGPolygon.union(pgAboveLevel, thisLevel);
 					toRemember = toRemember.reEvaluate();
-					//csgP.add(toRemember.offset(-0.3));
 					thisForTheRecord.add(toRemember);
 					
 					// The bit left over of the level above after we subtract all this layer
@@ -428,6 +410,118 @@ public class LayerProducer {
 		
 		csgP.add(supports);
 		
+	}
+	
+	/**
+	 * look at the layer above where we are, and calculate the infill depending
+	 * on whether something is an open surface or not.
+	 *
+	 */
+	private void inFillCalculations()
+	{
+		// We can only work out infill if we're going top down
+		
+		if(!layerConditions.getTopDown())
+			return;
+		
+		// Get the layer immediately above
+		
+		RrCSGPolygonList above = layerConditions.getLayerAbove(2);
+		if(above == null)
+		{
+			layerConditions.recordThisLayer(csgP);
+			return;
+		}
+		
+		// Pick up our materials
+		
+		Extruder [] es = layerConditions.getPrinter().getExtruders();
+		
+		//Horrid hack...
+		
+		if(layerConditions.getModelLayer() < es[0].getLowerFineLayers())
+			return;
+		
+		// Compute the union of everything on the layer above
+		// Nothing in that region will have a free surface in this layer.
+
+		RrCSGPolygon allAboveLayer = new RrCSGPolygon();
+		for(int i = 0; i < above.size(); i++)
+		{
+			allAboveLayer = RrCSGPolygon.union(above.get(i), allAboveLayer);
+			if(i > 0)
+				allAboveLayer = allAboveLayer.reEvaluate();
+		}
+		
+
+		
+		// A list for the infills
+		
+		RrCSGPolygonList inFills = new RrCSGPolygonList();
+		
+		// A list for the free surface bits
+		
+		RrCSGPolygonList surfaces = new RrCSGPolygonList();	
+
+		// This material's shape, its attributes,
+		// the extruder used for it, and the name of its infill material.
+		
+		RrCSGPolygon pgThisLevel;
+		Attributes aThisLevel;
+		Extruder eThisLevel;
+		String inFillName;
+		
+		// For each material in this layer
+		
+		for(int i = 0; i < csgP.size(); i++)
+		{
+			// Get this material's shape in the above layer, its attributes,
+			// the extruder used for it, and the name of its support material.
+			
+			pgThisLevel = csgP.get(i);
+			aThisLevel = pgThisLevel.getAttributes();
+			eThisLevel = aThisLevel.getExtruder(es);
+			inFillName = eThisLevel.getBroadInfillMaterial();
+			
+			// If this stuff's infill is not called "null"...
+
+			if(!inFillName.contentEquals("null"))
+			{
+				// Pick up the infill extruder
+
+				Extruder inFillExtruder = es[GenericExtruder.getNumberFromMaterial(inFillName)];
+
+				// The exposed region is whatever's in this layer that isn't above
+				
+				RrCSGPolygon exposed = RrCSGPolygon.difference(pgThisLevel, allAboveLayer);
+				exposed = exposed.reEvaluate();
+				
+				// Make the exposed layer bigger...
+				
+				exposed = exposed.offset(layerConditions.getZStep()*eThisLevel.getLowerFineLayers());
+				
+				// ...Then intersect it with what we have already.  That will cause the exposed
+				// region to penetrate the solid a bit.
+				
+				exposed = RrCSGPolygon.intersection(exposed, pgThisLevel);
+				exposed = exposed.reEvaluate();
+				surfaces.add(exposed);
+				
+				// What's left of this layer after the exposed bit is subtracted is the infill part
+				
+				pgThisLevel = RrCSGPolygon.difference(pgThisLevel, exposed);
+				pgThisLevel = pgThisLevel.reEvaluate();
+				pgThisLevel.setAttributes(new Attributes(inFillName, null, null, 
+						inFillExtruder.getAppearance()));
+				inFills.add(pgThisLevel);
+			}
+		}
+		
+		// We now have two new collections of polygons representing this layer
+		
+		csgP = inFills;
+		csgP.add(surfaces);
+		layerConditions.recordThisLayer(csgP);
 	}
 	
 	/**

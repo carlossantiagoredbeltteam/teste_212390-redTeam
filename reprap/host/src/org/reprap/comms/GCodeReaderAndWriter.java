@@ -150,6 +150,7 @@ public class GCodeReaderAndWriter
 		responsesExpected = 0;
 		responseAvailable = false;
 		response = "0000";
+		opFileIndex = -1;
 		try
 		{
 			portName = Preferences.loadGlobalString("Port(name)");
