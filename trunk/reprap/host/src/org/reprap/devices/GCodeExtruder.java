@@ -36,7 +36,7 @@ public class GCodeExtruder extends GenericExtruder
 	
 	public void setExtrusion(double speed, boolean reverse) throws IOException
 	{
-		if(extrusionSpeed < 0)
+		if(getExtruderSpeed() < 0)
 			return;
 		
 		if (speed < Preferences.tiny())

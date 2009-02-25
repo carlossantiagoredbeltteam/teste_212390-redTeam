@@ -224,13 +224,44 @@ public class LayerProducer {
 		super.finalize();
 	}
 	
-		
 	/**
-	 * @param printer
-	 * @param zValue
-	 * @param csgPol
+	 * Set up a layer consisting of a single material in a single pre-computed list.
+	 * Used for creating foundations.
+	 * @param pols
+	 * @param lc
+	 * @param simPlot
+	 * @throws Exception
+	 */
+	public LayerProducer(RrPolygonList pols, LayerRules lc, RrGraphics simPlot) throws Exception 
+	{
+		layerConditions = lc;
+		startNearHere = null;
+		lowerShell = null;
+		shellSet = false;
+		simulationPlot = simPlot;
+		
+		csgP = null;
+		
+		borderPolygons = null;
+		
+		hatchedPolygons = pols;
+		
+		if(simulationPlot != null)
+		{
+			if(!simulationPlot.isInitialised())
+				simulationPlot.init(hatchedPolygons.getBox(), false);
+			simulationPlot.add(hatchedPolygons);
+		}	
+	}
+	
+	
+	/**
+	 * Set up a normal layer
+	 * @param csgPols
 	 * @param ls
-	 * @param hatchDirection
+	 * @param lc
+	 * @param simPlot
+	 * @throws Exception
 	 */
 	public LayerProducer(RrCSGPolygonList csgPols, BranchGroup ls, LayerRules lc, RrGraphics simPlot) throws Exception 
 	{

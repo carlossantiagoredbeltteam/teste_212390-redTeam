@@ -1155,4 +1155,5 @@ public class RrCSGPolygon
 		
 		return snakes;
 	}
+	
 }

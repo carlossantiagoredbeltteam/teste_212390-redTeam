@@ -1,5 +1,7 @@
 package org.reprap;
+
 import java.io.IOException;
+import org.reprap.geometry.LayerRules;
 import javax.media.j3d.Appearance;
 
 public interface Extruder
@@ -174,7 +176,13 @@ public interface Extruder
     /**
      * @return the extruder speeds
      */
-    public double getExtruderSpeed();
+    public double getExtruderSpeed(); 
+    
+    /**
+     * Set the flag to show we're creating a separation
+     * @param s
+     */
+    public void setSeparating(boolean s);
 
     /**
      * @return the extrusion size in millimeters
@@ -210,11 +218,7 @@ public interface Extruder
      * @return the appearance (colour) to use in the simulation window for this material
      */
     public Appearance getAppearance();  
-    
-    /**
-     * @return the material name
-     */
-    //public String toString();
+
     
     /**
      * @return whether nozzle wipe method is enabled or not 

@@ -17,6 +17,11 @@ import javax.media.j3d.Material;
 public abstract class GenericExtruder implements Extruder
 {
 	/**
+	 * Flag to decide extrude speed
+	 */
+	boolean separating;
+	
+	/**
 	 * Offset of 0 degrees centigrade from absolute zero
 	 */
 	public static final double absZero = 273.15;
@@ -166,12 +171,6 @@ public abstract class GenericExtruder implements Extruder
 	protected boolean incrementedSt = false;
 	
 	/**
-	 * Flag indicating if initialisation succeeded.  Usually this
-	 * indicates if the extruder is present in the network. 
-	 */
-	//private boolean isCommsAvailable = false;
-	
-	/**
 	 *  The colour black
 	 */	
 	protected static final Color3f black = new Color3f(0, 0, 0);
@@ -289,6 +288,7 @@ public abstract class GenericExtruder implements Extruder
 	private double oddHatchDirection;
 	private String supportMaterial;
 	private String inFillMaterial;
+	
 	/**
 	* Our printer object.
 	*/
@@ -303,6 +303,7 @@ public abstract class GenericExtruder implements Extruder
 	public GenericExtruder(int extruderId)
 	{
 		myExtruderID = extruderId;
+		separating = false;
 		refreshPreferences();
 	}
 
@@ -456,11 +457,11 @@ public abstract class GenericExtruder implements Extruder
 	
 	public void setMotor(boolean motorOn) throws IOException
 	{
-		if(extrusionSpeed < 0)
+		if(getExtruderSpeed() < 0)
 			return;
 		
 		if(motorOn)
-			setExtrusion(extrusionSpeed, false);
+			setExtrusion(getExtruderSpeed(), false);
 		else
 			setExtrusion(0, false);
 	}
@@ -570,10 +571,45 @@ public abstract class GenericExtruder implements Extruder
     /* (non-Javadoc)
      * @see org.reprap.Extruder#getExtruderSpeed()
      */
+    private double getRegularExtruderSpeed()
+    {
+    	try
+    	{
+    		return Preferences.loadGlobalDouble(prefName + "ExtrusionSpeed(mm/minute)");
+    	} catch (Exception e)
+    	{
+    		System.err.println(e.toString());
+    		return 200;  //Hack
+    	}
+    }
+    
+    private double getSeparationSpeed()
+    {
+    	try
+    	{
+    		return Preferences.loadGlobalDouble(prefName + "SeparationSpeed(mm/minute)");
+    	} catch (Exception e)
+    	{
+    		System.err.println(e.toString());
+    		return 200;  //Hack
+    	}
+    }
+    
+    public void setSeparating(boolean s)
+    {
+    	separating = s;
+    }
+    
     public double getExtruderSpeed()
     {
-    	return extrusionSpeed;
-    } 
+    	if(separating)
+    		return getSeparationSpeed();
+    	else
+    		return getRegularExtruderSpeed();
+    	
+    }
+    
+    
     
     /* (non-Javadoc)
      * @see org.reprap.Extruder#getExtrusionSize()

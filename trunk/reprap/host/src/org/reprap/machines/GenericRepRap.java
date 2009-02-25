@@ -1063,4 +1063,14 @@ public abstract class GenericRepRap implements CartesianPrinter
 	{
 		return topDown;
 	}
+	
+	/**
+	 * Set all the extruders' separating mode
+	 * @param s
+	 */
+	public void setSeparating(boolean s)
+	{
+		for(int i = 0; i < extruders.length; i++)
+			extruders[i].setSeparating(s);
+	}
 }
