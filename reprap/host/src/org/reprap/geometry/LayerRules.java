@@ -252,12 +252,13 @@ public class LayerRules
 	public RrHalfPlane getHatchDirection(Extruder e) 
 	{
 		double angle;
+		
 		if(getMachineLayer() < getFoundationLayers())
 		{
-			if(getFoundationLayers() - getMachineLayer() == 2)
-				angle = e.getEvenHatchDirection();
-			else
+			if(getMachineLayer() == getFoundationLayers() - 2)
 				angle = e.getOddHatchDirection();
+			else
+				angle = e.getEvenHatchDirection();
 		} else
 		{
 			if(getModelLayer()%2 == 0)
@@ -287,10 +288,9 @@ public class LayerRules
 	{
 		if(getMachineLayer() < getFoundationLayers())
 		{
-			if(getFoundationLayers() - getMachineLayer() == 1)
-				return e.getExtrusionFoundationWidth()*0.5;
-			//else if(getMachineLayer() == getFoundationLayers()-1)
-				//return e.getExtrusionInfillWidth();
+			//if(getMachineLayer() == getFoundationLayers() - 2)
+				//return e.getExtrusionFoundationWidth()*0.5;
+
 			
 			return e.getExtrusionFoundationWidth();
 		}

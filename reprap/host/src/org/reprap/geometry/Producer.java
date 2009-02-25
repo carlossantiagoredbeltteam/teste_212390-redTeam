@@ -3,10 +3,15 @@ package org.reprap.geometry;
 import javax.swing.JCheckBoxMenuItem;
 import org.reprap.Preferences;
 import org.reprap.Printer;
+import org.reprap.Extruder;
+import org.reprap.Attributes;
 import org.reprap.geometry.polygons.Rr2Point;
 import org.reprap.geometry.polygons.RrRectangle;
 import org.reprap.geometry.polygons.RrCSGPolygonList;
 import org.reprap.geometry.polygons.STLSlice;
+import org.reprap.geometry.polygons.RrCSG;
+import org.reprap.geometry.polygons.RrCSGPolygon;
+import org.reprap.geometry.polygons.RrPolygonList;
 import org.reprap.gui.RepRapBuild;
 import org.reprap.utilities.Debug;
 import org.reprap.utilities.RrGraphics;
@@ -148,51 +153,17 @@ public class Producer {
 		}
 	}
 	
-	private void fillFoundationRectangle(Printer reprap, RrRectangle gp, boolean xDir) throws Exception
+	private void fillFoundationRectangle(Printer reprap, RrRectangle gp) throws Exception
 	{
-		double x = gp.sw().x();
-		double y = gp.sw().y();
-		
-		reprap.moveTo(x, y, layerRules.getMachineZ(), false, false);
-		reprap.getExtruder().startExtruding();
-		reprap.machineWait(reprap.getExtruder().getExtrusionDelayForLayer());
-		reprap.setFeedrate(reprap.getExtruder().getInfillFeedrate());
-		
-		if(xDir)
-		{
-			while(y <= gp.ne().y())
-			{
-				if (reprap.isCancelled())
-					break;
-				waitWhilePaused();
-				
-				x = gp.ne().x();
-				reprap.moveTo(x, y, layerRules.getMachineZ(), false, false);
-				y += layerRules.getHatchWidth(reprap.getExtruder());
-				reprap.moveTo(x, y, layerRules.getMachineZ(), false, false);
-				x = gp.sw().x();
-				reprap.moveTo(x, y, layerRules.getMachineZ(), false, false);
-				y += layerRules.getHatchWidth(reprap.getExtruder());
-				reprap.moveTo(x, y, layerRules.getMachineZ(), false, false);
-			}
-		} else
-		{
-			while(x <= gp.ne().x())
-			{
-				if (reprap.isCancelled())
-					break;
-				waitWhilePaused();
-				
-				y = gp.ne().y();
-				reprap.moveTo(x, y, layerRules.getMachineZ(), false, false);
-				x += layerRules.getHatchWidth(reprap.getExtruder());
-				reprap.moveTo(x, y, layerRules.getMachineZ(), false, false);
-				y = gp.sw().y();
-				reprap.moveTo(x, y, layerRules.getMachineZ(), false, false);
-				x += layerRules.getHatchWidth(reprap.getExtruder());
-				reprap.moveTo(x, y, layerRules.getMachineZ(), false, false);
-			}
-		}
+		RrCSG rect = RrCSG.RrCSGFromBox(gp);
+		gp = gp.scale(1.1);
+		Extruder e = reprap.getExtruder();
+		RrCSGPolygon rcp = new RrCSGPolygon(rect, gp, new Attributes(e.getMaterial(), null, null, 
+				e.getAppearance()));
+		rcp.divide(Preferences.tiny(), 1.01);
+		RrPolygonList h = rcp.hatch(layerRules.getHatchDirection(e), layerRules.getHatchWidth(e));
+		LayerProducer lp = new LayerProducer(h, layerRules, simulationPlot);
+		lp.plot();
 		reprap.getExtruder().stopExtruding();
 		reprap.setFeedrate(reprap.getFastFeedrateXY());
 	}
@@ -203,7 +174,7 @@ public class Producer {
 			return;
 		
 		Printer reprap = layerRules.getPrinter();
-		
+
 		while(layerRules.getMachineLayer() < layerRules.getFoundationLayers()) 
 		{
 			
@@ -216,7 +187,7 @@ public class Producer {
 			reprap.startingLayer(layerRules);
 			// Change Z height
 			reprap.moveTo(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), false, false);
-			fillFoundationRectangle(reprap, gp, layerRules.getMachineLayer() != layerRules.getFoundationLayers() - 1);			
+			fillFoundationRectangle(reprap, gp);
 			reprap.finishedLayer(layerRules);
 			reprap.betweenLayers(layerRules);
 			layerRules.stepMachine(reprap.getExtruder());
@@ -245,7 +216,7 @@ public class Producer {
 			reprap.startingLayer(layerRules);
 			// Change Z height
 			reprap.moveTo(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), false, false);
-			fillFoundationRectangle(reprap, gp, layerRules.getMachineLayer() != layerRules.getFoundationLayers() - 2);		
+			fillFoundationRectangle(reprap, gp);		
 			reprap.finishedLayer(layerRules);
 			reprap.betweenLayers(layerRules);
 			layerRules.stepMachine(reprap.getExtruder());	
@@ -264,6 +235,8 @@ public class Producer {
 		Printer reprap = layerRules.getPrinter();
 
 		layFoundationGroundUp(gp);
+		
+		reprap.setSeparating(true);
 		
 		while(layerRules.getMachineLayer() < layerRules.getMachineLayerMax()) 
 		{
@@ -313,6 +286,7 @@ public class Producer {
 			stlc.destroyLayer();
 
 			layerRules.step(reprap.getExtruder());
+			reprap.setSeparating(false);
 		}
 		
 		reprap.terminate();
@@ -329,8 +303,13 @@ public class Producer {
 		
 		layerRules.setLayingSupport(false);
 		
+		
 		while(layerRules.getModelLayer() >= 0 ) 
 		{
+			if(layerRules.getModelLayer() == 0)
+				reprap.setSeparating(true);
+			else
+				reprap.setSeparating(false);
 			
 			if (reprap.isCancelled())
 				break;

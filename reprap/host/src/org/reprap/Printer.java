@@ -413,4 +413,10 @@ public interface Printer {
 	 * @return the flag that decided which direction to compute the layers
 	 */
 	public boolean getTopDown();
+	
+	/**
+	 * Set all the extruders' separating mode
+	 * @param s
+	 */
+	public void setSeparating(boolean s);
 }
