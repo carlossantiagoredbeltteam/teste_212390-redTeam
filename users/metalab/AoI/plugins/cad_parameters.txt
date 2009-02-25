@@ -1,3 +1,12 @@
+maxx=10	
+maxy=10
+scale=2
+cubeSize=0.5
+
+
+i=2
+
+
 scaling=2
 radius=scaling*10
 dicke=scaling*5
