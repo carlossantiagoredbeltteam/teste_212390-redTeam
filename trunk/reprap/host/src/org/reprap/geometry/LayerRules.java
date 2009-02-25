@@ -3,6 +3,7 @@ package org.reprap.geometry;
 
 import org.reprap.Printer;
 import org.reprap.Extruder;
+import org.reprap.devices.GenericExtruder;
 import org.reprap.geometry.polygons.RrHalfPlane;
 import org.reprap.geometry.polygons.Rr2Point;
 import org.reprap.geometry.polygons.RrCSGPolygonList;
@@ -139,18 +140,21 @@ public class LayerRules
 		layingSupport = found;
 		Extruder[] es = printer.getExtruders();
 		zStep = es[0].getExtrusionHeight();
+		int fineLayers = es[0].getLowerFineLayers();
 		if(es.length > 1)
 		{
 			for(int i = 1; i < es.length; i++)
 			{
+				if(es[i].getLowerFineLayers() > fineLayers)
+					fineLayers = es[i].getLowerFineLayers();
 				if(Math.abs(es[i].getExtrusionHeight() - zStep) > Preferences.tiny())
 					System.err.println("Not all extruders extrude the same height of filament: " + 
 							zStep + " and " + es[i].getExtrusionHeight());
 			}
 		}
 		
-		layerRecord = new RrCSGPolygonList[3];
-		recordNumber = new int[3];
+		layerRecord = new RrCSGPolygonList[fineLayers+1];
+		recordNumber = new int[fineLayers+1];
 		layerPointer = 0;
 		for(int i = 0; i < layerRecord.length; i++)
 		{
@@ -171,16 +175,17 @@ public class LayerRules
 	}
 	
 	/**
-	 * Return the layer i above where we are (if i < 0 give layer i below).
+	 * Return the layer i above where we are 
 	 * @param i
 	 * @return
 	 */
-	public RrCSGPolygonList getLayerAbove()
+	public RrCSGPolygonList getLayerAbove(int i)
 	{
-		if(layerPointer == 0)
-			return layerRecord[layerRecord.length - 1];
+		int lp = layerPointer - i;
+		if(lp < 0)
+			return layerRecord[layerRecord.length + lp];
 		else
-			return layerRecord[layerPointer - 1];
+			return layerRecord[lp];
 	}
 	
 	public boolean getTopDown() { return topDown; }
@@ -282,7 +287,7 @@ public class LayerRules
 	{
 		if(getMachineLayer() < getFoundationLayers())
 		{
-			if(getFoundationLayers() - getMachineLayer() == 2)
+			if(getFoundationLayers() - getMachineLayer() == 1)
 				return e.getExtrusionFoundationWidth()*0.5;
 			//else if(getMachineLayer() == getFoundationLayers()-1)
 				//return e.getExtrusionInfillWidth();
@@ -290,10 +295,18 @@ public class LayerRules
 			return e.getExtrusionFoundationWidth();
 		}
 		
-		if(e.getExtrusionBroadWidth() > 0)
+		
+		String inFillName = e.getBroadInfillMaterial();
+		
+		// If this stuff's infill is not called "null"...
+		
+		if(!inFillName.contentEquals("null"))
 		{
 			if(modelLayer+1 > e.getLowerFineLayers() && modelLayer+1 <= modelLayerMax - e.getUpperFineLayers())
-				return e.getExtrusionBroadWidth();
+			{
+				Extruder inFillExtruder = printer.getExtruders()[GenericExtruder.getNumberFromMaterial(inFillName)];
+				return inFillExtruder.getExtrusionInfillWidth();
+			}
 		}
 		
 		return e.getExtrusionInfillWidth();
@@ -307,20 +320,31 @@ public class LayerRules
 	public void stepMachine(Extruder e)
 	{
 		double sZ = e.getExtrusionHeight();
+		int ld;
+		
 		if(topDown)
 		{
 			machineZ -= (sZ + addToStep);
 			machineLayer--;
+			ld = getFoundationLayers() - getMachineLayer();
+			if(ld == 2)
+				addToStep = sZ*(1 - e.getSeparationFraction());
+			else if(ld == 1)
+				addToStep = -sZ*(1 - e.getSeparationFraction());
+			else
+				addToStep = 0;
 		} else
 		{
 			machineZ += (sZ + addToStep);
 			machineLayer++;
+			ld = getFoundationLayers() - getMachineLayer();
+			if(ld == 2)
+				addToStep = -sZ*(1 - e.getSeparationFraction());
+			else if(ld == 1)
+				addToStep = sZ*(1 - e.getSeparationFraction());
+			else
+				addToStep = 0;
 		}
-		addToStep = 0;
-		if(getFoundationLayers() - getMachineLayer() == 2)
-			addToStep = -sZ*(1 - e.getSeparationFraction());
-		if(getFoundationLayers() - getMachineLayer() == 1)
-			addToStep = sZ*(1 - e.getSeparationFraction());
 	}
 	
 	/**

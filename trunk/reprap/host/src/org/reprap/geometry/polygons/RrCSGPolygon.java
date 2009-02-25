@@ -373,9 +373,6 @@ public class RrCSGPolygon
 	{
 		quad = quad + csg.toString() + "\n";
 
-
-
-		
 		if(leaf())
 		{
 			return quad;
@@ -445,7 +442,7 @@ public class RrCSGPolygon
 		{
 			System.err.println("RrCSGPolygon.divide(): hit resolution limit!  Complexity: " +
 					csg.complexity());
-			csg = RrCSG.nothing();  // Throw it away!  (It is small...)
+			csg = csg.forceRegularise();
 			return;
 		}
 		
@@ -694,7 +691,9 @@ public class RrCSGPolygon
 		if(leaf())
 			divide(Preferences.tiny(), 1.01);
 		RrPolygonList pgl = megList();
-		return pgl.toCSG(Preferences.tiny());
+		RrCSGPolygon r = pgl.toCSG(Preferences.tiny());
+		r.setAttributes(getAttributes());
+		return r;
 	}
 	
 	

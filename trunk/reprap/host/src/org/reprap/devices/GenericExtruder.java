@@ -288,6 +288,7 @@ public abstract class GenericExtruder implements Extruder
 	private double evenHatchDirection;
 	private double oddHatchDirection;
 	private String supportMaterial;
+	private String inFillMaterial;
 	/**
 	* Our printer object.
 	*/
@@ -331,6 +332,7 @@ public abstract class GenericExtruder implements Extruder
 			asFactor = Preferences.loadGlobalDouble(prefName + "AngleSpeedFactor(0..1)");
 			material = Preferences.loadGlobalString(prefName + "MaterialType(name)");
 			supportMaterial = Preferences.loadGlobalString(prefName + "SupportMaterialType(name)");
+			inFillMaterial = Preferences.loadGlobalString(prefName + "InFillMaterialType(name)");			
 			offsetX = Preferences.loadGlobalDouble(prefName + "OffsetX(mm)");
 			offsetY = Preferences.loadGlobalDouble(prefName + "OffsetY(mm)");
 			offsetZ = Preferences.loadGlobalDouble(prefName + "OffsetZ(mm)");
@@ -663,24 +665,8 @@ public abstract class GenericExtruder implements Extruder
 //    	return material;
 //    }
     
-	/**
-	 * What stuff are we working with?
-	 * @return
-	 */
-	public String getMaterial()
-	{
-		return material;
-	}
+
 	
-	/**
-	 * What stuff are we working with?
-	 * @return
-	 */
-	public String getSupportMaterial()
-	{
-		return supportMaterial;
-	}
-    
     /**
      * @return determine whether nozzle wipe method is enabled or not 
      */
@@ -885,7 +871,32 @@ public abstract class GenericExtruder implements Extruder
     	return pauseBetweenSegments;
     }
     
-
+	/**
+	 * What stuff are we working with?
+	 * @return
+	 */
+	public String getMaterial()
+	{
+		return material;
+	}
+	
+	/**
+	 * What stuff are we working with?
+	 * @return
+	 */
+	public String getSupportMaterial()
+	{
+		return supportMaterial;
+	}
+	
+	/**
+	 * What are the dimensions for infill?
+	 * @return
+	 */
+	public String getBroadInfillMaterial()
+	{
+		return inFillMaterial;
+	}
 	
     public static int getNumberFromMaterial(String material)
     {
@@ -898,7 +909,7 @@ public abstract class GenericExtruder implements Extruder
 				if(names[i].equals(material))
 					return i;
 			}
-
+			throw new Exception("getNumberFromMaterial - can't find " + material);
 		} catch (Exception ex)
 		{
 			System.err.println(ex.toString());
