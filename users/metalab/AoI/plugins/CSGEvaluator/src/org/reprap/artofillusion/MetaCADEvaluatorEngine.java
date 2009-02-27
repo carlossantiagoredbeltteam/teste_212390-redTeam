@@ -65,7 +65,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 		MetaCADParser forExpr = new MetaCADParser(line, ";");
 		
 		// no loop but a limple boolean op let base class do that
-		if (forExpr.parseError && forExpr.parameters.length != 3)
+		if (forExpr.parseError || forExpr.parameters.length != 3)
 		{
 			return false;
 		}
@@ -169,7 +169,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 					if (ratio > 1) ratio = 1;
 					if (ratio < 0) ratio = 0;
 				}	
-				obj3D = new Cylinder(a, b/2.0, c/2.0, ratio);
+				obj3D = new Cylinder(a, b, c, ratio);
 			}
 			
 			if (obj3D!=null)
