@@ -10,6 +10,7 @@ import artofillusion.object.CSGObject;
 import artofillusion.object.Object3D;
 import artofillusion.object.ObjectInfo;
 import artofillusion.texture.Texture;
+import artofillusion.texture.TextureMapping;
 import artofillusion.ui.MessageDialog;
 
 
@@ -213,8 +214,9 @@ public class CSGEvaluatorEngine
       // This is necessary since we're not adding the object to the scene, just replacing an existing
       // object.
       if (csgobj.getTexture() == null) {
-        Texture tex = this.window.getScene().getDefaultTexture();
-        csgobj.setTexture(tex, tex.getDefaultMapping(csgobj));
+        //Texture tex = this.window.getScene().getDefaultTexture();
+        Texture tex = parent.object.getTexture();
+		csgobj.setTexture(tex, tex.getDefaultMapping(csgobj));
       }
       
       undo.addCommandAtBeginning(UndoRecord.COPY_OBJECT, new Object[] { parent.object, parent.object.duplicate() });
