@@ -14,3 +14,39 @@ hoehe=scaling*5
 kugelradius=scaling*9
 
 cut= (radius+dicke+kugelradius+1)*2
+
+##############
+# Geneva Drive
+###############
+
+gearCuts=5
+
+gearHeight=3
+pegRadius=2
+pegHoleRadius=2.1
+
+#red
+gearRadiusBig=30
+gearRadiusSmall=10.5
+
+# green
+driveRadiusBig = 25
+driveRadiusSmall = 14
+
+driveGearOverlap=9
+drivePos= (gearRadiusBig+driveRadiusSmall)-driveGearOverlap
+
+baseHeight=4
+baseWidth=25
+baseLenght=60
+
+
+pegX=(gearRadiusBig*gearRadiusBig - (driveRadiusSmall*driveRadiusSmall - drivePos*drivePos))/(2*drivePos)
+pegY=(gearRadiusBig*gearRadiusBig-pegX*pegX)^0.5
+
+
+
+
+
+
+
