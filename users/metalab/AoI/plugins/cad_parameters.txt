@@ -26,14 +26,14 @@ pegRadius=2
 pegHoleRadius=2.1
 
 #red
-gearRadiusBig=30
+gearRadiusBig=40
 gearRadiusSmall=10.5
 
 # green
 driveRadiusBig = 25
 driveRadiusSmall = 14
 
-driveGearOverlap=9
+driveGearOverlap=10
 drivePos= (gearRadiusBig+driveRadiusSmall)-driveGearOverlap
 
 baseHeight=4
@@ -44,6 +44,17 @@ baseLenght=60
 pegX=(gearRadiusBig*gearRadiusBig - (driveRadiusSmall*driveRadiusSmall - drivePos*drivePos))/(2*drivePos)
 pegY=(gearRadiusBig*gearRadiusBig-pegX*pegX)^0.5
 
+_pegX=cos(0.5*2*pi/gearCuts)*gearRadiusBig
+_pegY=sin(0.5*2*pi/gearCuts)*gearRadiusBig
+pegX=drivePos + ((_pegX-drivePos)^2+_pegY^2)^0.5
+pegY=0
+
+#debug position of peg when it enters slice
+#pegX=cos(0.5*2*pi/gearCuts)*gearRadiusBig
+#pegY=sin(0.5*2*pi/gearCuts)*gearRadiusBig
+
+
+i=3
 
 
 
