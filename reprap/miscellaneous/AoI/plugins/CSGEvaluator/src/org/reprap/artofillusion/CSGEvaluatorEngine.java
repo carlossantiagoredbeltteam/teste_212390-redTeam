@@ -9,7 +9,6 @@ import artofillusion.math.CoordinateSystem;
 import artofillusion.object.CSGObject;
 import artofillusion.object.Object3D;
 import artofillusion.object.ObjectInfo;
-import artofillusion.texture.Texture;
 import artofillusion.ui.MessageDialog;
 
 class CSGEvaluatorEngine
@@ -182,8 +181,11 @@ class CSGEvaluatorEngine
 
       The result should be one CSG object where the entire child tree is disabled.
       If the operation is none or unknown, the parent will be returned unchanged.
+
+      An exception can be thrown if the evaluation fails. This is not used in the CSG Evaluator,
+      but is here to support more advanced evaluation in subtypes of this class.
    */
-  public ObjectInfo evaluateNode(ObjectInfo parent, UndoRecord undo)
+  public ObjectInfo evaluateNode(ObjectInfo parent, UndoRecord undo) throws Exception
   {
     int op = stringToOp(parent.name);
     if (op == -1) return parent;
@@ -192,15 +194,13 @@ class CSGEvaluatorEngine
       ObjectInfo csgobjinfo = combine(parent.getChildren(), op, undo);
       Object3D csgobj = csgobjinfo.object;
 
-      // This is necessary since we're not adding the object to the scene, just replacing an existing
-      // object.
-      if (csgobj.getTexture() == null) {
-        Texture tex = this.window.getScene().getDefaultTexture();
-        csgobj.setTexture(tex, tex.getDefaultMapping(csgobj));
-      }
+      // Inherit texture color from the parent in case the user changed the color
+      Object3D inheritfrom = parent.getObject();
+      csgobj.setTexture(inheritfrom.getTexture(), inheritfrom.getTextureMapping());
       
       undo.addCommandAtBeginning(UndoRecord.COPY_OBJECT, new Object[] { parent.object, parent.object.duplicate() });
       parent.setObject(csgobj);
+      parent.setCoords(new CoordinateSystem());
       parent.clearCachedMeshes();
       this.window.updateImage();
       this.window.updateMenus();
@@ -249,8 +249,10 @@ class CSGEvaluatorEngine
 
       Calls evaluateNode() on each child before performing the operation.
       Hides the children.
+      
+      Exception: See evaluateNode()
    */
-  public ObjectInfo combine(ObjectInfo[] objects, int operation, UndoRecord undo)
+  public ObjectInfo combine(ObjectInfo[] objects, int operation, UndoRecord undo) throws Exception
   {
     if (objects.length < 1) return null;    
     if (objects.length < 2) return objects[0];
@@ -288,8 +290,17 @@ class CSGEvaluatorEngine
   public ObjectInfo createNewObject(ObjectInfo[] objects, int operation, UndoRecord undo)
   {
     // create ObjectInfo for combined object
-    ObjectInfo resultinfo = combine(objects, operation, undo);
+    ObjectInfo resultinfo = null;
+    try {
+          resultinfo = combine(objects, operation, undo);
+    }
+    catch (Exception e) {
+    }
     resultinfo.setName(opToString(operation));
+
+    // Inherit texture color from the first source object
+    Object3D inheritfrom = objects[0].getObject();
+    resultinfo.getObject().setTexture(inheritfrom.getTexture(), inheritfrom.getTextureMapping());
 
     // add the object info to the window (which adds it to the scene and the item tree
     // and creates the proper undo record commands)

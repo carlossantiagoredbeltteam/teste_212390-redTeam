@@ -1,16 +1,12 @@
 package org.reprap.artofillusion;
 
-import java.io.InputStream;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import artofillusion.ArtOfIllusion;
 import artofillusion.Plugin;
-import artofillusion.PluginRegistry;
 
 public class CSGEvaluatorPlugin implements Plugin
 {
