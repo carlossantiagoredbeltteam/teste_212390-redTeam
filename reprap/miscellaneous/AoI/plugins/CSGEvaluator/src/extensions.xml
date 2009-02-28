@@ -24,6 +24,10 @@ http://objects.reprap.org/wiki/Builders/Metalab/AoI_CSG_Evaluator
     - Got retrieval of version number from Jar working
     </log>
     <log version="1.2" date="NN. xxx 2009" author="NN">
+    - Now inherits texture from the first source object
+    - Also supports manually overriding texture of result objects
+    - Fixed a bug causing manually moved result object hierarchies to be transformed wrongly
+    - Fixed a bug causing translated versions to fail
     </log>
   </history>
   <comments>
