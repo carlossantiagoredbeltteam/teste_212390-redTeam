@@ -5,30 +5,36 @@
  *  Copyright 2008 OoeyGUI. All rights reserved.
  *
  */
-#include <stdlib.h>
-#include <stdio.h>
+#define __STDC_LIMIT_MACROS
+#include <stdint.h>
+
 #include "WProgram.h"
 #include "Collections.h"
 #include "EventLoop.h"
 
+const unsigned long MILLICLOCK_MAX = UINT32_MAX;
 
 PeriodicCallback::PeriodicCallback()
 {
     
 }
 
-EventLoopTimer::EventLoopTimer()
-: _lastTimeout(0)
-, _period(0)
+PeriodicCallback::~PeriodicCallback()
 {
-    
+  
 }
 
-EventLoopTimer::EventLoopTimer(milliclock_t period)
+
+EventLoopTimer::EventLoopTimer(unsigned long period)
 : _lastTimeout(0)
 , _period(period)
 {
     
+}
+
+EventLoopTimer::~EventLoopTimer()
+{
+  
 }
 
 milliclock_t EventLoopTimer::nextTimeout() const
@@ -90,7 +96,6 @@ void EventLoop::run()
     _running = true;
     while (_running)
     {
-        incrementMillis();
         // This clone prevents changes to the event loop during a pass from interrupting the run.
         if (_periodicEvents.count())
         {
@@ -184,72 +189,6 @@ EventLoop* EventLoop::current()
     return g_eventLoop;
 }
 
-class EventCallbackTest : public PeriodicCallback
-{
-    int _num;
-public:
-    EventCallbackTest(int num)
-    : _num(num)
-    {
-        
-    }
-    virtual void service()
-    {
-        if (_num-- == 0)
-        {
-            printf("Serviced\n");
-            EventLoop::current()->removePeriodicCallback(this);
-            delete this;
-        }
-    }
-};
-
-class EventTimerTest : public EventLoopTimer
-{
-public:
-    EventTimerTest(unsigned long period)
-    : EventLoopTimer(period)
-    {
-    }
-    void fire()
-    {
-        Serial.println("Timer Fired");
-        
-        milliclock_t delta = 0;
-        if (lastTimeout() > millis())
-        {
-            delta += MILLICLOCK_MAX - lastTimeout();
-            delta += millis();
-        }
-        else
-        {
-            delta += millis() - lastTimeout();
-        }
-        if (delta != period())
-        {
-            Serial.println("Frak - Timer period calculation failed");
-            s_success = false;
-        }
-        
-        printf("Timer %u - Delta %u\n", millis(), delta);
-    }
-    
-};
-
-bool eventLoopTest()
-{
-    EventLoop loop;
-    Serial.println("Event Loop - adding a periodic timer to be called 5000 times");
-    loop.addPeriodicCallback(new EventCallbackTest(5000));
-    Serial.println("Event Loop - adding a timer to be called 5000 times");
-    loop.addTimer(new EventTimerTest(300));
-    loop.run();
-    return true;
-}
-
-
-
-
 void* operator new(size_t size)
 {
     return malloc(size);
@@ -268,5 +207,3 @@ extern "C" void __cxa_pure_virtual()
       // Hard lock?
     }
 }
-=======
->>>>>>> .r2612
