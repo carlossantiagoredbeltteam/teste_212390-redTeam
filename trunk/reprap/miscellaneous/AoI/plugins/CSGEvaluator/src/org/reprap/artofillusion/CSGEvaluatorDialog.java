@@ -29,12 +29,10 @@ import buoy.widget.LayoutInfo;
 class CSGEvaluatorDialog extends BDialog
 {
   protected LayoutWindow window;
-  protected String[] buttons = new String [] {
-	  Translate.text("CSGEvaluator:evaluate"), Translate.text("CSGEvaluator:devaluate"),
-	  Translate.text("CSGEvaluator:union"), Translate.text("CSGEvaluator:intersection"),
-	  Translate.text("CSGEvaluator:difference")
+  protected String[] functions = new String [] {
+	  "evaluate", "devaluate", "union", "intersection", "difference"
   };
-  
+
   protected String[] labels = new String [] {
 	  Translate.text("CSGEvaluator:Actions"), null, Translate.text("CSGEvaluator:BooleanOp"), null, null
   };
@@ -56,17 +54,17 @@ class CSGEvaluatorDialog extends BDialog
     bc.add(new BLabel(Translate.text("CSGEvaluator:title", versionstr)), BorderContainer.NORTH);
 
 
-    FormContainer fc = new FormContainer(2, buttons.length+1);
+    FormContainer fc = new FormContainer(2, functions.length+1);
     bc.add(fc, BorderContainer.CENTER);
 
-    for (int i = 0; i < buttons.length; i++) {
+    for (int i = 0; i < functions.length; i++) {
       if (labels[i] != null) {
         fc.add(new BLabel(labels[i]), 0, i, new LayoutInfo(LayoutInfo.EAST, LayoutInfo.NONE, new Insets(2, 0, 2, 5), null));
       }
-      BButton button = new BButton(buttons[i]);
+      BButton button = new BButton(Translate.text("CSGEvaluator:"+functions[i]));
       fc.add(button, 1, i, new LayoutInfo(LayoutInfo.WEST, LayoutInfo.HORIZONTAL, new Insets(2, 0, 2, 0), null));
       button.addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
-      button.addEventLink(CommandEvent.class, engine, buttons[i]);
+      button.addEventLink(CommandEvent.class, engine, functions[i]);
     }
 //    BButton button = new BButton("test");
 //    fc.add(button, 1, buttons.length);
