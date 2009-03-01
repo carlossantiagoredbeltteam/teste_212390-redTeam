@@ -52,6 +52,9 @@ void init_steppers()
   x_can_step = false;
   y_can_step = false;
   z_can_step = false;
+  
+  //have we encountered our first point yet?
+  firstPoint = false;
 }
 
 void seek_minimums(boolean find_x, boolean find_y, boolean find_z, unsigned long step_delay, unsigned int timeout_seconds)
@@ -221,7 +224,7 @@ boolean find_axis_max(byte step_pin, byte dir_pin, byte max_pin)
 
 
 //prepare our variables for a bresenham DDA run.
-void prepare_dda()
+inline void prepare_dda()
 {
   //whats our target?
   target_steps.x = current_steps.x + delta_steps.x;
@@ -278,6 +281,8 @@ void prepare_dda()
 //do a single step on our DDA line!
 inline void dda_step()
 {
+  debug_blink();
+
   //check endstops, position, etc.
   x_can_step = can_step(X_MIN_PIN, X_MAX_PIN, current_steps.x, target_steps.x, x_direction);
   y_can_step = can_step(Y_MIN_PIN, Y_MAX_PIN, current_steps.y, target_steps.y, y_direction);
@@ -350,7 +355,7 @@ inline void dda_step()
   }
 }
 
-void grab_next_point()
+inline void grab_next_point()
 {
   //can we even step to this?
   if (pointBuffer.size() >= POINT_SIZE)
@@ -374,7 +379,7 @@ void grab_next_point()
     disableTimer1Interrupt();
 }
 
-bool can_step(byte min_pin, byte max_pin, long current, long target, byte direction)
+inline bool can_step(byte min_pin, byte max_pin, long current, long target, byte direction)
 {
   //stop us if we're on target
   if (target == current)
@@ -391,7 +396,7 @@ bool can_step(byte min_pin, byte max_pin, long current, long target, byte direct
 }
 
 //actually send a step signal.
-void do_step(byte step_pin)
+inline void do_step(byte step_pin)
 {
   digitalWrite(step_pin, HIGH);
 #ifdef STEP_DELAY
@@ -401,7 +406,7 @@ void do_step(byte step_pin)
 }
 
 //figure out if we're at a switch or not
-bool read_switch(byte pin)
+inline bool read_switch(byte pin)
 {
   //dual read as crude debounce
   if (SENSORS_INVERTING)
@@ -411,7 +416,7 @@ bool read_switch(byte pin)
 }
 
 //enable our steppers so we can move them.
-void enable_steppers()
+inline void enable_steppers()
 {
   if (delta_steps.x > 0)
     digitalWrite(X_ENABLE_PIN, STEPPER_ENABLE);
@@ -422,7 +427,7 @@ void enable_steppers()
 }
 
 //turn off steppers to save juice / keep things cool.
-void disable_steppers()
+inline void disable_steppers()
 {
   //disable our steppers
   digitalWrite(X_ENABLE_PIN, STEPPER_DISABLE);
@@ -467,15 +472,19 @@ void queue_incremental_point(int x, int y, int z, byte prescaler, unsigned int c
 
   //wait until we have free space
   while (pointBuffer.remainingCapacity() < POINT_SIZE)
+  {
     delay(1);
+    debug_blink();
+  }
 
   //okay, add in our points.
   pointBuffer.append_16(x);
   pointBuffer.append_16(y);
   pointBuffer.append_16(z);
 
+  /*
   Serial.print("Queued:");
-  Serial.print(x, DEC);
+  Serial.print(x, DEC);   
   Serial.print(",");
   Serial.print(y, DEC);
   Serial.print(",");
@@ -485,6 +494,7 @@ void queue_incremental_point(int x, int y, int z, byte prescaler, unsigned int c
   Serial.print(",");
   Serial.print(count, DEC);
   Serial.println(".");
+  */
   
   // prescaler
   pointBuffer.append(prescaler);
@@ -493,10 +503,12 @@ void queue_incremental_point(int x, int y, int z, byte prescaler, unsigned int c
   pointBuffer.append_16(count);
   
   //first point? give us the right timer.
-  if (pointBuffer.size() == POINT_SIZE)
+  if (!firstPoint)
   {
     setTimer1Resolution(prescaler);
     setTimer1Ceiling(count);
+    
+    firstPoint = true;
   }
 
   //turn our interrupt on.
@@ -536,6 +548,7 @@ void queue_absolute_point(long x, long y, long z, byte prescaler, unsigned int c
   int segments = 0;
   while (delta_x > 0 || delta_y > 0 || delta_z > 0)
   {
+    /*
     Serial.print("Deltas:");
     Serial.print(delta_x, DEC);
     Serial.print(",");
@@ -543,11 +556,11 @@ void queue_absolute_point(long x, long y, long z, byte prescaler, unsigned int c
     Serial.print(",");
     Serial.print(delta_z, DEC);
     Serial.println(".");
-
+    */
     //figure out our incremental points.
     x_inc = get_increment_from_absolute(delta_x, x_ratio, x_dir);
     y_inc = get_increment_from_absolute(delta_y, y_ratio, y_dir);
-    z_inc = get_increment_from_absolute(delta_z, z_ratio, y_dir);
+    z_inc = get_increment_from_absolute(delta_z, z_ratio, z_dir);
 
     //remove them from our deltas.
     delta_x -= abs(x_inc);
@@ -556,6 +569,9 @@ void queue_absolute_point(long x, long y, long z, byte prescaler, unsigned int c
 
     //how many have we done?
     segments++;
+    
+    if (segments > 100)
+      Serial.println("segment loop!");
     //Serial.print("Segments: ");
     //Serial.println(segments, DEC);
 

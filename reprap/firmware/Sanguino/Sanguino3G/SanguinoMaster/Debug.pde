@@ -16,6 +16,12 @@ void square_move()
   Serial.println("Bottom left");
 }
 
+void debug_blink()
+{
+  digitalWrite(DEBUG_PIN, HIGH);
+  digitalWrite(DEBUG_PIN, LOW);
+}
+
 void check_tool_version(byte id)
 {
   ping_tool(id);

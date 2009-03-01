@@ -43,6 +43,7 @@ CircularBuffer commandBuffer(COMMAND_BUFFER_SIZE, underlyingBuffer);
 //this will be used to keep track of our current progress.
 unsigned long finishedCommands = 0;
 unsigned long finishedPoints = 0;
+boolean firstPoint = false;
 
 byte currentToolIndex = 0;
 
