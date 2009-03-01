@@ -3,7 +3,7 @@
 //these routines provide an easy interface for controlling timer1 interrupts
 
 //this handles the timer interrupt event
-ISR(SIG_OUTPUT_COMPARE1A)
+SIGNAL(SIG_OUTPUT_COMPARE1A)
 {
   dda_step();
 }
@@ -15,6 +15,7 @@ inline void enableTimer1Interrupt()
 
 inline void disableTimer1Interrupt()
 {
+	TIMSK1 &= ~(1<<ICIE1);
   TIMSK1 &= ~(1<<OCIE1A);
 }
 

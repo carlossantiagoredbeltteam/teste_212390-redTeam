@@ -13,7 +13,7 @@ void process_host_packets()
   unsigned long end = start + PACKET_TIMEOUT;
 
 #ifdef ENABLE_COMMS_DEBUG
-    Serial.print("IN: ");
+    //Serial.print("IN: ");
 #endif
 
   //do we have a finished packet?
@@ -28,8 +28,8 @@ void process_host_packets()
       hostPacket.process_byte(d);
 
 #ifdef ENABLE_COMMS_DEBUG
-      Serial.print(d, HEX);
-      Serial.print(" ");
+      //Serial.print(d, HEX);
+      //Serial.print(" ");
 #endif
       serial_rx_count++;
 
@@ -75,7 +75,10 @@ void process_host_packets()
           commandBuffer.append(hostPacket.get_8(i));
       }
       else
+      {
         hostPacket.overflow();
+        Serial.println("overflow.");
+      }
     }
     // top bit low == reply needed query packet (eg. #0-127)
     else
@@ -212,7 +215,7 @@ void handle_commands()
   unsigned int count;
 
   //do we have any commands?
-  if (commandBuffer.size() > 0)
+  while (commandBuffer.size() > 0)
   {
     /*
     Serial.print("size: ");
