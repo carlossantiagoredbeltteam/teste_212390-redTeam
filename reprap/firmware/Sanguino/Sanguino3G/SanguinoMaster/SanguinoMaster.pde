@@ -14,6 +14,11 @@
  *
  ***************************************************************************************/
 
+//a check to make sure we're compiling for the right firmware
+#ifndef __AVR_ATmega644P__
+#error Oops!  Make sure you have 'Sanguino' selected from the 'Tools -> Boards' menu.
+#endif
+
 //include some basic libraries.
 #include <WProgram.h>
 #include <SimplePacket.h>
@@ -48,6 +53,7 @@ void initialize()
 {
   is_machine_paused = false;
 
+  init_psu();
   init_commands();
   init_steppers();
   init_tools();
@@ -70,7 +76,7 @@ void loop()
   //check for and handle any packets that come in.
   if (Serial.available())
     process_host_packets();
-  
+
   handle_commands();
 }
 

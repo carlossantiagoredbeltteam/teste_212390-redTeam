@@ -49,7 +49,7 @@ void exercise_motors()
     toggle_motor1(1, dir, 1);
     set_motor2_pwm(1, i);
     toggle_motor2(1, dir, 1);
-	Serial.println(i, DEC);
+    Serial.println(i, DEC);
   }
 
   Serial.println("down");
@@ -59,7 +59,7 @@ void exercise_motors()
     toggle_motor1(1, dir, 1);
     set_motor2_pwm(1, i);
     toggle_motor2(1, dir, 1);
-	Serial.println(i, DEC);
+    Serial.println(i, DEC);
   }
 
   dir = false;
@@ -72,7 +72,7 @@ void exercise_motors()
     toggle_motor1(1, dir, 1);
     set_motor2_pwm(1, i);
     toggle_motor2(1, dir, 1);
-	Serial.println(i, DEC);
+    Serial.println(i, DEC);
   }
 
   Serial.println("down");
@@ -82,7 +82,7 @@ void exercise_motors()
     toggle_motor1(1, dir, 1);
     set_motor2_pwm(1, i);
     toggle_motor2(1, dir, 1);
-	Serial.println(i, DEC);
+    Serial.println(i, DEC);
   }
 }
 
@@ -175,8 +175,6 @@ void toggle_motor1(byte id, boolean dir, boolean enable)
 
   if (dir)
     flags += 2;
-
-  Serial.println(flags, BIN);
 
   slavePacket.init();
   slavePacket.add_8(id);
@@ -280,6 +278,52 @@ void get_filament_status(byte id)
   print_tool(id);
   Serial.print("filament: ");
   Serial.println(temp, DEC);
+}
+
+void test_rs485()
+{
+  for (byte j=0; j<5; j++)
+  {
+    Serial.print("starting round ");
+    Serial.println(j, DEC);
+
+    for (int i=0; i<=255; i++)
+    {
+      set_i(i);
+      delay(50);
+    }
+
+    delay(1000);
+
+    for (int i=255; i>=0; i--)
+    {
+      set_i(i);
+      delay(50);
+    }
+
+    delay(1000);
+  }
+
+  print_stats();
+}
+
+void set_i(byte i)
+{
+  set_motor1_pwm(0, i);
+  toggle_motor1(0, true, true);
+  set_motor2_pwm(0, i);
+  toggle_motor2(0, true, true);
+
+  if (i>127)
+  {
+    toggle_fan(0, true);
+    toggle_valve(0, true);
+  }
+  else
+  {
+    toggle_fan(0, false);
+    toggle_valve(0, false);
+  }
 }
 
 #endif
