@@ -45,8 +45,8 @@ void init_extruder()
   pinMode(MOTOR_2_DIR_PIN, OUTPUT);
 
   //turn them off and forward.
-  analogWrite(MOTOR_1_SPEED_PIN, 0);
-  analogWrite(MOTOR_2_SPEED_PIN, 0);
+  digitalWrite(MOTOR_1_SPEED_PIN, LOW);
+  digitalWrite(MOTOR_2_SPEED_PIN, LOW);
   digitalWrite(MOTOR_1_DIR_PIN, HIGH);
   digitalWrite(MOTOR_2_DIR_PIN, HIGH);
 

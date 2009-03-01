@@ -16,6 +16,10 @@
  *
  *********************************************************************************************************/
 
+#ifndef __AVR_ATmega168__
+#error Oops!  Make sure you have 'Arduino' selected from the boards menu.
+#endif
+
 //include some basic libraries.
 #include <WProgram.h>
 #include <Servo.h>

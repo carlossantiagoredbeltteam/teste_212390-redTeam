@@ -5,8 +5,8 @@
 //
 // CHOOSE WHICH MOTHERBOARD YOU'RE USING:
 //
-#define REPRAP_MOTHERBOARD_VERSION_1_0
-//#define REPRAP_MOTHERBOARD_VERSION_1_1
+//#define REPRAP_MOTHERBOARD_VERSION_1_0
+#define REPRAP_MOTHERBOARD_VERSION_1_1
 
 //
 // CHOOSE WHICH FAMILY OF STEPPER DRIVER YOU'RE USING:
@@ -101,19 +101,17 @@
 //our pin for debugging.
 #define DEBUG_PIN        0
 
-//various SPI select pins
-#define SPI_SELECT_1     1
-#define SPI_SELECT_2     3
-#define SPI_SELECT_3    14
-
 //our SD card pins
-#define SD_CARD_SELECT   4
 #define SD_CARD_WRITE    2
 #define SD_CARD_DETECT   3
+#define SD_CARD_SELECT   4
 
 //our RS485 pins
-#define RX_ENABLE_PIN	13
 #define TX_ENABLE_PIN	12
+#define RX_ENABLE_PIN	13
+
+//pin for controlling the PSU.
+#define PS_ON_PIN       14
 
 #endif
 
@@ -122,7 +120,7 @@
  ****************************************************************************************/
 
 //do we want a step delay (ie: length of pulse in microseconds) comment out to disable.
-#define STEP_DELAY 10
+#define STEP_DELAY 1
 
 #ifdef STEPPER_DRIVER_VERSION_1_X
 #define STEPPER_ENABLE    1

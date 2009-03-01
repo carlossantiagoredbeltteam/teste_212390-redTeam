@@ -18,7 +18,7 @@
 
 //our maximum feedrates
 #define FAST_XY_FEEDRATE 2500.0
-#define FAST_Z_FEEDRATE  100.0
+#define FAST_Z_FEEDRATE  1000.0
 
 // Units in curve section
 #define CURVE_SECTION_INCHES 0.019685
