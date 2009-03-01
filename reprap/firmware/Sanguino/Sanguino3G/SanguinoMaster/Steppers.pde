@@ -250,9 +250,12 @@ inline void prepare_dda()
   */
   
   //what is our direction
-  x_direction = (target_steps.x >= current_steps.x);
-  y_direction = (target_steps.y >= current_steps.y);
-  z_direction = (target_steps.z >= current_steps.z);
+  //x_direction = (target_steps.x >= current_steps.x);
+  //y_direction = (target_steps.y >= current_steps.y);
+  //z_direction = (target_steps.z >= current_steps.z);
+  x_direction = delta_steps.x >= 0;
+  y_direction = delta_steps.y >= 0;
+  z_direction = delta_steps.z >= 0;
 
   //set our direction pins as well
   digitalWrite(X_DIR_PIN, x_direction);
@@ -281,8 +284,6 @@ inline void prepare_dda()
 //do a single step on our DDA line!
 inline void dda_step()
 {
-  debug_blink();
-
   //check endstops, position, etc.
   x_can_step = can_step(X_MIN_PIN, X_MAX_PIN, current_steps.x, target_steps.x, x_direction);
   y_can_step = can_step(Y_MIN_PIN, Y_MAX_PIN, current_steps.y, target_steps.y, y_direction);
@@ -374,9 +375,6 @@ inline void grab_next_point()
     setTimer1Ceiling(pointBuffer.remove_16());
     enableTimer1Interrupt();
   }
-  //no more points?  why not bail.
-  else
-    disableTimer1Interrupt();
 }
 
 inline bool can_step(byte min_pin, byte max_pin, long current, long target, byte direction)
@@ -483,16 +481,12 @@ void queue_incremental_point(int x, int y, int z, byte prescaler, unsigned int c
   pointBuffer.append_16(z);
 
   /*
-  Serial.print("Queued:");
+  Serial.print("Q:");
   Serial.print(x, DEC);   
   Serial.print(",");
   Serial.print(y, DEC);
   Serial.print(",");
   Serial.print(z, DEC);
-  Serial.print(",");
-  Serial.print(prescaler, DEC);
-  Serial.print(",");
-  Serial.print(count, DEC);
   Serial.println(".");
   */
   
@@ -507,12 +501,12 @@ void queue_incremental_point(int x, int y, int z, byte prescaler, unsigned int c
   {
     setTimer1Resolution(prescaler);
     setTimer1Ceiling(count);
+
+    //turn our interrupt on.
+    enableTimer1Interrupt();
     
     firstPoint = true;
   }
-
-  //turn our interrupt on.
-  enableTimer1Interrupt();
 }
 
 //TODO: make this proportional based on the delta proportions.
@@ -520,33 +514,40 @@ void queue_incremental_point(int x, int y, int z, byte prescaler, unsigned int c
 void queue_absolute_point(long x, long y, long z, byte prescaler, unsigned int count)
 {
   //calculate our total travel in steps
-  unsigned long delta_x = abs(x - eventual_steps.x);
-  unsigned long delta_y = abs(y - eventual_steps.y);
-  unsigned long delta_z = abs(z - eventual_steps.z);
+  long delta_x = x - eventual_steps.x;
+  long delta_y = y - eventual_steps.y;
+  long delta_z = z - eventual_steps.z;
   
-  boolean x_dir = (x > eventual_steps.x);
-  boolean y_dir = (y > eventual_steps.y);
-  boolean z_dir = (z > eventual_steps.z);
+  long abs_delta_x = abs(delta_x);
+  long abs_delta_y = abs(delta_y);
+  long abs_delta_z = abs(delta_z);
   
   //which is our longest?
-  unsigned long max_delta = max(delta_x, delta_y);
-  max_delta = max(max_delta, delta_z);
+  long max_delta = max(abs_delta_x, abs_delta_y);
+  max_delta = max(max_delta, abs_delta_z);
 
   //zero movement?  bail.
   if (max_delta == 0)
     return;
 
+  //is it a short length?
+  if (max_delta <= 32767)
+  {
+    queue_incremental_point((x - eventual_steps.x), (y - eventual_steps.y), (z - eventual_steps.z), prescaler, count);
+    return;
+  }
+    
   //figure our ratios
-  double x_ratio = (double)delta_x / (double)max_delta;
-  double y_ratio = (double)delta_y / (double)max_delta;
-  double z_ratio = (double)delta_z / (double)max_delta;
+  float x_ratio = (float)delta_x / (float)max_delta;
+  float y_ratio = (float)delta_y / (float)max_delta;
+  float z_ratio = (float)delta_z / (float)max_delta;
 
   //setup some variables.
   int x_inc, y_inc, z_inc;
 
   //keep queueing points while we can.
   int segments = 0;
-  while (delta_x > 0 || delta_y > 0 || delta_z > 0)
+  while (abs_delta_x > 0 || abs_delta_y > 0 || abs_delta_z > 0)
   {
     /*
     Serial.print("Deltas:");
@@ -557,42 +558,35 @@ void queue_absolute_point(long x, long y, long z, byte prescaler, unsigned int c
     Serial.print(delta_z, DEC);
     Serial.println(".");
     */
+
     //figure out our incremental points.
-    x_inc = get_increment_from_absolute(delta_x, x_ratio, x_dir);
-    y_inc = get_increment_from_absolute(delta_y, y_ratio, y_dir);
-    z_inc = get_increment_from_absolute(delta_z, z_ratio, z_dir);
+    x_inc = get_increment_from_absolute(delta_x, x_ratio);
+    y_inc = get_increment_from_absolute(delta_y, y_ratio);
+    z_inc = get_increment_from_absolute(delta_z, z_ratio);
 
     //remove them from our deltas.
-    delta_x -= abs(x_inc);
-    delta_y -= abs(y_inc);
-    delta_z -= abs(z_inc);
+    abs_delta_x -= abs(x_inc);
+    abs_delta_y -= abs(y_inc);
+    abs_delta_z -= abs(z_inc);
 
     //how many have we done?
     segments++;
     
-    if (segments > 100)
-      Serial.println("segment loop!");
-    //Serial.print("Segments: ");
-    //Serial.println(segments, DEC);
-
     //queue our point.
     queue_incremental_point(x_inc, y_inc, z_inc, prescaler, count);
   }
 }
 
-int get_increment_from_absolute(long delta, double ratio, boolean dir)
+inline int get_increment_from_absolute(long delta, float ratio)
 {
   //get a proportional point.
   int increment = ceil(ratio * 32767.0);
 
   //make sure its within the proper range.
-  increment = min(delta, increment);
-
-  //which direction?
-  if (dir)
-    return increment;
+  if (delta < 0)
+    return max(delta, increment);
   else
-    return -increment;
+    return min(delta, increment);
 }
 
 boolean is_point_buffer_empty()
