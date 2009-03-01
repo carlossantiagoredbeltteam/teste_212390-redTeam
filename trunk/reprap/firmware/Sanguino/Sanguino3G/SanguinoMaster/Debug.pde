@@ -16,6 +16,22 @@ void square_move()
   Serial.println("Bottom left");
 }
 
+void circle_move()
+{
+  int x, y;
+  float rads;
+  
+  for (int i=0; i<100; i++)
+  {
+    rads = 2*PI*(i/100.0);
+
+    x = 200 * sin(rads);
+    y = 200 * cos(rads);
+    
+    queue_absolute_point(x, y, 0, 1, 60000);
+  }
+}
+
 void debug_blink()
 {
   digitalWrite(DEBUG_PIN, HIGH);

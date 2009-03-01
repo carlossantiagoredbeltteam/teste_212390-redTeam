@@ -85,9 +85,6 @@ void process_host_packets()
       handle_query(b);
   }
 
-  //take it easy.  no stomping on each other.
-  delayMicrosecondsInterruptible(50);
-  
   //okay, send our response
   hostPacket.sendReply();
 }
@@ -213,17 +210,25 @@ void handle_commands()
   long z;
   byte prescaler;
   unsigned int count;
+  byte cmd;
 
   //do we have any commands?
-  while (commandBuffer.size() > 0)
+  if (commandBuffer.size() > 0)
   {
     /*
     Serial.print("size: ");
     Serial.println(commandBuffer.size(), DEC);
     */
-        
+    
+    //peek at our command.
+    cmd = commandBuffer[0];
+
+    //queue point?  do we have enough room?
+    if ((cmd == HOST_CMD_QUEUE_POINT_INC || cmd == HOST_CMD_QUEUE_POINT_INC) && pointBuffer.remainingCapacity() < POINT_SIZE)
+      return;
+      
     //okay, which command are we handling?
-    byte cmd = commandBuffer.remove_8();
+    cmd = commandBuffer.remove_8();
 
     /*
     Serial.print("cmd: ");
