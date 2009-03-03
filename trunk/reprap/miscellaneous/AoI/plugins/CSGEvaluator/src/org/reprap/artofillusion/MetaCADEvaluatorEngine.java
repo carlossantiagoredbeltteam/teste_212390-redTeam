@@ -3,10 +3,15 @@ package org.reprap.artofillusion;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.Date;
+import java.util.List;
 
 import javax.print.DocFlavor.STRING;
 
 import org.cheffo.jeplite.JEP;
+
+import bsh.EvalError;
+import bsh.Interpreter;
 
 import artofillusion.LayoutWindow;
 import artofillusion.UndoRecord;
@@ -28,11 +33,26 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 		super(window);
 	}
 	
+	public void setParameters(String text)
+	{
+		window.getScene().setMetadata(MetaCADEvaluatorEngine.class.getName()+"Parameters", text);
+	}
+	
+	public String getParameters()
+	{
+		Object o = window.getScene().getMetadata(MetaCADEvaluatorEngine.class.getName()+"Parameters");
+		
+		if (o!=null)
+			return o.toString();
+		
+		return "";
+	}
+	
 	public void readParameters() {
 		jep = new JEP();
 		jep.addStandardConstants();
 		jep.addStandardFunctions();
-		evaluateParametersFile("cad_parameters.txt");
+		evaluateLines(getParameters());
 	}
 	
 	public void evaluate()
@@ -163,7 +183,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 				obj3D = new Cube(a, b, c);
 			}
 			if (objExpr.name.startsWith("sphere")) {
-				obj3D = new Sphere(a/2.0, b/2.0, c/2.0);
+				obj3D = new Sphere(a, b, c);
 			}
 			if (objExpr.name.startsWith("cylinder")) {
 				double ratio = 1;
@@ -231,6 +251,22 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 			throw(ex);
 		}
 	}
+	
+	void evaluateLines(String text)
+	{
+		try {
+			String lines[] = text.split("\n");
+			for (String curLine : lines)
+			{
+				curLine = curLine.trim();
+				if (curLine.length() == 0 || curLine.startsWith("#"))
+					continue;
+				evaluateAssignment(curLine);
+			}
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
+	}
 
 	void evaluateParametersFile(String fileName) {
 		try {
@@ -245,7 +281,6 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 				evaluateAssignment(curLine);
 			}
 		} catch (Exception ex) {
-			System.out.println(System.getProperty("user.dir"));
 			System.out.println(ex);
 		}
 	}
