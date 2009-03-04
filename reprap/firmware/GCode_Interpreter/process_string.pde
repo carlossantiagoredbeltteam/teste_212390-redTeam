@@ -4,7 +4,7 @@
 #include "extruder.h"
 
 //our command string
-char word[COMMAND_SIZE];
+char cmdbuffer[COMMAND_SIZE];
 char c = '?';
 byte serial_count = 0;
 boolean comment = false;
@@ -98,7 +98,7 @@ void get_and_do_command()
 				
 			// If we're not in comment mode, add it to our array.
 			if (!comment)
-				word[serial_count++] = c;
+				cmdbuffer[serial_count++] = c;
 		  }
 
                 }
@@ -112,10 +112,10 @@ void get_and_do_command()
 	if (serial_count && c == '\n')
 	{
                 // Terminate string
-                word[serial_count] = 0;
+                cmdbuffer[serial_count] = 0;
                 
 		//process our command!
-		process_string(word, serial_count);
+		process_string(cmdbuffer, serial_count);
 
 		//clear command.
 		init_process_string();
