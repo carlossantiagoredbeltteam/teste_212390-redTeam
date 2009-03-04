@@ -201,6 +201,7 @@ public class Producer {
 			return;
 		
 		layerRules.setLayingSupport(true);
+		layerRules.getPrinter().setSeparating(false);
 		
 		Printer reprap = layerRules.getPrinter();
 		
@@ -219,7 +220,7 @@ public class Producer {
 			fillFoundationRectangle(reprap, gp);		
 			reprap.finishedLayer(layerRules);
 			reprap.betweenLayers(layerRules);
-			layerRules.stepMachine(reprap.getExtruder());	
+			layerRules.stepMachine(reprap.getExtruder());
 		}
 	}
 	
