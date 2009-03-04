@@ -9,6 +9,7 @@
 
 #include <ctype.h>
 #include <HardwareSerial.h>
+#include "WProgram.h"
 #include "parameters.h"
 #include "pins.h"
 #include "extruder.h"
