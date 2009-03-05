@@ -256,9 +256,9 @@ public class LayerRules
 		if(getMachineLayer() < getFoundationLayers())
 		{
 			if(getMachineLayer() == getFoundationLayers() - 2)
-				angle = e.getOddHatchDirection();
-			else
 				angle = e.getEvenHatchDirection();
+			else
+				angle = e.getOddHatchDirection();
 		} else
 		{
 			if(getModelLayer()%2 == 0)
