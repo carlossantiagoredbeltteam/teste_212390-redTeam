@@ -1,9 +1,5 @@
 package org.reprap.artofillusion;
 
-import artofillusion.math.CoordinateSystem;
-import artofillusion.object.CSGObject;
-import artofillusion.object.Object3D;
-import artofillusion.object.ObjectInfo;
 
 public class MetaCADParser {
 	public Boolean parseError;
