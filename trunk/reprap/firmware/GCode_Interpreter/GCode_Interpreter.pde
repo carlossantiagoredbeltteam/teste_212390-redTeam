@@ -65,7 +65,7 @@ void loop()
   comms_test();
   
 #else
-  
+  byte c = 0;
   if (Serial.available() > 0)
   {
         c = Serial.read();
@@ -114,7 +114,6 @@ void loop()
       Serial.println(" 0..9 - select extruder");
       Serial.println(" s - stop current test at the end of its cycle then print this list\n\n");
       Serial.print("Command: ");
-      c = 0;
     }
   }
 
