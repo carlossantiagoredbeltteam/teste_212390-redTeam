@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="CSGEvaluator/src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/AoI-2.7/ArtOfIllusion.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/AoI-2.7"/>
+	<classpathentry kind="lib" path="CSGEvaluator/lib/jeplite-0.8.7a-bin.jar"/>
+	<classpathentry kind="output" path="CSGEvaluator/build"/>
+</classpath>
