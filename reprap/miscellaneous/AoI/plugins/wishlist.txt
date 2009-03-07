@@ -1,0 +1,13 @@
+MetaCADEvaluator:
+
+o named parameters: It's hard to remember parameter ordering
+o online help/tooltips/wizard or smth.?
+o Resize option for parameter editor
+o Separate object editor (tabs in main dialog?)
+o Operator buttons (tabs in main dialog?)
+
+o Sometimes the plugin hangs (for a long time)
+  for-loop-transform, ring-generator
+  -> Missing parameters?
+  -> display error on missing params?
+
