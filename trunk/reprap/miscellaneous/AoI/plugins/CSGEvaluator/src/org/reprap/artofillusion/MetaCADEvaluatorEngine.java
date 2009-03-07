@@ -3,28 +3,24 @@ package org.reprap.artofillusion;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.Date;
-import java.util.List;
-
-import javax.print.DocFlavor.STRING;
 
 import org.cheffo.jeplite.JEP;
-
-import bsh.EvalError;
-import bsh.Interpreter;
 
 import artofillusion.LayoutWindow;
 import artofillusion.UndoRecord;
 import artofillusion.math.CoordinateSystem;
 import artofillusion.math.Vec3;
-import artofillusion.object.CSGObject;
 import artofillusion.object.Cube;
+import artofillusion.object.Curve;
 import artofillusion.object.Cylinder;
+import artofillusion.object.Mesh;
 import artofillusion.object.Object3D;
 import artofillusion.object.ObjectInfo;
 import artofillusion.object.Sphere;
+import artofillusion.object.TriangleMesh;
 import artofillusion.texture.Texture;
 import artofillusion.texture.TextureMapping;
+import artofillusion.tools.ExtrudeTool;
 import artofillusion.ui.MessageDialog;
 
 public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
@@ -104,7 +100,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
     int count = 0;
 
     // condition loop evaluate the condition i.e. i < 10
-    while (evaluateExpresion(forExpr.parameters[1]) != 0 && count < 100) {
+    while (evaluateExpression(forExpr.parameters[1]) != 0 && count < 100) {
       ObjectInfo[] objects = parent.children;
 
       for (int i = 0; i < objects.length; i++) {
@@ -124,13 +120,13 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
       if (coordExpr != null && !coordExpr.parseError) {
         double x, y, z, rotx, roty, rotz;
 
-        x = evaluateExpresion(coordExpr.parameters[0]);
-        y = evaluateExpresion(coordExpr.parameters[1]);
-        z = evaluateExpresion(coordExpr.parameters[2]);
+        x = evaluateExpression(coordExpr.parameters[0]);
+        y = evaluateExpression(coordExpr.parameters[1]);
+        z = evaluateExpression(coordExpr.parameters[2]);
 
-        rotx = evaluateExpresion(coordExpr.parameters[3]);
-        roty = evaluateExpresion(coordExpr.parameters[4]);
-        rotz = evaluateExpresion(coordExpr.parameters[5]);
+        rotx = evaluateExpression(coordExpr.parameters[3]);
+        roty = evaluateExpression(coordExpr.parameters[4]);
+        rotz = evaluateExpression(coordExpr.parameters[5]);
 
         parent.setCoords(new CoordinateSystem(new Vec3(x, y, z), rotx, roty,
             rotz));
@@ -162,74 +158,109 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
     return obj;
   }
 
-  public Boolean evaluateObject(ObjectInfo parent, UndoRecord undo)
-      throws Exception {
+  public Boolean evaluateObject(ObjectInfo parent, UndoRecord undo) throws Exception {
+    
     String line = parent.name;
 
     MetaCADParser objExpr = new MetaCADParser(line, ",");
 
-    if (objExpr.parseError)
+    if (objExpr.parseError) {
+      // FIXME: Notify user? 
       return false;
+    }
 
-    if (objExpr.parameters.length >= 9) {
-      double x, y, z, rotx, roty, rotz, a, b, c;
+    Object3D obj3D = null;
+    CoordinateSystem coordsys = null;
 
-      x = evaluateExpresion(objExpr.parameters[0]);
-      y = evaluateExpresion(objExpr.parameters[1]);
-      z = evaluateExpresion(objExpr.parameters[2]);
-
-      rotx = evaluateExpresion(objExpr.parameters[3]);
-      roty = evaluateExpresion(objExpr.parameters[4]);
-      rotz = evaluateExpresion(objExpr.parameters[5]);
-
-      a = evaluateExpresion(objExpr.parameters[6]);
-      b = evaluateExpresion(objExpr.parameters[7]);
-      c = evaluateExpresion(objExpr.parameters[8]);
-
-      Object3D obj3D = null;
-
-      if (objExpr.name.startsWith("cube")) {
-        obj3D = new Cube(a, b, c);
+    if (objExpr.name.startsWith("extrude")) {
+      Vec3 dir = Vec3.vz();
+      if (objExpr.parameters.length >= 3) {
+        dir = new Vec3(evaluateExpression(objExpr.parameters[0]),
+            evaluateExpression(objExpr.parameters[1]),
+            evaluateExpression(objExpr.parameters[2]));
       }
-      if (objExpr.name.startsWith("sphere")) {
-        obj3D = new Sphere(a, b, c);
-      }
-      if (objExpr.name.startsWith("cylinder")) {
-        double ratio = 1;
+      ObjectInfo[] children = parent.getChildren();
 
-        if (objExpr.parameters.length >= 10) {
-          ratio = evaluateExpresion(objExpr.parameters[9]);
-          if (ratio > 1)
-            ratio = 1;
-          if (ratio < 0)
-            ratio = 0;
+      ObjectInfo profile = children[0];
+      if (profile.getObject() instanceof TriangleMesh) {
+        Vec3 v[] = new Vec3[5];
+        float smooth[] = new float[v.length];
+        for (int i = 0; i < v.length; i++) {
+          v[i] = new Vec3(dir);
+          v[i].scale(1.0*i/4);
+          smooth[i] = 1.0f;
         }
-        obj3D = new Cylinder(a, b, c, ratio);
+        Curve path = new Curve(v, smooth, Mesh.INTERPOLATING, false);
+        CoordinateSystem pathCoords = new CoordinateSystem(new Vec3(), Vec3.vz(), Vec3.vy());
+
+        obj3D = ExtrudeTool.extrudeMesh((TriangleMesh)profile.getObject(), path, profile.getCoords(), pathCoords, 45*Math.PI/180.0, true);
+      }
+      for (int i=0;i<children.length;i++) children[i].setVisible(false);
+    }
+    else {
+      // First part of expression is always the coordinate system (transform)
+      if (objExpr.parameters.length >= 6) {
+        double x, y, z, rotx, roty, rotz;
+
+        x = evaluateExpression(objExpr.parameters[0]);
+        y = evaluateExpression(objExpr.parameters[1]);
+        z = evaluateExpression(objExpr.parameters[2]);
+
+        rotx = evaluateExpression(objExpr.parameters[3]);
+        roty = evaluateExpression(objExpr.parameters[4]);
+        rotz = evaluateExpression(objExpr.parameters[5]);
+        coordsys = new CoordinateSystem(new Vec3(x, y, z), rotx, roty, rotz);
       }
 
-      if (obj3D != null) {
-        Texture tex = parent.object.getTexture();
-        TextureMapping map = parent.object.getTextureMapping();
+      // Typically, the three next parameters are common object properties
+      if (objExpr.parameters.length >= 9) {
+        double a, b, c;
 
-        parent.setCoords(new CoordinateSystem(new Vec3(x, y, z), rotx, roty,
-            rotz));
-        parent.setObject(obj3D);
-        parent.object.setTexture(tex, map);
+        a = evaluateExpression(objExpr.parameters[6]);
+        b = evaluateExpression(objExpr.parameters[7]);
+        c = evaluateExpression(objExpr.parameters[8]);
 
-        parent.clearCachedMeshes();
-        this.window.updateImage();
-        this.window.updateMenus();
-      } else {
-        return false;
+        if (objExpr.name.startsWith("cube")) {
+          obj3D = new Cube(a, b, c);
+        }
+        if (objExpr.name.startsWith("sphere")) {
+          obj3D = new Sphere(a, b, c);
+        }
+        if (objExpr.name.startsWith("cylinder")) {
+          double ratio = 1;
+          // Cylinder takes an optional fourth parameter
+          if (objExpr.parameters.length >= 10) {
+            ratio = evaluateExpression(objExpr.parameters[9]);
+            if (ratio > 1) ratio = 1;
+            if (ratio < 0) ratio = 0;
+          }
+          obj3D = new Cylinder(a, b, c, ratio);
+        }
       }
+    }
+    
+    if (obj3D != null) {
+      Texture tex = parent.object.getTexture();
+      TextureMapping map = parent.object.getTextureMapping();
+
+      if (coordsys != null) parent.setCoords(coordsys);
+      else parent.setCoords(new CoordinateSystem());
+      parent.setObject(obj3D);
+      parent.object.setTexture(tex, map);
+
+      parent.clearCachedMeshes();
+      this.window.updateImage();
+      this.window.updateMenus();
+    } else {
+      return false;
     }
 
     return true;
   }
 
   // Evaluates an Expression like 3*x+sin(a) and returns the value of it or 0 if
-  // any error occured
-  double evaluateExpresion(String expr) throws Exception {
+  // any error occurred
+  double evaluateExpression(String expr) throws Exception {
     try {
       jep.parseExpression(expr);
       return jep.getValue();
