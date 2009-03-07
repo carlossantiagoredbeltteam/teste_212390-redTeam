@@ -24,7 +24,6 @@ import buoy.widget.BTextArea;
 import buoy.widget.BorderContainer;
 import buoy.widget.FormContainer;
 import buoy.widget.LayoutInfo;
-import buoy.widget.TextWidget;
 
 /**
  * CSGEvaluator dialog
@@ -39,12 +38,12 @@ class MetaCADEvaluatorDialog extends BDialog
   };
 
   protected String[] labels = new String [] {
-	  Translate.text("CSGEvaluator:Actions"), null, Translate.text("CSGEvaluator:BooleanOp"), null,null,null
+	  Translate.text("MetaCADEvaluator:Actions"), null, Translate.text("MetaCADEvaluator:BooleanOp"), null,null,null
   };
   
   public MetaCADEvaluatorDialog(LayoutWindow window)
   {
-    super(window, Translate.text("CSGEvaluator:name"), false); // Modeless
+    super(window, Translate.text("MetaCADEvaluator:name"), false); // Modeless
     this.window = window;
     this.setResizable(false);
     
@@ -56,7 +55,7 @@ class MetaCADEvaluatorDialog extends BDialog
     bc.setDefaultLayout(new LayoutInfo());
 
     String versionstr = CSGEvaluatorPlugin.getVersion();
-    bc.add(new BLabel(Translate.text("CSGEvaluator:title", versionstr)), BorderContainer.NORTH);
+    bc.add(new BLabel(Translate.text("MetaCADEvaluator:title", versionstr)), BorderContainer.NORTH);
 
 
     FormContainer fc = new FormContainer(2, functions.length+1);
@@ -66,7 +65,7 @@ class MetaCADEvaluatorDialog extends BDialog
       if (labels[i] != null) {
         fc.add(new BLabel(labels[i]), 0, i, new LayoutInfo(LayoutInfo.EAST, LayoutInfo.NONE, new Insets(2, 0, 2, 5), null));
       }
-      BButton button = new BButton(Translate.text("CSGEvaluator:"+functions[i]));
+      BButton button = new BButton(Translate.text("MetaCADEvaluator:"+functions[i]));
       fc.add(button, 1, i, new LayoutInfo(LayoutInfo.WEST, LayoutInfo.HORIZONTAL, new Insets(2, 0, 2, 0), null));
       button.addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
       button.addEventLink(CommandEvent.class, engine, functions[i]);
