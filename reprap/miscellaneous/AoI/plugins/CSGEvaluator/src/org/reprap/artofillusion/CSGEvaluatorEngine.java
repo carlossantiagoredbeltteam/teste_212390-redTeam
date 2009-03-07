@@ -64,7 +64,8 @@ class CSGEvaluatorEngine
       }
     }
     catch (Exception ex) {
-      //            this.debug("exception in evaluate: " + ex.toString());
+      System.out.println("exception in evaluate: " + ex.toString());
+               //   this.debug("exception in evaluate: " + ex.toString());
     }
   }
 
