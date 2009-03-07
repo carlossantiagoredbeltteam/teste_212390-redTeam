@@ -9,6 +9,7 @@
   <property name="dist" value="Plugins" />
   <property name="aoijar" value="ArtOfIllusion.jar" />
   <property name="buoyjar" value="Buoy.jar" />
+  <property name="jeplite" value="CSGEvaluator/lib/jeplite-0.8.7a-bin.jar" />
 
 
   <target name="init">
@@ -31,7 +32,9 @@
     <copy todir="${build}">
       <fileset dir="${src}" includes="*.properties" />
     </copy>
-    <jar jarfile="${dist}/CSGEvaluator.jar" basedir="${build}" />
+    <jar jarfile="${dist}/CSGEvaluator.jar" basedir="${build}">
+        <zipfileset src="${jeplite}"/>
+    </jar>
   </target>
 
   <target name="docs" depends="init">

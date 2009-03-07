@@ -33,6 +33,7 @@
     <jar jarfile="${dist}/${package}.jar" basedir="${build}" >
     	<fileset dir="${src}" includes="extensions.xml, *.properties, icons/**" />
 <!--        <zipfileset prefix="help" dir="${help}/help" />  -->
+        <zipfileset src="${jeplite}"/>
     </jar>	
   </target>
 
