@@ -1,6 +1,11 @@
 package org.reprap.artofillusion;
 
-
+/**
+ * 
+ * Splits lines on the form "function(arg1,arg2)" into
+ * name = function
+ * parameters = [arg1, arg2]
+ */
 public class MetaCADParser {
 	public Boolean parseError;
 	public String name;
