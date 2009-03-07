@@ -10,6 +10,7 @@ import artofillusion.LayoutWindow;
 import artofillusion.UndoRecord;
 import artofillusion.math.CoordinateSystem;
 import artofillusion.math.Vec3;
+import artofillusion.object.CSGObject;
 import artofillusion.object.Cube;
 import artofillusion.object.Curve;
 import artofillusion.object.Cylinder;
@@ -57,8 +58,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
     super.evaluate();
   }
 
-  public ObjectInfo evaluateNode(ObjectInfo parent, UndoRecord undo)
-      throws Exception {
+  public ObjectInfo evaluateNode(ObjectInfo parent, UndoRecord undo) throws Exception {
     if (evaluateLoop(parent, undo))
       return parent;
 
@@ -86,7 +86,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 
     MetaCADParser forExpr = new MetaCADParser(line, ";");
 
-    // no loop but a slimple boolean op let base class do that
+    // no loop but a simple boolean op let base class do that
     if (forExpr.parseError || forExpr.parameters.length != 3) {
       forExpr = new MetaCADParser("dummyDummy(dummyDummy=0; dummyDummy<1; dummyDummy=dummyDummy+1)", ";");
     }
@@ -158,6 +158,15 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
     return obj;
   }
 
+  
+  /**
+   * 
+   * Evaluates the given object.
+   * 
+   * @return true if object was successfully evaluated, 
+   * false if either an error occurred or if the object was not recognized by MetaCADEvaluator
+   * 
+   */
   public Boolean evaluateObject(ObjectInfo parent, UndoRecord undo) throws Exception {
     
     String line = parent.name;
@@ -173,27 +182,51 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
     CoordinateSystem coordsys = null;
 
     if (objExpr.name.startsWith("extrude")) {
+      // Three first parameters define the extrusion vector
       Vec3 dir = Vec3.vz();
       if (objExpr.parameters.length >= 3) {
         dir = new Vec3(evaluateExpression(objExpr.parameters[0]),
             evaluateExpression(objExpr.parameters[1]),
             evaluateExpression(objExpr.parameters[2]));
       }
-      ObjectInfo[] children = parent.getChildren();
+      // 4. parameter is num segments
+      int numsegments = 1;
+      if (objExpr.parameters.length >= 4) {
+        numsegments = (int)evaluateExpression(objExpr.parameters[3]);
+        if (numsegments < 2) numsegments = 1;
+      }
+      // 5. parameter is twist degrees
+      double twist = 0.0;
+      if (objExpr.parameters.length >= 5) {
+        twist = evaluateExpression(objExpr.parameters[4]);
+      }
 
-      ObjectInfo profile = children[0];
-      if (profile.getObject() instanceof TriangleMesh) {
-        Vec3 v[] = new Vec3[5];
+      // First child is the base mesh
+      // FIXME: Find all extrudable child objects instead
+      // FIXME: Recursively evaluate children
+      ObjectInfo[] children = parent.getChildren();
+      for (int i=0;i<children.length;i++) {
+        evaluateNode(children[i], undo);
+      }
+      ObjectInfo profile = parent.getChildren()[0];
+      Object3D profileobj = profile.getObject();
+      if (profileobj.canConvertToTriangleMesh() != Object3D.CANT_CONVERT) {
+        profileobj = profileobj.convertToTriangleMesh(0.1);
+      }
+
+      if (profileobj instanceof TriangleMesh) {
+        // Build extrusion curve from vector and segments
+        Vec3 v[] = new Vec3[numsegments+1];
         float smooth[] = new float[v.length];
         for (int i = 0; i < v.length; i++) {
           v[i] = new Vec3(dir);
-          v[i].scale(1.0*i/4);
+          v[i].scale(1.0*i/numsegments);
           smooth[i] = 1.0f;
         }
         Curve path = new Curve(v, smooth, Mesh.INTERPOLATING, false);
-        CoordinateSystem pathCoords = new CoordinateSystem(new Vec3(), Vec3.vz(), Vec3.vy());
+        CoordinateSystem pathCoords = new CoordinateSystem();
 
-        obj3D = ExtrudeTool.extrudeMesh((TriangleMesh)profile.getObject(), path, profile.getCoords(), pathCoords, 45*Math.PI/180.0, true);
+        obj3D = ExtrudeTool.extrudeMesh((TriangleMesh)profileobj, path, profile.getCoords(), pathCoords, twist*Math.PI/180.0, true);
       }
       for (int i=0;i<children.length;i++) children[i].setVisible(false);
     }
