@@ -224,7 +224,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
           v[i].scale(1.0*i/numsegments);
           smooth[i] = 1.0f;
         }
-        Curve path = new Curve(v, smooth, Mesh.INTERPOLATING, false);
+        Curve path = new Curve(v, smooth, Mesh.NO_SMOOTHING, false);
         CoordinateSystem pathCoords = new CoordinateSystem();
 
         obj3D = ExtrudeTool.extrudeMesh((TriangleMesh)profileobj, path, profile.getCoords(), pathCoords, twist*Math.PI/180.0, true);
