@@ -43,11 +43,13 @@ volatile int dState = 0;                   // Last position input
 SimplePacket masterPacket(rs485_tx);
 
 //variables to keep track of stepper state.
-const byte coil_a_enabled   = B11101110;
-const byte coil_a_direction = B11110000;
-const byte coil_b_enabled   = B10111011;
-const byte coil_b_direction = B11000011;
+const byte coil_a_enabled   = B10011001;
+const byte coil_a_direction = B11000011;
+const byte coil_b_enabled   = B01100110;
+const byte coil_b_direction = B11110000;
 
 //what state are we in?
 volatile byte stepper_index = 0;
 volatile long stepper_ticks = 0;
+volatile byte stepper_high_pwm = 0;
+volatile byte stepper_low_pwm = 0;

@@ -155,6 +155,8 @@ void handle_query()
     #else
       motor1_control = MC_STEPPER;
       stepper_ticks = motor1_target_rpm / (MOTOR_STEPS * MOTOR_STEP_MULTIPLIER);
+      stepper_high_pwm = motor1_pwm;
+      stepper_low_pwm = motor1_pwm / 2;
     #endif
     break;
 
