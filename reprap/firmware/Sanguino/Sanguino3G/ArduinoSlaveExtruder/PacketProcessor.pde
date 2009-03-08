@@ -149,8 +149,13 @@ void handle_query()
 
   //NEEDS TESTING
   case SLAVE_CMD_SET_MOTOR_1_RPM:
-    motor1_control = MC_ENCODER;
-    motor1_target_rpm = masterPacket.get_32(2);
+    motor1_target_rpm = masterPacket.get_32(2) * 16;
+    #if MOTOR_STYLE == 1
+      motor1_control = MC_ENCODER;
+    #else
+      motor1_control = MC_STEPPER;
+      stepper_ticks = motor1_target_rpm / (MOTOR_STEPS * MOTOR_STEP_MULTIPLIER);
+    #endif
     break;
 
   //NEEDS TESTING
@@ -199,6 +204,7 @@ void handle_query()
     else
       motor2_dir = MC_REVERSE;
 
+    //TODO: check to see if we're not in stepper mode.
     if (temp & 1)
       enable_motor_2();
     else

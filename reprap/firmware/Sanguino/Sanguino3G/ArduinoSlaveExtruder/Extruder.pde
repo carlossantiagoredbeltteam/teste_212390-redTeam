@@ -106,7 +106,13 @@ void enable_motor_1()
   else if (motor1_control == MC_ENCODER)
   {
     speed_error = 0;
-    setTimer1Ticks(motor1_target_rpm/16);
+    disableTimer1Interrupt();
+    setTimer1Ticks(motor1_target_rpm);
+    enableTimer1Interrupt();
+  }
+  else if (motor1_control == MC_STEPPER)
+  {
+    setTimer1Ticks(stepper_ticks);
     enableTimer1Interrupt();
   }
 }
@@ -119,6 +125,12 @@ void disable_motor_1()
   {
     speed_error = 0;
     disableTimer1Interrupt();
+  }
+  else if (motor1_control == MC_STEPPER)
+  {
+    disableTimer1Interrupt();
+    digitalWrite(MOTOR_1_SPEED_PIN, LOW);
+    digitalWrite(MOTOR_2_SPEED_PIN, LOW);
   }
 }
 

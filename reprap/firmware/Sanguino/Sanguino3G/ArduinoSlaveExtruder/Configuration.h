@@ -5,7 +5,7 @@
 //
 // CHOOSE WHICH EXTRUDER YOU'RE USING:
 //
-#define EXTRUDER_CONTROLLER_VERSION_2_0
+#define EXTRUDER_CONTROLLER_VERSION_2_1
 
 #define TEMPERATURE_SAMPLES 5
 #define SERIAL_SPEED 38400
@@ -15,7 +15,17 @@
 #define PACKET_TIMEOUT 100
 
 /****************************************************************************************
- * Here's where you define the speed PID behavior
+ * Here's where you define the way your motors are driven.
+ ****************************************************************************************/
+//PWM
+//#define MOTOR_STYLE 0
+//ENCODER
+//#define MOTOR_STYLE 1 
+//STEPPER
+#define MOTOR_STYLE 2 
+
+/****************************************************************************************
+ * Here's where you define the speed PID behavior for an encoder
  ****************************************************************************************/
 //#define INVERT_QUADRATURE
 #define MIN_SPEED 50              //minimum PWM speed to use
@@ -25,12 +35,19 @@
 #define SPEED_INITIAL_IGAIN 100   //our integral gain.
 #define SPEED_INITIAL_DGAIN 10    //our derivative gain.
 
+
+/****************************************************************************************
+ * Here's where you define the configuration for the stepper.
+ ****************************************************************************************/
+#define MOTOR_STEPS 200              //number of steps per revolution
+#define MOTOR_STEP_MULTIPLIER 2      //step multiplier (full = 1, half=2, etc.)
+
 /****************************************************************************************
  * Sanguino Pin Assignment
  ****************************************************************************************/
 
 //these are the pins for the v2.0 Extruder Controller
-#ifdef EXTRUDER_CONTROLLER_VERSION_2_0
+#if defined(EXTRUDER_CONTROLLER_VERSION_2_0) || defined(EXTRUDER_CONTROLLER_VERSION_2_1)
 
 #define ENCODER_A_PIN 2
 #define ENCODER_B_PIN 3
