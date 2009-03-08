@@ -4,6 +4,29 @@
 //this handles the timer interrupt event
 SIGNAL(SIG_OUTPUT_COMPARE1A)
 {
+  #if MOTOR_STYLE == 1
+    //do encoder stuff here.
+  #else
+    //increment our index
+    if (motor1_dir == MC_FORWARD)
+      stepper_index = (stepper_index + 1) % 8;
+    else
+      stepper_index = (stepper_index - 1) % 8;
+      
+    //coil 1
+    digitalWrite(MOTOR_1_DIR_PIN,   coil_a_direction & (1 << stepper_index));
+    if (coil_a_enabled & (1 << stepper_index))
+      analogWrite(MOTOR_1_SPEED_PIN, motor1_pwm);
+    else
+      analogWrite(MOTOR_1_SPEED_PIN, 0);
+
+    //coil 2
+    digitalWrite(MOTOR_2_DIR_PIN,   coil_b_direction & (1 << stepper_index));
+    if (coil_b_enabled & (1 << stepper_index))
+      analogWrite(MOTOR_2_SPEED_PIN, motor1_pwm);
+    else
+      analogWrite(MOTOR_2_SPEED_PIN, 0);
+  #endif
 }
 
 void enableTimer1Interrupt()

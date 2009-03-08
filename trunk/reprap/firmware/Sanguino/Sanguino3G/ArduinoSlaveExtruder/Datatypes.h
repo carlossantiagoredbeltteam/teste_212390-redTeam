@@ -1,7 +1,8 @@
 // motor control states.
 typedef enum {
   MC_PWM = 0,
-  MC_ENCODER
+  MC_ENCODER = 1,
+  MC_STEPPER = 2
 } 
 MotorControlStyle;
 

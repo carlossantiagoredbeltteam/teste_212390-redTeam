@@ -53,7 +53,7 @@ void initialize()
 {
   is_machine_paused = false;
 
-  init_psu();
+  //init_psu();
   init_commands();
   init_steppers();
   init_tools();
@@ -73,11 +73,16 @@ void init_serial()
 //handle various things we're required to do.
 void loop()
 {
+/*
   //check for and handle any packets that come in.
   if (Serial.available())
     process_host_packets();
 
   handle_commands();
+*/
+
+
+
 }
 
 //handle the abortion of a print job

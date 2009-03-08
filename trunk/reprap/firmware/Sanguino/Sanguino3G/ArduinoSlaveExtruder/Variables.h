@@ -15,10 +15,10 @@ int heater_low = 64;
 int heater_high = 255;
 
 MotorControlStyle motor1_control = MC_PWM;
-MotorControlDirection motor1_dir = MC_FORWARD;
-byte motor1_pwm = 0;
-long motor1_target_rpm = 0;
-long motor1_current_rpm = 0;
+volatile MotorControlDirection motor1_dir = MC_FORWARD;
+volatile byte motor1_pwm = 0;
+volatile long motor1_target_rpm = 0;
+volatile long motor1_current_rpm = 0;
 
 MotorControlStyle motor2_control = MC_PWM;
 MotorControlDirection motor2_dir = MC_FORWARD;
@@ -41,3 +41,13 @@ volatile int dState = 0;                   // Last position input
 
 //these are our packet classes
 SimplePacket masterPacket(rs485_tx);
+
+//variables to keep track of stepper state.
+const byte coil_a_enabled   = B11101110;
+const byte coil_a_direction = B11110000;
+const byte coil_b_enabled   = B10111011;
+const byte coil_b_direction = B11000011;
+
+//what state are we in?
+volatile byte stepper_index = 0;
+volatile long stepper_ticks = 0;
