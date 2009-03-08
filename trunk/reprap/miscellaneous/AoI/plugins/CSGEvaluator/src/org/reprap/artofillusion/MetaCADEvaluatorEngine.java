@@ -46,16 +46,17 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
     return "";
   }
 
-  public void readParameters() {
+  public boolean readParameters() {
     jep = new JEP();
     jep.addStandardConstants();
     jep.addStandardFunctions();
-    evaluateLines(getParameters());
+    return evaluateLines(getParameters());
   }
 
   public void evaluate() {
-    readParameters();
-    super.evaluate();
+    // only evaluate selected objects if the parameters could be evaluated
+    if (readParameters())
+      super.evaluate();
   }
 
   public ObjectInfo evaluateNode(ObjectInfo parent, UndoRecord undo) throws Exception {
@@ -86,7 +87,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 
     MetaCADParser forExpr = new MetaCADParser(line, ";");
 
-    // no loop but a simple boolean op let base class do that
+    // no loop but a simple boolean operation let base class do that
     if (forExpr.parseError || forExpr.parameters.length != 3) {
       forExpr = new MetaCADParser("dummyDummy(dummyDummy=0; dummyDummy<1; dummyDummy=dummyDummy+1)", ";");
     }
@@ -96,7 +97,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
     // evaluate first part of for loop i.e. i=0
     evaluateAssignment(forExpr.parameters[0]);
 
-    // security count to exit loop even if wee fuck up exit condition
+    // security count to exit loop even if we fuck up exit condition
     int count = 0;
 
     // condition loop evaluate the condition i.e. i < 10
@@ -132,7 +133,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
             rotz));
       }
 
-      Object3D test = SanitizeObjectInfo(helper.sum);
+      Object3D test = sanitizeObject3D(helper.sum);
 
       parent.setObject(test);
 
@@ -147,11 +148,11 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
     return true;
   }
 
-  protected Object3D SanitizeObjectInfo(Object3D obj) throws Exception {
+  protected Object3D sanitizeObject3D(Object3D obj) throws Exception {
     try {
       obj.getBounds();
     } catch (Exception ex) {
-      new MessageDialog(this.window, "Exception in Object3D.getBounds()? Bad CSG Object?");
+      showMessage("Exception in Object3D.getBounds()? Bad CSG Object? Check for coinciding surfaces.");
       throw ex;
       // return new Cube(10,10,10);
     }
@@ -298,7 +299,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
       jep.parseExpression(expr);
       return jep.getValue();
     } catch (Exception ex) {
-      System.out.println("Error while evaluating Expression: \"" + expr
+      showMessage("Error while evaluating Expression: \"" + expr
           + "\" Syntax Error or unknown variable?");
       throw (ex);
       // return 0;
@@ -318,13 +319,12 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
       // System.out.println(value);
       jep.addVariable(name, value);
     } catch (Exception ex) {
-      System.out.println("Invalid Assignment: \"" + curLine
-          + "\" syntax error?");
+      showMessage("Invalid Assignment: \"" + curLine + "\" syntax error?");
       throw (ex);
     }
   }
 
-  void evaluateLines(String text) {
+  boolean evaluateLines(String text) {
     try {
       String lines[] = text.split("\n");
       for (String curLine : lines) {
@@ -333,25 +333,14 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
           continue;
         evaluateAssignment(curLine);
       }
+      return true;
     } catch (Exception ex) {
       System.out.println(ex);
+      return false;
     }
   }
 
-  void evaluateParametersFile(String fileName) {
-    try {
-      File inFile = new File(fileName);
-      BufferedReader fr = new BufferedReader(new FileReader(inFile));
-      String curLine;
-
-      while (null != (curLine = fr.readLine())) {
-        curLine = curLine.trim();
-        if (curLine.length() == 0 || curLine.startsWith("#"))
-          continue;
-        evaluateAssignment(curLine);
-      }
-    } catch (Exception ex) {
-      System.out.println(ex);
-    }
+  void showMessage(String text)  {
+    new MessageDialog(this.window, text);
   }
 }
