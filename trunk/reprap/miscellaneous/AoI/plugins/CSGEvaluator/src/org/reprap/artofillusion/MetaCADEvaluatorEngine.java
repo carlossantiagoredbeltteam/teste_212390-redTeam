@@ -335,7 +335,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
       }
       return true;
     } catch (Exception ex) {
-      System.out.println(ex);
+      //System.out.println(ex);
       return false;
     }
   }
