@@ -53,8 +53,7 @@ public:
    int sample_temperature(byte pin);
    void manage();
    
-#ifdef SANGUINO
-   // Interrupt setup and handling functions
+   // Interrupt setup and handling functions for stepper-driven extruders
    
    void interrupt();
    void enableTimerInterrupt(); 	
@@ -66,7 +65,6 @@ public:
    unsigned int getTimerCeiling(long delay);
    byte getTimerResolution(long delay);
    
-#endif
 
 #ifdef TEST_MACHINE
    void heater_test();

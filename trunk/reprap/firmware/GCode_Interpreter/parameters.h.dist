@@ -39,7 +39,7 @@
 // E_STEPS_PER_MM is the number of steps needed to 
 // extrude 1mm out of the nozzle.
 
-#define E_STEPS_PER_MM   0.52   // 5mm drive - empirically adjusted
+#define E_STEPS_PER_MM   0.52   // 5mm diameter drive - empirically adjusted
 #define E_STEPS_PER_INCH (E_STEPS_PER_MM*INCHES_TO_MM)
 #define E_MOTOR_STEPS    400
 
