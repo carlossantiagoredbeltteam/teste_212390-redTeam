@@ -181,6 +181,35 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 
     Object3D obj3D = null;
     CoordinateSystem coordsys = null;
+    
+    if (objExpr.name.startsWith("poly"))
+    {
+      if (objExpr.parameters.length == 4 && objExpr.parameters[0].startsWith("star"))
+      {
+        
+        double inner  = evaluateExpression(objExpr.parameters[2]); //innerValueField.getValue();
+        double outer = evaluateExpression(objExpr.parameters[3]); //outerValueField.getValue();
+        int n = (int)evaluateExpression(objExpr.parameters[1]); //(int) Math.round( nValueField.getValue() );
+  
+        Vec3[] v = new Vec3[2*n];
+        float[] smoothness = new float[2*n];
+        int index = 0;
+        for (int i = 0; i < n; i++)
+        {
+          v[index] = new Vec3( Math.cos( Math.PI * index / (double) n ),
+            Math.sin( Math.PI * index / (double) n ), 0 );
+          v[index].scale( inner );
+          v[index+1] = new Vec3( Math.cos( Math.PI * (index + 1) / (double) n ),
+            Math.sin( Math.PI * (index + 1) / (double) n ), 0 );
+          v[index+1].scale( outer );
+          smoothness[index]=0;
+          smoothness[index+1]=0;
+          index += 2;
+        }
+  
+        obj3D = new Curve( v, smoothness, Mesh.NO_SMOOTHING, true).convertToTriangleMesh(0);
+      }
+    }
 
     if (objExpr.name.startsWith("extrude")) {
       // Three first parameters define the extrusion vector
