@@ -43,12 +43,12 @@ extruder::extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin,
           pinMode(step_en_pin, OUTPUT);
 	  digitalWrite(step_en_pin, 1); // N.B. Active low.
         }
-#ifdef SANGUINO
+//#ifdef SANGUINO
 
         setupTimerInterrupt();
 	disableTimerInterrupt();
 
-#endif
+//#endif
 
         //these our the default values for the extruder.
         e_speed = 0;
@@ -262,8 +262,7 @@ void extruder::set_speed(float sp)
       analogWrite(motor_speed_pin, e_speed);
       return;
     }
-    
-#ifdef SANGUINO    
+      
     // No - stepper
   disableTimerInterrupt();
   
@@ -286,10 +285,8 @@ void extruder::set_speed(float sp)
   setupTimerInterrupt();
   setTimer(thousand_ticks_per_step);
   enableTimerInterrupt();
-#endif
 }
 
-#ifdef SANGUINO
 
 void extruder::interrupt()
 {
@@ -465,8 +462,6 @@ byte extruder::getTimerResolution(long delay)
 		return 4;
 }
 
-
-#endif
 
 #ifdef TEST_MACHINE
 

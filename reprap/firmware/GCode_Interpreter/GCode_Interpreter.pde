@@ -25,12 +25,12 @@ extruder* ex[EXTRUDER_COUNT];
 
 // Our interrupt function
 
-#ifdef SANGUINO
+
 SIGNAL(SIG_OUTPUT_COMPARE1A)
 {
   ex[extruder_in_use]->interrupt();
 }
-#endif
+
 
 void setup()
 {

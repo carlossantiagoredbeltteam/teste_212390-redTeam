@@ -75,7 +75,7 @@
 #define EXTRUDER_0_TEMPERATURE_PIN  (byte)0  // Analogue input
 #define EXTRUDER_0_VALVE_DIR_PIN             (byte)16       //NB: Conflicts with Max Z!!!!
 #define EXTRUDER_0_VALVE_ENABLE_PIN          (byte)15 
-#define EXTRUDER_0_STEP_ENABLE_PIN  -1
+#define EXTRUDER_0_STEP_ENABLE_PIN  -1 // 5 - NB conflicts with the fan; set -ve if no stepper
 
 #endif
 #endif
