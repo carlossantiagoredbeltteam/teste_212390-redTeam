@@ -110,13 +110,13 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
       count++;
     }
 
-    if (helper.sum != null) {
+    if (helper.GetObject() != null) {
       Texture tex = parent.object.getTexture();
       TextureMapping map = parent.object.getTextureMapping();
 
       if (coordsys != null) parent.setCoords(coordsys);
 
-      Object3D test = sanitizeObject3D(helper.sum);
+      Object3D test = sanitizeObject3D(helper.GetObject());
 
       parent.setObject(test);
 
