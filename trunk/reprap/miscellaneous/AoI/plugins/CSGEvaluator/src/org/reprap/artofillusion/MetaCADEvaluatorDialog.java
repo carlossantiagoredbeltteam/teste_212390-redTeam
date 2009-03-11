@@ -34,7 +34,7 @@ class MetaCADEvaluatorDialog extends BDialog
  BTextArea parametersTextArea;
 	protected LayoutWindow window;
   protected String[] functions = new String [] {
-	  "evaluate", "devaluate", "union", "intersection", "difference", "readParameters"
+	  "evaluate", "devaluate", "union", "intersection", "difference"
   };
 
   protected String[] labels = new String [] {
