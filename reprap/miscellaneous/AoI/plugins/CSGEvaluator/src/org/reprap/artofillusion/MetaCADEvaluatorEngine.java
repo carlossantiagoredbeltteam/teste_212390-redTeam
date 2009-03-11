@@ -75,18 +75,31 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
     if (booleanOp == -1)
       return false;
 
+    String[] parameters = null;
+    CoordinateSystem coordsys=null;
     MetaCADParser coordExpr = new MetaCADParser(line);
 
     if (!coordExpr.parse()) return false;
 
-    CoordinateSystem coordsys = evaluateCoordSys(coordExpr.getParameters("cs"));
-    
-    String[] parameters = coordExpr.getParameters(this.opToString(booleanOp));
+    Enumeration<String> iter = coordExpr.getNames();
+    while (iter.hasMoreElements()) {
+      String name = iter.nextElement();
+      parameters = coordExpr.getParameters(name);
+      
+      if (name.equals("cs")) {
+        coordsys = evaluateCoordSys(parameters);
+      }
+      else if (name.startsWith(this.opToString(booleanOp)))
+      {
+        parameters=coordExpr.getParameters(name);
+      }
+    }
+      
     if (parameters == null || parameters.length != 3) {
       // no loop but a simple boolean operation let base class do that
-      MetaCADParser forExpr = new MetaCADParser("dummyDummy(dummyDummy=0; dummyDummy<1; dummyDummy=dummyDummy+1)");
-      forExpr.parse();
-      parameters = forExpr.getParameters("dummyDummy");
+      coordExpr = new MetaCADParser("dummyDummy(dummyDummy=0; dummyDummy<1; dummyDummy=dummyDummy+1)");
+      coordExpr.parse();
+      parameters = coordExpr.getParameters("dummyDummy");
     }
 
     CSGHelper helper = new CSGHelper(booleanOp);
