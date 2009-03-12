@@ -1,4 +1,5 @@
 #include <SimplePacket.h>
+#include <avr/io.h>
 
 SimplePacket::SimplePacket(txFuncPtr myPtr)
 {
