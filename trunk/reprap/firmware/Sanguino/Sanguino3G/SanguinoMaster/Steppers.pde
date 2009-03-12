@@ -30,6 +30,17 @@ void init_steppers()
   pinMode(Z_MIN_PIN, INPUT);
   pinMode(Z_MAX_PIN, INPUT);
 
+#if SENSORS_INVERTING == 1
+  // If we are using inverting endstops, we'll turn on the pull-ups on these pins.
+  // This enables us to operate without endstops if necessary.
+  digitalWrite(X_MIN_PIN, HIGH);
+  digitalWrite(X_MAX_PIN, HIGH);
+  digitalWrite(Y_MIN_PIN, HIGH);
+  digitalWrite(Y_MAX_PIN, HIGH);
+  digitalWrite(Z_MIN_PIN, HIGH);
+  digitalWrite(Z_MAX_PIN, HIGH);
+#endif
+
   //turn them off to start.
   disable_steppers();
 
@@ -383,8 +394,8 @@ inline bool can_step(byte min_pin, byte max_pin, long current, long target, byte
   if (target == current)
     return false;
   //stop us if we're at home and still going 
-//  else if (read_switch(min_pin) && !direction)
-//    return false;
+  else if (read_switch(min_pin) && !direction)
+    return false;
   //stop us if we're at max and still going
 //  else if (read_switch(max_pin) && direction)
 //    return false;
