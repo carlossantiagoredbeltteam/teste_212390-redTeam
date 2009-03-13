@@ -397,8 +397,8 @@ inline bool can_step(byte min_pin, byte max_pin, long current, long target, byte
   else if (read_switch(min_pin) && !direction)
     return false;
   //stop us if we're at max and still going
-//  else if (read_switch(max_pin) && direction)
-//    return false;
+  else if (read_switch(max_pin) && direction)
+    return false;
 
   //default to being able to step
   return true;
@@ -586,6 +586,12 @@ void queue_absolute_point(long x, long y, long z, byte prescaler, unsigned int c
     //queue our point.
     queue_incremental_point(x_inc, y_inc, z_inc, prescaler, count);
   }
+
+  // update eventual_steps
+  eventual_steps.x = x;
+  eventual_steps.y = y;
+  eventual_steps.z = z;
+
 }
 
 inline int get_increment_from_absolute(long delta, float ratio)
