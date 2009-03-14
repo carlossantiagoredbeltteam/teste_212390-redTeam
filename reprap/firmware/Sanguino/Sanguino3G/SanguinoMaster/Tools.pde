@@ -51,6 +51,8 @@ void select_tool(byte tool)
   slavePacket.add_8(tool);
   slavePacket.add_8(SLAVE_CMD_SELECT_TOOL);
   send_packet();
+
+  wait_for_tool_ready_state(tool, 0, 0);
 }
 
 //ping the tool until it tells us its ready
