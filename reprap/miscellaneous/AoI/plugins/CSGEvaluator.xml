@@ -11,6 +11,7 @@
   <property name="docs" value="${package}/docs" />
   <property name="dist" value="Plugins" />
   <property name="aoijar" value="${aoidir}/ArtOfIllusion.jar" />
+  <property name="toolsjar" value="${aoidir}/Plugins/Tools.jar" />
   <property name="jeplite" value="${package}/lib/jeplite-0.8.7a-bin.jar" />
 
   <target name="init">
@@ -25,7 +26,7 @@
   <target name="compile" depends="init">
     <!-- Compile the java code from ${src} into ${build} -->
     <javac source="1.5" target="1.5" srcdir="${src}" destdir="${build}"
-	   classpath="${aoijar};${jeplite}" debug="on" extdirs="" />
+	   classpath="${aoijar};${toolsjar};${jeplite}" debug="on" extdirs="" />
   </target>
 
   <target name="dist" depends="compile">
@@ -55,7 +56,7 @@
   <target name="docs" depends="init">
     <javadoc packagenames="artofillusion.*"
         sourcepath="${src}"
-        classpath="${buoyjar};${aoijar}"
+        classpath="${buoyjar};${aoijar};${toolsjar}"
         defaultexcludes="yes"
         destdir="${docs}"
         author="true"
