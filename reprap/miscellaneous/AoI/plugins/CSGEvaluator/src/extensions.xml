@@ -1,6 +1,9 @@
 <?xml version='1.0'?>
 
 <extension name="CSGEvaluator" version="1.2">
+
+  <import name="Tools" />
+
   <plugin class="org.reprap.artofillusion.CSGEvaluatorTool"/> 
   <plugin class="org.reprap.artofillusion.MetaCADEvaluatorTool"/> 
   <plugin class="org.reprap.artofillusion.CSGEvaluatorPlugin"/> 
