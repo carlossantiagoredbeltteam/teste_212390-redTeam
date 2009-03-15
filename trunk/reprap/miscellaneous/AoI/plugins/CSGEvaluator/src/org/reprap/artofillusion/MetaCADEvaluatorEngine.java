@@ -209,6 +209,57 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 
           obj3D = new Curve(v, smoothness, Mesh.NO_SMOOTHING, true).convertToTriangleMesh(0);
         }
+        if (parameters.length >= 3 && parameters[0].startsWith("reg")) {
+          double radiusy;
+          double radiusx  = evaluateExpression(parameters[2]);
+          
+          if (parameters.length >= 4)
+            radiusy  = evaluateExpression(parameters[3]); 
+          else
+            radiusy  = radiusx;
+          
+          int n = (int)evaluateExpression(parameters[1]); 
+
+          Vec3[] v = new Vec3[n];
+          float[] smoothness = new float[n];
+          int index = 0;
+          for (int i = 0; i < n; i++)
+          {
+            v[index] = new Vec3( radiusx*Math.cos( 2*Math.PI * index / (double) n ),
+                radiusy*Math.sin(2*Math.PI * index / (double) n ), 0 );
+            smoothness[index]=0;
+            index++;
+          }
+
+          obj3D = new Curve(v, smoothness, Mesh.NO_SMOOTHING, true).convertToTriangleMesh(0);
+        }
+        
+        if (parameters.length == 4 && parameters[0].startsWith("roll")) {
+          double small  = evaluateExpression(parameters[2]); //innerValueField.getValue();
+          double big = evaluateExpression(parameters[3]); //outerValueField.getValue();
+          int n = (int)evaluateExpression(parameters[1]); //(int) Math.round( nValueField.getValue() );
+          
+          Vec3[] v = new Vec3[n];
+          float[] smoothness = new float[n];
+          int index = 0;
+          for (int i = 0; i < n; i++)
+          {
+            double biga=(2*Math.PI*i)/n;
+            double len = big*biga;
+            double smalla=len/small;
+            double x,y;
+            
+            x = (big+small)*Math.cos(biga) + (small)*Math.cos(smalla);
+            y = (big+small)*Math.sin(biga) + (small)*Math.sin(smalla);
+            
+            v[index] = new Vec3(x, y, 0 );
+            
+            smoothness[index]=0;
+            index++;
+          }
+
+          obj3D = new Curve(v, smoothness, Mesh.NO_SMOOTHING, true).convertToTriangleMesh(0);
+        }
       }
       else if (name.startsWith("extrude")) {
         // Three first parameters define the extrusion vector
