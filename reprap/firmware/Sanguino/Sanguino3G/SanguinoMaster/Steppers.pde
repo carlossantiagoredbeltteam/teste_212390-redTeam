@@ -424,15 +424,19 @@ inline bool read_switch(byte pin)
     return digitalRead(pin) && digitalRead(pin);
 }
 
-//enable our steppers so we can move them.
+// enable our steppers so we can move them.  disable any steppers
+// not about to be set in motion to reduce power and heat.
+// TODO: make this a configuration option (HOLD_AXIS?); there are some
+// situations (milling) where you want to leave the steppers on to
+// hold the position.
 inline void enable_steppers()
 {
-  if (delta_steps.x > 0)
-    digitalWrite(X_ENABLE_PIN, STEPPER_ENABLE);
-  if (delta_steps.y > 0)
-    digitalWrite(Y_ENABLE_PIN, STEPPER_ENABLE);
-  if (delta_steps.z > 0)
-    digitalWrite(Z_ENABLE_PIN, STEPPER_ENABLE);
+  digitalWrite(X_ENABLE_PIN, 
+	       (delta_steps.x > 0)?STEPPER_ENABLE:STEPPER_DISABLE);
+  digitalWrite(Y_ENABLE_PIN, 
+	       (delta_steps.y > 0)?STEPPER_ENABLE:STEPPER_DISABLE);
+  digitalWrite(Z_ENABLE_PIN, 
+	       (delta_steps.z > 0)?STEPPER_ENABLE:STEPPER_DISABLE);
 }
 
 //turn off steppers to save juice / keep things cool.
