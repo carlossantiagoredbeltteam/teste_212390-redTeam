@@ -86,11 +86,16 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
 
     		if(layer == oldLayer)
     			return;
+    		
+    		boolean topDown = layer < oldLayer;
 
     		oldLayer = layer;
 
     		currentLayerOutOfN.setText("" + layer + "/" + layers);
-    		fractionDone = (double)layer/(double)layers;
+    		if(topDown)
+    			fractionDone = (double)(layers - layer)/(double)layers;
+    		else
+    			fractionDone = (double)layer/(double)layers;
     	}
  
     	progressBar.setMinimum(0);
