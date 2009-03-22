@@ -14,7 +14,6 @@ package org.reprap.gui.botConsole;
 
 import org.reprap.Preferences;
 import javax.swing.JOptionPane;
-//import org.reprap.machines.Reprap;
 //import org.reprap.machines.MachineFactory;
 
 /**
