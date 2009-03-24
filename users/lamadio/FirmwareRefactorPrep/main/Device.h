@@ -10,9 +10,6 @@
 class Device
 {
 public:
-	Device() {}
-	virtual ~Device() {}
-	
-	static void map(size_t pin, Device* toDevice);
-	static Device* get(size_t pin);
+    Device() {}
+    virtual ~Device() {}
 };

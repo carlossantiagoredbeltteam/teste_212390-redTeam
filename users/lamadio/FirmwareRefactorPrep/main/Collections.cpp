@@ -23,7 +23,7 @@ DArray::DArray()
 
 DArray::~DArray()
 {
-	free(_array);
+    free(_array);
 }
 
 void* DArray::item(int i)
@@ -84,39 +84,39 @@ bool DArray::insert(int i, void* item)
     if (needed > _allocated)
     {
         _allocated += ARRAY_GROWTH_COUNT;
-            		
-		/*
-		    NOTE: Ideally this codepath would use realloc in order to expand an 
-		    existing array, however, the current libc implementation of realloc
-		    has a subtle bug which causes freelist corruption. 
-		    Editorial of this bug is:
-		    http://www.ooeygui.com/?p=216
-		    With annotated fix here:
-		    http://www.ooeygui.com/?p=221
+                    
+        /*
+            NOTE: Ideally this codepath would use realloc in order to expand an 
+            existing array, however, the current libc implementation of realloc
+            has a subtle bug which causes freelist corruption. 
+            Editorial of this bug is:
+            http://www.ooeygui.com/?p=216
+            With annotated fix here:
+            http://www.ooeygui.com/?p=221
 
-		    The patch will be submitted to the AVR working group, however,
-		    the workaround posted will function, albeit more slowly as it requires
-		    a memmove on each allocation. This codepath attempts to workaround it
-		    with by keeping track of a separate count and allocated.
+            The patch will be submitted to the AVR working group, however,
+            the workaround posted will function, albeit more slowly as it requires
+            a memmove on each allocation. This codepath attempts to workaround it
+            with by keeping track of a separate count and allocated.
             void** newArray = (void**)realloc(_array, _allocated * sizeof(void*));
             if (newArray)
                 _array = newArray;
             else
                 return false;
         */
-		void** newArray = (void**)malloc(_allocated * sizeof(void*));
-		if (newArray)
-		{
-		    if (_array)
-		    {
-    			memmove(newArray, _array, _count * sizeof(void*));
-    			free(_array);
-			}
-			
-			_array = newArray;
-		}
-		else
-			return false;
+        void** newArray = (void**)malloc(_allocated * sizeof(void*));
+        if (newArray)
+        {
+            if (_array)
+            {
+                memmove(newArray, _array, _count * sizeof(void*));
+                free(_array);
+            }
+            
+            _array = newArray;
+        }
+        else
+            return false;
     }
     
     
@@ -143,13 +143,13 @@ void DArray::remove(int i)
     }
     
     _count--;
-	
-	if (_count == 0)
-	{
+    
+    if (_count == 0)
+    {
         _allocated = 0;
-		free(_array);
-		_array = NULL;
-	}
+        free(_array);
+        _array = NULL;
+    }
 }
 
 bool DArray::find(void* item, size_t* at)

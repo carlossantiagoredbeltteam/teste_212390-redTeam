@@ -34,8 +34,11 @@ public:
 //
 class EventLoopTimer
 {
+private:
     milliclock_t _lastTimeout;
     milliclock_t _period;
+protected:
+    inline void setPeriod(milliclock_t period) { _period = period; }
 public:
     EventLoopTimer(unsigned long period);
     virtual ~EventLoopTimer();

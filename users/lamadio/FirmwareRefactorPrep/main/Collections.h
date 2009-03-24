@@ -17,6 +17,7 @@ inline int max(int x, int y)
 #endif
 
 typedef void (*DArrayForEach)(void* item, void* context);
+#undef int
 typedef int (*DArraySortCallback)(const void* item1, const void* item2);
 
 

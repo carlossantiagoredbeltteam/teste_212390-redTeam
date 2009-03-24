@@ -12,14 +12,6 @@
 class DArray;
 class Observer;
 
-const uint32_t ObservedEvent_None = 0;
-const uint32_t ObservedEvent_Attached = 1;
-const uint32_t ObservedEvent_Detached = 2;
-const uint32_t ObservedEvent_Destroyed = 3;
-
-const uint32_t ObservedEvent_ComponentFirst = 10;
-
-
 class Observable
 {
     DArray _observers;

@@ -6,22 +6,22 @@
  *  Copyright 2009 OoeyGUI. All rights reserved.
  *
  */
-
-const uint32_t StepperLinearActuator_CompletedMove = 'SLAC';
-const uint32_t StepperLinearActuator_Extent = 'SLAF';
-const uint32_t StepperLinearActuator_Homed = 'SLAH';
-
-class StepperLinearActuator : public Device, Observer, Observable
+ 
+class LinearActuator : public Device, 
+                       public Observable,
+                       public Observer
 {
-	float _currentPos;
-	float _revPerMM;
-	StepperDevice& _stepper;
-	OpticalInterrupt& _nearInterrupter;
-	OpticalInterrupt& _farInterrupter;
-	
+    float _currentPos;
+    float _revPerMM;
+    StepperDevice& _stepper;
+    OpticalInterrupt& _nearInterrupter;
+    OpticalInterrupt& _farInterrupter;
+    
 public:
-	StepperLinearActuator(float _revPerMM, StepperDevice& stepper, OpticalInterrupt& far, OpticalInterrupt& near);
-	
-	void moveTo(float newPosMM);
+    LinearActuator(float _revPerMM, StepperDevice& stepper, OpticalInterrupt& far, OpticalInterrupt& near);
+    inline float currentPosition() { return _currentPos; }
+    inline void setTempRate(float rate) { _stepper.setTempRate(rate); }
+    void moveTo(float newPosMM);
+    void moveHome();
     virtual void notify(uint32_t eventId, void* context);
 };
