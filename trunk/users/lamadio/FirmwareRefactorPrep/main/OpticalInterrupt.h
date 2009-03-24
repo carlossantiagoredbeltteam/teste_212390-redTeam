@@ -7,15 +7,14 @@
  *
  */
 
-const uint32_t OpticalInterrupt_Interrupted = 'OPTI';
 
-
-
-class OpticalInterrupt : public Device, Observable, PeriodicCallback
+class OpticalInterrupt : public Device, 
+                         public Observable, 
+                         public PeriodicCallback
 {
-	int _inputPin;
+    int _inputPin;
 public:
-	OpticalInterrupt(int pin);
+    OpticalInterrupt(int pin);
     virtual void service();
 };
 

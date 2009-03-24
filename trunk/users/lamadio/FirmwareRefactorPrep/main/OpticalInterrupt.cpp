@@ -7,6 +7,7 @@
  *
  */
 #include "WProgram.h"
+#include "Constants.h"
 #include "Collections.h"
 #include "EventLoop.h"
 #include "Device.h"

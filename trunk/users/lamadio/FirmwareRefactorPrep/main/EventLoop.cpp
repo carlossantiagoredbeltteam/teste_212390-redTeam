@@ -9,6 +9,7 @@
 #include <stdint.h>
 
 #include "WProgram.h"
+#include "Constants.h"
 #include "Collections.h"
 #include "EventLoop.h"
 
