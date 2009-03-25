@@ -51,14 +51,19 @@ public:
   }
 
   /// Append a character to the end of the circular buffer.
-  bool append(const uint8_t datum) {
+  void append(const uint8_t datum) {
     buffer[(start+count)%capacity] = datum;
     count++;
   }
   
-  bool append_16(const uint16_t datum) {
+  void append_16(const uint16_t datum) {
     append(datum & 0xff);
     append(datum >> 8);
+  }
+
+  void append_32(const uint32_t datum) {
+    append_16(datum & 0xffff);
+    append_16(datum >> 16);
   }
 
   /// Remove and return a character from the start of the

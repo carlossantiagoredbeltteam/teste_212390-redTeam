@@ -20,9 +20,9 @@
 //PWM
 //#define MOTOR_STYLE 0
 //ENCODER
-//#define MOTOR_STYLE 1 
+#define MOTOR_STYLE 1 
 //STEPPER
-#define MOTOR_STYLE 2 
+//define MOTOR_STYLE 2 
 
 /****************************************************************************************
  * Here's where you define the speed PID behavior for an encoder
