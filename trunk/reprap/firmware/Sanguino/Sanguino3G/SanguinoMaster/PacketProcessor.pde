@@ -246,7 +246,7 @@ void handle_commands()
         prescaler = commandBuffer.remove_8();
         count = commandBuffer.remove_16();
 
-        queue_incremental_point(x, y, z, prescaler, count);
+        //queue_incremental_point(x, y, z, prescaler, count);
 
         break;
 
@@ -293,7 +293,7 @@ void handle_commands()
           commandBuffer.remove_32(),
           commandBuffer.remove_16());
 
-        //turn on point seekign agian.
+        //turn on point seeking agian.
         enableTimer1Interrupt();
 
         break;
@@ -302,6 +302,9 @@ void handle_commands()
       case HOST_CMD_FIND_AXES_MAXIMUM:
         wait_until_target_reached(); //dont want to get hasty.
 
+        //no dda interrupts.
+        disableTimer1Interrupt();
+
         //find them!
         seek_maximums(
           flags & 1,
@@ -309,6 +312,10 @@ void handle_commands()
           flags & 4,
           commandBuffer.remove_32(),
           commandBuffer.remove_16());
+
+        //turn on point seeking agian.
+        enableTimer1Interrupt();
+
         break;
 
       //TODO: TEST
