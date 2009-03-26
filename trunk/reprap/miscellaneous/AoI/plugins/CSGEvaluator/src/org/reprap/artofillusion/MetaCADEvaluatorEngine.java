@@ -1,12 +1,15 @@
 package org.reprap.artofillusion;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 import org.cheffo.jeplite.JEP;
 
 import artofillusion.LayoutWindow;
 import artofillusion.UndoRecord;
 import artofillusion.math.CoordinateSystem;
+import artofillusion.math.Vec2;
 import artofillusion.math.Vec3;
 import artofillusion.object.Cube;
 import artofillusion.object.Curve;
@@ -186,13 +189,16 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
         coordsys = evaluateCoordSys(parameters);
       }
       else if (name.startsWith("poly")) {
+        Vec3[] v=null;
+        float[] smoothness=null;
+        
         if (parameters.length == 4 && parameters[0].startsWith("star")) {
           double inner  = evaluateExpression(parameters[2]); //innerValueField.getValue();
           double outer = evaluateExpression(parameters[3]); //outerValueField.getValue();
           int n = (int)evaluateExpression(parameters[1]); //(int) Math.round( nValueField.getValue() );
 
-          Vec3[] v = new Vec3[2*n];
-          float[] smoothness = new float[2*n];
+          v = new Vec3[2*n];
+          smoothness = new float[2*n];
           int index = 0;
           for (int i = 0; i < n; i++)
           {
@@ -206,7 +212,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
             smoothness[index+1]=0;
             index += 2;
           }
-
+        
           obj3D = new Curve(v, smoothness, Mesh.NO_SMOOTHING, true).convertToTriangleMesh(0);
         }
         if (parameters.length >= 3 && parameters[0].startsWith("reg")) {
@@ -220,8 +226,8 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
           
           int n = (int)evaluateExpression(parameters[1]); 
 
-          Vec3[] v = new Vec3[n];
-          float[] smoothness = new float[n];
+          v = new Vec3[n];
+          smoothness = new float[n];
           int index = 0;
           for (int i = 0; i < n; i++)
           {
@@ -234,13 +240,17 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
           obj3D = new Curve(v, smoothness, Mesh.NO_SMOOTHING, true).convertToTriangleMesh(0);
         }
         
-        if (parameters.length == 4 && parameters[0].startsWith("roll")) {
-          double small  = evaluateExpression(parameters[2]); //innerValueField.getValue();
-          double big = evaluateExpression(parameters[3]); //outerValueField.getValue();
+        if (parameters.length >= 4 && parameters[0].startsWith("roll")) {
+          double big  = evaluateExpression(parameters[2]); //innerValueField.getValue();
+          double small = evaluateExpression(parameters[3]); //outerValueField.getValue();
           int n = (int)evaluateExpression(parameters[1]); //(int) Math.round( nValueField.getValue() );
+          double small2 = small;
+          if (parameters.length == 5)
+            small2=evaluateExpression(parameters[4]);
+            
           
-          Vec3[] v = new Vec3[n];
-          float[] smoothness = new float[n];
+          v = new Vec3[n];
+          smoothness = new float[n];
           int index = 0;
           for (int i = 0; i < n; i++)
           {
@@ -249,15 +259,41 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
             double smalla=len/small;
             double x,y;
             
-            x = (big+small)*Math.cos(biga) + (small)*Math.cos(smalla);
-            y = (big+small)*Math.sin(biga) + (small)*Math.sin(smalla);
+            x = (big+small)*Math.cos(biga) + (small2)*Math.cos(smalla);
+            y = (big+small)*Math.sin(biga) + (small2)*Math.sin(smalla);
             
             v[index] = new Vec3(x, y, 0 );
             
             smoothness[index]=0;
             index++;
           }
-
+        }
+        if (v != null && smoothness!= null)
+        {
+          String[] inset = objExpr.getParameters("inset");
+          
+          if (inset != null && inset.length == 1)
+          {
+            v = insetPoly(v, evaluateExpression(inset[0]));
+            
+  //          double s=evaluateExpression(shrink[0]);
+  //          for (int i = 0; i < v.length; i++)
+  //          {
+  //            int iprev = (i+v.length-1)%v.length;
+  //            int inext = (i+1)%v.length;
+  //            
+  //            double yn = -(v[inext].x - v[iprev].x);
+  //            double xn = v[inext].y - v[iprev].y;
+  //            
+  //            double l=Math.sqrt(xn*xn+yn*yn);
+  //            xn /= l;
+  //            yn /= l;
+  //            
+  //            v[i].x += s*xn;
+  //            v[i].y += s*yn; 
+  //          }
+          }
+          
           obj3D = new Curve(v, smoothness, Mesh.NO_SMOOTHING, true).convertToTriangleMesh(0);
         }
       }
@@ -426,4 +462,103 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
   void showMessage(String text)  {
     new MessageDialog(this.window, text);
   }
+
+///////////////////////////////////////////
+//math helpers
+ 
+  // solves system of 2 linear equations in 2 unknown 
+  class LinearSolve2
+  {
+    public boolean error;
+    public double x1, x2;
+  
+    // matrix looks like this 
+    // a b
+    // c d
+    public double det(double a,double b, double c, double d)
+    {
+      return a*d-b*c;  
+    }
+    // the equations look like thsi looks like this
+    // x1*a + x2*b = r1
+    // x1*c + x2*d = r2
+    public LinearSolve2(double a,double b, double c, double d, double r1, double r2)
+    {
+      double q;
+      
+      q=det(a,b,c,d);
+      if (Math.abs(q) < 0.00000001)
+      {
+        error = true;
+      }
+      else
+      {
+        error = false;
+        x1=det(r1,b,r2,d)/q;
+        x2=det(a,r1,c,r2)/q;
+      }
+    }
+  }
+  
+  class MetaCADLine {
+    protected Vec2 start,end, dir;
+    protected Vec2 normal;
+    
+    public MetaCADLine(Vec3 s,Vec3 e)
+    {
+      start = new Vec2(s.x,s.y);
+      end = new Vec2(e.x, e.y);
+      dir = end.minus(start);
+      normal = new Vec2(dir);
+      normal.normalize();
+      normal.set(-normal.y, normal.x);
+    }
+    
+    public void parallelMove(double d)
+    {
+      start.add(normal.times(d));
+    }
+    
+    public Vec3 intersect3(MetaCADLine l)
+    {
+      LinearSolve2 solve = new LinearSolve2(l.dir.x, -dir.x, l.dir.y, -dir.y, start.x-l.start.x, start.y-l.start.y);
+      if (solve.error)
+      {
+        return null;
+      }
+      else
+      {
+        Vec2 point = start.plus(dir.times(solve.x2)); 
+        return new Vec3(point.x,point.y, 0);
+      }
+    }
+  }
+  
+  Vec3[] insetPoly(Vec3[] poly,double inset)
+  {
+    //List<MetaCADLine> lines = new ArrayList<MetaCADLine>();
+    List<Vec3> points = new ArrayList<Vec3>();
+    
+    for (int i = 0; i < poly.length; i++)
+    {
+        int iprev = (i+poly.length-1)%poly.length;
+        int inext = (i+1)%poly.length;
+        
+        MetaCADLine prev = new MetaCADLine(poly[iprev], poly[i]);
+        MetaCADLine next = new MetaCADLine(poly[i], poly[inext]);
+        
+        prev.parallelMove(inset);
+        next.parallelMove(inset);
+        
+        Vec3 intersect=prev.intersect3(next);
+        if (intersect ==  null)
+        {
+          intersect = new Vec3(0,0,0);
+        }
+        points.add(intersect);
+    }
+     
+    return points.toArray(new Vec3[1]);
+  }
 }
+
