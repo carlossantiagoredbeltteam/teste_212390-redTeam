@@ -391,7 +391,7 @@ public class RrCSG
 		// (I do hope that the Java garbage collector is up to 
 		// spotting this deadly embrace, or we - I mean it - has
 		// a memory leak.)
-		// It turned out it was dumb.  Hence addition of finalize() above...
+		// It turned out it was dumb.  Hence addition of destroy() above...
 		
 		comp = result;
 		result.comp = this;
