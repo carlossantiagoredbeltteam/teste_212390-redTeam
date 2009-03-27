@@ -358,6 +358,8 @@ public void goTo(double xTo, double yTo, double zTo)
 
 	try
 	{
+		if(plotExtruderCheck.isSelected())
+			printer.getExtruder().setExtrusion(2000);
 		if(z >= zTo)
 		{
 			printer.setFeedrate(Double.parseDouble(xySpeedField.getText()));
@@ -371,8 +373,11 @@ public void goTo(double xTo, double yTo, double zTo)
 			printer.setFeedrate(Double.parseDouble(xySpeedField.getText()));
 			printer.moveTo(xTo, yTo, zTo, false, false);	
 		}
+		if(plotExtruderCheck.isSelected())
+			printer.getExtruder().setExtrusion(0);
 	} catch (Exception e)
 	{}	
+
 }
 
 private void goButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goButtonActionPerformed
