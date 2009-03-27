@@ -136,10 +136,9 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
      * So the BotConsoleFrame can let us know who it is
      * @param b
      */
-    public void setFrames(BotConsoleFrame b, XYZTabPanel xyz)
+    public void setConsoleFrame(BotConsoleFrame b)
     {
     	parentBotConsoleFrame = b;
-//    	xYZTabPanel = xyz;
     }
 
     /** This method is called from within the constructor to

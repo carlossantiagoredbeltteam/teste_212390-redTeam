@@ -31,7 +31,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
     private double startTime = -1;
     private boolean ramping = false;
     private double startTemp = -1;
-    
+	private BotConsoleFrame parentBotConsoleFrame = null;
     private Extruder extruder;
  
     /** Creates new form GenericExtruderTabPanel */
@@ -42,6 +42,15 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
 
         initComponents(); 
         RampRate.setText("0.2"); // Sensible default
+    }
+    
+    /**
+     * So the BotConsoleFrame can let us know who it is
+     * @param b
+     */
+    public void setConsoleFrame(BotConsoleFrame b)
+    {
+    	parentBotConsoleFrame = b;
     }
     
     private void deactivatePanel() {
@@ -532,11 +541,11 @@ private void RampButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 }//GEN-LAST:event_RampButtonActionPerformed
 
 private void homeAllButtonAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homeAllButtonAction
-	BotConsoleFrame.XYZ().homeAll();
+	BotConsoleFrame.getXYZTabPanel().homeAll();
 }//GEN-LAST:event_homeAllButtonAction
 
 private void moveToSwapPointAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveToSwapPointAction
-	BotConsoleFrame.XYZ().goTo(10, 160, BotConsoleFrame.XYZ().getPrinter().getZ());
+	BotConsoleFrame.getXYZTabPanel().goTo(10, 160, BotConsoleFrame.getXYZTabPanel().getPrinter().getZ());
 }//GEN-LAST:event_moveToSwapPointAction
 
     private void setExtruderSpeed() {
@@ -546,6 +555,11 @@ private void moveToSwapPointAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:
                 JOptionPane.showMessageDialog(null, "Extruder exception: " + ex);
                 ex.printStackTrace();
         }
+    }
+    
+    public double getExtruderSpeed()
+    {
+    	return Double.parseDouble(motorSpeedField.getText());
     }
     
     public void setPrefs() throws Exception {

@@ -19,7 +19,8 @@ public class XYZTabPanel extends javax.swing.JPanel {
     private double ZfastSpeed;
     private Printer printer;
     private static double nudgeSize = 0;
-    
+	private BotConsoleFrame parentBotConsoleFrame = null;
+	
     private void setPrefs() throws IOException {
         
         //XYfastSpeed = Preferences.loadGlobalInt("FastSpeed(0..255)");
@@ -30,6 +31,15 @@ public class XYZTabPanel extends javax.swing.JPanel {
         
         xySpeedField.setText(String.valueOf(XYfastSpeed));
         zSpeedField.setText(String.valueOf(ZfastSpeed));
+    }
+    
+    /**
+     * So the BotConsoleFrame can let us know who it is
+     * @param b
+     */
+    public void setConsoleFrame(BotConsoleFrame b)
+    {
+    	parentBotConsoleFrame = b;
     }
     
     public void setMotorSpeeds() {
@@ -359,7 +369,13 @@ public void goTo(double xTo, double yTo, double zTo)
 	try
 	{
 		if(plotExtruderCheck.isSelected())
-			printer.getExtruder().setExtrusion(2000);
+		{
+			int eNum = Integer.parseInt(extruderToPlotWith.getText());
+			GenericExtruderTabPanel etp = parentBotConsoleFrame.getGenericExtruderTabPanel(eNum);
+			printer.selectExtruder(eNum);
+			printer.getExtruder().setExtrusion(etp.getExtruderSpeed());
+			printer.machineWait(printer.getExtruder().getExtrusionDelayForLayer());
+		}
 		if(z >= zTo)
 		{
 			printer.setFeedrate(Double.parseDouble(xySpeedField.getText()));

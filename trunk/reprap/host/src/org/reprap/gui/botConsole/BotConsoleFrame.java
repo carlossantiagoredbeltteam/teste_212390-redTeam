@@ -45,8 +45,7 @@ public class BotConsoleFrame extends javax.swing.JFrame {
         }
 
         initComponents();
-        printTabFrame1.setFrames(this, xYZTabPanel);
-        //xYZTabPanel.setBedPanelDimensions();
+
         this.setTitle("RepRap Console");
         
         /*
@@ -173,6 +172,10 @@ public class BotConsoleFrame extends javax.swing.JFrame {
             public void run() {
                 bcf = new BotConsoleFrame();
                 bcf.setVisible(true);
+                bcf.printTabFrame1.setConsoleFrame(bcf);
+                bcf.xYZTabPanel.setConsoleFrame(bcf);
+                for(int i = 0; i < bcf.extruderPanels.length; i++)
+                	bcf.extruderPanels[i].setConsoleFrame(bcf);
             }
             
         });
@@ -182,11 +185,11 @@ public class BotConsoleFrame extends javax.swing.JFrame {
     {
     	return bcf;
     }
-    
-    public static org.reprap.gui.botConsole.XYZTabPanel XYZ()
-    {
-    	return bcf.xYZTabPanel;
-    }
+//    
+//    public static org.reprap.gui.botConsole.XYZTabPanel XYZ()
+//    {
+//    	return bcf.xYZTabPanel;
+//    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTabbedPane jTabbedPane1;
@@ -202,6 +205,24 @@ public class BotConsoleFrame extends javax.swing.JFrame {
 //        motorID++;
 //        return motorID;
 //    }
+    
+    public static PrintTabFrame getPrintTabFrame()
+    {
+    	return bcf.printTabFrame1;
+    }
+    
+    public static XYZTabPanel getXYZTabPanel()
+    {
+    	return bcf.xYZTabPanel;
+    }  
+    
+    public static GenericExtruderTabPanel getGenericExtruderTabPanel(int i)
+    {
+    	if(i >= 0 && i < bcf.extruderPanels.length)
+    		return bcf.extruderPanels[i];
+    	System.err.println("getGenericExtruderTabPanel - extruder out of range: " + i);
+    	return bcf.extruderPanels[0];
+    }
     
     private void initialiseExtruderPanels() {
 
