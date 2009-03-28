@@ -20,6 +20,7 @@ import buoy.widget.BButton;
 import buoy.widget.BDialog;
 import buoy.widget.BLabel;
 import buoy.widget.BScrollPane;
+import buoy.widget.BTabbedPane;
 import buoy.widget.BTextArea;
 import buoy.widget.BorderContainer;
 import buoy.widget.FormContainer;
@@ -30,11 +31,10 @@ import buoy.widget.LayoutInfo;
  */
 class MetaCADEvaluatorDialog extends BDialog
 {
- protected  MetaCADEvaluatorEngine engine;
- BTextArea parametersTextArea;
-	protected LayoutWindow window;
+  protected  MetaCADEvaluatorEngine engine;
+  protected LayoutWindow window;
   protected String[] functions = new String [] {
-	  "evaluate", "devaluate", "union", "intersection", "difference"
+      "evaluate", "devaluate", "union", "intersection", "difference"
   };
 
   protected String[] labels = new String [] {
@@ -45,46 +45,43 @@ class MetaCADEvaluatorDialog extends BDialog
   {
     super(window, Translate.text("MetaCADEvaluator:name"), false); // Modeless
     this.window = window;
-    this.setResizable(false);
+    this.setResizable(true);
     
     engine = new MetaCADEvaluatorEngine(window);
 
     BorderContainer bc = new BorderContainer();
+    bc.setDefaultLayout(new LayoutInfo());
     this.setContent(bc);
 
-    bc.setDefaultLayout(new LayoutInfo());
-
+    BTabbedPane tabcontainer = new BTabbedPane();
+    bc.add(tabcontainer, BorderContainer.CENTER, new LayoutInfo(LayoutInfo.CENTER, LayoutInfo.BOTH));
+    
     String versionstr = CSGEvaluatorPlugin.getVersion();
     bc.add(new BLabel(Translate.text("MetaCADEvaluator:title", versionstr)), BorderContainer.NORTH);
 
 
-    FormContainer fc = new FormContainer(2, functions.length+1);
-    bc.add(fc, BorderContainer.CENTER);
+    FormContainer buttonstab = new FormContainer(2, functions.length+1);
+    tabcontainer.add(buttonstab, "Operations");
 
     for (int i = 0; i < functions.length; i++) {
       if (labels[i] != null) {
-        fc.add(new BLabel(labels[i]), 0, i, new LayoutInfo(LayoutInfo.EAST, LayoutInfo.NONE, new Insets(2, 0, 2, 5), null));
+        buttonstab.add(new BLabel(labels[i]), 0, i, new LayoutInfo(LayoutInfo.EAST, LayoutInfo.NONE, new Insets(2, 0, 2, 5), null));
       }
       BButton button = new BButton(Translate.text("MetaCADEvaluator:"+functions[i]));
-      fc.add(button, 1, i, new LayoutInfo(LayoutInfo.WEST, LayoutInfo.HORIZONTAL, new Insets(2, 0, 2, 0), null));
+      buttonstab.add(button, 1, i, new LayoutInfo(LayoutInfo.WEST, LayoutInfo.HORIZONTAL, new Insets(2, 0, 2, 0), null));
       button.addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
       button.addEventLink(CommandEvent.class, engine, functions[i]);
     }
     
-    parametersTextArea=new BTextArea(engine.getParameters(), 20, 50) {
-    	@Override
-    	protected void textChanged() {
-    		// TODO Auto-generated method stub
-    		super.textChanged();
-    		engine.setParameters(parametersTextArea.getText());
-    	}
+    BTextArea paramtab=new BTextArea(engine.getParameters(), 10, 20) {
+      @Override
+      protected void textChanged() {
+        super.textChanged();
+        engine.setParameters(this.getText());
+      }
     };
-    buoy.widget.BScrollPane sp=new BScrollPane(parametersTextArea);
-    
-    bc.add(sp, BorderContainer.WEST);
-//    BButton button = new BButton("test");
-//    fc.add(button, 1, buttons.length);
-//    button.addEventLink(CommandEvent.class, this, "test");
+    BScrollPane scrollpane = new BScrollPane(paramtab);
+    tabcontainer.add(scrollpane, "Parameters");
 
     // Close button
     BButton closeButton;
