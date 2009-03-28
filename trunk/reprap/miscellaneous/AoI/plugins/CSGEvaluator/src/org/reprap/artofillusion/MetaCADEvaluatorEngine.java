@@ -326,7 +326,8 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
         }
         ObjectInfo profile = parent.getChildren()[0];
         Object3D profileobj = profile.getObject();
-        if (profileobj.canConvertToTriangleMesh() != Object3D.CANT_CONVERT) {
+        if (!(profileobj instanceof TriangleMesh) &&
+            profileobj.canConvertToTriangleMesh() != Object3D.CANT_CONVERT) {
           profileobj = profileobj.convertToTriangleMesh(0.1);
         }
 
@@ -343,6 +344,14 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
           CoordinateSystem pathCoords = new CoordinateSystem();
 
           obj3D = ExtrudeTool.extrudeMesh((TriangleMesh)profileobj, path, profile.getCoords(), pathCoords, twist*Math.PI/180.0, true);
+
+          // Since the result is centered in the origin, offset the extruded object to 
+          // move it back to its original position
+          // FIXME: Combine this with the user-specified coordinate system
+          coordsys = new CoordinateSystem(new Vec3(), Vec3.vz(), Vec3.vy());
+          Vec3 offset = profile.getCoords().fromLocal().times(((Mesh)profileobj).getVertices()[0].r).
+          minus(coordsys.fromLocal().times(((Mesh)obj3D).getVertices()[0].r));
+          coordsys.setOrigin(coordsys.getOrigin().plus(offset));
         }
         for (int i=0;i<children.length;i++) children[i].setVisible(false);
       }
