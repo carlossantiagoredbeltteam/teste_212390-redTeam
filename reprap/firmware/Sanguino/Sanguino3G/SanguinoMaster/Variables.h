@@ -13,15 +13,12 @@ boolean is_machine_aborted = false;
 volatile long max_delta;
 
 volatile long x_counter;
-volatile bool x_can_step;
 volatile bool x_direction;
 
 volatile long y_counter;
-volatile bool y_can_step;
 volatile bool y_direction;
 
 volatile long z_counter;
-volatile bool z_can_step;
 volatile bool z_direction;
 
 //our position tracking variables

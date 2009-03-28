@@ -59,11 +59,6 @@ void init_steppers()
   eventual_steps.y = 0;
   eventual_steps.z = 0;
   
-  //probably not needed, but lets do it anyway.
-  x_can_step = false;
-  y_can_step = false;
-  z_can_step = false;
-  
   //have we encountered our first point yet?
   firstPoint = false;
 }
@@ -288,13 +283,8 @@ inline void grab_next_point()
 //do a single step on our DDA line!
 inline void dda_step()
 {
-  //check endstops, position, etc.
-  x_can_step = can_step(X_MIN_PIN, X_MAX_PIN, current_steps.x, target_steps.x, x_direction);
-  y_can_step = can_step(Y_MIN_PIN, Y_MAX_PIN, current_steps.y, target_steps.y, y_direction);
-  z_can_step = can_step(Z_MIN_PIN, Z_MAX_PIN, current_steps.z, target_steps.z, z_direction);
-
   //increment our x counter, and take steps if required.
-  if (x_can_step)
+  if (current_steps.x != target_steps.x)
   {
     x_counter += delta_steps.x;
 
@@ -311,7 +301,7 @@ inline void dda_step()
   }
 
   //increment our y counter, and take steps if required.
-  if (y_can_step)
+  if (current_steps.y != target_steps.y)
   {
     y_counter += delta_steps.y;
 
@@ -328,7 +318,7 @@ inline void dda_step()
   }
 
   //increment our z counter, and take steps if required.
-  if (z_can_step)
+  if (current_steps.z != target_steps.z)
   {
     z_counter += delta_steps.z;
 
@@ -344,37 +334,35 @@ inline void dda_step()
     }
   }        
 
-  //we're either at our target, or we're stuck.
-  if (!x_can_step && !y_can_step && !z_can_step)
+  //we're either at our target
+  if (at_target())
   {
 //    finishedPoints++;
 //    Serial.print("Finished:");
 //    Serial.println(finishedPoints, DEC);
-    
-    //set us to be at our target.
-    current_steps.x = target_steps.x;
-    current_steps.y = target_steps.y;
-    current_steps.z = target_steps.z;
-
     grab_next_point();
   }
 }
 
+/*
+// THIS IS NOW HANDLED IN THE OUTSIDE LOOP.
 inline bool can_step(byte min_pin, byte max_pin, long current, long target, byte direction)
 {
   //stop us if we're on target
   if (target == current)
     return false;
+  
   //stop us if we're at home and still going 
-  else if (read_switch(min_pin) && !direction)
-    return false;
+  //else if (read_switch(min_pin) && !direction)
+  //  return false;
   //stop us if we're at max and still going
-  else if (read_switch(max_pin) && direction)
-    return false;
+  //else if (read_switch(max_pin) && direction)
+  //  return false;
 
   //default to being able to step
   return true;
 }
+*/
 
 //actually send a step signal.
 inline void do_step(byte step_pin)
@@ -394,6 +382,19 @@ inline bool read_switch(byte pin)
     return !digitalRead(pin) && !digitalRead(pin);
   else
     return digitalRead(pin) && digitalRead(pin);
+}
+
+//looks at our endstops and disables our motor if we hit one.
+void check_endstops()
+{
+  if (read_switch(X_MIN_PIN) || read_switch(X_MAX_PIN))
+    digitalWrite(X_ENABLE_PIN, STEPPER_DISABLE);
+
+  if (read_switch(Y_MIN_PIN) || read_switch(Y_MAX_PIN))
+    digitalWrite(Y_ENABLE_PIN, STEPPER_DISABLE);
+
+  if (read_switch(Z_MIN_PIN) || read_switch(Z_MAX_PIN))
+    digitalWrite(Z_ENABLE_PIN, STEPPER_DISABLE);    
 }
 
 // enable our steppers so we can move them.  disable any steppers

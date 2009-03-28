@@ -70,20 +70,16 @@ void init_serial()
   Serial1.begin(SLAVE_SERIAL_SPEED);
 }
 
-void init_psu()
-{
-  pinMode(PS_ON_PIN, OUTPUT);
-  digitalWrite(PS_ON_PIN, LOW);
-}
-
 //handle various things we're required to do.
 void loop()
 {
   //check for and handle any packets that come in.
-   if (Serial.available())
-   process_host_packets();
-   
-   handle_commands();
+  if (Serial.available())
+    process_host_packets();
+
+  //our basic handling for each loop.
+  handle_commands();
+  check_endstops();
 }
 
 //handle the abortion of a print job
