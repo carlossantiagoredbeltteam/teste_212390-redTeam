@@ -41,7 +41,12 @@ CircularBuffer commandBuffer(COMMAND_BUFFER_SIZE, underlyingBuffer);
 unsigned long finishedCommands = 0;
 unsigned long finishedPoints = 0;
 boolean firstPoint = false;
+byte commandMode = COMMAND_MODE_IDLE;
 
+unsigned int toolPingDelay = 100;
+unsigned int toolTimeout = 120;
+unsigned long toolNextPing = 0;
+unsigned long toolTimeoutEnd = 0;
 byte currentToolIndex = 0;
 
 #ifdef USE_SD_CARD

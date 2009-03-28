@@ -7,3 +7,6 @@ struct LongPoint {
   long y;
   long z;
 };
+
+#define COMMAND_MODE_IDLE 0
+#define COMMAND_MODE_WAIT_FOR_TOOL 1

@@ -55,6 +55,30 @@ void select_tool(byte tool)
   wait_for_tool_ready_state(tool, 0, 0);
 }
 
+void check_tool_ready_state()
+{
+  //did we timeout?
+  if (millis() >= toolTimeoutEnd)
+  {
+    commandMode = COMMAND_MODE_IDLE;
+    return;
+  }
+
+  //is it time for the next ping?
+  if (millis() >= toolNextPing)
+  {
+    //is the tool ready?
+    if (is_tool_ready(currentToolIndex))
+    {
+      commandMode = COMMAND_MODE_IDLE;
+      return;
+    }
+    
+    //ping every x millis
+    toolNextPing = millis() + 100;
+  }
+}
+
 //ping the tool until it tells us its ready
 void wait_for_tool_ready_state(byte tool, int delay_millis, int timeout_seconds)
 {
