@@ -500,7 +500,7 @@ void queue_absolute_point(long x, long y, long z, byte prescaler, unsigned int c
   }
 }
 
-boolean is_point_buffer_empty()
+inline boolean is_point_buffer_empty()
 {
   //okay, we got points in the buffer.
   if (pointBuffer.size() > 0)
@@ -514,7 +514,7 @@ boolean is_point_buffer_empty()
   return true;
 }
 
-boolean at_target()
+inline boolean at_target()
 {
   if (current_steps.x == target_steps.x && current_steps.y == target_steps.y && current_steps.z == target_steps.z)
     return true;
