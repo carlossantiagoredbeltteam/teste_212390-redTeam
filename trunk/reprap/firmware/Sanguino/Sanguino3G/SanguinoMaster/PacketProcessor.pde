@@ -223,6 +223,9 @@ void handle_commands()
     //peek at our command.
     cmd = commandBuffer[0];
 
+    //TODO: only jump in if its command we can handle now
+    //ie: queue at zero, or queue has room and its a queue point cmd.
+    //then remove all the wait until target reached.
     //queue point?  do we have enough room?
     if ((cmd == HOST_CMD_QUEUE_POINT_INC || cmd == HOST_CMD_QUEUE_POINT_INC) && pointBuffer.remainingCapacity() < POINT_SIZE)
       return;
@@ -339,9 +342,22 @@ void handle_commands()
         wait_until_target_reached(); //dont want to get hasty.
 
         //get your temp in gear, you lazy bum.
-        wait_for_tool_ready_state(commandBuffer.remove_8(),
-        commandBuffer.remove_16(),
-        commandBuffer.remove_16());
+        
+        //what tool / timeout /etc?
+        currentToolIndex = commandBuffer.remove_8();
+        toolPingDelay = (unsigned int)commandBuffer.remove_16();
+        toolTimeout = (unsigned int)commandBuffer.remove_16();
+
+        //check to see if its ready now
+        if (!is_tool_ready(currentToolIndex))
+        {
+          //how often to ping?
+          toolNextPing = millis() + toolPingDelay;
+          toolTimeoutEnd = millis() + (toolTimeout * 1000);
+          
+          //okay, put us in ping-tool-until-ready mode
+          commandMode = COMMAND_MODE_WAIT_FOR_TOOL;
+        }
         break;
 
       //WORKS

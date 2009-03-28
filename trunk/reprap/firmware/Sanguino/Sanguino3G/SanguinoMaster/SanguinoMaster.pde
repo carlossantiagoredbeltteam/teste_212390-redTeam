@@ -78,7 +78,11 @@ void loop()
     process_host_packets();
 
   //our basic handling for each loop.
-  handle_commands();
+  if (commandMode == COMMAND_MODE_IDLE)
+    handle_commands();
+  else if (commandMode == COMMAND_MODE_WAIT_FOR_TOOL)
+    check_tool_ready_state();
+  
   check_endstops();
 }
 
