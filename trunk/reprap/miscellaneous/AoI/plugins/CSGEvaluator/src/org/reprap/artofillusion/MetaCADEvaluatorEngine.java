@@ -195,6 +195,11 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     
     String line = parent.name;
 
+    // Don't try to evaluate operations belonging to CSGEvaluator.
+    // FIXME: This is getting a little hackish
+    int op = stringToOp(parent.name);
+    if (op == -1 || isBooleanOp(op)) return false;
+
     MetaCADParser objExpr = new MetaCADParser(line);
     if (!objExpr.parse()) {
       showMessage("evaluateObject: Unable to parse \"" + line + "\"");
