@@ -40,10 +40,10 @@ class MetaCADEvaluatorDialog extends BDialog
       Translate.text("MetaCADEvaluator:Actions"), null, Translate.text("MetaCADEvaluator:BooleanOp"), null,null,null
   };
   protected String[] cadfunctions = new String [] {
-      "cube", "cylinder", "sphere", "polygon", "extrude"
+      "cube", "cylinder", "sphere", "polygon", "extrude", "test"
   };
   protected String[] cadlabels = new String [] {
-      Translate.text("MetaCADEvaluator:Objects"), null, null, null, Translate.text("MetaCADEvaluator:Operations")
+      Translate.text("MetaCADEvaluator:Objects"), null, null, null, Translate.text("MetaCADEvaluator:Operations"), null
   };
   
   public MetaCADEvaluatorDialog(LayoutWindow window)
