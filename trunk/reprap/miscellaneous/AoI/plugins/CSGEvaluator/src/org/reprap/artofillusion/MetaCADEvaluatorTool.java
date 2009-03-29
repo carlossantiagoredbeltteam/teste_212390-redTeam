@@ -67,7 +67,7 @@ public class MetaCADEvaluatorTool implements ModellingTool
       window.getAllViews()[i].setGrid(1, 0, true, false);
       window.getAllViews()[i].setShowAxes(true);
     }
-    window.repaint(); // FIXME: Repaint doesn't have immediate effect.
+    window.repaint(); // FIXME: Repaint doesn't have immediate effect on Mac.
     
     
     // Light check for whether the dialog is already visible and to then close it.
