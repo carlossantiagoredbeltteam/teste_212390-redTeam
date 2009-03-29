@@ -12,6 +12,7 @@ import java.awt.event.KeyEvent;
 
 import artofillusion.LayoutWindow;
 import artofillusion.ModellingTool;
+import artofillusion.ViewerCanvas;
 import artofillusion.keystroke.KeystrokeManager;
 import artofillusion.keystroke.KeystrokeRecord;
 import artofillusion.ui.Translate;
@@ -61,6 +62,14 @@ public class MetaCADEvaluatorTool implements ModellingTool
    */
   public void commandSelected(LayoutWindow window)
   {
+    for (int i = 0; i < window.getAllViews().length; i++)
+    {
+      window.getAllViews()[i].setGrid(1, 0, true, false);
+      window.getAllViews()[i].setShowAxes(true);
+    }
+    window.repaint();
+    
+    
     // Light check for whether the dialog is already visible and to then close it.
     // FIXME: Should be done better, but then we need to keep track of the dialog per window.
     if (this.dialog != null && this.dialog.isVisible() && this.dialog.getParent() == window) {
