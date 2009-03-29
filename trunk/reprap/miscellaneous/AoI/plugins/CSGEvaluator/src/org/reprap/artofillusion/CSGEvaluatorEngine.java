@@ -91,12 +91,13 @@ class CSGEvaluatorEngine
   /**
    * Performs the given operation on the currently selected objects
    */
-  public void execute(int operation)
+  public void execute(int operation, int minimum_children)
   {
     UndoRecord undo = new UndoRecord(this.window, false);
     ObjectInfo[] objects = getSelection();
-    if (objects == null || objects.length < 2) {
-      new MessageDialog(this.window, "Minimum two objects must be selected.");
+    if (objects == null || objects.length < minimum_children) {
+      new MessageDialog(this.window, "Minimum " + minimum_children + " object" + 
+                        ((minimum_children > 1)?"s":"") + " must be selected.");
       return;
     }
 
@@ -121,7 +122,7 @@ class CSGEvaluatorEngine
    */
   public void union()
   {
-    execute(CSGObject.UNION);
+    execute(CSGObject.UNION, 2);
   }
 
   /**
@@ -129,7 +130,7 @@ class CSGEvaluatorEngine
    */
   public void intersection()
   {
-    execute(CSGObject.INTERSECTION);
+    execute(CSGObject.INTERSECTION, 2);
   }
 
   /**
@@ -137,7 +138,7 @@ class CSGEvaluatorEngine
    */
   public void difference()
   {
-    execute(CSGObject.DIFFERENCE12);
+    execute(CSGObject.DIFFERENCE12, 2);
   }
 
   /**
@@ -154,6 +155,15 @@ class CSGEvaluatorEngine
     default:
       return null;
     }
+  }
+
+  /**
+   * Check if an operation is a boolean operation, as opposed to a custom-defined operation.
+   */
+  public Boolean isBooleanOp(int operation) {
+    return (operation == CSGObject.UNION) ||
+    (operation == CSGObject.INTERSECTION) ||
+    (operation ==CSGObject.DIFFERENCE12);
   }
 
   /**
@@ -293,7 +303,7 @@ class CSGEvaluatorEngine
     // create ObjectInfo for combined object
     ObjectInfo resultinfo = null;
     try {
-          resultinfo = combine(objects, operation, undo);
+      resultinfo = combine(objects, operation, undo);
     }
     catch (Exception e) {
     }
