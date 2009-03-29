@@ -54,17 +54,17 @@ class CSGEvaluatorDialog extends BDialog
     bc.add(new BLabel(Translate.text("CSGEvaluator:title", versionstr)), BorderContainer.NORTH);
 
 
-    FormContainer fc = new FormContainer(2, functions.length+1);
+    FormContainer fc = new FormContainer(2, this.functions.length+1);
     bc.add(fc, BorderContainer.CENTER);
 
-    for (int i = 0; i < functions.length; i++) {
-      if (labels[i] != null) {
-        fc.add(new BLabel(labels[i]), 0, i, new LayoutInfo(LayoutInfo.EAST, LayoutInfo.NONE, new Insets(2, 0, 2, 5), null));
+    for (int i = 0; i < this.functions.length; i++) {
+      if (this.labels[i] != null) {
+        fc.add(new BLabel(this.labels[i]), 0, i, new LayoutInfo(LayoutInfo.EAST, LayoutInfo.NONE, new Insets(2, 0, 2, 5), null));
       }
-      BButton button = new BButton(Translate.text("CSGEvaluator:"+functions[i]));
+      BButton button = new BButton(Translate.text("CSGEvaluator:"+this.functions[i]));
       fc.add(button, 1, i, new LayoutInfo(LayoutInfo.WEST, LayoutInfo.HORIZONTAL, new Insets(2, 0, 2, 0), null));
       button.addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
-      button.addEventLink(CommandEvent.class, engine, functions[i]);
+      button.addEventLink(CommandEvent.class, engine, this.functions[i]);
     }
 //    BButton button = new BButton("test");
 //    fc.add(button, 1, buttons.length);
