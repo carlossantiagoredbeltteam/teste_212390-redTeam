@@ -17,6 +17,11 @@ public class MetaCADParser {
     this.expr = expr;
   }
 
+  /**
+   * Parses the current string of expressions and creates a hashtable of mapping from name -> parameter list
+   * 
+   * @return true if parse succeeded, false if parse failed
+   */
   public Boolean parse() {
     Boolean found = false;    
     int pos = 0;
