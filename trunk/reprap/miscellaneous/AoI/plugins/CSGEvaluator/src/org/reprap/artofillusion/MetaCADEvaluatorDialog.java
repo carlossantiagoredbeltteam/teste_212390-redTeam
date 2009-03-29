@@ -33,12 +33,17 @@ class MetaCADEvaluatorDialog extends BDialog
 {
   protected  MetaCADEvaluatorEngine engine;
   protected LayoutWindow window;
-  protected String[] functions = new String [] {
+  protected String[] csgfunctions = new String [] {
       "evaluate", "devaluate", "union", "intersection", "difference"
   };
-
-  protected String[] labels = new String [] {
-	  Translate.text("MetaCADEvaluator:Actions"), null, Translate.text("MetaCADEvaluator:BooleanOp"), null,null,null
+  protected String[] csglabels = new String [] {
+      Translate.text("MetaCADEvaluator:Actions"), null, Translate.text("MetaCADEvaluator:BooleanOp"), null,null,null
+  };
+  protected String[] cadfunctions = new String [] {
+      "cube", "cylinder", "sphere", "polygon", "extrude"
+  };
+  protected String[] cadlabels = new String [] {
+      Translate.text("MetaCADEvaluator:Objects"), null, null, null, Translate.text("MetaCADEvaluator:Operations")
   };
   
   public MetaCADEvaluatorDialog(LayoutWindow window)
@@ -60,17 +65,17 @@ class MetaCADEvaluatorDialog extends BDialog
     bc.add(new BLabel(Translate.text("MetaCADEvaluator:title", versionstr)), BorderContainer.NORTH);
 
     //  Operations tab
-    FormContainer buttonstab = new FormContainer(2, this.functions.length+1);
+    FormContainer buttonstab = new FormContainer(2, this.csgfunctions.length+1);
     tabcontainer.add(buttonstab, "Operations");
 
-    for (int i = 0; i < this.functions.length; i++) {
-      if (this.labels[i] != null) {
-        buttonstab.add(new BLabel(this.labels[i]), 0, i, new LayoutInfo(LayoutInfo.EAST, LayoutInfo.NONE, new Insets(2, 0, 2, 5), null));
+    for (int i = 0; i < this.csgfunctions.length; i++) {
+      if (this.csglabels[i] != null) {
+        buttonstab.add(new BLabel(this.csglabels[i]), 0, i, new LayoutInfo(LayoutInfo.EAST, LayoutInfo.NONE, new Insets(2, 0, 2, 5), null));
       }
-      BButton button = new BButton(Translate.text("MetaCADEvaluator:"+this.functions[i]));
+      BButton button = new BButton(Translate.text("MetaCADEvaluator:"+this.csgfunctions[i]));
       buttonstab.add(button, 1, i, new LayoutInfo(LayoutInfo.WEST, LayoutInfo.HORIZONTAL, new Insets(2, 0, 2, 0), null));
       button.addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
-      button.addEventLink(CommandEvent.class, this.engine, this.functions[i]);
+      button.addEventLink(CommandEvent.class, this.engine, this.csgfunctions[i]);
     }
     
     // Parameters tab
@@ -84,13 +89,19 @@ class MetaCADEvaluatorDialog extends BDialog
     BScrollPane scrollpane = new BScrollPane(paramtab);
     tabcontainer.add(scrollpane, "Parameters");
 
-    // Test tab
-    FormContainer testtab = new FormContainer(2, this.functions.length+1);
-    tabcontainer.add(testtab, "Test");
+    // CAD tab
+    FormContainer cadtab = new FormContainer(2, this.cadfunctions.length+1);
+    tabcontainer.add(cadtab, "CAD");
 
-    BButton button = new BButton("extrude");
-    testtab.add(button, 1, 0);
-    button.addEventLink(CommandEvent.class, this, "extrude");
+    for (int i = 0; i < this.cadfunctions.length; i++) {
+      if (this.cadlabels[i] != null) {
+        cadtab.add(new BLabel(this.cadlabels[i]), 0, i, new LayoutInfo(LayoutInfo.EAST, LayoutInfo.NONE, new Insets(2, 0, 2, 5), null));
+      }
+      BButton button = new BButton(Translate.text("MetaCADEvaluator:"+this.cadfunctions[i]));
+      cadtab.add(button, 1, i, new LayoutInfo(LayoutInfo.WEST, LayoutInfo.HORIZONTAL, new Insets(2, 0, 2, 0), null));
+      button.addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
+      button.addEventLink(CommandEvent.class, this.engine, this.cadfunctions[i]);
+    }
 
     // Close button
     BButton closeButton;
@@ -125,11 +136,5 @@ class MetaCADEvaluatorDialog extends BDialog
   public void closeWindow()
   {
     dispose();
-  }
-  
-  public void extrude()
-  {
-    this.engine.execute(MetaCADEvaluatorEngine.EXTRUSION, 1);
-
   }
 }
