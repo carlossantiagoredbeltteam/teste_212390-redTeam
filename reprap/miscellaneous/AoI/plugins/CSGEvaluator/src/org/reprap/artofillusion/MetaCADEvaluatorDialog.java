@@ -47,7 +47,7 @@ class MetaCADEvaluatorDialog extends BDialog
     this.window = window;
     this.setResizable(true);
     
-    engine = new MetaCADEvaluatorEngine(window);
+    this.engine = new MetaCADEvaluatorEngine(window);
 
     BorderContainer bc = new BorderContainer();
     bc.setDefaultLayout(new LayoutInfo());
@@ -59,29 +59,38 @@ class MetaCADEvaluatorDialog extends BDialog
     String versionstr = CSGEvaluatorPlugin.getVersion();
     bc.add(new BLabel(Translate.text("MetaCADEvaluator:title", versionstr)), BorderContainer.NORTH);
 
-
-    FormContainer buttonstab = new FormContainer(2, functions.length+1);
+    //  Operations tab
+    FormContainer buttonstab = new FormContainer(2, this.functions.length+1);
     tabcontainer.add(buttonstab, "Operations");
 
-    for (int i = 0; i < functions.length; i++) {
-      if (labels[i] != null) {
-        buttonstab.add(new BLabel(labels[i]), 0, i, new LayoutInfo(LayoutInfo.EAST, LayoutInfo.NONE, new Insets(2, 0, 2, 5), null));
+    for (int i = 0; i < this.functions.length; i++) {
+      if (this.labels[i] != null) {
+        buttonstab.add(new BLabel(this.labels[i]), 0, i, new LayoutInfo(LayoutInfo.EAST, LayoutInfo.NONE, new Insets(2, 0, 2, 5), null));
       }
-      BButton button = new BButton(Translate.text("MetaCADEvaluator:"+functions[i]));
+      BButton button = new BButton(Translate.text("MetaCADEvaluator:"+this.functions[i]));
       buttonstab.add(button, 1, i, new LayoutInfo(LayoutInfo.WEST, LayoutInfo.HORIZONTAL, new Insets(2, 0, 2, 0), null));
       button.addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
-      button.addEventLink(CommandEvent.class, engine, functions[i]);
+      button.addEventLink(CommandEvent.class, this.engine, this.functions[i]);
     }
     
-    BTextArea paramtab=new BTextArea(engine.getParameters(), 10, 20) {
+    // Parameters tab
+    BTextArea paramtab=new BTextArea(this.engine.getParameters(), 10, 20) {
       @Override
       protected void textChanged() {
         super.textChanged();
-        engine.setParameters(this.getText());
+        MetaCADEvaluatorDialog.this.engine.setParameters(this.getText());
       }
     };
     BScrollPane scrollpane = new BScrollPane(paramtab);
     tabcontainer.add(scrollpane, "Parameters");
+
+    // Test tab
+    FormContainer testtab = new FormContainer(2, this.functions.length+1);
+    tabcontainer.add(testtab, "Test");
+
+    BButton button = new BButton("extrude");
+    testtab.add(button, 1, 0);
+    button.addEventLink(CommandEvent.class, this, "extrude");
 
     // Close button
     BButton closeButton;
@@ -118,11 +127,9 @@ class MetaCADEvaluatorDialog extends BDialog
     dispose();
   }
   
-  public void test()
+  public void extrude()
   {
-    int[] selidx = this.window.getSelectedIndices(); 
-    for (int i : selidx) {
-      System.out.println("sel: " + i);
-    }
+    this.engine.execute(MetaCADEvaluatorEngine.EXTRUSION, 1);
+
   }
 }
