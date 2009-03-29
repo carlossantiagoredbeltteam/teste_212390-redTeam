@@ -40,7 +40,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
   public String opToString(int operation) {
     switch (operation) {
     case EXTRUSION:
-      return "extrude";
+      return "extrude()";
     default:
       return super.opToString(operation);
     }
@@ -197,7 +197,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
 
     MetaCADParser objExpr = new MetaCADParser(line);
     if (!objExpr.parse()) {
-      // FIXME: Notify user? 
+      showMessage("evaluateObject: Unable to parse \"" + line + "\"");
       return false;
     }
 
@@ -385,7 +385,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     if (coordsys == null) {
       if(objcoordsys != null) coordsys = objcoordsys;
     }
-    else {
+    else if (objcoordsys != null){
       coordsys.transformCoordinates(objcoordsys.fromLocal());
     }
     
