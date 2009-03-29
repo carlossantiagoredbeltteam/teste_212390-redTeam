@@ -348,10 +348,16 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
           // Since the result is centered in the origin, offset the extruded object to 
           // move it back to its original position
           // FIXME: Combine this with the user-specified coordinate system
-          coordsys = new CoordinateSystem(new Vec3(), Vec3.vz(), Vec3.vy());
+          
+          CoordinateSystem coordsys2=new CoordinateSystem(new Vec3(), Vec3.vz(), Vec3.vy());
           Vec3 offset = profile.getCoords().fromLocal().times(((Mesh)profileobj).getVertices()[0].r).
-          minus(coordsys.fromLocal().times(((Mesh)obj3D).getVertices()[0].r));
-          coordsys.setOrigin(coordsys.getOrigin().plus(offset));
+          minus(coordsys2.fromLocal().times(((Mesh)obj3D).getVertices()[0].r));
+          if (coordsys != null)
+            coordsys2.setOrigin(coordsys2.getOrigin().plus(coordsys.getOrigin()));
+          else
+            coordsys = new CoordinateSystem(new Vec3(), Vec3.vz(), Vec3.vy());
+            
+          coordsys.setOrigin(coordsys2.getOrigin().plus(offset));
         }
         for (int i=0;i<children.length;i++) children[i].setVisible(false);
       }
