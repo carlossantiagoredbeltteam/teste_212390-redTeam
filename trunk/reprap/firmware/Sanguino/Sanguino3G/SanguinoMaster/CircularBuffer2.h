@@ -19,11 +19,12 @@
 class CircularBuffer {
 private:
   uint8_t* buffer;
-  volatile size_t capacity;
-  volatile size_t head;
-  volatile size_t tail;
+  uint16_t capacity;
+  uint16_t head;
+  uint16_t tail;
+  uint16_t size;
 public:
-  CircularBuffer(size_t capacity, uint8_t* pBuf) {
+  CircularBuffer(uint16_t capacity, uint8_t* pBuf) {
     this->capacity = capacity;
     buffer = pBuf;
     clear();
@@ -35,35 +36,38 @@ public:
   /// Reset buffer.  (Note: does not zero data.)
   void clear() {
     head = tail = 0;
+    size = 0;
   }
 
-  uint8_t operator[](const size_t i) {
-    const size_t idx = (i + head) % capacity;
+  uint8_t operator[](uint16_t i) {
+    const uint16_t idx = (i + head) % capacity;
     return buffer[idx];
   }
 
   /// Check remaining capacity of this vector.
-  size_t remainingCapacity() {
-    return capacity - size();
+  uint16_t remainingCapacity() {
+    return capacity - size;
   }
 
   /// Get the current number of elements in the buffer.
-  size_t size() {
-    return (capacity + head - tail) % capacity;
+  uint16_t size() {
+    return size;
   }
 
   /// Append a character to the end of the circular buffer.
   void append(const uint8_t datum) {
 
-  	size_t i = (head + 1) % capacity;
+  	uint16_t i = (head + 1) % capacity;
 
   	// if we should be storing the received character into the location
   	// just before the tail (meaning that the head would advance to the
   	// current location of the tail), we're about to overflow the buffer
   	// and so we don't write the character or advance the head.
-  	if (i != tail) {
+  	if (size + 1 <= capacity)
+  	{
   		buffer[head] = datum;
   		head = i;
+  		size++;
   	}
   }
   
@@ -80,12 +84,13 @@ public:
   /// Remove and return a character from the start of the
   /// circular buffer.
   const uint8_t remove_8() {
-    if (head == tail)
+    if (size == 0)
       return 0;
     else
     {
       uint8_t c = buffer[tail];
       tail = (tail + 1) % capacity;
+      size--;
       return c;
     }
   }

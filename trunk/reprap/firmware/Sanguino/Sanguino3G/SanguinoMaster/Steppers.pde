@@ -274,8 +274,7 @@ inline void grab_next_point()
 
     //start the move!
     disableTimer1Interrupt();
-    setTimer1Resolution(pointBuffer.remove_8());
-    setTimer1Ceiling(pointBuffer.remove_16());
+    setTimer1Micros(pointBuffer.remove_32());
     enableTimer1Interrupt();
   }
 }
@@ -450,7 +449,7 @@ void read_range_from_eeprom()
 }
 
 //queue a point for us to move to
-void queue_incremental_point(int x, int y, int z, byte prescaler, unsigned int count)
+void queue_incremental_point(int x, int y, int z, unsigned long micros)
 {
   //where we goin?
   long abs_x = eventual_steps.x + x;
@@ -458,11 +457,11 @@ void queue_incremental_point(int x, int y, int z, byte prescaler, unsigned int c
   long abs_z = eventual_steps.z + z;
 
   //okay, send us there.
-  queue_absolute_point(abs_x, abs_y, abs_z, prescaler, count);  
+  queue_absolute_point(abs_x, abs_y, abs_z, micros);  
 }
 
 //queue a point for us to move to
-void queue_absolute_point(long x, long y, long z, byte prescaler, unsigned int count)
+void queue_absolute_point(long x, long y, long z, unsigned long micros)
 {
   //this is the final position.
   eventual_steps.x = x;
@@ -480,18 +479,12 @@ void queue_absolute_point(long x, long y, long z, byte prescaler, unsigned int c
   pointBuffer.append_32(x);
   pointBuffer.append_32(y);
   pointBuffer.append_32(z);
-  
-  // prescaler
-  pointBuffer.append(prescaler);
-
-  // counter
-  pointBuffer.append_16(count);
+  pointBuffer.append_32(micros);
   
   //first point? give us the right timer.
   if (!firstPoint)
   {
-    setTimer1Resolution(prescaler);
-    setTimer1Ceiling(count);
+    setTimer1Micros(micros);
 
     //turn our interrupt on.
     enableTimer1Interrupt();
