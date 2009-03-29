@@ -655,6 +655,31 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
       return null;
     }
   }
-  
+ 
+  public void cube()
+  {
+    showMessage("cube function not implemented");
+  }
+
+  public void sphere()
+  {
+    showMessage("sphere function not implemented");
+  }
+
+  public void cylinder()
+  {
+    showMessage("cylinder function not implemented");
+  }
+
+  public void polygon()
+  {
+    showMessage("polygon function not implemented");
+  }
+
+  public void extrude()
+  {
+    execute(MetaCADEvaluatorEngine.EXTRUSION, 1);
+  }
+
   
 }
