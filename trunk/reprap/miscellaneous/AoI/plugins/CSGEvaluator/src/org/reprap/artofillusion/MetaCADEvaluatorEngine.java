@@ -24,20 +24,46 @@ import artofillusion.texture.TextureMapping;
 import artofillusion.tools.ExtrudeTool;
 import artofillusion.ui.MessageDialog;
 
-public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
+public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
+{
+  public static final int EXTRUSION = 10;
+  
   JEP jep = new JEP();
 
   public MetaCADEvaluatorEngine(LayoutWindow window) {
     super(window);
   }
 
+  /**
+   * Converts from operation to String
+   */
+  public String opToString(int operation) {
+    switch (operation) {
+    case EXTRUSION:
+      return "extrude";
+    default:
+      return super.opToString(operation);
+    }
+  }
+
+  /**
+   * Converts from string to operation.
+   */
+  public int stringToOp(String opstr) {
+    String lower = opstr.toLowerCase();
+    if (lower.startsWith("extrude")) {
+      return EXTRUSION;
+    }
+    else return super.stringToOp(opstr);
+  }
+  
   public void setParameters(String text) {
-    window.getScene().setMetadata(
+    this.window.getScene().setMetadata(
         MetaCADEvaluatorEngine.class.getName() + "Parameters", text);
   }
 
   public String getParameters() {
-    Object o = window.getScene().getMetadata(
+    Object o = this.window.getScene().getMetadata(
         MetaCADEvaluatorEngine.class.getName() + "Parameters");
 
     if (o != null)
@@ -47,12 +73,11 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
   }
 
   public boolean readParameters() {
-    jep = new JEP();
-    jep.addStandardConstants();
-    jep.addStandardFunctions();
+    this.jep = new JEP();
+    this.jep.addStandardConstants();
+    this.jep.addStandardFunctions();
     return evaluateLines(getParameters());
   }
-
 
   public void evaluate() {
     // only evaluate selected objects if the parameters could be evaluated
@@ -73,10 +98,9 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
   public Boolean evaluateLoop(ObjectInfo parent, UndoRecord undo)
       throws Exception {
     String line = parent.name;
-    int booleanOp = this.stringToOp(line);
+    int operation = this.stringToOp(line);
 
-    if (booleanOp == -1)
-      return false;
+    if (!isBooleanOp(operation)) return false;
 
     String[] parameters = null;
     CoordinateSystem coordsys=null;
@@ -92,7 +116,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
       if (name.equals("cs")) {
         coordsys = evaluateCoordSys(parameters);
       }
-      else if (name.startsWith(this.opToString(booleanOp)))
+      else if (name.startsWith(this.opToString(operation)))
       {
         parameters=coordExpr.getParameters(name);
       }
@@ -105,7 +129,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
       parameters = coordExpr.getParameters("dummyDummy");
     }
 
-    CSGHelper helper = new CSGHelper(booleanOp);
+    CSGHelper helper = new CSGHelper(operation);
 
     // evaluate first part of for loop i.e. i=0
     evaluateAssignment(parameters[0]);
@@ -179,7 +203,8 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 
     Object3D obj3D = null;
     CoordinateSystem coordsys = null;
-
+    CoordinateSystem objcoordsys = null;
+    
     Enumeration<String> iter = objExpr.getNames();
     while (iter.hasMoreElements()) {
       String name = iter.nextElement();
@@ -302,8 +327,8 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
         Vec3 dir = Vec3.vz();
         if (parameters.length >= 3) {
           dir = new Vec3(evaluateExpression(parameters[0]),
-              evaluateExpression(parameters[1]),
-              evaluateExpression(parameters[2]));
+                         evaluateExpression(parameters[1]),
+                         evaluateExpression(parameters[2]));
         }
         // 4. parameter is num segments
         int numsegments = 1;
@@ -317,49 +342,15 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
           twist = evaluateExpression(parameters[4]);
         }
 
-        // First child is the base mesh
-        // FIXME: Find all extrudable child objects instead
         // FIXME: Recursively evaluate children
         ObjectInfo[] children = parent.getChildren();
         for (int i=0;i<children.length;i++) {
           evaluateNode(children[i], undo);
         }
-        ObjectInfo profile = parent.getChildren()[0];
-        Object3D profileobj = profile.getObject();
-        if (!(profileobj instanceof TriangleMesh) &&
-            profileobj.canConvertToTriangleMesh() != Object3D.CANT_CONVERT) {
-          profileobj = profileobj.convertToTriangleMesh(0.1);
-        }
 
-        if (profileobj instanceof TriangleMesh) {
-          // Build extrusion curve from vector and segments
-          Vec3 v[] = new Vec3[numsegments+1];
-          float smooth[] = new float[v.length];
-          for (int i = 0; i < v.length; i++) {
-            v[i] = new Vec3(dir);
-            v[i].scale(1.0*i/numsegments);
-            smooth[i] = 1.0f;
-          }
-          Curve path = new Curve(v, smooth, Mesh.NO_SMOOTHING, false);
-          CoordinateSystem pathCoords = new CoordinateSystem();
-
-          obj3D = ExtrudeTool.extrudeMesh((TriangleMesh)profileobj, path, profile.getCoords(), pathCoords, twist*Math.PI/180.0, true);
-
-          // Since the result is centered in the origin, offset the extruded object to 
-          // move it back to its original position
-          // FIXME: Combine this with the user-specified coordinate system
-          
-          CoordinateSystem coordsys2=new CoordinateSystem(new Vec3(), Vec3.vz(), Vec3.vy());
-          Vec3 offset = profile.getCoords().fromLocal().times(((Mesh)profileobj).getVertices()[0].r).
-          minus(coordsys2.fromLocal().times(((Mesh)obj3D).getVertices()[0].r));
-          if (coordsys != null)
-            coordsys2.setOrigin(coordsys2.getOrigin().plus(coordsys.getOrigin()));
-          else
-            coordsys = new CoordinateSystem(new Vec3(), Vec3.vz(), Vec3.vy());
-            
-          coordsys.setOrigin(coordsys2.getOrigin().plus(offset));
-        }
-        for (int i=0;i<children.length;i++) children[i].setVisible(false);
+        ObjectInfo objinfo = extrude(children, dir, numsegments, twist);
+        obj3D = objinfo.getObject();
+        objcoordsys = objinfo.getCoords();
       }
       else {
         // Typically, the three next parameters are common object properties
@@ -390,6 +381,14 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
       }
     }
 
+    // FIXME: Verify that combining these coordsys'es is done correctly.
+    if (coordsys == null) {
+      if(objcoordsys != null) coordsys = objcoordsys;
+    }
+    else {
+      coordsys.transformCoordinates(objcoordsys.fromLocal());
+    }
+    
     if (obj3D != null) {
       Texture tex = parent.object.getTexture();
       TextureMapping map = parent.object.getTextureMapping();
@@ -412,8 +411,8 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
   // any error occurred
   double evaluateExpression(String expr) throws Exception {
     try {
-      jep.parseExpression(expr);
-      return jep.getValue();
+      this.jep.parseExpression(expr);
+      return this.jep.getValue();
     } catch (Exception ex) {
       showMessage("Error while evaluating Expression: \"" + expr
           + "\" Syntax Error or unknown variable?");
@@ -430,10 +429,10 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
 
       String name = curLine.substring(0, mark).trim();
       String formula = curLine.substring(mark + 1);
-      jep.parseExpression(formula);
-      double value = jep.getValue();
+      this.jep.parseExpression(formula);
+      double value = this.jep.getValue();
       // System.out.println(value);
-      jep.addVariable(name, value);
+      this.jep.addVariable(name, value);
     } catch (Exception ex) {
       showMessage("Invalid Assignment: \"" + curLine + "\" syntax error?");
       throw (ex);
@@ -451,7 +450,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
       }
       return true;
     } catch (Exception ex) {
-      //System.out.println(ex);
+      System.out.println(ex);
       return false;
     }
   }
@@ -504,13 +503,13 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
       q=det(a,b,c,d);
       if (Math.abs(q) < 0.00000001)
       {
-        error = true;
+        this.error = true;
       }
       else
       {
-        error = false;
-        x1=det(r1,b,r2,d)/q;
-        x2=det(a,r1,c,r2)/q;
+        this.error = false;
+        this.x1=det(r1,b,r2,d)/q;
+        this.x2=det(a,r1,c,r2)/q;
       }
     }
   }
@@ -521,29 +520,29 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
     
     public MetaCADLine(Vec3 s,Vec3 e)
     {
-      start = new Vec2(s.x,s.y);
-      end = new Vec2(e.x, e.y);
-      dir = end.minus(start);
-      normal = new Vec2(dir);
-      normal.normalize();
-      normal.set(-normal.y, normal.x);
+      this.start = new Vec2(s.x,s.y);
+      this.end = new Vec2(e.x, e.y);
+      this.dir = this.end.minus(this.start);
+      this.normal = new Vec2(this.dir);
+      this.normal.normalize();
+      this.normal.set(-this.normal.y, this.normal.x);
     }
     
     public void parallelMove(double d)
     {
-      start.add(normal.times(d));
+      this.start.add(this.normal.times(d));
     }
     
     public Vec3 intersect3(MetaCADLine l)
     {
-      LinearSolve2 solve = new LinearSolve2(l.dir.x, -dir.x, l.dir.y, -dir.y, start.x-l.start.x, start.y-l.start.y);
+      LinearSolve2 solve = new LinearSolve2(l.dir.x, -this.dir.x, l.dir.y, -this.dir.y, this.start.x-l.start.x, this.start.y-l.start.y);
       if (solve.error)
       {
         return null;
       }
       else
       {
-        Vec2 point = start.plus(dir.times(solve.x2)); 
+        Vec2 point = this.start.plus(this.dir.times(solve.x2)); 
         return new Vec3(point.x,point.y, 0);
       }
     }
@@ -575,5 +574,82 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine {
      
     return points.toArray(new Vec3[1]);
   }
-}
 
+  /**
+    Performs the given operation on the list of objects (of size >= 2),
+    and returns the resulting ObjectInfo containing a CSGObject.
+
+    Calls evaluateNode() on each child before performing the operation.
+    Hides the children.
+
+    Exception: See evaluateNode()
+   */    
+  public ObjectInfo combine(ObjectInfo[] objects, int operation, UndoRecord undo) throws Exception
+  {
+    if (objects.length < 1) return null;    
+    
+    switch (operation) {
+    case EXTRUSION:
+      return extrude(objects, Vec3.vz(), 1, 0.0);
+    default:
+      return super.combine(objects, operation, undo);
+    }
+  }
+
+  /**
+   * 
+   * Extrudes the given profiles using the given parameters and returns the result object.
+   * 
+   * @param objects
+   * @param dir
+   * @param numsegments
+   * @param twist
+   * @return an ObjectInfo. The coordsys in the object info is just there to move
+   * the object back to it's original position since the extrusion operation always 
+   * centers the result in the origin.
+   */
+  public ObjectInfo extrude(ObjectInfo[] objects, Vec3 dir, int numsegments, double twist)
+  {
+    // First child is the base mesh
+    // FIXME: Find all extrudable child objects instead
+    ObjectInfo profile = objects[0];
+    Object3D profileobj = profile.getObject();
+    if (!(profileobj instanceof TriangleMesh) &&
+        profileobj.canConvertToTriangleMesh() != Object3D.CANT_CONVERT) {
+      profileobj = profileobj.convertToTriangleMesh(0.1);
+    }
+
+    if (profileobj instanceof TriangleMesh) {
+      // Build extrusion curve from vector and segments
+      Vec3 v[] = new Vec3[numsegments+1];
+      float smooth[] = new float[v.length];
+      for (int i = 0; i < v.length; i++) {
+        v[i] = new Vec3(dir);
+        v[i].scale(1.0*i/numsegments);
+        smooth[i] = 1.0f;
+      }
+      Curve path = new Curve(v, smooth, Mesh.NO_SMOOTHING, false);
+      CoordinateSystem pathCoords = new CoordinateSystem();
+
+      Object3D obj3D = ExtrudeTool.extrudeMesh((TriangleMesh)profileobj, path, profile.getCoords(), pathCoords, twist*Math.PI/180.0, true);
+
+      // Since the result is centered in the origin, offset the extruded object to 
+      // move it back to its original position
+      // FIXME: Combine this with the user-specified coordinate system
+      CoordinateSystem coordsys = new CoordinateSystem(new Vec3(), Vec3.vz(), Vec3.vy());
+      Vec3 offset = profile.getCoords().fromLocal().times(((Mesh)profileobj).getVertices()[0].r).
+      minus(coordsys.fromLocal().times(((Mesh)obj3D).getVertices()[0].r));
+      coordsys.setOrigin(offset);
+      ObjectInfo objinfo = new ObjectInfo(obj3D, coordsys, "tmp");
+
+      for (int i=0;i<objects.length;i++) objects[i].setVisible(false);
+      return objinfo;
+    }
+    else {
+      // FIXME: Print error
+      return null;
+    }
+  }
+  
+  
+}
