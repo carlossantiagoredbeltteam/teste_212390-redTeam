@@ -7,7 +7,11 @@ import java.util.List;
 import org.cheffo.jeplite.JEP;
 
 import artofillusion.LayoutWindow;
+import artofillusion.Scene;
 import artofillusion.UndoRecord;
+import artofillusion.animation.PositionTrack;
+import artofillusion.animation.RotationTrack;
+import artofillusion.math.BoundingBox;
 import artofillusion.math.CoordinateSystem;
 import artofillusion.math.Vec2;
 import artofillusion.math.Vec3;
@@ -16,6 +20,7 @@ import artofillusion.object.Curve;
 import artofillusion.object.Cylinder;
 import artofillusion.object.Mesh;
 import artofillusion.object.Object3D;
+import artofillusion.object.Cube;
 import artofillusion.object.ObjectInfo;
 import artofillusion.object.Sphere;
 import artofillusion.object.TriangleMesh;
@@ -27,6 +32,10 @@ import artofillusion.ui.MessageDialog;
 public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
 {
   public static final int EXTRUSION = 10;
+  public static final int POLYGON   = 11;
+  public static final int SPHERE    = 12;
+  public static final int CUBE      = 13;
+  public static final int CYLINDER  = 14;
   
   JEP jep = new JEP();
 
@@ -41,6 +50,14 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     switch (operation) {
     case EXTRUSION:
       return "extrude()";
+    case POLYGON:
+      return "polygon()";
+    case CUBE:
+      return "cube()";
+    case SPHERE:
+      return "sphere()";
+    case CYLINDER:
+      return "cylinder()";
     default:
       return super.opToString(operation);
     }
@@ -53,6 +70,18 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     String lower = opstr.toLowerCase();
     if (lower.startsWith("extrude")) {
       return EXTRUSION;
+    }
+    else if (lower.startsWith("poly")) {
+      return POLYGON;
+    }
+    else if (lower.startsWith("cube")) {
+      return CUBE;
+    }
+    else if (lower.startsWith("sphere")) {
+      return SPHERE;
+    }
+    else if (lower.startsWith("cylinder")) {
+      return CYLINDER;
     }
     else return super.stringToOp(opstr);
   }
@@ -85,18 +114,64 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
       super.evaluate();
   }
 
-  public ObjectInfo evaluateNode(ObjectInfo parent, UndoRecord undo) throws Exception {
-    if (evaluateLoop(parent, undo))
-      return parent;
-
-    if (evaluateObject(parent, undo))
-      return parent;
+  public ObjectInfo evaluateNode(ObjectInfo parent, UndoRecord undo) throws Exception
+  {
+    if (evaluateLoop(parent, undo)) return parent;
+    if (convertObject(parent)) return parent;
+    if (evaluateObject(parent, undo)) return parent;
 
     return super.evaluateNode(parent, undo);
   }
 
-  public Boolean evaluateLoop(ObjectInfo parent, UndoRecord undo)
-      throws Exception {
+  Boolean convertObject(ObjectInfo parent) {
+    if (parent.name.startsWith("Cube ") && parent.object instanceof Cube) {
+      Vec3 size = ((Cube)parent.object).getBounds().getSize();
+      
+      String name = "cube(" +
+      String.format("%.2f", size.x) + "," +
+      String.format("%.2f", size.y) + "," +
+      String.format("%.2f", size.z) + ")";
+      name += coordSysToString(parent.getCoords());
+      parent.setName(name);
+      return true;
+    }
+    else if (parent.name.startsWith("Cylinder ") && parent.object instanceof Cylinder) {
+      Cylinder c = (Cylinder)parent.object;
+      Vec3 size = c.getBounds().getSize();
+      
+      String name = "cylinder("+
+                     String.format("%.2f", size.y)+","+
+                     String.format("%.2f", size.x/2)+","+
+                     String.format("%.2f", size.z/2)+","+
+                     String.format("%.2f", c.getRatio())+")";
+      name += coordSysToString(parent.getCoords());
+      parent.setName(name);
+      return true;
+    }
+    else if (parent.name.startsWith("Sphere ") && parent.object instanceof Sphere) {
+      Vec3 size = ((Sphere)parent.object).getRadii();
+      
+      String name = "sphere("+
+                     String.format("%.2f", size.x)+","+
+                     String.format("%.2f", size.y)+","+
+                     String.format("%.2f", size.z)+")";
+      name += coordSysToString(parent.getCoords());
+      parent.setName(name);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * 
+   * Evaluates a boolean expression as a loop.
+   * 
+   * @param parent
+   * @param undo
+   * @return
+   * @throws Exception
+   */
+  public Boolean evaluateLoop(ObjectInfo parent, UndoRecord undo) throws Exception {
     String line = parent.name;
     int operation = this.stringToOp(line);
 
@@ -104,29 +179,30 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
 
     String[] parameters = null;
     CoordinateSystem coordsys=null;
-    MetaCADParser coordExpr = new MetaCADParser(line);
+    MetaCADParser loopExpr = new MetaCADParser(line);
 
-    if (!coordExpr.parse()) return false;
+    // The parsing will fail if we don't find parentheses.
+    if (!loopExpr.parse()) return false;
 
-    Enumeration<String> iter = coordExpr.getNames();
+    Enumeration<String> iter = loopExpr.getNames();
     while (iter.hasMoreElements()) {
       String name = iter.nextElement();
-      parameters = coordExpr.getParameters(name);
+      parameters = loopExpr.getParameters(name);
       
       if (name.equals("cs")) {
         coordsys = evaluateCoordSys(parameters);
       }
       else if (name.startsWith(this.opToString(operation)))
       {
-        parameters=coordExpr.getParameters(name);
+        parameters=loopExpr.getParameters(name);
       }
     }
       
     if (parameters == null || parameters.length != 3) {
       // no loop but a simple boolean operation let base class do that
-      coordExpr = new MetaCADParser("dummyDummy(dummyDummy=0; dummyDummy<1; dummyDummy=dummyDummy+1)");
-      coordExpr.parse();
-      parameters = coordExpr.getParameters("dummyDummy");
+      loopExpr = new MetaCADParser("dummyDummy(dummyDummy=0; dummyDummy<1; dummyDummy=dummyDummy+1)");
+      loopExpr.parse();
+      parameters = loopExpr.getParameters("dummyDummy");
     }
 
     CSGHelper helper = new CSGHelper(operation);
@@ -367,7 +443,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
           c = evaluateExpression(parameters[2]);
 
           if (name.startsWith("cube")) {
-            obj3D = new Cube(a, b, c);
+            obj3D = cube(a,b,c);
           }
           if (name.startsWith("sphere")) {
             obj3D = new Sphere(a, b, c);
@@ -476,6 +552,23 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
       }
     }
     return coordsys;
+  }
+  
+  String coordSysToString(CoordinateSystem cs) {
+    Vec3 t = cs.getOrigin();
+    double r[] = cs.getRotationAngles();
+    String str = "cs(" +
+        String.format("%.2f", t.x) + "," +
+        String.format("%.2f", t.y) + "," +
+        String.format("%.2f", t.z);
+    
+    if (r[0] != 0.0 || r[1] != 0.0 || r[2] != 0.0) {
+      str += "," + String.format("%.2f", r[0]) +
+      "," + String.format("%.2f", r[1]) +
+      "," + String.format("%.2f", r[2]);
+    }
+    str += ")";
+    return str;
   }
   
   void showMessage(String text)  {
@@ -656,6 +749,11 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     }
   }
  
+  public Object3D cube(double x, double y, double z)
+  {
+    return new Cube(x, y, z);
+  }
+  
   public void cube()
   {
     showMessage("cube function not implemented");
@@ -673,13 +771,21 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
 
   public void polygon()
   {
-    showMessage("polygon function not implemented");
+    // FIXME: This is a hack a the moment, and we don't evaluate automatically either.
+    Scene theScene = this.window.getScene();
+    ObjectInfo objInfo = new ObjectInfo(new Sphere(1,1,1), new CoordinateSystem(), "poly(reg, 3, 5, 5)");
+    this.window.addObject(objInfo, null);
+    this.window.setSelection(theScene.getNumObjects()-1);
   }
 
   public void extrude()
   {
     execute(MetaCADEvaluatorEngine.EXTRUSION, 1);
   }
+ 
+  public void test()
+  {
+    showMessage("test function not implemented");
+  }
 
-  
 }
