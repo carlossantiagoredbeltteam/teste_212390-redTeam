@@ -94,6 +94,14 @@ byte getTimer1Resolution(unsigned long ticks)
     return 5;
 }
 
+inline void setTimer1Micros(unsigned long micros)
+{
+  //16 ticks in a microsecond.
+  unsigned long ticks = micros * 16;
+  
+  setTimer1Ticks(ticks);
+}
+
 inline void setTimer1Ticks(unsigned long ticks)
 {
   // ticks is the delay between interrupts in 62.5 nanosecond ticks.

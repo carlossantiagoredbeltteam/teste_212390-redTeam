@@ -208,8 +208,7 @@ void handle_commands()
   long x;
   long y;
   long z;
-  byte prescaler;
-  unsigned int count;
+  unsigned long step_delay;
   byte cmd;
 
   //do we have any commands?
@@ -241,27 +240,13 @@ void handle_commands()
     switch(cmd)
     {
       //TODO: TEST THOROUGHLY
-      case HOST_CMD_QUEUE_POINT_INC:
-
-        x = (int)commandBuffer.remove_16();
-        y = (int)commandBuffer.remove_16();
-        z = (int)commandBuffer.remove_16();
-        prescaler = commandBuffer.remove_8();
-        count = commandBuffer.remove_16();
-
-        //queue_incremental_point(x, y, z, prescaler, count);
-
-        break;
-
-      //TODO: TEST THOROUGHLY
       case HOST_CMD_QUEUE_POINT_ABS:
         x = (long)commandBuffer.remove_32();
         y = (long)commandBuffer.remove_32();
         z = (long)commandBuffer.remove_32();
-        prescaler = commandBuffer.remove_8();
-        count = commandBuffer.remove_16();
+        step_delay = (unsigned long)commandBuffer.remove_32();
           
-        queue_absolute_point(x, y, z, prescaler, count);
+        queue_absolute_point(x, y, z, step_delay);
       
         break;
 
@@ -321,7 +306,6 @@ void handle_commands()
 
         break;
 
-      //TODO: TEST
       case HOST_CMD_DELAY:
         wait_until_target_reached(); //dont want to get hasty.
 
@@ -329,7 +313,6 @@ void handle_commands()
         delay(commandBuffer.remove_32());
         break;
 
-      //TODO: TEST
       case HOST_CMD_CHANGE_TOOL:
         wait_until_target_reached(); //dont want to get hasty.
 
@@ -337,7 +320,6 @@ void handle_commands()
         select_tool(commandBuffer.remove_8());
         break;
 
-      //TODO: TEST
       case HOST_CMD_WAIT_FOR_TOOL:
         wait_until_target_reached(); //dont want to get hasty.
 
@@ -360,7 +342,6 @@ void handle_commands()
         }
         break;
 
-      //WORKS
       case HOST_CMD_TOOL_COMMAND:
         wait_until_target_reached(); //dont want to get hasty.
         

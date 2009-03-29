@@ -152,5 +152,5 @@
 // Explicitly allocate memory at compile time for buffer.
 #define COMMAND_BUFFER_SIZE 256
 #define POINT_QUEUE_SIZE 32
-#define POINT_SIZE 15 // 4 + 4 + 4 + 3 = 15
+#define POINT_SIZE 16 // 4 + 4 + 4 + 4 = 16
 #define MAX_PACKET_LENGTH 32
