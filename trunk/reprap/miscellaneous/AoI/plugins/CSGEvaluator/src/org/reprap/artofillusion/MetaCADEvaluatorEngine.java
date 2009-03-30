@@ -245,7 +245,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     return true;
   }
 
-  protected Object3D sanitizeObject3D(Object3D obj) throws Exception {
+  Object3D sanitizeObject3D(Object3D obj) throws Exception {
     try {
       obj.getBounds();
     } catch (Exception ex) {
@@ -730,11 +730,11 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
         v[i].scale(1.0*i/numsegments);
         smooth[i] = 1.0f;
       }
-      Curve path = new Curve(v, smooth, Mesh.NO_SMOOTHING, false);
+      Curve path = new Curve(v, smooth, Mesh.APPROXIMATING, false);
       CoordinateSystem pathCoords = new CoordinateSystem();
 
       Object3D obj3D = ExtrudeTool.extrudeMesh((TriangleMesh)profileobj, path, profile.getCoords(), pathCoords, twist*Math.PI/180.0, true);
-
+      
       // Since the result is centered in the origin, offset the extruded object to 
       // move it back to its original position
       // FIXME: Combine this with the user-specified coordinate system
