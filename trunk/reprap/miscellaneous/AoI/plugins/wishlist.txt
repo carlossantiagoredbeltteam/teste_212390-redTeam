@@ -3,12 +3,11 @@ MetaCADEvaluator:
 o named parameters: It's hard to remember parameter ordering
 o online help/tooltips/wizard or smth.?
 o Separate object editor (tabs in main dialog)
-o Operator buttons (tabs in main dialog)
 o Set/compute a minimal size for the dialog
 o Have a way of toggling debug info on/off (e.g. message boxes)
 o Extrude: Why is tesselation so ugly compared to the Extrude Tool?
-o starcylbox.aoi: The second difference failes to hide its union child
-o idea for creating cube/sphere/cyl: auto-rename on evaluate
+o devaluate doesn't work on extrude
+o CAD-evaluation doesn't show root node if it's hidden
 
 o Sometimes the plugin hangs (for a long time)
   for-loop-transform, ring-generator
