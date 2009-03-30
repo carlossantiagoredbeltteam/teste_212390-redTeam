@@ -1,6 +1,7 @@
 package org.reprap.artofillusion;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -9,9 +10,6 @@ import org.cheffo.jeplite.JEP;
 import artofillusion.LayoutWindow;
 import artofillusion.Scene;
 import artofillusion.UndoRecord;
-import artofillusion.animation.PositionTrack;
-import artofillusion.animation.RotationTrack;
-import artofillusion.math.BoundingBox;
 import artofillusion.math.CoordinateSystem;
 import artofillusion.math.Vec2;
 import artofillusion.math.Vec3;
@@ -20,7 +18,6 @@ import artofillusion.object.Curve;
 import artofillusion.object.Cylinder;
 import artofillusion.object.Mesh;
 import artofillusion.object.Object3D;
-import artofillusion.object.Cube;
 import artofillusion.object.ObjectInfo;
 import artofillusion.object.Sphere;
 import artofillusion.object.TriangleMesh;
@@ -296,111 +293,59 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
       }
       else if (name.startsWith("poly")) {
         Vec3[] v=null;
-        float[] smoothness=null;
         
         if (parameters.length == 4 && parameters[0].startsWith("star")) {
-          double inner  = evaluateExpression(parameters[2]); //innerValueField.getValue();
-          double outer = evaluateExpression(parameters[3]); //outerValueField.getValue();
-          int n = (int)evaluateExpression(parameters[1]); //(int) Math.round( nValueField.getValue() );
-
-          v = new Vec3[2*n];
-          smoothness = new float[2*n];
-          int index = 0;
-          for (int i = 0; i < n; i++)
-          {
-            v[index] = new Vec3( Math.cos( Math.PI * index / (double) n ),
-                Math.sin( Math.PI * index / (double) n ), 0 );
-            v[index].scale( inner );
-            v[index+1] = new Vec3( Math.cos( Math.PI * (index + 1) / (double) n ),
-                Math.sin( Math.PI * (index + 1) / (double) n ), 0 );
-            v[index+1].scale( outer );
-            smoothness[index]=0;
-            smoothness[index+1]=0;
-            index += 2;
+          int n = 6;
+          double inner = 3;
+          double outer = 5;
+          if (parameters.length >= 2) n = (int)evaluateExpression(parameters[1]);
+          if (parameters.length >= 4) {
+            inner  = evaluateExpression(parameters[2]);
+            outer = evaluateExpression(parameters[3]);
           }
-        
-          obj3D = new Curve(v, smoothness, Mesh.NO_SMOOTHING, true).convertToTriangleMesh(0);
+
+          v = createStar(n, inner, outer);
         }
         if (parameters.length >= 3 && parameters[0].startsWith("reg")) {
-          double radiusy;
-          double radiusx  = evaluateExpression(parameters[2]);
-          
-          if (parameters.length >= 4)
-            radiusy  = evaluateExpression(parameters[3]); 
-          else
-            radiusy  = radiusx;
-          
-          int n = (int)evaluateExpression(parameters[1]); 
-
-          v = new Vec3[n];
-          smoothness = new float[n];
-          int index = 0;
-          for (int i = 0; i < n; i++)
-          {
-            v[index] = new Vec3( radiusx*Math.cos( 2*Math.PI * index / (double) n ),
-                radiusy*Math.sin(2*Math.PI * index / (double) n ), 0 );
-            smoothness[index]=0;
-            index++;
+          int n = 6;
+          double radiusx = 4;
+          double radiusy = 4;
+          if (parameters.length >= 2) n = (int)evaluateExpression(parameters[1]);
+          if (parameters.length >= 3) {
+            radiusy = radiusx = evaluateExpression(parameters[2]);
+          }
+          if (parameters.length >= 4) {
+            radiusy  = evaluateExpression(parameters[3]);
           }
 
-          obj3D = new Curve(v, smoothness, Mesh.NO_SMOOTHING, true).convertToTriangleMesh(0);
+          v = createRegular(n, radiusx, radiusy);
         }
         
         if (parameters.length >= 4 && parameters[0].startsWith("roll")) {
-          double big  = evaluateExpression(parameters[2]); //innerValueField.getValue();
-          double small = evaluateExpression(parameters[3]); //outerValueField.getValue();
-          int n = (int)evaluateExpression(parameters[1]); //(int) Math.round( nValueField.getValue() );
-          double small2 = small;
-          if (parameters.length == 5)
-            small2=evaluateExpression(parameters[4]);
-            
-          
-          v = new Vec3[n];
-          smoothness = new float[n];
-          int index = 0;
-          for (int i = 0; i < n; i++)
-          {
-            double biga=(2*Math.PI*i)/n;
-            double len = big*biga;
-            double smalla=len/small;
-            double x,y;
-            
-            x = (big+small)*Math.cos(biga) + (small2)*Math.cos(smalla);
-            y = (big+small)*Math.sin(biga) + (small2)*Math.sin(smalla);
-            
-            v[index] = new Vec3(x, y, 0 );
-            
-            smoothness[index]=0;
-            index++;
+          int n = 20;
+          double big = 5;
+          double small = 0.5;
+          double small2 = 0.4;
+          if (parameters.length >= 2) n = (int)evaluateExpression(parameters[1]);
+          if (parameters.length >= 4) {
+            big  = evaluateExpression(parameters[2]);
+            small2 = small = evaluateExpression(parameters[3]);
           }
+          if (parameters.length == 5) {
+            small2 = evaluateExpression(parameters[4]);
+          }            
+          
+          v = createRoll(n, big, small, small2);
         }
-        if (v != null && smoothness!= null)
-        {
+
+        if (v != null) {
           String[] inset = objExpr.getParameters("inset");
           
-          if (inset != null && inset.length == 1)
-          {
+          if (inset != null && inset.length == 1) {
             v = insetPoly(v, evaluateExpression(inset[0]));
-            
-  //          double s=evaluateExpression(shrink[0]);
-  //          for (int i = 0; i < v.length; i++)
-  //          {
-  //            int iprev = (i+v.length-1)%v.length;
-  //            int inext = (i+1)%v.length;
-  //            
-  //            double yn = -(v[inext].x - v[iprev].x);
-  //            double xn = v[inext].y - v[iprev].y;
-  //            
-  //            double l=Math.sqrt(xn*xn+yn*yn);
-  //            xn /= l;
-  //            yn /= l;
-  //            
-  //            v[i].x += s*xn;
-  //            v[i].y += s*yn; 
-  //          }
           }
           
-          obj3D = new Curve(v, smoothness, Mesh.NO_SMOOTHING, true).convertToTriangleMesh(0);
+          obj3D = createPolygon(v);
         }
       }
       else if (name.startsWith("extrude")) {
@@ -435,29 +380,28 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
       }
       else {
         // Typically, the three next parameters are common object properties
+        Vec3 dims = new Vec3(1.0, 1.0, 1.0);
         if (parameters.length >= 3) {
-          double a, b, c;
-
-          a = evaluateExpression(parameters[0]);
-          b = evaluateExpression(parameters[1]);
-          c = evaluateExpression(parameters[2]);
-
-          if (name.startsWith("cube")) {
-            obj3D = cube(a,b,c);
+          dims.set(evaluateExpression(parameters[0]),
+                  evaluateExpression(parameters[1]),
+                  evaluateExpression(parameters[2]));
+        }
+        
+        if (name.startsWith("cube")) {
+          obj3D = cube(dims);
+        }
+        if (name.startsWith("sphere")) {
+          obj3D = new Sphere(dims.x, dims.y, dims.z);
+        }
+        if (name.startsWith("cylinder")) {
+          double ratio = 1;
+          // Cylinder takes an optional fourth parameter
+          if (parameters.length >= 4) {
+            ratio = evaluateExpression(parameters[3]);
+            if (ratio > 1) ratio = 1;
+            if (ratio < 0) ratio = 0;
           }
-          if (name.startsWith("sphere")) {
-            obj3D = new Sphere(a, b, c);
-          }
-          if (name.startsWith("cylinder")) {
-            double ratio = 1;
-            // Cylinder takes an optional fourth parameter
-            if (parameters.length >= 4) {
-              ratio = evaluateExpression(parameters[3]);
-              if (ratio > 1) ratio = 1;
-              if (ratio < 0) ratio = 0;
-            }
-            obj3D = new Cylinder(a, b, c, ratio);
-          }
+          obj3D = new Cylinder(dims.x, dims.y, dims.z, ratio);
         }
       }
     }
@@ -486,6 +430,65 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
       return false;
     }
     return true;
+  }
+
+  Vec3[] createRoll(int n, double big, double small, double small2) {
+    Vec3[] v;
+    v = new Vec3[n];
+    int index = 0;
+    for (int i = 0; i < n; i++)
+    {
+      double biga=(2*Math.PI*i)/n;
+      double len = big*biga;
+      double smalla=len/small;
+      double x,y;
+      
+      x = (big+small)*Math.cos(biga) + (small2)*Math.cos(smalla);
+      y = (big+small)*Math.sin(biga) + (small2)*Math.sin(smalla);
+      
+      v[index] = new Vec3(x, y, 0 );
+      
+      index++;
+    }
+    return v;
+  }
+
+  Vec3[] createRegular(int n, double radiusx, double radiusy) {
+    Vec3[] v;
+    v = new Vec3[n];
+    int index = 0;
+    for (int i = 0; i < n; i++)
+    {
+      v[index] = new Vec3( radiusx*Math.cos( 2*Math.PI * index / (double) n ),
+          radiusy*Math.sin(2*Math.PI * index / (double) n ), 0 );
+      index++;
+    }
+    return v;
+  }
+
+  Vec3[] createStar(int n, double inner, double outer) {
+    Vec3[] v;
+    v = new Vec3[2*n];
+    int index = 0;
+    for (int i = 0; i < n; i++)
+    {
+      v[index] = new Vec3( Math.cos( Math.PI * index / (double) n ),
+          Math.sin( Math.PI * index / (double) n ), 0 );
+      v[index].scale( inner );
+      v[index+1] = new Vec3( Math.cos( Math.PI * (index + 1) / (double) n ),
+          Math.sin( Math.PI * (index + 1) / (double) n ), 0 );
+      v[index+1].scale( outer );
+      index += 2;
+    }
+    return v;
+  }
+
+  Object3D createPolygon(Vec3[] v) {
+    Object3D obj3D;
+    float smoothness[] = new float[v.length];
+    Arrays.fill(smoothness, 0.0f);
+    obj3D = new Curve(v, smoothness, Mesh.NO_SMOOTHING, true).convertToTriangleMesh(0);
+    return obj3D;
   }
   
   // Evaluates an Expression like 3*x+sin(a) and returns the value of it or 0 if
@@ -749,9 +752,9 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     }
   }
  
-  public Object3D cube(double x, double y, double z)
+  public Object3D cube(Vec3 dims)
   {
-    return new Cube(x, y, z);
+    return new Cube(dims.x, dims.y, dims.z);
   }
   
   public void cube()
