@@ -216,6 +216,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
 
       for (int i = 0; i < objects.length; i++) {
         helper.Add(evaluateNode(objects[i], undo).duplicate());
+        objects[i].setVisible(false);
       }
 
       // "increment" evaluate 3rd for parameter i.e. i=i+1
