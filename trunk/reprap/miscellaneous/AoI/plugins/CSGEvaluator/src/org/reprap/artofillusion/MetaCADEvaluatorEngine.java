@@ -380,29 +380,49 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
         objcoordsys = objinfo.getCoords();
       }
       else {
-        // Typically, the three next parameters are common object properties
-        Vec3 dims = new Vec3(1.0, 1.0, 1.0);
-        if (parameters.length >= 3) {
-          dims.set(evaluateExpression(parameters[0]),
-                  evaluateExpression(parameters[1]),
-                  evaluateExpression(parameters[2]));
+        // Common main parameter (cube: size, sphere: radius, cylinder: radius && height)
+        double mainparam = 1.0f;
+        if (parameters.length >= 1) {
+          mainparam = evaluateExpression(parameters[0]);
         }
-        
         if (name.startsWith("cube")) {
+          // The two next parameters define y, and z dimensions
+          Vec3 dims = new Vec3(mainparam, mainparam, mainparam);
+          if (parameters.length >= 3) {
+            dims.set(mainparam,
+                    evaluateExpression(parameters[1]),
+                    evaluateExpression(parameters[2]));
+          }
           obj3D = cube(dims);
         }
         if (name.startsWith("sphere")) {
+          Vec3 dims = new Vec3(mainparam, mainparam, mainparam);
+          if (parameters.length >= 3) {
+            dims.set(mainparam,
+                    evaluateExpression(parameters[1]),
+                    evaluateExpression(parameters[2]));
+          }
           obj3D = new Sphere(dims.x, dims.y, dims.z);
         }
         if (name.startsWith("cylinder")) {
+          // First (main) parameter is height
+          double height = mainparam;
+          double rx = mainparam;
+          double ry = mainparam;
           double ratio = 1;
+
+          // Second parameter is radius
+          if (parameters.length >= 2) rx = ry = evaluateExpression(parameters[1]);
+          // Third parameter define separate y radius
+          if (parameters.length >= 3) ry = evaluateExpression(parameters[2]);
+          // Fourth parameter define top/bottom radius ratio
           // Cylinder takes an optional fourth parameter
           if (parameters.length >= 4) {
             ratio = evaluateExpression(parameters[3]);
-            if (ratio > 1) ratio = 1;
-            if (ratio < 0) ratio = 0;
+            if (ratio > 1) ratio = 1.0;
+            if (ratio < 0) ratio = 0.0;
           }
-          obj3D = new Cylinder(dims.x, dims.y, dims.z, ratio);
+          obj3D = new Cylinder(height, rx, ry, ratio);
         }
       }
     }
