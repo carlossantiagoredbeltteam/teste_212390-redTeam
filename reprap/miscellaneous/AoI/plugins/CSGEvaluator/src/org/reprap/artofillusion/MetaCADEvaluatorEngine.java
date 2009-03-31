@@ -443,6 +443,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
       else parent.setCoords(new CoordinateSystem());
       parent.setObject(obj3D);
       parent.object.setTexture(tex, map);
+      parent.setVisible(true);
 
       parent.clearCachedMeshes();
       this.window.updateImage();

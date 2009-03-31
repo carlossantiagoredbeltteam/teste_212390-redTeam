@@ -240,8 +240,13 @@ class CSGEvaluatorEngine
       this.window.getScene().objectModified(parent.getObject());
 
       ObjectInfo[] children = parent.getChildren();
-      for (int i=0;i<children.length;i++) {
-        devaluateNode(children[i], undo);
+      if (children.length > 0) {
+        for (int i=0;i<children.length;i++) {
+          devaluateNode(children[i], undo);
+        }
+      }
+      else {
+        parent.setVisible(true);
       }
     }
     else {
