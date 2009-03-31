@@ -323,10 +323,10 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
         }
         
         if (parameters.length >= 4 && parameters[0].startsWith("roll")) {
-          int n = 20;
+          int n = 30;
           double big = 5;
-          double small = 0.5;
-          double small2 = 0.4;
+          double small = 1;
+          double small2 = 0.8;
           if (parameters.length >= 2) n = (int)evaluateExpression(parameters[1]);
           if (parameters.length >= 4) {
             big  = evaluateExpression(parameters[2]);
@@ -794,15 +794,30 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     showMessage("cylinder function not implemented");
   }
 
-  public void polygon()
+  public void polygon(String defstr) throws Exception
   {
-    // FIXME: This is a hack a the moment, and we don't evaluate automatically either.
     Scene theScene = this.window.getScene();
-    ObjectInfo objInfo = new ObjectInfo(new Sphere(1,1,1), new CoordinateSystem(), "poly(reg, 3, 5, 5)");
+    ObjectInfo objInfo = new ObjectInfo(new Sphere(1,1,1), new CoordinateSystem(), defstr);
     this.window.addObject(objInfo, null);
     this.window.setSelection(theScene.getNumObjects()-1);
+    evaluateObject(objInfo, null);
   }
 
+  public void regular() throws Exception
+  {
+    polygon("poly(reg, 6, 4, 4)");
+  }
+  
+  public void star() throws Exception
+  {
+    polygon("poly(star, 6, 3, 5)");
+  }
+  
+  public void roll() throws Exception
+  {
+    polygon("poly(roll, 30, 5, 1, 0.8)");
+  }
+  
   public void extrude()
   {
     execute(MetaCADEvaluatorEngine.EXTRUSION, 1);

@@ -12,7 +12,6 @@ import java.awt.event.KeyEvent;
 
 import artofillusion.LayoutWindow;
 import artofillusion.ModellingTool;
-import artofillusion.ViewerCanvas;
 import artofillusion.keystroke.KeystrokeManager;
 import artofillusion.keystroke.KeystrokeRecord;
 import artofillusion.ui.Translate;
