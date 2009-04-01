@@ -1,0 +1,6 @@
+Usage:
+
+% metahost <file.gcode> 
+
+If start.gcode and/or end.gcode are present, prepend/append these
+

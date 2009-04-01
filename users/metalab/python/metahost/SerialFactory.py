@@ -6,6 +6,7 @@ import serial
 import time
 import glob
 
+# Creates a pyserial Serial instance
 def createSerialPort(port=None, baudrate=115200, verbose=False):
     if port == None:
         ports = scan()
