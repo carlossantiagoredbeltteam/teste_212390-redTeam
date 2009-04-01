@@ -26,8 +26,8 @@
 
 //do you want to reverse the motor?
 #define DELAY_FOR_STOP 5
-#define MOTOR_REVERSE_DURATION 500
-#define MOTOR_FORWARD_DURATION 250
+#define MOTOR_REVERSE_DURATION 400
+#define MOTOR_FORWARD_DURATION 325
 
 /****************************************************************************************
  * Here's where you define the speed PID behavior for an encoder
