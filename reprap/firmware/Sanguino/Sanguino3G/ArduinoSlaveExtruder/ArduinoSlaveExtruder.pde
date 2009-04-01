@@ -68,8 +68,11 @@ void init_serial()
 void loop()
 {
   //check for and handle any packets that come in.
-  if (Serial.available() > 0)
-  	process_packets();
+  process_packets();
+  	
+  //did we trigger a reversal?
+  if (motor1_reversal_state)
+    reverse_motor_1();
 
   //manage our extruder stuff.
   if (!is_tool_paused)

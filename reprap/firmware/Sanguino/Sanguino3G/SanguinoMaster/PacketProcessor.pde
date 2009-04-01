@@ -68,6 +68,7 @@ void process_host_packets()
     // top bit high == bufferable command packet (eg. #128-255)
     if (b & 0x80)
     {
+      //do we have room?
       if (commandBuffer.remainingCapacity() >= hostPacket.getLength())
       {
         //okay, throw it in the buffer.
@@ -75,10 +76,7 @@ void process_host_packets()
           commandBuffer.append(hostPacket.get_8(i));
       }
       else
-      {
         hostPacket.overflow();
-        Serial.println("overflow.");
-      }
     }
     // top bit low == reply needed query packet (eg. #0-127)
     else
@@ -257,10 +255,6 @@ void handle_commands()
         current_steps.x = (long)commandBuffer.remove_32();
         current_steps.y = (long)commandBuffer.remove_32();
         current_steps.z = (long)commandBuffer.remove_32();
-
-        eventual_steps.x = current_steps.x;
-        eventual_steps.y = current_steps.y;
-        eventual_steps.z = current_steps.z;
         break;
 
       //TODO: TEST
