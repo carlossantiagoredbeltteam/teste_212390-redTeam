@@ -54,11 +54,6 @@ void init_steppers()
   current_steps.y = 0;
   current_steps.z = 0;
   
-  //zero our mega position.
-  eventual_steps.x = 0;
-  eventual_steps.y = 0;
-  eventual_steps.z = 0;
-  
   //have we encountered our first point yet?
   firstPoint = false;
 }
@@ -82,19 +77,16 @@ void seek_minimums(boolean find_x, boolean find_y, boolean find_z, unsigned long
     {
       found_x = find_axis_min(X_STEP_PIN, X_DIR_PIN, X_MIN_PIN);
       current_steps.x = 0;
-      eventual_steps.x = 0;
     }
     if (find_y && !found_y)
     {
       found_y = find_axis_min(Y_STEP_PIN, Y_DIR_PIN, Y_MIN_PIN);
       current_steps.y = 0;
-      eventual_steps.y = 0;
     }
     if (find_z && !found_z)
     {
       found_z = find_axis_min(Z_STEP_PIN, Z_DIR_PIN, Z_MIN_PIN);
       current_steps.z = 0;
-      eventual_steps.z = 0;
     }
 
     //check to see if we've found all required switches.
@@ -163,19 +155,16 @@ void seek_maximums(boolean find_x, boolean find_y, boolean find_z, unsigned long
     {
       found_x = find_axis_max(X_STEP_PIN, X_DIR_PIN, X_MAX_PIN);
       range_steps.x = current_steps.x;
-      eventual_steps.x = current_steps.x;
     }
     if (find_y && !found_y)
     {
       found_y = find_axis_max(Y_STEP_PIN, Y_DIR_PIN, Y_MAX_PIN);
       range_steps.y = current_steps.y;
-      eventual_steps.y = current_steps.y;
     }
     if (find_z && !found_z)
     {
       found_z = find_axis_max(Z_STEP_PIN, Z_DIR_PIN, Z_MAX_PIN);
       range_steps.z = current_steps.z;
-      eventual_steps.z = current_steps.z;
     }
 
     //check to see if we've found all required switches.
@@ -280,7 +269,7 @@ inline void grab_next_point()
 }
 
 //do a single step on our DDA line!
-inline void dda_step()
+SIGNAL(SIG_OUTPUT_COMPARE1A)
 {
   //increment our x counter, and take steps if required.
   if (current_steps.x != target_steps.x)
@@ -342,26 +331,6 @@ inline void dda_step()
     grab_next_point();
   }
 }
-
-/*
-// THIS IS NOW HANDLED IN THE OUTSIDE LOOP.
-inline bool can_step(byte min_pin, byte max_pin, long current, long target, byte direction)
-{
-  //stop us if we're on target
-  if (target == current)
-    return false;
-  
-  //stop us if we're at home and still going 
-  //else if (read_switch(min_pin) && !direction)
-  //  return false;
-  //stop us if we're at max and still going
-  //else if (read_switch(max_pin) && direction)
-  //  return false;
-
-  //default to being able to step
-  return true;
-}
-*/
 
 //actually send a step signal.
 inline void do_step(byte step_pin)
@@ -449,29 +418,12 @@ void read_range_from_eeprom()
 }
 
 //queue a point for us to move to
-void queue_incremental_point(int x, int y, int z, unsigned long micros)
-{
-  //where we goin?
-  long abs_x = eventual_steps.x + x;
-  long abs_y = eventual_steps.y + y;
-  long abs_z = eventual_steps.z + z;
-
-  //okay, send us there.
-  queue_absolute_point(abs_x, abs_y, abs_z, micros);  
-}
-
-//queue a point for us to move to
 void queue_absolute_point(long x, long y, long z, unsigned long micros)
 {
-  //this is the final position.
-  eventual_steps.x = x;
-  eventual_steps.y = y;
-  eventual_steps.z = z;
-
   //wait until we have free space
   while (pointBuffer.remainingCapacity() < POINT_SIZE)
   {
-    delay(1);
+    delay(10);
     debug_blink();
   }
 
@@ -517,6 +469,6 @@ inline boolean at_target()
 
 inline void wait_until_target_reached()
 {
-  while(!is_point_buffer_empty())
+  while(!is_point_buffer_empty() && !at_target())
     delay(1);
 }

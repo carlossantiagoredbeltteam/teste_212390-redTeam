@@ -25,6 +25,7 @@
 
 #include "Configuration.h"
 #include "Datatypes.h"
+#include "Timer1.h"
 #include "CircularBuffer.h"
 #include "RS485.h"
 #include "Variables.h"

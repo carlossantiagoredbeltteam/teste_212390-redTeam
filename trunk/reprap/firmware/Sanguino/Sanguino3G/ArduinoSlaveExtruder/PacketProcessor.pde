@@ -34,57 +34,61 @@ void init_commands()
 //handle our packets.
 void process_packets()
 {
-  unsigned long start = millis();
-  unsigned long end = start + PACKET_TIMEOUT;
-
-  //is there serial data available?
-  //read through our available data
-  while (!masterPacket.isFinished())
+  //do we have any data to process?
+  if (Serial.available() > 0)
   {
-    //only try to grab it if theres something in the queue.
-    if (Serial.available() > 0)
+    unsigned long start = millis();
+    unsigned long end = start + PACKET_TIMEOUT;
+
+    //is there serial data available?
+    //read through our available data
+    while (!masterPacket.isFinished())
     {
-      digitalWrite(DEBUG_PIN, HIGH);
+      //only try to grab it if theres something in the queue.
+      if (Serial.available() > 0)
+      {
+        digitalWrite(DEBUG_PIN, HIGH);
 
-      //grab a byte and process it.
-      byte d = Serial.read();
-      masterPacket.process_byte(d);
+        //grab a byte and process it.
+        byte d = Serial.read();
+        masterPacket.process_byte(d);
 
-      //keep us goign while we have data coming in.
-      start = millis();
-      end = start + PACKET_TIMEOUT;
+        //keep us goign while we have data coming in.
+        start = millis();
+        end = start + PACKET_TIMEOUT;
 
-      digitalWrite(DEBUG_PIN, LOW);
+        digitalWrite(DEBUG_PIN, LOW);
+      }
+
+      //are we sure we wanna break mid-packet?
+      //have we timed out?
+      if (millis() >= end)
+        return;
     }
 
-    //are we sure we wanna break mid-packet?
-    //have we timed out?
-    if (millis() >= end)
-      return;
-  }
-
-  //do we have a finished packet?
-  if (masterPacket.isFinished())
-  {
-    //only process packets intended for us.
-    if (masterPacket.get_8(0) == RS485_ADDRESS)
+    //do we have a finished packet?
+    if (masterPacket.isFinished())
     {
-      //take some action.
-      handle_query();                
+      //only process packets intended for us.
+      if (masterPacket.get_8(0) == RS485_ADDRESS)
+      {
+        //take some action.
+        handle_query();                
 
-      //send reply over RS485
-      send_reply();
+        //send reply over RS485
+        send_reply();
 
-      //how many have we processed?
-      finishedCommands++;
+        //how many have we processed?
+        finishedCommands++;
 
-      //okay, we'll come back later.
-      return;
+        //okay, we'll come back later.
+        return;
+      }
     }
-  }
 
-  //always clean up the packet.
-  masterPacket.init();
+    //always clean up the packet.
+    masterPacket.init();  
+  }
 }
 
 void send_reply()

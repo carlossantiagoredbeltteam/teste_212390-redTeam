@@ -1,12 +1,9 @@
 // Yep, this is actually -*- c++ -*-
 
-//these routines provide an easy interface for controlling timer1 interrupts
+#ifndef _TIMER1_H_
+#define _TIMER1_H_
 
-//this handles the timer interrupt event
-SIGNAL(SIG_OUTPUT_COMPARE1A)
-{
-  dda_step();
-}
+//these routines provide an easy interface for controlling timer1 interrupts
 
 inline void enableTimer1Interrupt()
 {
@@ -94,14 +91,6 @@ byte getTimer1Resolution(unsigned long ticks)
     return 5;
 }
 
-inline void setTimer1Micros(unsigned long micros)
-{
-  //16 ticks in a microsecond.
-  unsigned long ticks = micros * 16;
-  
-  setTimer1Ticks(ticks);
-}
-
 inline void setTimer1Ticks(unsigned long ticks)
 {
   // ticks is the delay between interrupts in 62.5 nanosecond ticks.
@@ -113,6 +102,14 @@ inline void setTimer1Ticks(unsigned long ticks)
 
   setTimer1Ceiling(getTimer1Ceiling(ticks));
   setTimer1Resolution(getTimer1Resolution(ticks));
+}
+
+inline void setTimer1Micros(unsigned long micros)
+{
+  //16 ticks in a microsecond.
+  unsigned long ticks = micros * 16;
+  
+  setTimer1Ticks(ticks);
 }
 
 void setupTimer1Interrupt()
@@ -140,3 +137,5 @@ void setupTimer1Interrupt()
   setTimer1Ceiling(65535);
   disableTimer1Interrupt();
 }
+
+#endif

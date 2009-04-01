@@ -1,5 +1,6 @@
 #ifdef ENABLE_DEBUG
 
+/*
 void square_move()
 {
   queue_absolute_point(100, -100, 0, 2, 20833);
@@ -31,6 +32,7 @@ void circle_move()
     queue_absolute_point(x, y, 0, 1, 60000);
   }
 }
+*/
 
 void debug_blink()
 {

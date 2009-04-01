@@ -96,6 +96,9 @@ void enable_motor_1()
 {
   if (motor1_control == MC_PWM)
   {
+    //nuke any previous reversals.
+    motor1_reversal_state = false;
+    
     if (motor1_dir == MC_FORWARD)
       digitalWrite(MOTOR_1_DIR_PIN, HIGH);
     else
@@ -120,7 +123,12 @@ void enable_motor_1()
 void disable_motor_1()
 {
   if (motor1_control == MC_PWM)
+  {
     analogWrite(MOTOR_1_SPEED_PIN, 0);
+    
+    if (motor1_dir == MC_FORWARD)
+      motor1_reversal_state = true;
+  }
   else if (motor1_control == MC_ENCODER)
   {
     speed_error = 0;
@@ -131,6 +139,57 @@ void disable_motor_1()
     disableTimer1Interrupt();
     digitalWrite(MOTOR_1_SPEED_PIN, LOW);
     digitalWrite(MOTOR_2_SPEED_PIN, LOW);
+  }
+}
+
+void reverse_motor_1()
+{
+  //wait for it to stop.
+  if (DELAY_FOR_STOP > 0)
+    cancellable_delay(DELAY_FOR_STOP);
+
+  //reverse our motor for a bit.
+  if (MOTOR_REVERSE_DURATION > 0 && motor1_reversal_state)
+  {
+    digitalWrite(MOTOR_1_DIR_PIN, LOW);
+    analogWrite(MOTOR_1_SPEED_PIN, motor1_pwm);
+    cancellable_delay(MOTOR_REVERSE_DURATION);
+  }
+
+  //wait for it to stop.
+  if (DELAY_FOR_STOP > 0 && motor1_reversal_state)
+    cancellable_delay(DELAY_FOR_STOP);
+  
+  //reverse our motor for a bit.
+  if (MOTOR_FORWARD_DURATION > 0 && motor1_reversal_state)
+  {
+    digitalWrite(MOTOR_1_DIR_PIN, HIGH);
+    analogWrite(MOTOR_1_SPEED_PIN, motor1_pwm);
+    cancellable_delay(MOTOR_FORWARD_DURATION);
+  }
+
+  //finally stop it.
+  if (motor1_reversal_state)
+    analogWrite(MOTOR_1_SPEED_PIN, 0);
+  
+  //we're done.
+  motor1_reversal_state = false;
+}
+
+//basically we want to delay unless there is a start command issued.
+void cancellable_delay(unsigned int duration)
+{
+  if (motor1_reversal_state)
+  {
+    for (unsigned int i=0; i<duration; i++)
+    {
+      delay(1);
+      process_packets();
+      
+      //did we start up?  break!
+      if (!motor1_reversal_state)
+        break;
+    }    
   }
 }
 
