@@ -3,7 +3,7 @@ import SerialFactory
 
 # The iterator should produce lines of gcode
 class BufferedSender:
-    def __init__(self, iterator, verbose=False):
+    def __init__(self, iterator, port, verbose=False):
         """
             Opens the serial port and prepares for writing.
             port MUST be set, and values are operating system dependant.
@@ -16,7 +16,7 @@ class BufferedSender:
         self.nextline = ""
         self.BUFFERMAX = 128
 
-        self.serial = SerialFactory.createSerialPort(verbose=True)
+        self.serial = SerialFactory.createSerialPort(port,verbose=True)
 
         while self.serial.inWaiting(): self.serial.read()
 
@@ -50,6 +50,9 @@ class BufferedSender:
                         echo = recvline[6:]
                         if (echo != self.bufferedlines[0]):
                             print "Mismatch: sent: ", self.bufferedlines[0], " but got: ", echo
+                        self.bufferedlines.pop(0)
+                        size = self.bufferedlengths.pop(0)
+                        self.bufferavail += size
                     elif recvline.startswith("ok"):
                         self.bufferedlines.pop(0)
                         size = self.bufferedlengths.pop(0)
