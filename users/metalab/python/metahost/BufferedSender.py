@@ -3,7 +3,7 @@ import SerialFactory
 
 # The iterator should produce lines of gcode
 class BufferedSender:
-    def __init__(self, iterator, port, verbose=False):
+    def __init__(self, iterator, port, baudrate=115200, verbose=False):
         """
             Opens the serial port and prepares for writing.
             port MUST be set, and values are operating system dependant.
@@ -16,8 +16,10 @@ class BufferedSender:
         self.nextline = ""
         self.BUFFERMAX = 128
 
-        self.serial = SerialFactory.createSerialPort(port,verbose=True)
+        self.serial = SerialFactory.createSerialPort(port=port, 
+                                                     baudrate=baudrate, verbose=True)
 
+        # Just in case there is some leftover communication from the Arduino
         while self.serial.inWaiting(): self.serial.read()
 
         if self.verbose:
@@ -51,12 +53,12 @@ class BufferedSender:
                         if (echo != self.bufferedlines[0]):
                             print "Mismatch: sent: ", self.bufferedlines[0], " but got: ", echo
                         self.bufferedlines.pop(0)
-                        size = self.bufferedlengths.pop(0)
-                        self.bufferavail += size
+                        self.bufferavail += self.bufferedlengths.pop(0)
                     elif recvline.startswith("ok"):
                         self.bufferedlines.pop(0)
-                        size = self.bufferedlengths.pop(0)
-                        self.bufferavail += size
+                        self.bufferavail += self.bufferedlengths.pop(0)
+                    elif recvline.startswith("T:"):
+                        pass
                     else:
                         print "unexpected serial line: ", recvline
         except StopIteration:
