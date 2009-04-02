@@ -17,7 +17,7 @@ class BufferedSender:
         self.BUFFERMAX = 128
 
         self.serial = SerialFactory.createSerialPort(port=port, 
-                                                     baudrate=baudrate, verbose=True)
+                                                     baudrate=baudrate, verbose=verbose)
 
         # Just in case there is some leftover communication from the Arduino
         while self.serial.inWaiting(): self.serial.read()
