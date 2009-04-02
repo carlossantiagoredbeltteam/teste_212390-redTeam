@@ -51,12 +51,17 @@ class BufferedSender:
                     if recvline.startswith("echo: "):
                         echo = recvline[6:]
                         if (echo != self.bufferedlines[0]):
-                            print "Mismatch: sent: ", self.bufferedlines[0], " but got: ", echo
+                            print("Mismatch -  sent: " + self.bufferedlines[0])
+                            print("         but got: " + echo)
                         self.bufferedlines.pop(0)
                         self.bufferavail += self.bufferedlengths.pop(0)
                     elif recvline.startswith("ok"):
                         self.bufferedlines.pop(0)
                         self.bufferavail += self.bufferedlengths.pop(0)
+                    elif recvline.startswith("error: "):
+                        self.bufferedlines.pop(0)
+                        self.bufferavail += self.bufferedlengths.pop(0)
+                        print(recvline)
                     elif recvline.startswith("T:"):
                         pass
                     else:
