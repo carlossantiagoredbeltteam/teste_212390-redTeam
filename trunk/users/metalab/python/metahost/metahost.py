@@ -30,6 +30,6 @@ if __name__ == "__main__":
     infile = argv[0]
     print("Printing " + infile + "...")
     f = open(infile)
-    sender = BufferedSender(f, baudrate = 115200, verbose = False)
+    sender = BufferedSender(f, port = port, baudrate = 115200, verbose = verbose)
     sender.play()
     f.close()
