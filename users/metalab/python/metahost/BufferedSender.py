@@ -1,14 +1,14 @@
 import sys
+import os
 import SerialFactory
 
-# The iterator should produce lines of gcode
 class BufferedSender:
-    def __init__(self, iterators, port, baudrate, verbose):
+    def __init__(self, files, port, baudrate, verbose):
         """
             Opens the serial port and prepares for writing.
             port MUST be set, and values are operating system dependant.
         """
-        self.iterators = iterators
+        self.files = files
         self.verbose = verbose
         self.bufferedlengths = []
         self.bufferedlines = []     # for debugging
@@ -26,7 +26,19 @@ class BufferedSender:
             print("Serial Open?: " + str(self.serial.isOpen()))
             print("Baud Rate: " + str(self.serial.baudrate))
 
+        self.totalsize = 0
+        self.totalsent = 0
+        self.iterators = []
+        for f in files:
+            try:
+                self.iterators.append(open(f))
+                self.totalsize += os.path.getsize(f)
+            except IOError, err:
+                print("Unable to open file " + f)
+        print("Total size: " + str(self.totalsize) + " bytes");
+
     def play(self):
+        print "Printing ",
         for iter in self.iterators:
             try:
                 while True:
@@ -52,20 +64,25 @@ class BufferedSender:
                         if recvline.startswith("echo: "):
                             echo = recvline[6:]
                             if (echo != self.bufferedlines[0]):
-                                print("Mismatch -  sent: " + self.bufferedlines[0])
+                                print("\nMismatch -  sent: " + self.bufferedlines[0])
                                 print("         but got: " + echo)
                                 self.bufferedlines.pop(0)
                                 self.bufferavail += self.bufferedlengths.pop(0)
                         elif recvline.startswith("ok"):
                             self.bufferedlines.pop(0)
-                            self.bufferavail += self.bufferedlengths.pop(0)
+                            size = self.bufferedlengths.pop(0)
+                            self.totalsent += size
+                            self.bufferavail += size
+                            print "(%4.1f%%)\10\10\10\10\10\10\10\10" % (100.0*self.totalsent/self.totalsize),
+                            sys.stdout.flush()
                         elif recvline.startswith("error: "):
                             self.bufferedlines.pop(0)
                             self.bufferavail += self.bufferedlengths.pop(0)
-                            print(recvline)
+                            print("\n" + recvline)
                         elif recvline.startswith("T:"):
                             pass
                         else:
-                            print("unexpected serial line: " + recvline)
+                            print("\nunexpected serial line: " + recvline)
             except StopIteration:
-                pass
+                iter.close()
+        print("(100%) ")

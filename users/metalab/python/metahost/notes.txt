@@ -5,9 +5,8 @@ Usage:
 If start.gcode and/or end.gcode are present, prepend/append these
 
 TODO/ideas:
-o Check size of file and keep track of # of bytes sent -> progress in %
-o Parse entire gcode-file and estimate time to print
 o Detect ctrl-c and use this to cleanly shut down reprap (execute end.gcode)
+o Parse entire gcode-file and estimate time to print
 o Implement some kind of diagnostics mode to test that the reprap
   responds correctly to commands (cmd-line exerciser?)
 
