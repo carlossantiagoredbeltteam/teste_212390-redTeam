@@ -43,5 +43,14 @@ if __name__ == "__main__":
 
     print("Printing " + argv[0] + "...")
 
-    sender = BufferedSender(infiles, port = port, baudrate = baudrate, verbose = verbose)
-    sender.play()
+    if verbose: vlevel = BufferedSender.DEBUG
+    else: vlevel = BufferedSender.NORMAL
+    sender = BufferedSender(infiles, port = port, baudrate = baudrate, verbose = vlevel)
+    try:
+        sender.play()
+    except KeyboardInterrupt:
+        # Safe shutdown
+        print("User break! Shutting down safely..")
+        sender = BufferedSender([endfile], port = port, baudrate = baudrate, verbose = BufferedSender.SILENT)
+        sender.play()
+        print("Shutdown complete")
