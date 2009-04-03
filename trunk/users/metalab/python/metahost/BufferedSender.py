@@ -1,6 +1,7 @@
 import sys
 import os
 import SerialFactory
+from time import time
 
 class BufferedSender:
     SILENT, NORMAL, DEBUG = range(3)
@@ -31,6 +32,8 @@ class BufferedSender:
             print("Serial Open?: " + str(self.serial.isOpen()))
             print("Baud Rate: " + str(self.serial.baudrate))
 
+        self.currtemp = 0
+        self.starttime = time()
         self.totalsize = 0
         self.totalsent = 0
         self.iterators = []
@@ -79,15 +82,23 @@ class BufferedSender:
                             size = self.bufferedlengths.pop(0)
                             self.totalsent += size
                             self.bufferavail += size
+                            if self.totalsent > 10000:
+                                remainingtime = (time() - self.starttime) / self.totalsent * (self.totalsize - self.totalsent)
+                                minutes = "%3d" % (int(remainingtime / 60))
+                                seconds = "%02d" % (remainingtime % 60)
+                            else:
+                                minutes = "???"
+                                seconds = "??"
                             if self.verbose >= BufferedSender.NORMAL:
-                                print "(%4.1f%%)\10\10\10\10\10\10\10\10" % (100.0*self.totalsent/self.totalsize),
+                                print "(%4.1f%%) ETA %s:%s T: %3d\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10" % (100.0*self.totalsent/self.totalsize, minutes, seconds, self.currtemp),
+                                
                             sys.stdout.flush()
                         elif recvline.startswith("error: "):
                             self.bufferedlines.pop(0)
                             self.bufferavail += self.bufferedlengths.pop(0)
                             print("\n" + recvline)
                         elif recvline.startswith("T:"):
-                            pass
+                            self.currtemp = int(recvline[2:])
                         else:
                             print("\nunexpected serial line: " + recvline)
             except StopIteration:
