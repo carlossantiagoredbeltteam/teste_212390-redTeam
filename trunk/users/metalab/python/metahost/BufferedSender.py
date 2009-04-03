@@ -3,7 +3,9 @@ import os
 import SerialFactory
 
 class BufferedSender:
-    def __init__(self, files, port, baudrate, verbose):
+    SILENT, NORMAL, DEBUG = range(3)
+
+    def __init__(self, files, port, baudrate, verbose = NORMAL):
         """
             Opens the serial port and prepares for writing.
             port MUST be set, and values are operating system dependant.
@@ -16,13 +18,16 @@ class BufferedSender:
         self.nextline = ""
         self.BUFFERMAX = 128
 
+        if verbose >= BufferedSender.DEBUG: serial_verbose = True
+        else: serial_verbose = False
         self.serial = SerialFactory.createSerialPort(port=port, 
-                                                     baudrate=baudrate, verbose=verbose)
+                                                     baudrate=baudrate, 
+                                                     verbose=serial_verbose)
 
         # Just in case there is some leftover communication from the Arduino
         while self.serial.inWaiting(): self.serial.read()
 
-        if self.verbose:
+        if self.verbose >= BufferedSender.DEBUG:
             print("Serial Open?: " + str(self.serial.isOpen()))
             print("Baud Rate: " + str(self.serial.baudrate))
 
@@ -35,10 +40,11 @@ class BufferedSender:
                 self.totalsize += os.path.getsize(f)
             except IOError, err:
                 print("Unable to open file " + f)
-        print("Total size: " + str(self.totalsize) + " bytes");
+        if self.verbose >= BufferedSender.DEBUG:
+            print("Total size: " + str(self.totalsize) + " bytes");
 
     def play(self):
-        print "Printing ",
+        if self.verbose >= BufferedSender.NORMAL: print "Printing ",
         for iter in self.iterators:
             try:
                 while True:
@@ -52,14 +58,14 @@ class BufferedSender:
                         self.bufferedlengths.append(length)
                         self.bufferedlines.append(self.nextline)
                         self.bufferavail -= length
-                        if self.verbose: print("sent: " + self.nextline)
+                        if self.verbose >= BufferedSender.DEBUG: print("sent: " + self.nextline)
                         self.nextline = ""
                         while len(self.nextline) == 0 or self.nextline[0] == '(':
                             self.nextline = iter.next().strip();
 
                     while self.serial.inWaiting():
                         recvline = self.serial.readline().strip()
-                        if self.verbose: print("received: " + recvline)
+                        if self.verbose >= BufferedSender.DEBUG: print("received: " + recvline)
 
                         if recvline.startswith("echo: "):
                             echo = recvline[6:]
@@ -73,7 +79,8 @@ class BufferedSender:
                             size = self.bufferedlengths.pop(0)
                             self.totalsent += size
                             self.bufferavail += size
-                            print "(%4.1f%%)\10\10\10\10\10\10\10\10" % (100.0*self.totalsent/self.totalsize),
+                            if self.verbose >= BufferedSender.NORMAL:
+                                print "(%4.1f%%)\10\10\10\10\10\10\10\10" % (100.0*self.totalsent/self.totalsize),
                             sys.stdout.flush()
                         elif recvline.startswith("error: "):
                             self.bufferedlines.pop(0)
@@ -85,4 +92,4 @@ class BufferedSender:
                             print("\nunexpected serial line: " + recvline)
             except StopIteration:
                 iter.close()
-        print("(100%) ")
+        if self.verbose >= BufferedSender.NORMAL: print("(100%) ")
