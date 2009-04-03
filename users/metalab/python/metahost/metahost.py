@@ -20,6 +20,9 @@ if __name__ == "__main__":
     # option processing
     verbose = False
     port = None
+    baudrate = 115200
+    startfile = "warmup.gcode"
+    endfile = "cooldown.gcode"
     for option, value in opts:
         if option in ( "-v" , "--verbose" ):
             verbose = True
@@ -34,9 +37,19 @@ if __name__ == "__main__":
     
     if len(argv) < 1: printUsage()
 
-    infile = argv[0]
-    print("Printing " + infile + "...")
-    f = open(infile)
-    sender = BufferedSender(f, port = port, baudrate = baudrate, verbose = False)
+    infiles = [startfile]
+    infiles.append(argv[0])
+    infiles.append(endfile)
+
+    iterators = []
+    for file in infiles:
+        try:
+            iterators.append(open(file))
+        except IOError, err:
+            print("Unable to open file " + file)
+
+    print("Printing " + argv[0] + "...")
+
+    sender = BufferedSender(iterators, port = port, baudrate = baudrate, verbose = verbose)
     sender.play()
-    f.close()
+    for f in iterators: f.close()
