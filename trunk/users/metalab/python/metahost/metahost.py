@@ -41,15 +41,7 @@ if __name__ == "__main__":
     infiles.append(argv[0])
     infiles.append(endfile)
 
-    iterators = []
-    for file in infiles:
-        try:
-            iterators.append(open(file))
-        except IOError, err:
-            print("Unable to open file " + file)
-
     print("Printing " + argv[0] + "...")
 
-    sender = BufferedSender(iterators, port = port, baudrate = baudrate, verbose = verbose)
+    sender = BufferedSender(infiles, port = port, baudrate = baudrate, verbose = verbose)
     sender.play()
-    for f in iterators: f.close()
