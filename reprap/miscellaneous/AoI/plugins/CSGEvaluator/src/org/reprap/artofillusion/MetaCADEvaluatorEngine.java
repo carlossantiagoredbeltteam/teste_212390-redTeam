@@ -233,8 +233,8 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
       Object3D test = sanitizeObject3D(helper.GetObject());
 
       parent.setObject(test);
-
       parent.object.setTexture(tex, map);
+      parent.setVisible(true);
 
       parent.clearCachedMeshes();
       this.window.updateImage();
@@ -492,14 +492,13 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     Vec3[] v;
     v = new Vec3[2*n];
     int index = 0;
-    for (int i = 0; i < n; i++)
-    {
-      v[index] = new Vec3( Math.cos( Math.PI * index / (double) n ),
-          Math.sin( Math.PI * index / (double) n ), 0 );
-      v[index].scale( inner );
-      v[index+1] = new Vec3( Math.cos( Math.PI * (index + 1) / (double) n ),
-          Math.sin( Math.PI * (index + 1) / (double) n ), 0 );
-      v[index+1].scale( outer );
+    for (int i = 0; i < n; i++) {
+      v[index] = new Vec3(Math.cos(Math.PI * index / (double) n),
+                          Math.sin(Math.PI * index / (double) n), 0);
+      v[index].scale(inner);
+      v[index+1] = new Vec3(Math.cos(Math.PI * (index + 1) / (double) n),
+                            Math.sin(Math.PI * (index + 1) / (double) n), 0);
+      v[index+1].scale(outer);
       index += 2;
     }
     return v;
