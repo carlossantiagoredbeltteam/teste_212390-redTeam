@@ -5,9 +5,7 @@ Usage:
 If start.gcode and/or end.gcode are present, prepend/append these
 
 TODO/ideas:
-o Detect ctrl-c and use this to cleanly shut down reprap (execute end.gcode)
-o Parse entire gcode-file and estimate time to print
+o Ctrl-c: If we're in the middle of the first heating phase, it will move down
+  before aborting
 o Implement some kind of diagnostics mode to test that the reprap
   responds correctly to commands (cmd-line exerciser?)
-
-
