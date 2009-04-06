@@ -266,6 +266,8 @@ inline void grab_next_point()
     setTimer1Micros(pointBuffer.remove_32());
     enableTimer1Interrupt();
   }
+  else
+    is_point_queue_empty = true; //only real place to check.  
 }
 
 //do a single step on our DDA line!
@@ -420,6 +422,9 @@ void read_range_from_eeprom()
 //queue a point for us to move to
 void queue_absolute_point(long x, long y, long z, unsigned long micros)
 {
+  //point queue is not empty now!
+  is_point_queue_empty = false;
+
   //wait until we have free space
   while (pointBuffer.remainingCapacity() < POINT_SIZE)
   {
@@ -448,7 +453,7 @@ void queue_absolute_point(long x, long y, long z, unsigned long micros)
 inline boolean is_point_buffer_empty()
 {
   //okay, we got points in the buffer.
-  if (pointBuffer.size() > 0)
+  if (!is_point_queue_empty)
     return false;
 
   //still working on a point.
@@ -469,6 +474,6 @@ inline boolean at_target()
 
 inline void wait_until_target_reached()
 {
-  while(!is_point_buffer_empty() && !at_target())
+  while(!is_point_buffer_empty())
     delay(1);
 }
