@@ -10,6 +10,7 @@ void setup()
   pinMode(DEBUG_PIN, OUTPUT);
 
   Serial.begin(38400);
+  Serial.println("Started");
   Serial1.begin(38400);
 
   digitalWrite(TX_ENABLE_PIN, LOW); //disable tx

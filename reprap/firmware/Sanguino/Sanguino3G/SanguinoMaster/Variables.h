@@ -27,6 +27,8 @@ volatile LongPoint target_steps;
 volatile LongPoint delta_steps;
 volatile LongPoint range_steps;
 
+volatile bool is_point_queue_empty = true;
+
 //our point queue variables
 uint8_t rawPointBuffer[POINT_QUEUE_SIZE * POINT_SIZE];
 CircularBuffer pointBuffer((POINT_QUEUE_SIZE * POINT_SIZE), rawPointBuffer);
