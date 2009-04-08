@@ -77,11 +77,13 @@
   </target>
 
 	<target name="javacc">
-		<javacc target="${package}/javacc/MetaCADParser.jj"
-		  	  		    outputdirectory="${package}/src/org/reprap/artofillusion/parser"
-		  	  		    javacchome="${package}"
-		  	  		    static="true"
-		  	  		/>
+		<jjtree target="${package}/javacc/MetaCADParser.jjt" 
+			outputdirectory="${package}/src/org/reprap/artofillusion/parser" javacchome="${package}"/>
+		<javacc target="${package}/src/org/reprap/artofillusion/parser/MetaCADParser.jj"
+			outputdirectory="${package}/src/org/reprap/artofillusion/parser"
+		  	javacchome="${package}"
+		  	static="true"
+  		/>
 	</target>
 
 </project>
