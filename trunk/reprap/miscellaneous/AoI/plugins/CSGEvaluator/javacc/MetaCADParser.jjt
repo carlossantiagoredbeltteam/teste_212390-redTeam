@@ -25,6 +25,11 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+ 
+ 
+options {
+  TRACK_TOKENS=true;
+}
 
 
 PARSER_BEGIN(MetaCADParser)
@@ -33,16 +38,37 @@ package org.reprap.artofillusion.parser;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.List;
 
 import artofillusion.object.ObjectInfo;
 
 
 /** Simple brace matcher. */
 public class MetaCADParser {
+  
   /** Main entry point. */
-  public static ObjectInfo myParse(String txt) throws ParseException {
+  public static ObjectInfo parseObjectInfoTree(String txt) throws ParseException {
     MetaCADParser parser = new MetaCADParser(new StringReader(txt));
     return parser.Object();
+  }
+  
+  public static String testExpression(String txt) throws ParseException {
+    MetaCADParser parser = new MetaCADParser(new StringReader(txt));
+    return parser.Expression();
+  }
+  
+  public static String dumpTokens(SimpleNode node)
+  {
+	Token first = node.jjtGetFirstToken();
+	Token last = node.jjtGetLastToken();
+	
+	String s=first.image;
+	while (first != last)
+	{
+		first = first.next;
+		s = s  + first.image;
+	}
+	return s;
   }
 
 }
@@ -68,16 +94,29 @@ TOKEN :
 | < DOT: "." >
 }
 
+TOKEN :
+{
+  <REAL_LITERAL: (["0"-"9"])+ ("." (["0"-"9"])* (<EXPONENT>)?)? >
+|  <#EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+>
+}
+
+TOKEN : /* BINARY OPS */
+{
+	< PLUS: "+" >
+|	< MINUS: "-" >
+|	< OTHERBINOP: ["*","/"] >
+}
+
 TOKEN : /* IDENTIFIERS */
 {
-  < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
-|
-  < #LETTER:
+
+<IDENTIFIER: <LETTER>(<LETTER>|<DIGIT>)*>
+| < #LETTER: 
       [
        "\u0024",
        "\u0041"-"\u005a",
        "\u005f",
-       "\u0061"-"\u007a",
+       "\u0061"-"\u007a"/*,
        "\u00c0"-"\u00d6",
        "\u00d8"-"\u00f6",
        "\u00f8"-"\u00ff",
@@ -86,13 +125,13 @@ TOKEN : /* IDENTIFIERS */
        "\u3300"-"\u337f",
        "\u3400"-"\u3d2d",
        "\u4e00"-"\u9fff",
-       "\uf900"-"\ufaff"
+       "\uf900"-"\ufaff"*/
       ]
   >
 |
   < #DIGIT:
       [
-       "\u0030"-"\u0039",
+       "\u0030"-"\u0039"/*,
        "\u0660"-"\u0669",
        "\u06f0"-"\u06f9",
        "\u0966"-"\u096f",
@@ -106,7 +145,7 @@ TOKEN : /* IDENTIFIERS */
        "\u0d66"-"\u0d6f",
        "\u0e50"-"\u0e59",
        "\u0ed0"-"\u0ed9",
-       "\u1040"-"\u1049"
+       "\u1040"-"\u1049"*/
       ]
   >
 }
@@ -114,7 +153,7 @@ TOKEN : /* IDENTIFIERS */
 /** Root production. */
 ArrayList<ObjectInfo> ObjectTree() :
 {
-	ArrayList<ObjectInfo> elements;	
+	ArrayList<ObjectInfo> elements = new ArrayList<ObjectInfo>();;	
 }
 {
  <LBRACE> [Object() (<COMMA> Object())* ] <RBRACE>
@@ -126,12 +165,77 @@ ArrayList<ObjectInfo> ObjectTree() :
 /** Brace counting production. */
 ObjectInfo Object() :
 {
-	ObjectInfo obj;
-	ArrayList<ObjectInfo> children;
+	String name;
+	List<ObjectInfo> children=null;
 }
 {
-  <IDENTIFIER> [ children = ObjectTree() ]
+	name = FunctionCallList() (<LBRACE>children=ObjectList()<RBRACE>)? ";"
 {
-	return new ObjectInfo(null, null, "test");
+	ObjectInfo obj = new ObjectInfo(null, null, name);
+        if (children != null)
+        {
+                for (int i = 0;  i < children.size(); i++)
+                {
+                        obj.addChild(children.get(i), i);
+                }
+        }
+		return obj;
 }
+}
+
+List<ObjectInfo> ObjectList() :
+{	
+	List<ObjectInfo> list = new ArrayList<ObjectInfo>();
+	ObjectInfo current;
+}
+{
+	(current = Object() { list.add(current); })*
+	{
+	return list;
+	}
+}
+
+
+String FunctionCallList() :
+{
+}
+{
+	(FunctionCall())+ {
+		return dumpTokens(jjtThis);
+	}
+}
+
+
+
+void FunctionCall() :
+{
+}
+{
+	<IDENTIFIER>(<LPAREN>(ParameterList())?<RPAREN>)?
+}
+
+void ParameterList() :
+{
+}
+{
+	Expression()(<COMMA>Expression())*
+}
+
+/** Brace counting production. */
+void UnaryExpression() :
+{
+}
+{
+	<REAL_LITERAL>	|  FunctionCall()  | <LPAREN>Expression()<RPAREN> | <MINUS> UnaryExpression()
+}
+
+/** Brace counting production. */
+String Expression() :
+{
+}
+{
+	UnaryExpression()((<PLUS>|<MINUS>|<OTHERBINOP>)UnaryExpression())*
+	{
+		return dumpTokens(jjtThis);
+	}
 }
