@@ -39,6 +39,7 @@ public:
     void turn(float numberOfRevolutions = 0.0f);
     void start();
     void stop();
+    void pause();
     void setTempRate(float rate);
     virtual void fire();
 };

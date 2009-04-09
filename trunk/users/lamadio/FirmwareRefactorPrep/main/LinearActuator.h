@@ -36,5 +36,7 @@ public:
     inline void setTempRate(float rate) { _stepper.setTempRate(rate); }
     void moveTo(float newPosMM);
     void moveHome();
+    inline void pause() { _stepper.pause(); }
+    inline void start() { _stepper.start(); }
     virtual void notify(uint32_t eventId, void* context);
 };

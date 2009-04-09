@@ -71,8 +71,10 @@ EventLoop::~EventLoop()
 
 void EventLoop::addPeriodicCallback(PeriodicCallback* callback)
 {
-    // No checking done for duplicates. Don't do it.
-    _periodicEvents.push(callback);
+    if (!_periodicEvents.find(callback))
+    {
+        _periodicEvents.push(callback);
+    }
 }
 
 void EventLoop::removePeriodicCallback(PeriodicCallback* callback)
@@ -82,9 +84,11 @@ void EventLoop::removePeriodicCallback(PeriodicCallback* callback)
 
 void EventLoop::addTimer(EventLoopTimer* timer)
 {
-    // No checking done for duplicates. Don't do it.
-    _timers.push(timer);
-    sortTimers();
+    if (!_timers.find(timer))
+    {
+        _timers.push(timer);
+        sortTimers();
+    }
 }
 
 void EventLoop::removeTimer(EventLoopTimer* timer)

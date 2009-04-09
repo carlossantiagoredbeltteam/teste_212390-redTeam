@@ -31,8 +31,10 @@ const uint32_t ExtruderDevice_Stopped = 15;
 const uint32_t CartesianDevice_Homed = 16;
 const uint32_t CartesianDevice_MovingToNewPosition = 17;
 const uint32_t CartesianDevice_ReachedNewPosition = 18;
-const uint32_t CartesianDevice_PositionError = 18;
+const uint32_t CartesianDevice_PositionError = 19;
 
 
 
+// Interfaces
+const uint32_t IDevice = 0;
 
