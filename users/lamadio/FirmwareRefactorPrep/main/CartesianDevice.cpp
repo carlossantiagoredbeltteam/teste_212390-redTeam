@@ -22,6 +22,23 @@ CartesianDevice::CartesianDevice(LinearActuator& x, LinearActuator& y, LinearAct
     _z.addObserver(this);
 }
 
+void CartesianDevice::pause()
+{
+    _x.pause();
+    _y.pause();
+    _z.pause();
+}
+
+void CartesianDevice::start()
+{
+    if (_xInMotion)
+        _x.start();
+    if (_yInMotion)
+        _y.start();
+    if (_zInMotion)
+        _z.start();
+}
+
 void CartesianDevice::moveTo(float newX, float newY, float newZ)
 {
     float deltaX = newX - _x.currentPosition();

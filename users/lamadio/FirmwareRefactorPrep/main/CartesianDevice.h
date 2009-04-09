@@ -19,7 +19,31 @@
  *  POSSIBILITY OF SUCH DAMAGE. *
  */
 
- class CartesianDevice : public Device, 
+class CartesianPoint
+{
+public:
+    CartesianPoint()
+    : x(0.0f)
+    , y(0.0f)
+    , z(0.0f)
+    {
+
+    }
+
+    CartesianPoint(float a, float b, float c)
+    : x(a)
+    , y(b)
+    , z(c)
+    {
+
+    }
+
+    float x;
+    float y;
+    float z;
+};
+
+class CartesianDevice : public Device, 
                          public Observable,
                          public Observer
  {
@@ -29,11 +53,28 @@
      bool _xInMotion;
      bool _yInMotion;
      bool _zInMotion;
+     
+     float _maxFeed;
 public:
      CartesianDevice(LinearActuator& x, LinearActuator& y, LinearActuator& z);
+     
+     CartesianPoint position() 
+         { return CartesianPoint(_x.currentPosition(), 
+                                 _y.currentPosition(), 
+                                 _z.currentPosition()); }
 
      void moveTo(float newX, float newY, float newZ);
+     
+     inline void moveTo(CartesianPoint pt)
+         { moveTo(pt.x, pt.y, pt.z); }
+
+     void pause();
+     void start();
+     
      void moveHome();
      inline bool axesInMotion() { return _xInMotion || _yInMotion || _zInMotion; }
+     
+     void setRate(float rate) { _maxFeed = rate; }
+     
      virtual void notify(uint32_t eventId, void* context);
  };

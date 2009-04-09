@@ -34,12 +34,19 @@ ExtruderDevice::ExtruderDevice(int16_t extrusionTemp, StepperDevice& step,
 
 void ExtruderDevice::extrude()
 {
+    _stepper.goForward();
     if (_state == ExtruderDevice::Idle)
     {
         _heater.set(HEATER_MEDIUM);
         _state = ExtruderDevice::Heating;
     }
 }
+
+void ExtruderDevice::backup()
+{
+    _stepper.goBackward();
+}
+
 
 void ExtruderDevice::preheat()
 {

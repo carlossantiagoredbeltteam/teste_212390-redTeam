@@ -10,3 +10,13 @@
 #include "Constants.h"
 #include "Collections.h"
 #include "Device.h"
+
+void* Device::getInterface(uint32_t interfaceId)
+{
+    if (interfaceId == IDevice)
+    {
+        return this;
+    }
+    
+    return NULL;
+}

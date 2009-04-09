@@ -38,24 +38,21 @@ void StepperDevice::setTempRate(float rate)
 
 void StepperDevice::start()
 {
-    if (!_currentTick)
-    {
-        _currentTick = _targetTick = 0;
-        notifyObservers(StepperEvent_Start, this);
-        EventLoop::current()->addTimer(this);
-    }
+    notifyObservers(StepperEvent_Start, this);
+    EventLoop::current()->addTimer(this);
+}
+
+void StepperDevice::pause()
+{
+    EventLoop::current()->removeTimer(this);
 }
 
 void StepperDevice::stop()
 {
     setPeriod(_maxRate);
     
-    if (_currentTick)
-    {
-        _currentTick = 0;
-        notifyObservers(StepperEvent_Stop, this);
-        EventLoop::current()->removeTimer(this);
-    }
+    notifyObservers(StepperEvent_Stop, this);
+    EventLoop::current()->removeTimer(this);
 }
 
 void StepperDevice::goForward()
