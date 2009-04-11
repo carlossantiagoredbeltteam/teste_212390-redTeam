@@ -5,7 +5,9 @@
 //
 // CHOOSE WHICH EXTRUDER YOU'RE USING:
 //
-#define EXTRUDER_CONTROLLER_VERSION_2_1
+//#define EXTRUDER_CONTROLLER_VERSION_2_0
+//#define EXTRUDER_CONTROLLER_VERSION_2_1
+#define EXTRUDER_CONTROLLER_VERSION_2_2
 
 #define TEMPERATURE_SAMPLES 5
 #define SERIAL_SPEED 38400
@@ -52,7 +54,7 @@
  ****************************************************************************************/
 
 //these are the pins for the v2.0 Extruder Controller
-#if defined(EXTRUDER_CONTROLLER_VERSION_2_0) || defined(EXTRUDER_CONTROLLER_VERSION_2_1)
+#if defined(EXTRUDER_CONTROLLER_VERSION_2_0) || defined(EXTRUDER_CONTROLLER_VERSION_2_1) || defined(EXTRUDER_CONTROLLER_VERSION_2_2)
 
 #define ENCODER_A_PIN 2
 #define ENCODER_B_PIN 3
