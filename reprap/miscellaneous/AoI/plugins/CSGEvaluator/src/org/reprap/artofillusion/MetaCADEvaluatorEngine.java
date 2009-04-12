@@ -3,6 +3,7 @@ package org.reprap.artofillusion;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.cheffo.jeplite.JEP;
@@ -13,6 +14,7 @@ import artofillusion.UndoRecord;
 import artofillusion.math.CoordinateSystem;
 import artofillusion.math.Vec2;
 import artofillusion.math.Vec3;
+import artofillusion.object.CSGObject;
 import artofillusion.object.Cube;
 import artofillusion.object.Curve;
 import artofillusion.object.Cylinder;
@@ -732,45 +734,55 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
    */
   public ObjectInfo extrude(ObjectInfo[] objects, Vec3 dir, int numsegments, double twist)
   {
-    // First child is the base mesh
-    // FIXME: Find all extrudable child objects instead
-    ObjectInfo profile = objects[0];
-    Object3D profileobj = profile.getObject();
-    if (!(profileobj instanceof TriangleMesh) &&
-        profileobj.canConvertToTriangleMesh() != Object3D.CANT_CONVERT) {
-      profileobj = profileobj.convertToTriangleMesh(0.1);
+    // Build extrusion curve from vector and segments
+    Vec3 v[] = new Vec3[numsegments+1];
+    float smooth[] = new float[v.length];
+    for (int i = 0; i < v.length; i++) {
+      v[i] = new Vec3(dir);
+      v[i].scale(1.0*i/numsegments);
+      smooth[i] = 1.0f;
     }
+    Curve path = new Curve(v, smooth, Mesh.NO_SMOOTHING, false);
+    CoordinateSystem pathCS = new CoordinateSystem();
 
-    if (profileobj instanceof TriangleMesh) {
-      // Build extrusion curve from vector and segments
-      Vec3 v[] = new Vec3[numsegments+1];
-      float smooth[] = new float[v.length];
-      for (int i = 0; i < v.length; i++) {
-        v[i] = new Vec3(dir);
-        v[i].scale(1.0*i/numsegments);
-        smooth[i] = 1.0f;
+    // FIXME: Support specifying extrusion curves
+    // Extrude each extrudable child object
+    List<ObjectInfo> resultobjects = new LinkedList<ObjectInfo>();
+    for (int i=0;i<objects.length;i++) {
+      ObjectInfo profile = objects[i];
+      Object3D profileobj = profile.getObject();
+      if (!(profileobj instanceof TriangleMesh) &&
+          profileobj.canConvertToTriangleMesh() != Object3D.CANT_CONVERT) {
+        profileobj = profileobj.convertToTriangleMesh(0.1);
       }
-      Curve path = new Curve(v, smooth, Mesh.APPROXIMATING, false);
-      CoordinateSystem pathCoords = new CoordinateSystem();
 
-      Object3D obj3D = ExtrudeTool.extrudeMesh((TriangleMesh)profileobj, path, profile.getCoords(), pathCoords, twist*Math.PI/180.0, true);
+      if (profileobj instanceof TriangleMesh) {
+        Object3D obj3D = ExtrudeTool.extrudeMesh((TriangleMesh)profileobj, path, profile.getCoords(), pathCS, twist*Math.PI/180.0, true);
       
-      // Since the result is centered in the origin, offset the extruded object to 
-      // move it back to its original position
-      // FIXME: Combine this with the user-specified coordinate system
-      CoordinateSystem coordsys = new CoordinateSystem(new Vec3(), Vec3.vz(), Vec3.vy());
-      Vec3 offset = profile.getCoords().fromLocal().times(((Mesh)profileobj).getVertices()[0].r).
-      minus(coordsys.fromLocal().times(((Mesh)obj3D).getVertices()[0].r));
-      coordsys.setOrigin(offset);
-      ObjectInfo objinfo = new ObjectInfo(obj3D, coordsys, "tmp");
-
-      for (int i=0;i<objects.length;i++) objects[i].setVisible(false);
-      return objinfo;
+        // Since the result is centered in the origin, offset the extruded object to 
+        // move it back to its original position
+        // FIXME: Combine this with the user-specified coordinate system
+        CoordinateSystem coordsys = new CoordinateSystem(new Vec3(), Vec3.vz(), Vec3.vy());
+        Vec3 offset = profile.getCoords().fromLocal().times(((Mesh)profileobj).getVertices()[0].r).
+          minus(coordsys.fromLocal().times(((Mesh)obj3D).getVertices()[0].r));
+        coordsys.setOrigin(offset);
+        ObjectInfo objinfo = new ObjectInfo(obj3D, coordsys, "tmp");
+        resultobjects.add(objinfo);
+      }
+      objects[i].setVisible(false);
     }
-    else {
-      // FIXME: Print error
-      return null;
+    if (!resultobjects.isEmpty()) {
+      try {
+        // FIXME: Undo support?
+        UndoRecord undo = new UndoRecord(this.window, false);
+        ObjectInfo resultinfo = combine(resultobjects.toArray(new ObjectInfo[resultobjects.size()]), CSGObject.UNION, undo);
+        return resultinfo;
+      }
+      catch (Exception e) {
+      }
     }
+    // FIXME: Print error
+    return null;
   }
  
   public Object3D cube(Vec3 dims)
