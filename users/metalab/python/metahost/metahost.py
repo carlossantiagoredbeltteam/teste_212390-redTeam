@@ -52,5 +52,8 @@ if __name__ == "__main__":
         # Safe shutdown
         print("User break! Shutting down safely..")
         sender = BufferedSender([endfile], port = port, baudrate = baudrate, verbose = BufferedSender.SILENT)
+        # FIXME: The previous play() has outstanding commands. We need to
+        # wait for OK from these commands in addition to from endfile, otherwise
+        # things will go wrong.
         sender.play()
         print("Shutdown complete")
