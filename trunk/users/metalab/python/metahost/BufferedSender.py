@@ -49,13 +49,15 @@ class BufferedSender:
     def printProgress(self):
         if self.totalsent > 10000:
             remainingtime = (time() - self.starttime) / self.totalsent * (self.totalsize - self.totalsent)
-            minutes = "%3d" % (int(remainingtime / 60))
             seconds = "%02d" % (remainingtime % 60)
+            minutes = "%02d" % (int(remainingtime / 60) % 60)
+            hours = "%2d" % (int(remainingtime / 3600))
         else:
-            minutes = "???"
+            hours = "??"
+            minutes = "??"
             seconds = "??"
-        print "(%4.1f%%) ETA %s:%s T: %3d\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10" % (100.0*self.totalsent/self.totalsize, minutes, seconds, self.currtemp),
-
+        print "(%4.1f%%) ETA %s:%s:%s T: %3d\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10\10" % (100.0*self.totalsent/self.totalsize, hours, minutes, seconds, self.currtemp),
+        sys.stdout.flush()
         
     def play(self):
         if self.verbose >= BufferedSender.NORMAL: print "Printing ",
@@ -96,14 +98,14 @@ class BufferedSender:
                             if self.verbose >= BufferedSender.NORMAL:
                                 self.printProgress()
                                 
-                            sys.stdout.flush()
                         elif recvline.startswith("error: "):
                             self.bufferedlines.pop(0)
                             self.bufferavail += self.bufferedlengths.pop(0)
                             print("\n" + recvline)
                         elif recvline.startswith("T:"):
                             self.currtemp = int(recvline[2:])
-                            self.printProgress()
+                            if self.verbose >= BufferedSender.NORMAL:
+                                self.printProgress()
                         else:
                             print("\nunexpected serial line: " + recvline)
             except StopIteration:
