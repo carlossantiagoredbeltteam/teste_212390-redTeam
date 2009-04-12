@@ -109,8 +109,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
 
   public void evaluate() {
     // only evaluate selected objects if the parameters could be evaluated
-    if (readParameters())
-      super.evaluate();
+    if (readParameters()) super.evaluate();
   }
 
   public ObjectInfo evaluateNode(ObjectInfo parent, UndoRecord undo) throws Exception
@@ -837,6 +836,11 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
   public void test()
   {
     showMessage("test function not implemented");
+  }
+
+  public void execute(int operation, int minimum_children) {
+    // only evaluate selected objects if the parameters could be evaluated
+    if (readParameters()) super.execute(operation, minimum_children);
   }
 
 }
