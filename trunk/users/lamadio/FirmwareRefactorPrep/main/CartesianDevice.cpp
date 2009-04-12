@@ -1,3 +1,11 @@
+/*
+ *  CartesianDevice.cpp
+ *
+ *  Created by Lou Amadio on 9/17/08.
+ *  Copyright 2008 OoeyGUI. All rights reserved.
+ *     Provided under GPLv3 per gpl-3.0.txt
+ *
+ */
 #include "WProgram.h"
 #include "Constants.h"
 #include "Collections.h"

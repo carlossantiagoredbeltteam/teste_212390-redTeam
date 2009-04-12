@@ -1,6 +1,5 @@
 /*
  *  LinearActuator.h
- *  FirmwareRefactorPrep
  *
  *  Created by Lou Amadio on 2/24/09.
  *  Copyright 2009 OoeyGUI. All rights reserved.
@@ -32,6 +31,7 @@ class LinearActuator : public Device,
     
 public:
     LinearActuator(float _revPerMM, StepperDevice& stepper, OpticalInterrupt& far, OpticalInterrupt& near);
+    
     inline float currentPosition() { return _currentPos; }
     inline void setTempRate(float rate) { _stepper.setTempRate(rate); }
     void moveTo(float newPosMM);

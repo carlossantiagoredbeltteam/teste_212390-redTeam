@@ -3,6 +3,7 @@
  *
  *  Created by Lou Amadio on 9/17/08.
  *  Copyright 2008 OoeyGUI. All rights reserved.
+ *     Provided under GPLv3 per gpl-3.0.txt
  *
  */
 #define __STDC_LIMIT_MACROS
@@ -20,22 +21,11 @@ PeriodicCallback::PeriodicCallback()
     
 }
 
-PeriodicCallback::~PeriodicCallback()
-{
-  
-}
-
-
 EventLoopTimer::EventLoopTimer(unsigned long period)
 : _lastTimeout(0)
 , _period(period)
 {
     
-}
-
-EventLoopTimer::~EventLoopTimer()
-{
-  
 }
 
 milliclock_t EventLoopTimer::nextTimeout() const
@@ -62,11 +52,6 @@ EventLoop::EventLoop()
 , _running(false)
 {
     g_eventLoop = this;
-}
-
-EventLoop::~EventLoop()
-{
-    
 }
 
 void EventLoop::addPeriodicCallback(PeriodicCallback* callback)

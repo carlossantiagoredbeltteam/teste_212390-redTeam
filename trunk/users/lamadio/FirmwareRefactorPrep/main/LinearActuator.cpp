@@ -1,9 +1,9 @@
 /*
  *  LinearActuator.cpp
- *  FirmwareRefactorPrep
  *
  *  Created by Lou Amadio on 2/24/09.
  *  Copyright 2009 OoeyGUI. All rights reserved.
+ *     Provided under GPLv3 per gpl-3.0.txt
  *
  */
 #include "WProgram.h"
