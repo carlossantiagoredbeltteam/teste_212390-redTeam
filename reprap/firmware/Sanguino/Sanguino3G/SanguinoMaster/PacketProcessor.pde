@@ -76,7 +76,9 @@ void process_host_packets()
           commandBuffer.append(hostPacket.get_8(i));
       }
       else
+      {
         hostPacket.overflow();
+      }
     }
     // top bit low == reply needed query packet (eg. #0-127)
     else
