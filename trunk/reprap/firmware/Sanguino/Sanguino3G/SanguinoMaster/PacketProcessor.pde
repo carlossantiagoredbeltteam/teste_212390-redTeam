@@ -108,19 +108,16 @@ void handle_query(byte cmd)
       initialize();
       break;
 
-    //TODO: TEST
     case HOST_CMD_GET_BUFFER_SIZE:
       //send our remaining buffer size.
       hostPacket.add_16(commandBuffer.remainingCapacity());
       break;
 
-    //TODO: TEST
     case HOST_CMD_CLEAR_BUFFER:
       //just clear it.
       commandBuffer.clear();
       break;
 
-    //TODO: TEST
     case HOST_CMD_GET_POSITION:
       //send our position
       hostPacket.add_32(current_steps.x);
@@ -129,7 +126,6 @@ void handle_query(byte cmd)
       hostPacket.add_8(get_endstop_states());
       break;
 
-    //TODO: TEST
     case HOST_CMD_GET_RANGE:
       //send our range
       hostPacket.add_32(range_steps.x);
@@ -137,7 +133,6 @@ void handle_query(byte cmd)
       hostPacket.add_32(range_steps.z);
       break;
 
-    //TODO: TEST
     case HOST_CMD_SET_RANGE:
       //set our range to what the host tells us
       range_steps.x = (long)hostPacket.get_32(1);
@@ -148,13 +143,11 @@ void handle_query(byte cmd)
       write_range_to_eeprom();
       break;
 
-    //TODO: TEST
     case HOST_CMD_ABORT:
       //support a microcontrollers right to choice.
       abort_print();
       break;
 
-    //TODO: TEST
     case HOST_CMD_PAUSE:
       if (is_machine_paused)
       {
@@ -182,7 +175,6 @@ void handle_query(byte cmd)
       }
       break;
 
-    //TODO: IMPLEMENT
     case HOST_CMD_PROBE:
       //we dont support this yet.
       hostPacket.unsupported();
@@ -237,7 +229,6 @@ void handle_commands()
     
     switch(cmd)
     {
-      //TODO: TEST THOROUGHLY
       case HOST_CMD_QUEUE_POINT_ABS:
         x = (long)commandBuffer.remove_32();
         y = (long)commandBuffer.remove_32();
@@ -248,7 +239,6 @@ void handle_commands()
       
         break;
 
-      //TODO: TEST
       case HOST_CMD_SET_POSITION:
         wait_until_target_reached(); //dont want to get hasty.
 
