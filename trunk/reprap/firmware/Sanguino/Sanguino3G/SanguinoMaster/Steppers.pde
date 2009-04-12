@@ -272,6 +272,7 @@ inline void grab_next_point()
 //do a single step on our DDA line!
 SIGNAL(SIG_OUTPUT_COMPARE1A)
 {
+  check_endstops(); // TODO: this is perhaps inefficient, but necessary.
   //increment our x counter, and take steps if required.
   if (current_steps.x != target_steps.x)
   {
@@ -356,14 +357,17 @@ inline bool read_switch(byte pin)
 //looks at our endstops and disables our motor if we hit one.
 void check_endstops()
 {
-  if (read_switch(X_MIN_PIN) || read_switch(X_MAX_PIN))
+  if ( (x_direction && read_switch(X_MAX_PIN)) ||
+       (!x_direction && read_switch(X_MIN_PIN)) )
     digitalWrite(X_ENABLE_PIN, STEPPER_DISABLE);
 
-  if (read_switch(Y_MIN_PIN) || read_switch(Y_MAX_PIN))
+  if ( (y_direction && read_switch(Y_MAX_PIN)) ||
+       (!y_direction && read_switch(Y_MIN_PIN)) )
     digitalWrite(Y_ENABLE_PIN, STEPPER_DISABLE);
 
-  if (read_switch(Z_MIN_PIN) || read_switch(Z_MAX_PIN))
-    digitalWrite(Z_ENABLE_PIN, STEPPER_DISABLE);    
+  if ( (z_direction && read_switch(Z_MAX_PIN)) ||
+       (!z_direction && read_switch(Z_MIN_PIN)) )
+    digitalWrite(Z_ENABLE_PIN, STEPPER_DISABLE);
 }
 
 // enable our steppers so we can move them.  disable any steppers

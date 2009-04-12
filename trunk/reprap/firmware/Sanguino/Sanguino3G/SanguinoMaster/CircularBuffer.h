@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include "Timer1.h"
 
+#include <util/atomic.h>
+
 ///
 /// Implementation of an in-memory circular byte buffer.
 /// Originally a template, bowlderized to make the
@@ -36,61 +38,76 @@ public:
 
   /// Reset buffer.  (Note: does not zero data.)
   void clear() {
-    disableTimer1Interrupt();
-    head = tail = 0;
-    currentSize = 0;
-    enableTimer1Interrupt();
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      head = tail = 0;
+      currentSize = 0;
+    }
   }
 
   uint8_t operator[](uint16_t i) {
-    disableTimer1Interrupt();
-    uint16_t idx = (i + tail) % capacity;
-    enableTimer1Interrupt();
+    uint16_t idx;
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      idx = (i + tail) % capacity;
+    }
     return buffer[idx];
   }
 
   /// Check remaining capacity of this vector.
   uint16_t remainingCapacity()
   {
-    disableTimer1Interrupt();
-    uint16_t remaining = (capacity - currentSize);
-    enableTimer1Interrupt();
+    uint16_t remaining;
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      remaining = (capacity - currentSize);
+    }
     return remaining;
   }
 
   /// Get the current number of elements in the buffer.
   uint16_t size() {
-    return currentSize;
+    uint16_t csize;
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      csize = currentSize;
+    }
+    return csize;
   }
 
+private:
   /// Append a character to the end of the circular buffer.
-  void append(uint8_t datum)
+  void appendInternal(uint8_t datum)
   {
-    disableTimer1Interrupt();
-  	
-  	if ((currentSize + 1) <= capacity)
-  	{
-  		buffer[head] = datum;
-  		head = (head + 1) % capacity;
-  		currentSize++;
-  	}
-  	
-    enableTimer1Interrupt();
+    if ((currentSize + 1) <= capacity)
+    {
+      buffer[head] = datum;
+      head = (head + 1) % capacity;
+      currentSize++;
+    }
   }
   
+public:
+  void append(uint8_t datum) {
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      appendInternal(datum);
+    }
+  }
+
   void append_16(uint16_t datum) {
-    append(datum & 0xff);
-    append(datum >> 8);
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      appendInternal(datum & 0xff);
+      appendInternal((datum >> 8) & 0xff);
+    }
   }
 
   void append_32(uint32_t datum) {
-    append_16(datum & 0xffff);
-    append_16(datum >> 16);
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      appendInternal(datum & 0xff);
+      appendInternal((datum >> 8) & 0xff);
+      appendInternal((datum >> 16) & 0xff);
+      appendInternal((datum >> 24) & 0xff);
+    }
   }
 
-  /// Remove and return a character from the start of the
-  /// circular buffer.
-  uint8_t remove_8() {
+private:
+  uint8_t removeInternal() {
     if (currentSize == 0)
       return 0;
     else
@@ -102,14 +119,36 @@ public:
     }
   }
 
+public:    
+  /// Remove and return a character from the start of the
+  /// circular buffer.
+  uint8_t remove_8() {
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      return removeInternal();
+    }
+  }
+
   uint16_t remove_16() {
-    //order is important here!
-    return remove_8() | ((int16_t)remove_8() << 8);
+    uint8_t v[2];
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      v[0] = removeInternal();
+      v[1] = removeInternal();
+    }
+    return v[0] | ((uint16_t)v[1] << 8);
   }
 
   uint32_t remove_32() {
-    //order is important here!
-    return remove_16() | ((int32_t)remove_16() << 16);
+    uint8_t v[4];
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+      v[0] = removeInternal();
+      v[1] = removeInternal();
+      v[2] = removeInternal();
+      v[3] = removeInternal();
+    }
+    return v[0] |
+      ((uint32_t)v[1] << 8) |
+      ((uint32_t)v[2] << 16) |
+      ((uint32_t)v[3] << 24);
   }
 };
 
