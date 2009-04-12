@@ -11,9 +11,10 @@ Infill Begin Rotation (degrees):	45.0
 Infill Begin Rotation Repeat (layers):	1
 Infill Solidity (ratio):	0.2
 Infill Odd Layer Extra Rotation (degrees):	90.0
-Grid Hexagonal	True
+Grid Hexagonal	False
 Grid Rectangular	False
-Line	False
+Line	True
 Interior Infill Density over Exterior Density (ratio):	0.9
 Outside Extruded First	True
 Solid Surface Thickness (layers):	3
+windowPositionBehold Preferences	0+0

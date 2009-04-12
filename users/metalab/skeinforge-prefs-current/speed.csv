@@ -1,11 +1,12 @@
 Format is tab separated preferences.
 Activate Speed:	True
-Feedrate (mm/s):	8.0
+Extrusion Diameter over Thickness (ratio):	1.25
+Feedrate (mm/s):	13.0
 Open File to be Speeded	
 Do Not Add Flowrate	False
 Metric	False
 PWM Setting	True
-Flowrate PWM Setting (if PWM Setting is Chosen):	130.0
+Flowrate PWM Setting (if PWM Setting is Chosen):	250.0
 Orbital Feedrate over Operating Feedrate (ratio):	0.5
 Perimeter Feedrate over Operating Feedrate (ratio):	1.0
 Perimeter Flowrate over Operating Flowrate (ratio):	1.0
