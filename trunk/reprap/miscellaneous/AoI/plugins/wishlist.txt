@@ -1,10 +1,14 @@
 MetaCADEvaluator:
 
+o Regular polygon: Unintuitive in quad mode
 o named parameters: It's hard to remember parameter ordering
 o online help/tooltips/wizard or smth.?
 o Separate object editor (tabs in main dialog)
 o Set/compute a minimal size for the dialog
 o Have a way of toggling debug info on/off (e.g. message boxes)
+o Parameter evaluation:
+  - Read parameters every time a button is pressed which triggers evaluation
+    (e.g. union, difference etc.)
 
 o Sometimes the plugin hangs (for a long time)
   for-loop-transform, ring-generator
