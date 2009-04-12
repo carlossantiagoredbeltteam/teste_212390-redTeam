@@ -262,7 +262,6 @@ inline void grab_next_point()
     z_counter = -max_delta/2;
 
     //start the move!
-    disableTimer1Interrupt();
     setTimer1Micros(pointBuffer.remove_32());
     enableTimer1Interrupt();
   }
@@ -437,6 +436,9 @@ void queue_absolute_point(long x, long y, long z, unsigned long micros)
   pointBuffer.append_32(y);
   pointBuffer.append_32(z);
   pointBuffer.append_32(micros);
+
+  //just in case we got interrupted and it changed.
+  is_point_queue_empty = false;
   
   //first point? give us the right timer.
   if (!firstPoint)
@@ -474,6 +476,12 @@ inline boolean at_target()
 
 inline void wait_until_target_reached()
 {
+  //todo: check to see if this is what is locking up our code?
   while(!is_point_buffer_empty())
+  {
+    digitalWrite(DEBUG_PIN, HIGH);
     delay(1);
+    digitalWrite(DEBUG_PIN, LOW);
+    delay(1);
+  }
 }
