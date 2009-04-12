@@ -37,7 +37,6 @@ public:
   // Bug in avr-g++. 
   // See http://www.mail-archive.com/avr-chat@nongnu.org/msg00982.html
     PeriodicCallback();
-    virtual ~PeriodicCallback();
     
     virtual void service() = 0;
 };
@@ -59,7 +58,6 @@ protected:
         
 public:
     EventLoopTimer(unsigned long period);
-    virtual ~EventLoopTimer();
     
     virtual void fire() = 0;
     
@@ -91,7 +89,6 @@ private:
     DArray* findFiringTimers();
 public:
     EventLoop();
-    ~EventLoop();
     
     void addPeriodicCallback(PeriodicCallback* callback);
     void removePeriodicCallback(PeriodicCallback* callback);

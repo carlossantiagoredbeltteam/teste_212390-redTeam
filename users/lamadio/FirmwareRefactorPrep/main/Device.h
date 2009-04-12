@@ -24,7 +24,6 @@ class Device
 {
 public:
     Device() {}
-    virtual ~Device() {}
     
     virtual void* getInterface(uint32_t interfaceId);
 };

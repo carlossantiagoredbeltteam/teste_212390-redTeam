@@ -1,6 +1,5 @@
 /*
  *  Observable.cpp
- *  FirmwareRefactorPrep
  *
  *  Created by Lou Amadio on 10/18/08.
  *  Copyright 2008 OoeyGUI. All rights reserved.
@@ -33,12 +32,6 @@ void forEachFireEvent(void* item, void* context)
 Observable::Observable()
 {
     
-}
-
-
-Observable::~Observable()
-{
-    notifyObservers(ObservedEvent_Destroyed, this);
 }
 
 void Observable::notifyObservers(uint32_t eventId, void* context)
@@ -84,11 +77,6 @@ void removeObserver(void* item, void* context)
     ((Observable*)item)->removeObserver((Observer*)context);
 }
 
-Observer::~Observer()
-{
-    _observing.foreach(removeObserver, this);
-}
-        
 void Observer::notify(uint32_t eventId, void* context)
 {
     switch (eventId)

@@ -1,6 +1,5 @@
 /*
  *  Observable.h
- *  FirmwareRefactorPrep
  *
  *  Created by Lou Amadio on 10/18/08.
  *  Copyright 2008 OoeyGUI. All rights reserved.
@@ -31,7 +30,6 @@ class Observable
     
 public:
     Observable();
-    virtual ~Observable();
     
     bool hasObservers();
     void notifyObservers(uint32_t eventId, void* context = NULL);
@@ -47,7 +45,6 @@ class Observer
     DArray _observing;
 public:
     Observer();
-    virtual ~Observer();
     
     virtual void notify(uint32_t eventId, void* context);
 };
