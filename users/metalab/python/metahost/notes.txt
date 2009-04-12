@@ -9,3 +9,10 @@ o Ctrl-c: If we're in the middle of the first heating phase, it will move down
   before aborting
 o Implement some kind of diagnostics mode to test that the reprap
   responds correctly to commands (cmd-line exerciser?)
+o Sometimes metahost reports unexpected response: (empty line)
+o Sometimes, clean shutdown fails to turn off motor (premature exit?)
+o Subtract heating time/raft from ETA timer?
+o Update ETA every second (don't wait for a response)
+o Is it possible to check if a serial port is in use and not autoconnect to that one?
+o Print real time spend (statistics on exit)
+o Missing temperature reporting: fflush?
