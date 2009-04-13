@@ -49,6 +49,8 @@ eagle -X -N -d GERBER_RS274X -o "$TO_DIR/gerber/CopperTraces.pho" $BOARD/*.brd B
 eagle -X -N -d GERBER_RS274X -o "$TO_DIR/gerber/SolderMaskComponent.pho" $BOARD/*.brd tStop
 eagle -X -N -d GERBER_RS274X -o "$TO_DIR/gerber/SolderMaskCopper.pho" $BOARD/*.brd bStop
 eagle -X -N -d GERBER_RS274X -o "$TO_DIR/gerber/SilkScreen.pho" $BOARD/*.brd Dimension tPlace tDocu tValues tNames
+eagle -X -N -d GERBER_RS274X -o "$TO_DIR/gerber/TopCream.pho" $BOARD/*.brd Dimension tCream
+eagle -X -N -d GERBER_RS274X -o "$TO_DIR/gerber/BottomCream.pho" $BOARD/*.brd Dimension bCream
 
 # Drill data for NC drill st.
 # warning : eagle takes path of -R option from input file directory.
@@ -65,6 +67,8 @@ eagle -X -N -d PS -o "$TO_DIR/ps/ComponentTraces.ps" $BOARD/*.brd Top Pad Via Di
 eagle -X -N -d PS -o "$TO_DIR/ps/ComponentSilkscreen.ps" $BOARD/*.brd Pad Via Dimension tPlace tNames tDocu tValues
 eagle -X -N -d PS -o "$TO_DIR/ps/CopperTraces.ps" $BOARD/*.brd Bottom Pad Via Dimension
 eagle -X -N -d PS -o "$TO_DIR/ps/CopperSilkscreen.ps" $BOARD/*.brd Pad Via Dimension bPlace bNames bDocu
+eagle -X -N -d PS -o "$TO_DIR/ps/TopCream.ps" $BOARD/*.brd Dimension tCream
+eagle -X -N -d PS -o "$TO_DIR/ps/BottomCream.ps" $BOARD/*.brd Dimension bCream
 
 #convert to pdf...
 echo "Converting to PDF..."
