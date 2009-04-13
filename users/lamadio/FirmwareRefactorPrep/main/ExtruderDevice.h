@@ -45,7 +45,7 @@ public:
     void stop();
     void preheat();
     
-    inline void setTemp(int16_t temp) { _extrusionTemp = temp; }
+    void setTemp(int16_t temp);
     inline int16_t temp() { return _extrusionTemp; }
     
     virtual void notify(uint32_t eventId, void* context);

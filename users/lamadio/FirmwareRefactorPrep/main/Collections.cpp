@@ -27,9 +27,9 @@ DArray::~DArray()
     free(_array);
 }
 
-void* DArray::item(int i)
+void* DArray::item(size_t i)
 {
-    if (i >= 0 && i < _count)
+    if (i < _count)
     {
         return _array[i];
     }
@@ -67,20 +67,16 @@ void* DArray::pop()
     return item;
 }
 
-void DArray::set(int i, void* item)
+void DArray::set(size_t i, void* item)
 {
-    if (i < 0)
-        i = 0;
     if (i < _count)
     {
         _array[i] = item;
     }
 }
 
-bool DArray::insert(int i, void* item)
+bool DArray::insert(size_t i, void* item)
 {
-    if (i < 0)
-        i = 0;
     int needed = max(i, _count + 1);
     if (needed > _allocated)
     {
@@ -133,12 +129,9 @@ bool DArray::insert(int i, void* item)
     return true;
 }
 
-void DArray::remove(int i)
+void DArray::remove(size_t i)
 {
-    if (i < 0)
-        return;
-    
-    if (i < _count - 1)
+    if (i + 1 <= _count)
     {
         memmove(&_array[i], &_array[i + 1], (_count - i - 1) * sizeof(void*));
     }

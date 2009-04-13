@@ -70,6 +70,8 @@ GCodeBehavior::GCodeBehavior(ExtruderDevice& extruder, FakeBot& bot) // Cartesia
     _commandBuffer[0] = 0;
     bot.addObserver(this);
     extruder.addObserver(this);
+	
+	waitForCommand();
 }
 
 void GCodeBehavior::service()
@@ -80,7 +82,7 @@ void GCodeBehavior::service()
     {
         return;
     }
-        
+    
     if (Serial.available())
     {
         _commandState = GCodeState_BuildingCommand;
@@ -99,13 +101,25 @@ void GCodeBehavior::service()
     }
 }
 
+void GCodeBehavior::executingCommand()
+{
+	EventLoop::current()->removePeriodicCallback(this);
+	_commandState = GCodeState_ExecutingCommand;
+}
+
+void GCodeBehavior::waitForCommand()
+{
+    EventLoop::current()->addPeriodicCallback(this);
+	_commandState = GCodeState_Idle;
+}
+
 void GCodeBehavior::notify(uint32_t eventId, void* context)
 {
     switch (eventId)
     {
         case CartesianDevice_Homed:
         case CartesianDevice_ReachedNewPosition:
-            _commandState = GCodeState_Idle;
+			waitForCommand();
             break;
             
         case CartesianDevice_PositionError:
@@ -120,7 +134,7 @@ void GCodeBehavior::notify(uint32_t eventId, void* context)
         case ExtruderDevice_AtTemp:
             if (_commandState == GCodeState_PausingCommandForTemperature)
             {
-                _commandState = GCodeState_ExecutingCommand;
+                executingCommand();
                 _bot.start();
             }
             break;
@@ -134,7 +148,7 @@ void GCodeBehavior::processCommand()
     
     if (command.isComment())
         return;
-        
+    
     if (!command.hasGCode() && command.hasAnyParameters())
     {
         command.setPreviousCode(_previousGCode);
@@ -147,11 +161,11 @@ void GCodeBehavior::processCommand()
         CartesianPoint pt;
         if (_abs) 
             pt = _bot.position();
-            
+        
         if (command.has(GCODE_X))
             pt.x = command._X;
         if (command.has(GCODE_Y))
-            pt.y = command._X;
+            pt.y = command._Y;
         if (command.has(GCODE_Z))
             pt.z = command._Z;
         
@@ -162,38 +176,38 @@ void GCodeBehavior::processCommand()
         
         switch (command._G)
         {
-        case 0:
-        case 1:
-            _bot.moveTo(pt);
-            _commandState = GCodeState_ExecutingCommand;
-            break;
-        
-        case 4:
-		    delay((int)(command._P + 0.5));  // Changed by AB from 1000*gc.P
-            break;
-            
-        case 20:
-            _isMM = false;
-            break;
-        case 21:
-            _isMM = true;
-            break;
-        case 28:
-            _bot.moveHome();
-            _commandState = GCodeState_ExecutingCommand;
-            break;
-            
-        case 30:
-            // TODO: home via intermediate point;
-            break;
-            
-        case 90:
-            _abs = true;
-            break;
-            
-        case 91:
-            _abs = false;
-            break;
+            case 0:
+            case 1:
+                _bot.moveTo(pt);
+                executingCommand();
+                break;
+                
+            case 4:
+                delay((int)(command._P + 0.5));  // Changed by AB from 1000*gc.P
+                break;
+                
+            case 20:
+                _isMM = false;
+                break;
+            case 21:
+                _isMM = true;
+                break;
+            case 28:
+                _bot.moveHome();
+                executingCommand();
+                break;
+                
+            case 30:
+                // TODO: home via intermediate point;
+                break;
+                
+            case 90:
+                _abs = true;
+                break;
+                
+            case 91:
+                _abs = false;
+                break;
         }
     }
     
@@ -201,26 +215,27 @@ void GCodeBehavior::processCommand()
     {
         switch (command._M)
         {
-        case 0:
-            break;
-            
-        case 101:
-            _extruder.extrude();
-            break;
-        case 102:
-            _extruder.backup();
-            break;
-        case 103:
-            _extruder.stop();
-            break;
-            
-        case 104:
-            if (command.has(GCODE_S))
-            {
-                _extruder.setTemp((int)command._S);
-                _bot.pause();
-                _commandState = GCodeState_PausingCommandForTemperature;
-            }
+            case 0:
+                break;
+                
+            case 101:
+                _extruder.extrude();
+                break;
+            case 102:
+                _extruder.backup();
+                break;
+            case 103:
+                _extruder.stop();
+                break;
+                
+            case 104:
+                if (command.has(GCODE_S))
+                {
+                    _bot.pause();
+                    _commandState = GCodeState_PausingCommandForTemperature;
+                    _extruder.setTemp((int)command._S);
+                    _extruder.extrude();
+                }
         }
     }
 }
@@ -238,42 +253,43 @@ float GCodeBehavior::translatePosition(float pos)
 
 
 #define PARSE_INT(ch) \
-	case G_##ch: \
-		length = scan_int(parameters, &_##ch, &_bits, GCODE_##ch); \
-		break;
+    case G_##ch: \
+    length = scan_int(parameters, &_##ch, &_bits, GCODE_##ch); \
+    break;
 
 #define PARSE_FLOAT(ch) \
-	case G_##ch: \
-		length = scan_float(parameters, &_##ch, &_bits, GCODE_##ch); \
-		break;
+    case G_##ch: \
+    length = scan_float(parameters, &_##ch, &_bits, GCODE_##ch); \
+    break;
 
 
 
 GCodeCommand::GCodeCommand(char* buffer, size_t size)
+: _bits(0)
 {
     size_t length = 0;
-	for (int i = 0; i < size; i += (1 + length))
-	{
-		length = 0;
+    for (int i = 0; i < size; i += (1 + length))
+    {
+        length = 0;
         char* parameters = &buffer[i+1];
-		switch (buffer[i])
-		{
-			  PARSE_INT(G);
-			  PARSE_INT(M);
-			PARSE_FLOAT(S);
-			PARSE_FLOAT(P);
-			PARSE_FLOAT(X);
-			PARSE_FLOAT(Y);
-			PARSE_FLOAT(Z);
-			PARSE_FLOAT(I);
-			PARSE_FLOAT(J);
-			PARSE_FLOAT(F);
-			PARSE_FLOAT(R);
-			PARSE_FLOAT(Q);
+        switch (buffer[i])
+        {
+                PARSE_INT(G);
+                PARSE_INT(M);
+                PARSE_FLOAT(S);
+                PARSE_FLOAT(P);
+                PARSE_FLOAT(X);
+                PARSE_FLOAT(Y);
+                PARSE_FLOAT(Z);
+                PARSE_FLOAT(I);
+                PARSE_FLOAT(J);
+                PARSE_FLOAT(F);
+                PARSE_FLOAT(R);
+                PARSE_FLOAT(Q);
 			case '/':
                 _bits |= GCODE_COMMENT;
             default:
-            break;
+                break;
 		}
 	}
 }
@@ -286,37 +302,35 @@ bool GCodeCommand::has(uint32_t bit)
 
 int scan_float(char *str, float *valp, uint32_t* seen, uint32_t flag)
 {
-	char *end;
-     
-	float res = (float)strtod(str, &end);
-      
-	int len = end - str;
-
-	if (len > 0)
-	{
-		*valp = res;
-		*seen |= flag;
-	}
-	else
-		*valp = 0;
-          
+    char *end;
+    float res = (float)strtod(str, &end);
+    int len = end - str;
+    
+    if (len > 0)
+    {
+        *valp = res;
+        *seen |= flag;
+    }
+    else
+        *valp = 0;
+    
 	return len;	/* length of number */
 }
 
 int scan_int(char *str, int *valp, uint32_t* seen, uint32_t flag)
 {
-	char *end;
+    char *end;
 
-	int res = (int)strtol(str, &end, 10);
-	int len = end - str;
+    int res = (int)strtol(str, &end, 10);
+    int len = end - str;
 
-	if (len > 0)
-	{
-		*valp = res;
-		*seen |= flag;
-	}
-	else
-		*valp = 0;
-          
-	return len;	/* length of number */
+    if (len > 0)
+    {
+        *valp = res;
+        *seen |= flag;
+    }
+    else
+        *valp = 0;
+
+    return len;	/* length of number */
 }
