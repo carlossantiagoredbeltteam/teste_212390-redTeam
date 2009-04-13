@@ -18,6 +18,7 @@
 
 
 #define TEMP_RANGE 2
+#define HEATER_HIGH 255
 #define HEATER_MEDIUM 128
 #define HEATER_MIN 64
 
@@ -47,11 +48,22 @@ void ExtruderDevice::backup()
     _stepper.goBackward();
 }
 
+void ExtruderDevice::setTemp(int16_t temp) 
+{ 
+	_extrusionTemp = temp; 
+}
 
 void ExtruderDevice::preheat()
 {
     _heater.set(HEATER_MEDIUM);
     _state = ExtruderDevice::Preheating;
+	
+	// early escape if already at temp
+	if (_thermister.temp() >= _extrusionTemp - TEMP_RANGE &&
+		_thermister.temp() <  _extrusionTemp + TEMP_RANGE)
+	{
+		notifyObservers(ExtruderDevice_AtTemp, this);
+	}
 }
 
 void ExtruderDevice::stop()
@@ -76,7 +88,7 @@ void ExtruderDevice::notify(uint32_t eventId, void* context)
             if (currentTemp < _extrusionTemp - TEMP_RANGE)
             {
                 notifyObservers(ExtruderDevice_OutOfTemp, this);
-                _heater.set(HEATER_MEDIUM);
+                _heater.set(HEATER_HIGH);
                 _stepper.stop();
                 _state = ExtruderDevice::Heating;
             }

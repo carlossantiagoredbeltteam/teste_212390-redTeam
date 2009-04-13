@@ -48,14 +48,14 @@ public:
     DArray();
     ~DArray();
     
-    inline int count() { return _count; }
-    void* item(int i);
+    inline size_t count() { return _count; }
+    void* item(size_t i);
     void push(void* item);
     void* pop();
     void* dequeue();
-    void set(int i, void* item);
-    bool insert(int i, void* item);
-    void remove(int i);
+    void set(size_t i, void* item);
+    bool insert(size_t i, void* item);
+    void remove(size_t i);
     bool find(void* item, size_t* index = NULL);
     void* operator[](size_t index) { return item(index); }
     

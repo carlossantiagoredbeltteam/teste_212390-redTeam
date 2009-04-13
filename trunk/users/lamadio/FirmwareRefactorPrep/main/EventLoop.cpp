@@ -64,7 +64,9 @@ void EventLoop::addPeriodicCallback(PeriodicCallback* callback)
 
 void EventLoop::removePeriodicCallback(PeriodicCallback* callback)
 {
-    _periodicEvents.remove(_periodicEvents.find(callback));
+	size_t at;
+	if (_periodicEvents.find(callback, &at))
+		_periodicEvents.remove(at);
 }
 
 void EventLoop::addTimer(EventLoopTimer* timer)
@@ -78,7 +80,9 @@ void EventLoop::addTimer(EventLoopTimer* timer)
 
 void EventLoop::removeTimer(EventLoopTimer* timer)
 {
-    _timers.remove(_timers.find(timer));
+	size_t at;
+	if (_timers.find(timer, &at))
+		_timers.remove(at);
 }
 
 void EventLoop::run()

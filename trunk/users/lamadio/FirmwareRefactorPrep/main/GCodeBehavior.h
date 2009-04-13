@@ -71,12 +71,12 @@ public:
 
     inline bool isComment() { return (_bits & GCODE_COMMENT) == GCODE_COMMENT; }
     bool has(uint32_t bit);
-    inline bool hasAnyParameters() { _bits != 0; }
+    inline bool hasAnyParameters() { return _bits != 0; }
     
     inline bool isM() { return (_bits & GCODE_M) == GCODE_M; }
     inline bool isG() { return (_bits & GCODE_G) == GCODE_G; }
     inline bool hasGCode() { return (_bits & (GCODE_G | GCODE_M)) != 0;}
-    inline bool setPreviousCode(uint32_t code) { _G = code; _bits |= GCODE_G; }
+    inline void setPreviousCode(uint32_t code) { _G = code; _bits |= GCODE_G; }
 };
 
 class FakeBot : public Observable,
@@ -125,6 +125,8 @@ class GCodeBehavior : public PeriodicCallback,
     uint16_t _commandBufferLength;
     
     void processCommand();
+	void executingCommand();
+	void waitForCommand();
     
     bool _abs;
     bool _isMM;
