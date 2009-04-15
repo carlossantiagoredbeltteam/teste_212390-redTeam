@@ -230,6 +230,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
       TextureMapping map = parent.object.getTextureMapping();
 
       if (coordsys != null) parent.setCoords(coordsys);
+      else parent.setCoords(new CoordinateSystem());
 
       Object3D test = sanitizeObject3D(helper.GetObject());
 
