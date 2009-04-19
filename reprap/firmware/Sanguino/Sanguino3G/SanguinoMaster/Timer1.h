@@ -13,7 +13,7 @@ inline void enableTimer1Interrupt()
 inline void disableTimer1Interrupt()
 {
   TIMSK1 &= ~(1<<OCIE1A);
-//	TIMSK1 &= ~(1<<ICIE1);
+	TIMSK1 &= ~(1<<ICIE1);
 }
 
 inline void setTimer1Resolution(byte r)

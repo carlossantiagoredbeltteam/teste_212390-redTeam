@@ -8,9 +8,6 @@ void init_steppers()
   //pull in our saved values.
   read_range_from_eeprom();
 
-  //prep timer 1 for handling DDA stuff.
-  setupTimer1Interrupt();
-
   //initialize all our pins.
   pinMode(X_STEP_PIN, OUTPUT);
   pinMode(X_DIR_PIN, OUTPUT);
@@ -53,9 +50,14 @@ void init_steppers()
   current_steps.x = 0;
   current_steps.y = 0;
   current_steps.z = 0;
-  
-  //have we encountered our first point yet?
-  firstPoint = false;
+  target_steps.x = 0;
+  target_steps.y = 0;
+  target_steps.z = 0;
+    
+  //prep timer 1 for handling DDA stuff.
+  setupTimer1Interrupt();
+  setTimer1Micros(2500);
+  enableTimer1Interrupt();
 }
 
 void seek_minimums(boolean find_x, boolean find_y, boolean find_z, unsigned long step_delay, unsigned int timeout_seconds)
@@ -375,12 +377,13 @@ void check_endstops()
 // TODO: make this a configuration option (HOLD_AXIS?); there are some
 // situations (milling) where you want to leave the steppers on to
 // hold the position.
+// ZMS: made X/Y axes always on once used.
 inline void enable_steppers()
 {
-  digitalWrite(X_ENABLE_PIN, 
-	       (delta_steps.x > 0)?STEPPER_ENABLE:STEPPER_DISABLE);
-  digitalWrite(Y_ENABLE_PIN, 
-	       (delta_steps.y > 0)?STEPPER_ENABLE:STEPPER_DISABLE);
+	if (delta_steps.x > 0)
+	  digitalWrite(X_ENABLE_PIN, STEPPER_ENABLE);
+	if (delta_steps.y > 0)
+	  digitalWrite(Y_ENABLE_PIN, STEPPER_ENABLE);
   digitalWrite(Z_ENABLE_PIN, 
 	       (delta_steps.z > 0)?STEPPER_ENABLE:STEPPER_DISABLE);
 }
@@ -425,15 +428,11 @@ void read_range_from_eeprom()
 //queue a point for us to move to
 void queue_absolute_point(long x, long y, long z, unsigned long micros)
 {
-  //point queue is not empty now!
-  is_point_queue_empty = false;
-
   //wait until we have free space
   while (pointBuffer.remainingCapacity() < POINT_SIZE)
-  {
-    delay(10);
-    debug_blink();
-  }
+    delay(1);
+
+  disableTimer1Interrupt();
 
   //okay, add in our points.
   pointBuffer.append_32(x);
@@ -443,17 +442,8 @@ void queue_absolute_point(long x, long y, long z, unsigned long micros)
 
   //just in case we got interrupted and it changed.
   is_point_queue_empty = false;
-  
-  //first point? give us the right timer.
-  if (!firstPoint)
-  {
-    setTimer1Micros(micros);
 
-    //turn our interrupt on.
-    enableTimer1Interrupt();
-    
-    firstPoint = true;
-  }
+  enableTimer1Interrupt();
 }
 
 inline boolean is_point_buffer_empty()
@@ -463,6 +453,7 @@ inline boolean is_point_buffer_empty()
     return false;
 
   //still working on a point.
+  //todo: do we need this?
   if (!at_target())
     return false;
 
@@ -482,10 +473,5 @@ inline void wait_until_target_reached()
 {
   //todo: check to see if this is what is locking up our code?
   while(!is_point_buffer_empty())
-  {
-    digitalWrite(DEBUG_PIN, HIGH);
     delay(1);
-    digitalWrite(DEBUG_PIN, LOW);
-    delay(1);
-  }
 }
