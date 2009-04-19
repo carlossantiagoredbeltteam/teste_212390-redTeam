@@ -44,7 +44,7 @@
 #define E_MOTOR_STEPS    400
 
 //our maximum feedrates
-#define FAST_XY_FEEDRATE 1600.0
+#define FAST_XY_FEEDRATE 3000.0
 #define FAST_Z_FEEDRATE  50.0
 
 // Units in curve section
@@ -52,8 +52,9 @@
 #define CURVE_SECTION_INCHES (CURVE_SECTION_MM*INCHES_TO_MM)
 
 // Set to one if enable pins are inverting
-// RepRap enable pins are *not* inverting.
-#define INVERT_ENABLE_PINS 0
+// For RepRap stepper boards version 1.x the enable pins are *not* inverting.
+// For RepRap stepper boards version 2.x and above the enable pins are inverting.
+#define INVERT_ENABLE_PINS 1
 
 #if INVERT_ENABLE_PINS == 1
 #define ENABLE_ON LOW
