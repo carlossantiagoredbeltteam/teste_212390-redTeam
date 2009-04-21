@@ -144,7 +144,7 @@ public class GCodeRepRap extends GenericRepRap {
 			
 			//if (zFeedrate != currentFeedrate)
 			//{
-				code += " F" + zFeedrate;
+				code += " F" + round(getFeedrate(), 1); //zFeedrate;
 				//currentFeedrate = zFeedrate;
 			//}
 			
