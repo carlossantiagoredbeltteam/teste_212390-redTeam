@@ -30,7 +30,9 @@ inline void grab_next_point();
 inline void do_step(byte step_pin);
 inline bool read_switch(byte pin);
 void check_endstops();
-inline void enable_steppers();
+inline void enable_steppers(bool x, bool y, bool z);
+inline void enable_needed_steppers();
+inline void disable_steppers(bool x, bool y, bool z);
 inline void disable_steppers();
 byte get_endstop_states();
 void write_range_to_eeprom();
@@ -107,7 +109,7 @@ void seek_minimums(boolean find_x, boolean find_y, boolean find_z, unsigned long
   unsigned long start = millis();
   unsigned long end = millis() + (timeout_seconds*1000);
 
-  enable_steppers();
+  enable_steppers(find_x,find_y,find_z);
 
   boolean found_x = false;
   boolean found_y = false;
@@ -150,6 +152,7 @@ void seek_minimums(boolean find_x, boolean find_y, boolean find_z, unsigned long
     else
       delay(step_delay/1000);
   }
+  disable_steppers();
 }
 
 void seek_maximums(boolean find_x, boolean find_y, boolean find_z, unsigned long step_delay, unsigned int timeout_seconds)
@@ -157,7 +160,7 @@ void seek_maximums(boolean find_x, boolean find_y, boolean find_z, unsigned long
   unsigned long start = millis();
   unsigned long end = millis() + (timeout_seconds*1000);
 
-  enable_steppers();
+  enable_steppers(find_x,find_y,find_z);
 
   boolean found_x = false;
   boolean found_y = false;
@@ -203,6 +206,7 @@ void seek_maximums(boolean find_x, boolean find_y, boolean find_z, unsigned long
     else
       delay(step_delay/1000);
   }
+  disable_steppers();
 }
 
 boolean find_axis_dir(byte step_pin, byte dir_pin, 
@@ -272,7 +276,7 @@ inline void grab_next_point()
     delta_steps.z = abs(delta_steps.z);
 
     //enable our steppers if needed.
-    enable_steppers();
+    enable_needed_steppers();
 
     //figure out our deltas
     max_delta = 0;
@@ -393,29 +397,40 @@ void check_endstops()
     digitalWrite(Z_ENABLE_PIN, STEPPER_DISABLE);
 }
 
+inline void enable_steppers(bool x, bool y, bool z)
+{
+  if (x) { digitalWrite(X_ENABLE_PIN, STEPPER_ENABLE); }
+  if (y) { digitalWrite(Y_ENABLE_PIN, STEPPER_ENABLE); }
+  if (z) { digitalWrite(Z_ENABLE_PIN, STEPPER_ENABLE); }
+}
+
 // enable our steppers so we can move them.  disable any steppers
 // not about to be set in motion to reduce power and heat.
 // TODO: make this a configuration option (HOLD_AXIS?); there are some
 // situations (milling) where you want to leave the steppers on to
 // hold the position.
 // ZMS: made X/Y axes always on once used.
-inline void enable_steppers()
+inline void enable_needed_steppers()
 {
-	if (delta_steps.x > 0)
-	  digitalWrite(X_ENABLE_PIN, STEPPER_ENABLE);
-	if (delta_steps.y > 0)
-	  digitalWrite(Y_ENABLE_PIN, STEPPER_ENABLE);
-  digitalWrite(Z_ENABLE_PIN, 
-	       (delta_steps.z > 0)?STEPPER_ENABLE:STEPPER_DISABLE);
+  enable_steppers(delta_steps.x > 0, delta_steps.y > 0, delta_steps.z > 0);
+  if (!(delta_steps.z > 0)) {
+    disable_steppers(false,false,true); // explicitly turn off Z stepper when not needed
+  }
+}
+
+inline void disable_steppers(bool x, bool y, bool z)
+{
+  //disable our steppers
+  if (x) { digitalWrite(X_ENABLE_PIN, STEPPER_DISABLE); }
+  if (y) { digitalWrite(Y_ENABLE_PIN, STEPPER_DISABLE); }
+  if (z) { digitalWrite(Z_ENABLE_PIN, STEPPER_DISABLE); }
 }
 
 //turn off steppers to save juice / keep things cool.
 inline void disable_steppers()
 {
   //disable our steppers
-  digitalWrite(X_ENABLE_PIN, STEPPER_DISABLE);
-  digitalWrite(Y_ENABLE_PIN, STEPPER_DISABLE);
-  digitalWrite(Z_ENABLE_PIN, STEPPER_DISABLE);
+  disable_steppers(true,true,true);
 }
 
 //read all of our states into a single byte.
