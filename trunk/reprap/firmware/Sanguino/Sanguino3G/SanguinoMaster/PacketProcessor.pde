@@ -160,7 +160,7 @@ void handle_query(byte cmd)
         set_tool_pause_state(false);
 
         //resume stepping.
-        enable_steppers();
+        enable_needed_steppers();
         enableTimer1Interrupt();
       }
       else
