@@ -1,4 +1,46 @@
-// Yep, this is actually -*- c++ -*-
+/**
+ *  Sanguino 3rd Generation Firmware (S3G)
+ *
+ *  Specification for this protocol is located at: 
+ *    http://docs.google.com/Doc?id=dd5prwmp_14ggw37mfp
+ *  
+ *  License: GPLv2
+ *  Authors: Marius Kintel, Adam Mayer, and Zach Hoeken
+ */
+
+
+/// Initialize the stepper driver state.
+void init_steppers();
+
+/// Move the steppers until the minimum endstop is triggered on the
+/// specified axes.  All axes are moved at the same rate.
+/// \param find_x find the minimum position for the X axis
+/// \param find_y find the minimum position for the Y axis
+/// \param find_z find the minimum position for the Z axis
+/// \param step_delay delay between steps in microseconds
+/// \param timeout_seconds seconds to wait before giving up
+void seek_minimums(boolean find_x, boolean find_y, boolean find_z, unsigned long step_delay, unsigned int timeout_seconds);
+/// Move the axis one step in towards the minimum.  If the min endstop is
+/// triggered, back up until it is only triggered by a single step.
+/// \return true if the minimum endstop is triggered.
+boolean find_axis_min(byte step_pin, byte dir_pin, byte min_pin);
+void seek_maximums(boolean find_x, boolean find_y, boolean find_z, unsigned long step_delay, unsigned int timeout_seconds);
+boolean find_axis_max(byte step_pin, byte dir_pin, byte max_pin);
+inline void grab_next_point();
+inline void do_step(byte step_pin);
+inline bool read_switch(byte pin);
+void check_endstops();
+inline void enable_steppers();
+inline void disable_steppers();
+byte get_endstop_states();
+void write_range_to_eeprom();
+void read_range_from_eeprom();
+void queue_absolute_point(long x, long y, long z, unsigned long micros);
+inline boolean is_point_buffer_empty();
+inline boolean at_target();
+inline void wait_until_target_reached();
+
+
 //initialize our stepper drivers
 void init_steppers()
 {
@@ -110,34 +152,6 @@ void seek_minimums(boolean find_x, boolean find_y, boolean find_z, unsigned long
   }
 }
 
-boolean find_axis_min(byte step_pin, byte dir_pin, byte min_pin)
-{
-  //are we at the minimum?
-  if (read_switch(min_pin))
-  {
-    //move forward until the switch goes open. (slowly)
-    digitalWrite(dir_pin, HIGH);
-    while (read_switch(min_pin))
-    {
-      do_step(step_pin);
-      delay(500);
-    }
-
-    //okay, now move us back one step.
-    digitalWrite(dir_pin, LOW);
-    do_step(step_pin);
-
-    return true;
-  }
-  else
-  {
-    digitalWrite(dir_pin, LOW);
-    do_step(step_pin);
-  }
-
-  return false;
-}
-
 void seek_maximums(boolean find_x, boolean find_y, boolean find_z, unsigned long step_delay, unsigned int timeout_seconds)
 {
   unsigned long start = millis();
@@ -191,34 +205,41 @@ void seek_maximums(boolean find_x, boolean find_y, boolean find_z, unsigned long
   }
 }
 
-boolean find_axis_max(byte step_pin, byte dir_pin, byte max_pin)
+boolean find_axis_dir(byte step_pin, byte dir_pin, 
+		      byte switch_pin, bool maximum)
 {
-  //are we at the minimum?
-  if (read_switch(max_pin))
+  //are we at the end of our travel?
+  if (read_switch(switch_pin))
   {
-    //move forward until the switch goes open. (slowly)
-    digitalWrite(dir_pin, LOW);
-    while (read_switch(max_pin))
+    //move slowly in reverse until the switch goes open.
+    digitalWrite(dir_pin, maximum?LOW:HIGH);
+    while (read_switch(switch_pin))
     {
       do_step(step_pin);
       delay(500);
     }
-
-    //okay, now move us back one step.
-    digitalWrite(dir_pin, HIGH);
+    //then move one step in the given direction.
+    digitalWrite(dir_pin, maximum?HIGH:LOW);
     do_step(step_pin);
-
     return true;
   }
   else
   {
-    digitalWrite(dir_pin, HIGH);
+    digitalWrite(dir_pin, maximum?HIGH:LOW);
     do_step(step_pin);
   }
-
   return false;
 }
 
+boolean find_axis_min(byte step_pin, byte dir_pin, byte min_pin)
+{
+  return find_axis_dir(step_pin,dir_pin,min_pin,false);
+}
+
+boolean find_axis_max(byte step_pin, byte dir_pin, byte max_pin)
+{
+  return find_axis_dir(step_pin,dir_pin,max_pin,true);
+}
 
 inline void grab_next_point()
 {

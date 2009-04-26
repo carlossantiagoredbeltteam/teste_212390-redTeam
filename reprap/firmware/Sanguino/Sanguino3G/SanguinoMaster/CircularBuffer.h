@@ -1,32 +1,41 @@
 #ifndef _CIRCULAR_BUFFER_H_
 #define _CIRCULAR_BUFFER_H_
+/**
+ *  Sanguino 3rd Generation Firmware (S3G)
+ *
+ *  Specification for this protocol is located at: 
+ *    http://docs.google.com/Doc?id=dd5prwmp_14ggw37mfp
+ *  
+ *  License: GPLv2
+ *  Authors: Marius Kintel, Adam Mayer, and Zach Hoeken
+ */
 
 #include <stddef.h>
 #include <stdint.h>
 #include "Timer1.h"
 
-//#include <util/atomic.h>
-
-///
-/// Implementation of an in-memory circular byte buffer.
-/// Originally a template, bowlderized to make the
-/// arduino build happy.  Sigh.
-///
-/// No safety checks are made in this
-/// implementation.  It will allow you to cheerfully
-/// write bytes all over yourself.
-///
-/// Hacked to make it safer for multi-access by Hoeken.
-///
-
+/**
+ * This is an implementation of a simple in-memory circular
+ * buffer.
+ *
+ * Please note that this implementation is NOT thread/interrupt
+ * safe.  Remember that 16-bit data access is not atomic on
+ * 8-bit platforms!  Turn off interrupts before accessing the
+ * buffer.
+ */
 class CircularBuffer {
 private:
-  uint8_t* buffer;
-  uint16_t capacity;
-  uint16_t head;
-  uint16_t tail;
-  uint16_t currentSize;
+  uint8_t* buffer;        // ptr to the in-memory buffer
+  uint16_t capacity;      // size of the buffer
+  uint16_t head;          // index of first element of data
+  uint16_t tail;          // index of last element of data
+  uint16_t currentSize;   // number of elements of valid data in buffer
 public:
+  /**
+   * Create a circular buffer of the given size with a provided
+   * chunk of memory.
+   * This implementation does not claim ownership of the buffer!
+   */
   CircularBuffer(uint16_t capacity, uint8_t* pBuf) {
     this->capacity = capacity;
     buffer = pBuf;
@@ -36,51 +45,46 @@ public:
   ~CircularBuffer() {
   }
 
-  /// Reset buffer.  (Note: does not zero data.)
+  /**
+   * Reset the circular buffer to an empty state.
+   */
   void clear() {
-    //disableTimer1Interrupt();
-    //ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-      head = tail = 0;
-      currentSize = 0;
-    //}
-    //enableTimer1Interrupt();
+    head = tail = 0;
+    currentSize = 0;
   }
 
+  /**
+   * Return a byte of data in the circular buffer specified by its index.
+   */
   uint8_t operator[](uint16_t i) {
     uint16_t idx;
-    //disableTimer1Interrupt();
-    //ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-      idx = (i + tail) % capacity;
-    //}
-    //enableTimer1Interrupt();
+    idx = (i + tail) % capacity;
     return buffer[idx];
   }
 
-  /// Check remaining capacity of this vector.
+  /**
+   * Return the remaining capacity of the circular buffer.
+   */
   uint16_t remainingCapacity()
   {
     uint16_t remaining;
-    //disableTimer1Interrupt();
-    //ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-      remaining = (capacity - currentSize);
-    //}
-    //enableTimer1Interrupt();
+    remaining = (capacity - currentSize);
     return remaining;
   }
 
-  /// Get the current number of elements in the buffer.
+  /**
+   * Return the current number of valid bytes in the buffer.
+   */
   uint16_t size() {
     uint16_t csize;
-    //disableTimer1Interrupt();
-    //ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-      csize = currentSize;
-    //}
-    //enableTimer1Interrupt();
+    csize = currentSize;
     return csize;
   }
 
 private:
-  /// Append a character to the end of the circular buffer.
+  /**
+   * Internal: append a byte of data to the buffer's contents.
+   */
   void appendInternal(uint8_t datum)
   {
     if ((currentSize + 1) <= capacity)
@@ -92,35 +96,37 @@ private:
   }
   
 public:
+  /**
+   * Append a single byte of data to the buffer.
+   */
   void append(uint8_t datum) {
-    //disableTimer1Interrupt();
-    //ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-      appendInternal(datum);
-    //}
-    //enableTimer1Interrupt();
+    appendInternal(datum);
   }
 
+  /**
+   * Append a two-byte value to the buffer.
+   * The buffer stores values in little-endian format.
+   */
   void append_16(uint16_t datum) {
-    //disableTimer1Interrupt();
-    //ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-      appendInternal(datum & 0xff);
-      appendInternal((datum >> 8) & 0xff);
-    //}
-    //enableTimer1Interrupt();
+    appendInternal(datum & 0xff);
+    appendInternal((datum >> 8) & 0xff);
   }
 
+  /**
+   * Append a four-byte value to the buffer.
+   * The buffer stores values in little-endian format.
+   */
   void append_32(uint32_t datum) {
-    //disableTimer1Interrupt();
-    //ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-      appendInternal(datum & 0xff);
-      appendInternal((datum >> 8) & 0xff);
-      appendInternal((datum >> 16) & 0xff);
-      appendInternal((datum >> 24) & 0xff);
-    //}
-    //enableTimer1Interrupt();
+    appendInternal(datum & 0xff);
+    appendInternal((datum >> 8) & 0xff);
+    appendInternal((datum >> 16) & 0xff);
+    appendInternal((datum >> 24) & 0xff);
   }
 
 private:
+  /**
+   * Internal: Remove the first byte of the buffer's data and return it.
+   */
   uint8_t removeInternal() {
     if (currentSize == 0)
       return 0;
@@ -134,37 +140,34 @@ private:
   }
 
 public:    
-  /// Remove and return a character from the start of the
-  /// circular buffer.
+  /**
+   * Remove and return a byte from the start of the circular buffer.
+   */
   uint8_t remove_8() {
-    //disableTimer1Interrupt();
-    //ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-      return removeInternal();
-    //}
-    //enableTimer1Interrupt();
+    return removeInternal();
   }
 
+  /*
+   * Remove and return a two-byte value  from the start of the circular 
+   * buffer.  The buffer stores values in little-endian format.
+   */
   uint16_t remove_16() {
     uint8_t v[2];
-    //disableTimer1Interrupt();
-    //ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-      v[0] = removeInternal();
-      v[1] = removeInternal();
-    //}
-    //enableTimer1Interrupt();
+    v[0] = removeInternal();
+    v[1] = removeInternal();
     return v[0] | ((uint16_t)v[1] << 8);
   }
 
+  /*
+   * Remove and return a four-byte value  from the start of the circular 
+   * buffer.  The buffer stores values in little-endian format.
+   */
   uint32_t remove_32() {
     uint8_t v[4];
-    //disableTimer1Interrupt();
-    //ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-      v[0] = removeInternal();
-      v[1] = removeInternal();
-      v[2] = removeInternal();
-      v[3] = removeInternal();
-    //}
-    //enableTimer1Interrupt();
+    v[0] = removeInternal();
+    v[1] = removeInternal();
+    v[2] = removeInternal();
+    v[3] = removeInternal();
     return v[0] |
       ((uint32_t)v[1] << 8) |
       ((uint32_t)v[2] << 16) |

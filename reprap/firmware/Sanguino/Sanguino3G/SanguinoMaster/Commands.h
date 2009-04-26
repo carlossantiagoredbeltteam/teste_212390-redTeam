@@ -1,3 +1,25 @@
+#ifndef _COMMANDS_H_
+#define _COMMANDS_H_
+/**
+ *  Sanguino 3rd Generation Firmware (S3G)
+ *
+ *  Specification for this protocol is located at: 
+ *    http://docs.google.com/Doc?id=dd5prwmp_14ggw37mfp
+ *  
+ *  License: GPLv2
+ *  Authors: Marius Kintel, Adam Mayer, and Zach Hoeken
+ */
+
+/****************************
+ ***      WARNING         ***
+ ****************************
+
+ * These values here are also used in the replicatorG driver.
+ * If you modify anything here, please ensure that it is updated
+ * in the Sanguino3GDriver.java file at:
+ * https://replicatorg.googlecode.com/svn/trunk/src/replicatorg/app/drivers
+ */
+
 // These are our query commands from the host
 #define HOST_CMD_VERSION         0
 #define HOST_CMD_INIT            1
@@ -12,7 +34,7 @@
 #define HOST_CMD_TOOL_QUERY     10
 
 // These are our bufferable commands from the host
-#define HOST_CMD_QUEUE_POINT_INC   128
+// #define HOST_CMD_QUEUE_POINT_INC   128  // deprecated
 #define HOST_CMD_QUEUE_POINT_ABS   129
 #define HOST_CMD_SET_POSITION      130
 #define HOST_CMD_FIND_AXES_MINIMUM 131
@@ -46,3 +68,5 @@
 #define SLAVE_CMD_GET_MOTOR_2_RPM       20
 #define SLAVE_CMD_SELECT_TOOL           21
 #define SLAVE_CMD_IS_TOOL_READY         22
+
+#endif // _COMMANDS_H_
