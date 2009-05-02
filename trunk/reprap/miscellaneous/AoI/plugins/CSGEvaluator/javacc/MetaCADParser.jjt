@@ -231,7 +231,7 @@ List<String> ParameterList() :
 	String current;
 }
 {
-	current = Expression(){expressions.add(current);}(<COMMA>Expression(){expressions.add(current);})*
+	current = Expression(){expressions.add(current);}(<COMMA>current=Expression(){expressions.add(current);})*
 	{
 		return expressions;
 	}
