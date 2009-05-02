@@ -1,32 +1,3 @@
-/* Copyright (c) 2006, Sun Microsystems, Inc.
- * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *     * Redistributions of source code must retain the above copyright notice,
- *       this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Sun Microsystems, Inc. nor the names of its
- *       contributors may be used to endorse or promote products derived from
- *       this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
- * THE POSSIBILITY OF SUCH DAMAGE.
- */
- 
- 
 options {
   TRACK_TOKENS=true;
 }
@@ -37,10 +8,10 @@ PARSER_BEGIN(MetaCADParser)
 package org.reprap.artofillusion.parser;
 
 import org.reprap.artofillusion.ParsedTree;
-import org.reprap.artofillusion.TreeObject;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+
 
 import artofillusion.object.ObjectInfo;
 
@@ -50,8 +21,22 @@ public class MetaCADParser {
   
   /** Main entry point. */
   
-  public static TreeObject parseTree(String txt) throws ParseException {
-    MetaCADParser parser = new MetaCADParser(new StringReader(txt));
+  protected static MetaCADParser theParser = null;
+  protected static MetaCADParser getSingleton(String txt)
+  {
+        if (theParser== null)
+        {
+        	theParser=new MetaCADParser(new StringReader(txt));
+        }
+        else
+        {
+        	theParser.ReInit(new StringReader(txt));
+        }
+        return theParser;
+  }
+
+  public static ParsedTree parseTree(String txt) throws ParseException {
+    MetaCADParser parser = getSingleton(txt);
     return parser.Object();
   }
   
@@ -148,23 +133,10 @@ TOKEN : /* IDENTIFIERS */
   >
 }
 
-/** Root production. 
-ArrayList<ObjectInfo> ObjectTree() :
-{
-	ArrayList<ObjectInfo> elements = new ArrayList<ObjectInfo>();;	
-}
-{
- <LBRACE> [Object() (<COMMA> Object())* ] <RBRACE>
-{
-		return new ArrayList<ObjectInfo>();
-}
-}
-*/
-
-TreeObject Object() :
+ParsedTree Object() :
 {
 	ParsedTree tree;
-	List<TreeObject> children=null;
+	List<ParsedTree> children=null;
 }
 {
 	tree = FunctionCallList() (<LBRACE>children=ObjectList()<RBRACE>)? ";"
@@ -172,7 +144,7 @@ TreeObject Object() :
 	if (children != null)
 	{
 		ParsedTree bottom = tree;
-		while (bottom.children.size() != 0) { bottom = (ParsedTree)bottom.children.get(0); };
+		while (bottom.children.size() != 0) { bottom = bottom.children.get(0); };
 		bottom.children = children;
 	}
 	
@@ -180,10 +152,10 @@ TreeObject Object() :
 }
 }
 
-List<TreeObject> ObjectList() :
+List<ParsedTree> ObjectList() :
 {	
-	List<TreeObject> list = new ArrayList<TreeObject>();
-	TreeObject current;
+	List<ParsedTree> list = new ArrayList<ParsedTree>();
+	ParsedTree current;
 }
 {
 	(current = Object() { list.add(current); })*
