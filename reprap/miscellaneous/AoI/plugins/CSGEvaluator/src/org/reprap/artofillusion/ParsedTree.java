@@ -1,13 +1,9 @@
 package org.reprap.artofillusion;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import artofillusion.object.ObjectInfo;
-
-interface TreeObject
-{
-  ObjectInfo evaluate(); 
-}
 
 class MyObject implements TreeObject {
   ObjectInfo obj;
@@ -18,10 +14,15 @@ class MyObject implements TreeObject {
 }
 
 public class ParsedTree implements TreeObject {
-
-  String name;
-  List<String> parameters;
-  List<TreeObject> children;
+  public String name;
+  public List<String> parameters;
+  public List<TreeObject> children;
+  
+  public ParsedTree()
+  {
+	  parameters =  new ArrayList<String>();
+	  children = new ArrayList<TreeObject>();
+  }
   
   public ObjectInfo evaluate() {
     return null;
