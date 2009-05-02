@@ -36,6 +36,8 @@ PARSER_BEGIN(MetaCADParser)
 
 package org.reprap.artofillusion.parser;
 
+import org.reprap.artofillusion.ParsedTree;
+import org.reprap.artofillusion.TreeObject;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,14 +49,10 @@ import artofillusion.object.ObjectInfo;
 public class MetaCADParser {
   
   /** Main entry point. */
-  public static ObjectInfo parseObjectInfoTree(String txt) throws ParseException {
+  
+  public static TreeObject parseTree(String txt) throws ParseException {
     MetaCADParser parser = new MetaCADParser(new StringReader(txt));
     return parser.Object();
-  }
-  
-  public static String testExpression(String txt) throws ParseException {
-    MetaCADParser parser = new MetaCADParser(new StringReader(txt));
-    return parser.Expression();
   }
   
   public static String dumpTokens(SimpleNode node)
@@ -150,7 +148,7 @@ TOKEN : /* IDENTIFIERS */
   >
 }
 
-/** Root production. */
+/** Root production. 
 ArrayList<ObjectInfo> ObjectTree() :
 {
 	ArrayList<ObjectInfo> elements = new ArrayList<ObjectInfo>();;	
@@ -161,64 +159,89 @@ ArrayList<ObjectInfo> ObjectTree() :
 		return new ArrayList<ObjectInfo>();
 }
 }
+*/
 
-/** Brace counting production. */
-ObjectInfo Object() :
+TreeObject Object() :
 {
-	String name;
-	List<ObjectInfo> children=null;
+	ParsedTree tree;
+	List<TreeObject> children=null;
 }
 {
-	name = FunctionCallList() (<LBRACE>children=ObjectList()<RBRACE>)? ";"
+	tree = FunctionCallList() (<LBRACE>children=ObjectList()<RBRACE>)? ";"
 {
-	ObjectInfo obj = new ObjectInfo(null, null, name);
-        if (children != null)
-        {
-                for (int i = 0;  i < children.size(); i++)
-                {
-                        obj.addChild(children.get(i), i);
-                }
-        }
-		return obj;
+	if (children != null)
+	{
+		ParsedTree bottom = tree;
+		while (bottom.children.size() != 0) { bottom = (ParsedTree)bottom.children.get(0); };
+		bottom.children = children;
+	}
+	
+	return tree;
 }
 }
 
-List<ObjectInfo> ObjectList() :
+List<TreeObject> ObjectList() :
 {	
-	List<ObjectInfo> list = new ArrayList<ObjectInfo>();
-	ObjectInfo current;
+	List<TreeObject> list = new ArrayList<TreeObject>();
+	TreeObject current;
 }
 {
 	(current = Object() { list.add(current); })*
 	{
-	return list;
+		return list;
 	}
 }
 
 
-String FunctionCallList() :
+ParsedTree FunctionCallList() :
 {
+	ParsedTree current = new ParsedTree();
+	List<ParsedTree> trees =  new ArrayList<ParsedTree>();
 }
 {
-	(FunctionCall())+ {
-		return dumpTokens(jjtThis);
+	(current = FunctionCall() {trees.add(current);})+ 
+	{
+		for (int i = trees.size()-2; i >= 0; i--)
+		{
+			trees.get(i+1).children.add(trees.get(i));	
+		}	
+		return current;
 	}
 }
 
+ParsedTree FunctionCall() :
+{
+	ParsedTree tree = new ParsedTree();
+	Token name;
+	List <String> params = new ArrayList<String>(); 
+}
+{
+	name = <IDENTIFIER><LPAREN>(params = ParameterList())?<RPAREN>
+	{
+		tree.name = name.image;
+		tree.parameters =  params;
+		return tree;
+	}
+		
+}
 
+List<String> ParameterList() :
+{
+	List<String> expressions = new ArrayList<String>();
+	String current;
+}
+{
+	current = Expression(){expressions.add(current);}(<COMMA>Expression(){expressions.add(current);})*
+	{
+		return expressions;
+	}
+}
 
-void FunctionCall() :
+void JEPFunctionCall() :
 {
 }
 {
 	<IDENTIFIER>(<LPAREN>(ParameterList())?<RPAREN>)?
-}
-
-void ParameterList() :
-{
-}
-{
-	Expression()(<COMMA>Expression())*
 }
 
 /** Brace counting production. */
@@ -226,7 +249,7 @@ void UnaryExpression() :
 {
 }
 {
-	<REAL_LITERAL>	|  FunctionCall()  | <LPAREN>Expression()<RPAREN> | <MINUS> UnaryExpression()
+	<REAL_LITERAL>	|  JEPFunctionCall()  | <LPAREN>Expression()<RPAREN> | <MINUS> UnaryExpression()
 }
 
 /** Brace counting production. */
