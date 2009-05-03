@@ -25,7 +25,7 @@ public class CSObj extends ParsedTree {
     }
     
     coordsys.transformCoordinates(chinfo.coords.fromLocal());
-    ObjectInfo result = new ObjectInfo(chinfo.getObject(), coordsys, this.aoiobj.name);
+    ObjectInfo result = new ObjectInfo(chinfo.getObject(), coordsys, "dummy");
     return result;
   }
 
