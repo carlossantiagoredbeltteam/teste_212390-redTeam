@@ -119,8 +119,9 @@ class CSGEvaluatorEngine
 
   /**
    * Performs the union operation on the currently selected objects
+   * @throws Exception 
    */
-  public void union()
+  public void union() throws Exception
   {
     execute(CSGObject.UNION, 2);
   }
