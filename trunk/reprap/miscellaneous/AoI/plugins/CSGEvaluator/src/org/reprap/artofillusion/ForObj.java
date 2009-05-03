@@ -8,8 +8,7 @@ import artofillusion.math.Vec3;
 import artofillusion.object.ObjectInfo;
 
 public class ForObj extends ParsedTree {
-  
-  public List<ObjectInfo> evaluate(MetaCADContext ctx) throws Exception {
+  public List<ObjectInfo>  evaluateObject(MetaCADContext ctx) throws Exception {
     List<ObjectInfo> result = new LinkedList<ObjectInfo>();
     
     // evaluate first part of for loop i.e. i=0
@@ -24,12 +23,7 @@ public class ForObj extends ParsedTree {
       ctx.evaluateAssignment(this.parameters.get(2));
       count++;
     }
-    updateAOI(result.get(0));
     return result;
-  }
-  
-  public ObjectInfo evaluateObject(MetaCADContext ctx) throws Exception {
-    return null;
   }
 
 }
