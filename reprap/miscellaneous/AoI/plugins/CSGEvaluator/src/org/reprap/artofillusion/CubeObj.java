@@ -1,5 +1,8 @@
 package org.reprap.artofillusion;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import artofillusion.math.CoordinateSystem;
 import artofillusion.math.Vec3;
 import artofillusion.object.Cube;
@@ -8,7 +11,9 @@ import artofillusion.object.ObjectInfo;
 
 public class CubeObj extends ParsedTree {
 
-  public ObjectInfo evaluateObject(MetaCADContext ctx) throws Exception {
+  public List<ObjectInfo> evaluateObject(MetaCADContext ctx) throws Exception {
+    List<ObjectInfo> result = new LinkedList<ObjectInfo>();
+
     double mainparam = 1.0f;
     if (this.parameters.size() >= 1) {
       mainparam = ctx.evaluateExpression(this.parameters.get(0));
@@ -21,7 +26,7 @@ public class CubeObj extends ParsedTree {
     }
     Object3D obj3D = new artofillusion.object.Sphere(dims.x, dims.y, dims.z);
     obj3D = new Cube(dims.x, dims.y, dims.z);
-    ObjectInfo result = new ObjectInfo(obj3D, new CoordinateSystem(), "dummy");
+    result.add(new ObjectInfo(obj3D, new CoordinateSystem(), "dummy"));
     return result;
   }
 }

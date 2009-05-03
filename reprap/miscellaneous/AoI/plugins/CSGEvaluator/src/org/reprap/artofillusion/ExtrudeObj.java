@@ -17,8 +17,10 @@ import artofillusion.tools.ExtrudeTool;
 public class ExtrudeObj extends ParsedTree
 {
   
-  public ObjectInfo evaluateObject(MetaCADContext ctx) throws Exception {
+  public List<ObjectInfo> evaluateObject(MetaCADContext ctx) throws Exception {
   
+    List<ObjectInfo> result = new LinkedList<ObjectInfo>();
+
     List<ObjectInfo> children = evaluateChildren(ctx);
 
     // Three first parameters define the extrusion vector
@@ -40,7 +42,8 @@ public class ExtrudeObj extends ParsedTree
       twist = ctx.evaluateExpression(this.parameters.get(4));
     }
     
-    return extrude(children, dir, numsegments, twist);
+    result.add(extrude(children, dir, numsegments, twist));
+    return result;
   }
   
   /**

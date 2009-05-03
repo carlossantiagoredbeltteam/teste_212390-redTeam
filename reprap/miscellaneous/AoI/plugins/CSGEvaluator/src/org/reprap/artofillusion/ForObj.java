@@ -3,8 +3,6 @@ package org.reprap.artofillusion;
 import java.util.LinkedList;
 import java.util.List;
 
-import artofillusion.math.CoordinateSystem;
-import artofillusion.math.Vec3;
 import artofillusion.object.ObjectInfo;
 
 public class ForObj extends ParsedTree {
