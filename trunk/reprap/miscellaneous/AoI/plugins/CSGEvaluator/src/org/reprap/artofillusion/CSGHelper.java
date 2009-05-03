@@ -1,5 +1,7 @@
 package org.reprap.artofillusion;
 
+import java.util.Iterator;
+
 import artofillusion.math.CoordinateSystem;
 import artofillusion.object.CSGObject;
 import artofillusion.object.Object3D;
@@ -22,7 +24,13 @@ public class CSGHelper {
     this.sum = null;
     this.buffer = null;
   }
-
+  
+  public void addAll(Iterator<ObjectInfo> iter) {
+    while (iter.hasNext()) {
+      Add(iter.next());
+    }
+  }
+  
   public void Add(ObjectInfo obj) {
     if (this.count == 0) {
       this.buffer = obj;
