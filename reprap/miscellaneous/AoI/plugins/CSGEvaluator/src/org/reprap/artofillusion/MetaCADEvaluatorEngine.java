@@ -3,10 +3,12 @@ package org.reprap.artofillusion;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.cheffo.jeplite.JEP;
+import org.reprap.artofillusion.parser.ParseException;
 
 import artofillusion.LayoutWindow;
 import artofillusion.Scene;
@@ -36,7 +38,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
   public static final int CUBE      = 13;
   public static final int CYLINDER  = 14;
   
-  JEP jep = new JEP();
+  MetaCADContext context = new MetaCADContext();
 
   public MetaCADEvaluatorEngine(LayoutWindow window) {
     super(window);
@@ -101,15 +103,79 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
   }
 
   public boolean readParameters() {
-    this.jep = new JEP();
-    this.jep.addStandardConstants();
-    this.jep.addStandardFunctions();
+    this.context.jep = new JEP();
+    this.context.jep.addStandardConstants();
+    this.context.jep.addStandardFunctions();
     return evaluateLines(getParameters());
   }
 
+  
+  /**
+   * 
+   * Recursively extracts an AoI object tree and creates our own ParsedTree representation.
+   * 
+   */
+  public ParsedTree extractTree(ObjectInfo parent) {
+  
+    try {
+      // Try converting the object before parsing
+      convertObject(parent);
+
+      // Parse this ObjectInfo
+      ParsedTree root = org.reprap.artofillusion.parser.MetaCADParser.parseTree(parent.name + ";");
+      root.aoiobj = parent;
+
+      // If the parser returned a subtree, find the leaf node
+      // (we guarantee that there are at most one child of each intermediate node)
+      ParsedTree parenttree = root;
+      while (!parenttree.children.isEmpty()) parenttree = (ParsedTree)parenttree.children.get(0);
+
+      // Build hierarchy recursively
+      ObjectInfo[] objects = parent.children;
+      for (int i=0;i<objects.length;i++) {
+        parenttree.children.add(extractTree(objects[i]));
+      }
+      return root;
+    } catch (ParseException e) {
+      // FIXME: Auto-generated catch block
+      e.printStackTrace();
+    }
+    // FIXME: Something went wrong. Deal with it.
+    return null;
+  }
+
+  /**
+   * Evaluates selected objects
+   */
   public void evaluate() {
-    // only evaluate selected objects if the parameters could be evaluated
-    if (readParameters()) super.evaluate();
+    // Only evaluate selected objects if the parameters could be evaluated
+    if (readParameters()) {
+      // Extract object tree from AoI into our ParsedTree data structure,
+      // one tree per selected node in AoI
+      List<ParsedTree> trees = new LinkedList<ParsedTree>();
+      ObjectInfo[] objects = getSelection();
+      if (objects != null) {
+        for (int i=0;i<objects.length;i++) {
+          trees.add(extractTree(objects[i]));
+        }
+      }
+
+      // Evaluate the parsed trees
+      Iterator<ParsedTree> iter = trees.iterator();
+      while (iter.hasNext()) {
+        ParsedTree tree = iter.next();
+        try {
+          ObjectInfo newinfo = tree.evaluate(this.context);
+        } catch (Exception e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+      }
+      
+      this.window.rebuildItemList();
+      this.window.updateImage();
+      this.window.setModified();
+    }
   }
 
   public ObjectInfo evaluateNode(ObjectInfo parent, UndoRecord undo) throws Exception
@@ -518,8 +584,8 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
   // any error occurred
   double evaluateExpression(String expr) throws Exception {
     try {
-      this.jep.parseExpression(expr);
-      return this.jep.getValue();
+      this.context.jep.parseExpression(expr);
+      return this.context.jep.getValue();
     } catch (Exception ex) {
       showMessage("Error while evaluating Expression: \"" + expr
           + "\" Syntax Error or unknown variable?");
@@ -536,10 +602,10 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
 
       String name = curLine.substring(0, mark).trim();
       String formula = curLine.substring(mark + 1);
-      this.jep.parseExpression(formula);
-      double value = this.jep.getValue();
+      this.context.jep.parseExpression(formula);
+      double value = this.context.jep.getValue();
       // System.out.println(value);
-      this.jep.addVariable(name, value);
+      this.context.jep.addVariable(name, value);
     } catch (Exception ex) {
       showMessage("Invalid Assignment: \"" + curLine + "\" syntax error?");
       throw (ex);
@@ -562,7 +628,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     }
   }
 
-  CoordinateSystem evaluateCoordSys(String[] parameters) throws Exception {
+public CoordinateSystem evaluateCoordSys(String[] parameters) throws Exception {
     CoordinateSystem coordsys = null;
     if (parameters != null) {
       coordsys = new CoordinateSystem();
@@ -742,7 +808,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
       v[i].scale(1.0*i/numsegments);
       smooth[i] = 1.0f;
     }
-    Curve path = new Curve(v, smooth, Mesh.NO_SMOOTHING, false);
+    Curve path = new Curve(v, smooth, Mesh.APPROXIMATING, false);
     CoordinateSystem pathCS = new CoordinateSystem();
 
     // FIXME: Support specifying extrusion curves

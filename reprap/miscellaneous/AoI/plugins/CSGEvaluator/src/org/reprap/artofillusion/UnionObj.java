@@ -4,13 +4,9 @@ import java.util.List;
 
 import artofillusion.object.ObjectInfo;
 
-public class BooleanObj extends ParsedTree {
+public class UnionObj extends BooleanObj {
 
   public ObjectInfo evaluateObject(MetaCADContext ctx) throws Exception {
-    List<ObjectInfo> children = evaluateChildren(ctx);
-    
-    
-    
     return null;
   }
 }

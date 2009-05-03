@@ -7,10 +7,10 @@ import artofillusion.object.ObjectInfo;
 
 public class CSObj extends ParsedTree {
 
-  public ObjectInfo evaluate(MetaCADContext ctx) throws Exception {
+  public ObjectInfo evaluateObject(MetaCADContext ctx) throws Exception {
 
     assert(this.children.size() == 1);
-    ObjectInfo chinfo = this.children.get(0).evaluate(ctx);
+    ObjectInfo chinfo = this.children.get(0).evaluateObject(ctx);
     
     CoordinateSystem coordsys = new CoordinateSystem();
     if (this.parameters.size() >= 3) {
@@ -25,7 +25,8 @@ public class CSObj extends ParsedTree {
     }
     
     coordsys.transformCoordinates(chinfo.coords.fromLocal());
-    return new ObjectInfo(chinfo.getObject(), coordsys, this.aoiobj.name);
+    ObjectInfo result = new ObjectInfo(chinfo.getObject(), coordsys, this.aoiobj.name);
+    return result;
   }
 
 }
