@@ -29,10 +29,7 @@ public class CSObj extends ParsedTree {
     Iterator<ObjectInfo> iter = chlist.iterator();
     while (iter.hasNext()) {
       ObjectInfo info = iter.next();
-      CoordinateSystem tmp = coordsys.duplicate();
-      coordsys.transformCoordinates(info.coords.fromLocal());
-      info.setCoords(coordsys);
-      coordsys = tmp;
+      info.coords.transformCoordinates(coordsys.fromLocal());
     }
     return chlist;
   }
