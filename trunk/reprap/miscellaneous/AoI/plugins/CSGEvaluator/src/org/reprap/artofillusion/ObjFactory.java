@@ -49,6 +49,10 @@ public class ObjFactory {
                 {
                         return new PolygonObj(PolygonObj.ROLL);
                 }
+                else if (name.startsWith("for"))
+                {
+                        return new ForObj();
+                }
 		
 		throw new ParseException("unknown Object type: " + name);
 	}	

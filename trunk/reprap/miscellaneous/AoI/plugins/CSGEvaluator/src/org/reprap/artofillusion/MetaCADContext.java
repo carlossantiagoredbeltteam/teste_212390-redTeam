@@ -21,5 +21,22 @@ public class MetaCADContext {
     }
   }
   
+  // Evaluates Expressions like x=2*radius and assigns the value to the given
+  // variable
+  void evaluateAssignment(String curLine) throws Exception {
+    try {
+      int mark = curLine.indexOf("=");
+
+      String name = curLine.substring(0, mark).trim();
+      String formula = curLine.substring(mark + 1);
+      this.jep.parseExpression(formula);
+      double value = this.jep.getValue();
+      // System.out.println(value);
+      this.jep.addVariable(name, value);
+    } catch (Exception ex) {
+      throw (ex);
+    }
+  }
+  
 }
 
