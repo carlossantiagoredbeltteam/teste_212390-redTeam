@@ -2,9 +2,16 @@ package org.reprap.artofillusion;
 
 import org.cheffo.jeplite.JEP;
 
+import artofillusion.Scene;
+
 public class MetaCADContext {
 
   public JEP jep = new JEP();
+  public Scene scene;
+  
+  public MetaCADContext(Scene scene) {
+    this.scene = scene;
+  }
 
   // Evaluates an Expression like 3*x+sin(a) and returns the value of it or 0 if
   // any error occurred
