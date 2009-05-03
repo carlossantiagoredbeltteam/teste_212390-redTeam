@@ -35,6 +35,9 @@ public abstract class ParsedTree {
     while (iter.hasNext()) {
       ParsedTree treeobject = iter.next();
       resultchildren.addAll(treeobject.evaluate(ctx));
+      if (treeobject.aoiobj != null) {
+        treeobject.aoiobj.setVisible(false);
+      }
     }
     
     return resultchildren;
