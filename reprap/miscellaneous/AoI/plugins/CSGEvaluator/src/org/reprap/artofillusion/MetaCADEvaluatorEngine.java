@@ -515,43 +515,43 @@ String coordSysToString(CoordinateSystem cs) {
     return points.toArray(new Vec3[1]);
   }
 
-  public void cube()
+  public void cube() throws Exception
   {
-    showMessage("cube function not implemented");
+    createObjectFromString("cube(1, 2, 3)");
   }
 
-  public void sphere()
+  public void sphere() throws Exception
   {
-    showMessage("sphere function not implemented");
+    createObjectFromString("sphere(1)");
   }
 
-  public void cylinder()
+  public void cylinder() throws Exception
   {
-    showMessage("cylinder function not implemented");
+    createObjectFromString("cylinder(2, 1)");
   }
 
-  public void polygon(String defstr) throws Exception
+  public void createObjectFromString(String defstr) throws Exception
   {
     Scene theScene = this.window.getScene();
     ObjectInfo objInfo = new ObjectInfo(new Sphere(1,1,1), new CoordinateSystem(), defstr);
     this.window.addObject(objInfo, null);
     this.window.setSelection(theScene.getNumObjects()-1);
-    evaluateObject(objInfo, null);
+    evaluate();
   }
 
   public void regular() throws Exception
   {
-    polygon("reg(6, 4, 4)");
+    createObjectFromString("reg(6, 4, 4)");
   }
   
   public void star() throws Exception
   {
-    polygon("star(6, 3, 5)");
+    createObjectFromString("star(6, 3, 5)");
   }
   
   public void roll() throws Exception
   {
-    polygon("roll(30, 5, 1, 0.8)");
+    createObjectFromString("roll(30, 5, 1, 0.8)");
   }
   
   public void extrude()
