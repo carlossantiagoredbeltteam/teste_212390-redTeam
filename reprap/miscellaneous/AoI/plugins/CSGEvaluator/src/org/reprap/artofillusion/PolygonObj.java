@@ -139,7 +139,7 @@ public class PolygonObj extends ParsedTree
     return v;
   }
 
-  Object3D createPolygon(Vec3[] v) {
+  static public Object3D createPolygon(Vec3[] v) {
     Object3D obj3D;
     float smoothness[] = new float[v.length];
     Arrays.fill(smoothness, 0.0f);

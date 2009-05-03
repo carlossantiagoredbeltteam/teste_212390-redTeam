@@ -57,7 +57,11 @@ public class ObjFactory {
                 {
                         return new ForObj();
                 }
+                else if (name.startsWith("inset"))
+                {
+                        return new InsetObj();
+                }
 		
-		throw new ParseException("unknown Object type: " + name);
+		throw new ParseException("ObjFactory: Unknown Object type: " + name);
 	}	
 }
