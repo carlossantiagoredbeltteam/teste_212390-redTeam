@@ -25,6 +25,12 @@ public class CSGHelper {
     this.buffer = null;
   }
   
+  static public ObjectInfo combine(Iterator<ObjectInfo> iter, int op) {
+    CSGHelper helper = new CSGHelper(op);
+    helper.addAll(iter);
+    return helper.GetObjectInfo();
+  }
+  
   public void addAll(Iterator<ObjectInfo> iter) {
     while (iter.hasNext()) {
       Add(iter.next());
