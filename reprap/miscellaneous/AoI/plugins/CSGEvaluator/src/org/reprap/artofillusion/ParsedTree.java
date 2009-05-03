@@ -50,7 +50,9 @@ public abstract class ParsedTree {
 
       this.aoiobj.setObject(newinfo.object);
       this.aoiobj.setCoords(newinfo.coords);
-      this.aoiobj.object.setTexture(tex, map);
+      if (tex != null && map != null) {
+        this.aoiobj.object.setTexture(tex, map);
+      }
       this.aoiobj.setVisible(true);
 
       this.aoiobj.clearCachedMeshes();
