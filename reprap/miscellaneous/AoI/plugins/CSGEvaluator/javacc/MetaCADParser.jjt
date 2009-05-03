@@ -1,6 +1,7 @@
 options {
   TRACK_TOKENS=true;
-  LOOKAHEAD=2;
+  LOOKAHEAD=3;
+  FORCE_LA_CHECK=true;
 }
 
 
@@ -38,7 +39,7 @@ public class MetaCADParser {
 		MetaCADParser parser = getSingleton(txt);
 		return parser.Object();
 	}
-	catch (ParseException ex)
+	catch (Throwable ex)
 	{
 		ParseException newEx = new ParseException(ex.getMessage() + " in:\n" + txt);
 		newEx.initCause(ex);
@@ -94,7 +95,7 @@ TOKEN : /* BINARY OPS */
 	< PLUS: "+" >
 |	< MINUS: "-" >
 |   < DIVIDE: "/" >
-|	< OTHERBINOP: ["*","^","="] >
+|	< OTHERBINOP: ["*","^","=", ">","<"] >
 }
 
 TOKEN : /* IDENTIFIERS */
@@ -191,7 +192,7 @@ ParsedTree FunctionCallList() :
 ParsedTree FunctionCall() :
 {
 	ParsedTree tree;
-	Token name;
+	Token name, nameToken;
 	List <String> params = new ArrayList<String>(); 
 }
 {
@@ -204,10 +205,11 @@ ParsedTree FunctionCall() :
 	} 
 |
 
-	(name = <PLUS>|name = <MINUS>|name=<DIVIDE>) (<LPAREN>(params = ParameterList())?<RPAREN>)? 
+	(nameToken=<PLUS>|nameToken=<MINUS>|nameToken=<DIVIDE>)name=<IDENTIFIER> (<LPAREN>(params = ParameterList())?<RPAREN>)? 
 	{
-		tree = ObjFactory.create(name.image);
-		tree.name = name.image;
+		String n = nameToken.image+name.image;
+		tree = ObjFactory.create(n);
+		tree.name = n;
 		tree.parameters =  params;
 		return tree;
 	} 
