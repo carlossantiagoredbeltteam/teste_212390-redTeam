@@ -9,11 +9,11 @@ public class ObjFactory {
                 {
                         return new SphereObj();
                 }
-                if (name.startsWith("cube"))
+                else if (name.startsWith("cube"))
                 {
                         return new CubeObj();
                 }
-                if (name.startsWith("cylinder"))
+                else if (name.startsWith("cylinder"))
                 {
                         return new CylinderObj();
                 }
@@ -21,6 +21,18 @@ public class ObjFactory {
 		{
 			return new CSObj();
 		}
+                else if (name.startsWith("union"))
+                {
+                        return new UnionObj();
+                }
+                else if (name.startsWith("difference"))
+                {
+                        return new DifferenceObj();
+                }
+                else if (name.startsWith("intersection"))
+                {
+                        return new IntersectionObj();
+                }
 		
 		throw new Exception("unknown Object type: " + name);
 	}	
