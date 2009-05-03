@@ -165,7 +165,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
       while (iter.hasNext()) {
         ParsedTree tree = iter.next();
         try {
-          ObjectInfo newinfo = tree.evaluate(this.context);
+          tree.evaluate(this.context);
         } catch (Exception e) {
           // TODO Auto-generated catch block
           e.printStackTrace();
