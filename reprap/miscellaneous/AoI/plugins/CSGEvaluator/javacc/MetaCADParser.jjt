@@ -93,7 +93,8 @@ TOKEN : /* BINARY OPS */
 {
 	< PLUS: "+" >
 |	< MINUS: "-" >
-|	< OTHERBINOP: ["*","/"] >
+|   < DIVIDE: "/" >
+|	< OTHERBINOP: ["*","^","="] >
 }
 
 TOKEN : /* IDENTIFIERS */
@@ -194,13 +195,22 @@ ParsedTree FunctionCall() :
 	List <String> params = new ArrayList<String>(); 
 }
 {
-	name = <IDENTIFIER>(<LPAREN>(params = ParameterList())?<RPAREN>)?
+	name = <IDENTIFIER>(<LPAREN>(params = ParameterList())?<RPAREN>)? 
 	{
 		tree = ObjFactory.create(name.image);
 		tree.name = name.image;
 		tree.parameters =  params;
 		return tree;
-	}
+	} 
+|
+
+	(name = <PLUS>|name = <MINUS>|name=<DIVIDE>) (<LPAREN>(params = ParameterList())?<RPAREN>)? 
+	{
+		tree = ObjFactory.create(name.image);
+		tree.name = name.image;
+		tree.parameters =  params;
+		return tree;
+	} 
 		
 }
 
@@ -236,7 +246,7 @@ String Expression() :
 {
 }
 {
-	UnaryExpression()((<PLUS>|<MINUS>|<OTHERBINOP>)UnaryExpression())*
+	UnaryExpression()((<PLUS>|<MINUS>|<DIVIDE>|<OTHERBINOP>)UnaryExpression())*
 	{
 		return dumpTokens(jjtThis);
 	}
