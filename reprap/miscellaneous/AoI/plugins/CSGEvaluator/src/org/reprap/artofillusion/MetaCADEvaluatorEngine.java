@@ -15,6 +15,7 @@ import artofillusion.UndoRecord;
 import artofillusion.math.CoordinateSystem;
 import artofillusion.math.Vec2;
 import artofillusion.math.Vec3;
+import artofillusion.object.CSGObject;
 import artofillusion.object.Cube;
 import artofillusion.object.Cylinder;
 import artofillusion.object.Object3D;
@@ -181,11 +182,11 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     if (parent.name.startsWith("Cube ") && parent.object instanceof Cube) {
       Vec3 size = ((Cube)parent.object).getBounds().getSize();
       
-      String name = "cube(" +
-      String.format("%.2f", size.x) + "," +
-      String.format("%.2f", size.y) + "," +
-      String.format("%.2f", size.z) + ")";
-      name += coordSysToString(parent.getCoords());
+      String name = coordSysToString(parent.getCoords());
+      name += "cube(" + 
+              String.format("%.2f", size.x) + "," +
+              String.format("%.2f", size.y) + "," +
+              String.format("%.2f", size.z) + ")";
       parent.setName(name);
       return true;
     }
@@ -193,23 +194,23 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
       Cylinder c = (Cylinder)parent.object;
       Vec3 size = c.getBounds().getSize();
       
-      String name = "cylinder("+
-                     String.format("%.2f", size.y)+","+
-                     String.format("%.2f", size.x/2)+","+
-                     String.format("%.2f", size.z/2)+","+
-                     String.format("%.2f", c.getRatio())+")";
-      name += coordSysToString(parent.getCoords());
+      String name = coordSysToString(parent.getCoords());
+      name += "cylinder("+
+              String.format("%.2f", size.y)+","+
+              String.format("%.2f", size.x/2)+","+
+              String.format("%.2f", size.z/2)+","+
+              String.format("%.2f", c.getRatio())+")";
       parent.setName(name);
       return true;
     }
     else if (parent.name.startsWith("Sphere ") && parent.object instanceof Sphere) {
       Vec3 size = ((Sphere)parent.object).getRadii();
       
-      String name = "sphere("+
-                     String.format("%.2f", size.x)+","+
-                     String.format("%.2f", size.y)+","+
-                     String.format("%.2f", size.z)+")";
-      name += coordSysToString(parent.getCoords());
+      String name = coordSysToString(parent.getCoords());
+      name += "sphere("+
+              String.format("%.2f", size.x)+","+
+              String.format("%.2f", size.y)+","+
+              String.format("%.2f", size.z)+")";
       parent.setName(name);
       return true;
     }
@@ -530,13 +531,90 @@ String coordSysToString(CoordinateSystem cs) {
     createObjectFromString("cylinder(2, 1)");
   }
 
-  public void createObjectFromString(String defstr) throws Exception
+  public ObjectInfo createObjectFromString(String defstr) throws Exception
   {
     Scene theScene = this.window.getScene();
     ObjectInfo objInfo = new ObjectInfo(new Sphere(1,1,1), new CoordinateSystem(), defstr);
     this.window.addObject(objInfo, null);
     this.window.setSelection(theScene.getNumObjects()-1);
     evaluate();
+    return objInfo;
+  }
+
+  public void createCSGObject(String defstr) {
+    UndoRecord undo = new UndoRecord(this.window, false);
+    ObjectInfo[] objects = getSelection();
+    if (objects == null || objects.length < 2) {
+      showMessage("Minimum " + 2 + " object" + ((2 > 1) ? "s" : "") + " must be selected.");
+      return;
+    }
+
+    // Selection undo
+    int[] oldSelection = this.window.getSelectedIndices();
+    undo.addCommand(UndoRecord.SET_SCENE_SELECTION,
+                    new Object[] { oldSelection });
+
+    ObjectInfo resultinfo;
+    try {
+      Scene theScene = this.window.getScene();
+      resultinfo = new ObjectInfo(new Sphere(1,1,1), new CoordinateSystem(), defstr);
+      
+     // Inherit texture color from the first source object
+      Object3D inheritfrom = objects[0].getObject();
+      resultinfo.getObject().setTexture(inheritfrom.getTexture(), inheritfrom.getTextureMapping());
+
+      // add the object info to the window (which adds it to the scene and the item tree
+      // and creates the proper undo record commands)
+      // FIXME: The index is sometimes wrong since moving objects with the mouse confuses AoI's index system.
+      // Don't know how to get around this, so keep it like this for now.
+      this.window.getScene().addObject(resultinfo, this.window.getScene().indexOf(objects[0]), undo);
+
+      // reparent children
+      for (int i=0;i<objects.length;i++) {
+        resultinfo.addChild(objects[i], i);
+        undo.addCommandAtBeginning(UndoRecord.REMOVE_FROM_GROUP, new Object[] {resultinfo, objects[i]});
+      }
+
+      // Must rebuild before updating the selection to rebuild indices.
+      this.window.rebuildItemList();
+      this.window.setSelection(this.window.getScene().indexOf(resultinfo));
+
+      this.window.setUndoRecord(undo);
+
+      evaluate();
+
+      // FIXME: Not sure if these are needed..
+      this.window.updateImage();
+      this.window.setModified();
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * Performs the union operation on the currently selected objects
+   * @throws Exception 
+   */
+  public void union() throws Exception
+  {
+    createCSGObject("union()");
+  }
+
+  /**
+   * Performs the intersect operation on the currently selected objects
+   */
+  public void intersection()
+  {
+    createCSGObject("intersection()");
+  }
+
+  /**
+   * Performs the subtract operation on the currently selected objects
+   */
+  public void difference()
+  {
+    createCSGObject("difference()");
   }
 
   public void regular() throws Exception
