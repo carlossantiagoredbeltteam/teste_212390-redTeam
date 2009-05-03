@@ -1,5 +1,6 @@
 options {
   TRACK_TOKENS=true;
+  LOOKAHEAD=2;
 }
 
 
@@ -17,9 +18,6 @@ import java.util.List;
 
 /** Simple brace matcher. */
 public class MetaCADParser {
-  
-  /** Main entry point. */
-  
   protected static MetaCADParser theParser = null;
   protected static MetaCADParser getSingleton(String txt)
   {
@@ -35,8 +33,17 @@ public class MetaCADParser {
   }
 
   public static ParsedTree parseTree(String txt) throws ParseException {
-    MetaCADParser parser = getSingleton(txt);
-    return parser.Object();
+    try
+	{
+		MetaCADParser parser = getSingleton(txt);
+		return parser.Object();
+	}
+	catch (ParseException ex)
+	{
+		ParseException newEx = new ParseException(ex.getMessage() + " in:\n" + txt);
+		newEx.initCause(ex);
+		throw newEx;
+	}
   }
   
   public static String dumpTokens(SimpleNode node)
@@ -138,7 +145,7 @@ ParsedTree Object() :
 	List<ParsedTree> children=null;
 }
 {
-	tree = FunctionCallList() (<LBRACE>children=ObjectList()<RBRACE>)? ";"
+	tree = FunctionCallList() (<LBRACE>children=ObjectList()<RBRACE>)?
 {
 	if (children != null)
 	{
@@ -157,7 +164,7 @@ List<ParsedTree> ObjectList() :
 	ParsedTree current;
 }
 {
-	(current = Object() { list.add(current); })*
+	(current = Object() { list.add(current); } (";" current = Object() { list.add(current); })* (";")?)?
 	{
 		return list;
 	}
@@ -187,7 +194,7 @@ ParsedTree FunctionCall() :
 	List <String> params = new ArrayList<String>(); 
 }
 {
-	name = <IDENTIFIER><LPAREN>(params = ParameterList())?<RPAREN>
+	name = <IDENTIFIER>(<LPAREN>(params = ParameterList())?<RPAREN>)?
 	{
 		tree = ObjFactory.create(name.image);
 		tree.name = name.image;
