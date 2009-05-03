@@ -9,67 +9,82 @@ import artofillusion.object.Mesh;
 import artofillusion.object.Object3D;
 import artofillusion.object.ObjectInfo;
 
-public class PolygonObj extends ParsedTree {
-
+public class PolygonObj extends ParsedTree
+{
+  public static final int STAR = 0;
+  public static final int REG = 1;
+  public static final int ROLL = 2;
+  int type;
+  
+  public PolygonObj(int type) {
+    this.type = type;
+  }
+  
   public ObjectInfo evaluateObject(MetaCADContext ctx) throws Exception {
     
       Vec3[] v=null;
-      
-      if (this.parameters.size() == 4 && this.parameters.get(0).startsWith("star")) {
+      switch (this.type) {
+      case STAR: {
         int n = 6;
         double inner = 3;
         double outer = 5;
-        if (this.parameters.size() >= 2) n = (int)ctx.evaluateExpression(this.parameters.get(1));
-        if (this.parameters.size() >= 4) {
-          inner  = ctx.evaluateExpression(this.parameters.get(2));
-          outer = ctx.evaluateExpression(this.parameters.get(3));
+        if (this.parameters.size() >= 1) {
+          n = (int)ctx.evaluateExpression(this.parameters.get(0));
+        }
+        if (this.parameters.size() >= 3) {
+          inner  = ctx.evaluateExpression(this.parameters.get(1));
+          outer = ctx.evaluateExpression(this.parameters.get(2));
         }
 
         v = createStar(n, inner, outer);
+        break;
       }
-      if (this.parameters.size() >= 3 && this.parameters.get(0).startsWith("reg")) {
+      case REG: {
         int n = 6;
         double radiusx = 4;
         double radiusy = 4;
-        if (this.parameters.size() >= 2) n = (int)ctx.evaluateExpression(this.parameters.get(1));
-        if (this.parameters.size() >= 3) {
-          radiusy = radiusx = ctx.evaluateExpression(this.parameters.get(2));
+        if (this.parameters.size() >= 1) {
+          n = (int)ctx.evaluateExpression(this.parameters.get(0));
         }
-        if (this.parameters.size() >= 4) {
-          radiusy  = ctx.evaluateExpression(this.parameters.get(3));
+        if (this.parameters.size() >= 2) {
+          radiusy = radiusx = ctx.evaluateExpression(this.parameters.get(1));
+        }
+        if (this.parameters.size() >= 3) {
+          radiusy  = ctx.evaluateExpression(this.parameters.get(2));
         }
 
         v = createRegular(n, radiusx, radiusy);
+        break;
       }
-      
-      if (this.parameters.size() >= 4 && this.parameters.get(0).startsWith("roll")) {
+      case ROLL: {
         int n = 30;
         double big = 5;
         double small = 1;
         double small2 = 0.8;
-        if (this.parameters.size() >= 2) n = (int)ctx.evaluateExpression(this.parameters.get(1));
-        if (this.parameters.size() >= 4) {
-          big  = ctx.evaluateExpression(this.parameters.get(2));
-          small2 = small = ctx.evaluateExpression(this.parameters.get(3));
+        if (this.parameters.size() >= 1) {
+          n = (int)ctx.evaluateExpression(this.parameters.get(0));
         }
-        if (this.parameters.size() == 5) {
-          small2 = ctx.evaluateExpression(this.parameters.get(4));
+        if (this.parameters.size() >= 3) {
+          big  = ctx.evaluateExpression(this.parameters.get(1));
+          small2 = small = ctx.evaluateExpression(this.parameters.get(2));
+        }
+        if (this.parameters.size() == 4) {
+          small2 = ctx.evaluateExpression(this.parameters.get(3));
         }            
-        
+          
         v = createRoll(n, big, small, small2);
+        break;
+      }
       }
 
       if (v != null) {
         Object3D obj3D = createPolygon(v);
-        ObjectInfo result = new ObjectInfo(obj3D, new CoordinateSystem(), this.aoiobj.name);
-        updateAOI(result);
-        
+        ObjectInfo result = new ObjectInfo(obj3D, new CoordinateSystem(), "dummy");
         return result;
       }
       return null;
   }
   
-
   Vec3[] createRoll(int n, double big, double small, double small2) {
     Vec3[] v;
     v = new Vec3[n];
