@@ -143,7 +143,7 @@ public class PolygonObj extends ParsedTree
     Object3D obj3D;
     float smoothness[] = new float[v.length];
     Arrays.fill(smoothness, 0.0f);
-    obj3D = new Curve(v, smoothness, Mesh.NO_SMOOTHING, true).convertToTriangleMesh(0);
+    obj3D = new Curve(v, smoothness, Mesh.NO_SMOOTHING, true);
     return obj3D;
   }
 
