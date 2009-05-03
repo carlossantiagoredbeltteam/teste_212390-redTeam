@@ -21,7 +21,8 @@ public class BooleanObj extends ParsedTree {
     List<ObjectInfo> children = evaluateChildren(ctx);
     helper.addAll(children.iterator());
     
-    result.add(helper.GetObjectInfo());
+    if (helper.GetObjectInfo() !=  null)
+      result.add(helper.GetObjectInfo());
     return result;
     
   }
