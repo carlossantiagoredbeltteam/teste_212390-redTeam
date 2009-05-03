@@ -250,7 +250,6 @@ void handle_commands()
         current_steps.z = (long)commandBuffer.remove_32();
         break;
 
-      //TODO: TEST
       case HOST_CMD_FIND_AXES_MINIMUM:
         wait_until_target_reached(); //dont want to get hasty.
 
@@ -273,7 +272,6 @@ void handle_commands()
 
         break;
 
-      //TODO: TEST
       case HOST_CMD_FIND_AXES_MAXIMUM:
         wait_until_target_reached(); //dont want to get hasty.
 
@@ -334,7 +332,21 @@ void handle_commands()
         
         send_tool_command();
         break;
-  
+    case HOST_CMD_ENABLE_AXES:
+      wait_until_target_reached();
+      {
+	unsigned char param = commandBuffer.remove_8();
+	bool x = (param & 0x01) != 0;
+	bool y = (param & 0x02) != 0;
+	bool z = (param & 0x04) != 0;
+	if ((param & 0x80) != 0) {
+	  // enable axes
+	  enable_steppers(x,y,z);
+	} else {
+	  // disable axes
+	  disable_steppers(x,y,z);
+	}
+      }
       default:
         hostPacket.unsupported();
     }

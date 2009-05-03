@@ -43,6 +43,7 @@
 #define HOST_CMD_CHANGE_TOOL       134
 #define HOST_CMD_WAIT_FOR_TOOL     135
 #define HOST_CMD_TOOL_COMMAND      136
+#define HOST_CMD_ENABLE_AXES       137
 
 // These are our query commands from the host
 #define SLAVE_CMD_VERSION                0
