@@ -1,5 +1,6 @@
 package org.reprap.artofillusion;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import artofillusion.object.ObjectInfo;
@@ -12,13 +13,17 @@ public class BooleanObj extends ParsedTree {
     this.type = type;
   }
   
-  public ObjectInfo evaluateObject(MetaCADContext ctx) throws Exception {
+  public List<ObjectInfo> evaluateObject(MetaCADContext ctx) throws Exception {
+    
+    List<ObjectInfo> result = new LinkedList<ObjectInfo>();
     
     CSGHelper helper = new CSGHelper(this.type);
     List<ObjectInfo> children = evaluateChildren(ctx);
     helper.addAll(children.iterator());
     
-    return helper.GetObjectInfo();
+    result.add(helper.GetObjectInfo());
+    return result;
+    
   }
 
 }

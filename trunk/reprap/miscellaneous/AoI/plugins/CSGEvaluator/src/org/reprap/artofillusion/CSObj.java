@@ -1,16 +1,18 @@
 package org.reprap.artofillusion;
 
+import java.util.Iterator;
+import java.util.List;
+
 import artofillusion.math.CoordinateSystem;
 import artofillusion.math.Vec3;
-import artofillusion.object.Object3D;
 import artofillusion.object.ObjectInfo;
 
 public class CSObj extends ParsedTree {
 
-  public ObjectInfo evaluateObject(MetaCADContext ctx) throws Exception {
+  public List<ObjectInfo> evaluateObject(MetaCADContext ctx) throws Exception {
 
     assert(this.children.size() == 1);
-    ObjectInfo chinfo = this.children.get(0).evaluateObject(ctx);
+    List<ObjectInfo> chlist = evaluateChildren(ctx);
     
     CoordinateSystem coordsys = new CoordinateSystem();
     if (this.parameters.size() >= 3) {
@@ -24,9 +26,15 @@ public class CSObj extends ParsedTree {
                               ctx.evaluateExpression(this.parameters.get(5)));
     }
     
-    coordsys.transformCoordinates(chinfo.coords.fromLocal());
-    ObjectInfo result = new ObjectInfo(chinfo.getObject(), coordsys, "dummy");
-    return result;
+    Iterator<ObjectInfo> iter = chlist.iterator();
+    while (iter.hasNext()) {
+      ObjectInfo info = iter.next();
+      CoordinateSystem tmp = coordsys.duplicate();
+      coordsys.transformCoordinates(info.coords.fromLocal());
+      info.setCoords(coordsys);
+      coordsys = tmp;
+    }
+    return chlist;
   }
 
 }

@@ -1,6 +1,8 @@
 package org.reprap.artofillusion;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import artofillusion.math.CoordinateSystem;
 import artofillusion.math.Vec3;
@@ -20,9 +22,11 @@ public class PolygonObj extends ParsedTree
     this.type = type;
   }
   
-  public ObjectInfo evaluateObject(MetaCADContext ctx) throws Exception {
+  public List<ObjectInfo> evaluateObject(MetaCADContext ctx) throws Exception {
     
-      Vec3[] v=null;
+    List<ObjectInfo> result = new LinkedList<ObjectInfo>();
+
+    Vec3[] v=null;
       switch (this.type) {
       case STAR: {
         int n = 6;
@@ -79,7 +83,7 @@ public class PolygonObj extends ParsedTree
 
       if (v != null) {
         Object3D obj3D = createPolygon(v);
-        ObjectInfo result = new ObjectInfo(obj3D, new CoordinateSystem(), "dummy");
+        result.add(new ObjectInfo(obj3D, new CoordinateSystem(), "dummy"));
         return result;
       }
       return null;
