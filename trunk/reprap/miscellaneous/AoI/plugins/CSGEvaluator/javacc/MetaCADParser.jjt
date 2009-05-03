@@ -181,11 +181,11 @@ ParsedTree FunctionCallList() :
 {
 	(current = FunctionCall() {trees.add(current);})+ 
 	{
-		for (int i = trees.size()-2; i >= 0; i--)
+		for (int i = 0; i < trees.size()-1; i++)
 		{
-			trees.get(i+1).children.add(trees.get(i));	
+			trees.get(i).children.add(trees.get(i+1));	
 		}	
-		return current;
+		return trees.get(0);
 	}
 }
 
