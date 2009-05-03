@@ -7,13 +7,12 @@ PARSER_BEGIN(MetaCADParser)
 
 package org.reprap.artofillusion.parser;
 
+
+import org.reprap.artofillusion.ObjFactory;
 import org.reprap.artofillusion.ParsedTree;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-
-
-import artofillusion.object.ObjectInfo;
 
 
 /** Simple brace matcher. */
@@ -167,7 +166,7 @@ List<ParsedTree> ObjectList() :
 
 ParsedTree FunctionCallList() :
 {
-	ParsedTree current = new ParsedTree();
+	ParsedTree current = null;
 	List<ParsedTree> trees =  new ArrayList<ParsedTree>();
 }
 {
@@ -183,13 +182,14 @@ ParsedTree FunctionCallList() :
 
 ParsedTree FunctionCall() :
 {
-	ParsedTree tree = new ParsedTree();
+	ParsedTree tree;
 	Token name;
 	List <String> params = new ArrayList<String>(); 
 }
 {
 	name = <IDENTIFIER><LPAREN>(params = ParameterList())?<RPAREN>
 	{
+		tree = ObjFactory.create(name.image);
 		tree.name = name.image;
 		tree.parameters =  params;
 		return tree;
