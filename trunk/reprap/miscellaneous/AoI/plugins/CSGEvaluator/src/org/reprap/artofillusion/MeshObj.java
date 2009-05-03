@@ -30,7 +30,7 @@ public class MeshObj extends ParsedTree
       Object3D obj3D = chinfo.getObject();
       if (obj3D instanceof Curve) {
         TriangleMesh mesh = obj3D.convertToTriangleMesh(tolerance);
-        ObjectInfo newinfo = new ObjectInfo(mesh, new CoordinateSystem(), "dummy");
+        ObjectInfo newinfo = new ObjectInfo(mesh, chinfo.getCoords(), "dummy");
         newinfo.setTexture(ctx.scene.getDefaultTexture(), ctx.scene.getDefaultTexture().getDefaultMapping(mesh));
         results.add(newinfo);
       }
