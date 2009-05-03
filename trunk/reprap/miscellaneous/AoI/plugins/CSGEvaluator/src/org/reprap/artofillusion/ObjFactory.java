@@ -1,5 +1,9 @@
 package org.reprap.artofillusion;
 
+import org.reprap.artofillusion.parser.ParseException;
+
+import artofillusion.object.CSGObject;
+
 public class ObjFactory {
 	public static ParsedTree create(String name) throws Exception
 	{
@@ -23,17 +27,29 @@ public class ObjFactory {
 		}
                 else if (name.startsWith("union"))
                 {
-                        return new UnionObj();
+                        return new BooleanObj(CSGObject.UNION);
                 }
                 else if (name.startsWith("difference"))
                 {
-                        return new DifferenceObj();
+                  return new BooleanObj(CSGObject.DIFFERENCE12);
                 }
                 else if (name.startsWith("intersection"))
                 {
-                        return new IntersectionObj();
+                  return new BooleanObj(CSGObject.INTERSECTION);
+                }
+                else if (name.startsWith("star"))
+                {
+                        return new PolygonObj(PolygonObj.STAR);
+                }
+                else if (name.startsWith("reg"))
+                {
+                        return new PolygonObj(PolygonObj.REG);
+                }
+                else if (name.startsWith("roll"))
+                {
+                        return new PolygonObj(PolygonObj.ROLL);
                 }
 		
-		throw new Exception("unknown Object type: " + name);
+		throw new ParseException("unknown Object type: " + name);
 	}	
 }
