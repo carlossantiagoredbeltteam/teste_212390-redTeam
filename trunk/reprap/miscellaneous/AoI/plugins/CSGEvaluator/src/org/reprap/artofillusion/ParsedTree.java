@@ -20,9 +20,10 @@ public abstract class ParsedTree {
     this.children = new ArrayList<ParsedTree>();
   }
 
-  public ObjectInfo evaluate(MetaCADContext ctx) throws Exception {
-    ObjectInfo result = evaluateObject(ctx);
-    updateAOI(result);
+  public List<ObjectInfo> evaluate(MetaCADContext ctx) throws Exception {
+    List<ObjectInfo> result = new LinkedList<ObjectInfo>();
+    result.add(evaluateObject(ctx));
+    updateAOI(result.get(0));
     return result;
   }
 
@@ -33,7 +34,7 @@ public abstract class ParsedTree {
     Iterator<ParsedTree> iter = this.children.iterator();
     while (iter.hasNext()) {
       ParsedTree treeobject = iter.next();
-      resultchildren.add(treeobject.evaluateObject(ctx));
+      resultchildren.addAll(treeobject.evaluate(ctx));
     }
     
     return resultchildren;
