@@ -16,6 +16,7 @@
  * Our point representation.  Each coordinate is a 4-byte value.
  */
 struct LongPoint {
+public:
   int32_t x;
   int32_t y;
   int32_t z;

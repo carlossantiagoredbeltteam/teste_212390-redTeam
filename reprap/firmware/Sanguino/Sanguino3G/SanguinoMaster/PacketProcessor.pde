@@ -244,10 +244,11 @@ void handle_commands()
 
       case HOST_CMD_SET_POSITION:
         wait_until_target_reached(); //dont want to get hasty.
-
-        current_steps.x = (long)commandBuffer.remove_32();
-        current_steps.y = (long)commandBuffer.remove_32();
-        current_steps.z = (long)commandBuffer.remove_32();
+	cli();
+        target_steps.x = current_steps.x = (long)commandBuffer.remove_32();
+        target_steps.y = current_steps.y = (long)commandBuffer.remove_32();
+        target_steps.z = current_steps.z = (long)commandBuffer.remove_32();
+	sei();
         break;
 
       case HOST_CMD_FIND_AXES_MINIMUM:
