@@ -5,10 +5,18 @@ public class ObjFactory {
 	{
 		name = name.toLowerCase();
 		
-		if (name.startsWith("sphere"))
-		{
-			return new SphereObj();
-		}
+                if (name.startsWith("sphere"))
+                {
+                        return new SphereObj();
+                }
+                if (name.startsWith("cube"))
+                {
+                        return new CubeObj();
+                }
+                if (name.startsWith("cylinder"))
+                {
+                        return new CylinderObj();
+                }
 		else if (name.startsWith("cs"))
 		{
 			return new CSObj();
