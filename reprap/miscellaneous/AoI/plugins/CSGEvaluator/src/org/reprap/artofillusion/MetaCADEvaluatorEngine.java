@@ -1,7 +1,6 @@
 package org.reprap.artofillusion;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -16,18 +15,13 @@ import artofillusion.UndoRecord;
 import artofillusion.math.CoordinateSystem;
 import artofillusion.math.Vec2;
 import artofillusion.math.Vec3;
-import artofillusion.object.CSGObject;
 import artofillusion.object.Cube;
-import artofillusion.object.Curve;
 import artofillusion.object.Cylinder;
-import artofillusion.object.Mesh;
 import artofillusion.object.Object3D;
 import artofillusion.object.ObjectInfo;
 import artofillusion.object.Sphere;
-import artofillusion.object.TriangleMesh;
 import artofillusion.texture.Texture;
 import artofillusion.texture.TextureMapping;
-import artofillusion.tools.ExtrudeTool;
 import artofillusion.ui.MessageDialog;
 
 public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
@@ -38,10 +32,11 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
   public static final int CUBE      = 13;
   public static final int CYLINDER  = 14;
   
-  MetaCADContext context = new MetaCADContext();
+  MetaCADContext context;
 
   public MetaCADEvaluatorEngine(LayoutWindow window) {
     super(window);
+    this.context = new MetaCADContext(window.getScene());
   }
 
   /**
@@ -115,33 +110,26 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
    * Recursively extracts an AoI object tree and creates our own ParsedTree representation.
    * 
    */
-  public ParsedTree extractTree(ObjectInfo parent) {
-  
-    try {
-      // Try converting the object before parsing
-      convertObject(parent);
+  public ParsedTree extractTree(ObjectInfo parent) throws ParseException {
 
-      // Parse this ObjectInfo
-      ParsedTree root = org.reprap.artofillusion.parser.MetaCADParser.parseTree(parent.name + ";");
-      root.aoiobj = parent;
+    // Try converting the object before parsing
+    convertObject(parent);
 
-      // If the parser returned a subtree, find the leaf node
-      // (we guarantee that there are at most one child of each intermediate node)
-      ParsedTree parenttree = root;
-      while (!parenttree.children.isEmpty()) parenttree = (ParsedTree)parenttree.children.get(0);
+    // Parse this ObjectInfo
+    ParsedTree root = org.reprap.artofillusion.parser.MetaCADParser.parseTree(parent.name + ";");
+    root.aoiobj = parent;
 
-      // Build hierarchy recursively
-      ObjectInfo[] objects = parent.children;
-      for (int i=0;i<objects.length;i++) {
-        parenttree.children.add(extractTree(objects[i]));
-      }
-      return root;
-    } catch (ParseException e) {
-      // FIXME: Auto-generated catch block
-      e.printStackTrace();
+    // If the parser returned a subtree, find the leaf node
+    // (we guarantee that there are at most one child of each intermediate node)
+    ParsedTree parenttree = root;
+    while (!parenttree.children.isEmpty()) parenttree = (ParsedTree)parenttree.children.get(0);
+
+    // Build hierarchy recursively
+    ObjectInfo[] objects = parent.children;
+    for (int i=0;i<objects.length;i++) {
+      parenttree.children.add(extractTree(objects[i]));
     }
-    // FIXME: Something went wrong. Deal with it.
-    return null;
+    return root;
   }
 
   /**
@@ -152,29 +140,31 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     if (readParameters()) {
       // Extract object tree from AoI into our ParsedTree data structure,
       // one tree per selected node in AoI
-      List<ParsedTree> trees = new LinkedList<ParsedTree>();
-      ObjectInfo[] objects = getSelection();
-      if (objects != null) {
-        for (int i=0;i<objects.length;i++) {
-          trees.add(extractTree(objects[i]));
+      try {
+        List<ParsedTree> trees = new LinkedList<ParsedTree>();
+        ObjectInfo[] objects = getSelection();
+        if (objects != null) {
+          for (int i=0;i<objects.length;i++) {
+            ParsedTree tree = extractTree(objects[i]);
+            if (tree != null) trees.add(tree);
+          }
         }
-      }
 
-      // Evaluate the parsed trees
-      Iterator<ParsedTree> iter = trees.iterator();
-      while (iter.hasNext()) {
-        ParsedTree tree = iter.next();
-        try {
+        // Evaluate the parsed trees
+        Iterator<ParsedTree> iter = trees.iterator();
+        while (iter.hasNext()) {
+          ParsedTree tree = iter.next();
           tree.evaluate(this.context);
-        } catch (Exception e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
         }
+        
+        this.window.rebuildItemList();
+        this.window.updateImage();
+        this.window.setModified();
       }
-      
-      this.window.rebuildItemList();
-      this.window.updateImage();
-      this.window.setModified();
+      catch (Exception e) {
+        e.printStackTrace();
+        showMessage(e.getMessage());
+      }
     }
   }
 
@@ -253,10 +243,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
       String name = iter.nextElement();
       parameters = loopExpr.getParameters(name);
       
-      if (name.equals("cs")) {
-        coordsys = evaluateCoordSys(parameters);
-      }
-      else if (name.startsWith(this.opToString(operation)))
+      if (name.startsWith(this.opToString(operation)))
       {
         parameters=loopExpr.getParameters(name);
       }
@@ -272,7 +259,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     CSGHelper helper = new CSGHelper(operation);
 
     // evaluate first part of for loop i.e. i=0
-    evaluateAssignment(parameters[0]);
+    this.context.evaluateAssignment(parameters[0]);
 
     // security count to exit loop even if we fuck up exit condition
     int count = 0;
@@ -287,7 +274,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
       }
 
       // "increment" evaluate 3rd for parameter i.e. i=i+1
-      evaluateAssignment(parameters[2]);
+      this.context.evaluateAssignment(parameters[2]);
       count++;
     }
 
@@ -352,149 +339,6 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     CoordinateSystem coordsys = null;
     CoordinateSystem objcoordsys = null;
     
-    Enumeration<String> iter = objExpr.getNames();
-    while (iter.hasMoreElements()) {
-      String name = iter.nextElement();
-      String[] parameters = objExpr.getParameters(name);
-
-      if (name.equals("cs")) {
-        coordsys = evaluateCoordSys(parameters);
-      }
-      else if (name.startsWith("poly")) {
-        Vec3[] v=null;
-        
-        if (parameters.length == 4 && parameters[0].startsWith("star")) {
-          int n = 6;
-          double inner = 3;
-          double outer = 5;
-          if (parameters.length >= 2) n = (int)evaluateExpression(parameters[1]);
-          if (parameters.length >= 4) {
-            inner  = evaluateExpression(parameters[2]);
-            outer = evaluateExpression(parameters[3]);
-          }
-
-          v = createStar(n, inner, outer);
-        }
-        if (parameters.length >= 3 && parameters[0].startsWith("reg")) {
-          int n = 6;
-          double radiusx = 4;
-          double radiusy = 4;
-          if (parameters.length >= 2) n = (int)evaluateExpression(parameters[1]);
-          if (parameters.length >= 3) {
-            radiusy = radiusx = evaluateExpression(parameters[2]);
-          }
-          if (parameters.length >= 4) {
-            radiusy  = evaluateExpression(parameters[3]);
-          }
-
-          v = createRegular(n, radiusx, radiusy);
-        }
-        
-        if (parameters.length >= 4 && parameters[0].startsWith("roll")) {
-          int n = 30;
-          double big = 5;
-          double small = 1;
-          double small2 = 0.8;
-          if (parameters.length >= 2) n = (int)evaluateExpression(parameters[1]);
-          if (parameters.length >= 4) {
-            big  = evaluateExpression(parameters[2]);
-            small2 = small = evaluateExpression(parameters[3]);
-          }
-          if (parameters.length == 5) {
-            small2 = evaluateExpression(parameters[4]);
-          }            
-          
-          v = createRoll(n, big, small, small2);
-        }
-
-        if (v != null) {
-          String[] inset = objExpr.getParameters("inset");
-          
-          if (inset != null && inset.length == 1) {
-            v = insetPoly(v, evaluateExpression(inset[0]));
-          }
-          
-          obj3D = createPolygon(v);
-        }
-      }
-      else if (name.startsWith("extrude")) {
-        // Three first parameters define the extrusion vector
-        Vec3 dir = Vec3.vz();
-        if (parameters.length >= 3) {
-          dir = new Vec3(evaluateExpression(parameters[0]),
-                         evaluateExpression(parameters[1]),
-                         evaluateExpression(parameters[2]));
-        }
-        // 4. parameter is num segments
-        int numsegments = 1;
-        if (parameters.length >= 4) {
-          numsegments = (int)evaluateExpression(parameters[3]);
-          if (numsegments < 2) numsegments = 1;
-        }
-        // 5. parameter is twist degrees
-        double twist = 0.0;
-        if (parameters.length >= 5) {
-          twist = evaluateExpression(parameters[4]);
-        }
-
-        // FIXME: Recursively evaluate children
-        ObjectInfo[] children = parent.getChildren();
-        for (int i=0;i<children.length;i++) {
-          evaluateNode(children[i], undo);
-        }
-
-        ObjectInfo objinfo = extrude(children, dir, numsegments, twist);
-        obj3D = objinfo.getObject();
-        objcoordsys = objinfo.getCoords();
-      }
-      else {
-        // Common main parameter (cube: size, sphere: radius, cylinder: radius && height)
-        double mainparam = 1.0f;
-        if (parameters.length >= 1) {
-          mainparam = evaluateExpression(parameters[0]);
-        }
-        if (name.startsWith("cube")) {
-          // The two next parameters define y, and z dimensions
-          Vec3 dims = new Vec3(mainparam, mainparam, mainparam);
-          if (parameters.length >= 3) {
-            dims.set(mainparam,
-                    evaluateExpression(parameters[1]),
-                    evaluateExpression(parameters[2]));
-          }
-          obj3D = cube(dims);
-        }
-        if (name.startsWith("sphere")) {
-          Vec3 dims = new Vec3(mainparam, mainparam, mainparam);
-          if (parameters.length >= 3) {
-            dims.set(mainparam,
-                    evaluateExpression(parameters[1]),
-                    evaluateExpression(parameters[2]));
-          }
-          obj3D = new Sphere(dims.x, dims.y, dims.z);
-        }
-        if (name.startsWith("cylinder")) {
-          // First (main) parameter is height
-          double height = mainparam;
-          double rx = mainparam;
-          double ry = mainparam;
-          double ratio = 1;
-
-          // Second parameter is radius
-          if (parameters.length >= 2) rx = ry = evaluateExpression(parameters[1]);
-          // Third parameter define separate y radius
-          if (parameters.length >= 3) ry = evaluateExpression(parameters[2]);
-          // Fourth parameter define top/bottom radius ratio
-          // Cylinder takes an optional fourth parameter
-          if (parameters.length >= 4) {
-            ratio = evaluateExpression(parameters[3]);
-            if (ratio > 1) ratio = 1.0;
-            if (ratio < 0) ratio = 0.0;
-          }
-          obj3D = new Cylinder(height, rx, ry, ratio);
-        }
-      }
-    }
-
     // FIXME: Verify that combining these coordsys'es is done correctly.
     if (coordsys == null) {
       if(objcoordsys != null) coordsys = objcoordsys;
@@ -522,64 +366,6 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     return true;
   }
 
-  Vec3[] createRoll(int n, double big, double small, double small2) {
-    Vec3[] v;
-    v = new Vec3[n];
-    int index = 0;
-    for (int i = 0; i < n; i++)
-    {
-      double biga=(2*Math.PI*i)/n;
-      double len = big*biga;
-      double smalla=len/small;
-      double x,y;
-      
-      x = (big+small)*Math.cos(biga) + (small2)*Math.cos(smalla);
-      y = (big+small)*Math.sin(biga) + (small2)*Math.sin(smalla);
-      
-      v[index] = new Vec3(x, y, 0 );
-      
-      index++;
-    }
-    return v;
-  }
-
-  Vec3[] createRegular(int n, double radiusx, double radiusy) {
-    Vec3[] v;
-    v = new Vec3[n];
-    int index = 0;
-    for (int i = 0; i < n; i++)
-    {
-      v[index] = new Vec3( radiusx*Math.cos( 2*Math.PI * index / (double) n ),
-          radiusy*Math.sin(2*Math.PI * index / (double) n ), 0 );
-      index++;
-    }
-    return v;
-  }
-
-  Vec3[] createStar(int n, double inner, double outer) {
-    Vec3[] v;
-    v = new Vec3[2*n];
-    int index = 0;
-    for (int i = 0; i < n; i++) {
-      v[index] = new Vec3(Math.cos(Math.PI * index / (double) n),
-                          Math.sin(Math.PI * index / (double) n), 0);
-      v[index].scale(inner);
-      v[index+1] = new Vec3(Math.cos(Math.PI * (index + 1) / (double) n),
-                            Math.sin(Math.PI * (index + 1) / (double) n), 0);
-      v[index+1].scale(outer);
-      index += 2;
-    }
-    return v;
-  }
-
-  Object3D createPolygon(Vec3[] v) {
-    Object3D obj3D;
-    float smoothness[] = new float[v.length];
-    Arrays.fill(smoothness, 0.0f);
-    obj3D = new Curve(v, smoothness, Mesh.NO_SMOOTHING, true).convertToTriangleMesh(0);
-    return obj3D;
-  }
-  
   // Evaluates an Expression like 3*x+sin(a) and returns the value of it or 0 if
   // any error occurred
   double evaluateExpression(String expr) throws Exception {
@@ -594,24 +380,6 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     }
   }
 
-  // Evaluates Expressions like x=2*radius and assigns the value to the given
-  // variable
-  void evaluateAssignment(String curLine) throws Exception {
-    try {
-      int mark = curLine.indexOf("=");
-
-      String name = curLine.substring(0, mark).trim();
-      String formula = curLine.substring(mark + 1);
-      this.context.jep.parseExpression(formula);
-      double value = this.context.jep.getValue();
-      // System.out.println(value);
-      this.context.jep.addVariable(name, value);
-    } catch (Exception ex) {
-      showMessage("Invalid Assignment: \"" + curLine + "\" syntax error?");
-      throw (ex);
-    }
-  }
-
   boolean evaluateLines(String text) {
     try {
       String lines[] = text.split("\n");
@@ -619,34 +387,16 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
         curLine = curLine.trim();
         if (curLine.length() == 0 || curLine.startsWith("#"))
           continue;
-        evaluateAssignment(curLine);
+        this.context.evaluateAssignment(curLine);
       }
       return true;
-    } catch (Exception ex) {
+    } catch (Throwable ex) {
       System.out.println(ex);
       return false;
     }
   }
 
-public CoordinateSystem evaluateCoordSys(String[] parameters) throws Exception {
-    CoordinateSystem coordsys = null;
-    if (parameters != null) {
-      coordsys = new CoordinateSystem();
-      if (parameters.length >= 3) {
-        coordsys.setOrigin(new Vec3(evaluateExpression(parameters[0]),
-            evaluateExpression(parameters[1]),
-            evaluateExpression(parameters[2])));
-      }
-      if (parameters.length >= 6) {
-        coordsys.setOrientation(evaluateExpression(parameters[3]),
-             evaluateExpression(parameters[4]),
-             evaluateExpression(parameters[5]));
-      }
-    }
-    return coordsys;
-  }
-  
-  String coordSysToString(CoordinateSystem cs) {
+String coordSysToString(CoordinateSystem cs) {
     Vec3 t = cs.getOrigin();
     double r[] = cs.getRotationAngles();
     String str = "cs(" +
@@ -738,7 +488,7 @@ public CoordinateSystem evaluateCoordSys(String[] parameters) throws Exception {
     }
   }
   
-  Vec3[] insetPoly(Vec3[] poly,double inset)
+  Vec3[] insetPoly(Vec3[] poly, double inset)
   {
     //List<MetaCADLine> lines = new ArrayList<MetaCADLine>();
     List<Vec3> points = new ArrayList<Vec3>();
@@ -755,7 +505,7 @@ public CoordinateSystem evaluateCoordSys(String[] parameters) throws Exception {
         next.parallelMove(inset);
         
         Vec3 intersect=prev.intersect3(next);
-        if (intersect ==  null)
+        if (intersect == null)
         {
           intersect = new Vec3(0,0,0);
         }
@@ -765,97 +515,6 @@ public CoordinateSystem evaluateCoordSys(String[] parameters) throws Exception {
     return points.toArray(new Vec3[1]);
   }
 
-  /**
-    Performs the given operation on the list of objects (of size >= 2),
-    and returns the resulting ObjectInfo containing a CSGObject.
-
-    Calls evaluateNode() on each child before performing the operation.
-    Hides the children.
-
-    Exception: See evaluateNode()
-   */    
-  public ObjectInfo combine(ObjectInfo[] objects, int operation, UndoRecord undo) throws Exception
-  {
-    if (objects.length < 1) return null;    
-    
-    switch (operation) {
-    case EXTRUSION:
-      return extrude(objects, Vec3.vz(), 1, 0.0);
-    default:
-      return super.combine(objects, operation, undo);
-    }
-  }
-
-  /**
-   * 
-   * Extrudes the given profiles using the given parameters and returns the result object.
-   * 
-   * @param objects
-   * @param dir
-   * @param numsegments
-   * @param twist
-   * @return an ObjectInfo. The coordsys in the object info is just there to move
-   * the object back to it's original position since the extrusion operation always 
-   * centers the result in the origin.
-   */
-  public ObjectInfo extrude(ObjectInfo[] objects, Vec3 dir, int numsegments, double twist)
-  {
-    // Build extrusion curve from vector and segments
-    Vec3 v[] = new Vec3[numsegments+1];
-    float smooth[] = new float[v.length];
-    for (int i = 0; i < v.length; i++) {
-      v[i] = new Vec3(dir);
-      v[i].scale(1.0*i/numsegments);
-      smooth[i] = 1.0f;
-    }
-    Curve path = new Curve(v, smooth, Mesh.APPROXIMATING, false);
-    CoordinateSystem pathCS = new CoordinateSystem();
-
-    // FIXME: Support specifying extrusion curves
-    // Extrude each extrudable child object
-    List<ObjectInfo> resultobjects = new LinkedList<ObjectInfo>();
-    for (int i=0;i<objects.length;i++) {
-      ObjectInfo profile = objects[i];
-      Object3D profileobj = profile.getObject();
-      if (!(profileobj instanceof TriangleMesh) &&
-          profileobj.canConvertToTriangleMesh() != Object3D.CANT_CONVERT) {
-        profileobj = profileobj.convertToTriangleMesh(0.1);
-      }
-
-      if (profileobj instanceof TriangleMesh) {
-        Object3D obj3D = ExtrudeTool.extrudeMesh((TriangleMesh)profileobj, path, profile.getCoords(), pathCS, twist*Math.PI/180.0, true);
-      
-        // Since the result is centered in the origin, offset the extruded object to 
-        // move it back to its original position
-        // FIXME: Combine this with the user-specified coordinate system
-        CoordinateSystem coordsys = new CoordinateSystem(new Vec3(), Vec3.vz(), Vec3.vy());
-        Vec3 offset = profile.getCoords().fromLocal().times(((Mesh)profileobj).getVertices()[0].r).
-          minus(coordsys.fromLocal().times(((Mesh)obj3D).getVertices()[0].r));
-        coordsys.setOrigin(offset);
-        ObjectInfo objinfo = new ObjectInfo(obj3D, coordsys, "tmp");
-        resultobjects.add(objinfo);
-      }
-      objects[i].setVisible(false);
-    }
-    if (!resultobjects.isEmpty()) {
-      try {
-        // FIXME: Undo support?
-        UndoRecord undo = new UndoRecord(this.window, false);
-        ObjectInfo resultinfo = combine(resultobjects.toArray(new ObjectInfo[resultobjects.size()]), CSGObject.UNION, undo);
-        return resultinfo;
-      }
-      catch (Exception e) {
-      }
-    }
-    // FIXME: Print error
-    return null;
-  }
- 
-  public Object3D cube(Vec3 dims)
-  {
-    return new Cube(dims.x, dims.y, dims.z);
-  }
-  
   public void cube()
   {
     showMessage("cube function not implemented");
@@ -882,17 +541,17 @@ public CoordinateSystem evaluateCoordSys(String[] parameters) throws Exception {
 
   public void regular() throws Exception
   {
-    polygon("poly(reg, 6, 4, 4)");
+    polygon("reg(6, 4, 4)");
   }
   
   public void star() throws Exception
   {
-    polygon("poly(star, 6, 3, 5)");
+    polygon("star(6, 3, 5)");
   }
   
   public void roll() throws Exception
   {
-    polygon("poly(roll, 30, 5, 1, 0.8)");
+    polygon("roll(30, 5, 1, 0.8)");
   }
   
   public void extrude()
