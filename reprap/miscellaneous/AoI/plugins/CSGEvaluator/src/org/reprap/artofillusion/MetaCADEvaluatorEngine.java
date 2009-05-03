@@ -415,6 +415,8 @@ String coordSysToString(CoordinateSystem cs) {
   }
   
   void showMessage(String text)  {
+    if (text==null)
+      text ="null";
     new MessageDialog(this.window, text);
   }
 

@@ -23,7 +23,12 @@ public abstract class ParsedTree {
   public List<ObjectInfo> evaluate(MetaCADContext ctx) throws Exception {
     List<ObjectInfo> result = new LinkedList<ObjectInfo>();
     result.addAll(evaluateObject(ctx));
-    updateAOI(ObjectHelper.join(result, 0.1));
+    if(result.size() == 0)
+      updateAOI(ObjectHelper.getErrorObject());
+    else if (result.size() == 1)
+      updateAOI(result.get(0));
+    else
+      updateAOI(ObjectHelper.join(result, 0.1));
     return result;
   }
 

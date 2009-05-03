@@ -8,6 +8,7 @@ import artofillusion.MeshViewer;
 import artofillusion.math.CoordinateSystem;
 import artofillusion.math.Mat4;
 import artofillusion.math.Vec3;
+import artofillusion.object.Cube;
 import artofillusion.object.MeshVertex;
 import artofillusion.object.Object3D;
 import artofillusion.object.ObjectInfo;
@@ -17,6 +18,12 @@ import artofillusion.object.TriangleMesh.Face;
 import artofillusion.object.TriangleMesh.Vertex;
 
 public class ObjectHelper {
+  public static ObjectInfo getErrorObject()
+  {
+    Cube errorObj = new Cube(10,10,10);  
+    
+    return new ObjectInfo(errorObj, new CoordinateSystem(), "dummy");
+  }
   
   public static TriangleMesh applyCS(ObjectInfo obj, double tol)
   {
