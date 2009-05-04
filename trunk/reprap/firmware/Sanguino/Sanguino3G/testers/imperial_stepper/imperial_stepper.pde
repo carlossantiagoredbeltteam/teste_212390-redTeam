@@ -34,7 +34,7 @@ void turn_psu_off()
 void setup()
 {
   Serial.begin(19200);
-  Serial.println("Starting stepper exerciser.");
+  Serial.println("You have failed me for the last time.");
 
   pinMode(stepPin, OUTPUT);
   pinMode(dirPin, OUTPUT);
