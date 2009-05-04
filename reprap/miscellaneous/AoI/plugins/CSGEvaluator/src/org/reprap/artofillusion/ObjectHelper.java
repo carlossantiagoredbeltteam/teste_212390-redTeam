@@ -32,7 +32,7 @@ public class ObjectHelper {
     if (obj.object.getClass() != TriangleMesh.class)
       mesh = obj.object.convertToTriangleMesh(tol);
     else
-      mesh = (TriangleMesh)obj.object;
+      mesh = (TriangleMesh)obj.object.duplicate();
     
     MeshVertex[] v = mesh.getVertices();
     Mat4 trans = obj.coords.fromLocal();
