@@ -818,7 +818,7 @@ public class RrCSGPolygon
     public RrPolygon meg()
     {
     	
-    	RrPolygon result = new RrPolygon(att);
+    	RrPolygon result = new RrPolygon(att, true);
     	
     	if(!corner)
     	{
@@ -989,7 +989,7 @@ public class RrCSGPolygon
     	if(backwards)
     		beforeIndex++;
     	
-    	RrPolygon rPol = new RrPolygon(att);
+    	RrPolygon rPol = new RrPolygon(att, false);
     	RrCSGPolygon startQuad = modelEdge.getQuad(beforeIndex);
     	RrCSGPolygon c = startQuad;
     	RrHalfPlane next;
@@ -1047,7 +1047,7 @@ public class RrCSGPolygon
      */
 	private RrPolygon snakeGrow(List<RrHalfPlane> hatches, int thisHatch, int thisPt) 
 	{
-		RrPolygon result = new RrPolygon(att);
+		RrPolygon result = new RrPolygon(att, false);
 		
 		RrHalfPlane h = hatches.get(thisHatch);
 		Rr2Point pt = h.pLine().point(h.getParameter(thisPt));

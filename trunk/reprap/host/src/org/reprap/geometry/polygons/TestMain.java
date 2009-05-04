@@ -21,7 +21,7 @@ public class TestMain
 		Rr2Point rr = new Rr2Point(0.45, 0.5);
 		Rr2Point ss = new Rr2Point(0.4, 0.3);    
 		
-		RrPolygon a = new RrPolygon(new Attributes(null, null, null, null));
+		RrPolygon a = new RrPolygon(new Attributes(null, null, null, null), true);
 		a.add(p);
 		a.add(q);
 		a.add(r);
@@ -30,7 +30,7 @@ public class TestMain
 		RrPolygonList c = new RrPolygonList();
 		c.add(a);
 		
-		a = new RrPolygon(new Attributes(null, null, null, null));
+		a = new RrPolygon(new Attributes(null, null, null, null), true);
 		a.add(rr);
 		a.add(qq);
 		a.add(pp);
