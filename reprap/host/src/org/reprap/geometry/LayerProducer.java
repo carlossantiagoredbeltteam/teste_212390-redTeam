@@ -235,7 +235,7 @@ public class LayerProducer {
 	public LayerProducer(RrPolygonList pols, LayerRules lc, RrGraphics simPlot) throws Exception 
 	{
 		layerConditions = lc;
-		startNearHere = null;
+		startNearHere = null; //new Rr2Point(0, 0);
 		lowerShell = null;
 		shellSet = false;
 		simulationPlot = simPlot;
@@ -266,7 +266,7 @@ public class LayerProducer {
 	public LayerProducer(RrCSGPolygonList csgPols, BranchGroup ls, LayerRules lc, RrGraphics simPlot) throws Exception 
 	{
 		layerConditions = lc;
-		startNearHere = null;
+		startNearHere = null; //new Rr2Point(0, 0);
 		lowerShell = ls;
 		shellSet = false;
 		simulationPlot = simPlot;
@@ -289,13 +289,13 @@ public class LayerProducer {
 			offBorder = csgP.offset(layerConditions, true);
 			offBorder.divide(Preferences.tiny(), 1.01);
 			borderPolygons = offBorder.megList();
-			borderPolygons.setClosed(true);
+			//borderPolygons.setClosed(true);
 		}
 		
 		offHatch.divide(Preferences.tiny(), 1.01);		
 		hatchedPolygons = new RrPolygonList();
 		hatchedPolygons.add(offHatch.hatch(layerConditions));
-		hatchedPolygons.setClosed(false);
+		//hatchedPolygons.setClosed(false);
 		
 		if(simulationPlot != null)
 		{
@@ -781,11 +781,7 @@ public class LayerProducer {
 		else if(outline && printer.getExtruder().randomStart())
 			p = p.randomStart();
 		
-		// The last point is near where we want to start next
-		if(outline)
-			startNearHere = p.point(0);	
-		else
-			startNearHere = p.point(p.size() - 1);
+
 		
 		int stopExtruding = leng + 10;
 		int stopValve = stopExtruding;
@@ -880,6 +876,12 @@ public class LayerProducer {
 		}
 		
 		move(posNow(), posNow(), lift, lift, true);
+		
+		// The last point is near where we want to start next
+		if(outline)
+			startNearHere = p.point(0);	
+		else
+			startNearHere = p.point(p.size() - 1);
 		
 	}
 	
@@ -979,6 +981,7 @@ public class LayerProducer {
 			ih = commonHatch;
 
 			firstOneInLayer = true;
+			borderPolygons = borderPolygons.nearEnds(startNearHere);
 			ib = plotOneMaterial(borderPolygons, ib, true, firstOneInLayer);
 			firstOneInLayer = false;
 			hatchedPolygons = hatchedPolygons.nearEnds(startNearHere);

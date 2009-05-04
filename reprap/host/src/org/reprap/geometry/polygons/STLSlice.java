@@ -1422,7 +1422,7 @@ public class STLSlice
 		{
 			corner = startCorner;
 			edge = corner.segment(0);
-			RrPolygon pg = new RrPolygon(edge.att);
+			RrPolygon pg = new RrPolygon(edge.att, true);
 			do
 			{
 				trackPolygon tp = corner.processThisQuad(edge);

@@ -157,13 +157,14 @@ public class RrPolygon
 	/**
 	 * Make an empty polygon
 	 */
-	public RrPolygon(Attributes a)
+	public RrPolygon(Attributes a, boolean c)
 	{
 		if(a == null)
 			System.err.println("RrPolygon(): null attributes!");
 		points = new ArrayList<Rr2Point>();
 		att = a;
 		box = new RrRectangle();
+		closed = c;
 	}
 	
 	/**
@@ -202,14 +203,14 @@ public class RrPolygon
 		return closed;
 	}
 	
-	/**
-	 * Set whether we loop back on ourself.
-	 * @param c
-	 */
-	public void setClosed(boolean c)
-	{
-		closed = c;
-	}
+//	/**
+//	 * Set whether we loop back on ourself.
+//	 * @param c
+//	 */
+//	public void setClosed(boolean c)
+//	{
+//		closed = c;
+//	}
 		
 	/**
 	 * Length
@@ -226,21 +227,20 @@ public class RrPolygon
 	 */
 	public RrPolygon(RrPolygon p)
 	{
-		this(p.att);
+		this(p.att, p.closed);
 		for(int i = 0; i < p.size(); i++)
 			add(new Rr2Point(p.point(i))); 
 		closed = p.closed;
 	}
 	
 	/**
-	 * Add a new point and its flag value to the polygon
+	 * Add a new point to the polygon
 	 * @param p
 	 * @param f
 	 */
 	public void add(Rr2Point p)
 	{
 		points.add(new Rr2Point(p));
-		//flags.add(new Integer(f));
 		box.expand(p);
 	}
 	
@@ -315,7 +315,7 @@ public class RrPolygon
 	 */
 	public RrPolygon negate()
 	{
-		RrPolygon result = new RrPolygon(att);
+		RrPolygon result = new RrPolygon(att, closed);
 		for(int i = size() - 1; i >= 0; i--)
 		{
 			result.add(point(i)); 
@@ -328,7 +328,9 @@ public class RrPolygon
 	 */
 	public RrPolygon randomStart()
 	{
-		RrPolygon result = new RrPolygon(att);
+		if(!isClosed())
+			System.err.println("RrPolygon.randomStart(): random-starting an open polygon!");
+		RrPolygon result = new RrPolygon(att, closed);
 		int i = rangen.nextInt(size());
 		for(int j = 0; j < size(); j++)
 		{
@@ -341,22 +343,59 @@ public class RrPolygon
 	}
 	
 	/**
-	 * @return same polygon starting at point incremented from last polgon
+	 * @return same polygon, but starting at vertex i
 	 */
-	public RrPolygon incrementedStart(LayerRules lc)
+	public RrPolygon newStart(int i)
 	{
-		RrPolygon result = new RrPolygon(att);
-		if(size() == 0 || lc.getModelLayer() < 0)
+		if(!isClosed())
+			System.err.println("RrPolygon.newStart(i): reordering an open polygon!");
+		if(i < 0 || i >= size())
+		{
+			System.err.println("RrPolygon.newStart(i): dud index: " + i);
 			return this;
-		int i = lc.getModelLayer() % size();
+		}
+		RrPolygon result = new RrPolygon(att, closed);
 		for(int j = 0; j < size(); j++)
 		{
-			//System.err.println("i, j and size(): " + i + ", " + j + ", " + size());
 			result.add(new Rr2Point(point(i))); 
 			i++;
 			if(i >= size())
 				i = 0;
 		}
+		return result;
+	}
+	
+	/**
+	 * @return same polygon starting at point incremented from last polygon
+	 */
+	public RrPolygon incrementedStart(LayerRules lc)
+	{
+		if(size() == 0 || lc.getModelLayer() < 0)
+			return this;
+		int i = lc.getModelLayer() % size();
+		return newStart(i);
+	}
+	
+	/**
+	 * Find the nearest vertex on a polygon to a given point
+	 * @param p
+	 * @return
+	 */
+	public int nearestVertex(Rr2Point p)
+	{
+		double d = Double.POSITIVE_INFINITY;
+		int result = -1;
+		for(int i = 0; i < size(); i++)
+		{
+			double d2 = Rr2Point.dSquared(point(i), p);
+			if(d2 < d)
+			{
+				d = d2;
+				result = i;
+			}
+		}
+		if(result < 0)
+			System.err.println("nearestVertex: no point found!");
 		return result;
 	}
 	
@@ -456,7 +495,7 @@ public class RrPolygon
 		int leng = size();
 		if(leng <= 3)
 			return new RrPolygon(this);
-		RrPolygon r = new RrPolygon(att);
+		RrPolygon r = new RrPolygon(att, closed);
 		double d2 = d*d;
 		int v1 = findAngleStart(0, d2);
 		// We get back -1 if the points are in a straight line.
@@ -542,7 +581,7 @@ public class RrPolygon
 		
 		double thickness = e.getExtrusionSize();
 		
-		RrPolygon result = new RrPolygon(att);
+		RrPolygon result = new RrPolygon(att, closed);
 		
 		Rr2Point previous = point(size() - 1);
 		Rr2Point current = point(0);
@@ -602,7 +641,7 @@ public class RrPolygon
 	public RrPolygon convexHull()
 	{
 		List<Integer> ls = listConvexHull();
-		RrPolygon result = new RrPolygon(att);
+		RrPolygon result = new RrPolygon(att, true);
 		for(int i = 0; i < ls.size(); i++)
 			result.add(listPoint(i, ls));
 		return result;
