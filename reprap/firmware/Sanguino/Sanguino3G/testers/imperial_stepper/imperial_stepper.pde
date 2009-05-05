@@ -1,10 +1,20 @@
 // Yep, this is actually -*- c++ -*-
 
-#define stepPin 15
-#define dirPin 18
-#define enablePin 19
-#define minPin 20
-#define maxPin 21
+// Z axis pins for the Motherboard 1.1
+#define stepPin 27
+#define dirPin 28
+#define enablePin 29
+#define minPin 30
+#define maxPin 31
+
+// X axis pins
+//#define stepPin 15
+//#define dirPin 18
+//#define enablePin 19
+//#define minPin 20
+//#define maxPin 21
+
+
 //pin for controlling the PSU.
 #define PS_ON_PIN       14
 
