@@ -43,7 +43,7 @@ void turn_psu_off()
 
 void setup()
 {
-  Serial.begin(19200);
+  Serial.begin(38400);
   Serial.println("You have failed me for the last time.");
 
   pinMode(stepPin, OUTPUT);
