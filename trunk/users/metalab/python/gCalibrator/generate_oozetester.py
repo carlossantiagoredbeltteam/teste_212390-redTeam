@@ -40,8 +40,8 @@ for i in range(0, raftParts):
 
 
 z += layerHeight
-#layerStart(z);
-#moveTo(x,y,z,feedrate);
+layerStart(z);
+moveTo(x,y,z,feedrate);
 
 testStartX = x
 
