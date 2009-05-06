@@ -1,8 +1,10 @@
+#!/usr/bin/env python
+
 from gcodegen import *
 import math
 
-feedrate = 180.0
-layerHeight = 0.3
+feedrate = 1500.0
+layerHeight = 0.372
 
 testRuns = 15
 testHeight = 4
@@ -18,7 +20,7 @@ print "G21"
 print "G90"
 print "G28"
 print "M103"
-print "M108 S130.0"
+print "M108 S255.0"
 
 
 print "M101"
