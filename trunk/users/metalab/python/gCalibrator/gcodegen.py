@@ -24,6 +24,17 @@ def moveToXY(x, y):
     print "G1 X%(X).2f Y%(Y).2f" % {'X':x,'Y':y}
     return (x, y)
 
+def moveToXYF(x, y, f):
+    print "G1 X%(X).2f Y%(Y).2f F%(F).2f" % {'X':x,'Y':y,'F':f}
+    return (x, y)
+
+def linInterConstDist(x1,y1,x2,y2, f1, f2, steps):
+    for i in range(0,steps+1):
+        d=float(i)/steps
+        moveToXYF(x1*(1-d) + x2*d, y1*(1-d) + y2*d, f1*(1-d) + f2*d)
+    return (x2, y2)
+ 
+
 
 #     -----
 #     |
