@@ -3,6 +3,10 @@
 from gcodegen import *
 import math
 
+def oozebane_line(x, y, prerun, stop, postrun, feedrate, pwm, steps):
+    (x,y) = moveToXY(x - preRun, y)
+    
+
 feedrate = 1500.0
 layerHeight = 0.372
 extruderPWM = 255
@@ -10,12 +14,12 @@ extruderPWM = 255
 testRuns = 15
 testHeight = 4
 preRun = 5.0
-runPauseFactor = 1.25
+runPauseFactor = 20.0
 offLength=40
 
 raftHeight = (testRuns+2)*testHeight
 raftWidth = 5.0
-raftParts = int(math.ceil((2*preRun+runPauseFactor*testRuns+offLength)/raftWidth))
+raftParts = int(math.ceil((2*preRun+offLength)/raftWidth))
 
 
 print "G21"
@@ -48,19 +52,17 @@ testStartX = x
 for i in range(0, testRuns):
     (x,y) = moveToXY(x - preRun, y)
     setExtruderPWM(-extruderPWM)
-    startExtruder() 
+    startExtruder()
 
-    (x,y) = moveToXY(x - runPauseFactor * i, y)
-    stopExtruder() 
-    
-    (x,y) = moveToXY(x - (offLength - 2*runPauseFactor * i), y)
+    pause(i*runPauseFactor)
+    stopExtruder()
+
+    (x,y) = moveToXY(x - offLength, y)
 
     setExtruderPWM(extruderPWM)
     startExtruder()
-
-    (x,y) = moveToXY(x - runPauseFactor * i, y)
-
-    startExtruder() # to get mark
+    pause(i*runPauseFactor)
+    #(x,y) = moveToXY(x - preRun, y)
     (x,y) =  moveToXY(0,y)
     (x,y) = sCurveYAbs(x,y,testStartX,y-testHeight)
 

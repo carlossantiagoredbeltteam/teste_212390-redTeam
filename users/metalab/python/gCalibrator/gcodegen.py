@@ -14,6 +14,9 @@ def stopExtruder():
 def setExtruderPWM(speed):
     print "M108 S%d" % (speed)
 
+def pause(ms):
+    print "G04 P%d" % ms;
+
 def moveTo(x, y, z, f):
     print "G1 X%(X).2f Y%(Y).2f Z%(Z).2f F%(F).2f" % {'X':x,'Y':y, 'Z':z, 'F':f}
 
