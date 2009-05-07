@@ -3,8 +3,8 @@
 from gcodegen import *
 import math
 
-feedrate = 1500.0
-layerHeight = 0.372
+feedrate = 42.0*60
+layerHeight = 0.25
 
 testRuns = 10
 testHeight = 4.0
