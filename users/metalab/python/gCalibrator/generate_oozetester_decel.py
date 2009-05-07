@@ -22,6 +22,23 @@ raftHeight = (testRuns+2)*testHeight
 raftWidth = 5.0
 raftParts = int(math.ceil((2*(preRun+run)+offLength)/raftWidth))
 
+print """
+(homing routing)
+G21
+G90
+G92 X0 Y0 Z0
+G0 Z10
+M104 S220 T0
+M108 S255
+M6 T0
+G04 P5000
+M101
+G04 P5000
+M103
+M01 (Ready to print?)
+G0 Z0	
+(end of start.)
+"""
 
 print "G21"
 print "G90"
