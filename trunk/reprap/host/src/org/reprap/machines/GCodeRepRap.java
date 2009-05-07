@@ -15,6 +15,7 @@ import org.reprap.Extruder;
 import org.reprap.comms.GCodeReaderAndWriter;
 import org.reprap.utilities.Debug;
 import org.reprap.devices.GCodeExtruder;
+import org.reprap.devices.ExtrudedLength;
 import org.reprap.devices.GCodeStepperMotor;
 import org.reprap.geometry.LayerRules;
 
@@ -31,13 +32,6 @@ public class GCodeRepRap extends GenericRepRap {
 	* our class to send gcode instructions
 	*/
 	GCodeReaderAndWriter gcode;
-	
-	/**
-	* what is our current feedrate?
-	*/
-	//double currentXYFeedrate = 0.0;
-	
-	//double currentZFeedrate = 0.0;
 	
 	/**
 	 * @param prefs
@@ -83,6 +77,7 @@ public class GCodeRepRap extends GenericRepRap {
 		double gx = round(x, 1);
 		double gy = round(y, 1);
 		double gz = round(z, 4);
+		double extrudeLength;
 		double zFeedrate = round(getMaxFeedrateZ(), 4);
 		double xyFeedrate = round(getFeedrate(), 1);
 
@@ -95,21 +90,35 @@ public class GCodeRepRap extends GenericRepRap {
 		if (dx == 0.0 && dy == 0.0 && dz == 0.0)
 			return;
 		
-		double liftedZ = round(currentZ + (extruders[extruder].getExtrusionHeight()/2), 4);
+		double liftIncrement = extruders[extruder].getExtrusionHeight()/2;
+		double liftedZ = round(currentZ + liftIncrement, 4);
 
 		//go up first?
 		if (startUp)
 		{
 			code = "G1 Z" + liftedZ;
 
+			extrudeLength = extruders[extruder].getDistance(liftIncrement, zFeedrate);
+
+			if(extrudeLength > 0)
+			{
+				if(extruders[extruder].getReversing())
+					extruders[extruder].getExtrudedLength().add(-extrudeLength);
+				else
+					extruders[extruder].getExtrudedLength().add(extrudeLength);
+				if(extruders[extruder].get4D())
+					code += " E" + round(extruders[extruder].getExtrudedLength().length(), 1);
+			}
+			
 			//if (zFeedrate != currentFeedrate)
 			//{
-				code += " F" + zFeedrate;
-				//currentFeedrate = zFeedrate;
+			code += " F" + zFeedrate;
+			//currentFeedrate = zFeedrate;
 			//}
 
+
 			code += " ;lift up";
-			
+
 			gcode.queue(code);
 			currentZ = liftedZ;
 			dz = 0;
@@ -120,18 +129,31 @@ public class GCodeRepRap extends GenericRepRap {
 		{
 			code = "";
 			//if (currentFeedrate != xyFeedrate)
-				code = "G1 ";
+			code = "G1 ";
 
 			//if (dx != 0)
-				code += "X" + gx;
+			code += "X" + gx;
 			//if (dy != 0)
-				code += " Y" + gy;
+			code += " Y" + gy;
+
+			extrudeLength = extruders[extruder].getDistance(Math.sqrt(dx*dx + dy*dy), xyFeedrate);
+
+			if(extrudeLength > 0)
+			{
+				if(extruders[extruder].getReversing())
+					extruders[extruder].getExtrudedLength().add(-extrudeLength);
+				else
+					extruders[extruder].getExtrudedLength().add(extrudeLength);
+				if(extruders[extruder].get4D())
+					code += " E" + round(extruders[extruder].getExtrudedLength().length(), 1);
+			}
+			
 			//if (currentFeedrate != xyFeedrate)
 			//{
-				code += " F" + xyFeedrate;
-				currentFeedrate = xyFeedrate;
+			code += " F" + xyFeedrate;
+			currentFeedrate = xyFeedrate;
 			//}
-
+			
 			code += " ;xy move";
 			gcode.queue(code);
 		}
@@ -142,12 +164,25 @@ public class GCodeRepRap extends GenericRepRap {
 			code = "G1 ";
 			code += " Z" + gz;
 			
+
+			extrudeLength = extruders[extruder].getDistance(dz, zFeedrate);
+
+			if(extrudeLength > 0)
+			{
+				if(extruders[extruder].getReversing())
+					extruders[extruder].getExtrudedLength().add(-extrudeLength);
+				else
+					extruders[extruder].getExtrudedLength().add(extrudeLength);
+				if(extruders[extruder].get4D())
+					code += " E" + round(extruders[extruder].getExtrudedLength().length(), 1);
+			}	
+			
 			//if (zFeedrate != currentFeedrate)
 			//{
-				code += " F" + round(getFeedrate(), 1); //zFeedrate;
-				//currentFeedrate = zFeedrate;
+			code += " F" + zFeedrate;
+			//currentFeedrate = zFeedrate;
 			//}
-			
+
 			code += " ;lift down";
 			gcode.queue(code);
 		}
@@ -156,11 +191,23 @@ public class GCodeRepRap extends GenericRepRap {
 		if (!endUp && z != currentZ)
 		{
 			code = "G1 Z" + gz;
+
+			extrudeLength = extruders[extruder].getDistance(Math.abs(z - currentZ), zFeedrate);
+
+			if(extrudeLength > 0)
+			{
+				if(extruders[extruder].getReversing())
+					extruders[extruder].getExtrudedLength().add(-extrudeLength);
+				else
+					extruders[extruder].getExtrudedLength().add(extrudeLength);
+				if(extruders[extruder].get4D())
+					code += " E" + round(extruders[extruder].getExtrudedLength().length(), 1);
+			}	
 			
 			//if (zFeedrate != currentFeedrate)
 			//{
-				code += " F" + zFeedrate;
-				//currentFeedrate = zFeedrate;
+			code += " F" + zFeedrate;
+			//currentFeedrate = zFeedrate;
 			//}
 
 			code += " ;z down";
@@ -202,22 +249,35 @@ public class GCodeRepRap extends GenericRepRap {
 			return;
 
 		String code = "";
-		
+
 		//if (feed != currentFeedrate)
-			code += "G1 ";
-		
+		code += "G1 ";
+
 		//if (dx != 0)
-			code += " X" + gx;
+		code += " X" + gx;
 		//if (dy != 0)
-			code += " Y" + gy;
+		code += " Y" + gy;
 		//if (dz != 0)
-			code += " Z" + gz;
-		//if (feed != currentFeedrate)
-		//{
-			code += " F" + feed;
-			currentFeedrate = feed;
-		//}
+		code += " Z" + gz;
 		
+		double extrudeLength = extruders[extruder].getDistance(Math.sqrt(dx*dx + dy*dy + dz*dz), feed);
+
+		if(extrudeLength > 0)
+		{
+			if(extruders[extruder].getReversing())
+				extruders[extruder].getExtrudedLength().add(-extrudeLength);
+			else
+				extruders[extruder].getExtrudedLength().add(extrudeLength);
+			if(extruders[extruder].get4D())
+				code += " E" + round(extruders[extruder].getExtrudedLength().length(), 1);
+		}
+		
+		//if (feed != currentFeedrate)
+		//{		
+		code += " F" + feed;
+		currentFeedrate = feed;
+		//}
+
 		code += " ;print segment";
 		gcode.queue(code);
 		
@@ -269,7 +329,7 @@ public class GCodeRepRap extends GenericRepRap {
 		
 		gcode.startRun();
 		
-		gcode.queue("; GCode generated by RepRap Host Software");
+		gcode.queue("; GCode generated by RepRap Java Host Software");
 		Date myDate = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd:HH-mm-ss");
 		String myDateString = sdf.format(myDate);
@@ -303,6 +363,8 @@ public class GCodeRepRap extends GenericRepRap {
 		
 		double xyFeedrate = round(getFastFeedrateXY(), 4);
 		
+		// Assume the extruder is off...
+		
 		gcode.queue("G1 X-999 Y-999 F" + xyFeedrate + " ;xy home");
 		currentFeedrate = xyFeedrate;
 		
@@ -313,6 +375,21 @@ public class GCodeRepRap extends GenericRepRap {
 	
 	private void delay(long millis)
 	{
+		double extrudeLength = getExtruder().getDistance(millis);
+		if(extrudeLength > 0)
+		{
+			if(extruders[extruder].getReversing())
+				extruders[extruder].getExtrudedLength().add(-extrudeLength);
+			else
+				extruders[extruder].getExtrudedLength().add(extrudeLength);
+			if(extruders[extruder].get4D())
+			{
+				gcode.queue("G1 E" + round(extruders[extruder].getExtrudedLength().length(), 1) + 
+						" F" + round(extruders[extruder].getCurrentSpeed(), 1) + " ; extrude dwell");
+				return;
+			}
+		}
+		
 		gcode.queue("G4 P" + millis + " ;delay");
 	}
 
@@ -322,8 +399,10 @@ public class GCodeRepRap extends GenericRepRap {
 	public void homeToZeroX() throws ReprapException, IOException {
 		super.homeToZeroX();
 		
+		// Assume extruder is off...
+		
 		currentFeedrate = round(getMaxFeedrateX(), 4);
-		gcode.queue("G1 X-999 F" + round(getMaxFeedrateX(), 4) + " ;home x");
+		gcode.queue("G1 X-999 F" + currentFeedrate + " ;home x");
 		gcode.queue("G92 X0 ;set x 0");
 	}
 
@@ -333,8 +412,10 @@ public class GCodeRepRap extends GenericRepRap {
 	public void homeToZeroY() throws ReprapException, IOException {
 		super.homeToZeroY();
 
+		// Assume extruder is off...
+		
 		currentFeedrate = round(getMaxFeedrateY(), 4);
-		gcode.queue("G1 Y-999 F" + round(getMaxFeedrateY(), 4) + " ;home y");
+		gcode.queue("G1 Y-999 F" + currentFeedrate + " ;home y");
 		gcode.queue("G92 Y0 ;set y 0");
 	}
 
@@ -344,6 +425,8 @@ public class GCodeRepRap extends GenericRepRap {
 	public void homeToZeroZ() throws ReprapException, IOException {
 		super.homeToZeroZ();
 
+		// Assume extruder is off...
+		
 		//double feedrate = round(getMaxFeedrateZ(), 4);
 		gcode.queue("G1 Z-999 F" + round(getMaxFeedrateZ(), 4) + " ;home z");
 		gcode.queue("G92 Z0 ;set z 0");		
