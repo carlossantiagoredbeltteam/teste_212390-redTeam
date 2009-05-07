@@ -63,8 +63,14 @@ print "G92 X0 Y0 Z0"
 print "G28"
 
 print "(<layer> 0 )"
+bpm = 80
+notelength = 15.0 / bpm
 z = 0;
 for (note,length) in zip(notes, lengths):
-    z += 0.15 * length * feedrates[note] / 60
-    print "G1 Z%(Z).2f F%(F).2f" % {'Z':z, 'F':feedrates[note]}
+        if note == -1:
+            print "G4 P%(P)d" % {'P':length*notelength*1000}
+        else:
+            z += (notelength * length * 1000 - 50) * feedrates[note] / 60 / 1000
+            print "G1 Z%(Z).2f F%(F).2f" % {'Z':z, 'F':feedrates[note]}
+            print "G4 P%(P)d" % {'P':50}
 print "(</layer>)"
