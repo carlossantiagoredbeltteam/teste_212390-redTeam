@@ -19,7 +19,29 @@ public abstract class GenericExtruder implements Extruder
 	/**
 	 * Flag to decide extrude speed
 	 */
-	boolean separating;
+	protected boolean separating;
+	
+	/**
+	 * How far we have extruded
+	 */
+	protected ExtrudedLength el;
+	
+	/**
+	 * Flag to decide if the machine implements 4D extruding
+	 * (i.e. it processes extrude lengths along with X, Y, and Z
+	 * lengths in a 4D Bressenham DDA)
+	 */
+	protected boolean fourD;
+	
+	/**
+	 * Flag to record if we're going backwards
+	 */
+	protected boolean reversing;
+	
+	/**
+	 * The current extrude speed
+	 */
+	protected double currentSpeed = 0;
 	
 	/**
 	 * Offset of 0 degrees centigrade from absolute zero
@@ -150,10 +172,17 @@ public abstract class GenericExtruder implements Extruder
 	protected long lastTemperatureUpdate = 0;
 	
 	/**
-	 * Identifier of and extruder
-	 * TODO: which values mean what? 
+	 * Identifier of the extruder 
 	 */
 	protected int myExtruderID;
+	
+	/**
+	 * One physical extruder can have several of this class attached to it
+	 * with different myExtruderIDs.  physicalExtruder is a unique integer
+	 * for each actual extruder, derived from the old SNAP address of the extruder,
+	 * which is necessarily unique.
+	 */
+	protected int physicalExtruder;
 	
 	/**
 	* prefix for our preferences.
@@ -295,19 +324,42 @@ public abstract class GenericExtruder implements Extruder
 	Printer printer = null;
 	
 	/**
-	 * @param communicator
-	 * @param address
-	 * @param prefs
 	 * @param extruderId
 	 */
 	public GenericExtruder(int extruderId)
 	{
+		try
+		{
+			fourD = Preferences.loadGlobalBool("FourD");
+		} catch (Exception e)
+		{
+			fourD = false;
+		}
+		reversing = false;
+		el = new ExtrudedLength();
 		myExtruderID = extruderId;
 		separating = false;
 		refreshPreferences();
 	}
 
+	/**
+	 * Allow otthers to set our extrude length so that all logical extruders
+	 * talking to one physical extruder can use the same length instance.
+	 * @param e
+	 */
+	public void setExtrudeLength(ExtrudedLength e)
+	{
+		el = e;
+	}
 	
+	/**
+	 * Zero the extruded length
+	 *
+	 */
+	public void zeroExtrudedLength()
+	{
+		el.zero();
+	}
 	
 	public void refreshPreferences()
 	{
@@ -315,6 +367,7 @@ public abstract class GenericExtruder implements Extruder
 
 		try
 		{
+			physicalExtruder = Preferences.loadGlobalInt(prefName + "Address");
 			maxExtruderSpeed = Preferences.loadGlobalInt(prefName + "MaxSpeed(0..255)");
 			extrusionSpeed = Preferences.loadGlobalDouble(prefName + "ExtrusionSpeed(mm/minute)");
 			extrusionTemp = Preferences.loadGlobalDouble(prefName + "ExtrusionTemp(C)");
@@ -410,10 +463,13 @@ public abstract class GenericExtruder implements Extruder
 	}	
 
 	/**
-	 * Start the extruder motor at a given speed.  This ranges from 0
+	 * Start the extruder motor at a given speed.  In the old scheme, this ranges from 0
 	 * to 255 but is scaled by maxSpeed and t0, so that 255 corresponds to the
 	 * highest permitted speed.  It is also scaled so that 0 would correspond
 	 * with the lowest extrusion speed.
+	 * 
+	 * In the new scheme speed is simply mm/sec.
+	 * 
 	 * @param speed The speed to drive the motor at (0-255)
 	 * @throws IOException
 	 */
@@ -425,6 +481,8 @@ public abstract class GenericExtruder implements Extruder
 			isExtruding = false;
 			
 		setExtrusion(speed, false);
+		currentSpeed = speed;
+		reversing = false;
 	}
 	
 	public void startExtruding()
@@ -461,9 +519,16 @@ public abstract class GenericExtruder implements Extruder
 			return;
 		
 		if(motorOn)
+		{
 			setExtrusion(getExtruderSpeed(), false);
-		else
+			currentSpeed = getExtruderSpeed();
+			reversing = false;
+		} else
+		{
 			setExtrusion(0, false);
+			currentSpeed = 0;
+			reversing = false;
+		}
 	}
 
 	public void heatOn() throws Exception 
@@ -1035,5 +1100,92 @@ public abstract class GenericExtruder implements Extruder
 	{
 		return oddHatchDirection;		
 	}
+	
+	   /**
+     * Find out what our current speed is
+     * @return
+     */
+    public double getCurrentSpeed()
+    {
+    	return currentSpeed;
+    }
+    
+    /**
+     * Find out if we are currently in reverse
+     * @return
+     */
+    public boolean getReversing()
+    {
+    	return reversing;
+    }
+    
+    /**
+     * Get how much extrudate is deposited in a given time (in milliseconds)
+     * currentSpeed is in mm per minute
+     * @param time (ms)
+     * @return
+     */
+    public double getDistance(double time)
+    {
+    	return currentSpeed*time/60000.0;
+    }
+    
+    /**
+     * Get how much extrudate is deposited for a given xy movement
+     * currentSpeed is in mm per minute
+     * @param xyDistance (mm)
+     * @param xyFeedrate (mm/minute)
+     * @return
+     */
+    public double getDistance(double xyDistance, double xyFeedrate)
+    {
+    	return currentSpeed*xyDistance/xyFeedrate;
+    }
+	
+    /**
+     * Find out if we're working in 4D
+     * @return
+     */
+    public boolean get4D()
+    {
+    	return fourD;
+    }
+    /**
+     * Find out how far we have extruded so far
+     * @return
+     */
+    public ExtrudedLength getExtrudedLength()
+    {
+    	return el;
+    }
+    
+    /**
+     * Add some extruded length
+     * @param l
+     */
+    public void addExtrudedLength(double l)
+    {
+    	System.out.println("addExtrudedLength: " + el.length() + " + " + l);
+    	el.add(l);
+    }
+    
+    /**
+     * Each logical extruder has a unique ID
+     * @return
+     */
+    public int getID()
+    {
+    	return myExtruderID;
+    }
+    
+    /**
+     * Several logical extruders can share one physical extruder
+     * This number is unique to each physical extruder
+     * @return
+     */
+    public int getPhysicalExtruderNumber()
+    {
+    	return physicalExtruder;
+    }
     
 }

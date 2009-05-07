@@ -5,7 +5,8 @@ import java.io.IOException;
 import javax.media.j3d.BranchGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.reprap.Attributes;
 import org.reprap.CartesianPrinter;
 import org.reprap.Preferences;
@@ -152,7 +153,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		//load extruder prefs
 		extruderCount = Preferences.loadGlobalInt("NumberOfExtruders");
 		if (extruderCount < 1)
-			throw new Exception("A Reprap printer must contain at least one extruder");
+			throw new Exception("A Reprap printer must contain at least one extruder.");
 
 		//load our actual extruders.
 		extruders = new GenericExtruder[extruderCount];
@@ -166,6 +167,45 @@ public abstract class GenericRepRap implements CartesianPrinter
 		currentX = 0;
 		currentY = 0;
 		currentZ = 0;
+	}
+	
+	public void loadMotors()
+	{
+		motorX = new NullStepperMotor(1);
+		motorY = new NullStepperMotor(2);
+		motorZ = new NullStepperMotor(3);
+	}
+	
+	public void loadExtruders()
+	{
+		int pe;
+		
+		for(int i = 0; i < extruderCount; i++)
+		{
+			extruders[i] = extruderFactory(i);
+			
+			// Make sure all instances of each physical extruder share the same
+			// ExtrudedLength instance
+			
+			pe = extruders[i].getPhysicalExtruderNumber();
+			for(int j = 0; j < i; j++)
+			{
+				if(extruders[j].getPhysicalExtruderNumber() == pe)
+				{
+					extruders[i].setExtrudeLength(extruders[j].getExtrudedLength());
+					break;
+				}
+			}
+			
+			extruders[i].setPrinter(this);
+		}
+		
+		extruder = 0;
+	}
+	
+	public Extruder extruderFactory(int count)
+	{
+		return new NullExtruder(count);
 	}
 	
 	public void refreshPreferences()
@@ -252,28 +292,12 @@ public abstract class GenericRepRap implements CartesianPrinter
 		extruders[extruder].setTemperature(0);
 	}
 	
-	public void loadMotors()
-	{
-		motorX = new NullStepperMotor(1);
-		motorY = new NullStepperMotor(2);
-		motorZ = new NullStepperMotor(3);
-	}
+
 	
-	public void loadExtruders()
-	{
-		for(int i = 0; i < extruderCount; i++)
-		{
-			extruders[i] = extruderFactory(i);
-			extruders[i].setPrinter(this);
-		}
-		
-		extruder = 0;
-	}
-	
-	public Extruder extruderFactory(int count)
-	{
-		return new NullExtruder(count);
-	}
+//	public Extruder extruderFactory(int count)
+//	{
+//		return new NullExtruder(count);
+//	}
 	
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#selectMaterial(int)
@@ -727,6 +751,8 @@ public abstract class GenericRepRap implements CartesianPrinter
 			// Go home. Seek (0,0) then callibrate X first
 			homeToZeroX();
 			homeToZeroY();
+			for(int i = 0; i < extruderCount; i++)
+				extruders[i].zeroExtrudedLength();
 			startCooling = Timer.elapsed();
 		}
 

@@ -9,8 +9,6 @@ public class GCodeExtruder extends GenericExtruder
 {
 	GCodeReaderAndWriter gcode;
 	
-	double currentSpeed = 0;
-	
 	/**
 	 * @param prefs
 	 * @param extruderId
@@ -20,6 +18,16 @@ public class GCodeExtruder extends GenericExtruder
 		super(extruderId);
 		currentSpeed = 0;
 		gcode = writer;
+	}
+	
+	/**
+	 * Zero the extruded length
+	 *
+	 */
+	public void zeroExtrudedLength()
+	{
+		super.zeroExtrudedLength();
+		gcode.queue("G92 E0 ;zero the extruded length");
 	}
 	
 	public void setTemperature(double temperature) throws Exception
@@ -39,25 +47,28 @@ public class GCodeExtruder extends GenericExtruder
 		if(getExtruderSpeed() < 0)
 			return;
 		
+		reversing = reverse;
+		
 		if (speed < Preferences.tiny())
 		{
-			gcode.queue("M103" + " ;extruder off");
+			if(!fourD)
+				gcode.queue("M103" + " ;extruder off");
 			currentSpeed = 0;
 			isExtruding = false;
-		}
-		else
+		} else
 		{
-			if (speed != currentSpeed)
+			if(!fourD)
 			{
-				gcode.queue("M108 S" + speed + " ;extruder speed in RPM");
-				currentSpeed = speed;
+				if (speed != currentSpeed)
+					gcode.queue("M108 S" + speed + " ;extruder speed in RPM");
+
+				if (reversing)
+					gcode.queue("M102" + " ;extruder on, reverse");
+				else
+					gcode.queue("M101" + " ;extruder on, forward");
 			}
-
-			if (reverse)
-				gcode.queue("M102" + " ;extruder on, reverse");
-			else
-				gcode.queue("M101" + " ;extruder on, forward");
-
+			
+			currentSpeed = speed;
 			isExtruding = true;
 		}
 	}

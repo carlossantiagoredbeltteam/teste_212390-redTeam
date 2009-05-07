@@ -2,6 +2,7 @@ package org.reprap;
 
 import java.io.IOException;
 import org.reprap.geometry.LayerRules;
+import org.reprap.devices.ExtrudedLength;
 import javax.media.j3d.Appearance;
 
 public interface Extruder
@@ -198,7 +199,59 @@ public interface Extruder
      * @return the cooling period in seconds
      */
     public double getCoolingPeriod();
+    
+    /**
+     * Find out what our current speed is
+     * @return
+     */
+    public double getCurrentSpeed();
+    
+    /**
+     * Find out if we are currently in reverse
+     * @return
+     */
+    public boolean getReversing();
  
+    /**
+     * Get how much extrudate is deposited in a given time
+     * @param time
+     * @return
+     */
+    public double getDistance(double time);
+    
+    /**
+     * Find out if we're working in 4D
+     * @return
+     */
+    public boolean get4D();
+    
+    /**
+     * Get how much extrudate is deposited for a given xy movement
+     * @param xyDistance
+     * @param xyFeedrate
+     * @return
+     */
+    public double getDistance(double xyDistance, double xyFeedrate);
+    
+    /**
+     * Find out how far we have extruded so far
+     * @return
+     */
+    public ExtrudedLength getExtrudedLength();
+    
+	/**
+	 * Allow otthers to set our extrude length so that all logical extruders
+	 * talking to one physical extruder can use the same length instance.
+	 * @param e
+	 */
+	public void setExtrudeLength(ExtrudedLength e);
+	
+	/**
+	 * Zero the extruded length
+	 *
+	 */
+	public void zeroExtrudedLength();
+    
     /**
      * @return the X offset in millimeters
      */
@@ -219,6 +272,18 @@ public interface Extruder
      */
     public Appearance getAppearance();  
 
+    /**
+     * Each logical extruder has a unique ID
+     * @return
+     */
+    public int getID();
+    
+    /**
+     * Several logical extruders can share one physical extruder
+     * This number is unique to each physical extruder
+     * @return
+     */
+    public int getPhysicalExtruderNumber();
     
     /**
      * @return whether nozzle wipe method is enabled or not 

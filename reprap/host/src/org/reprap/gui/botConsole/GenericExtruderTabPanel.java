@@ -551,6 +551,10 @@ private void moveToSwapPointAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:
     private void setExtruderSpeed() {
         try {
                 extruder.setExtrusion(extruding?Double.parseDouble(motorSpeedField.getText()):0, motorReverseCheck.isSelected());
+                if(extruder.get4D())
+        		{
+        			extruder.getPrinter().machineWait(5000);
+        		}
         } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, "Extruder exception: " + ex);
                 ex.printStackTrace();
