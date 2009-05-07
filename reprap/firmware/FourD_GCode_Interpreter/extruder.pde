@@ -157,6 +157,8 @@ void extruder::set_direction(bool dir)
 
 void extruder::set_cooler(byte sp)
 {
+  if(step_en_pin >= 0) // Step enable conflicts with the fan
+    return;
 	analogWrite(fan_pin, sp);
 }
 
@@ -164,6 +166,10 @@ void extruder::set_temperature(int temp)
 {
 	target_celsius = temp;
 	max_celsius = (temp*11)/10;
+
+        // If we've turned the heat off, we might as well disable the extrude stepper
+        if(target_celsius < 1)
+          ex[extruder_in_use]->disableStep(); 
 }
 
 /**
