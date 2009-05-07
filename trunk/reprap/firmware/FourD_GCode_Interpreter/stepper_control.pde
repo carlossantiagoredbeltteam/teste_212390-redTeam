@@ -420,52 +420,7 @@ void enable_steppers()
 #endif  
 }
 
-#if 0
-void enable_steppers()
-{
-	// Enable steppers only for axes which are moving
-	// taking account of the fact that some or all axes
-	// may share an enable line (check using macros at
-	// compile time to avoid needless code)
-        // Not enough pins for enable on Arduino
-        
-#ifdef SANGUINO        
-	if ( target_units.x == current_units.x
-		#if X_ENABLE_PIN == Y_ENABLE_PIN
-		     && target_units.y == current_units.y
-		#endif
-		#if X_ENABLE_PIN == Z_ENABLE_PIN
-		     && target_units.z == current_units.z
-		#endif
-	)
-		digitalWrite(X_ENABLE_PIN, !ENABLE_ON);
-	else
-		digitalWrite(X_ENABLE_PIN, ENABLE_ON);
-	if ( target_units.y == current_units.y
-		#if Y_ENABLE_PIN == X_ENABLE_PIN
-		     && target_units.x == current_units.x
-		#endif
-		#if Y_ENABLE_PIN == Z_ENABLE_PIN
-		     && target_units.z == current_units.z
-		#endif
-	)
-		digitalWrite(Y_ENABLE_PIN, !ENABLE_ON);
-	else
-		digitalWrite(Y_ENABLE_PIN, ENABLE_ON);
-	if ( target_units.z == current_units.z
-		#if Z_ENABLE_PIN == X_ENABLE_PIN
-			&& target_units.x == current_units.x
-		#endif
-		#if Z_ENABLE_PIN == Y_ENABLE_PIN
-			&& target_units.y == current_units.y
-		#endif
-	)
-		digitalWrite(Z_ENABLE_PIN, !ENABLE_ON);
-	else
-		digitalWrite(Z_ENABLE_PIN, ENABLE_ON);
-#endif
-}
-#endif
+
 
 void disable_steppers()
 {
@@ -474,7 +429,11 @@ void disable_steppers()
 	digitalWrite(X_ENABLE_PIN, !ENABLE_ON);
 	digitalWrite(Y_ENABLE_PIN, !ENABLE_ON);
 	digitalWrite(Z_ENABLE_PIN, !ENABLE_ON);
-        ex[extruder_in_use]->disableStep();
+
+        // Disabling the extrude stepper causes the backpressure to
+        // turn the motor the wrong way.  Leave it on.
+        
+        //ex[extruder_in_use]->disableStep();       
 #endif
 }
 
