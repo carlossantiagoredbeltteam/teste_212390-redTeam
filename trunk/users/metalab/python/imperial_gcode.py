@@ -62,9 +62,9 @@ print "G90"
 print "G92 X0 Y0 Z0"
 print "G28"
 
-(<layer> 0 )
+print "(<layer> 0 )"
 z = 0;
 for (note,length) in zip(notes, lengths):
     z += 0.15 * length * feedrates[note] / 60
     print "G1 Z%(Z).2f F%(F).2f" % {'Z':z, 'F':feedrates[note]}
-(</layer>)
+print "(</layer>)"
