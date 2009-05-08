@@ -494,6 +494,13 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
                 //System.out.println("Extruding at speed: " + motorSpeedField.getText());
         }
         setExtruderSpeed();
+        if(extruder.get4D() && extruding)
+		{
+			extruder.getPrinter().machineWait(5000);
+			extruding = false;
+			setExtruderSpeed();
+            extrudeButton.setText("Extrude");
+		}
     }//GEN-LAST:event_extrudeButtonActionPerformed
 
     private void nozzleWipeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nozzleWipeButtonActionPerformed
@@ -551,10 +558,6 @@ private void moveToSwapPointAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:
     private void setExtruderSpeed() {
         try {
                 extruder.setExtrusion(extruding?Double.parseDouble(motorSpeedField.getText()):0, motorReverseCheck.isSelected());
-                if(extruder.get4D())
-        		{
-        			extruder.getPrinter().machineWait(5000);
-        		}
         } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, "Extruder exception: " + ex);
                 ex.printStackTrace();
