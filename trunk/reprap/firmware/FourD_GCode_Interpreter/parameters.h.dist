@@ -54,7 +54,7 @@
 // Set to one if enable pins are inverting
 // For RepRap stepper boards version 1.x the enable pins are *not* inverting.
 // For RepRap stepper boards version 2.x and above the enable pins are inverting.
-#define INVERT_ENABLE_PINS 0
+#define INVERT_ENABLE_PINS 1
 
 #if INVERT_ENABLE_PINS == 1
 #define ENABLE_ON LOW
