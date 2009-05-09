@@ -20,6 +20,19 @@ import java.util.*;
 import com.ysystems.ycad.lib.ydxf.*;
 import com.ysystems.ycad.lib.yxxf.*;
 
+
+class DXFLayer {
+  public Vector<int[]> faces;
+  public Vector<Vec3> vertices;
+  public Vector<Vec3[]> polylines;
+  
+  public DXFLayer() {
+    this.faces = new Vector<int[]>();
+    this.vertices = new Vector<Vec3>();
+    this.polylines = new Vector<Vec3[]>();
+  }
+};
+
 /**
  * @see artofillusion.translators.DXFImporter
  * @author klynn
@@ -35,18 +48,14 @@ public class DXFImporter {
   
   Frame parent;
   Boolean enableMeshRepair;
-  Vector<int[]> faces;
-  Vector<Vec3> vertices;
-  Vector<Vec3[]> polylines;
+  Hashtable<YxxfTblLayer, DXFLayer> layers;
   YxxfGfxContext gc;
   
   public DXFImporter(Frame parent, Boolean enableMeshRepair) {
     this.parent = parent;
     this.enableMeshRepair = enableMeshRepair;
-    this.faces = new Vector<int[]>();
-    this.vertices = new Vector<Vec3>();
-    this.polylines = new Vector<Vec3[]>();
     this.gc = new YxxfGfxContext();
+    this.layers = new Hashtable<YxxfTblLayer, DXFLayer>();
   }
   
   /**
@@ -128,10 +137,16 @@ public class DXFImporter {
         importer.addEntity((YxxfEntHeader)ent);
         nextToDraw++;
       }
-      
-      TriangleMesh mesh = importer.createMesh(objName);
-      Boolean curvesfound = importer.createCurve(objName, null);
-      if (mesh == null && !curvesfound) {
+      Boolean geometryfound = false;
+      Enumeration<YxxfTblLayer> keys = importer.layers.keys();
+      while (keys.hasMoreElements()) {
+        YxxfTblLayer layer = keys.nextElement();
+        DXFLayer mylayer = importer.layers.get(layer);
+        Color col = importer.gc.getPalette().jcolorarr[layer.aci];
+        if (importer.createMesh(mylayer, objName, col) != null) geometryfound = true;
+        if (importer.createCurve(mylayer, objName)) geometryfound = true;
+      }
+      if (!geometryfound) {
         new AWTMessageDialog(parent, new String[] { "Import of file: [" + f +
         "] failed. No supported geometry found." });
       }
@@ -168,20 +183,20 @@ public class DXFImporter {
     theScene.addObject(info, null);
   }
 
-  private Boolean createCurve(String objName, Color col) {
-    for (int i=0;i<this.polylines.size();i++) {
-      Vec3[] verts = this.polylines.get(i);
+  private Boolean createCurve(DXFLayer mylayer, String objName) {
+    for (int i=0;i<mylayer.polylines.size();i++) {
+      Vec3[] verts = mylayer.polylines.get(i);
       float smoothness[] = new float[verts.length];
       Arrays.fill(smoothness, 0.0f);
       Curve curve = new Curve(verts, smoothness, Mesh.NO_SMOOTHING, false);
-      createAndAddObjectInfo(objName + "_curve" + i, curve, col);
+      createAndAddObjectInfo(objName + "_curve" + i, curve, null);
     }
-    if (this.polylines.size() > 0) return true;
+    if (mylayer.polylines.size() > 0) return true;
     else return false;
   }
 
-  private TriangleMesh createMesh(String objName) {
-    int numVerts = this.vertices.size();
+  private TriangleMesh createMesh(DXFLayer mylayer, String objName, Color col) {
+    int numVerts = mylayer.vertices.size();
     if (numVerts == 0) return null;
     // construct AOI scene:
     double min[] = new double[] { Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE };
@@ -190,7 +205,7 @@ public class DXFImporter {
     // vertices:
     Vec3 vert[] = new Vec3[numVerts], center = new Vec3();
     for (int i = 0; i < numVerts; i++) {
-      vert[i] = this.vertices.elementAt(i);
+      vert[i] = mylayer.vertices.elementAt(i);
 
       // new min?
       if (vert[i].x < min[0]) min[0] = vert[i].x;
@@ -206,11 +221,11 @@ public class DXFImporter {
     }
 
     // faces:
-    int fc[][] = new int[this.faces.size()][];
-    for (int j = 0; j < this.faces.size(); j++)
-      fc[j] = this.faces.elementAt(j);
+    int fc[][] = new int[mylayer.faces.size()][];
+    for (int j = 0; j < mylayer.faces.size(); j++)
+      fc[j] = mylayer.faces.elementAt(j);
     if (debug) System.out.println("numVerts=" + numVerts);
-    if (debug) System.out.println("numFaces=" + this.faces.size());
+    if (debug) System.out.println("numFaces=" + mylayer.faces.size());
 
     // scale mesh:
     double maxSize = Math.max(Math.max(max[0] - min[0], max[1] - min[1]), max[2] - min[2]);
@@ -232,11 +247,8 @@ public class DXFImporter {
       // attempt to fix normals (SLOW!):
       if (this.enableMeshRepair) mutil.fixCirality(fc);
 
-      // add to scene:
-      CoordinateSystem coords = new CoordinateSystem(center, Vec3.vz(), Vec3.vy());
-      // coords.setOrientation(270, 0, 0);
       TriangleMesh mesh = new TriangleMesh(vert, fc);
-      createAndAddObjectInfo(objName, mesh, null);
+      createAndAddObjectInfo(objName, mesh, col);
       return mesh;
     }
     return null;
@@ -274,7 +286,11 @@ public class DXFImporter {
     YxxfTblLayer layer = ent.hdr_layer;
     int colorindex = layer.aci;
     if (colorindex < 0) return;
-    Color col = this.gc.getPalette().jcolorarr[colorindex];
+    DXFLayer mylayer = this.layers.get(layer);
+    if (mylayer == null) {
+      mylayer = new DXFLayer();
+      this.layers.put(layer, mylayer);
+    }
     
     if (ent instanceof YxxfEnt3Dface) {
       // if (debug) System.out.println("Found a 3DFace");
@@ -291,18 +307,18 @@ public class DXFImporter {
       // pt3.z);
       // if (debug) System.out.println("pt4: " + pt4.x + ", " + pt4.y + ", " +
       // pt4.z);
-      this.vertices.add(new Vec3(pt1.x, pt1.y, pt1.z));
-      this.vertices.add(new Vec3(pt2.x, pt2.y, pt2.z));
-      this.vertices.add(new Vec3(pt3.x, pt3.y, pt3.z));
+      mylayer.vertices.add(new Vec3(pt1.x, pt1.y, pt1.z));
+      mylayer.vertices.add(new Vec3(pt2.x, pt2.y, pt2.z));
+      mylayer.vertices.add(new Vec3(pt3.x, pt3.y, pt3.z));
       if (pt3.x == pt4.x && pt3.y == pt4.y && pt3.z == pt4.z) {
         // 1 face
-        this.faces.add(new int[] { this.vertices.size() - 1, this.vertices.size() - 2, this.vertices.size() - 3 });
+        mylayer.faces.add(new int[] { mylayer.vertices.size() - 1, mylayer.vertices.size() - 2, mylayer.vertices.size() - 3 });
       }
       else {
         // 2 faces
-        this.vertices.add(new Vec3(pt4.x, pt4.y, pt4.z));
-        this.faces.add(new int[] { this.vertices.size() - 1, this.vertices.size() - 2, this.vertices.size() - 3 });
-        this.faces.add(new int[] { this.vertices.size() - 1, this.vertices.size() - 3, this.vertices.size() - 4 });
+        mylayer.vertices.add(new Vec3(pt4.x, pt4.y, pt4.z));
+        mylayer.faces.add(new int[] { mylayer.vertices.size() - 1, mylayer.vertices.size() - 2, mylayer.vertices.size() - 3 });
+        mylayer.faces.add(new int[] { mylayer.vertices.size() - 1, mylayer.vertices.size() - 3, mylayer.vertices.size() - 4 });
       }
     }
     else if (ent instanceof YxxfEntArc) {
@@ -313,12 +329,12 @@ public class DXFImporter {
         
       }
       Vec3[] coords = createArc(mat, a.center, a.radius, a.entbegang, a.entendang);
-      this.polylines.add(coords);
+      mylayer.polylines.add(coords);
     }
     else if (ent instanceof YxxfEntCircle) {
       YxxfEntCircle c = (YxxfEntCircle)ent;
       Vec3[] coords = createArc(mat, c.center, c.radius, 0, 360);
-      this.polylines.add(coords);
+      mylayer.polylines.add(coords);
     }
     else if (ent instanceof YxxfEntLine) {
       if (debug) System.out.println("Found an Line");
@@ -328,7 +344,7 @@ public class DXFImporter {
       polyline[0] = new Vec3(p.x, p.y, p.z);
       p = mat.mtxTransformPoint(new YxxfGfxPointW(l.endpnt));
       polyline[1] = new Vec3(p.x, p.y, p.z); 
-      this.polylines.add(polyline);
+      mylayer.polylines.add(polyline);
     }
     else if (ent instanceof YxxfEntLwpolyline) {
       YxxfEntPolyline pl = (YxxfEntPolyline)((YxxfEntLwpolyline)ent).pline;
@@ -337,7 +353,7 @@ public class DXFImporter {
         YxxfGfxPointW p = mat.mtxTransformPoint(new YxxfGfxPointW(((YxxfEntVertex)pl.vtxEntities.get(i)).pnt));
         polyline[i] = new Vec3(p.x, p.y, p.z);
       }
-      this.polylines.add(polyline);
+      mylayer.polylines.add(polyline);
     }
     else if (ent instanceof YxxfEntInsert) {
       YxxfEntInsert e = (YxxfEntInsert) ent;
