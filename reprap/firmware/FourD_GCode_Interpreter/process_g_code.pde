@@ -2,31 +2,34 @@
 #include "parameters.h"
 #include "pins.h"
 #include "extruder.h"
+#include "cartesian_dda.h"
 
-//our command string
-char cmdbuffer[COMMAND_SIZE];
-char c = '?';
-byte serial_count = 0;
-boolean comment = false;
+/* bit-flags for commands and parameters */
+#define GCODE_G	(1<<0)
+#define GCODE_M	(1<<1)
+#define GCODE_P	(1<<2)
+#define GCODE_X	(1<<3)
+#define GCODE_Y	(1<<4)
+#define GCODE_Z	(1<<5)
+#define GCODE_I	(1<<6)
+#define GCODE_J	(1<<7)
+#define GCODE_K	(1<<8)
+#define GCODE_F	(1<<9)
+#define GCODE_S	(1<<10)
+#define GCODE_Q	(1<<11)
+#define GCODE_R	(1<<12)
+#define GCODE_E	(1<<13)
 
-// our point structure to make things nice.
-/*
-struct LongPoint
-{
-	long x;
-	long y;
-	long z;
-        long e;
-};
-*/
 
-struct FloatPoint
-{
-	float x;
-	float y;
-	float z;
-        float e;
-};
+#define PARSE_INT(ch, str, len, val, seen, flag) \
+	case ch: \
+		len = scan_int(str, &val, &seen, flag); \
+		break;
+
+#define PARSE_FLOAT(ch, str, len, val, seen, flag) \
+	case ch: \
+		len = scan_float(str, &val, &seen, flag); \
+		break;
 
 /* gcode line parse results */
 struct GcodeParser
@@ -47,29 +50,28 @@ struct GcodeParser
     float Q;
 };
 
-FloatPoint current_units;
+//our command string
+char cmdbuffer[COMMAND_SIZE];
+char c = '?';
+byte serial_count = 0;
+boolean comment = false;
+
+//our feedrate variables.
+float feedrate = SLOW_XY_FEEDRATE;
+
+/* keep track of the last G code - this is the command mode to use
+ * if there is no command in the current string 
+ */
+int last_gcode_g = -1;
 
 boolean abs_mode = true; //0 = incremental; 1 = absolute
-
-//default to mm for units
-float x_units = X_STEPS_PER_MM;
-float y_units = Y_STEPS_PER_MM;
-float z_units = Z_STEPS_PER_MM;
-float e_units = E_STEPS_PER_MM;
-float curve_section = CURVE_SECTION_MM;
-
-//our direction vars
-/*
-byte x_direction = 1;
-byte y_direction = 1;
-byte z_direction = 1;
-byte e_direction = 1;
-*/
 
 float extruder_speed = 0;
 
 int scan_int(char *str, int *valp);
 int scan_float(char *str, float *valp);
+
+GcodeParser gc;	/* string parse result */
 
 //init our string processing
 void init_process_string()
@@ -129,40 +131,7 @@ void get_and_do_command()
 	}
 }
 
-//our feedrate variables.
-float feedrate = SLOW_XY_FEEDRATE;
 
-/* keep track of the last G code - this is the command mode to use
- * if there is no command in the current string 
- */
-int last_gcode_g = -1;
-
-/* bit-flags for commands and parameters */
-#define GCODE_G	(1<<0)
-#define GCODE_M	(1<<1)
-#define GCODE_P	(1<<2)
-#define GCODE_X	(1<<3)
-#define GCODE_Y	(1<<4)
-#define GCODE_Z	(1<<5)
-#define GCODE_I	(1<<6)
-#define GCODE_J	(1<<7)
-#define GCODE_K	(1<<8)
-#define GCODE_F	(1<<9)
-#define GCODE_S	(1<<10)
-#define GCODE_Q	(1<<11)
-#define GCODE_R	(1<<12)
-#define GCODE_E	(1<<13)
-
-
-#define PARSE_INT(ch, str, len, val, seen, flag) \
-	case ch: \
-		len = scan_int(str, &val, &seen, flag); \
-		break;
-
-#define PARSE_FLOAT(ch, str, len, val, seen, flag) \
-	case ch: \
-		len = scan_float(str, &val, &seen, flag); \
-		break;
 
 int parse_string(struct GcodeParser * gc, char instruction[ ], int size)
 {
@@ -204,8 +173,6 @@ int parse_string(struct GcodeParser * gc, char instruction[ ], int size)
 void process_string(char instruction[], int size)
 {
 
-	GcodeParser gc;	/* string parse result */
-
 	//the character / means delete block... used for comments and stuff.
 	if (instruction[0] == '/')	
 		return;
@@ -235,7 +202,7 @@ void process_string(char instruction[], int size)
 	if (gc.seen & GCODE_G)
 	{
 		last_gcode_g = gc.G;	/* remember this for future instructions */
-		fp = current_units;
+		fp = cdda.where_i_am();
 		if (abs_mode)
 		{
 			if (gc.seen & GCODE_X)
@@ -266,104 +233,70 @@ void process_string(char instruction[], int size)
 		//do something!
 		switch (gc.G)
 		{
-			//Rapid Positioning
-			//Linear Interpolation
-			//these are basically the same thing.
+			//Rapid move
 			case 0:
-                                move(fp.x, fp.y, fp.z, fp.e, FAST_XY_FEEDRATE);
+                                cdda.move(fp.x, fp.y, fp.z, fp.e, FAST_XY_FEEDRATE);
                                 break;
                                 
+                        // Controlled move
 			case 1:
-                                move(fp.x, fp.y, fp.z, fp.e, feedrate);
+                                cdda.move(fp.x, fp.y, fp.z, fp.e, feedrate);
                                 break;
-                                
-				//set our target.
-				//set_target(fp.x, fp.y, fp.z, fp.e);
 
-				// Use currently set feedrate if doing a G1
-				//if (gc.G == 1)
-					//feedrate_micros = calculate_feedrate_delay(feedrate);
-				// Use our max for G0
-				//else
-					//feedrate_micros = getMaxSpeed();
-				//finally move.
-				//dda_move(feedrate_micros);
-				//break;
-
-			
-			case 4: //Dwell
+			 //Dwell
+			case 4:
 				delay((int)(gc.P + 0.5));  // Changed by AB from 1000*gc.P
 				break;
 
-				//Inches for Units
+			//Inches for Units
 			case 20:
-				x_units = X_STEPS_PER_INCH;
-				y_units = Y_STEPS_PER_INCH;
-				z_units = Z_STEPS_PER_INCH;
-                                e_units = E_STEPS_PER_INCH;
-				curve_section = CURVE_SECTION_INCHES;
-
-				calculate_deltas();
+                                cdda.set_units(false);
 				break;
 
-				//mm for Units
+			//mm for Units
 			case 21:
-				x_units = X_STEPS_PER_MM;
-				y_units = Y_STEPS_PER_MM;
-				z_units = Z_STEPS_PER_MM;
-				e_units = E_STEPS_PER_MM;
-				curve_section = CURVE_SECTION_MM;
-
-				calculate_deltas();
+                                cdda.set_units(true);
 				break;
 
-				//go home.
+			//go home.
 			case 28:
-				set_target_home();
-				dda_move(getMaxSpeed());
+                                if(cdda.where_i_am().z != 0.0)
+                                  cdda.move(0.0, 0.0, 0.0, cdda.where_i_am().e, FAST_Z_FEEDRATE);
+                                else
+                                  cdda.move(0.0, 0.0, 0.0, cdda.where_i_am().e, FAST_XY_FEEDRATE);
+
 				break;
 
-				//go home via an intermediate point.
+			//go home via an intermediate point.
 			case 30:
-				//set our target.
-				set_target(fp.x, fp.y, fp.z, fp.e);
+                               if(cdda.where_i_am().z != fp.z)
+                                  cdda.move(fp.x, fp.y, fp.z, fp.e, FAST_Z_FEEDRATE);
+                                else
+                                  cdda.move(fp.x, fp.y, fp.z, fp.e, FAST_XY_FEEDRATE);
+                                  
+                                if(cdda.where_i_am().z != 0.0)
+                                  cdda.move(0.0, 0.0, 0.0, cdda.where_i_am().e, FAST_Z_FEEDRATE);
+                                else
+                                  cdda.move(0.0, 0.0, 0.0, cdda.where_i_am().e, FAST_XY_FEEDRATE);
 
-				//go there.
-				dda_move(getMaxSpeed());
-
-				//go home.
-				set_target_home();
-				dda_move(getMaxSpeed());
 				break;
 
 
 
-			
-			case 90: //Absolute Positioning
+			//Absolute Positioning
+			case 90: 
 				abs_mode = true;
 				break;
 
-			
-			case 91: //Incremental Positioning
+			//Incremental Positioning
+			case 91: 
 				abs_mode = false;
 				break;
 
-			
-			case 92: //Set position as fp
-				set_position(fp.x, fp.y, fp.z, fp.e);
+			//Set position as fp
+			case 92: 
+				cdda.set_position(fp.x, fp.y, fp.z, fp.e);
 				break;
-
-				/*
-				 //Inverse Time Feed Mode
-				 case 93:
-
-				 break;  //TODO: add this
-
-				 //Feed per Minute Mode
-				 case 94:
-
-				 break;  //TODO: add this
-				 */
 
 			default:
 				Serial.print("huh? G");
@@ -378,7 +311,6 @@ void process_string(char instruction[], int size)
 		{
 			//TODO: this is a bug because search_string returns 0.  gotta fix that.
 			case 0:
-				true;
 				break;
 				/*
 				 case 0:
@@ -393,24 +325,25 @@ void process_string(char instruction[], int size)
 				 //todo: program end
 				 break;
 				 */
-				//turn extruder on, forward
+
+			//turn extruder on, forward
 			case 101:
 				ex[extruder_in_use]->set_direction(1);
 				ex[extruder_in_use]->set_speed(extruder_speed);
 				break;
 
-				//turn extruder on, reverse
+			//turn extruder on, reverse
 			case 102:
 				ex[extruder_in_use]->set_direction(0);
 				ex[extruder_in_use]->set_speed(extruder_speed);
 				break;
 
-				//turn extruder off
+			//turn extruder off
 			case 103:
 				ex[extruder_in_use]->set_speed(0);
 				break;
 
-				//custom code for temperature control
+			//custom code for temperature control
 			case 104:
 				if (gc.seen & GCODE_S)
 				{
@@ -418,34 +351,34 @@ void process_string(char instruction[], int size)
 				}
 				break;
 
-				//custom code for temperature reading
+			//custom code for temperature reading
 			case 105:
 				Serial.print("T:");
 				Serial.println(ex[extruder_in_use]->get_temperature());
 				break;
 
-				//turn fan on
+			//turn fan on
 			case 106:
 				ex[extruder_in_use]->set_cooler(255);
 				break;
 
-				//turn fan off
+			//turn fan off
 			case 107:
 				ex[extruder_in_use]->set_cooler(0);
 				break;
 
-				//set max extruder speed, 0-255 PWM
+			//set max extruder speed, 0-255 PWM
 			case 108:
 				if (gc.seen & GCODE_S)
 					extruder_speed = gc.S;
 				break;
 
-                                // Open the valve
+                        // Open the valve
                         case 126:
                                 ex[extruder_in_use]->valve_set(true, (int)(gc.P + 0.5));
                                 break;
                                 
-                                // Close the valve
+                        // Close the valve
                         case 127:
                                 ex[extruder_in_use]->valve_set(false, (int)(gc.P + 0.5));
                                 break;
@@ -456,7 +389,6 @@ void process_string(char instruction[], int size)
 				Serial.println(gc.M, DEC);
 		}
 	}
-
 }
 
 int scan_float(char *str, float *valp, unsigned int *seen, unsigned int flag)
@@ -500,16 +432,5 @@ int scan_int(char *str, int *valp, unsigned int *seen, unsigned int flag)
 	return len;	/* length of number */
 }
 
-#ifdef TEST_MACHINE
-
-// Read and echo bytes.
-
-void comms_test()
-{
-  if (Serial.available() > 0)
-        Serial.print((char)Serial.read());
-}
-
-#endif
 
 

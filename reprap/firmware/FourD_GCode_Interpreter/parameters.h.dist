@@ -11,11 +11,6 @@
 //our command string length
 #define COMMAND_SIZE 128
 
-// Uncomment the next line to run stand-alone tests on the machine (also see the 
-// ends of this, the process_string, the extruder, and the stepper_control tabs).
-//#define TEST_MACHINE
-// If that works, comment out the next line to test the rest:
-#define COMMS_TEST
 
 #define INCHES_TO_MM 25.4
 
@@ -47,14 +42,16 @@
 #define FAST_XY_FEEDRATE 3000.0
 #define FAST_Z_FEEDRATE  50.0
 
-// Units in curve section
-#define CURVE_SECTION_MM 0.5
-#define CURVE_SECTION_INCHES (CURVE_SECTION_MM*INCHES_TO_MM)
+// Data for acceleration calculations
+// Comment out the next line to turn accelerations off
+#define ACCELERATION_ON
+#define SLOW_XY_FEEDRATE 1000.0 // Speed from which to start accelerating
+#define ACCELERATION_RATE 500.0 // Steps/sec^2
 
 // Set to one if enable pins are inverting
 // For RepRap stepper boards version 1.x the enable pins are *not* inverting.
 // For RepRap stepper boards version 2.x and above the enable pins are inverting.
-#define INVERT_ENABLE_PINS 1
+#define INVERT_ENABLE_PINS 0
 
 #if INVERT_ENABLE_PINS == 1
 #define ENABLE_ON LOW
