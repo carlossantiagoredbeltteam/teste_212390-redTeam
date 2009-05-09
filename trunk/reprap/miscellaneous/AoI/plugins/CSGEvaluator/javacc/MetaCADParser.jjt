@@ -12,6 +12,7 @@ package org.reprap.artofillusion.parser;
 
 import org.reprap.artofillusion.ObjFactory;
 import org.reprap.artofillusion.ParsedTree;
+import org.reprap.artofillusion.language.*;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.List;
 /** Simple brace matcher. */
 public class MetaCADParser {
   protected static MetaCADParser theParser = null;
-  protected static MetaCADParser getSingleton(String txt)
+  public static MetaCADParser getSingleton(String txt)
   {
         if (theParser== null)
         {
@@ -37,7 +38,21 @@ public class MetaCADParser {
     try
 	{
 		MetaCADParser parser = getSingleton(txt);
-		return parser.Object();
+		return parser.ParsedTree();
+	}
+	catch (Throwable ex)
+	{
+		ParseException newEx = new ParseException(ex.getMessage() + " in:\n" + txt);
+		newEx.initCause(ex);
+		throw newEx;
+	}
+  }
+  
+  public static List<ParsedStatement> parseParameters(String txt) throws ParseException {
+    try
+	{
+		MetaCADParser parser = getSingleton(txt);
+		return parser.ParsedStatementList();
 	}
 	catch (Throwable ex)
 	{
@@ -74,6 +89,14 @@ SKIP : /* WHITE SPACE */
 | "\f"
 }
 
+SPECIAL_TOKEN : /* COMMENTS */
+{
+  <SINGLE_LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+| <SINGLE_LINE_COMMENT_DASH: "#" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+| <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+}
+
+
 TOKEN :
 {
   < LPAREN: "(" >
@@ -88,6 +111,18 @@ TOKEN :
 {
   <REAL_LITERAL: (["0"-"9"])+ ("." (["0"-"9"])* (<EXPONENT>)?)? >
 |  <#EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+>
+|   < STRING_LITERAL:
+      "\""
+      (   (~["\"","\\","\n","\r"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+      )*
+      "\""
+  >
 }
 
 TOKEN : /* BINARY OPS */
@@ -95,7 +130,8 @@ TOKEN : /* BINARY OPS */
 	< PLUS: "+" >
 |	< MINUS: "-" >
 |   < DIVIDE: "/" >
-|	< OTHERBINOP: ["*","^","=", ">","<"] >
+|   < ASSIGN: "=" >
+|	< OTHERBINOP: ["*","^"] >
 }
 
 TOKEN : /* IDENTIFIERS */
@@ -141,13 +177,15 @@ TOKEN : /* IDENTIFIERS */
   >
 }
 
-ParsedTree Object() :
+
+
+ParsedTree ParsedTree() :
 {
 	ParsedTree tree;
 	List<ParsedTree> children=null;
 }
 {
-	tree = FunctionCallList() (<LBRACE>children=ObjectList()<RBRACE>)?
+	tree = FunctionCallList() (<LBRACE>children=ParsedTreeList()<RBRACE>)?
 {
 	if (children != null)
 	{
@@ -160,13 +198,13 @@ ParsedTree Object() :
 }
 }
 
-List<ParsedTree> ObjectList() :
+List<ParsedTree> ParsedTreeList() :
 {	
 	List<ParsedTree> list = new ArrayList<ParsedTree>();
 	ParsedTree current;
 }
 {
-	(current = Object() { list.add(current); } (";" current = Object() { list.add(current); })* (";")?)?
+	(current = ParsedTree() { list.add(current); } (";" current = ParsedTree() { list.add(current); })* (";")?)?
 	{
 		return list;
 	}
@@ -240,7 +278,7 @@ void UnaryExpression() :
 {
 }
 {
-	<REAL_LITERAL>	|  JEPFunctionCall()  | <LPAREN>Expression()<RPAREN> | <MINUS> UnaryExpression()
+	<REAL_LITERAL>	|  JEPFunctionCall()  | <LPAREN>Expression()<RPAREN> | <MINUS> UnaryExpression() | <STRING_LITERAL>
 }
 
 /** Brace counting production. */
@@ -248,8 +286,58 @@ String Expression() :
 {
 }
 {
-	UnaryExpression()((<PLUS>|<MINUS>|<DIVIDE>|<OTHERBINOP>)UnaryExpression())*
+	UnaryExpression()((<PLUS>|<MINUS>|<DIVIDE>|<ASSIGN>|<OTHERBINOP>)UnaryExpression())*
 	{
 		return dumpTokens(jjtThis);
 	}
+}
+
+VariableAssignment VariableAssignment() :
+{
+	String name;
+	String formula;
+	Token temp;
+}
+{
+	temp=<IDENTIFIER>{name=temp.image;}
+	<ASSIGN>
+	formula=Expression()
+	{
+		return new VariableAssignment(name, formula);
+	}
+}
+
+MacroPrototype MacroPrototype() :
+{
+	Token temp;
+	String name;
+	List<String> list = new ArrayList<String>(); 
+	List<ParsedTree> children;
+}
+{
+	temp=<IDENTIFIER>{name=temp.image;}
+	<LPAREN>
+		(temp = <IDENTIFIER> { list.add(temp.image); } 
+		(<COMMA> temp = <IDENTIFIER> { list.add(temp.image); })*)?
+	<RPAREN>
+	<LBRACE>
+		children=ParsedTreeList()
+	<RBRACE>
+	{
+		return new MacroPrototype(name, list, children);
+	}
+}
+
+List<ParsedStatement> ParsedStatementList() :
+{
+	List <ParsedStatement> statements = new ArrayList();
+	ParsedStatement temp;
+}
+{
+	(  temp=MacroPrototype() {statements.add(temp);} 
+	 | temp=VariableAssignment() {statements.add(temp);} )* <EOF>
+	 
+	{
+		return statements;
+	}	
 }

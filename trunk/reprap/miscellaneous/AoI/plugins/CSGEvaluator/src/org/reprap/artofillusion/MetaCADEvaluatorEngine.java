@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.cheffo.jeplite.JEP;
+import org.reprap.artofillusion.language.ParsedStatement;
 import org.reprap.artofillusion.parser.ParseException;
 
 import artofillusion.LayoutWindow;
@@ -102,7 +103,26 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     this.context.jep = new JEP();
     this.context.jep.addStandardConstants();
     this.context.jep.addStandardFunctions();
-    return evaluateLines(getParameters());
+ 
+    try {
+      List<ParsedStatement> statements = 
+        org.reprap.artofillusion.parser.MetaCADParser.parseParameters(getParameters());
+      for (int i = 0; i < statements.size(); i++)
+      {
+        boolean success = statements.get(i).execute(this.context);
+        if (!success)
+        {
+          showMessage("Error in statement: " + statements.get(i).toString());
+          return false;
+        }
+      }
+    } catch (ParseException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+      showMessage(e.getMessage());
+      return false;
+    }
+    return true;
   }
 
   
@@ -169,6 +189,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     }
   }
 
+  /*
   public ObjectInfo evaluateNode(ObjectInfo parent, UndoRecord undo) throws Exception
   {
     if (evaluateLoop(parent, undo)) return parent;
@@ -177,6 +198,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
 
     return super.evaluateNode(parent, undo);
   }
+  */
 
   Boolean convertObject(ObjectInfo parent) {
     if (parent.name.startsWith("Cube ") && parent.object instanceof Cube) {
@@ -226,6 +248,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
    * @return
    * @throws Exception
    */
+  /*
   public Boolean evaluateLoop(ObjectInfo parent, UndoRecord undo) throws Exception {
     String line = parent.name;
     int operation = this.stringToOp(line);
@@ -300,7 +323,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
 
     return true;
   }
-
+*/
   Object3D sanitizeObject3D(Object3D obj) throws Exception {
     try {
       obj.getBounds();
@@ -381,22 +404,6 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     }
   }
 
-  boolean evaluateLines(String text) {
-    try {
-      String lines[] = text.split("\n");
-      for (String curLine : lines) {
-        curLine = curLine.trim();
-        if (curLine.length() == 0 || curLine.startsWith("#"))
-          continue;
-        this.context.evaluateAssignment(curLine);
-      }
-      return true;
-    } catch (Throwable ex) {
-      System.out.println(ex);
-      return false;
-    }
-  }
-
 String coordSysToString(CoordinateSystem cs) {
     Vec3 t = cs.getOrigin();
     double r[] = cs.getRotationAngles();
@@ -417,6 +424,7 @@ String coordSysToString(CoordinateSystem cs) {
   void showMessage(String text)  {
     if (text==null)
       text ="null";
+    
     new MessageDialog(this.window, text);
   }
 
