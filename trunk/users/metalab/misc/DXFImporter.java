@@ -8,6 +8,8 @@ import klynn.aoi.util.*;
 
 import artofillusion.*;
 import artofillusion.object.*;
+import artofillusion.texture.Texture;
+import artofillusion.texture.UniformTexture;
 import artofillusion.animation.*;
 import artofillusion.math.*;
 
@@ -36,6 +38,7 @@ public class DXFImporter {
   Vector<int[]> faces;
   Vector<Vec3> vertices;
   Vector<Vec3[]> polylines;
+  YxxfGfxContext gc;
   
   public DXFImporter(Frame parent, Boolean enableMeshRepair) {
     this.parent = parent;
@@ -43,6 +46,7 @@ public class DXFImporter {
     this.faces = new Vector<int[]>();
     this.vertices = new Vector<Vec3>();
     this.polylines = new Vector<Vec3[]>();
+    this.gc = new YxxfGfxContext();
   }
   
   /**
@@ -120,13 +124,13 @@ public class DXFImporter {
       DXFImporter importer = new DXFImporter(parent, enableMeshRepair);
       for (int nextToDraw = 0;;) {
         YxxfEnt ent = (YxxfEnt) drawing.secEntities.insMSpace.block.nextEntity(nextToDraw);
-        if (ent == null) break;
-        importer.addEntity(ent);
+        if (!(ent instanceof YxxfEntHeader)) break;
+        importer.addEntity((YxxfEntHeader)ent);
         nextToDraw++;
       }
       
       TriangleMesh mesh = importer.createMesh(objName);
-      Boolean curvesfound = importer.createCurve(objName);
+      Boolean curvesfound = importer.createCurve(objName, null);
       if (mesh == null && !curvesfound) {
         new AWTMessageDialog(parent, new String[] { "Import of file: [" + f +
         "] failed. No supported geometry found." });
@@ -148,17 +152,29 @@ public class DXFImporter {
     return;
   }
 
-  private Boolean createCurve(String objName) {
+  private void createAndAddObjectInfo(String objName, Object3D obj3d, Color col) {
+    Texture tex;
+    if (col != null) {
+      tex = new UniformTexture();
+      ((UniformTexture)tex).diffuseColor.setRGB(col.getRed(), col.getGreen(), col.getBlue());
+    }
+    else {
+      tex = theScene.getDefaultTexture();
+    }
+    ObjectInfo info = new ObjectInfo(obj3d, new CoordinateSystem(), objName);
+    info.setTexture(tex, tex.getDefaultMapping(obj3d));
+    info.addTrack(new PositionTrack(info), 0);
+    info.addTrack(new RotationTrack(info), 1);
+    theScene.addObject(info, null);
+  }
+
+  private Boolean createCurve(String objName, Color col) {
     for (int i=0;i<this.polylines.size();i++) {
       Vec3[] verts = this.polylines.get(i);
       float smoothness[] = new float[verts.length];
       Arrays.fill(smoothness, 0.0f);
       Curve curve = new Curve(verts, smoothness, Mesh.NO_SMOOTHING, false);
-      ObjectInfo info = new ObjectInfo(curve, new CoordinateSystem(), objName + "_curve" + i);
-      info.setTexture(theScene.getDefaultTexture(), theScene.getDefaultTexture().getDefaultMapping(curve));
-      info.addTrack(new PositionTrack(info), 0);
-      info.addTrack(new RotationTrack(info), 1);
-      theScene.addObject(info, null);
+      createAndAddObjectInfo(objName + "_curve" + i, curve, col);
     }
     if (this.polylines.size() > 0) return true;
     else return false;
@@ -220,12 +236,7 @@ public class DXFImporter {
       CoordinateSystem coords = new CoordinateSystem(center, Vec3.vz(), Vec3.vy());
       // coords.setOrientation(270, 0, 0);
       TriangleMesh mesh = new TriangleMesh(vert, fc);
-      ObjectInfo info = new ObjectInfo(mesh, coords, objName);
-      info.setTexture(theScene.getDefaultTexture(), theScene.getDefaultTexture()
-          .getDefaultMapping(mesh));
-      info.addTrack(new PositionTrack(info), 0);
-      info.addTrack(new RotationTrack(info), 1);
-      theScene.addObject(info, null);
+      createAndAddObjectInfo(objName, mesh, null);
       return mesh;
     }
     return null;
@@ -253,13 +264,18 @@ public class DXFImporter {
    * @param
    * @return
    */
-  private void addEntity(YxxfEnt ent) {
+  private void addEntity(YxxfEntHeader ent) {
     YxxfGfxMatrix m = new YxxfGfxMatrix();
     m.mtxSetIdentity();
     addEntity(ent, m);
   }
   
-  private void addEntity(YxxfEnt ent, YxxfGfxMatrix mat) {
+  private void addEntity(YxxfEntHeader ent, YxxfGfxMatrix mat) {
+    YxxfTblLayer layer = ent.hdr_layer;
+    int colorindex = layer.aci;
+    if (colorindex < 0) return;
+    Color col = this.gc.getPalette().jcolorarr[colorindex];
+    
     if (ent instanceof YxxfEnt3Dface) {
       // if (debug) System.out.println("Found a 3DFace");
       YxxfEnt3Dface f = (YxxfEnt3Dface) ent;
@@ -304,25 +320,13 @@ public class DXFImporter {
       Vec3[] coords = createArc(mat, c.center, c.radius, 0, 360);
       this.polylines.add(coords);
     }
-    else if (ent instanceof YxxfEntInsert) {
-      YxxfEntInsert e = (YxxfEntInsert) ent;
-      if (debug) System.out.printf("Insert: %.2f,%.2f,%.2f\n",
-                                   e.inspnt.x, e.inspnt.y, e.inspnt.z);
-      YxxfEntBlock blk = (YxxfEntBlock)e.block;
-      for (int nextToDraw = 0;;) {
-        YxxfEnt ent2 = (YxxfEnt)blk.nextEntity(nextToDraw);
-        if (ent2 == null) break;
-        addEntity(ent2, e.M_insert);
-        nextToDraw++;
-      }
-    }
     else if (ent instanceof YxxfEntLine) {
       if (debug) System.out.println("Found an Line");
       YxxfEntLine l = (YxxfEntLine)ent;
       Vec3[] polyline = new Vec3[2];
-      YxxfGfxPointW p = mat.mtxTransformPoint(l.begpnt);
+      YxxfGfxPointW p = mat.mtxTransformPoint(new YxxfGfxPointW(l.begpnt));
       polyline[0] = new Vec3(p.x, p.y, p.z);
-      p = mat.mtxTransformPoint(l.begpnt);
+      p = mat.mtxTransformPoint(new YxxfGfxPointW(l.endpnt));
       polyline[1] = new Vec3(p.x, p.y, p.z); 
       this.polylines.add(polyline);
     }
@@ -330,10 +334,24 @@ public class DXFImporter {
       YxxfEntPolyline pl = (YxxfEntPolyline)((YxxfEntLwpolyline)ent).pline;
       Vec3[] polyline = new Vec3[pl.vtxEntities.size()];
       for (int i=0;i<pl.vtxEntities.size();i++) {
-        YxxfGfxPointW p = mat.mtxTransformPoint(((YxxfEntVertex) pl.vtxEntities.get(i)).pnt);
+        YxxfGfxPointW p = mat.mtxTransformPoint(new YxxfGfxPointW(((YxxfEntVertex)pl.vtxEntities.get(i)).pnt));
         polyline[i] = new Vec3(p.x, p.y, p.z);
       }
       this.polylines.add(polyline);
+    }
+    else if (ent instanceof YxxfEntInsert) {
+      YxxfEntInsert e = (YxxfEntInsert) ent;
+      if (debug) System.out.printf("Insert: %.2f,%.2f,%.2f\n",
+                                   e.inspnt.x, e.inspnt.y, e.inspnt.z);
+      YxxfEntBlock blk = (YxxfEntBlock)e.block;
+      for (int nextToDraw = 0;;) {
+        YxxfEnt ent2 = (YxxfEnt)blk.nextEntity(nextToDraw);
+        if (!(ent2 instanceof YxxfEntHeader)) break;
+        YxxfGfxMatrix m = new YxxfGfxMatrix(e.M_insert);
+        m.mtxTranslate(e.inspnt);
+        addEntity((YxxfEntHeader)ent2, m);
+        nextToDraw++;
+      }
     }
     
     else System.out.println("Skipping unknown/unsupported entity: " + ent.getClass().getName());
