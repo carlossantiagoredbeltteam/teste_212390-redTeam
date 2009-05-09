@@ -10,7 +10,6 @@ PARSER_BEGIN(MetaCADParser)
 package org.reprap.artofillusion.parser;
 
 
-import org.reprap.artofillusion.ObjFactory;
 import org.reprap.artofillusion.ParsedTree;
 import org.reprap.artofillusion.language.*;
 import java.io.StringReader;
@@ -237,7 +236,7 @@ ParsedTree FunctionCall() :
 	(nameToken=<PLUS>|nameToken=<MINUS>|nameToken=<DIVIDE>)name=<IDENTIFIER> (<LPAREN>(params = ParameterList())?<RPAREN>)? 
 	{
 		String n = nameToken.image+name.image;
-		tree = ObjFactory.create(n);
+		tree = new ParsedTree();
 		tree.name = n;
 		tree.parameters =  params;
 		return tree;
