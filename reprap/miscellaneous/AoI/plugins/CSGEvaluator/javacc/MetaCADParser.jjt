@@ -35,17 +35,8 @@ public class MetaCADParser {
   }
 
   public static ParsedTree parseTree(String txt) throws ParseException {
-    try
-	{
-		MetaCADParser parser = getSingleton(txt);
-		return parser.ParsedTree();
-	}
-	catch (Throwable ex)
-	{
-		ParseException newEx = new ParseException(ex.getMessage() + " in:\n" + txt);
-		newEx.initCause(ex);
-		throw newEx;
-	}
+	MetaCADParser parser = getSingleton(txt);
+	return parser.ParsedTree();
   }
   
   public static List<ParsedStatement> parseParameters(String txt) throws ParseException {
