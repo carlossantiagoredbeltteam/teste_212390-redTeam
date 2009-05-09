@@ -3,10 +3,13 @@ package org.reprap.artofillusion;
 import artofillusion.object.CSGObject;
 
 public class ObjFactory {
-  public static ParsedTree create(String name) throws ObjFactoryException {
+  public static MetaCADObject create(String name) throws ObjFactoryException {
     name = name.toLowerCase();
 
-    if (name.startsWith("sphere")) {
+    if (name == "native") {
+      return new NativeObj();
+    }
+    else if (name.startsWith("sphere")) {
       return new SphereObj();
     }
     else if (name.startsWith("cube")) {

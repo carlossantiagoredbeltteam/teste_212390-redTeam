@@ -14,35 +14,35 @@ import artofillusion.object.ObjectInfo;
 import artofillusion.object.TriangleMesh;
 import artofillusion.tools.ExtrudeTool;
 
-public class ExtrudeObj extends ParsedTree
+public class ExtrudeObj extends MetaCADObject
 {
   
-  public List<ObjectInfo> evaluateObject(MetaCADContext ctx) throws Exception {
+  public List<ObjectInfo> evaluateObject(MetaCADContext ctx, 
+                                         List<String> parameters, 
+                                         List<ParsedTree> children) throws Exception {
   
     List<ObjectInfo> result = new LinkedList<ObjectInfo>();
 
-    List<ObjectInfo> children = evaluateChildren(ctx);
-
     // Three first parameters define the extrusion vector
     Vec3 dir = Vec3.vz();
-    if (this.parameters.size() >= 3) {
-      dir = new Vec3(ctx.evaluateExpression(this.parameters.get(0)),
-                     ctx.evaluateExpression(this.parameters.get(1)),
-                     ctx.evaluateExpression(this.parameters.get(2)));
+    if (parameters.size() >= 3) {
+      dir = new Vec3(ctx.evaluateExpression(parameters.get(0)),
+                     ctx.evaluateExpression(parameters.get(1)),
+                     ctx.evaluateExpression(parameters.get(2)));
     }
     // 4. parameter is num segments
     int numsegments = 1;
-    if (this.parameters.size() >= 4) {
-      numsegments = (int)ctx.evaluateExpression(this.parameters.get(3));
+    if (parameters.size() >= 4) {
+      numsegments = (int)ctx.evaluateExpression(parameters.get(3));
       if (numsegments < 2) numsegments = 1;
     }
     // 5. parameter is twist degrees
     double twist = 0.0;
-    if (this.parameters.size() >= 5) {
-      twist = ctx.evaluateExpression(this.parameters.get(4));
+    if (parameters.size() >= 5) {
+      twist = ctx.evaluateExpression(parameters.get(4));
     }
     
-    result.add(extrude(children, dir, numsegments, twist));
+    result.add(extrude(ParsedTree.evaluate(ctx, children), dir, numsegments, twist));
     return result;
   }
   

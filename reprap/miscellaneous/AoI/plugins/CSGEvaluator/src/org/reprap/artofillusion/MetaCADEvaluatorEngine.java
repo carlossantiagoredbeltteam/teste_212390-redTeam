@@ -144,7 +144,9 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     }
     catch (ObjFactoryException e) {
       // Handle non-MetaCAD object here
-      root = new NativeObj(parent);
+      root = new ParsedTree();
+      root.name = "native";
+      root.aoiobj = parent;
     }
     
     // If the parser returned a subtree, find the leaf node
