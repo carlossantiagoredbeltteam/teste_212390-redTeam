@@ -20,13 +20,13 @@ public class ObjFactory {
     else if (name.startsWith("cs")) {
       return new CSObj();
     }
-    else if (name.startsWith("union")) {
+    else if (name.startsWith("union") || name.startsWith("+")) {
       return new BooleanObj(CSGObject.UNION);
     }
-    else if (name.startsWith("difference")) {
+    else if (name.startsWith("difference") || name.startsWith("-")) {
       return new BooleanObj(CSGObject.DIFFERENCE12);
     }
-    else if (name.startsWith("intersection")) {
+    else if (name.startsWith("intersection") || name.startsWith("/")) {
       return new BooleanObj(CSGObject.INTERSECTION);
     }
     else if (name.startsWith("star")) {
