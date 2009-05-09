@@ -227,7 +227,7 @@ ParsedTree FunctionCall() :
 {
 	name = <IDENTIFIER>(<LPAREN>(params = ParameterList())?<RPAREN>)? 
 	{
-		tree = ObjFactory.create(name.image);
+		tree = new ParsedTree();
 		tree.name = name.image;
 		tree.parameters =  params;
 		return tree;
