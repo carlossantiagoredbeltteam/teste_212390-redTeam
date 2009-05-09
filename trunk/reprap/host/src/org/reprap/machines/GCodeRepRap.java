@@ -369,7 +369,11 @@ public class GCodeRepRap extends GenericRepRap {
 		currentFeedrate = xyFeedrate;
 		
 		gcode.queue("G1 Z-999 F" + round(getMaxFeedrateZ(), 4) + " ;z home");
-		gcode.queue("G92 X0 Y0 Z0; set current position as home");
+		String setHome = "G92 X0 Y0 Z0";
+		if(extruders[extruder].get4D())
+			setHome += " E0";
+		setHome += "; set current position as home";
+		gcode.queue(setHome);
 		
 	}
 	
