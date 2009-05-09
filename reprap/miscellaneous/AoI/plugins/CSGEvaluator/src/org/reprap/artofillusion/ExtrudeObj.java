@@ -75,7 +75,7 @@ public class ExtrudeObj extends ParsedTree
     // Extrude each extrudable child object
     List<ObjectInfo> resultobjects = new LinkedList<ObjectInfo>();
     Iterator<ObjectInfo> iter = objects.iterator();
-    while(iter.hasNext()) {
+    while (iter.hasNext()) {
       ObjectInfo profile = iter.next();
       Object3D profileobj = profile.getObject();
       if (!(profileobj instanceof TriangleMesh) &&
@@ -83,9 +83,14 @@ public class ExtrudeObj extends ParsedTree
         profileobj = profileobj.convertToTriangleMesh(0.1);
       }
 
+      Object3D obj3D = null;
       if (profileobj instanceof TriangleMesh) {
-        Object3D obj3D = ExtrudeTool.extrudeMesh((TriangleMesh)profileobj, path, profile.getCoords(), pathCS, twist*Math.PI/180.0, true);
-      
+        obj3D = ExtrudeTool.extrudeMesh((TriangleMesh)profileobj, path, profile.getCoords(), pathCS, twist*Math.PI/180.0, true);
+      }
+      else if (profileobj instanceof Curve) {
+        obj3D = ExtrudeTool.extrudeCurve((Curve)profileobj, path, profile.getCoords(), pathCS, twist*Math.PI/180.0, true);
+      }
+      if (obj3D != null) {
         // Since the result is centered in the origin, offset the extruded object to 
         // move it back to its original position
         // FIXME: Combine this with the user-specified coordinate system
