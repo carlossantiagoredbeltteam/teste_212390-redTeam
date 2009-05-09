@@ -10,6 +10,7 @@ byte serial_count = 0;
 boolean comment = false;
 
 // our point structure to make things nice.
+/*
 struct LongPoint
 {
 	long x;
@@ -17,6 +18,7 @@ struct LongPoint
 	long z;
         long e;
 };
+*/
 
 struct FloatPoint
 {
@@ -46,12 +48,6 @@ struct GcodeParser
 };
 
 FloatPoint current_units;
-FloatPoint target_units;
-FloatPoint delta_units;
-
-FloatPoint current_steps;
-FloatPoint target_steps;
-FloatPoint delta_steps;
 
 boolean abs_mode = true; //0 = incremental; 1 = absolute
 
@@ -63,10 +59,12 @@ float e_units = E_STEPS_PER_MM;
 float curve_section = CURVE_SECTION_MM;
 
 //our direction vars
+/*
 byte x_direction = 1;
 byte y_direction = 1;
 byte z_direction = 1;
 byte e_direction = 1;
+*/
 
 float extruder_speed = 0;
 
@@ -132,8 +130,7 @@ void get_and_do_command()
 }
 
 //our feedrate variables.
-float feedrate = 0.0;
-long feedrate_micros = 0;
+float feedrate = SLOW_XY_FEEDRATE;
 
 /* keep track of the last G code - this is the command mode to use
  * if there is no command in the current string 
@@ -167,7 +164,7 @@ int last_gcode_g = -1;
 		len = scan_float(str, &val, &seen, flag); \
 		break;
 
-int parse_string(struct GcodeParser * gc, char instruction[], int size)
+int parse_string(struct GcodeParser * gc, char instruction[ ], int size)
 {
 	int ind;
 	int len;	/* length of parameter argument */
@@ -273,19 +270,25 @@ void process_string(char instruction[], int size)
 			//Linear Interpolation
 			//these are basically the same thing.
 			case 0:
+                                move(fp.x, fp.y, fp.z, fp.e, FAST_XY_FEEDRATE);
+                                break;
+                                
 			case 1:
+                                move(fp.x, fp.y, fp.z, fp.e, feedrate);
+                                break;
+                                
 				//set our target.
-				set_target(fp.x, fp.y, fp.z, fp.e);
+				//set_target(fp.x, fp.y, fp.z, fp.e);
 
 				// Use currently set feedrate if doing a G1
-				if (gc.G == 1)
-					feedrate_micros = calculate_feedrate_delay(feedrate);
+				//if (gc.G == 1)
+					//feedrate_micros = calculate_feedrate_delay(feedrate);
 				// Use our max for G0
-				else
-					feedrate_micros = getMaxSpeed();
+				//else
+					//feedrate_micros = getMaxSpeed();
 				//finally move.
-				dda_move(feedrate_micros);
-				break;
+				//dda_move(feedrate_micros);
+				//break;
 
 			
 			case 4: //Dwell

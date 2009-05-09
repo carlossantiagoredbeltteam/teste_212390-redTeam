@@ -2,8 +2,22 @@
 #include "pins.h"
 #include "extruder.h"
 
+//FloatPoint current_units;
+FloatPoint target_units;
+FloatPoint delta_units;
+
+FloatPoint current_steps;
+FloatPoint target_steps;
+FloatPoint delta_steps;
+
+//our direction vars
+byte x_direction = 1;
+byte y_direction = 1;
+byte z_direction = 1;
+byte e_direction = 1;
+
 //init our variables
-long max_delta;
+
 long x_counter;
 long y_counter;
 long z_counter;
@@ -14,14 +28,19 @@ bool z_can_step;
 bool e_can_step;
 int milli_delay;
 
+// Variables for acceleration calculations
+
+long total_steps;
+long micro_delay_ends;
+long micro_delay_fast;
+long start_steps;
+long end_steps;
 
 // Initialise X, Y and Z.  The extruder is initialized
 // separately.
 
 void init_steppers()
 {
-
-	
 	//init our points.
 	current_units.x = 0.0;
 	current_units.y = 0.0;
@@ -93,21 +112,25 @@ inline void do_e_step()
 }
 
 
+void move(float x, float y, float z, float e, float feedrate)
+{
+  set_target(x, y, z, e);
+  dda_move(calculate_feedrate_delay(feedrate));
+}
+
+
 void dda_move(long micro_delay)
 {
-	//turn on steppers to start moving =)
-	enable_steppers();
-	
 	//figure out our deltas
-	max_delta = max(delta_steps.x, delta_steps.y);
-	max_delta = max(delta_steps.z, max_delta);
-	max_delta = max(delta_steps.e, max_delta);
+	//total_steps = max(delta_steps.x, delta_steps.y);
+	//total_steps = max(delta_steps.z, total_steps);
+	//total_steps = max(delta_steps.e, total_steps);
 
 	//init stuff.
-	long x_counter = -max_delta/2;
-	long y_counter = -max_delta/2;
-	long z_counter = -max_delta/2;
-        long e_counter = -max_delta/2;
+	long x_counter = -total_steps/2;
+	long y_counter = -total_steps/2;
+	long z_counter = -total_steps/2;
+        long e_counter = -total_steps/2;
 	
 	//our step flags
 	bool x_can_step = 0;
@@ -120,6 +143,9 @@ void dda_move(long micro_delay)
 		milli_delay = micro_delay / 1000;
 	else
 		milli_delay = 0;
+
+	//turn on steppers to start moving =)
+	enable_steppers();
 
 	//do our DDA line!
 	do
@@ -136,7 +162,7 @@ void dda_move(long micro_delay)
 			if (x_counter > 0)
 			{
 				do_x_step();
-				x_counter -= max_delta;
+				x_counter -= total_steps;
 				
 				if (x_direction)
 					current_steps.x++;
@@ -152,7 +178,7 @@ void dda_move(long micro_delay)
 			if (y_counter > 0)
 			{
 				do_y_step();
-				y_counter -= max_delta;
+				y_counter -= total_steps;
 
 				if (y_direction)
 					current_steps.y++;
@@ -168,7 +194,7 @@ void dda_move(long micro_delay)
 			if (z_counter > 0)
 			{
 				do_z_step();
-				z_counter -= max_delta;
+				z_counter -= total_steps;
 				
 				if (z_direction)
 					current_steps.z++;
@@ -184,7 +210,7 @@ void dda_move(long micro_delay)
 			if (e_counter > 0)
 			{
 				do_e_step();
-				e_counter -= max_delta;
+				e_counter -= total_steps;
 				
 				if (e_direction)
 					current_steps.e++;
@@ -351,51 +377,21 @@ long calculate_feedrate_delay(float feedrate)
 	float distance = sqrt(delta_units.x*delta_units.x + 
                               delta_units.y*delta_units.y + 
                               delta_units.z*delta_units.z + 
-                              delta_units.e*delta_units.e);
-	long master_steps = 0;
+                              delta_units.e*delta_units.e);  // Should this be here?  Hyperdistance?
 	
 	//find the dominant axis.
-        if(delta_steps.x > delta_steps.e)
-        {
-	  if (delta_steps.x > delta_steps.y)
-	  {
-		if (delta_steps.x > delta_steps.z)
-			master_steps = delta_steps.x;
-		else
-			master_steps = delta_steps.z;
-	  }
-	  else
-	  {
-		if (delta_steps.y > delta_steps.z)
-			master_steps = delta_steps.y;
-		else
-			master_steps = delta_steps.z;
-	  }
-        } else
-        {
-	  if (delta_steps.e > delta_steps.y)
-	  {
-		if (delta_steps.e > delta_steps.z)
-			master_steps = delta_steps.e;
-		else
-			master_steps = delta_steps.z;
-	  }
-	  else
-	  {
-		if (delta_steps.y > delta_steps.z)
-			master_steps = delta_steps.y;
-		else
-			master_steps = delta_steps.z;
-	  }          
-        }
 
+        total_steps = max(delta_steps.x, delta_steps.y);
+        total_steps = max(total_steps, delta_steps.z);
+        total_steps = max(total_steps, delta_steps.e);
+        
 	//calculate delay between steps in microseconds.  this is sort of tricky, but not too bad.
 	//the formula has been condensed to save space.  here it is in english:
         // (feedrate is in mm/minute)
-	// distance / feedrate * 60000000.0 = move duration in microseconds
-	// move duration / master_steps = time between steps for master axis.
+	// 60000000.0*distance/feedrate  = move duration in microseconds
+	// move duration/master_steps = time between steps for master axis.
 
-	return ((distance * 60000000.0) / feedrate) / master_steps;	
+	return ((distance * 60000000.0) / feedrate) / total_steps;	
 }
 
 long getMaxSpeed()
