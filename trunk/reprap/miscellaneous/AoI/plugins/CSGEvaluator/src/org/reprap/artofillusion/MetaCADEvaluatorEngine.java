@@ -137,9 +137,16 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     convertObject(parent);
 
     // Parse this ObjectInfo
-    ParsedTree root = org.reprap.artofillusion.parser.MetaCADParser.parseTree(parent.name + ";");
-    root.aoiobj = parent;
-
+    ParsedTree root = null;
+    try {
+      root = org.reprap.artofillusion.parser.MetaCADParser.parseTree(parent.name + ";");
+      root.aoiobj = parent;
+    }
+    catch (ObjFactoryException e) {
+      // Handle non-MetaCAD object here
+      root = new NativeObj(parent);
+    }
+    
     // If the parser returned a subtree, find the leaf node
     // (we guarantee that there are at most one child of each intermediate node)
     ParsedTree parenttree = root;
@@ -571,8 +578,9 @@ String coordSysToString(CoordinateSystem cs) {
       
       // Inherit texture color from the first source object
       Object3D inheritfrom = objects[0].getObject();
-      resultinfo.getObject().setTexture(inheritfrom.getTexture(), inheritfrom.getTextureMapping());
-
+      if (inheritfrom.canSetTexture()) {
+        resultinfo.getObject().setTexture(inheritfrom.getTexture(), inheritfrom.getTextureMapping());
+      }
       // add the object info to the window (which adds it to the scene and the item tree
       // and creates the proper undo record commands)
       // FIXME: The index is sometimes wrong since moving objects with the mouse confuses AoI's index system.
@@ -644,10 +652,21 @@ String coordSysToString(CoordinateSystem cs) {
   
   public void extrude()
   {
-    createParentObject("extrude()", 2);
+    createParentObject("extrude()", 1);
   }
  
+  public void mesh()
+  {
+    createParentObject("mesh()", 1);
+  }
+
+  public void group()
+  {
+    createParentObject("cs()", 1);
+  }
+
   public void test()
+  
   {
     showMessage("test function not implemented");
   }
