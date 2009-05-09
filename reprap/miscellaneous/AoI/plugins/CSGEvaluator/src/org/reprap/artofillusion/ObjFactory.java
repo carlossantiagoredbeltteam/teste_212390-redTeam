@@ -1,11 +1,9 @@
 package org.reprap.artofillusion;
 
-import org.reprap.artofillusion.parser.ParseException;
-
 import artofillusion.object.CSGObject;
 
 public class ObjFactory {
-  public static ParsedTree create(String name) throws Exception {
+  public static ParsedTree create(String name) throws ObjFactoryException {
     name = name.toLowerCase();
 
     if (name.startsWith("sphere")) {
@@ -51,6 +49,6 @@ public class ObjFactory {
       return new MeshObj();
     }
 
-    throw new ParseException("ObjFactory: Unknown Object type: " + name);
+    throw new ObjFactoryException("ObjFactory: Unknown Object type: " + name);
   }
 }
