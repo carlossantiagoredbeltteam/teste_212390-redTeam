@@ -41,14 +41,11 @@ extruder::extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin,
         if(step_en_pin >= 0)
         {
           pinMode(step_en_pin, OUTPUT);
-	  digitalWrite(step_en_pin, 1); // N.B. Active low.
+	  disableStep();
         }
-//#ifdef SANGUINO
 
         setupTimerInterrupt();
 	disableTimerInterrupt();
-
-//#endif
 
         //these our the default values for the extruder.
         e_speed = 0;
@@ -294,14 +291,6 @@ void extruder::set_speed(float sp)
   enableTimerInterrupt();
 }
 
-void extruder::step()
-{
-   digitalWrite(motor_speed_pin, HIGH);
-   delayMicroseconds(5);
-   digitalWrite(motor_speed_pin, LOW); 
-}
-
-
 void extruder::interrupt()
 {
     if(!e_speed)
@@ -312,25 +301,6 @@ void extruder::interrupt()
       step();
       extrude_step_count = 0;
     }
-}
-
-void extruder::enableTimerInterrupt() 
-{
-   //reset our timer to 0 for reliable timing TODO: is this needed?
-   //TCNT1 = 0;
-          
-   //then enable our interrupt!
-   TIMSK1 |= (1<<OCIE1A);
- }
-	
-void extruder::disableTimerInterrupt() 
-{
-     TIMSK1 &= ~(1<<OCIE1A);
-}
-        
-void extruder::setTimerCeiling(unsigned int c) 
-{
-    OCR1A = c;
 }
 
 void extruder::setupTimerInterrupt()
@@ -474,81 +444,3 @@ byte extruder::getTimerResolution(long delay)
 		return 4;
 }
 
-
-#ifdef TEST_MACHINE
-
-bool heat_on;
-
-void extruder::heater_test()
-{
-  int t = get_temperature();
-  if(t < 50 && !heat_on)
-  {
-    Serial.println("\n *** Turning heater on.\n");
-    heat_on = true;
-    analogWrite(heater_pin, heater_high);
-  }
-
-  if(t > 100 && heat_on)
-  {
-    Serial.println("\n *** Turning heater off.\n");
-    heat_on = false;
-    analogWrite(heater_pin, 0);
-  } 
- 
-  Serial.print("Temperature: ");
-  Serial.print(t);
-  Serial.print(" deg C. The heater is ");
-  if(heat_on)
-    Serial.println("on.");
-  else
-    Serial.println("off.");
-  
-  delay(2000);  
-}
-
-void extruder::drive_test()
-{
-    Serial.println("Turning the extruder motor on forwards for 5 seconds.");
-    set_direction(true);
-    set_speed(200);
-    delay(5000);
-    set_speed(0);
-    Serial.println("Pausing for 2 seconds.");
-    delay(2000);  
-    Serial.println("Turning the extruder motor on backwards for 5 seconds.");
-    set_direction(false);
-    set_speed(200);
-    delay(5000);
-    set_speed(0);    
-    Serial.println("Pausing for 2 seconds.");
-    delay(2000);
-}
-
-void extruder::valve_test()
-{
-    Serial.println("Opening the valve.");
-    valve_set(true, 500);
-    Serial.println("Pausing for 2 seconds.");
-    delay(2000);  
-    Serial.println("Closing the valve.");
-    valve_set(false, 500);
-    Serial.println("Pausing for 2 seconds.");
-    delay(2000);  
-}
-
-void extruder::fan_test()
-{
-    Serial.println("Fan on.");
-    set_cooler(255);
-    Serial.println("Pausing for 2 seconds.");
-    delay(2000);  
-    Serial.println("Fan off.");
-    set_cooler(0);
-    Serial.println("Pausing for 2 seconds.");
-    delay(2000);  
-}
-
-
-
-#endif
