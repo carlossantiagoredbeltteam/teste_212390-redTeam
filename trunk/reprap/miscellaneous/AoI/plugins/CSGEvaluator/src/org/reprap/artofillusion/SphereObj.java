@@ -8,21 +8,23 @@ import artofillusion.math.Vec3;
 import artofillusion.object.Object3D;
 import artofillusion.object.ObjectInfo;
 
-public class SphereObj extends ParsedTree {
+public class SphereObj extends MetaCADObject {
 
-  public List<ObjectInfo> evaluateObject(MetaCADContext ctx) throws Exception {
- 
+  public List<ObjectInfo> evaluateObject(MetaCADContext ctx, 
+                                         List<String> parameters, 
+                                         List<ParsedTree> children) throws Exception {
+    
     List<ObjectInfo> result = new LinkedList<ObjectInfo>();
 
     double mainparam = 1.0f;
-    if (this.parameters.size() >= 1) {
-      mainparam = ctx.evaluateExpression(this.parameters.get(0));
+    if (parameters.size() >= 1) {
+      mainparam = ctx.evaluateExpression(parameters.get(0));
     }
     Vec3 dims = new Vec3(mainparam, mainparam, mainparam);
-    if (this.parameters.size() >= 3) {
+    if (parameters.size() >= 3) {
       dims.set(mainparam,
-               ctx.evaluateExpression(this.parameters.get(1)),
-               ctx.evaluateExpression(this.parameters.get(2)));
+               ctx.evaluateExpression(parameters.get(1)),
+               ctx.evaluateExpression(parameters.get(2)));
     }
     Object3D obj3D = new artofillusion.object.Sphere(dims.x, dims.y, dims.z);
 

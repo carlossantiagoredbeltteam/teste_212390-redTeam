@@ -14,21 +14,22 @@ import artofillusion.object.Mesh;
 import artofillusion.object.Object3D;
 import artofillusion.object.ObjectInfo;
 
-public class InsetObj extends ParsedTree
+public class InsetObj extends MetaCADObject
 {
   
-  public List<ObjectInfo> evaluateObject(MetaCADContext ctx) throws Exception {
+  public List<ObjectInfo> evaluateObject(MetaCADContext ctx, 
+                                         List<String> parameters, 
+                                         List<ParsedTree> children) throws Exception {
 
     double inset = 1.0;
-    if (this.parameters.size() > 0) {
-      inset = ctx.evaluateExpression(this.parameters.get(0));
+    if (parameters.size() > 0) {
+      inset = ctx.evaluateExpression(parameters.get(0));
     }
     
     List<ObjectInfo> result = new LinkedList<ObjectInfo>();
 
-    List<ObjectInfo> children = evaluateChildren(ctx);
+    Iterator<ObjectInfo> iter = ParsedTree.evaluate(ctx, children).iterator();
 
-    Iterator<ObjectInfo> iter = children.iterator();
     while (iter.hasNext()) {
       ObjectInfo chinfo = iter.next();
       Object3D obj3D = chinfo.object;

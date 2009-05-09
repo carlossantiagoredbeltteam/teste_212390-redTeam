@@ -11,7 +11,7 @@ import artofillusion.object.Mesh;
 import artofillusion.object.Object3D;
 import artofillusion.object.ObjectInfo;
 
-public class PolygonObj extends ParsedTree
+public class PolygonObj extends MetaCADObject
 {
   public static final int STAR = 0;
   public static final int REG = 1;
@@ -22,7 +22,9 @@ public class PolygonObj extends ParsedTree
     this.type = type;
   }
   
-  public List<ObjectInfo> evaluateObject(MetaCADContext ctx) throws Exception {
+  public List<ObjectInfo> evaluateObject(MetaCADContext ctx, 
+                                         List<String> parameters, 
+                                         List<ParsedTree> children) throws Exception {
     
     List<ObjectInfo> result = new LinkedList<ObjectInfo>();
 
@@ -32,12 +34,12 @@ public class PolygonObj extends ParsedTree
         int n = 6;
         double inner = 3;
         double outer = 5;
-        if (this.parameters.size() >= 1) {
-          n = (int)ctx.evaluateExpression(this.parameters.get(0));
+        if (parameters.size() >= 1) {
+          n = (int)ctx.evaluateExpression(parameters.get(0));
         }
-        if (this.parameters.size() >= 3) {
-          inner  = ctx.evaluateExpression(this.parameters.get(1));
-          outer = ctx.evaluateExpression(this.parameters.get(2));
+        if (parameters.size() >= 3) {
+          inner  = ctx.evaluateExpression(parameters.get(1));
+          outer = ctx.evaluateExpression(parameters.get(2));
         }
 
         v = createStar(n, inner, outer);
@@ -47,14 +49,14 @@ public class PolygonObj extends ParsedTree
         int n = 6;
         double radiusx = 4;
         double radiusy = 4;
-        if (this.parameters.size() >= 1) {
-          n = (int)ctx.evaluateExpression(this.parameters.get(0));
+        if (parameters.size() >= 1) {
+          n = (int)ctx.evaluateExpression(parameters.get(0));
         }
-        if (this.parameters.size() >= 2) {
-          radiusy = radiusx = ctx.evaluateExpression(this.parameters.get(1));
+        if (parameters.size() >= 2) {
+          radiusy = radiusx = ctx.evaluateExpression(parameters.get(1));
         }
-        if (this.parameters.size() >= 3) {
-          radiusy  = ctx.evaluateExpression(this.parameters.get(2));
+        if (parameters.size() >= 3) {
+          radiusy  = ctx.evaluateExpression(parameters.get(2));
         }
 
         v = createRegular(n, radiusx, radiusy);
@@ -65,15 +67,15 @@ public class PolygonObj extends ParsedTree
         double big = 5;
         double small = 1;
         double small2 = 0.8;
-        if (this.parameters.size() >= 1) {
-          n = (int)ctx.evaluateExpression(this.parameters.get(0));
+        if (parameters.size() >= 1) {
+          n = (int)ctx.evaluateExpression(parameters.get(0));
         }
-        if (this.parameters.size() >= 3) {
-          big  = ctx.evaluateExpression(this.parameters.get(1));
-          small2 = small = ctx.evaluateExpression(this.parameters.get(2));
+        if (parameters.size() >= 3) {
+          big  = ctx.evaluateExpression(parameters.get(1));
+          small2 = small = ctx.evaluateExpression(parameters.get(2));
         }
-        if (this.parameters.size() == 4) {
-          small2 = ctx.evaluateExpression(this.parameters.get(3));
+        if (parameters.size() == 4) {
+          small2 = ctx.evaluateExpression(parameters.get(3));
         }            
           
         v = createRoll(n, big, small, small2);

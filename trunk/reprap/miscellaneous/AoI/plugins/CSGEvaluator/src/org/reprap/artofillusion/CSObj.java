@@ -7,23 +7,25 @@ import artofillusion.math.CoordinateSystem;
 import artofillusion.math.Vec3;
 import artofillusion.object.ObjectInfo;
 
-public class CSObj extends ParsedTree {
+public class CSObj extends MetaCADObject {
 
-  public List<ObjectInfo> evaluateObject(MetaCADContext ctx) throws Exception {
+  public List<ObjectInfo> evaluateObject(MetaCADContext ctx, 
+                                                  List<String> parameters, 
+                                                  List<ParsedTree> children) throws Exception {
 
-    assert(this.children.size() == 1);
-    List<ObjectInfo> chlist = evaluateChildren(ctx);
+    assert(children.size() == 1);
+    List<ObjectInfo> chlist = ParsedTree.evaluate(ctx, children);
     
     CoordinateSystem coordsys = new CoordinateSystem();
-    if (this.parameters.size() >= 3) {
-      coordsys.setOrigin(new Vec3(ctx.evaluateExpression(this.parameters.get(0)),
-                                  ctx.evaluateExpression(this.parameters.get(1)),
-                                  ctx.evaluateExpression(this.parameters.get(2))));
+    if (parameters.size() >= 3) {
+      coordsys.setOrigin(new Vec3(ctx.evaluateExpression(parameters.get(0)),
+                                  ctx.evaluateExpression(parameters.get(1)),
+                                  ctx.evaluateExpression(parameters.get(2))));
     }
-    if (this.parameters.size() >= 6) {
-      coordsys.setOrientation(ctx.evaluateExpression(this.parameters.get(3)),
-                              ctx.evaluateExpression(this.parameters.get(4)),
-                              ctx.evaluateExpression(this.parameters.get(5)));
+    if (parameters.size() >= 6) {
+      coordsys.setOrientation(ctx.evaluateExpression(parameters.get(3)),
+                              ctx.evaluateExpression(parameters.get(4)),
+                              ctx.evaluateExpression(parameters.get(5)));
     }
     
     Iterator<ObjectInfo> iter = chlist.iterator();
