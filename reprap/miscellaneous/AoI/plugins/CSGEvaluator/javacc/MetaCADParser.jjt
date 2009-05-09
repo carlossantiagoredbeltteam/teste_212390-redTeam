@@ -121,7 +121,11 @@ TOKEN : /* BINARY OPS */
 |	< MINUS: "-" >
 |   < DIVIDE: "/" >
 |   < ASSIGN: "=" >
-|	< OTHERBINOP: ["*","^"] >
+|   < LTE: "<=" >
+|   < GTE: ">=" >
+|   < EQUALS: "==">
+|   < NEQUALS: "!=">
+|	< OTHERBINOP: ["*","^", "<", ">"] >
 }
 
 TOKEN : /* IDENTIFIERS */
@@ -276,7 +280,7 @@ String Expression() :
 {
 }
 {
-	UnaryExpression()((<PLUS>|<MINUS>|<DIVIDE>|<ASSIGN>|<OTHERBINOP>)UnaryExpression())*
+	UnaryExpression()((<PLUS>|<MINUS>|<DIVIDE>|<ASSIGN>|<LTE>|<GTE>|<EQUALS>|<NEQUALS>|<OTHERBINOP>)UnaryExpression())*
 	{
 		return dumpTokens(jjtThis);
 	}
