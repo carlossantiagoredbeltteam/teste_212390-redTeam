@@ -551,11 +551,11 @@ String coordSysToString(CoordinateSystem cs) {
     return objInfo;
   }
 
-  public void createCSGObject(String defstr) {
+  public void createParentObject(String defstr, int minchildren) {
     UndoRecord undo = new UndoRecord(this.window, false);
     ObjectInfo[] objects = getSelection();
-    if (objects == null || objects.length < 2) {
-      showMessage("Minimum " + 2 + " object" + ((2 > 1) ? "s" : "") + " must be selected.");
+    if (objects == null || objects.length < minchildren) {
+      showMessage("Minimum " + minchildren + " object" + ((minchildren > 1) ? "s" : "") + " must be selected.");
       return;
     }
 
@@ -569,7 +569,7 @@ String coordSysToString(CoordinateSystem cs) {
       Scene theScene = this.window.getScene();
       resultinfo = new ObjectInfo(new Sphere(1,1,1), new CoordinateSystem(), defstr);
       
-     // Inherit texture color from the first source object
+      // Inherit texture color from the first source object
       Object3D inheritfrom = objects[0].getObject();
       resultinfo.getObject().setTexture(inheritfrom.getTexture(), inheritfrom.getTextureMapping());
 
@@ -608,7 +608,7 @@ String coordSysToString(CoordinateSystem cs) {
    */
   public void union() throws Exception
   {
-    createCSGObject("union()");
+    createParentObject("union()", 2);
   }
 
   /**
@@ -616,7 +616,7 @@ String coordSysToString(CoordinateSystem cs) {
    */
   public void intersection()
   {
-    createCSGObject("intersection()");
+    createParentObject("intersection()", 2);
   }
 
   /**
@@ -624,7 +624,7 @@ String coordSysToString(CoordinateSystem cs) {
    */
   public void difference()
   {
-    createCSGObject("difference()");
+    createParentObject("difference()", 2);
   }
 
   public void regular() throws Exception
@@ -644,7 +644,7 @@ String coordSysToString(CoordinateSystem cs) {
   
   public void extrude()
   {
-    execute(MetaCADEvaluatorEngine.EXTRUSION, 1);
+    createParentObject("extrude()", 2);
   }
  
   public void test()
