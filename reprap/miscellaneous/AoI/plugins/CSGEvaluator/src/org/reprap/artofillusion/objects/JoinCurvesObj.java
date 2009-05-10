@@ -69,7 +69,7 @@ public class JoinCurvesObj extends MetaCADObject
       polyline.curves.add(curves[curridx]);
       polyline.flipped.add(false);
       polyline.numvertices += ((Curve)curves[curridx].object).getVertices().length;
-      curvesconsumed = 1;
+      curvesconsumed++;
       curves[curridx] = null;
       Vec3 loopstart = ends[curridx][0];
       Vec3 loopend = ends[curridx][1];
