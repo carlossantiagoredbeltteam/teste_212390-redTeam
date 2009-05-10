@@ -42,11 +42,11 @@ public class JoinCurvesObj extends MetaCADObject
       tol = ctx.evaluateExpression(parameters.get(1));
     }
     
+    List<ObjectInfo> ch = ParsedTree.evaluate(ctx, children);
+    if (ch.size() < 2) return ch;
+    
     List<ObjectInfo> result = new LinkedList<ObjectInfo>();
     
-    List<ObjectInfo> ch = ParsedTree.evaluate(ctx, children);
-    
-    // FIXME: Check that # children >= 2
     // FIXME: Check that all children are curves
     ObjectInfo[] curves = ch.toArray(new ObjectInfo[ch.size()]);
 
@@ -69,38 +69,43 @@ public class JoinCurvesObj extends MetaCADObject
       polyline.curves.add(curves[curridx]);
       polyline.flipped.add(false);
       polyline.numvertices += ((Curve)curves[curridx].object).getVertices().length;
-      curvesconsumed++;
+      curvesconsumed = 1;
       curves[curridx] = null;
-      
-      
       Vec3 loopstart = ends[curridx][0];
       Vec3 loopend = ends[curridx][1];
-      int i;
-      for (i=curridx+1;i<curves.length;i++) {
-        for (int k=0;k<2;k++) {
-          if (loopstart.distance(ends[i][k]) < tol) {
-            polyline.curves.addFirst(curves[i]);
-            polyline.numvertices += ((Curve)curves[i].object).getVertices().length;
-            polyline.flipped.addFirst(k == 0);
-            curvesconsumed++;
-            curves[i] = null;
+      int localconsumed = 1;
+      while (localconsumed > 0 && !polyline.loop) {
+        localconsumed = 0;
+        int i;
+        for (i=0;i<curves.length;i++) {
+          if (curves[i] == null) continue;
+          for (int k=0;k<2 && curves[i] != null;k++) {
+            if (loopstart.distance(ends[i][k]) < tol) {
+              polyline.curves.addFirst(curves[i]);
+              polyline.numvertices += ((Curve)curves[i].object).getVertices().length;
+              polyline.flipped.addFirst(k == 0);
+              localconsumed++;
+              curves[i] = null;
 
-            loopstart = ends[i][(k+1)%2];
-          }
-          if (loopend.distance(ends[i][k]) < tol) {
-            polyline.curves.addLast(curves[i]);
-            polyline.numvertices += ((Curve)curves[i].object).getVertices().length;
-            polyline.flipped.addFirst(k == 1);
-            curvesconsumed++;
-            curves[i] = null;
+              loopstart = ends[i][(k+1)%2];
+            }
+            else if (loopend.distance(ends[i][k]) < tol) {
+              polyline.curves.addLast(curves[i]);
+              polyline.numvertices += ((Curve)curves[i].object).getVertices().length;
+              polyline.flipped.addLast(k == 1);
+              localconsumed++;
+              curves[i] = null;
 
-            loopend = ends[i][(k+1)%2];
+              loopend = ends[i][(k+1)%2];
+            }
           }
           if (loopstart.distance(loopend) < tol) break; // Loop found
         }
+        if (i != curves.length) polyline.loop = true;
+        curvesconsumed += localconsumed;
       }
-      if (i != curves.length) polyline.loop = true;
       polylines.add(polyline);
+      curridx++;
     }
 
     for (Polyline polyline : polylines) {
@@ -117,7 +122,7 @@ public class JoinCurvesObj extends MetaCADObject
         Mat4 mat = info.coords.fromLocal();
         MeshVertex[] verts = ((Curve)info.object).getVertices();
         for (int v=0;v<verts.length;v++) {
-          vertices[currvidx + (flipped?v:verts.length-1-v)] = mat.times(verts[v].r);
+          vertices[(currvidx + (flipped?verts.length-1-v:v)) % numvertices] = mat.times(verts[v].r);
         }
         currvidx += verts.length - 1;
       }
