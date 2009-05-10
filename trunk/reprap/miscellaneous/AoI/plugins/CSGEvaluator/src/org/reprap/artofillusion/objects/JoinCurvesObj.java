@@ -1,5 +1,6 @@
 package org.reprap.artofillusion.objects;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,6 +14,13 @@ import artofillusion.object.Curve;
 import artofillusion.object.MeshVertex;
 import artofillusion.object.ObjectInfo;
 
+class Polyline {
+  public LinkedList<ObjectInfo> curves = new LinkedList<ObjectInfo>();
+  public LinkedList<Boolean> flipped = new LinkedList<Boolean>();
+  public boolean loop = false;
+  public int numvertices = 0;
+}
+
 public class JoinCurvesObj extends MetaCADObject
 {
   
@@ -20,142 +28,108 @@ public class JoinCurvesObj extends MetaCADObject
                                          List<String> parameters, 
                                          List<ParsedTree> children) throws Exception {
 
+    int smoothtype = 0;
+    float smoothness = 1.0f;
+
+    // First parameters is joinends
+    boolean joinends = true;
+    if (parameters.size() >= 1) {
+      joinends = ((int)ctx.evaluateExpression(parameters.get(0)) != 0);
+    }
+    // 2. parameter is tolerance
+    double tol = 0.1f;
+    if (parameters.size() >= 2) {
+      tol = ctx.evaluateExpression(parameters.get(1));
+    }
+    
     List<ObjectInfo> result = new LinkedList<ObjectInfo>();
     
     List<ObjectInfo> ch = ParsedTree.evaluate(ctx, children);
     
     // FIXME: Check that # children >= 2
     // FIXME: Check that all children are curves
-    
+    ObjectInfo[] curves = ch.toArray(new ObjectInfo[ch.size()]);
+
+    // Cache end vertices
     Vec3[][] ends = new Vec3[ch.size()][2];
+    for (int i=0;i<curves.length;i++) {
+      Mat4 mat = curves[i].coords.fromLocal();
+      MeshVertex[] verts = ((Curve)curves[i].object).getVertices();
+      ends[i][0] = mat.times(verts[0].r);
+      ends[i][1] = mat.times(verts[verts.length-1].r);
+    }
 
-    float tol = 0.1f;
-    int smoothtype = 0;
-    float smoothness = 1.0f;
-    Boolean joinends = true;
+    int curvesconsumed = 0;
+    List<Polyline> polylines = new LinkedList<Polyline>();
+    int curridx = 0;
+    while (curvesconsumed < curves.length) {
+      while (curves[curridx] == null) curridx++;
+      Polyline polyline = new Polyline();
+
+      polyline.curves.add(curves[curridx]);
+      polyline.flipped.add(false);
+      polyline.numvertices += ((Curve)curves[curridx].object).getVertices().length;
+      curvesconsumed++;
+      curves[curridx] = null;
+      
+      
+      Vec3 loopstart = ends[curridx][0];
+      Vec3 loopend = ends[curridx][1];
+      int i;
+      for (i=curridx+1;i<curves.length;i++) {
+        for (int k=0;k<2;k++) {
+          if (loopstart.distance(ends[i][k]) < tol) {
+            polyline.curves.addFirst(curves[i]);
+            polyline.numvertices += ((Curve)curves[i].object).getVertices().length;
+            polyline.flipped.addFirst(k == 0);
+            curvesconsumed++;
+            curves[i] = null;
+
+            loopstart = ends[i][(k+1)%2];
+          }
+          if (loopend.distance(ends[i][k]) < tol) {
+            polyline.curves.addLast(curves[i]);
+            polyline.numvertices += ((Curve)curves[i].object).getVertices().length;
+            polyline.flipped.addFirst(k == 1);
+            curvesconsumed++;
+            curves[i] = null;
+
+            loopend = ends[i][(k+1)%2];
+          }
+          if (loopstart.distance(loopend) < tol) break; // Loop found
+        }
+      }
+      if (i != curves.length) polyline.loop = true;
+      polylines.add(polyline);
+    }
+
+    for (Polyline polyline : polylines) {
+      Iterator<ObjectInfo> c_iter = polyline.curves.iterator();
+      Iterator<Boolean> f_iter = polyline.flipped.iterator();
+      int numvertices = polyline.numvertices - polyline.curves.size();
+      if (!polyline.loop) numvertices++;
+      Vec3[] vertices = new Vec3[numvertices];
+      int currvidx = 0;
+      while (c_iter.hasNext() && f_iter.hasNext()) {
+        ObjectInfo info = c_iter.next();
+        boolean flipped = f_iter.next();
+
+        Mat4 mat = info.coords.fromLocal();
+        MeshVertex[] verts = ((Curve)info.object).getVertices();
+        for (int v=0;v<verts.length;v++) {
+          vertices[currvidx + (flipped?v:verts.length-1-v)] = mat.times(verts[v].r);
+        }
+        currvidx += verts.length - 1;
+      }
+      //  create new curve
+      float[] smooth = new float[numvertices];
+      for (int i=0;i<numvertices;i++) {
+        smooth[i] = smoothness;
+      }
+      Curve curve = new Curve(vertices, smooth, smoothtype, joinends || polyline.loop);
+      result.add(new ObjectInfo(curve, new CoordinateSystem(), "dummy"));
+    }
     
-    // get total number of curve points and start/end vertices of each curve
-    int num = 0;
-    int idx = 0;
-    ObjectInfo[] curves = new ObjectInfo[ch.size()];
-    curves = ch.toArray(curves);
-    for (idx=0;idx<curves.length;idx++) {
-      Mat4 mat = curves[idx].coords.fromLocal();
-      MeshVertex[] verts = ((Curve)curves[idx].object).getVertices();
-      num = num + verts.length;
-      ends[idx][0] = mat.times(verts[0].r);
-      ends[idx][1] = mat.times(verts[verts.length-1].r);
-    }
-
-    int end0found = 0;
-    int end1found = 0;
-    int i;
-    // find ends
-    for (i=0;i<curves.length;i++) {
-      end0found = 0;
-      end1found = 0;
-      for (int j=0;j<curves.length;j++) {
-        if (j == i) continue;
-        for (int k=0;k<2;k++)	{
-          if (ends[i][0].distance(ends[j][k]) < tol) end0found = 1;
-          if (ends[i][1].distance(ends[j][k]) < tol) end1found = 1;
-        }
-      }
-      if (end0found + end1found < 2) break;
-    }
-    if (end0found + end1found == 0) {
-      // FIXME: Throw exception
-//      new MessageDialog(window, "One or more of the curves are not within selected Proximity - either increase Proximity or move curves");
-      return result;
-    }
-
-    //
-    Boolean loop;
-    int firstCurve;
-    if (i == curves.length) {
-      loop = true;
-      firstCurve = 0; // if no ends found, then must be a loop so choose any starting curve
-    }
-    else {
-      loop = false;
-      firstCurve = i;  // otherwise curve i is at one end
-    }
-
-    // assemble the joined curve
-    int[] curvesUsed = new int[curves.length];
-    int curvesUsedIdx = 0;
-    curvesUsed[curvesUsedIdx] = firstCurve;
-    curvesUsedIdx++;
-    Vec3[] curvePoints;
-    int numCurvePoints = num - curves.length;
-    if (!loop) numCurvePoints++;
-    curvePoints = new Vec3[numCurvePoints];
-
-    // add first curve
-    int counter = 0;
-    Mat4 mat = curves[firstCurve].coords.fromLocal();
-    MeshVertex[] verts = ((Curve)curves[firstCurve].object).getVertices();
-    if (end1found == 1) {
-      for (int v=0;v<verts.length;v++) {
-        curvePoints[v+counter]=mat.times(verts[v].r); // update position in world space
-      }
-    }
-    if (end0found == 1) { // reverse order of vertices so curve starts at end
-      for (int v=0;v<verts.length;v++) {
-        curvePoints[verts.length-1-v+counter]=mat.times(verts[v].r); // update position in world space
-      }
-    }
-    counter = counter + verts.length;
-    if (joinends) counter--;
-
-    //  assembly joined curve
-    while (curvesUsedIdx < curves.length) {
-      int c;
-      for (c=0;c<curves.length;c++)  { //cycle through the selected curves
-        if (c == curvesUsed[curvesUsedIdx-1]) continue; // skip if the same curve
-        int pointToCheck;
-        if (joinends) pointToCheck = counter;
-        else pointToCheck = counter - 1;
-        //
-        if (curvePoints[pointToCheck].distance(ends[c][0])<tol) { // if start of curve c is close to end
-          mat= curves[c].coords.fromLocal();
-          verts = ((Curve)curves[c].object).getVertices();
-          for (int v=0;v<verts.length;v++) {
-            curvePoints[v+counter]=mat.times(verts[v].r);
-          }
-          curvesUsed[curvesUsedIdx]=c; // add curve to list of those used
-          curvesUsedIdx++;  //update number of curves used
-          counter=counter+verts.length;
-          if (joinends) counter--;
-          break;
-        }
-        if (curvePoints[pointToCheck].distance(ends[c][1])<tol) { // if end of curve c is close to end
-          mat = curves[c].coords.fromLocal();
-          verts = ((Curve)curves[c].object).getVertices();
-          for (int v=0;v<verts.length;v++) {
-            curvePoints[verts.length-1-v+counter]=mat.times(verts[v].r);
-          }
-          curvesUsed[curvesUsedIdx]=c; // add curve to list of those used
-          curvesUsedIdx++;  //update number of curves used
-          counter=counter+verts.length;
-          if (joinends) counter--;
-          break;
-        }
-      }
-      if (c == curves.length) {
-        // FIXME: Throw exception
-//        new MessageDialog(window, "One or more of the curves are not within selected Proximity - either increase Proximity or move curves");
-        return result;
-      }
-    }
-//  create new curve
-    float[] smooth = new float[num];
-    for (i=0;i<num;i++) {
-      smooth[i]=smoothness;
-    }
-
-    Curve curve = new Curve(curvePoints, smooth, smoothtype, joinends || loop);
-    result.add(new ObjectInfo(curve, new CoordinateSystem(), "dummy"));
     return result;
   }
 }
