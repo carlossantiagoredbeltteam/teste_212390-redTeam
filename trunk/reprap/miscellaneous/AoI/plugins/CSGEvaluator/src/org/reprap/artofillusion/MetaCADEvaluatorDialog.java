@@ -11,6 +11,8 @@ package org.reprap.artofillusion;
 import java.awt.Insets;
 import java.awt.Rectangle;
 
+import javax.swing.SwingUtilities;
+
 import artofillusion.LayoutWindow;
 import artofillusion.ui.Translate;
 import buoy.event.CommandEvent;
@@ -30,7 +32,7 @@ import buoy.widget.LayoutInfo;
 /**
  * CSGEvaluator dialog
  */
-class MetaCADEvaluatorDialog extends BDialog
+class MetaCADEvaluatorDialog extends BDialog implements TextChangedListener
 {
   protected  MetaCADEvaluatorEngine engine;
   protected LayoutWindow window;
@@ -49,6 +51,8 @@ class MetaCADEvaluatorDialog extends BDialog
   protected String[] cadlabels = new String [] {
       Translate.text("MetaCADEvaluator:Operations"), null, null, null, null, null, null
   };
+  
+  protected BTextArea paramtab;
   
   public MetaCADEvaluatorDialog(LayoutWindow window)
   {
@@ -83,13 +87,15 @@ class MetaCADEvaluatorDialog extends BDialog
     }
     
     // Parameters tab
-    BTextArea paramtab=new BTextArea(this.engine.getParameters(), 10, 20) {
+    paramtab=new BTextArea(this.engine.getParameters(), 10, 20) {
       @Override
       protected void textChanged() {
         super.textChanged();
         MetaCADEvaluatorDialog.this.engine.setParameters(this.getText());
       }
     };
+    engine.addParameterChangedListener(this);
+    
     BScrollPane scrollpane = new BScrollPane(paramtab);
     tabcontainer.add(scrollpane, "Parameters");
 
@@ -152,5 +158,20 @@ class MetaCADEvaluatorDialog extends BDialog
   public void closeWindow()
   {
     dispose();
+  }
+
+  public void textChanged(Object source) {
+    final String newText = engine.getParameters();
+    if (!newText.equals(paramtab.getText()))
+    {
+      SwingUtilities.invokeLater(new Runnable()
+      {
+        public void run()
+        {
+          paramtab.setText(newText);
+        }
+      });
+      
+    }
   }
 }

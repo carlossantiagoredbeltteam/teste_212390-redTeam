@@ -88,6 +88,12 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
   public void setParameters(String text) {
     this.window.getScene().setMetadata(
         MetaCADEvaluatorEngine.class.getName() + "Parameters", text);
+    Iterator<TextChangedListener> iter = parameterListeners.iterator();
+   
+    while (iter.hasNext())
+    {
+      iter.next().textChanged(this);
+    }
   }
 
   public String getParameters() {
@@ -725,9 +731,6 @@ String coordSysToString(CoordinateSystem cs) {
     this.window.setModified();
   }
 
-  private void createMacro(String macroname, List<ObjectInfo> objects) {
-  }
-
   public void test()
   
   {
@@ -738,5 +741,54 @@ String coordSysToString(CoordinateSystem cs) {
     // only evaluate selected objects if the parameters could be evaluated
     if (readParameters()) super.execute(operation, minimum_children);
   }
-
+  
+  private void createMacro(String macroname, List<ObjectInfo> asList) {
+    StringBuilder sb = new StringBuilder();
+    
+    sb.append(getParameters());
+    sb.append("\n");
+    
+    sb.append(macroname);
+    sb.append(" {\n");
+    Iterator<ObjectInfo> iter = asList.iterator();
+    while (iter.hasNext())
+    {
+      ObjectInfo objInfo = iter.next();
+      objectInfoToString(objInfo, sb, 1);
+    }
+    sb.append("}");
+    
+    this.setParameters(sb.toString());
+  }
+  
+  private void objectInfoToString(ObjectInfo objInfo, StringBuilder sb, int indent)
+  {
+    int i;
+    
+    for (i = 0; i < indent; i++)
+      sb.append(' ');
+    
+    sb.append(objInfo.name);
+    
+    if (objInfo.children.length > 0)
+    {
+      sb.append(" {\n");
+      for (i = 0; i < objInfo.children.length; i++)
+        objectInfoToString(objInfo.children[i], sb, indent+1);
+      
+      for (i = 0; i < indent; i++)
+        sb.append(' ');
+      sb.append("}\n");
+    }
+    else
+    {
+      sb.append(";\n");
+    }
+  }
+  
+  protected List<TextChangedListener> parameterListeners=new LinkedList<TextChangedListener>();
+  public void addParameterChangedListener(TextChangedListener listener)
+  {
+    parameterListeners.add(listener);
+  }
 }
