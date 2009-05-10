@@ -9,15 +9,137 @@
 #ifndef CARTESIAN_DDA_H
 #define CARTESIAN_DDA_H
 
-// Struct to hold points in 4D space.
+#define round(x) ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
 
+// Structs to hold points in 5D space.
+
+// Real-world units
 struct FloatPoint
 {
 	float x;
 	float y;
 	float z;
         float e;
+        float f;
 };
+
+inline FloatPoint operator+(const FloatPoint& a, const FloatPoint& b)
+{
+  FloatPoint result;
+  result.x = a.x + b.x;
+  result.y = a.y + b.y;
+  result.z = a.z + b.z;
+  result.e = a.e + b.e;
+  result.f = a.f + b.f;
+  return result;
+}  
+
+inline FloatPoint operator-(const FloatPoint& a, const FloatPoint& b)
+{
+  FloatPoint result;
+  result.x = a.x - b.x;
+  result.y = a.y - b.y;
+  result.z = a.z - b.z;
+  result.e = a.e - b.e;
+  result.f = a.f - b.f;
+  return result;
+} 
+
+
+// NB - the next gives neither the scalar nor the vector product
+
+inline FloatPoint operator*(const FloatPoint& a, const FloatPoint& b)
+{
+  FloatPoint result;
+  result.x = a.x * b.x;
+  result.y = a.y * b.y;
+  result.z = a.z * b.z;
+  result.e = a.e * b.e;
+  result.f = a.f * b.f;
+  return result;
+} 
+
+// Can't use abs for this as it's defined somewhere in a #define
+
+inline FloatPoint absv(const FloatPoint& a)
+{
+  FloatPoint result;
+  result.x = abs(a.x);
+  result.y = abs(a.y);
+  result.z = abs(a.z);
+  result.e = abs(a.e);
+  result.f = abs(a.f);
+  return result;
+} 
+
+
+// Integer numbers of steps
+struct LongPoint
+{
+	long x;
+	long y;
+	long z;
+        long e;
+        long f;
+};
+
+inline LongPoint operator+(const LongPoint& a, const LongPoint& b)
+{
+  LongPoint result;
+  result.x = a.x + b.x;
+  result.y = a.y + b.y;
+  result.z = a.z + b.z;
+  result.e = a.e + b.e;
+  result.f = a.f + b.f;
+  return result;
+}  
+
+inline LongPoint operator-(const LongPoint& a, const LongPoint& b)
+{
+  LongPoint result;
+  result.x = a.x - b.x;
+  result.y = a.y - b.y;
+  result.z = a.z - b.z;
+  result.e = a.e - b.e;
+  result.f = a.f - b.f;
+  return result;
+} 
+
+// NB - the next gives neither the scalar nor the vector product
+
+inline LongPoint operator*(const LongPoint& a, const LongPoint& b)
+{
+  LongPoint result;
+  result.x = a.x * b.x;
+  result.y = a.y * b.y;
+  result.z = a.z * b.z;
+  result.e = a.e * b.e;
+  result.f = a.f * b.f;
+  return result;
+} 
+
+inline LongPoint absv(const LongPoint& a)
+{
+  LongPoint result;
+  result.x = abs(a.x);
+  result.y = abs(a.y);
+  result.z = abs(a.z);
+  result.e = abs(a.e);
+  result.f = abs(a.f);
+  return result;
+} 
+
+inline LongPoint roundv(const FloatPoint& a)
+{
+  LongPoint result;
+  result.x = round(a.x);
+  result.y = round(a.y);
+  result.z = round(a.z);
+  result.e = round(a.e);
+  result.f = round(a.f);
+  return result;
+} 
+
 
 // Main class for moving the RepRap machine about
 
@@ -27,28 +149,22 @@ private:
 
   extruder* ext;               // The extruder I'm currently using - keep this up to date...
 
-  float x_units;               // Factors for converting either mm or inches to steps
-  float y_units;
-  float z_units;
-  float e_units;
+  FloatPoint units;            // Factors for converting either mm or inches to steps
 
   FloatPoint current_position; // Where the machine is
   FloatPoint target_position;  // Where it's going
   FloatPoint delta_position;   // The difference between the two
 
-  FloatPoint current_steps;    // The same information as above in steps rather than units
-  FloatPoint target_steps;
-  FloatPoint delta_steps;
+  LongPoint current_steps;     // Similar information as above in steps rather than units
+  LongPoint target_steps;
+  LongPoint delta_steps;
 
   byte x_direction;            // Am I going in the + or - direction?
   byte y_direction;
   byte z_direction;
   byte e_direction;
 
-  long x_counter;              // DDA error-accumulation variables
-  long y_counter;
-  long z_counter;
-  long e_counter;
+  LongPoint dda_counter;       // DDA error-accumulation variables
   
   bool x_can_step;             // Am I not at an endstop?  Have I not reached the target? etc.
   bool y_can_step;
@@ -82,16 +198,9 @@ private:
   
   bool read_switch(byte pin);
   
-  // Convert a distance in mm or inches to a number of steps
+  // Set where I'm going
   
-  long to_steps(float steps_per_unit, float units);
-  
-  // Set where I'm going and then call...
-  void set_target(float x, float y, float z, float e);
-  
-  // ...this function to calculate the DDA variables
-  
-  void calculate_deltas();
+  void set_target(const FloatPoint& p);
   
   // Work out the number of microseconds between steps
   
@@ -112,7 +221,7 @@ public:
   
   // Move somewhere at a given speed
   
-  void move(float x, float y, float z, float e, float feedrate);
+  void move(const FloatPoint& p, float feedrate);
   
   // True for mm; false for inches
   
@@ -120,7 +229,7 @@ public:
   
   // Override where I think I am
   
-  void set_position(float x, float y, float z, float e);
+  void set_position(const FloatPoint& p);
   
   // Report where I am
   
@@ -133,9 +242,14 @@ public:
 
 // Short functions inline to save memory; particularly useful in the Arduino
 
-inline void cartesian_dda::move(float x, float y, float z, float e, float feedrate)
+inline void cartesian_dda::set_position(const FloatPoint& p)
 {
-  set_target(x, y, z, e);
+	current_position = p;
+}
+
+inline void cartesian_dda::move(const FloatPoint& p, float feedrate)
+{
+  set_target(p);
   dda_move(feedrate);
 }
 
@@ -175,8 +289,13 @@ inline void cartesian_dda::do_e_step()
         ext->step();
 }
 
-inline long cartesian_dda::to_steps(float steps_per_unit, float units)
+inline long to_steps(float steps_per_unit, float units)
 {
-	return steps_per_unit * units;
+	return round(steps_per_unit * units);
+}
+
+inline LongPoint to_steps(const FloatPoint& units, const FloatPoint& position)
+{
+        return roundv(units*position);
 }
 #endif

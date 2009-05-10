@@ -71,18 +71,17 @@ void cartesian_dda::set_units(bool using_mm)
 {
     if(using_mm)
     {
-      x_units = X_STEPS_PER_MM;
-      y_units = Y_STEPS_PER_MM;
-      z_units = Z_STEPS_PER_MM;
-      e_units = E_STEPS_PER_MM;
+      units.x = X_STEPS_PER_MM;
+      units.y = Y_STEPS_PER_MM;
+      units.z = Z_STEPS_PER_MM;
+      units.e = E_STEPS_PER_MM;
     } else
     {
-      x_units = X_STEPS_PER_INCH;
-      y_units = Y_STEPS_PER_INCH;
-      z_units = Z_STEPS_PER_INCH;
-      e_units = E_STEPS_PER_INCH;      
+      units.x = X_STEPS_PER_INCH;
+      units.y = Y_STEPS_PER_INCH;
+      units.z = Z_STEPS_PER_INCH;
+      units.e = E_STEPS_PER_INCH;      
     }
-    calculate_deltas();
 }
 
 
@@ -105,10 +104,10 @@ void cartesian_dda::dda_move(float feedrate)
 
   // Set up the DDA
   
-	long x_counter = -total_steps/2;
-	long y_counter = -total_steps/2;
-	long z_counter = -total_steps/2;
-        long e_counter = -total_steps/2;
+	dda_counter.x = -total_steps/2;
+	dda_counter.y = -total_steps/2;
+	dda_counter.z = -total_steps/2;
+        dda_counter.e = -total_steps/2;
 
 	bool x_can_step = 0;
 	bool y_can_step = 0;
@@ -130,12 +129,12 @@ void cartesian_dda::dda_move(float feedrate)
                 
 		if (x_can_step)
 		{
-			x_counter += delta_steps.x;
+			dda_counter.x += delta_steps.x;
 			
-			if (x_counter > 0)
+			if (dda_counter.x > 0)
 			{
 				do_x_step();
-				x_counter -= total_steps;
+				dda_counter.x -= total_steps;
 				
 				if (x_direction)
 					current_steps.x++;
@@ -146,12 +145,12 @@ void cartesian_dda::dda_move(float feedrate)
 
 		if (y_can_step)
 		{
-			y_counter += delta_steps.y;
+			dda_counter.y += delta_steps.y;
 			
-			if (y_counter > 0)
+			if (dda_counter.y > 0)
 			{
 				do_y_step();
-				y_counter -= total_steps;
+				dda_counter.y -= total_steps;
 
 				if (y_direction)
 					current_steps.y++;
@@ -162,12 +161,12 @@ void cartesian_dda::dda_move(float feedrate)
 		
 		if (z_can_step)
 		{
-			z_counter += delta_steps.z;
+			dda_counter.z += delta_steps.z;
 			
-			if (z_counter > 0)
+			if (dda_counter.z > 0)
 			{
 				do_z_step();
-				z_counter -= total_steps;
+				dda_counter.z -= total_steps;
 				
 				if (z_direction)
 					current_steps.z++;
@@ -178,12 +177,12 @@ void cartesian_dda::dda_move(float feedrate)
 
 		if (e_can_step)
 		{
-			e_counter += delta_steps.e;
+			dda_counter.e += delta_steps.e;
 			
-			if (e_counter > 0)
+			if (dda_counter.e > 0)
 			{
 				do_e_step();
-				e_counter -= total_steps;
+				dda_counter.e -= total_steps;
 				
 				if (e_direction)
 					current_steps.e++;
@@ -207,14 +206,11 @@ void cartesian_dda::dda_move(float feedrate)
 	
   //set my current position to be where I now am.
 
-	current_position.x = target_position.x;
-	current_position.y = target_position.y;
-	current_position.z = target_position.z;
-	current_position.e = target_position.e;
+	current_position = target_position;
 
   // Keep stuff up-to-date
   
-	calculate_deltas();
+	//calculate_deltas();
 
   // Motors off
   
@@ -270,52 +266,16 @@ bool cartesian_dda::read_switch(byte pin)
 }
 
 
-
-void cartesian_dda::set_target(float x, float y, float z, float e)
+void cartesian_dda::set_target(const FloatPoint& p)
 {
-	target_position.x = x;
-	target_position.y = y;
-	target_position.z = z;
-	target_position.e = e;
-	
-	calculate_deltas();
-}
-
-
-
-void cartesian_dda::set_position(float x, float y, float z, float e)
-{
-	current_position.x = x;
-	current_position.y = y;
-	current_position.z = z;
-	current_position.e = e;
-	
-	calculate_deltas();
-}
-
-void cartesian_dda::calculate_deltas()
-{
+        target_position = p;
 	//figure our deltas.
-	delta_position.x = abs(target_position.x - current_position.x);
-	delta_position.y = abs(target_position.y - current_position.y);
-	delta_position.z = abs(target_position.z - current_position.z);
-	delta_position.e = abs(target_position.e - current_position.e);
+	delta_position = absv(target_position - current_position);
 				
 	//set our steps current, target, and delta
-	current_steps.x = to_steps(x_units, current_position.x);
-	current_steps.y = to_steps(y_units, current_position.y);
-	current_steps.z = to_steps(z_units, current_position.z);
-	current_steps.e = to_steps(e_units, current_position.e);
-
-	target_steps.x = to_steps(x_units, target_position.x);
-	target_steps.y = to_steps(y_units, target_position.y);
-	target_steps.z = to_steps(z_units, target_position.z);
-	target_steps.e = to_steps(e_units, target_position.e);
-
-	delta_steps.x = abs(target_steps.x - current_steps.x);
-	delta_steps.y = abs(target_steps.y - current_steps.y);
-	delta_steps.z = abs(target_steps.z - current_steps.z);
-	delta_steps.e = abs(target_steps.e - current_steps.e);
+	current_steps = to_steps(units, current_position);
+	target_steps = to_steps(units, target_position);
+	delta_steps = absv(target_steps - current_steps);
 	
 	//what is our direction
 	x_direction = (target_position.x >= current_position.x);
@@ -368,7 +328,7 @@ long cartesian_dda::calculate_feedrate_delay(float feedrate)
 	// 60000000.0*distance/feedrate  = move duration in microseconds
 	// move duration/master_steps = time between steps for master axis.
 
-	return ((distance * 60000000.0) / feedrate) / total_steps;	
+	return round(((distance * 60000000.0) / feedrate) / (float)total_steps);	
 }
 
 
