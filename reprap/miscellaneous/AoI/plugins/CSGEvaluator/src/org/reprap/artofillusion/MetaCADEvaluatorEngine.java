@@ -2,7 +2,6 @@ package org.reprap.artofillusion;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,15 +10,12 @@ import org.cheffo.jeplite.JEP;
 import org.reprap.artofillusion.language.ParsedStatement;
 import org.reprap.artofillusion.parser.ParseException;
 
-import buoy.widget.BStandardDialog;
-
 import artofillusion.LayoutWindow;
 import artofillusion.Scene;
 import artofillusion.UndoRecord;
 import artofillusion.math.CoordinateSystem;
 import artofillusion.math.Vec2;
 import artofillusion.math.Vec3;
-import artofillusion.object.CSGObject;
 import artofillusion.object.Cube;
 import artofillusion.object.Cylinder;
 import artofillusion.object.Object3D;
@@ -29,6 +25,7 @@ import artofillusion.texture.Texture;
 import artofillusion.texture.TextureMapping;
 import artofillusion.ui.MessageDialog;
 import artofillusion.ui.Translate;
+import buoy.widget.BStandardDialog;
 
 public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
 {
@@ -439,8 +436,7 @@ String coordSysToString(CoordinateSystem cs) {
   }
   
   void showMessage(String text)  {
-    if (text==null)
-      text ="null";
+    if (text == null) text = "null";
     
     new MessageDialog(this.window, text);
   }
@@ -665,6 +661,11 @@ String coordSysToString(CoordinateSystem cs) {
     createParentObject("extrude()", 1);
   }
  
+  public void lathe()
+  {
+    createParentObject("lathe()", 1);
+  }
+
   public void mesh()
   {
     createParentObject("mesh()", 1);
