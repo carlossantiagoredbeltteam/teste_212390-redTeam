@@ -1,9 +1,11 @@
 package org.reprap.artofillusion;
 
+import org.reprap.artofillusion.language.MacroPrototype;
+
 import artofillusion.object.CSGObject;
 
 public class ObjFactory {
-  public static MetaCADObject create(String name) throws ObjFactoryException {
+  public static MetaCADObject create(String name, MetaCADContext ctx) throws ObjFactoryException {
     name = name.toLowerCase();
 
     if (name == "native") {
@@ -50,6 +52,13 @@ public class ObjFactory {
     }
     else if (name.startsWith("mesh")) {
       return new MeshObj();
+    }
+    else {
+      MacroPrototype macroPrototype = ctx.macros.get(name.toLowerCase());
+      if (macroPrototype != null)
+      {
+        return new MacroObj(macroPrototype);
+      }
     }
 
     throw new ObjFactoryException("ObjFactory: Unknown Object type: " + name);

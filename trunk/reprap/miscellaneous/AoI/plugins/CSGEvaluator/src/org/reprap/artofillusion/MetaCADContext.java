@@ -27,10 +27,8 @@ public class MetaCADContext {
       return this.jep.getValue();
     } catch (Exception ex) {
       // FIXME: Message?
-//      showMessage("Error while evaluating Expression: \"" + expr
-//          + "\" Syntax Error or unknown variable?");
-      throw (ex);
-      // return 0;
+      throw (new Exception("Error while evaluating Expression: \"" + expr
+                           + "\" Syntax Error or unknown variable?", ex));
     }
   } 
   

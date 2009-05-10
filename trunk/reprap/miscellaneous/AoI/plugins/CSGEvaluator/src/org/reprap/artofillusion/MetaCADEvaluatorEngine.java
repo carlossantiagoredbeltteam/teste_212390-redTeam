@@ -193,7 +193,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
       }
       catch (Exception e) {
         e.printStackTrace();
-        showMessage(e.getMessage());
+        showMessage(e.toString());
       }
     }
   }

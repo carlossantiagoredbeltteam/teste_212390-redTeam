@@ -7,13 +7,13 @@ import org.reprap.artofillusion.ParsedTree;
 
 public class MacroPrototype implements ParsedStatement {
   public String name;
-  public List<String> parameters;
+  public List<String> variables;
   public List<ParsedTree> children;
   
   public MacroPrototype(String n, List<String> p, List<ParsedTree> c)
   {
     name = n;
-    parameters = p;
+    variables = p;
     children =  c;
   }
 
