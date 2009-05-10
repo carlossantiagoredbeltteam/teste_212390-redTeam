@@ -23,7 +23,7 @@ public class ParsedTree {
 
   public List<ObjectInfo> evaluate(MetaCADContext ctx) throws Exception {
     
-    this.cadobj = ObjFactory.create(this.name);
+    this.cadobj = ObjFactory.create(this.name, ctx);
     
     List<ObjectInfo> result = this.cadobj.evaluateObject(ctx, this.parameters, this.children);
     if (result == null) {
