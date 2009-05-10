@@ -6,7 +6,6 @@ import java.util.List;
 
 import artofillusion.math.CoordinateSystem;
 import artofillusion.math.Vec3;
-import artofillusion.object.CSGObject;
 import artofillusion.object.Curve;
 import artofillusion.object.Mesh;
 import artofillusion.object.Object3D;
@@ -42,7 +41,7 @@ public class ExtrudeObj extends MetaCADObject
       twist = ctx.evaluateExpression(parameters.get(4));
     }
     
-    result.add(extrude(ParsedTree.evaluate(ctx, children), dir, numsegments, twist));
+    result.addAll(extrude(ParsedTree.evaluate(ctx, children), dir, numsegments, twist));
     return result;
   }
   
@@ -54,11 +53,11 @@ public class ExtrudeObj extends MetaCADObject
    * @param dir
    * @param numsegments
    * @param twist
-   * @return an ObjectInfo. The coordsys in the object info is just there to move
-   * the object back to it's original position since the extrusion operation always 
+   * @return a list of ObjectInfos. The coordsys in the object infos are just there to move
+   * the objects back to their original positions since the extrusion operation always 
    * centers the result in the origin.
    */
-  public ObjectInfo extrude(List<ObjectInfo> objects, Vec3 dir, int numsegments, double twist)
+  public List<ObjectInfo> extrude(List<ObjectInfo> objects, Vec3 dir, int numsegments, double twist)
   {
     // Build extrusion curve from vector and segments
     Vec3 v[] = new Vec3[numsegments+1];
@@ -78,10 +77,6 @@ public class ExtrudeObj extends MetaCADObject
     while (iter.hasNext()) {
       ObjectInfo profile = iter.next();
       Object3D profileobj = profile.getObject();
-      if (!(profileobj instanceof TriangleMesh) &&
-          profileobj.canConvertToTriangleMesh() != Object3D.CANT_CONVERT) {
-        profileobj = profileobj.convertToTriangleMesh(0.1);
-      }
 
       Object3D obj3D = null;
       if (profileobj instanceof TriangleMesh) {
@@ -103,18 +98,9 @@ public class ExtrudeObj extends MetaCADObject
       }
       profile.setVisible(false);
     }
-    if (!resultobjects.isEmpty()) {
-      try {
-        // FIXME: Undo support?
-        // FIXME: We don't really need to union. Join/group should suffice
-        return CSGHelper.combine(resultobjects.iterator(), CSGObject.UNION);
-      }
-      catch (Exception e) {
-      }
-    }
-    // FIXME: Print error
-    return null;
-  }
+    // FIXME: Undo support?
+    return resultobjects;
+}
 
   
   
