@@ -1,5 +1,6 @@
-package org.reprap.artofillusion;
+package org.reprap.artofillusion.objects;
 
+import org.reprap.artofillusion.MetaCADContext;
 import org.reprap.artofillusion.language.MacroPrototype;
 
 import artofillusion.object.CSGObject;

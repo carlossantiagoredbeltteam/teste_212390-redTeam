@@ -1,16 +1,12 @@
 package org.reprap.artofillusion;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import artofillusion.MeshViewer;
 import artofillusion.math.CoordinateSystem;
 import artofillusion.math.Mat4;
 import artofillusion.math.Vec3;
 import artofillusion.object.Cube;
 import artofillusion.object.MeshVertex;
-import artofillusion.object.Object3D;
 import artofillusion.object.ObjectInfo;
 import artofillusion.object.TriangleMesh;
 import artofillusion.object.TriangleMesh.Edge;

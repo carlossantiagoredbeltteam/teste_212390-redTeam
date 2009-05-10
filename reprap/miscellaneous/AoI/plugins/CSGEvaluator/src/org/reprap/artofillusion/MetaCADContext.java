@@ -21,7 +21,7 @@ public class MetaCADContext {
 
   // Evaluates an Expression like 3*x+sin(a) and returns the value of it or 0 if
   // any error occurred
-  double evaluateExpression(String expr) throws Exception {
+  public double evaluateExpression(String expr) throws Exception {
     try {
       this.jep.parseExpression(expr);
       return this.jep.getValue();
@@ -34,7 +34,7 @@ public class MetaCADContext {
   
   // Evaluates Expressions like x=2*radius and assigns the value to the given
   // variable
-  void evaluateAssignment(String curLine) throws Exception {
+  public void evaluateAssignment(String curLine) throws Exception {
     try {
       int mark = curLine.indexOf("=");
       String name = curLine.substring(0, mark).trim();

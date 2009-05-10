@@ -1,4 +1,4 @@
-package org.reprap.artofillusion;
+package org.reprap.artofillusion.objects;
 
 import org.reprap.artofillusion.parser.ParseException;
 

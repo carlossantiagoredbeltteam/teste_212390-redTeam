@@ -1,7 +1,10 @@
-package org.reprap.artofillusion;
+package org.reprap.artofillusion.objects;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import org.reprap.artofillusion.MetaCADContext;
+import org.reprap.artofillusion.ParsedTree;
 
 import artofillusion.math.CoordinateSystem;
 import artofillusion.object.Cylinder;
