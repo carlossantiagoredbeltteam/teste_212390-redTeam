@@ -7,6 +7,7 @@ import org.reprap.artofillusion.MetaCADContext;
 import org.reprap.artofillusion.ParsedTree;
 
 import artofillusion.math.CoordinateSystem;
+import artofillusion.math.Mat4;
 import artofillusion.math.Vec3;
 import artofillusion.object.ObjectInfo;
 
@@ -29,6 +30,13 @@ public class CSObj extends MetaCADObject {
       coordsys.setOrientation(ctx.evaluateExpression(parameters.get(3)),
                               ctx.evaluateExpression(parameters.get(4)),
                               ctx.evaluateExpression(parameters.get(5)));
+    }
+    if  (parameters.size() >= 9) {
+      double scaleX = ctx.evaluateExpression(parameters.get(6));
+      double scaleY = ctx.evaluateExpression(parameters.get(7));
+      double scaleZ = ctx.evaluateExpression(parameters.get(8));
+      
+      coordsys.transformCoordinates(new Mat4(scaleX,0,0,0,  0,scaleY,0,0, 0,0,scaleZ,0, 0,0,0,1));
     }
     
     Iterator<ObjectInfo> iter = chlist.iterator();
