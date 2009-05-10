@@ -6,6 +6,7 @@ import artofillusion.math.CoordinateSystem;
 import artofillusion.math.Mat4;
 import artofillusion.math.Vec3;
 import artofillusion.object.Cube;
+import artofillusion.object.Curve;
 import artofillusion.object.MeshVertex;
 import artofillusion.object.ObjectInfo;
 import artofillusion.object.TriangleMesh;
@@ -42,6 +43,10 @@ public class ObjectHelper {
   
   public static ObjectInfo join(List <ObjectInfo> objects, double tol)
   {
+    // FIXME: Worksaround for missing support for joining curves
+    if (objects.get(0).object instanceof Curve) return objects.get(0);
+    
+    
     int n = objects.size();
     TriangleMesh[] meshes = new TriangleMesh[n];
     
