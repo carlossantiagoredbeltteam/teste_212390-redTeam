@@ -8,7 +8,7 @@ public class ObjFactory {
   public static MetaCADObject create(MetaCADContext ctx, String name) throws ObjFactoryException {
     name = name.toLowerCase();
 
-    if (name == "native") {
+    if (name.equals("native")) {
       return new NativeObj();
     }
     else if (name.startsWith("sphere")) {
@@ -55,6 +55,9 @@ public class ObjFactory {
     }
     else if (name.startsWith("joincurves")) {
       return new JoinCurvesObj();
+    }
+    else if (name.startsWith("lathe")) {
+      return new LatheObj();
     }
     else {
       MacroPrototype macroPrototype = ctx.macros.get(name.toLowerCase());
