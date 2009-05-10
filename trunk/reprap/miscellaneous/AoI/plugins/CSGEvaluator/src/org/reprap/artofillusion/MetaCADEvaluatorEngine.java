@@ -88,7 +88,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
   public void setParameters(String text) {
     this.window.getScene().setMetadata(
         MetaCADEvaluatorEngine.class.getName() + "Parameters", text);
-    Iterator<TextChangedListener> iter = parameterListeners.iterator();
+    Iterator<TextChangedListener> iter = this.parameterListeners.iterator();
    
     while (iter.hasNext())
     {
@@ -585,7 +585,6 @@ String coordSysToString(CoordinateSystem cs) {
 
     ObjectInfo resultinfo;
     try {
-      Scene theScene = this.window.getScene();
       resultinfo = new ObjectInfo(new Sphere(1,1,1), new CoordinateSystem(), defstr);
       
       // Inherit texture color from the first source object
@@ -789,6 +788,6 @@ String coordSysToString(CoordinateSystem cs) {
   protected List<TextChangedListener> parameterListeners=new LinkedList<TextChangedListener>();
   public void addParameterChangedListener(TextChangedListener listener)
   {
-    parameterListeners.add(listener);
+    this.parameterListeners.add(listener);
   }
 }

@@ -1,18 +1,17 @@
-package org.reprap.artofillusion;
+package org.reprap.artofillusion.objects;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.reprap.artofillusion.MetaCADContext;
+import org.reprap.artofillusion.ParsedTree;
+
 import artofillusion.math.CoordinateSystem;
-import artofillusion.math.Vec3;
-import artofillusion.object.CSGObject;
 import artofillusion.object.Curve;
 import artofillusion.object.Mesh;
 import artofillusion.object.Object3D;
 import artofillusion.object.ObjectInfo;
-import artofillusion.object.TriangleMesh;
-import artofillusion.tools.ExtrudeTool;
 import artofillusion.tools.LatheTool;
 
 public class LatheObj extends MetaCADObject

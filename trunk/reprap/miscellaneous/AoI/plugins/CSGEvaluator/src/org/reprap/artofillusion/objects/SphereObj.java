@@ -1,15 +1,17 @@
-package org.reprap.artofillusion;
+package org.reprap.artofillusion.objects;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import org.reprap.artofillusion.MetaCADContext;
+import org.reprap.artofillusion.ParsedTree;
+
 import artofillusion.math.CoordinateSystem;
 import artofillusion.math.Vec3;
-import artofillusion.object.Cube;
 import artofillusion.object.Object3D;
 import artofillusion.object.ObjectInfo;
 
-public class CubeObj extends MetaCADObject {
+public class SphereObj extends MetaCADObject {
 
   public List<ObjectInfo> evaluateObject(MetaCADContext ctx, 
                                          List<String> parameters, 
@@ -28,8 +30,9 @@ public class CubeObj extends MetaCADObject {
                ctx.evaluateExpression(parameters.get(2)));
     }
     Object3D obj3D = new artofillusion.object.Sphere(dims.x, dims.y, dims.z);
-    obj3D = new Cube(dims.x, dims.y, dims.z);
+
     result.add(new ObjectInfo(obj3D, new CoordinateSystem(), "dummy"));
+    
     return result;
   }
 }

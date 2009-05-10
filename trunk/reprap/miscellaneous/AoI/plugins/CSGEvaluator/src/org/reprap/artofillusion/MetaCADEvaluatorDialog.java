@@ -87,16 +87,16 @@ class MetaCADEvaluatorDialog extends BDialog implements TextChangedListener
     }
     
     // Parameters tab
-    paramtab=new BTextArea(this.engine.getParameters(), 10, 20) {
+    this.paramtab=new BTextArea(this.engine.getParameters(), 10, 20) {
       @Override
       protected void textChanged() {
         super.textChanged();
         MetaCADEvaluatorDialog.this.engine.setParameters(this.getText());
       }
     };
-    engine.addParameterChangedListener(this);
+    this.engine.addParameterChangedListener(this);
     
-    BScrollPane scrollpane = new BScrollPane(paramtab);
+    BScrollPane scrollpane = new BScrollPane(this.paramtab);
     tabcontainer.add(scrollpane, "Parameters");
 
     // CAD tab
@@ -161,14 +161,14 @@ class MetaCADEvaluatorDialog extends BDialog implements TextChangedListener
   }
 
   public void textChanged(Object source) {
-    final String newText = engine.getParameters();
-    if (!newText.equals(paramtab.getText()))
+    final String newText = this.engine.getParameters();
+    if (!newText.equals(this.paramtab.getText()))
     {
       SwingUtilities.invokeLater(new Runnable()
       {
         public void run()
         {
-          paramtab.setText(newText);
+          MetaCADEvaluatorDialog.this.paramtab.setText(newText);
         }
       });
       

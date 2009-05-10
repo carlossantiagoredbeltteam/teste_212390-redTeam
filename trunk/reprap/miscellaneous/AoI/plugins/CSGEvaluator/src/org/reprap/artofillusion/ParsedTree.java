@@ -5,6 +5,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.reprap.artofillusion.objects.MetaCADObject;
+import org.reprap.artofillusion.objects.ObjFactory;
+import org.reprap.artofillusion.objects.ObjFactoryException;
+
 import artofillusion.object.ObjectInfo;
 import artofillusion.texture.Texture;
 import artofillusion.texture.TextureMapping;
