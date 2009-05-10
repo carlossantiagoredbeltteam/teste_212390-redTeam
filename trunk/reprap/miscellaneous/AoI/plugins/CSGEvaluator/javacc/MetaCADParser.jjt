@@ -179,7 +179,7 @@ ParsedTree ParsedTree() :
 	List<ParsedTree> children=null;
 }
 {
-	tree = FunctionCallList() (<LBRACE>children=ParsedTreeList()<RBRACE>)?
+	tree = FunctionCallList() (<LBRACE>children=ParsedTreeList()<RBRACE> (";")? | ";")
 {
 	if (children != null)
 	{
@@ -198,7 +198,7 @@ List<ParsedTree> ParsedTreeList() :
 	ParsedTree current;
 }
 {
-	(current = ParsedTree() { list.add(current); } (";" current = ParsedTree() { list.add(current); })* (";")?)?
+	(current = ParsedTree() { list.add(current); })*
 	{
 		return list;
 	}
