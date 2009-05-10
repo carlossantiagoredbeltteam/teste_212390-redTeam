@@ -10,8 +10,8 @@ import artofillusion.object.ObjectInfo;
 public class CSObj extends MetaCADObject {
 
   public List<ObjectInfo> evaluateObject(MetaCADContext ctx, 
-                                                  List<String> parameters, 
-                                                  List<ParsedTree> children) throws Exception {
+                                         List<String> parameters, 
+                                         List<ParsedTree> children) throws Exception {
 
     assert(children.size() == 1);
     List<ObjectInfo> chlist = ParsedTree.evaluate(ctx, children);
