@@ -5,7 +5,7 @@ import org.reprap.artofillusion.language.MacroPrototype;
 import artofillusion.object.CSGObject;
 
 public class ObjFactory {
-  public static MetaCADObject create(String name, MetaCADContext ctx) throws ObjFactoryException {
+  public static MetaCADObject create(MetaCADContext ctx, String name) throws ObjFactoryException {
     name = name.toLowerCase();
 
     if (name == "native") {
@@ -52,6 +52,9 @@ public class ObjFactory {
     }
     else if (name.startsWith("mesh")) {
       return new MeshObj();
+    }
+    else if (name.startsWith("joincurves")) {
+      return new JoinCurvesObj();
     }
     else {
       MacroPrototype macroPrototype = ctx.macros.get(name.toLowerCase());

@@ -44,10 +44,10 @@ class MetaCADEvaluatorDialog extends BDialog
       "cube", "cylinder", "sphere", "regular", "star", "roll"
   };
   protected String[] cadfunctions = new String [] {
-      "extrude", "mesh", "group", "test"
+      "extrude", "mesh", "group", "joincurves", "test"
   };
   protected String[] cadlabels = new String [] {
-      Translate.text("MetaCADEvaluator:Operations"), null, null, null
+      Translate.text("MetaCADEvaluator:Operations"), null, null, null, null
   };
   
   public MetaCADEvaluatorDialog(LayoutWindow window)

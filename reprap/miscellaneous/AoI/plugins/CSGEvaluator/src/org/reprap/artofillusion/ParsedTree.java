@@ -22,8 +22,21 @@ public class ParsedTree {
   }
 
   public List<ObjectInfo> evaluate(MetaCADContext ctx) throws Exception {
-    
-    this.cadobj = ObjFactory.create(this.name, ctx);
+
+    try {
+      this.cadobj = ObjFactory.create(ctx, this.name);
+    }
+    catch (ObjFactoryException e) {
+      if (this.aoiobj.isLocked()) { // This object has previously been evaluated successfully
+        throw e; // Rethrow exception        
+      }
+      else {
+        this.name = "native";
+        this.cadobj = ObjFactory.create(ctx, this.name);
+      }
+    }
+
+    // FIXME: If we're native, we can probably skip the evaluation
     
     List<ObjectInfo> result = this.cadobj.evaluateObject(ctx, this.parameters, this.children);
     if (result == null) {
@@ -68,7 +81,7 @@ public class ParsedTree {
         this.aoiobj.object.setTexture(tex, map);
       }
       this.aoiobj.setVisible(true);
-
+      this.aoiobj.setLocked(true); // Indicate that this object is a MetaCAD evaluated object
       this.aoiobj.clearCachedMeshes();
     }
   }

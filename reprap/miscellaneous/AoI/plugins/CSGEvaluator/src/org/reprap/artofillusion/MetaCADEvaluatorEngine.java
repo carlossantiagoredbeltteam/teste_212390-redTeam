@@ -142,11 +142,15 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
       root = org.reprap.artofillusion.parser.MetaCADParser.parseTree(parent.name + ";");
       root.aoiobj = parent;
     }
-    catch (ObjFactoryException e) {
-      // Handle non-MetaCAD object here
-      root = new ParsedTree();
-      root.name = "native";
-      root.aoiobj = parent;
+    catch (ParseException e) {
+      if (parent.isLocked()) { // This object has previously been evaluated successfully
+        throw e; // Rethrow exception        
+      }
+      else { // This is probably a native object
+        root = new ParsedTree();
+        root.name = "native";
+        root.aoiobj = parent;
+      }
     }
     
     // If the parser returned a subtree, find the leaf node
@@ -665,6 +669,11 @@ String coordSysToString(CoordinateSystem cs) {
   public void group()
   {
     createParentObject("cs()", 1);
+  }
+
+  public void joincurves()
+  {
+    createParentObject("joincurves()", 2);
   }
 
   public void test()
