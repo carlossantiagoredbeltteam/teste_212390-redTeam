@@ -1,6 +1,7 @@
 package org.reprap.artofillusion;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -9,6 +10,8 @@ import java.util.List;
 import org.cheffo.jeplite.JEP;
 import org.reprap.artofillusion.language.ParsedStatement;
 import org.reprap.artofillusion.parser.ParseException;
+
+import buoy.widget.BStandardDialog;
 
 import artofillusion.LayoutWindow;
 import artofillusion.Scene;
@@ -25,6 +28,7 @@ import artofillusion.object.Sphere;
 import artofillusion.texture.Texture;
 import artofillusion.texture.TextureMapping;
 import artofillusion.ui.MessageDialog;
+import artofillusion.ui.Translate;
 
 public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
 {
@@ -674,6 +678,53 @@ String coordSysToString(CoordinateSystem cs) {
   public void joincurves()
   {
     createParentObject("joincurves()", 2);
+  }
+
+  public void extractmacro() throws Exception
+  {
+    UndoRecord undo = new UndoRecord(this.window, false);
+    ObjectInfo[] objects = getSelection();
+    if (objects == null || objects.length < 1) {
+      showMessage("Minimum " + 1 + " object" + ((1 > 1) ? "s" : "") + " must be selected.");
+      return;
+    }
+
+    // Selection undo
+    int[] oldSelection = this.window.getSelectedIndices();
+    undo.addCommand(UndoRecord.SET_SCENE_SELECTION,
+                    new Object[] { oldSelection });
+
+    
+    BStandardDialog dlg = new BStandardDialog("", Translate.text("enterMacroName"), BStandardDialog.PLAIN);
+    String macroname = dlg.showInputDialog(this.window, null, "mymacro(param1, param2)");
+    if (macroname == null) return;
+    
+    createMacro(macroname, Arrays.asList(objects));
+    
+    Scene theScene = this.window.getScene();
+    // delete selected objects
+    for (int i=0;i<objects.length;i++) {
+      int index = this.window.getScene().indexOf(objects[i]);
+      theScene.removeObject(index, undo);
+      undo.addCommandAtBeginning(UndoRecord.ADD_OBJECT, new Object[] {objects[i], index});
+    }
+
+    
+    // Must rebuild before updating the selection to rebuild indices.
+    this.window.rebuildItemList();
+
+    ObjectInfo result = createObjectFromString(macroname);
+    
+    this.window.setSelection(this.window.getScene().indexOf(result));
+
+    this.window.setUndoRecord(undo);
+
+    evaluate();
+    this.window.updateImage();
+    this.window.setModified();
+  }
+
+  private void createMacro(String macroname, List<ObjectInfo> objects) {
   }
 
   public void test()
