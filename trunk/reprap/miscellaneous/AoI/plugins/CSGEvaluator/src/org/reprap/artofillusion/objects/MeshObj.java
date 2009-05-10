@@ -31,11 +31,12 @@ public class MeshObj extends MetaCADObject
       ObjectInfo chinfo = iter.next();
       Object3D obj3D = chinfo.getObject();
       if (obj3D instanceof Curve) {
-        assert(obj3D.canConvertToTriangleMesh() != Object3D.CANT_CONVERT);
         TriangleMesh mesh = obj3D.convertToTriangleMesh(tolerance);
-        ObjectInfo newinfo = new ObjectInfo(mesh, chinfo.getCoords(), "dummy");
-        newinfo.setTexture(ctx.scene.getDefaultTexture(), ctx.scene.getDefaultTexture().getDefaultMapping(mesh));
-        results.add(newinfo);
+        if (mesh != null) {
+          ObjectInfo newinfo = new ObjectInfo(mesh, chinfo.getCoords(), "dummy");
+          newinfo.setTexture(ctx.scene.getDefaultTexture(), ctx.scene.getDefaultTexture().getDefaultMapping(mesh));
+          results.add(newinfo);
+        }
       }
     }
     return results;
