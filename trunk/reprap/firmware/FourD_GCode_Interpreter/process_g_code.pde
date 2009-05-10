@@ -57,7 +57,7 @@ byte serial_count = 0;
 boolean comment = false;
 
 //our feedrate variables.
-float feedrate = SLOW_XY_FEEDRATE;
+//float feedrate = SLOW_XY_FEEDRATE;
 
 /* keep track of the last G code - this is the command mode to use
  * if there is no command in the current string 
@@ -180,10 +180,13 @@ void process_string(char instruction[], int size)
 	//init baby!
 	FloatPoint fp;
         FloatPoint sp;
+        float fr;
+        
 	fp.x = 0.0;
 	fp.y = 0.0;
 	fp.z = 0.0;
         fp.e = 0.0;
+        fp.f = 0.0;
 
 	//get all our parameters!
 	parse_string(&gc, instruction, size);
@@ -227,21 +230,24 @@ void process_string(char instruction[], int size)
 				fp.e += gc.E;
 		}
 
-		// Get feedrate if supplied
+		// Get feedrate if supplied - feedrates are always absolute???
 		if ( gc.seen & GCODE_F )
-			feedrate = gc.F;
+			fp.f = gc.F;
 
 		//do something!
 		switch (gc.G)
 		{
 			//Rapid move
 			case 0:
-                                cdda.move(fp, FAST_XY_FEEDRATE);
+                                fr = fp.f;
+                                fp.f = FAST_XY_FEEDRATE;
+                                cdda.move(fp);
+                                fp.f = fr;
                                 break;
                                 
                         // Controlled move
 			case 1:
-                                cdda.move(fp, feedrate);
+                                cdda.move(fp);
                                 break;
 
 			 //Dwell
@@ -264,28 +270,37 @@ void process_string(char instruction[], int size)
                                 sp.x = 0.0;
                                 sp.y = 0.0;
                                 sp.z = 0.0;
-                                sp.e = cdda.where_i_am().e;
-                                if(cdda.where_i_am().z != 0.0)
-                                  cdda.move(sp, FAST_Z_FEEDRATE);
+                                if(abs_mode)
+                                  sp.e = cdda.where_i_am().e;
                                 else
-                                  cdda.move(sp, FAST_XY_FEEDRATE);
+                                  sp.e = 0.0;
+                                if(cdda.where_i_am().z != 0.0)
+                                  sp.f = FAST_Z_FEEDRATE;                                 
+                                else
+                                  sp.f = FAST_XY_FEEDRATE;
+                                cdda.move(sp);
 
 				break;
 
 			//go home via an intermediate point.
 			case 30:
-                               if(cdda.where_i_am().z != fp.z)
-                                  cdda.move(fp, FAST_Z_FEEDRATE);
+                                fr = fp.f;
+                                if(cdda.where_i_am().z != fp.z)
+                                  fp.f = FAST_Z_FEEDRATE;
                                 else
-                                  cdda.move(fp, FAST_XY_FEEDRATE);
+                                  fp.f = FAST_XY_FEEDRATE;
+                                fp.f = fr;
+                                
+                                cdda.move(fp);
                                 sp.x = 0.0;
                                 sp.y = 0.0;
                                 sp.z = 0.0;
                                 sp.e = cdda.where_i_am().e;  
                                 if(cdda.where_i_am().z != 0.0)
-                                  cdda.move(sp, FAST_Z_FEEDRATE);
+                                  sp.f = FAST_Z_FEEDRATE;
                                 else
-                                  cdda.move(sp, FAST_XY_FEEDRATE);
+                                  sp.f = FAST_XY_FEEDRATE;
+                                cdda.move(sp);
 
 				break;
 
