@@ -178,7 +178,8 @@ void process_string(char instruction[], int size)
 		return;
 
 	//init baby!
-	FloatPoint fp; 
+	FloatPoint fp;
+        FloatPoint sp;
 	fp.x = 0.0;
 	fp.y = 0.0;
 	fp.z = 0.0;
@@ -235,12 +236,12 @@ void process_string(char instruction[], int size)
 		{
 			//Rapid move
 			case 0:
-                                cdda.move(fp.x, fp.y, fp.z, fp.e, FAST_XY_FEEDRATE);
+                                cdda.move(fp, FAST_XY_FEEDRATE);
                                 break;
                                 
                         // Controlled move
 			case 1:
-                                cdda.move(fp.x, fp.y, fp.z, fp.e, feedrate);
+                                cdda.move(fp, feedrate);
                                 break;
 
 			 //Dwell
@@ -260,24 +261,31 @@ void process_string(char instruction[], int size)
 
 			//go home.
 			case 28:
+                                sp.x = 0.0;
+                                sp.y = 0.0;
+                                sp.z = 0.0;
+                                sp.e = cdda.where_i_am().e;
                                 if(cdda.where_i_am().z != 0.0)
-                                  cdda.move(0.0, 0.0, 0.0, cdda.where_i_am().e, FAST_Z_FEEDRATE);
+                                  cdda.move(sp, FAST_Z_FEEDRATE);
                                 else
-                                  cdda.move(0.0, 0.0, 0.0, cdda.where_i_am().e, FAST_XY_FEEDRATE);
+                                  cdda.move(sp, FAST_XY_FEEDRATE);
 
 				break;
 
 			//go home via an intermediate point.
 			case 30:
                                if(cdda.where_i_am().z != fp.z)
-                                  cdda.move(fp.x, fp.y, fp.z, fp.e, FAST_Z_FEEDRATE);
+                                  cdda.move(fp, FAST_Z_FEEDRATE);
                                 else
-                                  cdda.move(fp.x, fp.y, fp.z, fp.e, FAST_XY_FEEDRATE);
-                                  
+                                  cdda.move(fp, FAST_XY_FEEDRATE);
+                                sp.x = 0.0;
+                                sp.y = 0.0;
+                                sp.z = 0.0;
+                                sp.e = cdda.where_i_am().e;  
                                 if(cdda.where_i_am().z != 0.0)
-                                  cdda.move(0.0, 0.0, 0.0, cdda.where_i_am().e, FAST_Z_FEEDRATE);
+                                  cdda.move(sp, FAST_Z_FEEDRATE);
                                 else
-                                  cdda.move(0.0, 0.0, 0.0, cdda.where_i_am().e, FAST_XY_FEEDRATE);
+                                  cdda.move(sp, FAST_XY_FEEDRATE);
 
 				break;
 
@@ -295,7 +303,7 @@ void process_string(char instruction[], int size)
 
 			//Set position as fp
 			case 92: 
-				cdda.set_position(fp.x, fp.y, fp.z, fp.e);
+				cdda.set_position(fp);
 				break;
 
 			default:
