@@ -16,11 +16,11 @@
 // Real-world units
 struct FloatPoint
 {
-	float x;
+	float x;   // Coordinate axes
 	float y;
 	float z;
-        float e;
-        float f;
+        float e;   // Extrude length
+        float f;   // Feedrate
 };
 
 inline FloatPoint operator+(const FloatPoint& a, const FloatPoint& b)
@@ -76,11 +76,11 @@ inline FloatPoint absv(const FloatPoint& a)
 // Integer numbers of steps
 struct LongPoint
 {
-	long x;
+	long x;   // Coordinates
 	long y;
 	long z;
-        long e;
-        long f;
+        long e;   // Extrusion
+        long t;   // Time delay
 };
 
 inline LongPoint operator+(const LongPoint& a, const LongPoint& b)
@@ -90,7 +90,7 @@ inline LongPoint operator+(const LongPoint& a, const LongPoint& b)
   result.y = a.y + b.y;
   result.z = a.z + b.z;
   result.e = a.e + b.e;
-  result.f = a.f + b.f;
+  result.t = a.t + b.t;
   return result;
 }  
 
@@ -101,7 +101,7 @@ inline LongPoint operator-(const LongPoint& a, const LongPoint& b)
   result.y = a.y - b.y;
   result.z = a.z - b.z;
   result.e = a.e - b.e;
-  result.f = a.f - b.f;
+  result.t = a.t - b.t;
   return result;
 } 
 
@@ -114,7 +114,7 @@ inline LongPoint operator*(const LongPoint& a, const LongPoint& b)
   result.y = a.y * b.y;
   result.z = a.z * b.z;
   result.e = a.e * b.e;
-  result.f = a.f * b.f;
+  result.t = a.t * b.t;
   return result;
 } 
 
@@ -125,9 +125,11 @@ inline LongPoint absv(const LongPoint& a)
   result.y = abs(a.y);
   result.z = abs(a.z);
   result.e = abs(a.e);
-  result.f = abs(a.f);
+  result.t = abs(a.t);
   return result;
 } 
+
+// NB - watch the f -> t; you need to do something about it
 
 inline LongPoint roundv(const FloatPoint& a)
 {
@@ -136,7 +138,7 @@ inline LongPoint roundv(const FloatPoint& a)
   result.y = round(a.y);
   result.z = round(a.z);
   result.e = round(a.e);
-  result.f = round(a.f);
+  result.t = round(a.f);
   return result;
 } 
 
@@ -153,6 +155,7 @@ private:
 
   FloatPoint current_position; // Where the machine is
   FloatPoint target_position;  // Where it's going
+  float distance;              // How long the path is
   FloatPoint delta_position;   // The difference between the two
 
   LongPoint current_steps;     // Similar information as above in steps rather than units
@@ -163,6 +166,7 @@ private:
   byte y_direction;
   byte z_direction;
   byte e_direction;
+  byte t_direction;
 
   LongPoint dda_counter;       // DDA error-accumulation variables
   
@@ -170,14 +174,15 @@ private:
   bool y_can_step;
   bool z_can_step;
   bool e_can_step;
+  bool t_can_step;
 
 // Variables for acceleration calculations
 
   long total_steps;            // The number of steps to take along the longest movement axis
-  long micro_delay_ends;       // Microseconds between steps at the start and end of the movement
-  long micro_delay_fast;       // Microseconds between steps when we have accelerated to the feedrate needed
-  long start_steps;            // The number of steps from the start to accelerate for
-  long end_steps;              // The number of steps from the start to start decelerating at
+//  long micro_delay_ends;       // Microseconds between steps at the start and end of the movement
+//  long micro_delay_fast;       // Microseconds between steps when we have accelerated to the feedrate needed
+//  long start_steps;            // The number of steps from the start to accelerate for
+//  long end_steps;              // The number of steps from the start to start decelerating at
 
 // Internal functions that need not concern the user
 
@@ -186,9 +191,10 @@ private:
   void do_x_step();               
   void do_y_step();
   void do_z_step();
-  void do_e_step(); 
+  void do_e_step();
+  void do_t_step(); 
   
-  void dda_move(float feedrate);  // Run the DDA
+  void dda_move();  // Run the DDA
   
   // Can this axis step?
   
@@ -221,7 +227,7 @@ public:
   
   // Move somewhere at a given speed
   
-  void move(const FloatPoint& p, float feedrate);
+  void move(const FloatPoint& p);
   
   // True for mm; false for inches
   
@@ -247,10 +253,10 @@ inline void cartesian_dda::set_position(const FloatPoint& p)
 	current_position = p;
 }
 
-inline void cartesian_dda::move(const FloatPoint& p, float feedrate)
+inline void cartesian_dda::move(const FloatPoint& p)
 {
   set_target(p);
-  dda_move(feedrate);
+  dda_move();
 }
 
 inline void cartesian_dda::set_extruder(extruder* ex)
@@ -287,6 +293,11 @@ inline void cartesian_dda::do_z_step()
 inline void cartesian_dda::do_e_step()
 {
         ext->step();
+}
+
+inline void cartesian_dda::do_t_step()
+{
+
 }
 
 inline long to_steps(float steps_per_unit, float units)

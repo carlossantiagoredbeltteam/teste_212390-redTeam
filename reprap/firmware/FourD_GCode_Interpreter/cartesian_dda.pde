@@ -15,6 +15,7 @@ cartesian_dda::cartesian_dda()
         y_direction = 1;
         z_direction = 1;
         e_direction = 1;
+        t_direction = 1;
         
   // Default to the origin and not going anywhere
   
@@ -22,10 +23,12 @@ cartesian_dda::cartesian_dda()
 	current_position.y = 0.0;
 	current_position.z = 0.0;
 	current_position.e = 0.0;
+        current_position.f = SLOW_XY_FEEDRATE;
 	target_position.x = 0.0;
 	target_position.y = 0.0;
 	target_position.z = 0.0;
 	target_position.e = 0.0;
+        target_position.f = SLOW_XY_FEEDRATE;
 
   // Set up the pin directions
   
@@ -75,32 +78,121 @@ void cartesian_dda::set_units(bool using_mm)
       units.y = Y_STEPS_PER_MM;
       units.z = Z_STEPS_PER_MM;
       units.e = E_STEPS_PER_MM;
+      units.f = 1.0;               // This doesn't make a lot of sense
     } else
     {
       units.x = X_STEPS_PER_INCH;
       units.y = Y_STEPS_PER_INCH;
       units.z = Z_STEPS_PER_INCH;
-      units.e = E_STEPS_PER_INCH;      
+      units.e = E_STEPS_PER_INCH;
+      units.f = INCHES_TO_MM;      // Neither does this     
     }
+}
+
+
+long cartesian_dda::calculate_feedrate_delay(float feedrate)
+{
+	// find the dominant axis.
+        // NB we ignore the t values here, as it takes no time to take a step in time :-)
+
+        total_steps = max(delta_steps.x, delta_steps.y);
+        total_steps = max(total_steps, delta_steps.z);
+        total_steps = max(total_steps, delta_steps.e);
+  
+        // If we're not going anywhere, it doesn't matter what we return
+        
+        if(total_steps == 0)
+          return 1;      
+        
+	// Calculate delay between steps in microseconds.  Here it is in English:
+        // (feedrate is in mm/minute)
+	// 60000000.0*distance/feedrate  = move duration in microseconds
+	// move duration/total_steps = time between steps for master axis.
+
+	return round(((distance * 60000000.0) / feedrate) / (float)total_steps);	
+}
+
+
+void cartesian_dda::set_target(const FloatPoint& p)
+{
+        target_position = p;
+        
+	//figure our deltas.
+
+	delta_position = absv(target_position - current_position);
+
+        // The feedrate values refer to distance in (X, Y, Z) space, so ignore e and f
+        // values unless they're the only thing there.
+
+        FloatPoint squares = delta_position*delta_position;
+        distance = squares.x + squares.y + squares.z;
+        // If we are 0, only thing changing is e
+        if(distance <= 0.0)
+          distance = squares.e;
+        // If we are still 0, only thing changing is f
+        if(distance <= 0.0)
+          distance = squares.f;
+        distance = sqrt(distance);          
+                                                                         
+                          			
+	//set our steps current, target, and delta
+
+	current_steps = to_steps(units, current_position);
+	target_steps = to_steps(units, target_position);
+	delta_steps = absv(target_steps - current_steps);
+
+#ifdef ACCELERATION_ON
+        current_steps.t = calculate_feedrate_delay(current_position.f);
+#else
+        current_steps.t = calculate_feedrate_delay(target_position.f);
+#endif
+
+        target_steps.t = calculate_feedrate_delay(target_position.f);
+        delta_steps.t = abs(target_steps.t - current_steps.t);
+        total_steps = max(total_steps, delta_steps.t); 
+        	
+	//what is our direction
+
+	x_direction = (target_position.x >= current_position.x);
+	y_direction = (target_position.y >= current_position.y);
+	z_direction = (target_position.z >= current_position.z);
+	e_direction = (target_position.e >= current_position.e);
+	t_direction = (target_position.f < current_position.f);   // Because t is *inversely* proportional to f
+
+
+	//set our direction pins as well
+#if INVERT_X_DIR == 1
+	digitalWrite(X_DIR_PIN, !x_direction);
+#else
+	digitalWrite(X_DIR_PIN, x_direction);
+#endif
+
+#if INVERT_Y_DIR == 1
+	digitalWrite(Y_DIR_PIN, !y_direction);
+#else
+	digitalWrite(Y_DIR_PIN, y_direction);
+#endif
+
+#if INVERT_Z_DIR == 1
+	digitalWrite(Z_DIR_PIN, !z_direction);
+#else
+	digitalWrite(Z_DIR_PIN, z_direction);
+#endif
+        if(e_direction)
+          ext->set_direction(1);
+        else
+          ext->set_direction(0);        
 }
 
 
 // Run the DDA
 
-void cartesian_dda::dda_move(float feedrate)
+void cartesian_dda::dda_move()
 {
   
   // How long between steps?
   
         int milli_delay;
-        long micro_delay = calculate_feedrate_delay(feedrate);
-
-  // Use milli- or micro-seconds, as appropriate
-  
-	if (micro_delay >= 16383)
-		milli_delay = micro_delay / 1000;
-	else
-		milli_delay = 0;
 
   // Set up the DDA
   
@@ -108,15 +200,19 @@ void cartesian_dda::dda_move(float feedrate)
 	dda_counter.y = -total_steps/2;
 	dda_counter.z = -total_steps/2;
         dda_counter.e = -total_steps/2;
+        dda_counter.t = -total_steps/2;
 
 	bool x_can_step = 0;
 	bool y_can_step = 0;
 	bool z_can_step = 0;
 	bool e_can_step = 0;
-
+        bool t_can_step = 0;
+        
   //turn on steppers to start moving =)
   
 	enable_steppers();
+
+        bool real_move; // Flag to know if we've changed something physical
 
   //do our DDA line!
 
@@ -126,6 +222,9 @@ void cartesian_dda::dda_move(float feedrate)
 		y_can_step = can_step(Y_MIN_PIN, Y_MAX_PIN, current_steps.y, target_steps.y, y_direction);
 		z_can_step = can_step(Z_MIN_PIN, Z_MAX_PIN, current_steps.z, target_steps.z, z_direction);
                 e_can_step = can_step(-1, -1, current_steps.e, target_steps.e, e_direction);
+                t_can_step = can_step(-1, -1, current_steps.t, target_steps.t, t_direction);
+                
+                real_move = false;
                 
 		if (x_can_step)
 		{
@@ -134,6 +233,7 @@ void cartesian_dda::dda_move(float feedrate)
 			if (dda_counter.x > 0)
 			{
 				do_x_step();
+                                real_move = true;
 				dda_counter.x -= total_steps;
 				
 				if (x_direction)
@@ -150,6 +250,7 @@ void cartesian_dda::dda_move(float feedrate)
 			if (dda_counter.y > 0)
 			{
 				do_y_step();
+                                real_move = true;
 				dda_counter.y -= total_steps;
 
 				if (y_direction)
@@ -166,6 +267,7 @@ void cartesian_dda::dda_move(float feedrate)
 			if (dda_counter.z > 0)
 			{
 				do_z_step();
+                                real_move = true;
 				dda_counter.z -= total_steps;
 				
 				if (z_direction)
@@ -182,6 +284,7 @@ void cartesian_dda::dda_move(float feedrate)
 			if (dda_counter.e > 0)
 			{
 				do_e_step();
+                                real_move = true;
 				dda_counter.e -= total_steps;
 				
 				if (e_direction)
@@ -191,26 +294,47 @@ void cartesian_dda::dda_move(float feedrate)
 			}
 		}
 		
+		if (t_can_step)
+		{
+			dda_counter.t += delta_steps.t;
+			
+			if (dda_counter.t > 0)
+			{
+				do_t_step();
+				dda_counter.t -= total_steps;
+				
+				if (t_direction)
+					current_steps.t++;
+				else
+					current_steps.t--;
+			}
+		}
+
       // keep it hot =)
     
 		manage_all_extruders();
 				
       // wait for next step.
-    
-		if (milli_delay > 0)
+      // Use milli- or micro-seconds, as appropriate
+      // If the only thing that changed was t; don't bother to delay
+  
+                if(real_move)
+                {
+	          if (current_steps.t >= 16383)
+		    milli_delay = current_steps.t/1000;
+	          else
+		    milli_delay = 0;
+		  if (milli_delay > 0)
 			delay(milli_delay);			
-		else
-			delayMicrosecondsInterruptible(micro_delay);
-	}
-	while (x_can_step || y_can_step || z_can_step  || e_can_step);
+		  else
+			delayMicrosecondsInterruptible(current_steps.t);
+                }
+                
+	} while (x_can_step || y_can_step || z_can_step  || e_can_step || t_can_step);
 	
   //set my current position to be where I now am.
 
 	current_position = target_position;
-
-  // Keep stuff up-to-date
-  
-	//calculate_deltas();
 
   // Motors off
   
@@ -263,72 +387,6 @@ bool cartesian_dda::read_switch(byte pin)
 	#else
 		return digitalRead(pin) && digitalRead(pin);
 	#endif
-}
-
-
-void cartesian_dda::set_target(const FloatPoint& p)
-{
-        target_position = p;
-	//figure our deltas.
-	delta_position = absv(target_position - current_position);
-				
-	//set our steps current, target, and delta
-	current_steps = to_steps(units, current_position);
-	target_steps = to_steps(units, target_position);
-	delta_steps = absv(target_steps - current_steps);
-	
-	//what is our direction
-	x_direction = (target_position.x >= current_position.x);
-	y_direction = (target_position.y >= current_position.y);
-	z_direction = (target_position.z >= current_position.z);
-	e_direction = (target_position.e >= current_position.e);
-
-	//set our direction pins as well
-#if INVERT_X_DIR == 1
-	digitalWrite(X_DIR_PIN, !x_direction);
-#else
-	digitalWrite(X_DIR_PIN, x_direction);
-#endif
-
-#if INVERT_Y_DIR == 1
-	digitalWrite(Y_DIR_PIN, !y_direction);
-#else
-	digitalWrite(Y_DIR_PIN, y_direction);
-#endif
-
-#if INVERT_Z_DIR == 1
-	digitalWrite(Z_DIR_PIN, !z_direction);
-#else
-	digitalWrite(Z_DIR_PIN, z_direction);
-#endif
-        if(e_direction)
-          ext->set_direction(1);
-        else
-          ext->set_direction(0);        
-}
-
-
-long cartesian_dda::calculate_feedrate_delay(float feedrate)
-{
-	//how long is our line length?
-
-	float distance = sqrt(delta_position.x*delta_position.x + 
-                              delta_position.y*delta_position.y + 
-                              delta_position.z*delta_position.z + 
-                              delta_position.e*delta_position.e);  // This must be here in case it is the only non-0 one.
-	
-	//find the dominant axis.
-
-        total_steps = max(delta_steps.x, delta_steps.y);
-        total_steps = max(total_steps, delta_steps.z);
-        total_steps = max(total_steps, delta_steps.e);
-        
-	// Calculate delay between steps in microseconds.  Here it is in English:
-        // (feedrate is in mm/minute)
-	// 60000000.0*distance/feedrate  = move duration in microseconds
-	// move duration/master_steps = time between steps for master axis.
-
-	return round(((distance * 60000000.0) / feedrate) / (float)total_steps);	
 }
 
 
