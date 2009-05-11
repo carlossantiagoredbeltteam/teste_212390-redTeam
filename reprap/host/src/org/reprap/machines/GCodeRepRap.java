@@ -64,7 +64,91 @@ public class GCodeRepRap extends GenericRepRap {
 	{
 		return new GCodeExtruder(gcode, count);
 	}
+	
+	private void qXYMove(double x, double y, double feedrate)
+	{
+		double extrudeLength;
+		
+		x = round(x, 1);
+		y = round(y, 1);
+		
+		double dx = x - currentX;
+		double dy = y - currentY;
+		
+		String code;
+		
+		code = "G1 ";
 
+		//if (dx != 0)
+		code += "X" + x;
+		//if (dy != 0)
+		code += " Y" + y;
+
+		extrudeLength = extruders[extruder].getDistance(Math.sqrt(dx*dx + dy*dy), feedrate);
+
+		if(extrudeLength > 0)
+		{
+			if(extruders[extruder].getReversing())
+				extruders[extruder].getExtrudedLength().add(-extrudeLength);
+			else
+				extruders[extruder].getExtrudedLength().add(extrudeLength);
+			if(extruders[extruder].get4D())
+				code += " E" + round(extruders[extruder].getExtrudedLength().length(), 1);
+		}
+		
+		//if (currentFeedrate != feedrate)
+		//{
+		code += " F" + feedrate;
+		currentFeedrate = feedrate;
+		//}
+		
+		code += " ;xy move";
+		gcode.queue(code);
+		currentX = x;
+		currentY = y;
+	}
+
+	private void xyMove(double x, double y, double feedrate)
+	{
+		String code;
+		if(!accelerating || feedrate <= slowFeedrateXY)
+		{
+			code = "G1 F" + feedrate + "; force no acceleration";
+			currentFeedrate = feedrate;
+			gcode.queue(code);
+			qXYMove(x, y, feedrate);
+			return;
+		}
+		
+		double x0 = currentX;
+		double y0 = currentY;
+		double dx = x - x0;
+		double dy = y - y0;
+		double x1, y1;
+		double distance = Math.sqrt(dx*dx + dy*dy);
+		
+		code = "G1 F" + slowFeedrateXY + "; force starting speed";
+		currentFeedrate = slowFeedrateXY;
+		gcode.queue(code);
+		
+		if(distance > 2*accelerationDistance)
+		{
+			x1 = x0 + dx*accelerationDistance/distance;
+			y1 = y0 + dy*accelerationDistance/distance;
+			qXYMove(x1, y1, feedrate);
+			x1 = x0 + dx*(distance - accelerationDistance)/distance;
+			y1 = y0 + dy*(distance - accelerationDistance)/distance;
+			qXYMove(x1, y1, feedrate);
+			qXYMove(x, y, slowFeedrateXY);
+		}else
+		{
+			x1 = x0 + dx*0.5;
+			y1 = y0 + dy*0.5;
+			double intermediateFeedrate = slowFeedrateXY + (feedrate - slowFeedrateXY)*(0.5*distance/accelerationDistance);
+			qXYMove(x1, y1, intermediateFeedrate);
+			qXYMove(x, y, slowFeedrateXY);			
+		}
+	}
 
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#moveTo(double, double, double, boolean, boolean)
@@ -76,29 +160,34 @@ public class GCodeRepRap extends GenericRepRap {
 
 		double gx = round(x, 1);
 		double gy = round(y, 1);
-		double gz = round(z, 4);
+		double gz = round(z, 1);
 		double extrudeLength;
-		double zFeedrate = round(getMaxFeedrateZ(), 4);
+		double zFeedrate = round(getMaxFeedrateZ(), 1);
 		double xyFeedrate = round(getFeedrate(), 1);
 
-		double dx = currentX - x;
-		double dy = currentY - y;
-		double dz = currentZ - z;
-		
-		String code;
+		double dx = gx - currentX;
+		double dy = gy - currentY;
+		double dz = gz - currentZ;
 
 		if (dx == 0.0 && dy == 0.0 && dz == 0.0)
 			return;
 		
+		String code;
+		
 		double liftIncrement = extruders[extruder].getExtrusionHeight()/2;
-		double liftedZ = round(currentZ + liftIncrement, 4);
+		double liftedZ = round(currentZ + liftIncrement, 1);
 
 		//go up first?
 		if (startUp)
 		{
+			code = "G1 F";
+			code += zFeedrate + ";Don't accelerate Z axis";
+			currentFeedrate = zFeedrate;
+			gcode.queue(code);
+			
 			code = "G1 Z" + liftedZ;
 
-			extrudeLength = extruders[extruder].getDistance(liftIncrement, zFeedrate);
+			extrudeLength = extruders[extruder].getDistance(Math.abs(liftIncrement), zFeedrate);
 
 			if(extrudeLength > 0)
 			{
@@ -113,7 +202,7 @@ public class GCodeRepRap extends GenericRepRap {
 			//if (zFeedrate != currentFeedrate)
 			//{
 			code += " F" + zFeedrate;
-			//currentFeedrate = zFeedrate;
+			currentFeedrate = zFeedrate;
 			//}
 
 
@@ -126,46 +215,21 @@ public class GCodeRepRap extends GenericRepRap {
 		
 		//our real command
 		if (dx != 0 | dy != 0)
-		{
-			code = "";
-			//if (currentFeedrate != xyFeedrate)
-			code = "G1 ";
-
-			//if (dx != 0)
-			code += "X" + gx;
-			//if (dy != 0)
-			code += " Y" + gy;
-
-			extrudeLength = extruders[extruder].getDistance(Math.sqrt(dx*dx + dy*dy), xyFeedrate);
-
-			if(extrudeLength > 0)
-			{
-				if(extruders[extruder].getReversing())
-					extruders[extruder].getExtrudedLength().add(-extrudeLength);
-				else
-					extruders[extruder].getExtrudedLength().add(extrudeLength);
-				if(extruders[extruder].get4D())
-					code += " E" + round(extruders[extruder].getExtrudedLength().length(), 1);
-			}
-			
-			//if (currentFeedrate != xyFeedrate)
-			//{
-			code += " F" + xyFeedrate;
-			currentFeedrate = xyFeedrate;
-			//}
-			
-			code += " ;xy move";
-			gcode.queue(code);
-		}
+			xyMove(x, y, xyFeedrate);
 		
 
 		if (dz != 0)
 		{
+			code = "G1 F";
+			code += zFeedrate + ";Don't accelerate Z axis";
+			currentFeedrate = zFeedrate;
+			gcode.queue(code);
+			
 			code = "G1 ";
 			code += " Z" + gz;
 			
 
-			extrudeLength = extruders[extruder].getDistance(dz, zFeedrate);
+			extrudeLength = extruders[extruder].getDistance(Math.abs(dz), zFeedrate);
 
 			if(extrudeLength > 0)
 			{
@@ -180,7 +244,7 @@ public class GCodeRepRap extends GenericRepRap {
 			//if (zFeedrate != currentFeedrate)
 			//{
 			code += " F" + zFeedrate;
-			//currentFeedrate = zFeedrate;
+			currentFeedrate = zFeedrate;
 			//}
 
 			code += " ;lift down";
@@ -190,6 +254,11 @@ public class GCodeRepRap extends GenericRepRap {
 		//go back down?
 		if (!endUp && z != currentZ)
 		{
+			code = "G1 F";
+			code += zFeedrate + ";Don't accelerate Z axis";
+			currentFeedrate = zFeedrate;
+			gcode.queue(code);
+			
 			code = "G1 Z" + gz;
 
 			extrudeLength = extruders[extruder].getDistance(Math.abs(z - currentZ), zFeedrate);
@@ -207,7 +276,7 @@ public class GCodeRepRap extends GenericRepRap {
 			//if (zFeedrate != currentFeedrate)
 			//{
 			code += " F" + zFeedrate;
-			//currentFeedrate = zFeedrate;
+			currentFeedrate = zFeedrate;
 			//}
 
 			code += " ;z down";
@@ -225,70 +294,72 @@ public class GCodeRepRap extends GenericRepRap {
 		// if (previewer != null)
 		//	previewer.addSegment(currentX, currentY, currentZ, x, y, z);
 			
-		if (isCancelled())
-			return;
+//		if (isCancelled())
+//			return;
+//		
+//		maybeReZero();
+//		
+//		double distance = segmentLength(x - currentX, y - currentY);
+//		if (z != currentZ)
+//			distance += Math.abs(currentZ - z);
+//		totalDistanceExtruded += distance;
+//		totalDistanceMoved += distance;
+//
+//		double gx = round(x, 1);
+//		double gy = round(y, 1);
+//		double gz = round(z, 4);
+//		double feed = round(getFeedrate(), 1);
+//
+//		double dx = currentX - x;
+//		double dy = currentY - y;
+//		double dz = currentZ - z;
+//
+//		if (dx == 0.0 && dy == 0.0 && dz == 0.0)
+//			return;
+//
+//		String code = "";
+//
+//		//if (feed != currentFeedrate)
+//		code += "G1 ";
+//
+//		//if (dx != 0)
+//		code += " X" + gx;
+//		//if (dy != 0)
+//		code += " Y" + gy;
+//		//if (dz != 0)
+//		code += " Z" + gz;
+//		
+//		double extrudeLength = extruders[extruder].getDistance(Math.sqrt(dx*dx + dy*dy + dz*dz), feed);
+//
+//		if(extrudeLength > 0)
+//		{
+//			if(extruders[extruder].getReversing())
+//				extruders[extruder].getExtrudedLength().add(-extrudeLength);
+//			else
+//				extruders[extruder].getExtrudedLength().add(extrudeLength);
+//			if(extruders[extruder].get4D())
+//				code += " E" + round(extruders[extruder].getExtrudedLength().length(), 1);
+//		}
+//		
+//		//if (feed != currentFeedrate)
+//		//{		
+//		code += " F" + feed;
+//		currentFeedrate = feed;
+//		//}
+//
+//		code += " ;print segment";
+//		gcode.queue(code);
 		
-		maybeReZero();
-		
-		double distance = segmentLength(x - currentX, y - currentY);
-		if (z != currentZ)
-			distance += Math.abs(currentZ - z);
-		totalDistanceExtruded += distance;
-		totalDistanceMoved += distance;
-
-		double gx = round(x, 1);
-		double gy = round(y, 1);
-		double gz = round(z, 4);
-		double feed = round(getFeedrate(), 1);
-
-		double dx = currentX - x;
-		double dy = currentY - y;
-		double dz = currentZ - z;
-
-		if (dx == 0.0 && dy == 0.0 && dz == 0.0)
-			return;
-
-		String code = "";
-
-		//if (feed != currentFeedrate)
-		code += "G1 ";
-
-		//if (dx != 0)
-		code += " X" + gx;
-		//if (dy != 0)
-		code += " Y" + gy;
-		//if (dz != 0)
-		code += " Z" + gz;
-		
-		double extrudeLength = extruders[extruder].getDistance(Math.sqrt(dx*dx + dy*dy + dz*dz), feed);
-
-		if(extrudeLength > 0)
-		{
-			if(extruders[extruder].getReversing())
-				extruders[extruder].getExtrudedLength().add(-extrudeLength);
-			else
-				extruders[extruder].getExtrudedLength().add(extrudeLength);
-			if(extruders[extruder].get4D())
-				code += " E" + round(extruders[extruder].getExtrudedLength().length(), 1);
-		}
-		
-		//if (feed != currentFeedrate)
-		//{		
-		code += " F" + feed;
-		currentFeedrate = feed;
-		//}
-
-		code += " ;print segment";
-		gcode.queue(code);
+		moveTo(x, y, z, false, false);
 		
 		if(stopExtruder)
 			getExtruder().stopExtruding();
 		if(closeValve)
 			getExtruder().setValve(false);
 
-		currentX = x;
-		currentY = y;
-		currentZ = z;
+//		currentX = x;
+//		currentY = y;
+//		currentZ = z;
 	}
 	
 	/* (non-Javadoc)
