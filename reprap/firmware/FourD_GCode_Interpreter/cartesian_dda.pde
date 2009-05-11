@@ -78,14 +78,14 @@ void cartesian_dda::set_units(bool using_mm)
       units.y = Y_STEPS_PER_MM;
       units.z = Z_STEPS_PER_MM;
       units.e = E_STEPS_PER_MM;
-      units.f = 1.0;               // This doesn't make a lot of sense
+      units.f = 1.0;
     } else
     {
       units.x = X_STEPS_PER_INCH;
       units.y = Y_STEPS_PER_INCH;
       units.z = Z_STEPS_PER_INCH;
       units.e = E_STEPS_PER_INCH;
-      units.f = INCHES_TO_MM;      // Neither does this     
+      units.f = 1.0;  
     }
 }
 
@@ -99,10 +99,10 @@ long cartesian_dda::calculate_feedrate_delay(float feedrate)
         total_steps = max(total_steps, delta_steps.z);
         total_steps = max(total_steps, delta_steps.e);
   
-        // If we're not going anywhere, it doesn't matter what we return
+        // If we're not going anywhere, flag the fact
         
         if(total_steps == 0)
-          return 1;      
+          return -1;      
         
 	// Calculate delay between steps in microseconds.  Here it is in English:
         // (feedrate is in mm/minute)
@@ -113,7 +113,7 @@ long cartesian_dda::calculate_feedrate_delay(float feedrate)
 }
 
 
-void cartesian_dda::set_target(const FloatPoint& p)
+bool cartesian_dda::set_target(const FloatPoint& p)
 {
         target_position = p;
         
@@ -146,12 +146,14 @@ void cartesian_dda::set_target(const FloatPoint& p)
 #else
         current_steps.t = calculate_feedrate_delay(target_position.f);
 #endif
-
+        if(current_steps.t <= 0)
+          return false;
+          
         target_steps.t = calculate_feedrate_delay(target_position.f);
         delta_steps.t = abs(target_steps.t - current_steps.t);
         total_steps = max(total_steps, delta_steps.t); 
         	
-	//what is our direction
+	//what is our direction?
 
 	x_direction = (target_position.x >= current_position.x);
 	y_direction = (target_position.y >= current_position.y);
@@ -181,7 +183,9 @@ void cartesian_dda::set_target(const FloatPoint& p)
         if(e_direction)
           ext->set_direction(1);
         else
-          ext->set_direction(0);        
+          ext->set_direction(0);
+  
+        return true;        
 }
 
 
@@ -189,11 +193,6 @@ void cartesian_dda::set_target(const FloatPoint& p)
 
 void cartesian_dda::dda_move()
 {
-  
-  // How long between steps?
-  
-        int milli_delay;
-
   // Set up the DDA
   
 	dda_counter.x = -total_steps/2;
@@ -321,13 +320,9 @@ void cartesian_dda::dda_move()
                 if(real_move)
                 {
 	          if (current_steps.t >= 16383)
-		    milli_delay = current_steps.t/1000;
+		    delay(current_steps.t/1000);
 	          else
-		    milli_delay = 0;
-		  if (milli_delay > 0)
-			delay(milli_delay);			
-		  else
-			delayMicrosecondsInterruptible(current_steps.t);
+		    delayMicrosecondsInterruptible(current_steps.t);
                 }
                 
 	} while (x_can_step || y_can_step || z_can_step  || e_can_step || t_can_step);
