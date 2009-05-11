@@ -28,6 +28,10 @@ public abstract class GenericRepRap implements CartesianPrinter
 	protected boolean stlLoaded = false;
 	protected boolean gcodeLoaded = false;
 	
+	protected boolean accelerating = true;
+	protected double accelerationDistance = 10;
+	protected double slowFeedrateXY = 1000;
+	
 	/**
 	 * 
 	 */
