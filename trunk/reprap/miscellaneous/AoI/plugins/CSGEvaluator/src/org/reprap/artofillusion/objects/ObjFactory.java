@@ -63,6 +63,9 @@ public class ObjFactory {
     else if (name.startsWith("scale")) {
       return new ScaleObj();
     }
+    else if (name.startsWith("file")) {
+      return new FileObj();
+    }
     else {
       MacroPrototype macroPrototype = ctx.macros.get(name.toLowerCase());
       if (macroPrototype != null)
