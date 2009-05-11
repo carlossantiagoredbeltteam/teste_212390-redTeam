@@ -9,6 +9,7 @@ import org.reprap.artofillusion.objects.MetaCADObject;
 import org.reprap.artofillusion.objects.ObjFactory;
 import org.reprap.artofillusion.objects.ObjFactoryException;
 
+import artofillusion.math.CoordinateSystem;
 import artofillusion.object.ObjectInfo;
 import artofillusion.texture.Texture;
 import artofillusion.texture.TextureMapping;
@@ -55,7 +56,8 @@ public class ParsedTree {
       updateAOI(result.get(0));
     }
     else {
-      updateAOI(ObjectHelper.join(result, 0.1));
+      ObjectInfo collection = new ObjectInfo(new MetaCADObjectCollection(result), new CoordinateSystem(), "dummy");
+      updateAOI(collection);
     }
     return result;
   }
