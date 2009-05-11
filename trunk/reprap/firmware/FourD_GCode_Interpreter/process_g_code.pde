@@ -295,7 +295,10 @@ void process_string(char instruction[], int size)
                                 sp.x = 0.0;
                                 sp.y = 0.0;
                                 sp.z = 0.0;
-                                sp.e = cdda.where_i_am().e;  
+                                if(abs_mode)
+                                  sp.e = cdda.where_i_am().e;
+                                else
+                                  sp.e = 0.0;  
                                 if(cdda.where_i_am().z != 0.0)
                                   sp.f = FAST_Z_FEEDRATE;
                                 else

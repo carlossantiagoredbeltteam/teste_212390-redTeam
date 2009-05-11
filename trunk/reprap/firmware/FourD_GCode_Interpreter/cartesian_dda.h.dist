@@ -155,21 +155,20 @@ private:
 
   FloatPoint current_position; // Where the machine is
   FloatPoint target_position;  // Where it's going
-  float distance;              // How long the path is
   FloatPoint delta_position;   // The difference between the two
-
+  float distance;              // How long the path is
+  
   LongPoint current_steps;     // Similar information as above in steps rather than units
   LongPoint target_steps;
   LongPoint delta_steps;
-
+  LongPoint dda_counter;       // DDA error-accumulation variables
+  
   byte x_direction;            // Am I going in the + or - direction?
   byte y_direction;
   byte z_direction;
   byte e_direction;
   byte t_direction;
 
-  LongPoint dda_counter;       // DDA error-accumulation variables
-  
   bool x_can_step;             // Am I not at an endstop?  Have I not reached the target? etc.
   bool y_can_step;
   bool z_can_step;
@@ -179,10 +178,6 @@ private:
 // Variables for acceleration calculations
 
   long total_steps;            // The number of steps to take along the longest movement axis
-//  long micro_delay_ends;       // Microseconds between steps at the start and end of the movement
-//  long micro_delay_fast;       // Microseconds between steps when we have accelerated to the feedrate needed
-//  long start_steps;            // The number of steps from the start to accelerate for
-//  long end_steps;              // The number of steps from the start to start decelerating at
 
 // Internal functions that need not concern the user
 
@@ -206,7 +201,7 @@ private:
   
   // Set where I'm going
   
-  void set_target(const FloatPoint& p);
+  bool set_target(const FloatPoint& p);
   
   // Work out the number of microseconds between steps
   
@@ -255,7 +250,11 @@ inline void cartesian_dda::set_position(const FloatPoint& p)
 
 inline void cartesian_dda::move(const FloatPoint& p)
 {
-  set_target(p);
+  if(!set_target(p))
+  {
+    set_position(p);
+    return;
+  }
   dda_move();
 }
 
