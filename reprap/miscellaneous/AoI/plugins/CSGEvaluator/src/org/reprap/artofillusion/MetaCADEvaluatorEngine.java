@@ -1,5 +1,7 @@
 package org.reprap.artofillusion;
 
+import java.awt.FileDialog;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -10,7 +12,9 @@ import org.cheffo.jeplite.JEP;
 import org.reprap.artofillusion.language.ParsedStatement;
 import org.reprap.artofillusion.parser.ParseException;
 
+import artofillusion.ArtOfIllusion;
 import artofillusion.LayoutWindow;
+import artofillusion.ModellingApp;
 import artofillusion.Scene;
 import artofillusion.UndoRecord;
 import artofillusion.math.CoordinateSystem;
@@ -25,6 +29,7 @@ import artofillusion.texture.Texture;
 import artofillusion.texture.TextureMapping;
 import artofillusion.ui.MessageDialog;
 import artofillusion.ui.Translate;
+import buoy.widget.BFileChooser;
 import buoy.widget.BStandardDialog;
 
 public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
@@ -683,7 +688,7 @@ String coordSysToString(CoordinateSystem cs) {
 
   public void joincurves()
   {
-    createParentObject("joincurves()", 2);
+    createParentObject("joincurves()", 1);
   }
 
   public void extractmacro() throws Exception
@@ -730,8 +735,21 @@ String coordSysToString(CoordinateSystem cs) {
     this.window.setModified();
   }
 
-  public void test()
-  
+
+  public void file() throws Exception
+  {
+    String dir = "";
+    if (ArtOfIllusion.getCurrentDirectory() != null) dir= ArtOfIllusion.getCurrentDirectory();
+    BFileChooser fc = new BFileChooser(BFileChooser.OPEN_FILE, Translate.text("importFile"), new File(dir));
+    if (!fc.showDialog(null)) return;
+
+    File f = fc.getSelectedFile();
+    String filename = f.getPath();
+    
+    createObjectFromString("file(\""+filename+"\")");
+  }
+
+  public void test()  
   {
     showMessage("test function not implemented");
   }

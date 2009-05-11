@@ -46,10 +46,10 @@ class MetaCADEvaluatorDialog extends BDialog implements TextChangedListener
       "cube", "cylinder", "sphere", "regular", "star", "roll"
   };
   protected String[] cadfunctions = new String [] {
-      "extrude", "lathe", "mesh", "group", "joincurves", "extractmacro", "test"
+      "extrude", "lathe", "mesh", "group", "joincurves", "extractmacro", "file", "test"
   };
   protected String[] cadlabels = new String [] {
-      Translate.text("MetaCADEvaluator:Operations"), null, null, null, null, null, null
+      Translate.text("MetaCADEvaluator:Operations"), null, null, null, null, null, null, null
   };
   
   protected BTextArea paramtab;
