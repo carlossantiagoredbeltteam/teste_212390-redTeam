@@ -4,21 +4,58 @@
 
 package klynn.aoi.translators;
 
-import klynn.aoi.util.*;
+import java.awt.Color;
+import java.awt.FileDialog;
+import java.awt.Frame;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
-import artofillusion.*;
-import artofillusion.object.*;
+import klynn.aoi.util.AWTMessageDialog;
+import klynn.aoi.util.MeshTools;
+import klynn.aoi.util.ProgressDialog;
+import artofillusion.ModellingApp;
+import artofillusion.Scene;
+import artofillusion.animation.PositionTrack;
+import artofillusion.animation.RotationTrack;
+import artofillusion.math.CoordinateSystem;
+import artofillusion.math.RGBColor;
+import artofillusion.math.Vec3;
+import artofillusion.object.Curve;
+import artofillusion.object.DirectionalLight;
+import artofillusion.object.Mesh;
+import artofillusion.object.Object3D;
+import artofillusion.object.ObjectInfo;
+import artofillusion.object.SceneCamera;
+import artofillusion.object.TriangleMesh;
 import artofillusion.texture.Texture;
 import artofillusion.texture.UniformTexture;
-import artofillusion.animation.*;
-import artofillusion.math.*;
 
-import java.awt.*;
-import java.io.*;
-import java.util.*;
-
-import com.ysystems.ycad.lib.ydxf.*;
-import com.ysystems.ycad.lib.yxxf.*;
+import com.ysystems.ycad.lib.ydxf.YdxfGet;
+import com.ysystems.ycad.lib.ydxf.YdxfGetBuffer;
+import com.ysystems.ycad.lib.yxxf.Yxxf;
+import com.ysystems.ycad.lib.yxxf.YxxfEnt;
+import com.ysystems.ycad.lib.yxxf.YxxfEnt3Dface;
+import com.ysystems.ycad.lib.yxxf.YxxfEntArc;
+import com.ysystems.ycad.lib.yxxf.YxxfEntBlock;
+import com.ysystems.ycad.lib.yxxf.YxxfEntCircle;
+import com.ysystems.ycad.lib.yxxf.YxxfEntHeader;
+import com.ysystems.ycad.lib.yxxf.YxxfEntInsert;
+import com.ysystems.ycad.lib.yxxf.YxxfEntLine;
+import com.ysystems.ycad.lib.yxxf.YxxfEntLwpolyline;
+import com.ysystems.ycad.lib.yxxf.YxxfEntPolyline;
+import com.ysystems.ycad.lib.yxxf.YxxfEntVertex;
+import com.ysystems.ycad.lib.yxxf.YxxfGfxContext;
+import com.ysystems.ycad.lib.yxxf.YxxfGfxMatrix;
+import com.ysystems.ycad.lib.yxxf.YxxfGfxPointW;
+import com.ysystems.ycad.lib.yxxf.YxxfTblLayer;
 
 
 class DXFLayer {
@@ -50,12 +87,68 @@ public class DXFImporter {
   Boolean enableMeshRepair;
   Hashtable<YxxfTblLayer, DXFLayer> layers;
   YxxfGfxContext gc;
+  List<ObjectInfo> importedobjects;
   
   public DXFImporter(Frame parent, Boolean enableMeshRepair) {
     this.parent = parent;
     this.enableMeshRepair = enableMeshRepair;
     this.gc = new YxxfGfxContext();
     this.layers = new Hashtable<YxxfTblLayer, DXFLayer>();
+    this.importedobjects = new LinkedList<ObjectInfo>();
+  }
+  
+  public static List<ObjectInfo> importFile(String filename, boolean enableMeshRepair) throws Exception {
+
+    File f = new File(filename);
+
+    String objName = f.getName();
+    if (objName.lastIndexOf('.') > 0) objName = objName.substring(0, objName.lastIndexOf('.'));
+    if (debug) System.out.println("Object name: " + objName);
+    
+    // open file:
+    BufferedInputStream in = null;
+    try {
+      // read file using ycad lib:
+      in = new BufferedInputStream(new FileInputStream(f));
+      Yxxf drawing = new Yxxf();
+      YdxfGetBuffer buffer = new YdxfGetBuffer();
+      int type = YdxfGetBuffer.GET_TYPE_MAIN; // drawing (versus font) get this
+      // from file somehow?
+      buffer.setInput(type, in, drawing);
+      YdxfGet.get(buffer);
+      drawing = buffer.getDrawing();
+      String blockName = drawing.secEntities.insMSpace.block.getBlockname2();
+      if (debug) System.out.println("blockName: [" + blockName + "]");
+
+      DXFImporter importer = new DXFImporter(null, enableMeshRepair);
+      for (int nextToDraw = 0;;) {
+        YxxfEnt ent = (YxxfEnt) drawing.secEntities.insMSpace.block.nextEntity(nextToDraw);
+        if (!(ent instanceof YxxfEntHeader)) break;
+        importer.addEntity((YxxfEntHeader)ent);
+        nextToDraw++;
+      }
+      Boolean geometryfound = false;
+      Enumeration<YxxfTblLayer> keys = importer.layers.keys();
+      while (keys.hasMoreElements()) {
+        YxxfTblLayer layer = keys.nextElement();
+        DXFLayer mylayer = importer.layers.get(layer);
+        Color col = importer.gc.getPalette().jcolorarr[layer.aci];
+        if (importer.createMesh(mylayer, objName, col) != null) geometryfound = true;
+        if (importer.createCurve(mylayer, objName)) geometryfound = true;
+      }
+      if (!geometryfound) {
+        throw new Exception("Import of file: \"" + f + "\" failed. No supported geometry found.");
+      }
+      return importer.importedobjects;
+    } catch (Exception ex) {
+      throw ex;
+    } finally {
+      try {
+        in.close();
+      } catch (Exception ex2) {
+        throw new Exception("Unable to close file: \"" + f + "\"." + ex2.getMessage());
+      }
+    }
   }
   
   /**
@@ -74,10 +167,8 @@ public class DXFImporter {
     fd.show();
     if (fd.getFile() == null) return;
     f = new File(fd.getDirectory(), fd.getFile());
+    String filename = f.getPath();
     ModellingApp.currentDirectory = fd.getDirectory();
-    String objName = fd.getFile();
-    if (objName.lastIndexOf('.') > 0) objName = objName.substring(0, objName.lastIndexOf('.'));
-    if (debug) System.out.println("Object name: " + objName);
 
     // ask user to enable/disable mesh repair tools:
     String msgText = "WARNING: This option can be extremely slow!";
@@ -88,13 +179,6 @@ public class DXFImporter {
     if (choice == 0) enableMeshRepair = true;
     if (choice == 2) return;
     dialog.dispose();
-
-    ProgressDialog pdialog = null;
-    /*
-     * KEVIN threading is backwards! This won't work pdialog = new
-     * ProgressDialog(parent, 100, "Importing...");
-     * pdialog.setPriority(Thread.MAX_PRIORITY); pdialog.start();
-     */
 
     // create an AOI Scene to add objects to:
     if (theScene == null) {
@@ -112,62 +196,20 @@ public class DXFImporter {
       theScene.addObject(info, null);
     }
 
-    // open file:
-    BufferedInputStream in = null;
-    String line = null;
-    String formName = null;
+    List<ObjectInfo> importedobjects;
     try {
-      // read file using ycad lib:
-      in = new BufferedInputStream(new FileInputStream(f));
-      java.util.Vector faces = new java.util.Vector();
-      Yxxf drawing = new Yxxf();
-      YdxfGetBuffer buffer = new YdxfGetBuffer();
-      int type = YdxfGetBuffer.GET_TYPE_MAIN; // drawing (versus font) get this
-      // from file somehow?
-      buffer.setInput(type, in, drawing);
-      YdxfGet.get(buffer);
-      drawing = buffer.getDrawing();
-      String blockName = drawing.secEntities.insMSpace.block.getBlockname2();
-      if (debug) System.out.println("blockName: [" + blockName + "]");
-
-      DXFImporter importer = new DXFImporter(parent, enableMeshRepair);
-      for (int nextToDraw = 0;;) {
-        YxxfEnt ent = (YxxfEnt) drawing.secEntities.insMSpace.block.nextEntity(nextToDraw);
-        if (!(ent instanceof YxxfEntHeader)) break;
-        importer.addEntity((YxxfEntHeader)ent);
-        nextToDraw++;
-      }
-      Boolean geometryfound = false;
-      Enumeration<YxxfTblLayer> keys = importer.layers.keys();
-      while (keys.hasMoreElements()) {
-        YxxfTblLayer layer = keys.nextElement();
-        DXFLayer mylayer = importer.layers.get(layer);
-        Color col = importer.gc.getPalette().jcolorarr[layer.aci];
-        if (importer.createMesh(mylayer, objName, col) != null) geometryfound = true;
-        if (importer.createCurve(mylayer, objName)) geometryfound = true;
-      }
-      if (!geometryfound) {
-        new AWTMessageDialog(parent, new String[] { "Import of file: [" + f +
-        "] failed. No supported geometry found." });
-      }
-      
-    } catch (Exception ex) {
-      new AWTMessageDialog(parent, new String[] {
-          "Import of file: [" + f + "] failed with exception:", ex.getMessage() });
-      return;
-    } finally {
-      try {
-        in.close();
-      } catch (Exception ex2) {
-        new AWTMessageDialog(parent, new String[] { "Unable to close file: [" + f + "]. ",
-            ex2.getMessage() });
-      }
+      importedobjects = importFile(filename, enableMeshRepair);
+      addObjects(importedobjects);
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
     }
+    
     if (!appendFlag) ModellingApp.newWindow(theScene);
     return;
   }
 
-  private void createAndAddObjectInfo(String objName, Object3D obj3d, Color col) {
+  private void createObjectInfo(String objName, Object3D obj3d, Color col) {
     Texture tex;
     if (col != null) {
       tex = new UniformTexture();
@@ -180,7 +222,14 @@ public class DXFImporter {
     info.setTexture(tex, tex.getDefaultMapping(obj3d));
     info.addTrack(new PositionTrack(info), 0);
     info.addTrack(new RotationTrack(info), 1);
-    theScene.addObject(info, null);
+    this.importedobjects.add(info);
+  }
+  
+  private static void addObjects(List<ObjectInfo> objects)
+  {
+    for (ObjectInfo info : objects) {
+      theScene.addObject(info, null);
+    }
   }
 
   private Boolean createCurve(DXFLayer mylayer, String objName) {
@@ -189,7 +238,7 @@ public class DXFImporter {
       float smoothness[] = new float[verts.length];
       Arrays.fill(smoothness, 0.0f);
       Curve curve = new Curve(verts, smoothness, Mesh.NO_SMOOTHING, false);
-      createAndAddObjectInfo(objName + "_curve" + i, curve, null);
+      createObjectInfo(objName + "_curve" + i, curve, null);
     }
     if (mylayer.polylines.size() > 0) return true;
     else return false;
@@ -248,7 +297,7 @@ public class DXFImporter {
       if (this.enableMeshRepair) mutil.fixCirality(fc);
 
       TriangleMesh mesh = new TriangleMesh(vert, fc);
-      createAndAddObjectInfo(objName, mesh, col);
+      createObjectInfo(objName, mesh, col);
       return mesh;
     }
     return null;
@@ -391,23 +440,5 @@ public class DXFImporter {
       angle += delta;
     }
     return coords;
-  }
-
-  /**
-   * Separate a line into pieces divided by whitespace.
-   * 
-   * @param line
-   *          an input String
-   * @return String[] array of tokens
-   */
-  private static String[] splitLine(String line) {
-    StringTokenizer st = new StringTokenizer(line);
-    Vector v = new Vector();
-
-    while (st.hasMoreTokens())
-      v.addElement(st.nextToken());
-    String result[] = new String[v.size()];
-    v.copyInto(result);
-    return result;
   }
 }
