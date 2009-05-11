@@ -2,6 +2,7 @@
 #include "parameters.h"
 #include "pins.h"
 #include "extruder.h"
+#include "vectors.h"
 #include "cartesian_dda.h"
 
 /* bit-flags for commands and parameters */
