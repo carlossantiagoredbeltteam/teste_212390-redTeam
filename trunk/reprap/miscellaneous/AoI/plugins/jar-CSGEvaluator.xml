@@ -5,6 +5,7 @@
   <!-- set global properties for this build -->
   <property name="src" value="CSGEvaluator/src" />
   <property name="build" value="CSGEvaluator/build" />
+  <property name="classes" value="CSGEvaluator/classes" />
   <property name="docs" value="CSGEvaluator/docs" />
   <property name="dist" value="Plugins" />
   <property name="aoijar" value="ArtOfIllusion.jar" />
@@ -31,6 +32,7 @@
     <copy file="${src}/extensions.xml" todir="${build}" />
     <copy todir="${build}">
       <fileset dir="${src}" includes="*.properties" />
+      <fileset dir="${classes}" includes="**/*.class" />
     </copy>
     <jar jarfile="${dist}/CSGEvaluator.jar" basedir="${build}">
         <zipfileset src="${jeplite}"/>
