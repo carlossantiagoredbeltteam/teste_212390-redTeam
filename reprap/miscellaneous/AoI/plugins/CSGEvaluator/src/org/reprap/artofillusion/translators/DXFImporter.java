@@ -5,7 +5,6 @@
 package org.reprap.artofillusion.translators;
 
 import java.awt.Color;
-import java.awt.FileDialog;
 import java.awt.Frame;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -15,12 +14,9 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.Vector;
 
-import klynn.aoi.util.AWTMessageDialog;
-import klynn.aoi.util.MeshTools;
-import klynn.aoi.util.ProgressDialog;
+import artofillusion.ArtOfIllusion;
 import artofillusion.ModellingApp;
 import artofillusion.Scene;
 import artofillusion.animation.PositionTrack;
@@ -37,6 +33,9 @@ import artofillusion.object.SceneCamera;
 import artofillusion.object.TriangleMesh;
 import artofillusion.texture.Texture;
 import artofillusion.texture.UniformTexture;
+import artofillusion.ui.Translate;
+import buoy.widget.BFileChooser;
+import buoy.widget.BStandardDialog;
 
 import com.ysystems.ycad.lib.ydxf.YdxfGet;
 import com.ysystems.ycad.lib.ydxf.YdxfGetBuffer;
@@ -162,25 +161,24 @@ public class DXFImporter {
    *          Scene Scene to append to
    */
   public static void importFile(Frame parent) {
-    // input file setup:
-    FileDialog fd = new FileDialog(parent, "Import DXF File", FileDialog.LOAD);
-    File f;
-    if (ModellingApp.currentDirectory != null) fd.setDirectory(ModellingApp.currentDirectory);
-    fd.show();
-    if (fd.getFile() == null) return;
-    f = new File(fd.getDirectory(), fd.getFile());
+    
+    String dir = "";
+    if (ArtOfIllusion.getCurrentDirectory() != null) dir= ArtOfIllusion.getCurrentDirectory();
+    BFileChooser fc = new BFileChooser(BFileChooser.OPEN_FILE, Translate.text("importFile"), new File(dir));
+    if (!fc.showDialog(null)) return;
+
+    File f = fc.getSelectedFile();
     String filename = f.getPath();
-    ModellingApp.currentDirectory = fd.getDirectory();
+    ArtOfIllusion.setCurrentDirectory(fc.getDirectory().getPath());
 
     // ask user to enable/disable mesh repair tools:
-    String msgText = "WARNING: This option can be extremely slow!";
-    AWTMessageDialog dialog = new AWTMessageDialog(parent, msgText, new String[] {
-        " Mesh Repair ON ", " Mesh Repair OFF ", " Cancel " });
-    int choice = dialog.getChoice();
+    BStandardDialog dlg = new BStandardDialog("", "WARNING: This option can be extremely slow!",
+                                              BStandardDialog.QUESTION);
+    String[] choices = new String[] { "Mesh Repair ON", "Mesh Repair OFF", "Cancel" };
+    int choice = dlg.showOptionDialog(null, choices, choices[1]);
     boolean enableMeshRepair = false;
     if (choice == 0) enableMeshRepair = true;
     if (choice == 2) return;
-    dialog.dispose();
 
     // create an AOI Scene to add objects to:
     if (theScene == null) {
@@ -207,7 +205,7 @@ public class DXFImporter {
       e.printStackTrace();
     }
     
-    if (!appendFlag) ModellingApp.newWindow(theScene);
+    if (!appendFlag) ArtOfIllusion.newWindow(theScene);
     return;
   }
 
@@ -218,7 +216,7 @@ public class DXFImporter {
       ((UniformTexture)tex).diffuseColor.setRGB(col.getRed(), col.getGreen(), col.getBlue());
     }
     else {
-      tex = scene.getDefaultTexture();
+      tex = this.scene.getDefaultTexture();
     }
     ObjectInfo info = new ObjectInfo(obj3d, new CoordinateSystem(), objName);
     info.setTexture(tex, tex.getDefaultMapping(obj3d));
