@@ -56,8 +56,9 @@ public class ParsedTree {
       updateAOI(result.get(0));
     }
     else {
-      ObjectInfo collection = new ObjectInfo(new MetaCADObjectCollection(result), new CoordinateSystem(), "dummy");
-      updateAOI(collection);
+     ObjectInfo collection = new ObjectInfo(new MetaCADObjectCollection(result), new CoordinateSystem(), "dummy");
+     updateAOI(collection);
+//      updateAOI(ObjectHelper.join(result, 0.1));
     }
     return result;
   }
