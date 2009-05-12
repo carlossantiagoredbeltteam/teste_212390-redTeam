@@ -12,6 +12,7 @@ package org.reprap.machines;
 
 import org.reprap.ReprapException;
 import org.reprap.Extruder;
+import org.reprap.Preferences;
 import org.reprap.comms.GCodeReaderAndWriter;
 import org.reprap.utilities.Debug;
 import org.reprap.devices.GCodeExtruder;
@@ -120,12 +121,15 @@ public class GCodeRepRap extends GenericRepRap {
 			return;
 		}
 		
+
 		double x0 = currentX;
 		double y0 = currentY;
 		double dx = x - x0;
 		double dy = y - y0;
 		double x1, y1;
 		double distance = Math.sqrt(dx*dx + dy*dy);
+		if(distance < Preferences.tiny())
+			return;
 		
 		code = "G1 F" + slowFeedrateXY + "; force starting speed";
 		currentFeedrate = slowFeedrateXY;
@@ -160,7 +164,7 @@ public class GCodeRepRap extends GenericRepRap {
 
 		double gx = round(x, 1);
 		double gy = round(y, 1);
-		double gz = round(z, 1);
+		double gz = round(z, 4);
 		double extrudeLength;
 		double zFeedrate = round(getMaxFeedrateZ(), 1);
 		double xyFeedrate = round(getFeedrate(), 1);
@@ -175,7 +179,7 @@ public class GCodeRepRap extends GenericRepRap {
 		String code;
 		
 		double liftIncrement = extruders[extruder].getExtrusionHeight()/2;
-		double liftedZ = round(currentZ + liftIncrement, 1);
+		double liftedZ = round(currentZ + liftIncrement, 4);
 
 		//go up first?
 		if (startUp)
@@ -227,9 +231,42 @@ public class GCodeRepRap extends GenericRepRap {
 			
 			code = "G1 ";
 			code += " Z" + gz;
-			
+			currentZ = gz;
 
 			extrudeLength = extruders[extruder].getDistance(Math.abs(dz), zFeedrate);
+
+			if(extrudeLength > 0)
+			{
+				if(extruders[extruder].getReversing())
+					extruders[extruder].getExtrudedLength().add(-extrudeLength);
+				else
+					extruders[extruder].getExtrudedLength().add(extrudeLength);
+				if(extruders[extruder].get4D())
+					code += " E" + round(extruders[extruder].getExtrudedLength().length(), 1);
+			}	
+			
+			//if (zFeedrate != currentFeedrate)
+			//{
+			code += " F" + zFeedrate;
+			currentFeedrate = zFeedrate;
+			//}
+
+			code += " ;z change";
+			gcode.queue(code);
+		}
+		
+		//go back down?
+		if (!endUp && gz != currentZ)
+		{
+			code = "G1 F";
+			code += zFeedrate + ";Don't accelerate Z axis";
+			currentFeedrate = zFeedrate;
+			gcode.queue(code);
+			
+			code = "G1 Z" + gz;
+			currentZ = gz;
+			
+			extrudeLength = extruders[extruder].getDistance(Math.abs(z - currentZ), zFeedrate);
 
 			if(extrudeLength > 0)
 			{
@@ -251,39 +288,7 @@ public class GCodeRepRap extends GenericRepRap {
 			gcode.queue(code);
 		}
 		
-		//go back down?
-		if (!endUp && z != currentZ)
-		{
-			code = "G1 F";
-			code += zFeedrate + ";Don't accelerate Z axis";
-			currentFeedrate = zFeedrate;
-			gcode.queue(code);
-			
-			code = "G1 Z" + gz;
-
-			extrudeLength = extruders[extruder].getDistance(Math.abs(z - currentZ), zFeedrate);
-
-			if(extrudeLength > 0)
-			{
-				if(extruders[extruder].getReversing())
-					extruders[extruder].getExtrudedLength().add(-extrudeLength);
-				else
-					extruders[extruder].getExtrudedLength().add(extrudeLength);
-				if(extruders[extruder].get4D())
-					code += " E" + round(extruders[extruder].getExtrudedLength().length(), 1);
-			}	
-			
-			//if (zFeedrate != currentFeedrate)
-			//{
-			code += " F" + zFeedrate;
-			currentFeedrate = zFeedrate;
-			//}
-
-			code += " ;z down";
-			gcode.queue(code);
-		}
-		
-		super.moveTo(x, y, z, startUp, endUp);
+		super.moveTo(gx, gy, gz, startUp, endUp);
 	}
 
 	/* (non-Javadoc)
@@ -430,22 +435,25 @@ public class GCodeRepRap extends GenericRepRap {
 	}
 
 	public void home() {
-		super.home();
+
 		
-		double xyFeedrate = round(getFastFeedrateXY(), 4);
 		
 		// Assume the extruder is off...
+		currentFeedrate = slowFeedrateXY;
 		
-		gcode.queue("G1 X-999 Y-999 F" + xyFeedrate + " ;xy home");
-		currentFeedrate = xyFeedrate;
+		try
+		{
+			moveTo(-250, -250, currentZ, false, false);
+			moveTo(currentX, currentY, -250, false, false);
+		} catch (Exception e)
+		{}
 		
-		gcode.queue("G1 Z-999 F" + round(getMaxFeedrateZ(), 4) + " ;z home");
 		String setHome = "G92 X0 Y0 Z0";
 		if(extruders[extruder].get4D())
 			setHome += " E0";
 		setHome += "; set current position as home";
 		gcode.queue(setHome);
-		
+		super.home();
 	}
 	
 	private void delay(long millis)
@@ -459,8 +467,10 @@ public class GCodeRepRap extends GenericRepRap {
 				extruders[extruder].getExtrudedLength().add(extrudeLength);
 			if(extruders[extruder].get4D())
 			{
+				double feed = round(extruders[extruder].getCurrentSpeed(), 1);
+				gcode.queue("G1 F" + feed + "; force feedrate");
 				gcode.queue("G1 E" + round(extruders[extruder].getExtrudedLength().length(), 1) + 
-						" F" + round(extruders[extruder].getCurrentSpeed(), 1) + " ; extrude dwell");
+						" F" + feed + " ; extrude dwell");
 				return;
 			}
 		}
@@ -472,39 +482,48 @@ public class GCodeRepRap extends GenericRepRap {
 	 * @see org.reprap.Printer#homeToZeroX()
 	 */
 	public void homeToZeroX() throws ReprapException, IOException {
-		super.homeToZeroX();
+
 		
 		// Assume extruder is off...
-		
-		currentFeedrate = round(getMaxFeedrateX(), 4);
-		gcode.queue("G1 X-999 F" + currentFeedrate + " ;home x");
+		try
+		{
+			moveTo(-250, currentY, currentZ, false, false);
+		} catch (Exception e)
+		{}
 		gcode.queue("G92 X0 ;set x 0");
+		super.homeToZeroX();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#homeToZeroY()
 	 */
 	public void homeToZeroY() throws ReprapException, IOException {
-		super.homeToZeroY();
 
 		// Assume extruder is off...
 		
-		currentFeedrate = round(getMaxFeedrateY(), 4);
-		gcode.queue("G1 Y-999 F" + currentFeedrate + " ;home y");
+		try
+		{
+			moveTo(currentX, -250, currentZ, false, false);
+		} catch (Exception e)
+		{}
 		gcode.queue("G92 Y0 ;set y 0");
+		super.homeToZeroY();
+
 	}
 
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#homeToZeroY()
 	 */
 	public void homeToZeroZ() throws ReprapException, IOException {
-		super.homeToZeroZ();
 
 		// Assume extruder is off...
-		
-		//double feedrate = round(getMaxFeedrateZ(), 4);
-		gcode.queue("G1 Z-999 F" + round(getMaxFeedrateZ(), 4) + " ;home z");
-		gcode.queue("G92 Z0 ;set z 0");		
+		try
+		{
+			moveTo(currentX, currentY, -250, false, false);
+		} catch (Exception e)
+		{}
+		gcode.queue("G92 Z0 ;set z 0");	
+		super.homeToZeroZ();
 	}
 	
 	public double round(double c, double d)
