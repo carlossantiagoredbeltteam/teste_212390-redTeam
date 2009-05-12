@@ -28,9 +28,9 @@ public abstract class GenericRepRap implements CartesianPrinter
 	protected boolean stlLoaded = false;
 	protected boolean gcodeLoaded = false;
 	
-	protected boolean accelerating = true;
-	protected double accelerationDistance = 10;
-	protected double slowFeedrateXY = 1000;
+	protected boolean accelerating;
+	protected double accelerationDistance;
+	protected double slowFeedrateXY;
 	
 	/**
 	 * 
@@ -232,6 +232,10 @@ public abstract class GenericRepRap implements CartesianPrinter
 			maxFeedrateX = Preferences.loadGlobalDouble("MaximumFeedrateX(mm/minute)");
 			maxFeedrateY = Preferences.loadGlobalDouble("MaximumFeedrateY(mm/minute)");
 			maxFeedrateZ = Preferences.loadGlobalDouble("MaximumFeedrateZ(mm/minute)");
+			
+			accelerating = Preferences.loadGlobalBool("Accelerating");
+			accelerationDistance = Preferences.loadGlobalDouble("AccelerationDistance");
+			slowFeedrateXY = Preferences.loadGlobalDouble("SlowFeedrateXY");
 			
 			//set our standard feedrates.
 			setFastFeedrateXY(Math.min(maxFeedrateX, maxFeedrateY));
