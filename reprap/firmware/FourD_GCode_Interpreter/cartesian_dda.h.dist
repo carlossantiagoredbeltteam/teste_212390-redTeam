@@ -9,26 +9,26 @@
 #ifndef CARTESIAN_DDA_H
 #define CARTESIAN_DDA_H
 
-// Custom short delay function (microseconds)
-  
-void delayMicrosecondsInterruptible(unsigned int us);
+// Main class for moving the RepRap machine about
 
-class cartesian_dda;
-
-class dda
+class cartesian_dda
 {
-  private:
-  
+private:
+
+  extruder* ext;               // The extruder I'm currently using - keep this up to date...
+
+  FloatPoint units;            // Factors for converting either mm or inches to steps
+
+  FloatPoint current_position; // Where the machine is
+  FloatPoint target_position;  // Where it's going
   FloatPoint delta_position;   // The difference between the two
   float distance;              // How long the path is
-    
-  LongPoint current_steps;     // axis information in steps rather than units
+  
+  LongPoint current_steps;     // Similar information as above in steps rather than units
   LongPoint target_steps;
   LongPoint delta_steps;
   LongPoint dda_counter;       // DDA error-accumulation variables
-  
-  FloatPoint target_position;  // Where it's going
-  FloatPoint current_position; // Where it's coming from
+  long t_scale;                // When doing lots of t steps, scale them so the DDA doesn't spend for ever on them
   
   byte x_direction;            // Am I going in the + or - direction?
   byte y_direction;
@@ -36,107 +36,16 @@ class dda
   byte e_direction;
   byte t_direction;
 
-  bool no_movement;
-  
+  bool x_can_step;             // Am I not at an endstop?  Have I not reached the target? etc.
+  bool y_can_step;
+  bool z_can_step;
+  bool e_can_step;
+  bool t_can_step;
+
 // Variables for acceleration calculations
 
   long total_steps;            // The number of steps to take along the longest movement axis
-  
-  // Can this axis step?
-  
-  bool can_step(byte min_pin, byte max_pin, long current, long target, byte dir);
-  
-  // Read a limit switch
-  
-  bool read_switch(byte pin);
 
-  cartesian_dda* cdda;
-  
-  // Work out the number of microseconds between steps
-  
-  long calculate_feedrate_delay(float feedrate);
-  
-  public:
-    dda(cartesian_dda* c);
-    void setEnds(const FloatPoint& from, const FloatPoint& to);
-    void move();
-};
-
-inline bool dda::can_step(byte min_pin, byte max_pin, long current, long target, byte dir)
-{
-
-  //stop us if we're on target
-
-	if (target == current)
-		return false;
-
-#if ENDSTOPS_MIN_ENABLED == 1
-
-  //stop us if we're home and still going
-  
-	else if(min_pin >= 0)
-        {
-          if (read_switch(min_pin) && !dir)
-		return false;
-        }
-#endif
-
-#if ENDSTOPS_MAX_ENABLED == 1
-
-  //stop us if we're at max and still going
-  
-	else if(max_pin >= 0)
-        {
- 	    if (read_switch(max_pin) && dir)
- 		return false;
-        }
-#endif
-
-  // All OK - we can step
-  
-	return true;
-}
-
-inline bool dda::read_switch(byte pin)
-{
-	//dual read as crude debounce
-
-	#if ENDSTOPS_INVERTING == 1
-		return !digitalRead(pin) && !digitalRead(pin);
-	#else
-		return digitalRead(pin) && digitalRead(pin);
-	#endif
-}
-
-inline long dda::calculate_feedrate_delay(float feedrate)
-{
-        
-	// Calculate delay between steps in microseconds.  Here it is in English:
-        // (feedrate is in mm/minute)
-	// 60000000.0*distance/feedrate  = move duration in microseconds
-	// move duration/total_steps = time between steps for master axis.
-
-	return round( (distance*60000000.0)/(feedrate*(float)total_steps) );	
-}
-
-
-//****************************************************************************************************
-
-
-// Main class for moving the RepRap machine about
-
-class cartesian_dda
-{
-private:
-
-  dda* dd;
-
-  extruder* ext;               // The extruder I'm currently using - keep this up to date...
-
-  FloatPoint units;            // Factors for converting either mm or inches to steps
-
-  FloatPoint current_position; // Where the machine is
-  
 // Internal functions that need not concern the user
 
   // Take a single step
@@ -145,18 +54,37 @@ private:
   void do_y_step();
   void do_z_step();
   void do_e_step();
-  void do_t_step(); 
+  
+  void dda_move();  // Run the DDA
+  
+  // Can this axis step?
+  
+  bool can_step(byte min_pin, byte max_pin, long current, long target, byte dir);
+  
+  // Read a limit switch
+  
+  bool read_switch(byte pin);
+  
+  // Set where I'm going
+  
+  bool set_target(const FloatPoint& p);
+  
+  // Work out the number of microseconds between steps
+  
+  long calculate_feedrate_delay(float feedrate);
   
   // Switch the steppers on and off
   
   void enable_steppers();
   void disable_steppers();
-    
+  
+  // Custom short delay function (microseconds)
+  
+  void delayMicrosecondsInterruptible(unsigned int us);
+  
 public:
 
   cartesian_dda();
-  
-  void set_dda(dda* d);
   
   // Move somewhere at a given speed
   
@@ -177,19 +105,7 @@ public:
   // Record the selection of a new extruder
   
   void set_extruder(extruder* ex);
-  
-  extruder* extruder();
 };
-
-inline void cartesian_dda::set_dda(dda* d)
-{
-  dd = d;
-}
-
-inline extruder* cartesian_dda::extruder()
-{
-  return ext;
-}
 
 // Short functions inline to save memory; particularly useful in the Arduino
 
@@ -198,11 +114,14 @@ inline void cartesian_dda::set_position(const FloatPoint& p)
 	current_position = p;
 }
 
-
 inline void cartesian_dda::move(const FloatPoint& p)
 {
-  dd->setEnds(current_position, p);
-  dd->move();
+  if(!set_target(p))
+  {
+    set_position(p);
+    return;
+  }
+  dda_move();
 }
 
 inline void cartesian_dda::set_extruder(extruder* ex)
@@ -242,13 +161,5 @@ inline void cartesian_dda::do_e_step()
 }
 
 
-inline long to_steps(float units, float steps_per_unit)
-{
-	return round(steps_per_unit * units);
-}
 
-inline LongPoint to_steps(const FloatPoint& units, const FloatPoint& position)
-{
-        return roundv(units*position);
-}
 #endif
