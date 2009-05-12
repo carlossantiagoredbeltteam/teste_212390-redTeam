@@ -5,258 +5,31 @@
 #include "cartesian_dda.h"
 
 
-dda::dda(cartesian_dda* c)
-{
-    cdda = c;
-}
-
-void dda::setEnds(const FloatPoint& from, const FloatPoint& to)
-{
-  
-  no_movement = false;
-  
-        current_position = from;
-        target_position = to;
-        
-	//figure our deltas.
-
-	delta_position = fabsv(target_position - current_position);
-
-        // The feedrate values refer to distance in (X, Y, Z) space, so ignore e and f
-        // values unless they're the only thing there.
-
-        FloatPoint squares = delta_position*delta_position;
-        distance = squares.x + squares.y + squares.z; // + squares.e + squares.f;
-        // If we are 0, only thing changing is e
-        if(distance <= 0.0)
-          distance = squares.e;
-        // If we are still 0, only thing changing is f
-        if(distance <= 0.0)
-          distance = squares.f;
-        distance = sqrt(distance);          
-                                                                                               			
-	//set our steps current, target, and delta
-
-	current_steps = to_steps(cdda->units(), current_position);
-	target_steps = to_steps(cdda->units(), target_position);
-	delta_steps = absv(target_steps - current_steps);
-
-	// find the dominant axis.
-        // NB we ignore the t values here, as it takes (almost) 0 time to take a step in time :-)
-
-        total_steps = max(delta_steps.x, delta_steps.y);
-        total_steps = max(total_steps, delta_steps.z);
-        total_steps = max(total_steps, delta_steps.e);
-        
-        // If we're not going anywhere, flag the fact
-        
-        if(total_steps <= 0)
-        {
-          no_movement = true;
-          return;
-        }    
-
-#ifdef ACCELERATION_ON
-        current_steps.t = calculate_feedrate_delay(current_position.f);
-#else
-        current_steps.t = calculate_feedrate_delay(target_position.f);
-#endif
-          
-        target_steps.t = calculate_feedrate_delay(target_position.f);
-        delta_steps.t = abs(target_steps.t - current_steps.t);
-        total_steps = max(total_steps, delta_steps.t);
-        	
-	//what is our direction?
-
-	x_direction = (target_position.x >= current_position.x);
-	y_direction = (target_position.y >= current_position.y);
-	z_direction = (target_position.z >= current_position.z);
-	e_direction = (target_position.e >= current_position.e);
-	t_direction = (target_position.f < current_position.f);   // Because t is *inversely* proportional to f
-
-  // Set up the DDA
-  
-	dda_counter.x = -total_steps/2;
-	dda_counter.y = dda_counter.x;
-	dda_counter.z = dda_counter.x;
-        dda_counter.e = dda_counter.x;
-        dda_counter.t = dda_counter.x;
-        
-     
-}
-
-void dda::move()
-{
-  if(no_movement)
-  {
-    cdda->set_position(target_position);
-    return;
-  }
-  
-  bool x_can_step;             // Am I not at an endstop?  Have I not reached the target? etc.
-  bool y_can_step;
-  bool z_can_step;
-  bool e_can_step;
-  bool t_can_step;
-  
-  	//set our direction pins
-#if INVERT_X_DIR == 1
-	digitalWrite(X_DIR_PIN, !x_direction);
-#else
-	digitalWrite(X_DIR_PIN, x_direction);
-#endif
-
-#if INVERT_Y_DIR == 1
-	digitalWrite(Y_DIR_PIN, !y_direction);
-#else
-	digitalWrite(Y_DIR_PIN, y_direction);
-#endif
-
-#if INVERT_Z_DIR == 1
-	digitalWrite(Z_DIR_PIN, !z_direction);
-#else
-	digitalWrite(Z_DIR_PIN, z_direction);
-#endif
-        if(e_direction)
-          cdda->extruder()->set_direction(1);
-        else
-          cdda->extruder()->set_direction(0); 
-  
-  //turn on steppers to start moving =)
-  
-	cdda->enable_steppers();
-
-        bool real_move; // Flag to know if we've changed something physical
-
-  //do our DDA line!
-
-	do
-	{
-		x_can_step = can_step(X_MIN_PIN, X_MAX_PIN, current_steps.x, target_steps.x, x_direction);
-		y_can_step = can_step(Y_MIN_PIN, Y_MAX_PIN, current_steps.y, target_steps.y, y_direction);
-		z_can_step = can_step(Z_MIN_PIN, Z_MAX_PIN, current_steps.z, target_steps.z, z_direction);
-                e_can_step = can_step(-1, -1, current_steps.e, target_steps.e, e_direction);
-                t_can_step = can_step(-1, -1, current_steps.t, target_steps.t, t_direction);
-                
-                real_move = false;
-                
-		if (x_can_step)
-		{
-			dda_counter.x += delta_steps.x;
-			
-			if (dda_counter.x > 0)
-			{
-				cdda->do_x_step();
-                                real_move = true;
-				dda_counter.x -= total_steps;
-				
-				if (x_direction)
-					current_steps.x++;
-				else
-					current_steps.x--;
-			}
-		}
-
-		if (y_can_step)
-		{
-			dda_counter.y += delta_steps.y;
-			
-			if (dda_counter.y > 0)
-			{
-				cdda->do_y_step();
-                                real_move = true;
-				dda_counter.y -= total_steps;
-
-				if (y_direction)
-					current_steps.y++;
-				else
-					current_steps.y--;
-			}
-		}
-		
-		if (z_can_step)
-		{
-			dda_counter.z += delta_steps.z;
-			
-			if (dda_counter.z > 0)
-			{
-				cdda->do_z_step();
-                                real_move = true;
-				dda_counter.z -= total_steps;
-				
-				if (z_direction)
-					current_steps.z++;
-				else
-					current_steps.z--;
-			}
-		}
-
-		if (e_can_step)
-		{
-			dda_counter.e += delta_steps.e;
-			
-			if (dda_counter.e > 0)
-			{
-				cdda->do_e_step();
-                                real_move = true;
-				dda_counter.e -= total_steps;
-				
-				if (e_direction)
-					current_steps.e++;
-				else
-					current_steps.e--;
-			}
-		}
-		
-		if (t_can_step)
-		{
-			dda_counter.t += delta_steps.t;
-			
-			if (dda_counter.t > 0)
-			{
-				dda_counter.t -= total_steps;
-				
-				if (t_direction)
-					current_steps.t++;
-				else
-					current_steps.t--;
-			}
-		}
-				
-      // wait for next step.
-      // Use milli- or micro-seconds, as appropriate
-      // If the only thing that changed was t; don't bother to delay
-  
-                if(real_move)
-                {
-                   // keep it hot =)
-    
-		   manage_all_extruders();
-
-	           if (current_steps.t >= 16383)
-		    delay(current_steps.t/1000);
-	           else
-		    delayMicrosecondsInterruptible(current_steps.t);
-                }
-                
-	} while (x_can_step || y_can_step || z_can_step  || e_can_step || t_can_step);
-	
-  //set my current position to be where I now am.
-
-	cdda->set_position(target_position);
-
-  // Motors off
-  
-        cdda->disable_steppers();
-}
-
-
-
 // Initialise X, Y and Z.  The extruder is initialized
 // separately.
 
 cartesian_dda::cartesian_dda()
 {
+  // Default is going forward
+  
+        x_direction = 1;
+        y_direction = 1;
+        z_direction = 1;
+        e_direction = 1;
+        t_direction = 1;
+        
+  // Default to the origin and not going anywhere
+  
+	current_position.x = 0.0;
+	current_position.y = 0.0;
+	current_position.z = 0.0;
+	current_position.e = 0.0;
+        current_position.f = SLOW_XY_FEEDRATE;
+	target_position.x = 0.0;
+	target_position.y = 0.0;
+	target_position.z = 0.0;
+	target_position.e = 0.0;
+        target_position.f = SLOW_XY_FEEDRATE;
 
   // Set up the pin directions
   
@@ -318,6 +91,316 @@ void cartesian_dda::set_units(bool using_mm)
 }
 
 
+long cartesian_dda::calculate_feedrate_delay(float feedrate)
+{  
+        
+	// Calculate delay between steps in microseconds.  Here it is in English:
+        // (feedrate is in mm/minute)
+	// 60000000.0*distance/feedrate  = move duration in microseconds
+	// move duration/total_steps = time between steps for master axis.
+
+	return round(((distance * 60000000.0) / feedrate) / (float)total_steps);	
+}
+
+
+bool cartesian_dda::set_target(const FloatPoint& p)
+{
+        target_position = p;
+        
+	//figure our deltas.
+
+	delta_position = absv(target_position - current_position);
+
+        // The feedrate values refer to distance in (X, Y, Z) space, so ignore e and f
+        // values unless they're the only thing there.
+
+        FloatPoint squares = delta_position*delta_position;
+        distance = squares.x + squares.y + squares.z;
+        // If we are 0, only thing changing is e
+        if(distance <= 0.0)
+          distance = squares.e;
+        // If we are still 0, only thing changing is f
+        if(distance <= 0.0)
+          distance = squares.f;
+        distance = sqrt(distance);          
+                                                                         
+                          			
+	//set our steps current, target, and delta
+
+	current_steps = to_steps(units, current_position);
+	target_steps = to_steps(units, target_position);
+	delta_steps = absv(target_steps - current_steps);
+
+	// find the dominant axis.
+        // NB we ignore the t values here, as it takes no time to take a step in time :-)
+
+        total_steps = max(delta_steps.x, delta_steps.y);
+        total_steps = max(total_steps, delta_steps.z);
+        total_steps = max(total_steps, delta_steps.e);
+  
+        // If we're not going anywhere, flag the fact
+        
+        if(total_steps == 0)
+          return false;    
+
+#ifdef ACCELERATION_ON
+        current_steps.t = calculate_feedrate_delay(current_position.f);
+#else
+        current_steps.t = calculate_feedrate_delay(target_position.f);
+#endif
+        if(current_steps.t <= 0)
+          return false;
+          
+        target_steps.t = calculate_feedrate_delay(target_position.f);
+        delta_steps.t = abs(target_steps.t - current_steps.t);
+        t_scale = 1;
+        if(delta_steps.t > total_steps)
+        {
+            t_scale = delta_steps.t/total_steps;
+            if(t_scale >= 3)
+            {
+              target_steps.t = target_steps.t/t_scale;
+              current_steps.t = current_steps.t/t_scale;
+              delta_steps.t = abs(target_steps.t - current_steps.t);
+              if(delta_steps.t > total_steps)
+                total_steps =  delta_steps.t;
+            } else
+            {
+              t_scale = 1;
+              total_steps =  delta_steps.t;
+            }
+        } 
+        	
+	//what is our direction?
+
+	x_direction = (target_position.x >= current_position.x);
+	y_direction = (target_position.y >= current_position.y);
+	z_direction = (target_position.z >= current_position.z);
+	e_direction = (target_position.e >= current_position.e);
+	t_direction = (target_position.f < current_position.f);   // Because t is *inversely* proportional to f
+
+
+	//set our direction pins as well
+#if INVERT_X_DIR == 1
+	digitalWrite(X_DIR_PIN, !x_direction);
+#else
+	digitalWrite(X_DIR_PIN, x_direction);
+#endif
+
+#if INVERT_Y_DIR == 1
+	digitalWrite(Y_DIR_PIN, !y_direction);
+#else
+	digitalWrite(Y_DIR_PIN, y_direction);
+#endif
+
+#if INVERT_Z_DIR == 1
+	digitalWrite(Z_DIR_PIN, !z_direction);
+#else
+	digitalWrite(Z_DIR_PIN, z_direction);
+#endif
+        if(e_direction)
+          ext->set_direction(1);
+        else
+          ext->set_direction(0);
+  
+        return true;        
+}
+
+
+// Run the DDA
+
+void cartesian_dda::dda_move()
+{
+  // Set up the DDA
+  
+        long timestep;
+        
+	dda_counter.x = -total_steps/2;
+	dda_counter.y = dda_counter.x;
+	dda_counter.z = dda_counter.x;
+        dda_counter.e = dda_counter.x;
+        dda_counter.t = dda_counter.x;
+        
+  //turn on steppers to start moving =)
+  
+	enable_steppers();
+
+        bool real_move; // Flag to know if we've changed something physical
+
+  //do our DDA line!
+
+	do
+	{
+		x_can_step = can_step(X_MIN_PIN, X_MAX_PIN, current_steps.x, target_steps.x, x_direction);
+		y_can_step = can_step(Y_MIN_PIN, Y_MAX_PIN, current_steps.y, target_steps.y, y_direction);
+		z_can_step = can_step(Z_MIN_PIN, Z_MAX_PIN, current_steps.z, target_steps.z, z_direction);
+                e_can_step = can_step(-1, -1, current_steps.e, target_steps.e, e_direction);
+                t_can_step = can_step(-1, -1, current_steps.t, target_steps.t, t_direction);
+                
+                real_move = false;
+                
+		if (x_can_step)
+		{
+			dda_counter.x += delta_steps.x;
+			
+			if (dda_counter.x > 0)
+			{
+				do_x_step();
+                                real_move = true;
+				dda_counter.x -= total_steps;
+				
+				if (x_direction)
+					current_steps.x++;
+				else
+					current_steps.x--;
+			}
+		}
+
+		if (y_can_step)
+		{
+			dda_counter.y += delta_steps.y;
+			
+			if (dda_counter.y > 0)
+			{
+				do_y_step();
+                                real_move = true;
+				dda_counter.y -= total_steps;
+
+				if (y_direction)
+					current_steps.y++;
+				else
+					current_steps.y--;
+			}
+		}
+		
+		if (z_can_step)
+		{
+			dda_counter.z += delta_steps.z;
+			
+			if (dda_counter.z > 0)
+			{
+				do_z_step();
+                                real_move = true;
+				dda_counter.z -= total_steps;
+				
+				if (z_direction)
+					current_steps.z++;
+				else
+					current_steps.z--;
+			}
+		}
+
+		if (e_can_step)
+		{
+			dda_counter.e += delta_steps.e;
+			
+			if (dda_counter.e > 0)
+			{
+				do_e_step();
+                                real_move = true;
+				dda_counter.e -= total_steps;
+				
+				if (e_direction)
+					current_steps.e++;
+				else
+					current_steps.e--;
+			}
+		}
+		
+		if (t_can_step)
+		{
+			dda_counter.t += delta_steps.t;
+			
+			if (dda_counter.t > 0)
+			{
+				dda_counter.t -= total_steps;
+				if (t_direction)
+					current_steps.t++;
+				else
+					current_steps.t--;
+			}
+		}
+
+				
+      // wait for next step.
+      // Use milli- or micro-seconds, as appropriate
+      // If the only thing that changed was t; don't bother to delay
+  
+                if(real_move)
+                {
+                  // keep it hot =)
+    
+		  manage_all_extruders();
+                  if(t_scale > 1)
+                    timestep = t_scale*current_steps.t;
+                  else
+                    timestep = current_steps.t;
+	          if (timestep >= 16383)
+		    delay(timestep/1000);
+	          else
+		    delayMicrosecondsInterruptible(timestep);
+                }
+                
+	} while (x_can_step || y_can_step || z_can_step  || e_can_step || t_can_step);
+	
+  //set my current position to be where I now am.
+
+	current_position = target_position;
+
+  // Motors off
+  
+        disable_steppers();
+}
+
+bool cartesian_dda::can_step(byte min_pin, byte max_pin, long current, long target, byte dir)
+{
+
+  //stop us if we're on target
+
+	if (target == current)
+		return false;
+
+#if ENDSTOPS_MIN_ENABLED == 1
+
+  //stop us if we're home and still going
+  
+	else if(min_pin >= 0)
+        {
+          if (read_switch(min_pin) && !dir)
+		return false;
+        }
+#endif
+
+#if ENDSTOPS_MAX_ENABLED == 1
+
+  //stop us if we're at max and still going
+  
+	else if(max_pin >= 0)
+        {
+ 	    if (read_switch(max_pin) && dir)
+ 		return false;
+        }
+#endif
+
+  // All OK - we can step
+  
+	return true;
+}
+
+
+
+bool cartesian_dda::read_switch(byte pin)
+{
+	//dual read as crude debounce
+
+	#if ENDSTOPS_INVERTING == 1
+		return !digitalRead(pin) && !digitalRead(pin);
+	#else
+		return digitalRead(pin) && digitalRead(pin);
+	#endif
+}
+
+
 void cartesian_dda::enable_steppers()
 {
 #ifdef SANGUINO
@@ -349,7 +432,7 @@ void cartesian_dda::disable_steppers()
 #endif
 }
 
-void delayMicrosecondsInterruptible(unsigned int us)
+void cartesian_dda::delayMicrosecondsInterruptible(unsigned int us)
 {
 
 #if F_CPU >= 16000000L

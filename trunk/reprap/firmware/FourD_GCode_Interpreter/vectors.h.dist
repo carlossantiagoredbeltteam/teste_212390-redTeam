@@ -1,15 +1,10 @@
-/*
- * Structs to hold float and long multi-dimensinal vectors
- *
- * Adrian 11 May 2009
- */
- 
+// Structs to hold points in 5D space.
+
+
 #ifndef VECTORS_H
 #define VECTORS_H
 
 #define round(x) ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
-
-// Structs to hold points in 5D space.
 
 // Real-world units
 struct FloatPoint
@@ -59,14 +54,14 @@ inline FloatPoint operator*(const FloatPoint& a, const FloatPoint& b)
 
 // Can't use abs for this as it's defined somewhere in a #define
 
-inline FloatPoint fabsv(const FloatPoint& a)
+inline FloatPoint absv(const FloatPoint& a)
 {
   FloatPoint result;
-  result.x = fabs(a.x);
-  result.y = fabs(a.y);
-  result.z = fabs(a.z);
-  result.e = fabs(a.e);
-  result.f = fabs(a.f);
+  result.x = abs(a.x);
+  result.y = abs(a.y);
+  result.z = abs(a.z);
+  result.e = abs(a.e);
+  result.f = abs(a.f);
   return result;
 } 
 
@@ -138,6 +133,11 @@ inline LongPoint roundv(const FloatPoint& a)
   result.e = round(a.e);
   result.t = round(a.f);
   return result;
+} 
+
+inline LongPoint to_steps(const FloatPoint& units, const FloatPoint& position)
+{
+        return roundv(units*position);
 }
 
-#endif;
+#endif
