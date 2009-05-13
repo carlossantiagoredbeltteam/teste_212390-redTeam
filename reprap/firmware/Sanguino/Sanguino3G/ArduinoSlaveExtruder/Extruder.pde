@@ -146,27 +146,29 @@ void reverse_motor_1()
 {
   //wait for it to stop.
   if (DELAY_FOR_STOP > 0)
-    cancellable_delay(DELAY_FOR_STOP);
+    cancellable_delay(DELAY_FOR_STOP, 0);
 
   //reverse our motor for a bit.
   if (MOTOR_REVERSE_DURATION > 0 && motor1_reversal_state)
   {
     digitalWrite(MOTOR_1_DIR_PIN, LOW);
     analogWrite(MOTOR_1_SPEED_PIN, motor1_pwm);
-    cancellable_delay(MOTOR_REVERSE_DURATION);
+    cancellable_delay(MOTOR_REVERSE_DURATION, 1);
   }
 
   //wait for it to stop.
   if (DELAY_FOR_STOP > 0 && motor1_reversal_state)
-    cancellable_delay(DELAY_FOR_STOP);
+    cancellable_delay(DELAY_FOR_STOP, 0);
   
-  //reverse our motor for a bit.
+  //forward our motor for a bit.
   if (MOTOR_FORWARD_DURATION > 0 && motor1_reversal_state)
   {
     digitalWrite(MOTOR_1_DIR_PIN, HIGH);
     analogWrite(MOTOR_1_SPEED_PIN, motor1_pwm);
-    cancellable_delay(MOTOR_FORWARD_DURATION);
+    cancellable_delay(MOTOR_FORWARD_DURATION, 2);
   }
+  
+  motor1_reversal_count = 0;
 
   //finally stop it.
   if (motor1_reversal_state)
@@ -177,13 +179,21 @@ void reverse_motor_1()
 }
 
 //basically we want to delay unless there is a start command issued.
-void cancellable_delay(unsigned int duration)
+void cancellable_delay(unsigned int duration, byte state)
 {
   if (motor1_reversal_state)
   {
     for (unsigned int i=0; i<duration; i++)
     {
       delay(1);
+      
+      //keep track of how far we go.
+      if (state == 1)
+	      motor1_reversal_count++;
+      else if (state == 2)
+      	motor1_reversal_count--;
+
+			//check for packets.
       process_packets();
       
       //did we start up?  break!
