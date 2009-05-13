@@ -1,19 +1,25 @@
 // Yep, this is actually -*- c++ -*-
 
-// Z axis pins for the Motherboard 1.1
-#define stepPin 27
-#define dirPin 28
-#define enablePin 29
-#define minPin 30
-#define maxPin 31
+//x axis pins
+#define X_STEP_PIN      15
+#define X_DIR_PIN       18
+#define X_ENABLE_PIN    19
+#define X_MIN_PIN       20
+#define X_MAX_PIN       21
 
-// X axis pins
-//#define stepPin 15
-//#define dirPin 18
-//#define enablePin 19
-//#define minPin 20
-//#define maxPin 21
+//y axis pins
+#define Y_STEP_PIN      23
+#define Y_DIR_PIN       22
+#define Y_ENABLE_PIN    24
+#define Y_MIN_PIN       25
+#define Y_MAX_PIN       26
 
+//z axis pins
+#define Z_STEP_PIN      27
+#define Z_DIR_PIN       28
+#define Z_ENABLE_PIN    29
+#define Z_MIN_PIN       30
+#define Z_MAX_PIN       31
 
 //pin for controlling the PSU.
 #define PS_ON_PIN       14
@@ -46,17 +52,31 @@ void setup()
   Serial.begin(38400);
   Serial.println("You have failed me for the last time.");
 
-  pinMode(stepPin, OUTPUT);
-  pinMode(dirPin, OUTPUT);
-  pinMode(enablePin, OUTPUT);
-  pinMode(minPin, INPUT);
-  pinMode(maxPin, INPUT);
-  digitalWrite(minPin, HIGH); //turn on internal pullup
-  digitalWrite(maxPin, HIGH); //other pullup
+  //initialize all our pins.
+  pinMode(X_STEP_PIN, OUTPUT);
+  pinMode(X_DIR_PIN, OUTPUT);
+  pinMode(X_ENABLE_PIN, OUTPUT);
+  pinMode(X_MIN_PIN, INPUT);
+  pinMode(X_MAX_PIN, INPUT);
 
-  digitalWrite(dirPin, HIGH);
-  digitalWrite(stepPin, LOW);
-  digitalWrite(enablePin, HIGH); //disable
+  pinMode(Y_STEP_PIN, OUTPUT);
+  pinMode(Y_DIR_PIN, OUTPUT);
+  pinMode(Y_ENABLE_PIN, OUTPUT);
+  pinMode(Y_MIN_PIN, INPUT);
+  pinMode(Y_MAX_PIN, INPUT);
+
+  pinMode(Z_STEP_PIN, OUTPUT);
+  pinMode(Z_DIR_PIN, OUTPUT);
+  pinMode(Z_ENABLE_PIN, OUTPUT);
+  pinMode(Z_MIN_PIN, INPUT);
+  pinMode(Z_MAX_PIN, INPUT);
+  
+  digitalWrite(X_MIN_PIN, HIGH);
+  digitalWrite(X_MAX_PIN, HIGH);
+  digitalWrite(Y_MIN_PIN, HIGH);
+  digitalWrite(Y_MAX_PIN, HIGH);
+  digitalWrite(Z_MIN_PIN, HIGH);
+  digitalWrite(Z_MAX_PIN, HIGH);
 
   init_psu();
   calculate_tones();
@@ -65,14 +85,18 @@ void setup()
 void loop()
 {
   Serial.println("Forward!");
-  digitalWrite(dirPin, HIGH);
-  play_song(maxPin);
+  digitalWrite(X_DIR_PIN, HIGH);
+  digitalWrite(Y_DIR_PIN, HIGH);
+  digitalWrite(Z_DIR_PIN, HIGH);
+  play_song(X_MAX_PIN, Y_MAX_PIN, Z_MAX_PIN);
 
   delay(500);
 
   Serial.println("Reverse!");
-  digitalWrite(dirPin, LOW);
-  play_song(minPin);
+  digitalWrite(X_DIR_PIN, LOW);
+  digitalWrite(Y_DIR_PIN, LOW);
+  digitalWrite(Z_DIR_PIN, LOW);
+  play_song(X_MIN_PIN, Y_MIN_PIN, Z_MIN_PIN);
 
   delay(500);
 }
@@ -145,19 +169,23 @@ void calculate_tones()
     tones[i] = (int)(1000000.0/ (2.0 * frequencies[i]));
 }
 
-void play_song(byte switchPin)
+void play_song(byte xPin, byte yPin, byte zPin)
 {
-  digitalWrite(enablePin, LOW); //enable
+  digitalWrite(X_ENABLE_PIN, LOW); //enable
+  digitalWrite(Y_ENABLE_PIN, LOW); //enable
+  digitalWrite(Z_ENABLE_PIN, LOW); //enable
 
   for (byte i=0; i<NOTE_COUNT; i++)
   {
-    if (!at_switch(switchPin))
+    if (!at_switch(xPin) && !at_switch(yPin) && !at_switch(zPin))
     {
       play_note(tones[notes[i]], 80000*lengths[i]);
       delay(10); 
     }
   }
-  digitalWrite(enablePin, HIGH); //disable
+  digitalWrite(X_ENABLE_PIN, HIGH); //disable
+  digitalWrite(Y_ENABLE_PIN, HIGH); //disable
+  digitalWrite(Z_ENABLE_PIN, HIGH); //disable
 }
 
 void play_note(int note, long time)
@@ -166,9 +194,13 @@ void play_note(int note, long time)
 
   for (int i=0; i<count; i++)
   {
-    digitalWrite(stepPin, HIGH);
+    digitalWrite(X_STEP_PIN, HIGH);
+    digitalWrite(Y_STEP_PIN, HIGH);
+    digitalWrite(Z_STEP_PIN, HIGH);
     delayMicroseconds(note);
-    digitalWrite(stepPin, LOW); 
+    digitalWrite(X_STEP_PIN, LOW);
+    digitalWrite(Y_STEP_PIN, LOW);
+    digitalWrite(Z_STEP_PIN, LOW);
     delayMicroseconds(note);
   }
 }
