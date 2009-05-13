@@ -38,62 +38,13 @@ import buoy.widget.BStandardDialog;
 
 public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
 {
-  public static final int EXTRUSION = 10;
-  public static final int POLYGON   = 11;
-  public static final int SPHERE    = 12;
-  public static final int CUBE      = 13;
-  public static final int CYLINDER  = 14;
-  
   MetaCADContext context;
 
   public MetaCADEvaluatorEngine(LayoutWindow window) {
     super(window);
     this.context = new MetaCADContext(window.getScene());
   }
-
-  /**
-   * Converts from operation to String
-   */
-  public String opToString(int operation) {
-    switch (operation) {
-    case EXTRUSION:
-      return "extrude()";
-    case POLYGON:
-      return "polygon()";
-    case CUBE:
-      return "cube()";
-    case SPHERE:
-      return "sphere()";
-    case CYLINDER:
-      return "cylinder()";
-    default:
-      return super.opToString(operation);
-    }
-  }
-
-  /**
-   * Converts from string to operation.
-   */
-  public int stringToOp(String opstr) {
-    String lower = opstr.toLowerCase();
-    if (lower.startsWith("extrude")) {
-      return EXTRUSION;
-    }
-    else if (lower.startsWith("poly")) {
-      return POLYGON;
-    }
-    else if (lower.startsWith("cube")) {
-      return CUBE;
-    }
-    else if (lower.startsWith("sphere")) {
-      return SPHERE;
-    }
-    else if (lower.startsWith("cylinder")) {
-      return CYLINDER;
-    }
-    else return super.stringToOp(opstr);
-  }
-  
+ 
   public void setParameters(String text) {
     this.window.getScene().setMetadata(
         MetaCADEvaluatorEngine.class.getName() + "Parameters", text);
@@ -218,17 +169,6 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     }
   }
 
-  /*
-  public ObjectInfo evaluateNode(ObjectInfo parent, UndoRecord undo) throws Exception
-  {
-    if (evaluateLoop(parent, undo)) return parent;
-    if (convertObject(parent)) return parent;
-    if (evaluateObject(parent, undo)) return parent;
-
-    return super.evaluateNode(parent, undo);
-  }
-  */
-
   Boolean convertObject(ObjectInfo parent) {
     if (parent.name.startsWith("Cube ") && parent.object instanceof Cube) {
       Vec3 size = ((Cube)parent.object).getBounds().getSize();
@@ -268,91 +208,6 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     return false;
   }
 
-  /**
-   * 
-   * Evaluates a boolean expression as a loop.
-   * 
-   * @param parent
-   * @param undo
-   * @return
-   * @throws Exception
-   */
-  /*
-  public Boolean evaluateLoop(ObjectInfo parent, UndoRecord undo) throws Exception {
-    String line = parent.name;
-    int operation = this.stringToOp(line);
-
-    if (!isBooleanOp(operation)) return false;
-
-    String[] parameters = null;
-    CoordinateSystem coordsys=null;
-    MetaCADParser loopExpr = new MetaCADParser(line);
-
-    // The parsing will fail if we don't find parentheses.
-    if (!loopExpr.parse()) return false;
-
-    Enumeration<String> iter = loopExpr.getNames();
-    while (iter.hasMoreElements()) {
-      String name = iter.nextElement();
-      parameters = loopExpr.getParameters(name);
-      
-      if (name.startsWith(this.opToString(operation)))
-      {
-        parameters=loopExpr.getParameters(name);
-      }
-    }
-      
-    if (parameters == null || parameters.length != 3) {
-      // no loop but a simple boolean operation let base class do that
-      loopExpr = new MetaCADParser("dummyDummy(dummyDummy=0; dummyDummy<1; dummyDummy=dummyDummy+1)");
-      loopExpr.parse();
-      parameters = loopExpr.getParameters("dummyDummy");
-    }
-
-    CSGHelper helper = new CSGHelper(operation);
-
-    // evaluate first part of for loop i.e. i=0
-    this.context.evaluateAssignment(parameters[0]);
-
-    // security count to exit loop even if we fuck up exit condition
-    int count = 0;
-
-    // condition loop evaluate the condition i.e. i < 10
-    while (evaluateExpression(parameters[1]) != 0 && count < 100) {
-      ObjectInfo[] objects = parent.children;
-
-      for (int i = 0; i < objects.length; i++) {
-        helper.Add(evaluateNode(objects[i], undo).duplicate());
-        objects[i].setVisible(false);
-      }
-
-      // "increment" evaluate 3rd for parameter i.e. i=i+1
-      this.context.evaluateAssignment(parameters[2]);
-      count++;
-    }
-
-    if (helper.GetObject() != null) {
-      Texture tex = parent.object.getTexture();
-      TextureMapping map = parent.object.getTextureMapping();
-
-      if (coordsys != null) parent.setCoords(coordsys);
-      else parent.setCoords(new CoordinateSystem());
-
-      Object3D test = sanitizeObject3D(helper.GetObject());
-
-      parent.setObject(test);
-      parent.object.setTexture(tex, map);
-      parent.setVisible(true);
-
-      parent.clearCachedMeshes();
-      this.window.updateImage();
-      this.window.updateMenus();
-
-    }
-
-    return true;
-  }
-*/
   Object3D sanitizeObject3D(Object3D obj) throws Exception {
     try {
       obj.getBounds();
@@ -362,75 +217,6 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
       // return new Cube(10,10,10);
     }
     return obj;
-  }
-
-  
-  /**
-   * 
-   * Evaluates the given object.
-   * 
-   * @return true if object was successfully evaluated, 
-   * false if either an error occurred or if the object was not recognized by MetaCADEvaluator
-   * 
-   */
-  public Boolean evaluateObject(ObjectInfo parent, UndoRecord undo) throws Exception {
-    
-    String line = parent.name;
-
-    // Don't try to evaluate operations belonging to CSGEvaluator.
-    // FIXME: This is getting a little hackish
-    int op = stringToOp(parent.name);
-    if (op == -1 || isBooleanOp(op)) return false;
-
-    MetaCADParser objExpr = new MetaCADParser(line);
-    if (!objExpr.parse()) {
-      showMessage("evaluateObject: Unable to parse \"" + line + "\"");
-      return false;
-    }
-
-    Object3D obj3D = null;
-    CoordinateSystem coordsys = null;
-    CoordinateSystem objcoordsys = null;
-    
-    // FIXME: Verify that combining these coordsys'es is done correctly.
-    if (coordsys == null) {
-      if(objcoordsys != null) coordsys = objcoordsys;
-    }
-    else if (objcoordsys != null){
-      coordsys.transformCoordinates(objcoordsys.fromLocal());
-    }
-    
-    if (obj3D != null) {
-      Texture tex = parent.object.getTexture();
-      TextureMapping map = parent.object.getTextureMapping();
-
-      if (coordsys != null) parent.setCoords(coordsys);
-      else parent.setCoords(new CoordinateSystem());
-      parent.setObject(obj3D);
-      parent.object.setTexture(tex, map);
-      parent.setVisible(true);
-
-      parent.clearCachedMeshes();
-      this.window.updateImage();
-      this.window.updateMenus();
-    } else {
-      return false;
-    }
-    return true;
-  }
-
-  // Evaluates an Expression like 3*x+sin(a) and returns the value of it or 0 if
-  // any error occurred
-  double evaluateExpression(String expr) throws Exception {
-    try {
-      this.context.jep.parseExpression(expr);
-      return this.context.jep.getValue();
-    } catch (Exception ex) {
-      showMessage("Error while evaluating Expression: \"" + expr
-          + "\" Syntax Error or unknown variable?");
-      throw (ex);
-      // return 0;
-    }
   }
 
 String coordSysToString(CoordinateSystem cs) {
