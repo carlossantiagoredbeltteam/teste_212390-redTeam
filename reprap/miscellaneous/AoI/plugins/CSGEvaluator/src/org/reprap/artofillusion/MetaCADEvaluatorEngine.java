@@ -106,10 +106,9 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     // Parse this ObjectInfo
     ParsedTree root = null;
     
-    String name =  parent.name.trim();
-    if (name.startsWith(evaluateMePrefix))
+    String name =  removeEvaluationPrefix(parent.name);
+    if (name != null)
     {
-      name = name.substring(evaluateMePrefix.length());
       root = org.reprap.artofillusion.parser.MetaCADParser.parseTree(name + ";");
       root.aoiobj = parent;
     }
@@ -217,36 +216,36 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     if (parent.name.startsWith("Cube ") && parent.object instanceof Cube) {
       Vec3 size = ((Cube)parent.object).getBounds().getSize();
       
-      String name = evaluateMePrefix + coordSysToString(parent.getCoords());
+      String name = coordSysToString(parent.getCoords());
       name += "cube(" + 
               String.format("%.2f", size.x) + "," +
               String.format("%.2f", size.y) + "," +
               String.format("%.2f", size.z) + ")";
-      parent.setName(name);
+      parent.setName(evaluateMePrefix + name);
       return true;
     }
     else if (parent.name.startsWith("Cylinder ") && parent.object instanceof Cylinder) {
       Cylinder c = (Cylinder)parent.object;
       Vec3 size = c.getBounds().getSize();
       
-      String name = evaluateMePrefix + coordSysToString(parent.getCoords());
+      String name = coordSysToString(parent.getCoords());
       name += "cylinder("+
               String.format("%.2f", size.y)+","+
               String.format("%.2f", size.x/2)+","+
               String.format("%.2f", size.z/2)+","+
               String.format("%.2f", c.getRatio())+")";
-      parent.setName(name);
+      parent.setName(evaluateMePrefix + name);
       return true;
     }
     else if (parent.name.startsWith("Sphere ") && parent.object instanceof Sphere) {
       Vec3 size = ((Sphere)parent.object).getRadii();
       
-      String name = evaluateMePrefix + coordSysToString(parent.getCoords());
+      String name = coordSysToString(parent.getCoords());
       name += "sphere("+
               String.format("%.2f", size.x)+","+
               String.format("%.2f", size.y)+","+
               String.format("%.2f", size.z)+")";
-      parent.setName(name);
+      parent.setName(evaluateMePrefix + name);
       return true;
     }
     return false;
@@ -304,7 +303,7 @@ String coordSysToString(CoordinateSystem cs) {
   public ObjectInfo createObjectFromString(String defstr) throws Exception
   {
     Scene theScene = this.window.getScene();
-    ObjectInfo objInfo = new ObjectInfo(new Sphere(1,1,1), new CoordinateSystem(), defstr);
+    ObjectInfo objInfo = new ObjectInfo(new Sphere(1,1,1), new CoordinateSystem(), addEvaluationPrefix(defstr));
     this.window.addObject(objInfo, null);
     this.window.setSelection(theScene.getNumObjects()-1);
     evaluate();
@@ -326,7 +325,7 @@ String coordSysToString(CoordinateSystem cs) {
 
     ObjectInfo resultinfo;
     try {
-      resultinfo = new ObjectInfo(new Sphere(1,1,1), new CoordinateSystem(), defstr);
+      resultinfo = new ObjectInfo(new Sphere(1,1,1), new CoordinateSystem(), addEvaluationPrefix(defstr));
       
       // Inherit texture color from the first source object
       Object3D inheritfrom = objects[0].getObject();
@@ -521,7 +520,12 @@ String coordSysToString(CoordinateSystem cs) {
     for (i = 0; i < indent; i++)
       sb.append(' ');
     
-    sb.append(objInfo.name);
+    String name = removeEvaluationPrefix(objInfo.name);
+    
+    if (name != null)
+      sb.append(name);
+    else
+      sb.append("/* unconvertable native object object */");
     
     if (objInfo.children.length > 0)
     {
@@ -543,5 +547,20 @@ String coordSysToString(CoordinateSystem cs) {
   public void addParameterChangedListener(TextChangedListener listener)
   {
     this.parameterListeners.add(listener);
+  }
+  
+  protected String removeEvaluationPrefix(String objInfoName)
+  {
+    objInfoName = objInfoName.trim();
+    if (objInfoName.startsWith(evaluateMePrefix))
+    {
+      return objInfoName.substring(evaluateMePrefix.length());
+    }
+    return null;
+  }
+  
+  protected String addEvaluationPrefix(String objInfoName)
+  {
+    return evaluateMePrefix + objInfoName;
   }
 }
