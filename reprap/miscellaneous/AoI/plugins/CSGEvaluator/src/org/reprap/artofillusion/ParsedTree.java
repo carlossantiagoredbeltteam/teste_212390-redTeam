@@ -25,7 +25,38 @@ public class ParsedTree {
     this.parameters =  new ArrayList<String>();
     this.children = new ArrayList<ParsedTree>();
   }
+  
+  // experimental version without locked check
+  public List<ObjectInfo> evaluate(MetaCADContext ctx) throws Exception {
 
+    this.cadobj = ObjFactory.create(ctx, this.name);
+
+    // FIXME: If we're native, we can probably skip the evaluation
+    
+    List<ObjectInfo> result = this.cadobj.evaluateObject(ctx, this.parameters, this.children);
+    
+    //must have been a  native object
+    if (result == null) {
+      result = new LinkedList<ObjectInfo>();
+      // duplicate native object to prevent accumulating cs
+      result.add(this.aoiobj.duplicate());
+    }
+    else if (result.size() == 0) {
+      updateAOI(ObjectHelper.getErrorObject());
+    }
+    else if (result.size() == 1) {
+      updateAOI(result.get(0));
+    }
+    else {
+     ObjectInfo collection = new ObjectInfo(new MetaCADObjectCollection(result), new CoordinateSystem(), "dummy");
+     updateAOI(collection);
+//      updateAOI(ObjectHelper.join(result, 0.1));
+    }
+    return result;
+  }
+
+  // this is the isLocked version - wasnot so nice to use
+  /*
   public List<ObjectInfo> evaluate(MetaCADContext ctx) throws Exception {
 
     try {
@@ -62,6 +93,7 @@ public class ParsedTree {
     }
     return result;
   }
+  */
 
   public static List<ObjectInfo> evaluate(MetaCADContext ctx, List<ParsedTree> children) throws Exception {
     if (children.size() == 0) return null;
@@ -89,7 +121,7 @@ public class ParsedTree {
         this.aoiobj.object.setTexture(tex, map);
       }
       this.aoiobj.setVisible(true);
-      this.aoiobj.setLocked(true); // Indicate that this object is a MetaCAD evaluated object
+      //this.aoiobj.setLocked(true); // Indicate that this object is a MetaCAD evaluated object
       this.aoiobj.clearCachedMeshes();
     }
   }

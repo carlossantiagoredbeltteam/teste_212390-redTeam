@@ -39,6 +39,7 @@ import buoy.widget.BStandardDialog;
 public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
 {
   MetaCADContext context;
+  static final String evaluateMePrefix = "=";
 
   public MetaCADEvaluatorEngine(LayoutWindow window) {
     super(window);
@@ -92,12 +93,54 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     return true;
   }
 
-  
   /**
    * 
    * Recursively extracts an AoI object tree and creates our own ParsedTree representation.
    * 
    */
+  public ParsedTree extractTree(ObjectInfo parent) throws ParseException {
+
+    // Try converting the object before parsing
+    convertObject(parent);
+
+    // Parse this ObjectInfo
+    ParsedTree root = null;
+    
+    String name =  parent.name.trim();
+    if (name.startsWith(evaluateMePrefix))
+    {
+      name = name.substring(evaluateMePrefix.length());
+      root = org.reprap.artofillusion.parser.MetaCADParser.parseTree(name + ";");
+      root.aoiobj = parent;
+    }
+    // not preceded by a * so it must be a native object
+    else
+    {
+      root = new ParsedTree();
+      root.name = "native";
+      root.aoiobj = parent;
+    }
+    
+    // If the parser returned a subtree, find the leaf node
+    // (we guarantee that there are at most one child of each intermediate node)
+    ParsedTree parenttree = root;
+    while (!parenttree.children.isEmpty()) parenttree = (ParsedTree)parenttree.children.get(0);
+
+    // Build hierarchy recursively
+    ObjectInfo[] objects = parent.children;
+    for (int i=0;i<objects.length;i++) {
+      parenttree.children.add(extractTree(objects[i]));
+    }
+    return root;
+  }
+
+  /**
+   * 
+   * Recursively extracts an AoI object tree and creates our own ParsedTree representation.
+   * 
+   */
+  // is locked  version
+  /*
   public ParsedTree extractTree(ObjectInfo parent) throws ParseException {
 
     // Try converting the object before parsing
@@ -132,6 +175,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     }
     return root;
   }
+  */
 
   /**
    * Evaluates selected objects
@@ -173,7 +217,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     if (parent.name.startsWith("Cube ") && parent.object instanceof Cube) {
       Vec3 size = ((Cube)parent.object).getBounds().getSize();
       
-      String name = coordSysToString(parent.getCoords());
+      String name = evaluateMePrefix + coordSysToString(parent.getCoords());
       name += "cube(" + 
               String.format("%.2f", size.x) + "," +
               String.format("%.2f", size.y) + "," +
@@ -185,7 +229,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
       Cylinder c = (Cylinder)parent.object;
       Vec3 size = c.getBounds().getSize();
       
-      String name = coordSysToString(parent.getCoords());
+      String name = evaluateMePrefix + coordSysToString(parent.getCoords());
       name += "cylinder("+
               String.format("%.2f", size.y)+","+
               String.format("%.2f", size.x/2)+","+
@@ -197,7 +241,7 @@ public class MetaCADEvaluatorEngine extends CSGEvaluatorEngine
     else if (parent.name.startsWith("Sphere ") && parent.object instanceof Sphere) {
       Vec3 size = ((Sphere)parent.object).getRadii();
       
-      String name = coordSysToString(parent.getCoords());
+      String name = evaluateMePrefix + coordSysToString(parent.getCoords());
       name += "sphere("+
               String.format("%.2f", size.x)+","+
               String.format("%.2f", size.y)+","+
