@@ -40,7 +40,7 @@ public interface Printer {
 	 * @throws ReprapException
 	 * @throws IOException 
 	 */
-	public void moveTo(double x, double y, double z, boolean startUp, boolean endUp) throws ReprapException, IOException;
+	public void moveTo(double x, double y, double z, double feedrate, boolean startUp, boolean endUp) throws ReprapException, IOException;
 	
 	/**
 	 * Move the printer carriage to the give x, y and z position <b>while extruding material<b>
@@ -55,7 +55,13 @@ public interface Printer {
 	 * @throws ReprapException
 	 * @throws IOException 
 	 */
-	public void printTo(double x, double y, double z, boolean stopExtruder, boolean closeValve) throws ReprapException, IOException;
+	public void printTo(double x, double y, double z, double feedrate, boolean stopExtruder, boolean closeValve) throws ReprapException, IOException;
+	
+	/**
+	 * Get the feedrate currently being used
+	 * @return
+	 */
+	public double getCurrentFeedrate();
 	
 	/**
 	 * Fire up the extruder for a lead-in
@@ -117,7 +123,7 @@ public interface Printer {
 	/**
 	 * @param feedrate in mm/minute
 	 */
-	public void setFeedrate(double feedrate);
+	//public void setFeedrate(double feedrate);
 	
 	/**
 	 * @param feedrate in mm/minute
@@ -128,6 +134,11 @@ public interface Printer {
 	 * @return fast XY movement feedrate in mm/minute
 	 */
 	public double getFastFeedrateXY();
+	
+	/**
+	 * @return slow XY movement feedrate in mm/minute
+	 */
+	public double getSlowFeedrateXY();
 	
 	/**
 	 * @param feedrate in mm/minute

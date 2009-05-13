@@ -137,14 +137,14 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
     }
     
     public void setSpeed() {
-        if (axis.equals("Z"))
+        if (motorID == 3)
         {
         	currentSpeed = Double.parseDouble(org.reprap.gui.botConsole.XYZTabPanel.zSpeedField.getText());
-        	printer.setFeedrate(currentSpeed);
+        	//printer.setFeedrate(currentSpeed);
         } else
         {
        		currentSpeed = Double.parseDouble(org.reprap.gui.botConsole.XYZTabPanel.xySpeedField.getText());
-       		printer.setFeedrate(currentSpeed);
+       		//printer.setFeedrate(currentSpeed);
         }
     }
     
@@ -194,7 +194,7 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
     			default:
     				System.err.println("moveToTarget()  Dud motor id: " + motorID);
     			}
-    			printer.moveTo(x, y, z, false, false);
+    			printer.moveTo(x, y, z, currentSpeed, false, false);
     		} catch (Exception ex)
     		{}
 //	    	try {

@@ -165,7 +165,7 @@ public class Producer {
 		LayerProducer lp = new LayerProducer(h, layerRules, simulationPlot);
 		lp.plot();
 		reprap.getExtruder().stopExtruding();
-		reprap.setFeedrate(reprap.getFastFeedrateXY());
+		//reprap.setFeedrate(reprap.getFastFeedrateXY());
 	}
 	
 	private void layFoundationGroundUp(RrRectangle gp) throws Exception
@@ -186,7 +186,7 @@ public class Producer {
 
 			reprap.startingLayer(layerRules);
 			// Change Z height
-			reprap.moveTo(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), false, false);
+			reprap.moveTo(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), reprap.getFastFeedrateZ(), false, false);
 			fillFoundationRectangle(reprap, gp);
 			reprap.finishedLayer(layerRules);
 			reprap.betweenLayers(layerRules);
@@ -216,7 +216,7 @@ public class Producer {
 
 			reprap.startingLayer(layerRules);
 			// Change Z height
-			reprap.moveTo(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), false, false);
+			reprap.moveTo(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), reprap.getFastFeedrateZ(), false, false);
 			fillFoundationRectangle(reprap, gp);		
 			reprap.finishedLayer(layerRules);
 			reprap.betweenLayers(layerRules);
@@ -251,7 +251,7 @@ public class Producer {
 			reprap.startingLayer(layerRules);
 			
 			// Change Z height
-			reprap.moveTo(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), false, false);
+			reprap.moveTo(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), reprap.getFastFeedrateZ(), false, false);
 			
 			reprap.waitWhileBufferNotEmpty();
 			reprap.slowBuffer();
@@ -321,7 +321,7 @@ public class Producer {
 			reprap.startingLayer(layerRules);
 			
 			// Change Z height
-			reprap.moveTo(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), false, false);
+			reprap.moveTo(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), reprap.getFastFeedrateZ(), false, false);
 			
 			reprap.waitWhileBufferNotEmpty();
 			reprap.slowBuffer();
