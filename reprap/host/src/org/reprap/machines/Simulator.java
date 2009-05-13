@@ -40,7 +40,7 @@ public class Simulator extends GenericRepRap {
 	public void betweenLayers(int layerNumber) throws Exception{}
 	public void startingLayer(int layerNumber) throws Exception {}
 
-	public void printTo(double x, double y, double z, boolean stopExtruder, boolean closeValve) 
+	public void printTo(double x, double y, double z, double feedRate, boolean stopExtruder, boolean closeValve) 
 	{
 		//if (previewer != null)
 		//	previewer.addSegment(currentX, currentY, currentZ, x, y, z);

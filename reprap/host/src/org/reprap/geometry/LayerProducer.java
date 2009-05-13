@@ -601,12 +601,12 @@ public class LayerProducer {
 			return false;
 		}
 
-		printer.setFeedrate(printer.getExtruder().getShortLineFeedrate());
+		//printer.setFeedrate(printer.getExtruder().getShortLineFeedrate());
 // TODO: FIX THIS
 //		printer.setSpeed(LinePrinter.speedFix(printer.getExtruder().getXYSpeed(), 
 //				printer.getExtruder().getShortSpeed()));
-		printer.printTo(p.x(), p.y(), layerConditions.getMachineZ(), stopExtruder, closeValve);
-		printer.setFeedrate(currentFeedrate);
+		printer.printTo(p.x(), p.y(), layerConditions.getMachineZ(), printer.getExtruder().getShortLineFeedrate(), stopExtruder, closeValve);
+		//printer.setFeedrate(currentFeedrate);
 		return true;	
 	}
 	
@@ -644,25 +644,25 @@ public class LayerProducer {
 			if(ss.abandon)
 				return;
 
-			printer.printTo(ss.p1.x(), ss.p1.y(), z, false, false);
+			printer.printTo(ss.p1.x(), ss.p1.y(), z, currentFeedrate, false, false);
 
 			if(ss.plotMiddle)
 			{
 //TODO: FIX THIS.
 //				int straightSpeed = LinePrinter.speedFix(currentSpeed, (1 - 
 //						printer.getExtruder().getAngleSpeedFactor()));
-				printer.setFeedrate(printer.getExtruder().getAngleFeedrate());
-				printer.printTo(ss.p2.x(), ss.p2.y(), z, false, false);
+				//printer.setFeedrate(printer.getExtruder().getAngleFeedrate());
+				printer.printTo(ss.p2.x(), ss.p2.y(), z, printer.getExtruder().getAngleFeedrate(), false, false);
 			}
 
 			//printer.setSpeed(ss.speed(currentSpeed, printer.getExtruder().getAngleSpeedFactor()));
 			
-			printer.setFeedrate(printer.getExtruder().getAngleFeedrate());
-			printer.printTo(ss.p3.x(), ss.p3.y(), z, stopExtruder, closeValve);
+			//printer.setFeedrate(printer.getExtruder().getAngleFeedrate());
+			printer.printTo(ss.p3.x(), ss.p3.y(), z, printer.getExtruder().getAngleFeedrate(), stopExtruder, closeValve);
 			//pos = ss.p3;
 		// Leave speed set for the start of the next line.
 		} else
-			printer.printTo(first.x(), first.y(), z, stopExtruder, closeValve);
+			printer.printTo(first.x(), first.y(), z, currentFeedrate, stopExtruder, closeValve);
 	}
 
 	/**
@@ -693,8 +693,8 @@ public class LayerProducer {
 		//if(startUp)
 		if(fast)
 		{
-			printer.setFeedrate(printer.getFastFeedrateXY());
-			printer.moveTo(first.x(), first.y(), z, startUp, endUp);
+			//printer.setFeedrate(printer.getFastFeedrateXY());
+			printer.moveTo(first.x(), first.y(), z, printer.getFastFeedrateXY(), startUp, endUp);
 			return;
 		}
 		
@@ -706,23 +706,23 @@ public class LayerProducer {
 			if(ss.abandon)
 				return;
 
-			printer.moveTo(ss.p1.x(), ss.p1.y(), z, startUp, startUp);
+			printer.moveTo(ss.p1.x(), ss.p1.y(), z, printer.getCurrentFeedrate(), startUp, startUp);
 
 			if(ss.plotMiddle)
 			{
-				printer.setFeedrate(currentFeedrate);
-				printer.moveTo(ss.p2.x(), ss.p2.y(), z, startUp, startUp);
+				//printer.setFeedrate(currentFeedrate);
+				printer.moveTo(ss.p2.x(), ss.p2.y(), z, currentFeedrate, startUp, startUp);
 			}
 
 			//TODO: FIX ME!
 			//printer.setSpeed(ss.speed(currentSpeed, printer.getExtruder().getAngleSpeedFactor()));
 			
-			printer.setFeedrate(printer.getExtruder().getAngleFeedrate());
-			printer.moveTo(ss.p3.x(), ss.p3.y(), z, startUp, endUp);
+			//printer.setFeedrate(printer.getExtruder().getAngleFeedrate());
+			printer.moveTo(ss.p3.x(), ss.p3.y(), z, printer.getExtruder().getAngleFeedrate(), startUp, endUp);
 			//pos = ss.p3;
 			// Leave speed set for the start of the next movement.
 		} else
-			printer.moveTo(first.x(), first.y(), z, startUp, endUp);
+			printer.moveTo(first.x(), first.y(), z, printer.getCurrentFeedrate(), startUp, endUp);
 	}
 
 
@@ -769,7 +769,7 @@ public class LayerProducer {
 				att.getExtruder(printer.getExtruders()).getInfillSpeed(layerConditions));
 		*/
 		
-		/* double baseFeedrate = */ att.getExtruder(printer.getExtruders()).getXYFeedrate();
+		/* double baseFeedrate =  att.getExtruder(printer.getExtruders()).getXYFeedrate();*/
 		double outlineFeedrate = att.getExtruder(printer.getExtruders()).getOutlineFeedrate();
 		double infillFeedrate = att.getExtruder(printer.getExtruders()).getInfillFeedrate();
 		
@@ -807,7 +807,8 @@ public class LayerProducer {
 		
 		Boolean lift = printer.getExtruder().getMinLiftedZ() >= 0;
 		
-		printer.setFeedrate(printer.getFastFeedrateXY());
+		//printer.setFeedrate(printer.getFastFeedrateXY());
+		currentFeedrate = printer.getFastFeedrateXY();
 		move(p.point(0), p.point(1), lift, false, true);
 
 		//printer.getExtruder().setMotor(true);
@@ -818,11 +819,11 @@ public class LayerProducer {
 				
 		if(outline)
 		{
-			printer.setFeedrate(outlineFeedrate);
+			//printer.setFeedrate(outlineFeedrate);
 			currentFeedrate = outlineFeedrate;			
 		} else
 		{
-			printer.setFeedrate(infillFeedrate);
+			//printer.setFeedrate(infillFeedrate);
 			currentFeedrate = infillFeedrate;			
 		}
 		

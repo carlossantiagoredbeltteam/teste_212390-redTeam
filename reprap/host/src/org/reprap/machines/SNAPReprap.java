@@ -131,9 +131,11 @@ public class SNAPReprap extends GenericRepRap
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#moveTo(double, double, double, boolean, boolean)
 	 */
-	public void moveTo(double x, double y, double z, boolean startUp, boolean endUp) throws ReprapException, IOException {
+	public void moveTo(double x, double y, double z, double feedrate, boolean startUp, boolean endUp) throws ReprapException, IOException {
 		
 		if (isCancelled()) return;
+		
+		setFeedrate(feedrate);
 		
 		int stepperX = convertToStepX(x);
 		int stepperY = convertToStepY(y);
@@ -203,13 +205,16 @@ public class SNAPReprap extends GenericRepRap
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#printTo(double, double, double, boolean)
 	 */
-	public void printTo(double x, double y, double z, boolean stopExtruder, boolean closeValve) 
-		throws ReprapException, IOException {
+	public void printTo(double x, double y, double z, double feedrate, boolean stopExtruder, boolean closeValve) 
+		throws ReprapException, IOException 
+	{
 		if (isCancelled()) return;
 		EnsureNotEmpty();
 		if (isCancelled()) return;
 		EnsureHot();
 		if (isCancelled()) return;
+		
+		setFeedrate(feedrate);
 		
 		maybeReZero();
 
@@ -406,7 +411,7 @@ public class SNAPReprap extends GenericRepRap
 				}
 		}
 		Debug.d("Returning to previous position");
-		moveTo(x, y, currentZ, true, false);
+		moveTo(x, y, currentZ, currentFeedrate, true, false);
 		
 		setFeedrate(oldFeedrate);
 		
@@ -438,8 +443,8 @@ public class SNAPReprap extends GenericRepRap
 	 * @throws ReprapException
 	 */
 	private void moveToHeatingZone() throws ReprapException, IOException {
-		setFeedrate(getFastFeedrateXY());
-		moveTo(1, 1, currentZ, true, false);
+		//setFeedrate(getFastFeedrateXY());
+		moveTo(1, 1, currentZ, getFastFeedrateXY(), true, false);
 	}
 	
 	/* (non-Javadoc)

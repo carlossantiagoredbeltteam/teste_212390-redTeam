@@ -29,7 +29,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	protected boolean gcodeLoaded = false;
 	
 	protected boolean accelerating;
-	protected double accelerationDistance;
+	protected double maxAcceleration;
 	protected double slowFeedrateXY;
 	
 	/**
@@ -171,6 +171,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		currentX = 0;
 		currentY = 0;
 		currentZ = 0;
+		currentFeedrate = 0;
 	}
 	
 	public void loadMotors()
@@ -234,8 +235,8 @@ public abstract class GenericRepRap implements CartesianPrinter
 			maxFeedrateZ = Preferences.loadGlobalDouble("MaximumFeedrateZ(mm/minute)");
 			
 			accelerating = Preferences.loadGlobalBool("Accelerating");
-			accelerationDistance = Preferences.loadGlobalDouble("AccelerationDistance");
-			slowFeedrateXY = Preferences.loadGlobalDouble("SlowFeedrateXY");
+			maxAcceleration = Preferences.loadGlobalDouble("MaxAcceleration(mm/mininute/minute)");
+			slowFeedrateXY = Preferences.loadGlobalDouble("SlowFeedrateXY(mm/minute)");
 			
 			//set our standard feedrates.
 			setFastFeedrateXY(Math.min(maxFeedrateX, maxFeedrateY));
@@ -294,7 +295,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 */
 	public void terminate() throws Exception
 	{
-		moveTo(0.5, 0.5, getZ(), true, true);
+		moveTo(0.5, 0.5, getZ(), this.fastFeedrateXY, true, true);
 		extruders[extruder].setMotor(false);
 		extruders[extruder].setValve(false);
 		extruders[extruder].setTemperature(0);
@@ -547,7 +548,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#moveTo(double, double, double, boolean, boolean)
 	 */
-	public void moveTo(double x, double y, double z, boolean startUp, boolean endUp) throws ReprapException, IOException
+	public void moveTo(double x, double y, double z, double feedRate, boolean startUp, boolean endUp) throws ReprapException, IOException
 	{
 		if (isCancelled()) return;
 
@@ -612,8 +613,8 @@ public abstract class GenericRepRap implements CartesianPrinter
 		{
 			double liftedZ = currentZ + (extruders[extruder].getMinLiftedZ());
 
-			setFeedrate(getFastFeedrateZ());
-			moveTo(currentX, currentY, liftedZ, false, false);
+			//setFeedrate(getFastFeedrateZ());
+			moveTo(currentX, currentY, liftedZ, getFastFeedrateZ(), false, false);
 		}
 		
 		double oldX = currentX;
@@ -621,15 +622,15 @@ public abstract class GenericRepRap implements CartesianPrinter
 		homeToZeroX();
 		homeToZeroY();
 		
-		setFeedrate(getFastFeedrateXY());
-		moveTo(oldX, oldY, currentZ, false, false);
+		//setFeedrate(getFastFeedrateXY());
+		moveTo(oldX, oldY, currentZ, getFastFeedrateXY(), false, false);
 		
 		if (!excludeZ)
 		{
 			double liftedZ = currentZ - (extruders[extruder].getMinLiftedZ());
 
-			setFeedrate(getFastFeedrateZ());
-			moveTo(currentX, currentY, liftedZ, false, false);
+			//setFeedrate(getFastFeedrateZ());
+			moveTo(currentX, currentY, liftedZ, getFastFeedrateZ(), false, false);
 		}
 
 		setFeedrate(oldFeedrate);
@@ -836,10 +837,10 @@ public abstract class GenericRepRap implements CartesianPrinter
 
 		if(getExtruder().getNozzleWipeEnabled())
 		{
-			setFeedrate(getExtruder().getOutlineFeedrate());
+			//setFeedrate(getExtruder().getOutlineFeedrate());
 			
 			// Now hunt down the wiper.
-			moveTo(datumX, datumY, currentZ, false, false);
+			moveTo(datumX, datumY, currentZ, getExtruder().getOutlineFeedrate(), false, false);
 			
 			if(clearTime > 0)
 			{
@@ -851,7 +852,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 				machineWait(1000*waitTime);
 			}
 
-			moveTo(datumX, datumY + strokeY, currentZ, false, false);
+			moveTo(datumX, datumY + strokeY, currentZ, currentFeedrate, false, false);
 		}
 		
 		setFeedrate(getFastFeedrateXY());
@@ -1106,5 +1107,22 @@ public abstract class GenericRepRap implements CartesianPrinter
 	{
 		for(int i = 0; i < extruders.length; i++)
 			extruders[i].setSeparating(s);
+	}
+	
+	/**
+	 * Get the feedrate currently being used
+	 * @return
+	 */
+	public double getCurrentFeedrate()
+	{
+		return currentFeedrate;
+	}
+	
+	/**
+	 * @return slow XY movement feedrate in mm/minute
+	 */
+	public double getSlowFeedrateXY()
+	{
+		return slowFeedrateXY;
 	}
 }

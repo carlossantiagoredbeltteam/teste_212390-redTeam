@@ -98,13 +98,13 @@ public class GCodeStepperMotor extends GenericStepperMotor {
 			switch(mid)
 			{
 			case 1:
-				printer.moveTo(x + 1.0/printer.getXStepsPerMM(), y, z, false, false);
+				printer.moveTo(x + 1.0/printer.getXStepsPerMM(), y, z, printer.getSlowFeedrateXY(), false, false);
 				break;
 			case 2:
-				printer.moveTo(x, y + 1.0/printer.getYStepsPerMM(), z, false, false);
+				printer.moveTo(x, y + 1.0/printer.getYStepsPerMM(), z, printer.getSlowFeedrateXY(), false, false);
 				break;
 			case 3:
-				printer.moveTo(x, y, z + 1.0/printer.getZStepsPerMM(), false, false);
+				printer.moveTo(x, y, z + 1.0/printer.getZStepsPerMM(), printer.getFastFeedrateZ(), false, false);
 				break;
 			default:
 				System.err.println("GCodeStepperMotor - stepForward.  Dud motor id: " + mid);
@@ -126,13 +126,13 @@ public class GCodeStepperMotor extends GenericStepperMotor {
 			switch(mid)
 			{
 			case 1:
-				printer.moveTo(x - 1.0/printer.getXStepsPerMM(), y, z, false, false);
+				printer.moveTo(x - 1.0/printer.getXStepsPerMM(), y, z, printer.getSlowFeedrateXY(), false, false);
 				break;
 			case 2:
-				printer.moveTo(x, y - 1.0/printer.getYStepsPerMM(), z, false, false);
+				printer.moveTo(x, y - 1.0/printer.getYStepsPerMM(), z, printer.getSlowFeedrateXY(), false, false);
 				break;
 			case 3:
-				printer.moveTo(x, y, z - 1.0/printer.getZStepsPerMM(), false, false);
+				printer.moveTo(x, y, z - 1.0/printer.getZStepsPerMM(), printer.getFastFeedrateZ(), false, false);
 				break;
 			default:
 				System.err.println("GCodeStepperMotor - stepBackward.  Dud motor id: " + mid);
@@ -207,7 +207,7 @@ public class GCodeStepperMotor extends GenericStepperMotor {
 			default:
 				System.err.println("GCodeStepperMotor - seek.  Dud motor id: " + mid);
 			}
-			printer.moveTo(x, y, z, false, false);
+			printer.moveTo(x, y, z, printer.getCurrentFeedrate(), false, false);
 		} catch (Exception ex)
 		{}
 	}

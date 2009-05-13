@@ -378,16 +378,16 @@ public void goTo(double xTo, double yTo, double zTo)
 		}
 		if(z >= zTo)
 		{
-			printer.setFeedrate(Double.parseDouble(xySpeedField.getText()));
-			printer.moveTo(xTo, yTo, z, false, false);
-			printer.setFeedrate(Double.parseDouble(zSpeedField.getText()));
-			printer.moveTo(xTo, yTo, zTo, false, false);
+			//printer.setFeedrate(Double.parseDouble(xySpeedField.getText()));
+			printer.moveTo(xTo, yTo, z, Double.parseDouble(xySpeedField.getText()), false, false);
+			//printer.setFeedrate(Double.parseDouble(zSpeedField.getText()));
+			printer.moveTo(xTo, yTo, zTo, Double.parseDouble(zSpeedField.getText()), false, false);
 		} else
 		{
-			printer.setFeedrate(Double.parseDouble(zSpeedField.getText()));
-			printer.moveTo(x, y, zTo, false, false);
-			printer.setFeedrate(Double.parseDouble(xySpeedField.getText()));
-			printer.moveTo(xTo, yTo, zTo, false, false);	
+			//printer.setFeedrate(Double.parseDouble(zSpeedField.getText()));
+			printer.moveTo(x, y, zTo, Double.parseDouble(zSpeedField.getText()), false, false);
+			//printer.setFeedrate(Double.parseDouble(xySpeedField.getText()));
+			printer.moveTo(xTo, yTo, zTo, Double.parseDouble(xySpeedField.getText()), false, false);	
 		}
 		if(plotExtruderCheck.isSelected())
 			printer.getExtruder().setExtrusion(0);
