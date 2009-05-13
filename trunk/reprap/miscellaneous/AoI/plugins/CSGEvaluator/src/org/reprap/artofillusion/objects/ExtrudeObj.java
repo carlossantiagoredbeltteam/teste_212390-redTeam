@@ -43,8 +43,13 @@ public class ExtrudeObj extends MetaCADObject
     if (parameters.size() >= 5) {
       twist = ctx.evaluateExpression(parameters.get(4));
     }
+    boolean approximate = true;
+    if (parameters.size() >= 6)
+    {
+      approximate = ctx.evaluateBoolean(parameters.get(5));
+    }
     
-    result.addAll(extrude(ParsedTree.evaluate(ctx, children), dir, numsegments, twist));
+    result.addAll(extrude(ParsedTree.evaluate(ctx, children), dir, numsegments, twist, approximate));
     return result;
   }
   
@@ -60,7 +65,7 @@ public class ExtrudeObj extends MetaCADObject
    * the objects back to their original positions since the extrusion operation always 
    * centers the result in the origin.
    */
-  public List<ObjectInfo> extrude(List<ObjectInfo> objects, Vec3 dir, int numsegments, double twist)
+  public List<ObjectInfo> extrude(List<ObjectInfo> objects, Vec3 dir, int numsegments, double twist, boolean approximate)
   {
     // Build extrusion curve from vector and segments
     Vec3 v[] = new Vec3[numsegments+1];
@@ -70,7 +75,13 @@ public class ExtrudeObj extends MetaCADObject
       v[i].scale(1.0*i/numsegments);
       smooth[i] = 1.0f;
     }
-    Curve path = new Curve(v, smooth, Mesh.APPROXIMATING, false);
+    
+    Curve path;
+    if (approximate)
+      path = new Curve(v, smooth, Mesh.APPROXIMATING, false);
+    else
+      path = new Curve(v, smooth, Mesh.NO_SMOOTHING, false);
+      
     CoordinateSystem pathCS = new CoordinateSystem();
 
     // FIXME: Support specifying extrusion curves
