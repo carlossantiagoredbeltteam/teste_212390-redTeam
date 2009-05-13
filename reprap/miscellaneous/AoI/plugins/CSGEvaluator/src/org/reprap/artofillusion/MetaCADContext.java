@@ -46,5 +46,21 @@ public class MetaCADContext {
       throw (ex);
     }
   }
+  
+  public boolean evaluateBoolean(String expr) throws Exception {
+    try {
+      return this.evaluateExpression(expr) != 0;
+    }
+    catch (Exception ex) {
+      // test special cases
+      String lc = expr.toLowerCase();
+      if (lc.equals("true") || lc.equals("yes") || lc.equals("on"))
+        return true;
+      if (lc.equals("false") || lc.equals("no") || lc.equals("off"))
+        return false;
+      // no special cases then well have to throw an exception
+      throw (ex);
+    }
+  }
 }
 
