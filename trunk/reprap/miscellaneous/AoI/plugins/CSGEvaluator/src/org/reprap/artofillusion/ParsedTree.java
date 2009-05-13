@@ -39,7 +39,9 @@ public class ParsedTree {
     if (result == null) {
       result = new LinkedList<ObjectInfo>();
       // duplicate native object to prevent accumulating cs
-      result.add(this.aoiobj.duplicate());
+      ObjectInfo objInfo = this.aoiobj.duplicate();
+      objInfo.setVisible(true);
+      result.add(objInfo);
     }
     else if (result.size() == 0) {
       updateAOI(ObjectHelper.getErrorObject());
