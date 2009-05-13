@@ -170,7 +170,6 @@ void handle_query()
     motor2_target_rpm = masterPacket.get_32(2);
     break;
 
-  //WORKING
   case SLAVE_CMD_SET_MOTOR_1_DIR:
     temp = masterPacket.get_8(2);
     if (temp & 1)
@@ -179,7 +178,6 @@ void handle_query()
       motor1_dir = MC_REVERSE;    
     break;
 
-  //WORKING
   case SLAVE_CMD_SET_MOTOR_2_DIR:
     temp = masterPacket.get_8(2);
     if (temp & 1)
@@ -188,7 +186,6 @@ void handle_query()
       motor2_dir = MC_REVERSE;    
     break;
 
-  //WORKING
   case SLAVE_CMD_TOGGLE_MOTOR_1:
     temp = masterPacket.get_8(2);
     if (temp & 2)
@@ -197,7 +194,14 @@ void handle_query()
       motor1_dir = MC_REVERSE;
 
     if (temp & 1)
+    {
       enable_motor_1();
+      
+      //if we interrupted a reversal, wait for the motor to get back to its old position.
+      if (motor1_reversal_count > 0)
+      	delay(motor1_reversal_count);
+      motor1_reversal_count = 0;
+    }
     else
       disable_motor_1();
     break;

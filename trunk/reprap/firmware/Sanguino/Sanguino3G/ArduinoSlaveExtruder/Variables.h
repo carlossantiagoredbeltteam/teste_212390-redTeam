@@ -20,6 +20,7 @@ volatile byte motor1_pwm = 0;
 volatile long motor1_target_rpm = 0;
 volatile long motor1_current_rpm = 0;
 boolean motor1_reversal_state = false;
+int motor1_reversal_count = 0;
 
 MotorControlStyle motor2_control = MC_PWM;
 MotorControlDirection motor2_dir = MC_FORWARD;
