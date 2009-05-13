@@ -1,0 +1,14 @@
+Import AoI in Eclipse:
+----------------------
+
+o Copy to AoiSrc272/lib/:
+  jmf.jar, jogl.jar, junit-4.5.jar
+
+o Build using Ant:
+  - ant -f ArtOfIllusion.xml 
+  - ant -f SPManager.xml 
+  - ant -f Tools.xml 
+  - ant -f OSSpecific.xml 
+
+o New->Java Project
+  - Create from existing source: AoiSrc272
