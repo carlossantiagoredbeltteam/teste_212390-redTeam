@@ -12,13 +12,13 @@ public class MacroPrototype implements ParsedStatement {
   
   public MacroPrototype(String n, List<String> p, List<ParsedTree> c)
   {
-    name = n;
-    variables = p;
-    children =  c;
+    this.name = n;
+    this.variables = p;
+    this.children =  c;
   }
 
   public boolean execute(MetaCADContext context) {
-    context.macros.put(name.toLowerCase(), this);
+    context.macros.put(this.name.toLowerCase(), this);
     return true;
   }
 }

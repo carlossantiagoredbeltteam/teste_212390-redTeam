@@ -8,20 +8,20 @@ public class VariableAssignment implements ParsedStatement {
   
   public String toString()
   {
-    return name + "=" + formula;
+    return this.name + "=" + this.formula;
   }
   
   public VariableAssignment(String n, String f)
   {
-    name = n;
-    formula = f;
+    this.name = n;
+    this.formula = f;
   }
 
   public boolean execute(MetaCADContext context) {
     try {
-      context.jep.parseExpression(formula);
+      context.jep.parseExpression(this.formula);
       double value = context.jep.getValue();
-      context.jep.addVariable(name, value);
+      context.jep.addVariable(this.name, value);
     } catch (Exception ex) {
       return false;
     }

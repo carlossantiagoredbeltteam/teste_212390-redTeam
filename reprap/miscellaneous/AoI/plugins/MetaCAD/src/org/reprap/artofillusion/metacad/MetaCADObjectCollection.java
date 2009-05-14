@@ -14,7 +14,6 @@ import java.util.List;
 import artofillusion.ArtOfIllusion;
 import artofillusion.Scene;
 import artofillusion.animation.Keyframe;
-import artofillusion.animation.ObjectRef;
 import artofillusion.math.CoordinateSystem;
 import artofillusion.object.Object3D;
 import artofillusion.object.ObjectCollection;
@@ -43,9 +42,9 @@ public class MetaCADObjectCollection extends ObjectCollection
     out.writeShort(0);
     
     // how many objects do we have?
-    out.writeInt(objects.size());
+    out.writeInt(this.objects.size());
     // serializing all the ObjectInfos in the collection
-    for (ObjectInfo objInfo : objects)
+    for (ObjectInfo objInfo : this.objects)
     {
       objInfo.getCoords().writeToFile(out);
       out.writeUTF(objInfo.getName());
@@ -66,7 +65,7 @@ public class MetaCADObjectCollection extends ObjectCollection
 
     int objectSize = in.readInt();
     try {
-      objects = new ArrayList<ObjectInfo>(objectSize);
+      this.objects = new ArrayList<ObjectInfo>(objectSize);
       // deserializing all the ObjectInfos in the collection
       for (int i = 0; i < objectSize; i++)
       {
@@ -81,7 +80,7 @@ public class MetaCADObjectCollection extends ObjectCollection
         {
           objInfo.getObject().setMaterial(getMaterial(), getMaterialMapping());
         }
-        objects.add(objInfo);
+        this.objects.add(objInfo);
       }
     }
     catch (InvocationTargetException ex)
