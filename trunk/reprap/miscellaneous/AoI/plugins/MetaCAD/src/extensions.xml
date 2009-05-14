@@ -1,0 +1,25 @@
+<?xml version='1.0'?>
+
+<extension name="MetaCAD" version="0.8">
+
+  <import name="Tools" />
+
+  <plugin class="org.reprap.artofillusion.metacad.MetaCADTool"/> 
+  <plugin class="org.reprap.artofillusion.metacad.MetaCADPlugin"/> 
+
+  <resource type="TranslateBundle" id="MetaCADEvaluator" name="MetaCADEvaluator" />
+
+  <author>Marius Kintel (marius@kintel.net), Philipp Tiefenbacher (wizards23@gmail.com)</author>
+  <description>
+MetaCAD plugin. FIXME: Write descriptions here.
+
+Documentation and tutorial:
+http://objects.reprap.org/wiki/Builders/Metalab/AoI_CSG_Evaluator
+</description>
+  <history> 
+    <log version="0.9" date="XX May 2009" author="all">
+    - Initial release</log> 
+  </history>
+  <comments>
+  </comments>
+</extension>
