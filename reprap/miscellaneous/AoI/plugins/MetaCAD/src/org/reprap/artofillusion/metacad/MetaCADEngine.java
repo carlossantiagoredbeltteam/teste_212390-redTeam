@@ -513,6 +513,26 @@ String coordSysToString(CoordinateSystem cs) {
     createParentObject("cs()", 1);
   }
 
+  public void move()
+  {
+    createParentObject("cs()", 1);
+  }
+
+  public void rotate()
+  {
+    createParentObject("cs()", 1);
+  }
+
+  public void scale()
+  {
+    createParentObject("cs()", 1);
+  }
+
+  public void trans()
+  {
+    createParentObject("cs()", 1);
+  }
+
   public void joincurves()
   {
     createParentObject("joincurves()", 1);
