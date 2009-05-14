@@ -32,8 +32,10 @@ public class ScaleObj extends MetaCADObject {
     
     double scaleX = 1, scaleY = 1, scaleZ = 1;
     
+    if (parameters.size() >= 1) {
+      scaleX = scaleY = scaleZ = ctx.evaluateExpression(parameters.get(0));
+    }
     if (parameters.size() >= 3) {
-      scaleX = ctx.evaluateExpression(parameters.get(0));
       scaleY = ctx.evaluateExpression(parameters.get(1));
       scaleZ = ctx.evaluateExpression(parameters.get(2));
     }
