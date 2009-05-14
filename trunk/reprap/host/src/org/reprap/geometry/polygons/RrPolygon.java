@@ -93,9 +93,14 @@ public class RrPolygon
 	private static Random rangen = new Random(918273);
 	
 	/**
-	 * The (X, Y) points rond the polygon as Rr2Points
+	 * The (X, Y) points round the polygon as Rr2Points
 	 */
 	private List<Rr2Point> points = null;
+	
+	/**
+	 * The speed of the machine at each corner
+	 */
+	private List<Double> speeds = null;
 	
 	/**
 	 * The atributes of the STL object that this polygon represents
@@ -120,6 +125,14 @@ public class RrPolygon
 		if(beingDestroyed) // Prevent infinite loop
 			return;
 		beingDestroyed = true;
+		
+		if(speeds != null)
+		{
+			for(int i = 0; i < size(); i++)
+				speeds.set(i, null);
+		}
+		speeds = null;
+		
 		if(points != null)
 		{
 			for(int i = 0; i < size(); i++)
@@ -129,7 +142,7 @@ public class RrPolygon
 			}
 		}
 		points = null;
-
+		
 		if(box != null)
 			box.destroy();
 		box = null;
@@ -148,6 +161,7 @@ public class RrPolygon
 	protected void finalize() throws Throwable
 	{
 		points = null;
+		speeds = null;
 		att = null;
 		box = null;
 		super.finalize();
@@ -162,6 +176,7 @@ public class RrPolygon
 		if(a == null)
 			System.err.println("RrPolygon(): null attributes!");
 		points = new ArrayList<Rr2Point>();
+		speeds = null;
 		att = a;
 		box = new RrRectangle();
 		closed = c;
@@ -174,7 +189,23 @@ public class RrPolygon
 	 */
 	public Rr2Point point(int i)
 	{
-		return new Rr2Point(points.get(i));
+		//return new Rr2Point(points.get(i));
+		return points.get(i);
+	}
+	
+	/**
+	 * Get the speed
+	 * @param i
+	 * @return i-th point object of polygon
+	 */
+	public double speed(int i)
+	{
+		if(speeds == null)
+		{
+			System.err.println("Rr2Point.speed(int i): speeds null!");
+			return 0;
+		}
+		return speeds.get(i).doubleValue();
 	}
 
 	
@@ -189,7 +220,11 @@ public class RrPolygon
 		result += box.toString();
 		result += "\n";
 		for(int i = 0; i < size(); i++)
+		{
 			result += point(i).toString();
+			if(speeds != null)
+				result += "(" + speed(i) + ") ";
+		}
 		
 		return result;
 	}
@@ -202,15 +237,6 @@ public class RrPolygon
 	{
 		return closed;
 	}
-	
-//	/**
-//	 * Set whether we loop back on ourself.
-//	 * @param c
-//	 */
-//	public void setClosed(boolean c)
-//	{
-//		closed = c;
-//	}
 		
 	/**
 	 * Length
@@ -229,7 +255,12 @@ public class RrPolygon
 	{
 		this(p.att, p.closed);
 		for(int i = 0; i < p.size(); i++)
-			add(new Rr2Point(p.point(i))); 
+			add(new Rr2Point(p.point(i)));
+		if(p.speeds != null)
+		{
+			for(int i = 0; i < p.size(); i++)
+				speeds.add(new Double(p.speed(i)));
+		}
 		closed = p.closed;
 	}
 	
@@ -240,8 +271,27 @@ public class RrPolygon
 	 */
 	public void add(Rr2Point p)
 	{
+		if(speeds != null)
+			System.err.println("Rr2Point.add(): adding a point to a polygon with it's speeds set.");
 		points.add(new Rr2Point(p));
 		box.expand(p);
+	}
+	
+	/**
+	 * Add a speed to the polygon
+	 * @param p
+	 * @param f
+	 */
+	public void setSpeed(int i, double s)
+	{
+		// Lazy initialization
+		if(speeds == null)
+		{
+			speeds = new ArrayList<Double>();
+			for(int j = 0; j < size(); j++)
+				speeds.add(new Double(0));
+		}
+		speeds.set(i, new Double(s));
 	}
 	
 	/**
@@ -268,6 +318,21 @@ public class RrPolygon
 			points.add(new Rr2Point(p.point(i)));
 		}
 		box.expand(p.box);
+		if(speeds == null)
+		{
+			if(p.speeds != null)
+				System.err.println("Rr2Point.add(): adding a polygon to another polygon but discarding it's speeds.");
+			return;
+		}
+		if(p.speeds == null)
+		{
+			System.err.println("Rr2Point.add(): adding a polygon to another polygon, but it has no needed speeds.");
+			return;
+		}
+		for(int i = 0; i < p.size(); i++)
+		{
+			speeds.add(new Double(p.speed(i)));
+		}
 	}
 	
 	/**
@@ -278,6 +343,8 @@ public class RrPolygon
 	public void remove(int i)
 	{
 		points.remove(i);
+		if(speeds != null)
+			speeds.remove(i);
 	}
 	
 	/**
@@ -296,6 +363,7 @@ public class RrPolygon
 	
 	/**
 	 * Output the polygon in SVG XML format
+	 * This ignores any speeds
 	 * @param opf
 	 */
 	public String svg()
@@ -319,6 +387,12 @@ public class RrPolygon
 		for(int i = size() - 1; i >= 0; i--)
 		{
 			result.add(point(i)); 
+		}
+		if(speeds == null)
+			return result;
+		for(int i = size() - 1; i >= 0; i--)
+		{
+			result.setSpeed(i, speed(i)); 
 		}
 		return result;
 	}
@@ -347,6 +421,7 @@ public class RrPolygon
 	 */
 	public RrPolygon newStart(int i)
 	{
+		int k = i;
 		if(!isClosed())
 			System.err.println("RrPolygon.newStart(i): reordering an open polygon!");
 		if(i < 0 || i >= size())
@@ -362,6 +437,17 @@ public class RrPolygon
 			if(i >= size())
 				i = 0;
 		}
+		
+		if(speeds == null)
+			return result;
+		for(int j = 0; j < size(); j++)
+		{
+			result.setSpeed(j, speed(k));
+			k++;
+			if(k >= size())
+				k = 0;
+		}
+		
 		return result;
 	}
 	
@@ -449,9 +535,13 @@ public class RrPolygon
 				if(j < size())
 				{
 					points.add(j, p);
+					if(speeds != null)
+						speeds.add(j, new Double(0)); // It's up to the user to set something sensible here afterwards
 				} else
 				{
-					points.add(p);				
+					points.add(p);
+					if(speeds != null)
+						speeds.add(new Double(0));    // ditto
 				}
 				return(j);
 			}
@@ -463,7 +553,7 @@ public class RrPolygon
 	/**
 	 * @param v1
 	 * @param d2
-	 * @return ??
+	 * @return the vertex at which the polygon deviates from a (nearly) straight line from v1
 	 */
 	private int findAngleStart(int v1, double d2)
 	{
@@ -487,6 +577,7 @@ public class RrPolygon
 	/**
 	 * Simplify a polygon by deleting points from it that
 	 * are closer than d to lines joining other points
+	 * NB - this ignores speeds
 	 * @param d
 	 * @return simplified polygon object
 	 */
@@ -501,7 +592,7 @@ public class RrPolygon
 		// We get back -1 if the points are in a straight line.
 		if (v1<0)
 			return new RrPolygon(this);
-		r.add(point(v1%leng)); //, flag(v1%leng));
+		r.add(point(v1%leng));
 		int v2 = v1;
 		while(true)
 		{
@@ -509,7 +600,7 @@ public class RrPolygon
 			v2 = findAngleStart(v2, d2);
 			if((v2 > leng)||(v2<0))
 				return(r);
-			r.add(point(v2%leng)); //, flag(v2%leng));
+			r.add(point(v2%leng));
 		}
 		// The compiler is very clever to spot that no return
 		// is needed here...
@@ -563,6 +654,7 @@ public class RrPolygon
 	 * circles otherwise don't come out right.  See http://reprap.org/bin/view/Main/ArcCompensation.
 	 * If the extruder for the polygon's arc compensation factor is 0, return the polygon unmodified.
 	 * 
+	 * This ignores speeds
 	 * @param es
 	 */
 	public RrPolygon arcCompensate(Extruder[] es)
@@ -628,12 +720,57 @@ public class RrPolygon
 		return result;
 	}
 	
+	/**
+	 * Set the speeds at each vertex so that the polygon can be plotted as fast as possible
+	 * @param minSpeed
+	 * @param maxSpeed
+	 * @param maxAcceleration
+	 */
+	void setSpeeds(double minSpeed, double maxSpeed, double acceleration)
+	{
+		setSpeed(0, minSpeed);
+		Rr2Point a, b, c, ab, bc;
+		double oldV, vCorner, vAcc, length, newLength;
+		int next;
+		a = point(0);
+		b = point(1);
+		ab = Rr2Point.sub(b, a);
+		length = ab.mod();
+		ab = Rr2Point.div(ab, length);
+		oldV = minSpeed;
+		for(int i = 1; i < size(); i++)
+		{
+			next = i+1;
+			if(next >= size())
+				next = 0;
+			c = point(next);
+			bc = Rr2Point.sub(c, b);
+			newLength = bc.mod();
+			bc = Rr2Point.div(bc, newLength);
+			vCorner = Rr2Point.mul(ab, bc);
+			if(vCorner >= 0)
+				vCorner = minSpeed + (maxSpeed - minSpeed)*vCorner;
+			else
+				vCorner = 0.5*minSpeed*(2 + vCorner);
+			vAcc = Math.sqrt(0.5*acceleration/length + oldV*oldV);
+			setSpeed(i, vCorner);
+			a = b;
+			b = c;
+			ab = bc;
+			oldV = speed(i);
+			length = newLength;
+		}
+		if(!isClosed())
+			setSpeed(size() - 1, minSpeed);
+	}
+	
 	// ****************************************************************************
 	
 	// Convex hull code - this uses the QuickHull algorithm
 	// It finds the convex hull of a list of points from the polygon
 	// (which can be the whole polygon if the list is all the points.
 	// of course).
+	// This completely ignores speeds
 	
 	/**
 	 * @return Convex hull as a polygon
@@ -881,6 +1018,7 @@ public class RrPolygon
 	
 	// Convert polygon to CSG form 
 	// using Kai Tang and Tony Woo's algorithm.
+	// This completely ignores speeds
 	
 	/**
 	 * Construct a list of all the points in the polygon
