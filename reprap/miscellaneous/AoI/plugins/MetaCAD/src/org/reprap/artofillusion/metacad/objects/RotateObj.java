@@ -20,9 +20,9 @@ public class RotateObj extends MetaCADObject {
     
     CoordinateSystem coordsys = new CoordinateSystem();
     if (parameters.size() >= 3) {
-      coordsys.setOrientation(ctx.evaluateExpression(parameters.get(3)),
-                              ctx.evaluateExpression(parameters.get(4)),
-                              ctx.evaluateExpression(parameters.get(5)));
+      coordsys.setOrientation(ctx.evaluateExpression(parameters.get(0)),
+                              ctx.evaluateExpression(parameters.get(1)),
+                              ctx.evaluateExpression(parameters.get(2)));
     }
     
     Iterator<ObjectInfo> iter = chlist.iterator();
