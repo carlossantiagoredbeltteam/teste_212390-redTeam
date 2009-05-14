@@ -102,7 +102,9 @@ public class MetaCADObjectCollection extends ObjectCollection
 
   public Object3D duplicate()
   {
-    return new MetaCADObjectCollection(this.objects);
+    Object3D obj = new MetaCADObjectCollection(this.objects);
+    obj.copyTextureAndMaterial(this);
+    return obj;
   }
 
   public void copyObject(Object3D obj)
