@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="CSGEvaluator" default="dist" basedir=".">
+<project name="MetaCAD" default="dist" basedir=".">
 
   <property file="build.properties" />
 
@@ -23,7 +23,7 @@
     <mkdir dir="${docs}" />
   </target>
 
-  <target name="compile" depends="init">
+  <target name="compile" depends="init,javacc">
     <!-- Compile the java code from ${src} into ${build} -->
     <javac source="1.5" target="1.5" srcdir="${src}" destdir="${build}"
 	   classpath="${aoijar};${toolsjar};${jeplite}" debug="on" extdirs="" />
@@ -75,5 +75,16 @@
     <delete dir="${docs}" />
     <delete file="${dist}/${package}.jar" />
   </target>
+
+  <target name="javacc">
+    <jjtree target="${package}/javacc/MetaCADParser.jjt" 
+	    outputdirectory="${package}/src/org/reprap/artofillusion/metacad/parser" javacchome="${package}"/>
+    <javacc target="${package}/src/org/reprap/artofillusion/metacad/parser/MetaCADParser.jj"
+	    outputdirectory="${package}/src/org/reprap/artofillusion/metacad/parser"
+	    javacchome="${package}"
+	    static="true"
+  	    />
+  </target>
+
 </project>
 
