@@ -39,7 +39,7 @@ public class MetaCADEngine
     this.window = window;
     this.context = new MetaCADContext(window.getScene());
   }
- 
+  
   public void setParameters(String text) {
     this.window.getScene().setMetadata(
         MetaCADEngine.class.getName() + "Parameters", text);
@@ -424,21 +424,61 @@ String coordSysToString(CoordinateSystem cs) {
       if (inheritfrom.canSetTexture()) {
         resultinfo.getObject().setTexture(inheritfrom.getTexture(), inheritfrom.getTextureMapping());
       }
+      
       // add the object info to the window (which adds it to the scene and the item tree
       // and creates the proper undo record commands)
       // FIXME: The index is sometimes wrong since moving objects with the mouse confuses AoI's index system.
       // Don't know how to get around this, so keep it like this for now.
-      this.window.getScene().addObject(resultinfo, this.window.getScene().indexOf(objects[0]), undo);
-
+      // this.window.getScene().addObject(resultinfo, this.window.getScene().indexOf(objects[0]), undo); // oldversion with hierachical bug 
+      this.window.getScene().addObject(resultinfo, undo);
+      
+      // this is the node we are going to use as the parent for our new node
+      ObjectInfo firstParent = null;
+      int insertPosition = -1;
+      if (objects.length > 0)
+      {
+        firstParent = objects[0].getParent();
+        if (firstParent != null)
+        {
+          ObjectInfo children[] = firstParent.getChildren();
+          for (int i = 0; i < children.length; i++)
+          {
+            if (children[i] == objects[0])
+            {
+              insertPosition = i;
+              break;
+            }
+          }
+        }
+      }   
+      
       // reparent children
       for (int i=0;i<objects.length;i++) {
+        ObjectInfo oldParent = objects[i].getParent();
+
+        if (oldParent != null)
+        {
+          oldParent.removeChild(objects[i]);
+          undo.addCommandAtBeginning(UndoRecord.ADD_TO_GROUP, new Object[] {oldParent, objects[i]});
+        }
         resultinfo.addChild(objects[i], i);
         undo.addCommandAtBeginning(UndoRecord.REMOVE_FROM_GROUP, new Object[] {resultinfo, objects[i]});
       }
-
+      
+      if (firstParent != null)
+      {
+        if (insertPosition < 0 || insertPosition > firstParent.children.length)
+          insertPosition = firstParent.children.length;
+        firstParent.addChild(resultinfo, insertPosition);
+        // resultinfo.setParent(firstParent); // taken care of in addChild
+        undo.addCommandAtBeginning(UndoRecord.REMOVE_FROM_GROUP, new Object[] {firstParent, resultinfo});
+      }
+      
       // Must rebuild before updating the selection to rebuild indices.
       this.window.rebuildItemList();
-      this.window.setSelection(this.window.getScene().indexOf(resultinfo));
+      int selectionIndex = this.window.getScene().indexOf(resultinfo);
+      if (selectionIndex >= 0)
+        this.window.setSelection(selectionIndex);
 
       this.window.setUndoRecord(undo);
 
