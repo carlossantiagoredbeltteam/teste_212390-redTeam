@@ -21,9 +21,6 @@ public class ObjFactory {
     else if (name.startsWith("cylinder")) {
       return new CylinderObj();
     }
-    else if (name.startsWith("cs")) {
-      return new CSObj();
-    }
     else if (name.startsWith("union") || name.startsWith("+")) {
       return new BooleanObj(CSGObject.UNION);
     }
@@ -59,6 +56,21 @@ public class ObjFactory {
     }
     else if (name.startsWith("lathe")) {
       return new LatheObj();
+    }
+    else if (name.startsWith("cs")) {
+      return new CSObj();
+    }
+    else if (name.startsWith("group")) {
+      return new CSObj();
+    }
+    else if (name.startsWith("trans")) {
+      return new CSObj();
+    }
+    else if (name.startsWith("move")) {
+      return new CSObj();
+    }
+    else if (name.startsWith("rotate")) {
+      return new RotateObj();
     }
     else if (name.startsWith("scale")) {
       return new ScaleObj();
