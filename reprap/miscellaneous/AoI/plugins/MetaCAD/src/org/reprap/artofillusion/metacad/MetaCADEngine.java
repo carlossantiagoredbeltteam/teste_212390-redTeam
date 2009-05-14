@@ -540,7 +540,7 @@ String coordSysToString(CoordinateSystem cs) {
 
   public void loop()
   {
-    createParentObject("for(i=0,i<10,i=i+1)", 1);
+    createParentObject("for(i=0,i<1,i=i+1)", 1);
   }
 
   public void extractmacro() throws Exception
