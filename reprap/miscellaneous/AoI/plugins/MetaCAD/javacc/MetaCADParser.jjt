@@ -1,0 +1,337 @@
+options {
+  TRACK_TOKENS=true;
+  LOOKAHEAD=3;
+  FORCE_LA_CHECK=true;
+}
+
+
+PARSER_BEGIN(MetaCADParser)
+
+package org.reprap.artofillusion.metacad.parser;
+
+
+import org.reprap.artofillusion.metacad.ParsedTree;
+import org.reprap.artofillusion.metacad.language.*;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+
+
+/** Simple brace matcher. */
+public class MetaCADParser {
+  protected static MetaCADParser theParser = null;
+  public static MetaCADParser getSingleton(String txt)
+  {
+        if (theParser== null)
+        {
+        	theParser=new MetaCADParser(new StringReader(txt));
+        }
+        else
+        {
+        	theParser.ReInit(new StringReader(txt));
+        }
+        return theParser;
+  }
+
+  public static ParsedTree parseTree(String txt) throws ParseException {
+	MetaCADParser parser = getSingleton(txt);
+	return parser.ParsedTree();
+  }
+  
+  public static List<ParsedStatement> parseParameters(String txt) throws ParseException {
+    try
+	{
+		MetaCADParser parser = getSingleton(txt);
+		return parser.ParsedStatementList();
+	}
+	catch (Throwable ex)
+	{
+		ParseException newEx = new ParseException(ex.getMessage() + " in:\n" + txt);
+		newEx.initCause(ex);
+		throw newEx;
+	}
+  }
+  
+  public static String dumpTokens(SimpleNode node)
+  {
+	Token first = node.jjtGetFirstToken();
+	Token last = node.jjtGetLastToken();
+	
+	String s=first.image;
+	while (first != last)
+	{
+		first = first.next;
+		s = s  + first.image;
+	}
+	return s;
+  }
+
+}
+
+PARSER_END(MetaCADParser)
+
+SKIP : /* WHITE SPACE */
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+| "\f"
+}
+
+SPECIAL_TOKEN : /* COMMENTS */
+{
+  <SINGLE_LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+| <SINGLE_LINE_COMMENT_DASH: "#" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+| <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+}
+
+
+TOKEN :
+{
+  < LPAREN: "(" >
+| < RPAREN: ")" >
+| < LBRACE: "{" >
+| < RBRACE: "}" >
+| < COMMA: "," >
+| < DOT: "." >
+}
+
+TOKEN :
+{
+  <REAL_LITERAL: (["0"-"9"])+ ("." (["0"-"9"])* (<EXPONENT>)?)? >
+|  <#EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+>
+|   < STRING_LITERAL:
+      "\""
+      (   (~["\"","\\","\n","\r"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+      )*
+      "\""
+  >
+}
+
+TOKEN : /* BINARY OPS */
+{
+	< PLUS: "+" >
+|	< MINUS: "-" >
+|   < DIVIDE: "/" >
+|   < ASSIGN: "=" >
+|   < LTE: "<=" >
+|   < GTE: ">=" >
+|   < EQUALS: "==">
+|   < NEQUALS: "!=">
+|	< OTHERBINOP: ["*","^", "<", ">"] >
+}
+
+TOKEN : /* IDENTIFIERS */
+{
+
+<IDENTIFIER: <LETTER>(<LETTER>|<DIGIT>)*>
+| < #LETTER: 
+      [
+       "\u0024",
+       "\u0041"-"\u005a",
+       "\u005f",
+       "\u0061"-"\u007a"/*,
+       "\u00c0"-"\u00d6",
+       "\u00d8"-"\u00f6",
+       "\u00f8"-"\u00ff",
+       "\u0100"-"\u1fff",
+       "\u3040"-"\u318f",
+       "\u3300"-"\u337f",
+       "\u3400"-"\u3d2d",
+       "\u4e00"-"\u9fff",
+       "\uf900"-"\ufaff"*/
+      ]
+  >
+|
+  < #DIGIT:
+      [
+       "\u0030"-"\u0039"/*,
+       "\u0660"-"\u0669",
+       "\u06f0"-"\u06f9",
+       "\u0966"-"\u096f",
+       "\u09e6"-"\u09ef",
+       "\u0a66"-"\u0a6f",
+       "\u0ae6"-"\u0aef",
+       "\u0b66"-"\u0b6f",
+       "\u0be7"-"\u0bef",
+       "\u0c66"-"\u0c6f",
+       "\u0ce6"-"\u0cef",
+       "\u0d66"-"\u0d6f",
+       "\u0e50"-"\u0e59",
+       "\u0ed0"-"\u0ed9",
+       "\u1040"-"\u1049"*/
+      ]
+  >
+}
+
+
+
+ParsedTree ParsedTree() :
+{
+	ParsedTree tree;
+	List<ParsedTree> children=null;
+}
+{
+	tree = FunctionCallList() (<LBRACE>children=ParsedTreeList()<RBRACE> (";")? | ";")
+{
+	if (children != null)
+	{
+		ParsedTree bottom = tree;
+		while (bottom.children.size() != 0) { bottom = bottom.children.get(0); };
+		bottom.children = children;
+	}
+	
+	return tree;
+}
+}
+
+List<ParsedTree> ParsedTreeList() :
+{	
+	List<ParsedTree> list = new ArrayList<ParsedTree>();
+	ParsedTree current;
+}
+{
+	(current = ParsedTree() { list.add(current); })*
+	{
+		return list;
+	}
+}
+
+
+ParsedTree FunctionCallList() :
+{
+	ParsedTree current = null;
+	List<ParsedTree> trees =  new ArrayList<ParsedTree>();
+}
+{
+	(current = FunctionCall() {trees.add(current);})+ 
+	{
+		for (int i = 0; i < trees.size()-1; i++)
+		{
+			trees.get(i).children.add(trees.get(i+1));	
+		}	
+		return trees.get(0);
+	}
+}
+
+ParsedTree FunctionCall() :
+{
+	ParsedTree tree;
+	Token name, nameToken;
+	List <String> params = new ArrayList<String>(); 
+}
+{
+	name = <IDENTIFIER>(<LPAREN>(params = ParameterList())?<RPAREN>)? 
+	{
+		tree = new ParsedTree();
+		tree.name = name.image;
+		tree.parameters =  params;
+		return tree;
+	} 
+|
+
+	(nameToken=<PLUS>|nameToken=<MINUS>|nameToken=<DIVIDE>)name=<IDENTIFIER> (<LPAREN>(params = ParameterList())?<RPAREN>)? 
+	{
+		String n = nameToken.image+name.image;
+		tree = new ParsedTree();
+		tree.name = n;
+		tree.parameters =  params;
+		return tree;
+	} 
+		
+}
+
+List<String> ParameterList() :
+{
+	List<String> expressions = new ArrayList<String>();
+	String current;
+}
+{
+	current = Expression(){expressions.add(current);}(<COMMA>current=Expression(){expressions.add(current);})*
+	{
+		return expressions;
+	}
+}
+
+void JEPFunctionCall() :
+{
+}
+{
+	<IDENTIFIER>(<LPAREN>(ParameterList())?<RPAREN>)?
+}
+
+/** Brace counting production. */
+void UnaryExpression() :
+{
+}
+{
+	<REAL_LITERAL>	|  JEPFunctionCall()  | <LPAREN>Expression()<RPAREN> | <MINUS> UnaryExpression() | <STRING_LITERAL>
+}
+
+/** Brace counting production. */
+String Expression() :
+{
+}
+{
+	UnaryExpression()((<PLUS>|<MINUS>|<DIVIDE>|<ASSIGN>|<LTE>|<GTE>|<EQUALS>|<NEQUALS>|<OTHERBINOP>)UnaryExpression())*
+	{
+		return dumpTokens(jjtThis);
+	}
+}
+
+VariableAssignment VariableAssignment() :
+{
+	String name;
+	String formula;
+	Token temp;
+}
+{
+	temp=<IDENTIFIER>{name=temp.image;}
+	<ASSIGN>
+	formula=Expression()
+	{
+		return new VariableAssignment(name, formula);
+	}
+}
+
+MacroPrototype MacroPrototype() :
+{
+	Token temp;
+	String name;
+	List<String> list = new ArrayList<String>(); 
+	List<ParsedTree> children;
+}
+{
+	temp=<IDENTIFIER>{name=temp.image;}
+	<LPAREN>
+		(temp = <IDENTIFIER> { list.add(temp.image); } 
+		(<COMMA> temp = <IDENTIFIER> { list.add(temp.image); })*)?
+	<RPAREN>
+	<LBRACE>
+		children=ParsedTreeList()
+	<RBRACE>
+	{
+		return new MacroPrototype(name, list, children);
+	}
+}
+
+List<ParsedStatement> ParsedStatementList() :
+{
+	List <ParsedStatement> statements = new ArrayList();
+	ParsedStatement temp;
+}
+{
+	(  temp=MacroPrototype() {statements.add(temp);} 
+	 | temp=VariableAssignment() {statements.add(temp);} )* <EOF>
+	 
+	{
+		return statements;
+	}	
+}
