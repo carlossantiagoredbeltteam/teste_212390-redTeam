@@ -124,7 +124,7 @@ public class GCodeReaderAndWriter
 	 * The transmission to the RepRap machine is handled by
 	 * a separate thread.  These control that.
 	 */
-	private boolean threadLock = false;
+	//private boolean threadLock = false;
 	private Thread bufferThread = null;
 	private int myPriority;
 	
@@ -145,7 +145,7 @@ public class GCodeReaderAndWriter
 		ringBuffer = new String[buflen];
 		head = 0;
 		tail = 0;
-		threadLock = false;
+		//threadLock = false;
 		exhaustBuffer = false;
 		responsesExpected = 0;
 		responseAvailable = false;
@@ -377,30 +377,59 @@ public class GCodeReaderAndWriter
 	 */
 	private void bufferQueue(String cmd)
 	{
-		// Is the output thread running?
-		if(bufferThread == null)
+		int com = cmd.indexOf(';');
+		if(com > 0)
+			cmd = cmd.substring(0, com);
+		if(com != 0)
 		{
-			Debug.d("bufferQueue: attempt to queue: " + cmd + " to a non-running output buffer.");
-			return;
-		}
-		// Are we locked out by the transmit thread?
-		while(threadLock) sleep(5);
-		// Lock out the transmit thread
-		threadLock = true;
-		// Next location in the ring
-		head++;
-		if(head >= buflen) head = 0;
-		// Have we collided with the tail (i.e. is the ring full)?
-		while(head == tail-1 || (tail == 0 && head == buflen-1))
-		{
-			// Release the lock so the transmit thread can get rid of stuff
-			threadLock = false;
-			sleep(223);
-		}
-		// Record the command in the buffer
-		ringBuffer[head] = cmd;
-		threadLock = false;
-		Debug.c("G-code: " + cmd + " queued");
+			cmd = cmd.trim();
+			serialOutStream.print(cmd + "\n");
+			// Message has effectively gone to the machine, so we can release the queuing thread
+			//threadLock = false;				
+			serialOutStream.flush();
+			//oneSent = true;
+			Debug.c("G-code: " + cmd + " dequeued and sent");
+			// Wait for the machine to respond before we send the next command
+			waitForOK();
+		} else
+			Debug.c("G-code: " + ringBuffer[tail] + " not sent");
+		
+//		// Is the output thread running?
+//		if(bufferThread == null)
+//		{
+//			Debug.d("bufferQueue: attempt to queue: " + cmd + " to a non-running output buffer.");
+//			return;
+//		}
+//		// Are we locked out by the transmit thread?
+//		//while(threadLock) sleep(5);
+//		// Lock out the transmit thread
+//		//threadLock = true;
+//		// Next location in the ring
+//		
+//		int newHead = head + 1;
+//		while(newHead == tail-1 || (tail == 0 && newHead == buflen-1))
+//		{
+//			// Release the lock so the transmit thread can get rid of stuff
+//			//threadLock = false;
+//			sleep(223);
+//		}
+//		synchronized(this)
+//		{
+//			//head++;
+//			head = newHead;
+//			if(head >= buflen) head = 0;
+//			// Have we collided with the tail (i.e. is the ring full)?
+//			//while(head == tail-1 || (tail == 0 && head == buflen-1))
+//			//{
+//			// Release the lock so the transmit thread can get rid of stuff
+//			//threadLock = false;
+//			//sleep(223);
+//			//}
+//			// Record the command in the buffer
+//			ringBuffer[head] = cmd;
+//			//threadLock = false;
+//			Debug.c("G-code: " + cmd + " queued");
+//		}
 	}
 	
 	/**
@@ -413,7 +442,7 @@ public class GCodeReaderAndWriter
 		for(;;)
 		{
 			// Are we locked out by the queuing thread?
-			while(threadLock) sleep(7);
+			//while(threadLock) sleep(7);
 			// Wait for something to be there to send
 			while(bufferEmpty())
 			{
@@ -426,29 +455,36 @@ public class GCodeReaderAndWriter
 				sleep(19);
 			}
 			// Lock out the queuing thread
-			threadLock = true;
-			// Pick up the next command in the buffer
-			tail++;
-			if(tail >= buflen) tail = 0;
-			// Strip any comment and send the command to the machine
-			String cmd = ringBuffer[tail];
-			int com = cmd.indexOf(';');
-			if(com > 0)
-				cmd = cmd.substring(0, com);
-			if(com != 0)
+			//threadLock = true;
+			boolean oneSent = false;
+			synchronized(this)
 			{
-				cmd = cmd.trim();
-				serialOutStream.print(cmd + "\n");
-				// Message has effectively gone to the machine, so we can release the queuing thread
-				threadLock = false;				
-				serialOutStream.flush();
-				Debug.c("G-code: " + cmd + " dequeued and sent");
-				// Wait for the machine to respond before we send the next command
+				// Pick up the next command in the buffer
+				tail++;
+				if(tail >= buflen) tail = 0;
+				// Strip any comment and send the command to the machine
+				String cmd = ringBuffer[tail];
+				int com = cmd.indexOf(';');
+				if(com > 0)
+					cmd = cmd.substring(0, com);
+				if(com != 0)
+				{
+					cmd = cmd.trim();
+					serialOutStream.print(cmd + "\n");
+					// Message has effectively gone to the machine, so we can release the queuing thread
+					//threadLock = false;				
+					serialOutStream.flush();
+					oneSent = true;
+					Debug.c("G-code: " + cmd + " dequeued and sent");
+					// Wait for the machine to respond before we send the next command
+					//waitForOK();
+				} else
+					Debug.c("G-code: " + ringBuffer[tail] + " not sent");
+				// Just for safety
+				//threadLock = false;
+			}
+			if(oneSent)
 				waitForOK();
-			} else
-				Debug.c("G-code: " + ringBuffer[tail] + " not sent");
-			// Just for safety
-			threadLock = false;
 		}
 	}
 
