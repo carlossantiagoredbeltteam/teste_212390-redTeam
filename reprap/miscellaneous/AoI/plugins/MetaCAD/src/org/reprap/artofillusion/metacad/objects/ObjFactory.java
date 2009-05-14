@@ -51,7 +51,7 @@ public class ObjFactory {
     else if (name.startsWith("mesh")) {
       return new MeshObj();
     }
-    else if (name.startsWith("joincurves")) {
+    else if (name.startsWith("join")) {
       return new JoinCurvesObj();
     }
     else if (name.startsWith("lathe")) {
@@ -69,7 +69,7 @@ public class ObjFactory {
     else if (name.startsWith("move")) {
       return new CSObj();
     }
-    else if (name.startsWith("rotate")) {
+    else if (name.startsWith("rot")) {
       return new RotateObj();
     }
     else if (name.startsWith("scale")) {
