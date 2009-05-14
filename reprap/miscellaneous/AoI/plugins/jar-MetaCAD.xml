@@ -1,15 +1,16 @@
 <?xml version="1.0"?>
 
-<project name="CSGEvaluator" default="dist" basedir=".">
+<project name="MetaCAD" default="dist" basedir=".">
 
   <!-- set global properties for this build -->
-  <property name="src" value="CSGEvaluator/src" />
-  <property name="build" value="CSGEvaluator/build" />
-  <property name="docs" value="CSGEvaluator/docs" />
+  <property name="src" value="MetaCAD/src" />
+  <property name="build" value="MetaCAD/build" />
+  <property name="classes" value="MetaCAD/classes" />
+  <property name="docs" value="MetaCAD/docs" />
   <property name="dist" value="Plugins" />
   <property name="aoijar" value="ArtOfIllusion.jar" />
   <property name="buoyjar" value="Buoy.jar" />
-  <property name="jeplite" value="CSGEvaluator/lib/jeplite-0.8.7a-bin.jar" />
+  <property name="jeplite" value="MetaCAD/lib/jeplite-0.8.7a-bin.jar" />
 
 
   <target name="init">
@@ -31,8 +32,9 @@
     <copy file="${src}/extensions.xml" todir="${build}" />
     <copy todir="${build}">
       <fileset dir="${src}" includes="*.properties" />
+      <fileset dir="${classes}" includes="**/*.class" />
     </copy>
-    <jar jarfile="${dist}/CSGEvaluator.jar" basedir="${build}">
+    <jar jarfile="${dist}/MetaCAD.jar" basedir="${build}">
         <zipfileset src="${jeplite}"/>
     </jar>
   </target>
@@ -46,10 +48,10 @@
         author="true"
         version="true"
         use="true"
-        windowtitle="CSGEvaluator Documentation"
+        windowtitle="MetaCAD Documentation"
 	public="true">
-      <doctitle><![CDATA[<h1>CSGEvaluator</h1>]]></doctitle>
-      <bottom><![CDATA[<i>Copyright &#169; 2009 by Marius Kintel.</i>]]></bottom>
+      <doctitle><![CDATA[<h1>MetaCAD</h1>]]></doctitle>
+      <bottom><![CDATA[<i>Copyright &#169; 2009 by Marius Kintel and Philipp Tiefenbacher.</i>]]></bottom>
     </javadoc>
   </target>
   
