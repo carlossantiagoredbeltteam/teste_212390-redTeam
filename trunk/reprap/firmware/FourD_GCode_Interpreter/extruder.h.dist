@@ -1,3 +1,8 @@
+
+// Class for controlling each extruder
+//
+// Adrian Bowyer 14 May 2009
+
 #ifndef EXTRUDER_H
 #define EXTRUDER_H
 

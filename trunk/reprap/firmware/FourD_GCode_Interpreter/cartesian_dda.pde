@@ -95,11 +95,11 @@ long cartesian_dda::calculate_feedrate_delay(float feedrate)
 {  
         
 	// Calculate delay between steps in microseconds.  Here it is in English:
-        // (feedrate is in mm/minute)
+        // (feedrate is in mm/minute, distance is in mm)
 	// 60000000.0*distance/feedrate  = move duration in microseconds
 	// move duration/total_steps = time between steps for master axis.
 
-	return round(((distance * 60000000.0) / feedrate) / (float)total_steps);	
+	return round( (distance*60000000.0) / (feedrate*(float)total_steps) );	
 }
 
 
@@ -109,7 +109,7 @@ bool cartesian_dda::set_target(const FloatPoint& p)
         
 	//figure our deltas.
 
-	delta_position = absv(target_position - current_position);
+	delta_position = fabsv(target_position - current_position);
 
         // The feedrate values refer to distance in (X, Y, Z) space, so ignore e and f
         // values unless they're the only thing there.
@@ -148,8 +148,8 @@ bool cartesian_dda::set_target(const FloatPoint& p)
 #else
         current_steps.t = calculate_feedrate_delay(target_position.f);
 #endif
-        if(current_steps.t <= 0)
-          return false;
+        //if(current_steps.t <= 0)
+         // return false;
           
         target_steps.t = calculate_feedrate_delay(target_position.f);
         delta_steps.t = abs(target_steps.t - current_steps.t);
@@ -178,9 +178,26 @@ bool cartesian_dda::set_target(const FloatPoint& p)
 	z_direction = (target_position.z >= current_position.z);
 	e_direction = (target_position.e >= current_position.e);
 	t_direction = (target_position.f < current_position.f);   // Because t is *inversely* proportional to f
+  
+        return true;        
+}
 
 
-	//set our direction pins as well
+// Run the DDA
+
+void cartesian_dda::dda_move()
+{
+  // Set up the DDA
+  
+        long timestep;
+        
+	dda_counter.x = -total_steps/2;
+	dda_counter.y = dda_counter.x;
+	dda_counter.z = dda_counter.x;
+        dda_counter.e = dda_counter.x;
+        dda_counter.t = dda_counter.x;
+  
+  	//set our direction pins as well
 #if INVERT_X_DIR == 1
 	digitalWrite(X_DIR_PIN, !x_direction);
 #else
@@ -203,26 +220,8 @@ bool cartesian_dda::set_target(const FloatPoint& p)
         else
           ext->set_direction(0);
   
-        return true;        
-}
-
-
-// Run the DDA
-
-void cartesian_dda::dda_move()
-{
-  // Set up the DDA
-  
-        long timestep;
-        
-	dda_counter.x = -total_steps/2;
-	dda_counter.y = dda_counter.x;
-	dda_counter.z = dda_counter.x;
-        dda_counter.e = dda_counter.x;
-        dda_counter.t = dda_counter.x;
-        
-  //turn on steppers to start moving =)
-  
+    //turn on steppers to start moving =)
+    
 	enable_steppers();
 
         bool real_move; // Flag to know if we've changed something physical

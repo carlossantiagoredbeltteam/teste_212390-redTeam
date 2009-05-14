@@ -54,14 +54,14 @@ inline FloatPoint operator*(const FloatPoint& a, const FloatPoint& b)
 
 // Can't use abs for this as it's defined somewhere in a #define
 
-inline FloatPoint absv(const FloatPoint& a)
+inline FloatPoint fabsv(const FloatPoint& a)
 {
   FloatPoint result;
-  result.x = abs(a.x);
-  result.y = abs(a.y);
-  result.z = abs(a.z);
-  result.e = abs(a.e);
-  result.f = abs(a.f);
+  result.x = fabs(a.x);
+  result.y = fabs(a.y);
+  result.z = fabs(a.z);
+  result.e = fabs(a.e);
+  result.f = fabs(a.f);
   return result;
 } 
 
@@ -99,7 +99,7 @@ inline LongPoint operator-(const LongPoint& a, const LongPoint& b)
 } 
 
 // NB - the next gives neither the scalar nor the vector product
-
+/*
 inline LongPoint operator*(const LongPoint& a, const LongPoint& b)
 {
   LongPoint result;
@@ -110,6 +110,7 @@ inline LongPoint operator*(const LongPoint& a, const LongPoint& b)
   result.t = a.t * b.t;
   return result;
 } 
+*/
 
 inline LongPoint absv(const LongPoint& a)
 {
