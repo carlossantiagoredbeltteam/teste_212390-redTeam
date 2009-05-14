@@ -11,7 +11,7 @@ import artofillusion.object.ObjectInfo;
  *  Allows easy boolean modeling of multiple objects 
  *
  */
-public class CSGHelper {
+class CSGHelper {
   int count;
   int operation;
   ObjectInfo buffer;

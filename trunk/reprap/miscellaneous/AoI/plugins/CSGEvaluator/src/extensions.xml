@@ -5,11 +5,9 @@
   <import name="Tools" />
 
   <plugin class="org.reprap.artofillusion.CSGEvaluatorTool"/> 
-  <plugin class="org.reprap.artofillusion.MetaCADEvaluatorTool"/> 
   <plugin class="org.reprap.artofillusion.CSGEvaluatorPlugin"/> 
 
   <resource type="TranslateBundle" id="CSGEvaluator" name="CSGEvaluator" />
-  <resource type="TranslateBundle" id="MetaCADEvaluator" name="MetaCADEvaluator" />
 <!-- <resource type="help" id="CSGEvaluator" name="help/CSGEvaluator.hs" /> -->
 
   <author>Marius Kintel (kintel@sim.no), Philipp Tiefenbacher (wizards23@gmail.com), Stefan Farthofer</author>

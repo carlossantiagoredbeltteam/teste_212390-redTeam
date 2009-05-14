@@ -13,7 +13,7 @@ import artofillusion.ui.MessageDialog;
 
 class CSGEvaluatorEngine
 {
-  LayoutWindow window;
+  protected LayoutWindow window;
 
   public CSGEvaluatorEngine(LayoutWindow window)
   {
