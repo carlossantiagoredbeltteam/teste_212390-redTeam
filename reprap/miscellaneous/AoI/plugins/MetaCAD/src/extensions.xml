@@ -7,7 +7,7 @@
   <plugin class="org.reprap.artofillusion.metacad.MetaCADTool"/> 
   <plugin class="org.reprap.artofillusion.metacad.MetaCADPlugin"/> 
 
-  <resource type="TranslateBundle" id="MetaCADEvaluator" name="MetaCADEvaluator" />
+  <resource type="TranslateBundle" id="MetaCAD" name="MetaCAD" />
 
   <author>Marius Kintel (marius@kintel.net), Philipp Tiefenbacher (wizards23@gmail.com)</author>
   <description>
