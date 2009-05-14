@@ -2,7 +2,19 @@ Import AoI in Eclipse:
 ----------------------
 
 o Copy to AoiSrc272/lib/:
-  jmf.jar, jogl.jar, junit-4.5.jar
+  jmf.jar, junit-4.5.jar, jogl.jar (if it is not already there)
+
+o Edit the ArtOfIllusion.xml to include the jmf.jar
+afterwards the diff should look something like this:
+
+diff ArtOfIllusion.xml ArtOfIllusion.xml~
+14d13
+< 	<property name="jmf" value="lib/jmf.jar" />
+29c28
+<     <javac srcdir="${src}" destdir="${build}" classpath="${beanshell};${otherclasses};${buoy};${buoyx};${jogl};${jmf}" debug="on" target="1.5" source="1.5" />
+---
+>     <javac srcdir="${src}" destdir="${build}" classpath="${beanshell};${otherclasses};${buoy};${buoyx};${jogl}" debug="on" target="1.5" source="1.5" />
+
 
 o Build using Ant:
   - ant -f ArtOfIllusion.xml 
@@ -12,3 +24,5 @@ o Build using Ant:
 
 o New->Java Project
   - Create from existing source: AoiSrc272
+    - name it: AoI-2.7.2
+
