@@ -510,32 +510,37 @@ String coordSysToString(CoordinateSystem cs) {
 
   public void group()
   {
-    createParentObject("cs()", 1);
+    createParentObject("group()", 1);
   }
 
   public void move()
   {
-    createParentObject("cs()", 1);
+    createParentObject("move()", 1);
   }
 
   public void rotate()
   {
-    createParentObject("cs()", 1);
+    createParentObject("rotate()", 1);
   }
 
   public void scale()
   {
-    createParentObject("cs()", 1);
+    createParentObject("scale()", 1);
   }
 
   public void trans()
   {
-    createParentObject("cs()", 1);
+    createParentObject("trans()", 1);
   }
 
   public void joincurves()
   {
     createParentObject("joincurves()", 1);
+  }
+
+  public void loop()
+  {
+    createParentObject("for(i=0,i<10,i=i+1)", 1);
   }
 
   public void extractmacro() throws Exception
@@ -594,11 +599,6 @@ String coordSysToString(CoordinateSystem cs) {
     String filename = f.getPath();
     
     createObjectFromString("file(\""+filename+"\")");
-  }
-
-  public void test()  
-  {
-    showMessage("test function not implemented");
   }
 
   private void createMacro(String macroname, List<ObjectInfo> asList) {
