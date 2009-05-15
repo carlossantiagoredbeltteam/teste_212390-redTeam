@@ -43,7 +43,7 @@ public class ExtrudeObj extends MetaCADObject
     if (parameters.size() >= 5) {
       twist = ctx.evaluateExpression(parameters.get(4));
     }
-    boolean approximate = true;
+    boolean approximate = false;
     if (parameters.size() >= 6)
     {
       approximate = ctx.evaluateBoolean(parameters.get(5));
