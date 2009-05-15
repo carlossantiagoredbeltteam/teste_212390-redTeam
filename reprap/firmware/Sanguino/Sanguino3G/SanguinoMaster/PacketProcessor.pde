@@ -186,7 +186,14 @@ void handle_query(byte cmd)
     case HOST_CMD_TOOL_QUERY:
       send_tool_query();
       break;
-  
+
+  case HOST_CMD_IS_FINISHED:
+    {
+      bool finished = is_point_buffer_empty() && at_target() && commandBuffer.size() == 0;
+      hostPacket.add_8(finished?1:0);
+      break;
+    }
+
     default:
       hostPacket.unsupported();
   }
