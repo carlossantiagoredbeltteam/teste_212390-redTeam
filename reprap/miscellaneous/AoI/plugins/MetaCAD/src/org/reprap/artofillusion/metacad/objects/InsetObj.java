@@ -82,8 +82,7 @@ public class InsetObj extends MetaCADObject
   }
   
   class MetaCADLine {
-    protected Vec2 start,end, dir;
-    protected Vec2 normal;
+    Vec2 start, end, dir, normal;
     
     public MetaCADLine(Vec3 s,Vec3 e)
     {
