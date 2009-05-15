@@ -278,6 +278,18 @@ public class RrPolygon
 	}
 	
 	/**
+	 * Insert a new point into the polygon
+	 * @param p
+	 * @param f
+	 */
+	public void add(int i, Rr2Point p, double s)
+	{
+		points.add(i, new Rr2Point(p));
+		box.expand(p);
+		setSpeed(i, s);
+	}
+	
+	/**
 	 * Add a speed to the polygon
 	 * @param p
 	 * @param f
@@ -728,16 +740,18 @@ public class RrPolygon
 	 */
 	void setSpeeds(double minSpeed, double maxSpeed, double acceleration)
 	{
+		boolean fixup[] = new boolean[size()];
 		setSpeed(0, minSpeed);
 		Rr2Point a, b, c, ab, bc;
-		double oldV, vCorner, vAcc, length, newLength;
+		double oldV, vCorner, vAcc, s, newS;
 		int next;
 		a = point(0);
 		b = point(1);
 		ab = Rr2Point.sub(b, a);
-		length = ab.mod();
-		ab = Rr2Point.div(ab, length);
+		s = ab.mod();
+		ab = Rr2Point.div(ab, s);
 		oldV = minSpeed;
+		fixup[0] = true;
 		for(int i = 1; i < size(); i++)
 		{
 			next = i+1;
@@ -745,23 +759,59 @@ public class RrPolygon
 				next = 0;
 			c = point(next);
 			bc = Rr2Point.sub(c, b);
-			newLength = bc.mod();
-			bc = Rr2Point.div(bc, newLength);
+			newS = bc.mod();
+			bc = Rr2Point.div(bc, newS);
 			vCorner = Rr2Point.mul(ab, bc);
 			if(vCorner >= 0)
 				vCorner = minSpeed + (maxSpeed - minSpeed)*vCorner;
 			else
 				vCorner = 0.5*minSpeed*(2 + vCorner);
-			vAcc = Math.sqrt(0.5*acceleration/length + oldV*oldV);
-			setSpeed(i, vCorner);
-			a = b;
+			vAcc = Math.sqrt(2*acceleration*s + oldV*oldV);
+			if(vAcc > vCorner)
+			{
+				setSpeed(i, vCorner);
+				fixup[i] = true;
+			} else
+			{
+				setSpeed(i, vAcc);
+				fixup[i] = false;				
+			}
 			b = c;
 			ab = bc;
 			oldV = speed(i);
-			length = newLength;
+			s = newS;
 		}
 		if(!isClosed())
 			setSpeed(size() - 1, minSpeed);
+		
+		for(int i = isClosed()?size():size() - 1; i > 0; i--)
+		{
+			int ib= i;
+			if(ib== size())
+				ib = 0;
+			
+			if(fixup[ib])
+			{
+				int ia = i - 1;
+				a = point(ia);
+				b = point(ib);
+				ab = Rr2Point.sub(b, a);
+				s = ab.mod();
+				double va = speed(ia);
+				double vb = speed(ib);
+				double sm = (2*s - va*va + vb*vb)/(4*acceleration);
+				double vm = Math.sqrt(2*acceleration*sm + va*va);
+				if(vm < maxSpeed)
+					add(ib, Rr2Point.add(a, Rr2Point.mul(ab, sm/s)), vm);
+				else
+				{
+					double s1 = sm + 0.5*(vm*vm - vb*vb)/acceleration;
+					add(ib, Rr2Point.add(a, Rr2Point.mul(ab, s1/s)), maxSpeed);
+					s1 = 0.5*(maxSpeed*maxSpeed - va*va)/acceleration;
+					add(ib, Rr2Point.add(a, Rr2Point.mul(ab, s1/s)), maxSpeed);
+				}
+			}
+		}
 	}
 	
 	// ****************************************************************************
