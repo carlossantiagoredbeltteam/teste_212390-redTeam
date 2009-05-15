@@ -21,10 +21,12 @@ public class CubeObj extends MetaCADObject {
     List<ObjectInfo> result = new LinkedList<ObjectInfo>();
 
     double mainparam = 1.0f;
+    // With one parameter, make a cube
     if (parameters.size() >= 1) {
       mainparam = ctx.evaluateExpression(parameters.get(0));
     }
     Vec3 dims = new Vec3(mainparam, mainparam, mainparam);
+    // With three parameters, make a cuboid
     if (parameters.size() >= 3) {
       dims.set(mainparam,
                ctx.evaluateExpression(parameters.get(1)),

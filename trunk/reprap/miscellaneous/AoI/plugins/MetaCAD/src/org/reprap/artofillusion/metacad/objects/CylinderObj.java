@@ -34,7 +34,6 @@ public class CylinderObj extends MetaCADObject {
     // Third parameter define separate y radius
     if (parameters.size() >= 3) ry = ctx.evaluateExpression(parameters.get(2));
     // Fourth parameter define top/bottom radius ratio
-    // Cylinder takes an optional fourth parameter
     if (parameters.size() >= 4) {
       ratio = ctx.evaluateExpression(parameters.get(3));
       if (ratio > 1) ratio = 1.0;
