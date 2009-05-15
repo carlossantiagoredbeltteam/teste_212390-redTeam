@@ -34,7 +34,7 @@
 #include <RepRapSDCard.h>
 #endif
 
-//this is our firmware version
+//this is our firmware version.
 #define FIRMWARE_VERSION 0001
 
 //set up our firmware for actual usage.

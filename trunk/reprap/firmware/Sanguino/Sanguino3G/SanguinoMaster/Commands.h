@@ -32,6 +32,7 @@
 #define HOST_CMD_PAUSE           8
 #define HOST_CMD_PROBE           9
 #define HOST_CMD_TOOL_QUERY     10
+#define HOST_CMD_IS_FINISHED    11
 
 // These are our bufferable commands from the host
 // #define HOST_CMD_QUEUE_POINT_INC   128  // deprecated
