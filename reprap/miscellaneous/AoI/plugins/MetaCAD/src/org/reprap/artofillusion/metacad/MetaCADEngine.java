@@ -500,7 +500,7 @@ String coordSysToString(CoordinateSystem cs) {
    */
   public void union() throws Exception
   {
-    createParentObject("union()", 2);
+    createParentObject("union()", 1);
   }
 
   /**
@@ -508,7 +508,7 @@ String coordSysToString(CoordinateSystem cs) {
    */
   public void intersection()
   {
-    createParentObject("intersection()", 2);
+    createParentObject("intersection()", 1);
   }
 
   /**
@@ -516,7 +516,7 @@ String coordSysToString(CoordinateSystem cs) {
    */
   public void difference()
   {
-    createParentObject("difference()", 2);
+    createParentObject("difference()", 1);
   }
 
   public void regular() throws Exception
@@ -572,6 +572,11 @@ String coordSysToString(CoordinateSystem cs) {
   public void trans()
   {
     createParentObject("trans()", 1);
+  }
+
+  public void inset()
+  {
+    createParentObject("inset(1)", 1);
   }
 
   public void joincurves()
