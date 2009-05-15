@@ -34,6 +34,7 @@ public class MetaCADEngine
   protected LayoutWindow window;
   MetaCADContext context;
   static final String evaluateMePrefix = "=";
+  static final String parametersKey =  "org.reprap.artofillusion.MetaCADEvaluatorEngineParameters";
 
   public MetaCADEngine(LayoutWindow window) {
     this.window = window;
@@ -41,8 +42,8 @@ public class MetaCADEngine
   }
   
   public void setParameters(String text) {
-    this.window.getScene().setMetadata(
-        MetaCADEngine.class.getName() + "Parameters", text);
+    this.window.getScene().setMetadata(parametersKey, text);
+    
     Iterator<TextChangedListener> iter = this.parameterListeners.iterator();
    
     while (iter.hasNext())
@@ -52,9 +53,9 @@ public class MetaCADEngine
   }
 
   public String getParameters() {
-    Object o = this.window.getScene().getMetadata(
-        MetaCADEngine.class.getName() + "Parameters");
+    Object o = this.window.getScene().getMetadata(parametersKey);
 
+    
     if (o != null)
       return o.toString();
 
