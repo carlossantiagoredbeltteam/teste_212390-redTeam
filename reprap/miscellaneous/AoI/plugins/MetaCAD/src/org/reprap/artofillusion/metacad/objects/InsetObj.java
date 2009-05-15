@@ -68,7 +68,7 @@ public class InsetObj extends MetaCADObject
       double q;
       
       q=det(a,b,c,d);
-      if (Math.abs(q) < 0.00000001)
+      if (Math.abs(q) < 0.0000000001)
       {
         this.error = true;
       }
@@ -96,7 +96,9 @@ public class InsetObj extends MetaCADObject
     
     public void parallelMove(double d)
     {
-      this.start.add(this.normal.times(d));
+      Vec2 move = this.normal.times(d);
+      this.start.add(move);
+      this.end.add(move);
     }
     
     public Vec3 intersect3(MetaCADLine l)
@@ -133,7 +135,12 @@ public class InsetObj extends MetaCADObject
         Vec3 intersect=prev.intersect3(next);
         if (intersect ==  null)
         {
-          intersect = new Vec3(0,0,0);
+          // take parallel moved poly[i]
+          // from the line thats longer (in case we  have a degenerate line in there)
+          if(prev.dir.length() < next.dir.length())
+            intersect = new Vec3(next.start.x, next.start.y, 0);
+          else
+            intersect = new Vec3(prev.end.x, prev.end.y, 0);
         }
         points.add(intersect);
     }
