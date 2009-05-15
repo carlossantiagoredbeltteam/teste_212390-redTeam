@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.cheffo.jeplite.JEP;
+import org.reprap.artofillusion.metacad.language.MacroPrototype;
 import org.reprap.artofillusion.metacad.language.ParsedStatement;
 import org.reprap.artofillusion.metacad.parser.MetaCADParser;
 import org.reprap.artofillusion.metacad.parser.ParseException;
@@ -588,6 +589,64 @@ String coordSysToString(CoordinateSystem cs) {
   {
     createParentObject("for(i=0,i<1,i=i+1)", 1);
   }
+  
+  public void inlinemacro() throws Exception
+  {
+    ObjectInfo[] objects = getSelection();
+    if (objects.length != 1)
+    {
+      showMessage("Exactly one object must be selected.");
+      return;
+    }
+    
+    ParsedTree tree = extractTree(objects[0]);
+    MacroPrototype macro = this.context.macros.get(tree.name);
+    
+    if (macro !=  null)
+    {
+      for (ParsedTree c : macro.children)
+      {
+        ObjectInfo cInfo = fromParsedTree(c, objects[0].object);
+        
+        objects[0].addChild(cInfo, objects[0].children.length);
+      }
+    }
+    this.window.rebuildItemList();
+  }
+  
+  public ObjectInfo fromParsedTree(ParsedTree tree, Object3D inheritfrom)
+  {    
+    String s= evaluateMePrefix + tree.name + "(";
+    boolean first = true;
+    for (String p : tree.parameters)
+    {
+      if (!first)
+        s += ",";
+      s += p;
+      first = false;
+    }
+    s+=")";
+    
+    ObjectInfo info = new ObjectInfo(new Cube(0.1,0.1,0.1), new CoordinateSystem(), s);
+   
+    
+    if (inheritfrom.canSetTexture()) {
+      //this.window.getScene().getDefaultTexture();
+      info.getObject().setTexture(inheritfrom.getTexture(), inheritfrom.getTextureMapping());
+    }
+   
+    this.window.getScene().addObject(info, null);
+    
+    for (ParsedTree c : tree.children)
+    {
+      info.addChild(fromParsedTree(c, inheritfrom), info.children.length);
+    }
+    
+    
+    return info;
+  }
+  
+  
 
   public void extractmacro() throws Exception
   {

@@ -45,7 +45,7 @@ class MetaCADDialog extends BDialog implements TextChangedListener
   protected String[] cadfunctions = new String [] {
       "union", "intersection", "difference", "inset",
       "move", "rotate", "scale", "trans", "group",
-      "extrude", "lathe", "mesh", "joincurves", "extractmacro", "file", "loop"
+      "extrude", "lathe", "mesh", "joincurves", "extractmacro", "inlinemacro", "file", "loop"
   };
   
   protected BTextArea paramtab;
