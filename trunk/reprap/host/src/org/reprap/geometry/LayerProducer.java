@@ -677,6 +677,7 @@ public class LayerProducer {
 		throws ReprapException, IOException
 	{
 		Printer printer = layerConditions.getPrinter();
+		
 		if (printer.isCancelled()) return;
 		
 //		 Don't call delay; this isn't controlling the printer
@@ -722,7 +723,7 @@ public class LayerProducer {
 			//pos = ss.p3;
 			// Leave speed set for the start of the next movement.
 		} else
-			printer.moveTo(first.x(), first.y(), z, printer.getCurrentFeedrate(), startUp, endUp);
+			printer.moveTo(first.x(), first.y(), z, currentFeedrate, startUp, endUp);
 	}
 
 
@@ -734,9 +735,16 @@ public class LayerProducer {
 	 */
 	private void plot(RrPolygon p, boolean outline, boolean firstOneInLayer) throws ReprapException, IOException
 	{
-		int leng = p.size();
+		Attributes att = p.getAttributes();
+		Printer printer = layerConditions.getPrinter();
+		double outlineFeedrate = att.getExtruder(printer.getExtruders()).getOutlineFeedrate();
+		double infillFeedrate = att.getExtruder(printer.getExtruders()).getInfillFeedrate();
+		
+		boolean acc = Preferences.loadGlobalBool("Accelerating");
+			
+		//int leng = p.size();
 	
-		if(leng <= 1)
+		if(p.size() <= 1)
 		{
 			startNearHere = null;
 			return;
@@ -746,20 +754,17 @@ public class LayerProducer {
 		// This will not spot an attempt to plot 10,000 points in 1mm.
 		double plotDist=0;
 		Rr2Point lastPoint=p.point(0);
-		for (int i=1; i<leng; i++)
+		for (int i=1; i<p.size(); i++)
 		{
 			Rr2Point n=p.point(i);
 			plotDist+=Rr2Point.d(lastPoint, n);
 			lastPoint=n;
 		}
 		if (plotDist<Preferences.machineResolution()*0.5) {
-			Debug.d("Rejected line with "+leng+" points, length: "+plotDist);
+			Debug.d("Rejected line with "+p.size()+" points, length: "+plotDist);
 			startNearHere = null;
 			return;
-		}
-
-		Printer printer = layerConditions.getPrinter();		
-		Attributes att = p.getAttributes();
+		}	
 		
 		/* changed for feedrate stuff. - ZMS
 		int baseSpeed = att.getExtruder(printer.getExtruders()).getXYSpeed();
@@ -770,8 +775,6 @@ public class LayerProducer {
 		*/
 		
 		/* double baseFeedrate =  att.getExtruder(printer.getExtruders()).getXYFeedrate();*/
-		double outlineFeedrate = att.getExtruder(printer.getExtruders()).getOutlineFeedrate();
-		double infillFeedrate = att.getExtruder(printer.getExtruders()).getInfillFeedrate();
 		
 		printer.selectExtruder(att);
 		
@@ -781,9 +784,7 @@ public class LayerProducer {
 		else if(outline && printer.getExtruder().randomStart())
 			p = p.randomStart();
 		
-
-		
-		int stopExtruding = leng + 10;
+		int stopExtruding = p.size() + 10;
 		int stopValve = stopExtruding;
 		double extrudeBackLength = printer.getExtruder().getExtrusionOverRun();
 		double valveBackLength = printer.getExtruder().getValveOverRun();
@@ -807,25 +808,53 @@ public class LayerProducer {
 		
 		Boolean lift = printer.getExtruder().getMinLiftedZ() >= 0;
 		
+		if(acc)
+			p.setSpeeds(printer.getSlowFeedrateXY(), p.isClosed()?outlineFeedrate:infillFeedrate, 
+					printer.getMaxAcceleration());
+		
 		//printer.setFeedrate(printer.getFastFeedrateXY());
+
 		currentFeedrate = printer.getFastFeedrateXY();
 		move(p.point(0), p.point(1), lift, false, true);
+		
+		if(acc)
+			currentFeedrate = p.speed(0);
+		else
+		{
+			if(outline)
+			{
+				//printer.setFeedrate(outlineFeedrate);
+				currentFeedrate = outlineFeedrate;			
+			} else
+			{
+				//printer.setFeedrate(infillFeedrate);
+				currentFeedrate = infillFeedrate;			
+			}
+		}
 
 		//printer.getExtruder().setMotor(true);
 		plot(p.point(0), p.point(1), false, false);
 		
 		// Print any lead-in.
 		printer.printStartDelay(firstOneInLayer);
-				
-		if(outline)
+		
+		if(acc)
+			currentFeedrate = p.speed(0);
+		else
 		{
-			//printer.setFeedrate(outlineFeedrate);
-			currentFeedrate = outlineFeedrate;			
-		} else
-		{
-			//printer.setFeedrate(infillFeedrate);
-			currentFeedrate = infillFeedrate;			
+			if(outline)
+			{
+				//printer.setFeedrate(outlineFeedrate);
+				currentFeedrate = outlineFeedrate;			
+			} else
+			{
+				//printer.setFeedrate(infillFeedrate);
+				currentFeedrate = infillFeedrate;			
+			}
 		}
+
+		//printer.getExtruder().setMotor(true);
+		plot(p.point(0), p.point(1), false, false);
 		
 		if(outline)
 		{
@@ -840,7 +869,8 @@ public class LayerProducer {
 					move(posNow(), posNow(), lift, true, true);
 					return;
 				}
-				
+				if(acc)
+					currentFeedrate = p.speed(i);
 				if(j > stopExtruding || j == p.size())
 					plot(p.point(i), next, true, j == p.size()); //plot(p.point(i), next, lift, j == p.size());
 				else
@@ -863,6 +893,9 @@ public class LayerProducer {
 					move(posNow(), posNow(), lift, lift, true);
 					return;
 				}
+				
+				if(acc)
+					currentFeedrate = p.speed(i);
 				
 				if(i > stopExtruding || i == p.size()-1)
 					plot(p.point(i), next, true, i == p.size()-1);
