@@ -91,16 +91,6 @@ void cartesian_dda::set_units(bool using_mm)
 }
 
 
-long cartesian_dda::calculate_feedrate_delay(float feedrate)
-{  
-        
-	// Calculate delay between steps in microseconds.  Here it is in English:
-        // (feedrate is in mm/minute, distance is in mm)
-	// 60000000.0*distance/feedrate  = move duration in microseconds
-	// move duration/total_steps = time between steps for master axis.
-
-	return round( (distance*60000000.0) / (feedrate*(float)total_steps) );	
-}
 
 
 bool cartesian_dda::set_target(const FloatPoint& p)
@@ -144,14 +134,15 @@ bool cartesian_dda::set_target(const FloatPoint& p)
           return false;    
 
 #ifdef ACCELERATION_ON
-        current_steps.t = calculate_feedrate_delay(current_position.f);
+        //current_steps.t = calculate_feedrate_delay(current_position.f);
 #else
-        current_steps.t = calculate_feedrate_delay(target_position.f);
+        //current_steps.t = calculate_feedrate_delay(target_position.f);
+        current_steps.t = round(target_position.f);
 #endif
         //if(current_steps.t <= 0)
          // return false;
           
-        target_steps.t = calculate_feedrate_delay(target_position.f);
+        //target_steps.t = calculate_feedrate_delay(target_position.f);
         delta_steps.t = abs(target_steps.t - current_steps.t);
         t_scale = 1;
         if(delta_steps.t > total_steps)
@@ -177,7 +168,13 @@ bool cartesian_dda::set_target(const FloatPoint& p)
 	y_direction = (target_position.y >= current_position.y);
 	z_direction = (target_position.z >= current_position.z);
 	e_direction = (target_position.e >= current_position.e);
-	t_direction = (target_position.f < current_position.f);   // Because t is *inversely* proportional to f
+	t_direction = (target_position.f >= current_position.f);
+
+	dda_counter.x = -total_steps/2;
+	dda_counter.y = dda_counter.x;
+	dda_counter.z = dda_counter.x;
+        dda_counter.e = dda_counter.x;
+        dda_counter.t = dda_counter.x;
   
         return true;        
 }
@@ -190,12 +187,7 @@ void cartesian_dda::dda_move()
   // Set up the DDA
   
         long timestep;
-        
-	dda_counter.x = -total_steps/2;
-	dda_counter.y = dda_counter.x;
-	dda_counter.z = dda_counter.x;
-        dda_counter.e = dda_counter.x;
-        dda_counter.t = dda_counter.x;
+        int extcount;
   
   	//set our direction pins as well
 #if INVERT_X_DIR == 1
@@ -225,6 +217,8 @@ void cartesian_dda::dda_move()
 	enable_steppers();
 
         bool real_move; // Flag to know if we've changed something physical
+        
+        extcount = 0;
 
   //do our DDA line!
 
@@ -328,12 +322,17 @@ void cartesian_dda::dda_move()
                 if(real_move)
                 {
                   // keep it hot =)
-    
-		  manage_all_extruders();
+                  extcount++;
+                  if(extcount > 50)
+                  {
+                    extcount = 0;
+		    manage_all_extruders();
+                  }
                   if(t_scale > 1)
                     timestep = t_scale*current_steps.t;
                   else
                     timestep = current_steps.t;
+                  timestep = calculate_feedrate_delay((float) timestep);
 	          if (timestep >= 16383)
 		    delay(timestep/1000);
 	          else
