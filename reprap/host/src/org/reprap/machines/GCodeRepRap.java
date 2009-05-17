@@ -91,7 +91,11 @@ public class GCodeRepRap extends GenericRepRap {
 			qFeedrate(feedrate);
 		
 		if(dx == 0.0 && dy == 0.0)
+		{
+			if(currentFeedrate != feedrate)
+				qFeedrate(feedrate);
 			return;
+		}
 		
 		double extrudeLength;
 		String code = "G1 ";

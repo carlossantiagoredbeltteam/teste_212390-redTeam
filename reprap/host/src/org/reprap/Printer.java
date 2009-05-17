@@ -141,6 +141,11 @@ public interface Printer {
 	public double getSlowFeedrateXY();
 	
 	/**
+	 * @return the fastest the machine can accelerate
+	 */
+	public double getMaxAcceleration();
+	
+	/**
 	 * @param feedrate in mm/minute
 	 */
 	public void setFastFeedrateZ(double feedrate);

@@ -1125,4 +1125,12 @@ public abstract class GenericRepRap implements CartesianPrinter
 	{
 		return slowFeedrateXY;
 	}
+	
+	/**
+	 * @return the fastest the machine can accelerate
+	 */
+	public double getMaxAcceleration()
+	{
+		return maxAcceleration;
+	}
 }

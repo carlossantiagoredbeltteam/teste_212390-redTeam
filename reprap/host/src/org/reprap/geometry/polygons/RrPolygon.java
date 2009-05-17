@@ -284,9 +284,11 @@ public class RrPolygon
 	 */
 	public void add(int i, Rr2Point p, double s)
 	{
+		if(speeds == null)
+			System.err.println("Rr2Point.add(): adding a point and a speed to a polygon without it's speeds set.");
 		points.add(i, new Rr2Point(p));
+		speeds.add(i, s);
 		box.expand(p);
-		setSpeed(i, s);
 	}
 	
 	/**
@@ -444,20 +446,12 @@ public class RrPolygon
 		RrPolygon result = new RrPolygon(att, closed);
 		for(int j = 0; j < size(); j++)
 		{
-			result.add(new Rr2Point(point(i))); 
+			result.add(new Rr2Point(point(i)));
+			if(speeds != null)
+				result.setSpeed(j, speed(i));
 			i++;
 			if(i >= size())
 				i = 0;
-		}
-		
-		if(speeds == null)
-			return result;
-		for(int j = 0; j < size(); j++)
-		{
-			result.setSpeed(j, speed(k));
-			k++;
-			if(k >= size())
-				k = 0;
 		}
 		
 		return result;
@@ -734,11 +728,12 @@ public class RrPolygon
 	
 	/**
 	 * Set the speeds at each vertex so that the polygon can be plotted as fast as possible
+	 * TODO: fix case where line is too short and so give too high a deceleration.
 	 * @param minSpeed
 	 * @param maxSpeed
 	 * @param maxAcceleration
 	 */
-	void setSpeeds(double minSpeed, double maxSpeed, double acceleration)
+	public void setSpeeds(double minSpeed, double maxSpeed, double acceleration)
 	{
 		boolean fixup[] = new boolean[size()];
 		setSpeed(0, minSpeed);
@@ -795,22 +790,33 @@ public class RrPolygon
 				int ia = i - 1;
 				a = point(ia);
 				b = point(ib);
+				//System.out.println("Line from " + a.toString() + "(speed: " + speed(ia) + ") to " + b.toString() + "(speed: " + speed(ib) + ") changed to:");
+				int ibb = ib;
 				ab = Rr2Point.sub(b, a);
 				s = ab.mod();
 				double va = speed(ia);
 				double vb = speed(ib);
-				double sm = (2*s - va*va + vb*vb)/(4*acceleration);
+
+				double sm = (2*acceleration*s - va*va + vb*vb)/(4*acceleration);
 				double vm = Math.sqrt(2*acceleration*sm + va*va);
 				if(vm < maxSpeed)
+				{
+					System.out.println("sm: " + sm + "/s: " + s);
 					add(ib, Rr2Point.add(a, Rr2Point.mul(ab, sm/s)), vm);
-				else
+					ibb++;
+				} else
 				{
 					double s1 = sm + 0.5*(vm*vm - vb*vb)/acceleration;
 					add(ib, Rr2Point.add(a, Rr2Point.mul(ab, s1/s)), maxSpeed);
 					s1 = 0.5*(maxSpeed*maxSpeed - va*va)/acceleration;
 					add(ib, Rr2Point.add(a, Rr2Point.mul(ab, s1/s)), maxSpeed);
+					ibb = ibb + 2;
 				}
-			}
+				for(int ip = ia; ip <= ibb; ip++)
+				{
+					//System.out.println("   point: " + point(ip).toString() + ", speed: " + speed(ip));
+				}
+			} 
 		}
 	}
 	
