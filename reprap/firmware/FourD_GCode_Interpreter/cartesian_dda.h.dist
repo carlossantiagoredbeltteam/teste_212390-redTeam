@@ -160,6 +160,16 @@ inline void cartesian_dda::do_e_step()
         ext->step();
 }
 
+inline long cartesian_dda::calculate_feedrate_delay(float feedrate)
+{  
+        
+	// Calculate delay between steps in microseconds.  Here it is in English:
+        // (feedrate is in mm/minute, distance is in mm)
+	// 60000000.0*distance/feedrate  = move duration in microseconds
+	// move duration/total_steps = time between steps for master axis.
+
+	return round( (distance*60000000.0) / (feedrate*(float)total_steps) );	
+}
 
 
 #endif
