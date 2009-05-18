@@ -726,9 +726,15 @@ public class RrPolygon
 		return result;
 	}
 	
+	private void backTrack(int i, double vAccMin, double minSpeed, double acceleration)
+	{
+		
+		//vAccMax = Math.sqrt(2*acceleration*s + oldV*oldV);
+	}
+	
 	/**
 	 * Set the speeds at each vertex so that the polygon can be plotted as fast as possible
-	 * TODO: fix case where line is too short and so give too high a deceleration.
+	 * 
 	 * @param minSpeed
 	 * @param maxSpeed
 	 * @param maxAcceleration
@@ -738,7 +744,7 @@ public class RrPolygon
 		boolean fixup[] = new boolean[size()];
 		setSpeed(0, minSpeed);
 		Rr2Point a, b, c, ab, bc;
-		double oldV, vCorner, vAcc, s, newS;
+		double oldV, vCorner, vAccMax, vAccMin, s, newS;
 		int next;
 		a = point(0);
 		b = point(1);
@@ -761,15 +767,23 @@ public class RrPolygon
 				vCorner = minSpeed + (maxSpeed - minSpeed)*vCorner;
 			else
 				vCorner = 0.5*minSpeed*(2 + vCorner);
-			vAcc = Math.sqrt(2*acceleration*s + oldV*oldV);
-			if(vAcc > vCorner)
+			vAccMax = Math.sqrt(2*acceleration*s + oldV*oldV);
+			vAccMin = -2*acceleration*s + oldV*oldV;
+			if(vAccMin <= 0)
+				vAccMin = 0;
+			else
+				vAccMin = Math.sqrt(vAccMin);
+			if(vCorner <= vAccMin)
+			{
+				backTrack(i, vAccMin, minSpeed, acceleration);
+			} else if(vCorner < vAccMax)
 			{
 				setSpeed(i, vCorner);
-				fixup[i] = true;
+				fixup[i] = true;				
 			} else
 			{
-				setSpeed(i, vAcc);
-				fixup[i] = false;				
+				setSpeed(i, vAccMax);
+				fixup[i] = false;
 			}
 			b = c;
 			ab = bc;
