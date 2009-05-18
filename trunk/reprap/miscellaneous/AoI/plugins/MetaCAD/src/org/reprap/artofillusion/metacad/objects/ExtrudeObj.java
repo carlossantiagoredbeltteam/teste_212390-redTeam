@@ -7,6 +7,7 @@ import java.util.List;
 import org.reprap.artofillusion.metacad.MetaCADContext;
 import org.reprap.artofillusion.metacad.ParsedTree;
 
+import artofillusion.math.BoundingBox;
 import artofillusion.math.CoordinateSystem;
 import artofillusion.math.Vec3;
 import artofillusion.object.Curve;
@@ -108,10 +109,17 @@ public class ExtrudeObj extends MetaCADObject
       if (obj3D != null) {
         // Since the result is centered in the origin, offset the extruded object to 
         // move it back to its original position
-        // FIXME: Combine this with the user-specified coordinate system
-        CoordinateSystem coordsys = new CoordinateSystem(new Vec3(), Vec3.vz(), Vec3.vy());
-        Vec3 offset = profile.getCoords().fromLocal().times(((Mesh)profileobj).getVertices()[0].r).
-          minus(coordsys.fromLocal().times(((Mesh)obj3D).getVertices()[0].r));
+        BoundingBox mybox = profile.getBounds();
+        if (dir.x < 0) mybox.minx -= dir.x;
+        else mybox.maxx += dir.x;
+        if (dir.y < 0) mybox.miny -= dir.y;
+        else mybox.maxy += dir.y;
+        if (dir.z < 0) mybox.minz -= dir.z;
+        else mybox.maxz += dir.z;
+        
+        Vec3 offset = profile.getCoords().fromLocal().times(mybox.getCenter()).
+        minus(((Mesh)obj3D).getBounds().getCenter());
+        CoordinateSystem coordsys = new CoordinateSystem();
         coordsys.setOrigin(offset);
         ObjectInfo objinfo = new ObjectInfo(obj3D, coordsys, "tmp");
         resultobjects.add(objinfo);
