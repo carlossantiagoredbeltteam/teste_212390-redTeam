@@ -77,10 +77,12 @@ public class ExtrudeObj extends MetaCADObject
     }
     
     Curve path;
-    if (approximate)
+    if (approximate) {
       path = new Curve(v, smooth, Mesh.APPROXIMATING, false);
-    else
+    }
+    else {
       path = new Curve(v, smooth, Mesh.NO_SMOOTHING, false);
+    }
       
     CoordinateSystem pathCS = new CoordinateSystem();
 
@@ -97,6 +99,10 @@ public class ExtrudeObj extends MetaCADObject
         obj3D = ExtrudeTool.extrudeMesh((TriangleMesh)profileobj, path, profile.getCoords(), pathCS, twist*Math.PI/180.0, true);
       }
       else if (profileobj instanceof Curve) {
+        if (((Curve)profileobj).getSmoothingMethod() < Mesh.INTERPOLATING &&
+            path.getSmoothingMethod() < Mesh.INTERPOLATING) {
+          path.setSmoothingMethod(Mesh.INTERPOLATING);
+        }
         obj3D = ExtrudeTool.extrudeCurve((Curve)profileobj, path, profile.getCoords(), pathCS, twist*Math.PI/180.0, true);
       }
       if (obj3D != null) {
