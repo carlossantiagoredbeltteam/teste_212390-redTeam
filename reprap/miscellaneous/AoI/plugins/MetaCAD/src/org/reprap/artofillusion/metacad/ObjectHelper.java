@@ -25,19 +25,20 @@ public class ObjectHelper {
   public static TriangleMesh applyCS(ObjectInfo obj, double tol)
   {
     TriangleMesh mesh;
-    
-    if (obj.object.getClass() != TriangleMesh.class)
+
+    if (obj.object.getClass() != TriangleMesh.class) {
       mesh = obj.object.convertToTriangleMesh(tol);
-    else
-      mesh = (TriangleMesh)obj.object.duplicate();
-    
+    }
+    else {
+      mesh = (TriangleMesh) obj.object.duplicate();
+    }
+
     MeshVertex[] v = mesh.getVertices();
     Mat4 trans = obj.coords.fromLocal();
-    for (int i=0; i < v.length; i++)
-    {
+    for (int i = 0; i < v.length; i++) {
       trans.transform(v[i].r);
     }
-    
+
     return mesh;
   }
   
