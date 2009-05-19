@@ -439,6 +439,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void coolingCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_coolingCheckActionPerformed
+    	parentBotConsoleFrame.suspendPolling();
         try {
             extruder.setCooler(coolingCheck.isSelected());
         }
@@ -446,6 +447,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(null, "Exception setting cooler: " + ex);
             ex.printStackTrace();
         }
+        parentBotConsoleFrame.resumePolling();
 }//GEN-LAST:event_coolingCheckActionPerformed
 
     private void motorReverseCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_motorReverseCheckActionPerformed
@@ -455,6 +457,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
 
     
     private void heatButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_heatButtonActionPerformed
+    	parentBotConsoleFrame.suspendPolling();
     	if (heatPushed) {
     		rampOff();
     		try {
@@ -478,6 +481,8 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
     		heatButton.setText("Switch heater off");
     		heatPushed = true;
     	}
+    	parentBotConsoleFrame.resumePolling();
+    	
     }//GEN-LAST:event_heatButtonActionPerformed
 
     private boolean extruding = false;
@@ -493,6 +498,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
 
                 //System.out.println("Extruding at speed: " + motorSpeedField.getText());
         }
+        parentBotConsoleFrame.suspendPolling();
         setExtruderSpeed();
         if(extruder.get4D() && extruding)
 		{
@@ -501,6 +507,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
 			setExtruderSpeed();
             extrudeButton.setText("Extrude");
 		}
+        parentBotConsoleFrame.resumePolling();
     }//GEN-LAST:event_extrudeButtonActionPerformed
 
     private void nozzleWipeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nozzleWipeButtonActionPerformed
@@ -509,6 +516,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_nozzleWipeButtonActionPerformed
 
     private void valveToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_valveToggleButtonActionPerformed
+    	parentBotConsoleFrame.suspendPolling();
         if (valveToggleButton.isSelected()) {
         	try
         	{
@@ -523,6 +531,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
            		valveToggleButton.setText("Open valve");
         	} catch (Exception ex) {}
         }
+        parentBotConsoleFrame.resumePolling();
 }//GEN-LAST:event_valveToggleButtonActionPerformed
 
 private void rampOff()

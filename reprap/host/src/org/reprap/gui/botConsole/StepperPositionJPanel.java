@@ -32,7 +32,7 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
     private double axisLength;
     private double nudgeSize;
     private double newTargetAfterNudge;
-        
+    private BotConsoleFrame parentBotConsoleFrame = null;
     /**
      * Really set it up under control...
      * @param m
@@ -91,6 +91,11 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
 
     }
     
+    public void setConsoleFrame(BotConsoleFrame b)
+    {
+    	parentBotConsoleFrame = b;
+    }
+    
 //    private void deactivateMotorPanel() {
 //            //motor.dispose();
 //            //motor = null;
@@ -113,6 +118,7 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
 //    }
     
     public void homeAxis() {
+    	parentBotConsoleFrame.suspendPolling();
         try {
             setSpeed();
 			switch(motorID)
@@ -134,6 +140,7 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Could not home motor: " + ex);
         }
+        parentBotConsoleFrame.resumePolling();
     }
     
     public void setSpeed() {
@@ -172,6 +179,7 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
 //    }
     
     public void moveToTarget() {
+    	parentBotConsoleFrame.suspendPolling();
     	    setSpeed();
     		double x, y, z, p;
     		x = printer.getX();
@@ -203,6 +211,7 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
 //	        catch (Exception ex) {
 //	            JOptionPane.showMessageDialog(null, axis + " motor could not seek: " + ex);
 //	        }
+    		parentBotConsoleFrame.resumePolling();
     }
     
 //    public void moveToTargetBlocking() {

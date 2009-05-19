@@ -451,9 +451,9 @@ private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     	if(printer.setGCodeFileForOutput() == null)
     		return;
     }
-    if(printer.filePlay())
-    	return;
-    org.reprap.Main.gui.onProduceB();
+    if(!printer.filePlay())
+    	org.reprap.Main.gui.onProduceB();
+    //parentBotConsoleFrame.resumePolling();
 }//GEN-LAST:event_printButtonActionPerformed
 
 public void pauseAction()
