@@ -24,10 +24,10 @@ public class ObjFactory {
     else if (name.startsWith("union")) {
       return new BooleanObj(CSGObject.UNION);
     }
-    else if (name.startsWith("difference")) {
+    else if (name.startsWith("diff")) {
       return new BooleanObj(CSGObject.DIFFERENCE12);
     }
-    else if (name.startsWith("intersection")) {
+    else if (name.startsWith("inter")) {
       return new BooleanObj(CSGObject.INTERSECTION);
     }
     else if (name.startsWith("star")) {
