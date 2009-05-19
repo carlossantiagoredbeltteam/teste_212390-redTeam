@@ -14,6 +14,7 @@ import java.util.List;
 import artofillusion.ArtOfIllusion;
 import artofillusion.Scene;
 import artofillusion.animation.Keyframe;
+import artofillusion.math.BoundingBox;
 import artofillusion.math.CoordinateSystem;
 import artofillusion.object.Object3D;
 import artofillusion.object.ObjectCollection;
@@ -145,5 +146,30 @@ public class MetaCADObjectCollection extends ObjectCollection
       }
     }
     super.setTexture(tex, map);
+  }
+  
+
+  /* Get a BoundingBox which just encloses the object. */
+
+  public BoundingBox getBounds()
+  {
+
+    Enumeration objects = getObjects(null, true, null);
+    if (!objects.hasMoreElements()) {
+      this.cachedBounds = new BoundingBox(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    }
+    else {
+      while (objects.hasMoreElements())
+        {
+          ObjectInfo obj = (ObjectInfo) objects.nextElement();
+          BoundingBox bounds = obj.getBounds();
+          bounds = bounds.transformAndOutset(obj.getCoords().fromLocal());
+          if (this.cachedBounds == null)
+            this.cachedBounds = bounds;
+          else
+            this.cachedBounds = cachedBounds.merge(bounds);
+        }
+    }
+    return this.cachedBounds;
   }
 }
