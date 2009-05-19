@@ -726,9 +726,34 @@ public class RrPolygon
 		return result;
 	}
 	
-	private void backTrack(int i, double vAccMin, double minSpeed, double acceleration)
+	private RrInterval accRange(double startV, double s, double acc)
 	{
+		double vMax = Math.sqrt(2*acc*s + startV*startV);
+		double vMin = -2*acc*s + startV*startV;
+		if(vMin <= 0)
+			vMin = 0; //-Math.sqrt(-vMin);
+		else
+			vMin = Math.sqrt(vMin);
+		return new RrInterval(vMin, vMax);
+	}
+	
+	private void backTrack(int j, double v, double vAccMin, double minSpeed, double acceleration)
+	{
+		Rr2Point a, b, c, ab, bc;
+		double oldV, vCorner, s, newS;
+		int next;
+		int i = j - 1;		
+		a = point(i);
+		b = point(j);
+		ab = Rr2Point.sub(b, a);
+		s = ab.mod();
+		ab = Rr2Point.div(ab, s);
 		
+		while(i >= 0)
+		{
+			
+			
+		}
 		//vAccMax = Math.sqrt(2*acceleration*s + oldV*oldV);
 	}
 	
@@ -744,7 +769,7 @@ public class RrPolygon
 		boolean fixup[] = new boolean[size()];
 		setSpeed(0, minSpeed);
 		Rr2Point a, b, c, ab, bc;
-		double oldV, vCorner, vAccMax, vAccMin, s, newS;
+		double oldV, vCorner, s, newS;
 		int next;
 		a = point(0);
 		b = point(1);
@@ -767,22 +792,19 @@ public class RrPolygon
 				vCorner = minSpeed + (maxSpeed - minSpeed)*vCorner;
 			else
 				vCorner = 0.5*minSpeed*(2 + vCorner);
-			vAccMax = Math.sqrt(2*acceleration*s + oldV*oldV);
-			vAccMin = -2*acceleration*s + oldV*oldV;
-			if(vAccMin <= 0)
-				vAccMin = 0;
-			else
-				vAccMin = Math.sqrt(vAccMin);
-			if(vCorner <= vAccMin)
+			
+			RrInterval aRange = accRange(oldV, s, acceleration);
+			
+			if(vCorner <= aRange.low())
 			{
-				backTrack(i, vAccMin, minSpeed, acceleration);
-			} else if(vCorner < vAccMax)
+				backTrack(i, vCorner, aRange.low(), minSpeed, acceleration);
+			} else if(vCorner < aRange.high())
 			{
 				setSpeed(i, vCorner);
 				fixup[i] = true;				
 			} else
 			{
-				setSpeed(i, vAccMax);
+				setSpeed(i, aRange.high());
 				fixup[i] = false;
 			}
 			b = c;
@@ -790,6 +812,7 @@ public class RrPolygon
 			oldV = speed(i);
 			s = newS;
 		}
+		
 		if(!isClosed())
 			setSpeed(size() - 1, minSpeed);
 		
