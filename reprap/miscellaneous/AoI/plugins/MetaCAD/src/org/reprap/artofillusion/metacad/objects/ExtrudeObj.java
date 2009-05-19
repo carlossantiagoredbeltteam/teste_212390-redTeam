@@ -9,9 +9,11 @@ import org.reprap.artofillusion.metacad.ParsedTree;
 
 import artofillusion.math.BoundingBox;
 import artofillusion.math.CoordinateSystem;
+import artofillusion.math.Mat4;
 import artofillusion.math.Vec3;
 import artofillusion.object.Curve;
 import artofillusion.object.Mesh;
+import artofillusion.object.MeshVertex;
 import artofillusion.object.Object3D;
 import artofillusion.object.ObjectInfo;
 import artofillusion.object.TriangleMesh;
@@ -96,20 +98,26 @@ public class ExtrudeObj extends MetaCADObject
       Object3D profileobj = profile.getObject();
 
       Object3D obj3D = null;
-      if (profileobj instanceof TriangleMesh) {
-        obj3D = ExtrudeTool.extrudeMesh((TriangleMesh)profileobj, path, profile.getCoords(), pathCS, twist*Math.PI/180.0, true);
-      }
-      else if (profileobj instanceof Curve) {
-        if (((Curve)profileobj).getSmoothingMethod() < Mesh.INTERPOLATING &&
-            path.getSmoothingMethod() < Mesh.INTERPOLATING) {
-          path.setSmoothingMethod(Mesh.INTERPOLATING);
+      if (profileobj instanceof Mesh) {
+        applyCS(profile.coords, ((Mesh)profileobj));
+        profile.setCoords(new CoordinateSystem());
+        
+        if (profileobj instanceof TriangleMesh) {
+          obj3D = ExtrudeTool.extrudeMesh((TriangleMesh)profileobj, path, profile.getCoords(), pathCS, twist*Math.PI/180.0, true);
         }
-        obj3D = ExtrudeTool.extrudeCurve((Curve)profileobj, path, profile.getCoords(), pathCS, twist*Math.PI/180.0, true);
+        else if (profileobj instanceof Curve) {
+          if (((Curve)profileobj).getSmoothingMethod() < Mesh.INTERPOLATING &&
+              path.getSmoothingMethod() < Mesh.INTERPOLATING) {
+            path.setSmoothingMethod(Mesh.INTERPOLATING);
+          }
+          obj3D = ExtrudeTool.extrudeCurve((Curve)profileobj, path, profile.getCoords(), pathCS, twist*Math.PI/180.0, true);
+        }
       }
       if (obj3D != null) {
         // Since the result is centered in the origin, offset the extruded object to 
         // move it back to its original position
-        BoundingBox mybox = profile.getBounds();
+        // FIXME: This only works for linear extrusions, not off-center twists.
+        BoundingBox mybox = profile.getBounds();        
         if (dir.x < 0) mybox.minx -= dir.x;
         else mybox.maxx += dir.x;
         if (dir.y < 0) mybox.miny -= dir.y;
@@ -130,8 +138,13 @@ public class ExtrudeObj extends MetaCADObject
     return resultobjects;
 }
 
-  
-  
-  
+  void applyCS(CoordinateSystem cs, Mesh mesh) {
+    MeshVertex[] verts = mesh.getVertices();
+    Mat4 trans = cs.fromLocal();
+    
+    for (int i = 0; i < verts.length; i++) {
+      trans.transform(verts[i].r);
+    }
+  }
   
 }
