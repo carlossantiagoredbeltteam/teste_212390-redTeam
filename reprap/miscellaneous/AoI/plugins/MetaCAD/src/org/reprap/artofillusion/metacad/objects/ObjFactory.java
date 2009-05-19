@@ -21,13 +21,13 @@ public class ObjFactory {
     else if (name.startsWith("cylinder")) {
       return new CylinderObj();
     }
-    else if (name.startsWith("union") || name.startsWith("+")) {
+    else if (name.startsWith("union")) {
       return new BooleanObj(CSGObject.UNION);
     }
-    else if (name.startsWith("difference") || name.startsWith("-")) {
+    else if (name.startsWith("difference")) {
       return new BooleanObj(CSGObject.DIFFERENCE12);
     }
-    else if (name.startsWith("intersection") || name.startsWith("/")) {
+    else if (name.startsWith("intersection")) {
       return new BooleanObj(CSGObject.INTERSECTION);
     }
     else if (name.startsWith("star")) {
