@@ -40,6 +40,9 @@ public class XYZTabPanel extends javax.swing.JPanel {
     public void setConsoleFrame(BotConsoleFrame b)
     {
     	parentBotConsoleFrame = b;
+    	xStepperPositionJPanel.setConsoleFrame(b);
+    	yStepperPositionJPanel.setConsoleFrame(b);
+    	zStepperPositionJPanel.setConsoleFrame(b);
     }
     
     public void setMotorSpeeds() {
@@ -324,9 +327,11 @@ private void nudgeSizeRB3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
 public void homeAll()
 {
+	//parentBotConsoleFrame.suspendPolling();
     xStepperPositionJPanel.homeAxis();
     yStepperPositionJPanel.homeAxis();
-    zStepperPositionJPanel.homeAxis();	
+    zStepperPositionJPanel.homeAxis();
+    //parentBotConsoleFrame.resumePolling();
 }
 
 private void homeAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homeAllButtonActionPerformed
@@ -362,6 +367,7 @@ public Printer getPrinter()
 
 public void goTo(double xTo, double yTo, double zTo)
 {
+	parentBotConsoleFrame.suspendPolling();
 	double x = printer.getX();
 	double y = printer.getY();
 	double z = printer.getZ();
@@ -393,7 +399,7 @@ public void goTo(double xTo, double yTo, double zTo)
 			printer.getExtruder().setExtrusion(0);
 	} catch (Exception e)
 	{}	
-
+	parentBotConsoleFrame.resumePolling();
 }
 
 private void goButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goButtonActionPerformed

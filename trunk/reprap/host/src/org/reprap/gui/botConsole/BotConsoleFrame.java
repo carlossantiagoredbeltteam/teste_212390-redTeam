@@ -111,9 +111,23 @@ public class BotConsoleFrame extends javax.swing.JFrame {
     public void suspendPolling()
     {
     	carryOnPolling = false;
+    	try 
+		{
+			Thread.sleep(200); 
+		} catch (InterruptedException ex) 
+		{
+			// This is normal when shutting down, so ignore		
+		}
     }
     public void resumePolling()
     {
+    	try 
+		{
+			Thread.sleep(200); 
+		} catch (InterruptedException ex) 
+		{
+			// This is normal when shutting down, so ignore		
+		}
     	carryOnPolling = true;
     }
  
