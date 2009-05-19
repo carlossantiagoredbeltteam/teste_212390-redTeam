@@ -764,9 +764,11 @@ String coordSysToString(CoordinateSystem cs) {
   protected String removeEvaluationPrefix(String objInfoName)
   {
     objInfoName = objInfoName.trim();
-    if (objInfoName.startsWith(evaluateMePrefix))
+    int index = objInfoName.indexOf(evaluateMePrefix);
+    
+    if (index >= 0)
     {
-      return objInfoName.substring(evaluateMePrefix.length());
+      return objInfoName.substring(index +evaluateMePrefix.length());
     }
     return null;
   }
