@@ -1,5 +1,6 @@
 package org.reprap.artofillusion.metacad.objects;
 
+import java.io.File;
 import java.util.List;
 
 import org.reprap.artofillusion.metacad.MetaCADContext;
@@ -20,8 +21,19 @@ public class FileObj extends MetaCADObject
       if (filename.charAt(0) == '"') filename = filename.substring(1, filename.length()-1);
     }
     
-    List<ObjectInfo> objects = DXFImporter.importFile(ctx.scene, filename, false);
+    List<ObjectInfo> objects = null;
     
+    // lets see if the file exists
+    boolean absExists = (new File(filename)).exists();
+    if (absExists) {
+      objects = DXFImporter.importFile(ctx.scene, filename, false);
+    } 
+    // otherwise lets try to append the path of the aoi scene
+    else {
+      String dir = ctx.scene.getDirectory();
+      objects = DXFImporter.importFile(ctx.scene, dir + File.separator + filename, false);
+    }
+  
     return objects;
   }
   
