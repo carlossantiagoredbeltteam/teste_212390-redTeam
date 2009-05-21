@@ -211,27 +211,26 @@ public interface Extruder
      * @return
      */
     public boolean getReversing();
- 
-    /**
-     * Get how much extrudate is deposited in a given time
-     * @param time
-     * @return
-     */
-    public double getDistance(double time);
     
     /**
      * Find out if we're working in 4D
      * @return
      */
     public boolean get4D();
-    
+ 
     /**
-     * Get how much extrudate is deposited for a given xy movement
-     * @param xyDistance
-     * @param xyFeedrate
+     * Get how much extrudate is deposited in a given time
+     * @param time
      * @return
      */
-    public double getDistance(double xyDistance, double xyFeedrate);
+    public double getDistanceFromTime(double time);
+    
+    /**
+     * Get how much extrudate is deposited for a given movement
+     * @param distance
+     * @return
+     */
+    public double getDistance(double distance);
     
     /**
      * Find out how far we have extruded so far

@@ -186,7 +186,7 @@ public class Producer {
 
 			reprap.startingLayer(layerRules);
 			// Change Z height
-			reprap.moveTo(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), reprap.getFastFeedrateZ(), false, false);
+			reprap.singleMove(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), reprap.getFastFeedrateZ());
 			fillFoundationRectangle(reprap, gp);
 			reprap.finishedLayer(layerRules);
 			reprap.betweenLayers(layerRules);
@@ -216,7 +216,7 @@ public class Producer {
 
 			reprap.startingLayer(layerRules);
 			// Change Z height
-			reprap.moveTo(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), reprap.getFastFeedrateZ(), false, false);
+			reprap.singleMove(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), reprap.getFastFeedrateZ());
 			fillFoundationRectangle(reprap, gp);		
 			reprap.finishedLayer(layerRules);
 			reprap.betweenLayers(layerRules);
@@ -251,7 +251,7 @@ public class Producer {
 			reprap.startingLayer(layerRules);
 			
 			// Change Z height
-			reprap.moveTo(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), reprap.getFastFeedrateZ(), false, false);
+			reprap.singleMove(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), reprap.getFastFeedrateZ());
 			
 			reprap.waitWhileBufferNotEmpty();
 			reprap.slowBuffer();
@@ -321,7 +321,7 @@ public class Producer {
 			reprap.startingLayer(layerRules);
 			
 			// Change Z height
-			reprap.moveTo(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), reprap.getFastFeedrateZ(), false, false);
+			reprap.singleMove(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), reprap.getFastFeedrateZ());
 			
 			reprap.waitWhileBufferNotEmpty();
 			reprap.slowBuffer();

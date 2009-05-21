@@ -664,7 +664,13 @@ public class LayerProducer {
 		} else
 			printer.printTo(first.x(), first.y(), z, currentFeedrate, stopExtruder, closeValve);
 	}
-
+	
+	private void singleMove(Rr2Point p)
+	{
+		Printer pt = layerConditions.getPrinter();
+		pt.singleMove(p.x(), p.y(), pt.getZ(), currentFeedrate);
+	}
+	
 	/**
 	 * @param first
 	 * @param second
@@ -815,7 +821,8 @@ public class LayerProducer {
 		//printer.setFeedrate(printer.getFastFeedrateXY());
 
 		currentFeedrate = printer.getFastFeedrateXY();
-		move(p.point(0), p.point(1), lift, false, true);
+		singleMove(p.point(0));
+		//move(p.point(0), p.point(1), lift, false, true);
 		
 		if(acc)
 			currentFeedrate = p.speed(0);
@@ -866,6 +873,7 @@ public class LayerProducer {
 				if (printer.isCancelled())
 				{
 					printer.stopMotor();
+					singleMove(posNow());
 					move(posNow(), posNow(), lift, true, true);
 					return;
 				}
@@ -890,6 +898,7 @@ public class LayerProducer {
 				if (printer.isCancelled())
 				{
 					printer.stopMotor();
+					singleMove(posNow());
 					move(posNow(), posNow(), lift, lift, true);
 					return;
 				}

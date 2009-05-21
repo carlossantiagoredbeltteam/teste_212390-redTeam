@@ -318,10 +318,12 @@ public abstract class GenericExtruder implements Extruder
 	private String supportMaterial;
 	private String inFillMaterial;
 	
+	protected double extrudeRatio = 1;
+	
 	/**
 	* Our printer object.
 	*/
-	Printer printer = null;
+	protected Printer printer = null;
 	
 	/**
 	 * @param extruderId
@@ -419,6 +421,7 @@ public abstract class GenericExtruder implements Extruder
 			separationFraction = Preferences.loadGlobalDouble(prefName + "SeparationFraction(0..1)");
 			arcCompensationFactor = Preferences.loadGlobalDouble(prefName + "ArcCompensationFactor(0..)");
 			arcShortSides = Preferences.loadGlobalDouble(prefName + "ArcShortSides(0..)");
+			extrudeRatio = Preferences.loadGlobalDouble(prefName + "ExtrudeRatio(0..)");
 			
 			evenHatchDirection = Preferences.loadGlobalDouble(prefName + "EvenHatchDirection(degrees)");
 			oddHatchDirection = Preferences.loadGlobalDouble(prefName + "OddHatchDirection(degrees)");			
@@ -1125,9 +1128,11 @@ public abstract class GenericExtruder implements Extruder
      * @param time (ms)
      * @return
      */
-    public double getDistance(double time)
+    public double getDistanceFromTime(double time)
     {
-    	return currentSpeed*time/60000.0;
+    	if(!isExtruding)
+    		return 0;
+    	return printer.getCurrentFeedrate()*time/60000.0;
     }
     
     /**
@@ -1137,9 +1142,11 @@ public abstract class GenericExtruder implements Extruder
      * @param xyFeedrate (mm/minute)
      * @return
      */
-    public double getDistance(double xyDistance, double xyFeedrate)
+    public double getDistance(double distance)
     {
-    	return currentSpeed*xyDistance/xyFeedrate;
+    	if(!isExtruding)
+    		return 0;
+    	return extrudeRatio*distance;
     }
 	
     /**

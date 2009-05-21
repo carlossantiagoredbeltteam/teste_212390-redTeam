@@ -76,6 +76,7 @@ import org.reprap.Attributes;
 import org.reprap.Preferences;
 import org.reprap.Extruder;
 import org.reprap.geometry.LayerRules;
+import org.reprap.machines.VelocityProfile;
 
 /**
  * The main boundary-representation polygon class
@@ -737,24 +738,32 @@ public class RrPolygon
 		return new RrInterval(vMin, vMax);
 	}
 	
-	private void backTrack(int j, double v, double vAccMin, double minSpeed, double acceleration)
+	private void backTrack(int j, double v, double vAccMin, double minSpeed, double acceleration, boolean fixup[])
 	{
-		Rr2Point a, b, c, ab, bc;
-		double oldV, vCorner, s, newS;
-		int next;
-		int i = j - 1;		
-		a = point(i);
+		Rr2Point a, b, ab;
+		double backV, s;
+		int i = j - 1;
 		b = point(j);
-		ab = Rr2Point.sub(b, a);
-		s = ab.mod();
-		ab = Rr2Point.div(ab, s);
-		
 		while(i >= 0)
 		{
-			
-			
+			a = point(i);
+			ab = Rr2Point.sub(b, a);
+			s = ab.mod();
+			ab = Rr2Point.div(ab, s);
+			backV = Math.sqrt(v*v + 2*acceleration*s);
+			setSpeed(j, v);
+			if(backV > speed(i))
+			{
+				fixup[j] = true;
+				return;
+			}
+			setSpeed(i, backV);
+			v = backV;
+			fixup[j] = false;
+			b = a;
+			j = i;
+			i--;
 		}
-		//vAccMax = Math.sqrt(2*acceleration*s + oldV*oldV);
 	}
 	
 	/**
@@ -766,6 +775,9 @@ public class RrPolygon
 	 */
 	public void setSpeeds(double minSpeed, double maxSpeed, double acceleration)
 	{
+		RrPolygon pg = simplify(Preferences.gridRes());
+		points = pg.points;
+		box = pg.box;
 		boolean fixup[] = new boolean[size()];
 		setSpeed(0, minSpeed);
 		Rr2Point a, b, c, ab, bc;
@@ -780,9 +792,7 @@ public class RrPolygon
 		fixup[0] = true;
 		for(int i = 1; i < size(); i++)
 		{
-			next = i+1;
-			if(next >= size())
-				next = 0;
+			next = (i+1)%size();
 			c = point(next);
 			bc = Rr2Point.sub(c, b);
 			newS = bc.mod();
@@ -797,7 +807,7 @@ public class RrPolygon
 			
 			if(vCorner <= aRange.low())
 			{
-				backTrack(i, vCorner, aRange.low(), minSpeed, acceleration);
+				backTrack(i, vCorner, aRange.low(), minSpeed, acceleration, fixup);
 			} else if(vCorner < aRange.high())
 			{
 				setSpeed(i, vCorner);
@@ -819,7 +829,7 @@ public class RrPolygon
 		for(int i = isClosed()?size():size() - 1; i > 0; i--)
 		{
 			int ib= i;
-			if(ib== size())
+			if(ib == size())
 				ib = 0;
 			
 			if(fixup[ib])
@@ -827,34 +837,25 @@ public class RrPolygon
 				int ia = i - 1;
 				a = point(ia);
 				b = point(ib);
-				//System.out.println("Line from " + a.toString() + "(speed: " + speed(ia) + ") to " + b.toString() + "(speed: " + speed(ib) + ") changed to:");
-				int ibb = ib;
 				ab = Rr2Point.sub(b, a);
 				s = ab.mod();
 				double va = speed(ia);
 				double vb = speed(ib);
-
-				double sm = (2*acceleration*s - va*va + vb*vb)/(4*acceleration);
-				double vm = Math.sqrt(2*acceleration*sm + va*va);
-				if(vm < maxSpeed)
+				
+				VelocityProfile vp = new VelocityProfile(s, va, vb, maxSpeed, acceleration);
+				if(vp.flat())
 				{
-					System.out.println("sm: " + sm + "/s: " + s);
-					add(ib, Rr2Point.add(a, Rr2Point.mul(ab, sm/s)), vm);
-					ibb++;
+					add(i, Rr2Point.add(a, Rr2Point.mul(ab, vp.s2()/s)), maxSpeed);
+					add(i, Rr2Point.add(a, Rr2Point.mul(ab, vp.s1()/s)), maxSpeed);				
 				} else
 				{
-					double s1 = sm + 0.5*(vm*vm - vb*vb)/acceleration;
-					add(ib, Rr2Point.add(a, Rr2Point.mul(ab, s1/s)), maxSpeed);
-					s1 = 0.5*(maxSpeed*maxSpeed - va*va)/acceleration;
-					add(ib, Rr2Point.add(a, Rr2Point.mul(ab, s1/s)), maxSpeed);
-					ibb = ibb + 2;
-				}
-				for(int ip = ia; ip <= ibb; ip++)
-				{
-					//System.out.println("   point: " + point(ip).toString() + ", speed: " + speed(ip));
+					add(i, Rr2Point.add(a, Rr2Point.mul(ab, vp.s1()/s)), vp.v());
 				}
 			} 
 		}
+		
+		if(speeds.size() != points.size())
+			System.err.println("Speeds and points arrays different: " + speeds.size() + ", " + points.size());
 	}
 	
 	// ****************************************************************************
