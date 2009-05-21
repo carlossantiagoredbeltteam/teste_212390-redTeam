@@ -563,6 +563,17 @@ public abstract class GenericRepRap implements CartesianPrinter
 		currentZ = z;
 	}
 	
+	public void singleMove(double x, double y, double z, double feedrate)
+	{
+		try
+		{
+			moveTo(x, y, z, feedrate, false, false);
+		} catch (Exception e)
+		{
+			System.err.println(e.toString());
+		}
+	}
+	
 	
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#printTo(double, double, double)

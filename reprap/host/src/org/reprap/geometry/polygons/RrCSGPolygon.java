@@ -861,6 +861,8 @@ public class RrCSGPolygon
     		now = next;
     	} while (c != this);
     	
+    	//result = result.simplify(Preferences.gridRes());
+    	
     	return result;
     }
     

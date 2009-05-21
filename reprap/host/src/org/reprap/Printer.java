@@ -43,6 +43,15 @@ public interface Printer {
 	public void moveTo(double x, double y, double z, double feedrate, boolean startUp, boolean endUp) throws ReprapException, IOException;
 	
 	/**
+	 * Single move for when we're moving about giong places rather than making
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param feedrate
+	 */
+	public void singleMove(double x, double y, double z, double feedrate);
+	
+	/**
 	 * Move the printer carriage to the give x, y and z position <b>while extruding material<b>
 	 * 
 	 * @param x absolute x position in millimeters relative to the home position. 
