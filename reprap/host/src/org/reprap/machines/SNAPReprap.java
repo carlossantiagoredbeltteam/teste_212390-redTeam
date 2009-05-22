@@ -135,7 +135,7 @@ public class SNAPReprap extends GenericRepRap
 		
 		if (isCancelled()) return;
 		
-		setFeedrate(feedrate);
+		currentFeedrate = feedrate;
 		
 		int stepperX = convertToStepX(x);
 		int stepperY = convertToStepY(y);
@@ -214,7 +214,7 @@ public class SNAPReprap extends GenericRepRap
 		EnsureHot();
 		if (isCancelled()) return;
 		
-		setFeedrate(feedrate);
+		currentFeedrate = feedrate;
 		
 		maybeReZero();
 
@@ -413,7 +413,7 @@ public class SNAPReprap extends GenericRepRap
 		Debug.d("Returning to previous position");
 		moveTo(x, y, currentZ, currentFeedrate, true, false);
 		
-		setFeedrate(oldFeedrate);
+		currentFeedrate = oldFeedrate;
 		
 		//if (previewer != null) previewer.
 		setMessage(null);

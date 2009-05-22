@@ -644,7 +644,8 @@ public abstract class GenericRepRap implements CartesianPrinter
 			moveTo(currentX, currentY, liftedZ, getFastFeedrateZ(), false, false);
 		}
 
-		setFeedrate(oldFeedrate);
+		moveTo(currentX, currentY, currentZ, oldFeedrate, false, false);
+		//setFeedrate(oldFeedrate);
 		printStartDelay(false);		
 	}
 	
@@ -672,10 +673,10 @@ public abstract class GenericRepRap implements CartesianPrinter
 //		this.previewer = previewer;
 //	}
 	
-	public void setFeedrate(double feedrate)
-	{
-		currentFeedrate = feedrate;
-	}
+//	public void setFeedrate(double feedrate)
+//	{
+//		currentFeedrate = feedrate;
+//	}
 		
 	public double getFeedrate()
 	{
@@ -766,7 +767,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		if(coolTime > 0 && !lc.notStartedYet()) {
 			getExtruder().setCooler(true);
 			Debug.d("Start of cooling period");
-			setFeedrate(getFastFeedrateXY());
+			//setFeedrate(getFastFeedrateXY());
 			
 			// Go home. Seek (0,0) then callibrate X first
 			homeToZeroX();
@@ -866,7 +867,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 			moveTo(datumX, datumY + strokeY, currentZ, currentFeedrate, false, false);
 		}
 		
-		setFeedrate(getFastFeedrateXY());
+		//setFeedrate(getFastFeedrateXY());
 
 	}
 
