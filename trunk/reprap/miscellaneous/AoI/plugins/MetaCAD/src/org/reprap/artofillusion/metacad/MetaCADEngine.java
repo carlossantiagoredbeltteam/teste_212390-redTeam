@@ -64,29 +64,15 @@ public class MetaCADEngine
   }
 
   public boolean readParameters() {
-    this.context.jep = new JEP();
-    this.context.jep.addStandardConstants();
-    this.context.jep.addStandardFunctions();
- 
     try {
-      List<ParsedStatement> statements = 
-        MetaCADParser.parseParameters(getParameters());
-      for (int i = 0; i < statements.size(); i++)
-      {
-        boolean success = statements.get(i).execute(this.context);
-        if (!success)
-        {
-          showMessage("Error in statement: " + statements.get(i).toString());
-          return false;
-        }
-      }
-    } catch (ParseException e) {
+      this.context.evaluateParameters(getParameters());
+      return true;
+    } catch (Exception e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
       showMessage(e.getMessage());
       return false;
     }
-    return true;
   }
 
   /**

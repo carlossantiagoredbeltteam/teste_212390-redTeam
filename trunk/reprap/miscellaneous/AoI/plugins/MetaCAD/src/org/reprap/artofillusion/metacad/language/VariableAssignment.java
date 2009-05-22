@@ -19,9 +19,7 @@ public class VariableAssignment implements ParsedStatement {
 
   public boolean execute(MetaCADContext context) {
     try {
-      context.jep.parseExpression(this.formula);
-      double value = context.jep.getValue();
-      context.jep.addVariable(this.name, value);
+      context.evaluateAssignment(this.name, this.formula);
     } catch (Exception ex) {
       return false;
     }

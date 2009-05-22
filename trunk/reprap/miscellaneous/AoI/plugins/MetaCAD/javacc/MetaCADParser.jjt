@@ -125,7 +125,7 @@ TOKEN : /* BINARY OPS */
 |   < GTE: ">=" >
 |   < EQUALS: "==">
 |   < NEQUALS: "!=">
-|	< OTHERBINOP: ["*","^", "<", ">"] >
+|	< OTHERBINOP: ["*","^", "<", ">", "?", ":", "."] >
 }
 
 TOKEN : /* IDENTIFIERS */
@@ -283,7 +283,23 @@ String Expression() :
 	UnaryExpression()((<PLUS>|<MINUS>|<DIVIDE>|<ASSIGN>|<LTE>|<GTE>|<EQUALS>|<NEQUALS>|<OTHERBINOP>)UnaryExpression())*
 	{
 		return dumpTokens(jjtThis);
+	}	
+}
+
+VariableAssignment LocalVariableAssignment() :
+{
+	String name;
+	String formula;
+	Token temp;
+}
+{
+	temp=<IDENTIFIER>{name=temp.image;}
+	<ASSIGN>
+	formula=Expression()
+	{
+		return new VariableAssignment(name, formula);
 	}
+	";"
 }
 
 VariableAssignment VariableAssignment() :
