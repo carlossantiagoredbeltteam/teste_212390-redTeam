@@ -842,14 +842,23 @@ public class RrPolygon
 				double va = speed(ia);
 				double vb = speed(ib);
 				
-				VelocityProfile vp = new VelocityProfile(s, va, vb, maxSpeed, acceleration);
-				if(vp.flat())
+				VelocityProfile vp = new VelocityProfile(s, va, maxSpeed, vb, acceleration);
+				switch(vp.flat())
 				{
-					add(i, Rr2Point.add(a, Rr2Point.mul(ab, vp.s2()/s)), maxSpeed);
-					add(i, Rr2Point.add(a, Rr2Point.mul(ab, vp.s1()/s)), maxSpeed);				
-				} else
-				{
+				case 0:
+					break;
+					
+				case 1:
 					add(i, Rr2Point.add(a, Rr2Point.mul(ab, vp.s1()/s)), vp.v());
+					break;
+					
+				case 2:
+					add(i, Rr2Point.add(a, Rr2Point.mul(ab, vp.s2()/s)), maxSpeed);
+					add(i, Rr2Point.add(a, Rr2Point.mul(ab, vp.s1()/s)), maxSpeed);	
+					break;
+					
+				default:
+					System.err.println("RrPolygon.setSpeeds(): dud VelocityProfile flat value.");	
 				}
 			} 
 		}

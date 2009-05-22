@@ -193,15 +193,15 @@ public class GCodeStepperMotor extends GenericStepperMotor {
 			switch(mid)
 			{
 			case 1:
-				printer.setFeedrate(printer.getFastFeedrateXY());
+				//printer.setFeedrate(printer.getFastFeedrateXY());
 				x = (double)position/printer.getXStepsPerMM();
 				break;
 			case 2:
-				printer.setFeedrate(printer.getFastFeedrateXY());
+				//printer.setFeedrate(printer.getFastFeedrateXY());
 				y = (double)position/printer.getYStepsPerMM();
 				break;
 			case 3:
-				printer.setFeedrate(printer.getFastFeedrateZ());
+				//printer.setFeedrate(printer.getFastFeedrateZ());
 				z = (double)position/printer.getZStepsPerMM();
 				break;
 			default:

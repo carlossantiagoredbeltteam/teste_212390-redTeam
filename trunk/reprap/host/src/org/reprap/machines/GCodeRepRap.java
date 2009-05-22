@@ -267,17 +267,30 @@ public class GCodeRepRap extends GenericRepRap {
 			{
 				double s = Math.sqrt(dx*dx + dy*dy);
 
-				VelocityProfile vp = new VelocityProfile(s, slowFeedrateXY, slowFeedrateXY, feedrate, maxAcceleration);
-				moveTo(x0, y0, z0, slowFeedrateXY, false, false);
-				if(vp.flat())
+				VelocityProfile vp = new VelocityProfile(s, slowFeedrateXY, feedrate, slowFeedrateXY, maxAcceleration);
+				switch(vp.flat())
 				{
+				case 0:
+					qFeedrate(feedrate);
+					moveTo(x, y, z0, feedrate, false, false);
+					break;
+					
+				case 1:
+					qFeedrate(slowFeedrateXY);
+					moveTo(x0 + dx*vp.s1()/s, y0 + dy*vp.s1()/s, z0, vp.v(), false, false);
+					moveTo(x, y, z0, slowFeedrateXY, false, false);
+					break;
+					
+				case 2:
+					qFeedrate(slowFeedrateXY);
 					moveTo(x0 + dx*vp.s1()/s, y0 + dy*vp.s1()/s, z0, feedrate, false, false);
 					moveTo(x0 + dx*vp.s2()/s, y0 + dy*vp.s2()/s, z0, feedrate, false, false);
-				} else
-				{
-					moveTo(x0 + dx*vp.s1()/s, y0 + dy*vp.s1()/s, z0, vp.v(), false, false);
+					moveTo(x, y, z0, slowFeedrateXY, false, false);
+					break;
+					
+				default:
+					System.err.println("GCodeRepRap.singleMove(): dud VelocityProfile flat value.");	
 				}
-				moveTo(x, y, z0, slowFeedrateXY, false, false);
 			}
 
 			if(zMove)
@@ -350,16 +363,18 @@ public class GCodeRepRap extends GenericRepRap {
 		
 		// Set absolute positioning, which is what we use.
 		gcode.queue("G90 ;absolute positioning");
+		
+		currentX = 0;
+		currentY = 0;
+		currentZ = 0;
+		currentFeedrate = -100; // Force it to set the feedrate at the start
 				
 		try	{
 			super.startRun();
 		} catch (Exception E) {
 			Debug.d("Initialization error: " + E.toString());
 		}
-		currentX = 0;
-		currentY = 0;
-		currentZ = 0;
-		currentFeedrate = -100; // Force it to set the feedrate at the start
+
 	}
 
 	/* (non-Javadoc)
@@ -375,31 +390,31 @@ public class GCodeRepRap extends GenericRepRap {
 	public void home() {
 
 		// Assume the extruder is off...
-		
 		try
 		{
-			singleMove(-250, -250, currentZ, fastFeedrateXY);
-			singleMove(currentX, currentY, -250, getMaxFeedrateZ());
+			homeToZeroX();
+			homeToZeroY();
+			homeToZeroZ();
 		} catch (Exception e)
-		{}
-		
-		String setHome = "G92 X0 Y0 Z0";
+		{
+			
+		}
+
 		if(extruders[extruder].get4D())
-			setHome += " E0";
-		setHome += "; set current position as home";
-		gcode.queue(setHome);
+			gcode.queue("G92 E0; set extruder home");
+
 		super.home();
 	}
 	
 	private void delay(long millis)
 	{
-		double extrudeLength = getExtruder().getDistance(millis);
+		double extrudeLength = getExtruder().getDistanceFromTime(millis);
 		if(extrudeLength > 0)
 		{
 			if(extruders[extruder].get4D())
 			{
 				qFeedrate(fastFeedrateXY);
-				extrudeLength = getExtruder().getDistance(millis); // Fix the value for possible feedrate change
+				extrudeLength = getExtruder().getDistanceFromTime(millis); // Fix the value for possible feedrate change
 			}
 			if(extruders[extruder].getReversing())
 				extruders[extruder].getExtrudedLength().add(-extrudeLength);
@@ -424,7 +439,7 @@ public class GCodeRepRap extends GenericRepRap {
 		// Assume extruder is off...
 		try
 		{
-			singleMove(-250, currentY, currentZ, slowFeedrateXY);
+			singleMove(-250, currentY, currentZ, fastFeedrateXY);
 		} catch (Exception e)
 		{}
 		gcode.queue("G92 X0 ;set x 0");
@@ -440,7 +455,7 @@ public class GCodeRepRap extends GenericRepRap {
 		
 		try
 		{
-			singleMove(currentX, -250, currentZ, slowFeedrateXY);
+			singleMove(currentX, -250, currentZ, fastFeedrateXY);
 		} catch (Exception e)
 		{}
 		gcode.queue("G92 Y0 ;set y 0");

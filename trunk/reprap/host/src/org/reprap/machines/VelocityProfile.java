@@ -13,10 +13,16 @@ package org.reprap.machines;
 public class VelocityProfile 
 {
 	private double v, s1, s2;
-	private boolean flat;
+	private int flat;
 	
-	public VelocityProfile(double s, double vStart, double vEnd, double maxSpeed, double acceleration)
+	public VelocityProfile(double s, double vStart, double maxSpeed, double vEnd, double acceleration)
 	{
+		if(maxSpeed <= vStart && maxSpeed <= vEnd)
+		{
+			flat = 0;
+			return;
+		}
+		
 		s1 = (2*acceleration*s - vStart*vStart + vEnd*vEnd)/(4*acceleration);
 		v = Math.sqrt(2*acceleration*s1 + vStart*vStart);
 		double f = s1/s;
@@ -25,7 +31,7 @@ public class VelocityProfile
 			System.err.println("VelocityProfile - sm/s: " + f);
 		} 
 		if(v <= maxSpeed)
-			flat = false;
+			flat = 1;
 		else
 		{
 			s2 = s1 + 0.5*(v*v - vEnd*vEnd)/acceleration;
@@ -40,12 +46,12 @@ public class VelocityProfile
 			{
 				System.err.println("VelocityProfile - s1/s: " + f);
 			}
-			flat = true;
+			flat = 2;
 		}
 	}
 
 	public double v() { return v; }
 	public double s1() { return s1; }
 	public double s2() { return s2; }
-	public boolean flat() { return flat; }
+	public int flat() { return flat; }
 }
