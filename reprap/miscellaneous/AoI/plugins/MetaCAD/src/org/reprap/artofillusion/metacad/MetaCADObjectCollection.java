@@ -76,11 +76,11 @@ public class MetaCADObjectCollection extends ObjectCollection
         Constructor con = cls.getConstructor(DataInputStream.class, Scene.class);
         objInfo.setObject((Object3D) con.newInstance(in, theScene));
         
-        if  (getTexture() !=  null && objInfo.getObject().getTexture() == null)
+        if  ((getTexture() !=  null) && (objInfo.getObject().getTexture() == null || objInfo.getObject().getTextureMapping() == null))
         {
           objInfo.getObject().setTexture(getTexture(), getTextureMapping());
         }
-        if (getMaterial() != null && objInfo.getObject().getMaterial() == null)
+        if ((getMaterial() != null) && (objInfo.getObject().getMaterial() == null || objInfo.getObject().getMaterialMapping() == null))
         {
           objInfo.getObject().setMaterial(getMaterial(), getMaterialMapping());
         }
@@ -138,7 +138,7 @@ public class MetaCADObjectCollection extends ObjectCollection
         Texture existingTex = info.object.getTexture();
         TextureMapping existingMap = info.object.getTextureMapping();
         
-        if (existingTex == null) {
+        if (existingTex == null || existingMap == null) {
           info.object.setTexture(tex, map);
         }
         

@@ -2,14 +2,11 @@
 package org.reprap.artofillusion.metacad.parser;
 
 
+import org.reprap.artofillusion.metacad.ParsedTree;
+import org.reprap.artofillusion.metacad.language.*;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.reprap.artofillusion.metacad.ParsedTree;
-import org.reprap.artofillusion.metacad.language.MacroPrototype;
-import org.reprap.artofillusion.metacad.language.ParsedStatement;
-import org.reprap.artofillusion.metacad.language.VariableAssignment;
 
 
 /** Simple brace matcher. */
@@ -480,6 +477,44 @@ public class MetaCADParser/*@bgen(jjtree)*/implements MetaCADParserTreeConstants
           jjtc000 = false;
           jjtn000.jjtSetLastToken(getToken(0));
                 {if (true) return dumpTokens(jjtn000);}
+    } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            {if (true) throw (RuntimeException)jjte000;}
+          }
+          if (jjte000 instanceof ParseException) {
+            {if (true) throw (ParseException)jjte000;}
+          }
+          {if (true) throw (Error)jjte000;}
+    } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+            jjtn000.jjtSetLastToken(getToken(0));
+          }
+    }
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public VariableAssignment LocalVariableAssignment() throws ParseException {
+ /*@bgen(jjtree) LocalVariableAssignment */
+        SimpleNode jjtn000 = new SimpleNode(JJTLOCALVARIABLEASSIGNMENT);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+        jjtn000.jjtSetFirstToken(getToken(1));String name;
+        String formula;
+        Token temp;
+    try {
+      temp = jj_consume_token(IDENTIFIER);
+                          name=temp.image;
+      jj_consume_token(ASSIGN);
+      formula = Expression();
+                {if (true) return new VariableAssignment(name, formula);}
+      jj_consume_token(30);
     } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -984,6 +1019,26 @@ public class MetaCADParser/*@bgen(jjtree)*/implements MetaCADParserTreeConstants
     return false;
   }
 
+  static private boolean jj_3_37() {
+    if (jj_3R_15()) return true;
+    return false;
+  }
+
+  static private boolean jj_3_36() {
+    if (jj_3R_14()) return true;
+    return false;
+  }
+
+  static private boolean jj_3_35() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_36()) {
+    jj_scanpos = xsp;
+    if (jj_3_37()) return true;
+    }
+    return false;
+  }
+
   static private boolean jj_3_1() {
     if (jj_scan_token(30)) return true;
     return false;
@@ -1014,13 +1069,24 @@ public class MetaCADParser/*@bgen(jjtree)*/implements MetaCADParserTreeConstants
     return false;
   }
 
-  static private boolean jj_3_8() {
-    if (jj_scan_token(PLUS)) return true;
+  static private boolean jj_3_33() {
+    if (jj_scan_token(COMMA)) return true;
+    if (jj_scan_token(IDENTIFIER)) return true;
     return false;
   }
 
-  static private boolean jj_3_37() {
-    if (jj_3R_15()) return true;
+  static private boolean jj_3_34() {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3_33()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  static private boolean jj_3_8() {
+    if (jj_scan_token(PLUS)) return true;
     return false;
   }
 
@@ -1045,18 +1111,13 @@ public class MetaCADParser/*@bgen(jjtree)*/implements MetaCADParserTreeConstants
     return false;
   }
 
-  static private boolean jj_3_36() {
-    if (jj_3R_14()) return true;
-    return false;
-  }
-
-  static private boolean jj_3_35() {
+  static private boolean jj_3R_14() {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    if (jj_scan_token(LPAREN)) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_36()) {
-    jj_scanpos = xsp;
-    if (jj_3_37()) return true;
-    }
+    if (jj_3_34()) jj_scanpos = xsp;
+    if (jj_scan_token(RPAREN)) return true;
     return false;
   }
 
@@ -1083,24 +1144,8 @@ public class MetaCADParser/*@bgen(jjtree)*/implements MetaCADParserTreeConstants
     return false;
   }
 
-  static private boolean jj_3_33() {
-    if (jj_scan_token(COMMA)) return true;
-    if (jj_scan_token(IDENTIFIER)) return true;
-    return false;
-  }
-
   static private boolean jj_3_11() {
     if (jj_3R_10()) return true;
-    return false;
-  }
-
-  static private boolean jj_3_34() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3_33()) { jj_scanpos = xsp; break; }
-    }
     return false;
   }
 
@@ -1125,13 +1170,10 @@ public class MetaCADParser/*@bgen(jjtree)*/implements MetaCADParserTreeConstants
     return false;
   }
 
-  static private boolean jj_3R_14() {
+  static private boolean jj_3R_15() {
     if (jj_scan_token(IDENTIFIER)) return true;
-    if (jj_scan_token(LPAREN)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_34()) jj_scanpos = xsp;
-    if (jj_scan_token(RPAREN)) return true;
+    if (jj_scan_token(ASSIGN)) return true;
+    if (jj_3R_11()) return true;
     return false;
   }
 
@@ -1210,13 +1252,6 @@ public class MetaCADParser/*@bgen(jjtree)*/implements MetaCADParserTreeConstants
 
   static private boolean jj_3_4() {
     if (jj_3R_8()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_15() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    if (jj_scan_token(ASSIGN)) return true;
-    if (jj_3R_11()) return true;
     return false;
   }
 

@@ -11,9 +11,10 @@ public interface MetaCADParserTreeConstants
   public int JJTJEPFUNCTIONCALL = 5;
   public int JJTUNARYEXPRESSION = 6;
   public int JJTEXPRESSION = 7;
-  public int JJTVARIABLEASSIGNMENT = 8;
-  public int JJTMACROPROTOTYPE = 9;
-  public int JJTPARSEDSTATEMENTLIST = 10;
+  public int JJTLOCALVARIABLEASSIGNMENT = 8;
+  public int JJTVARIABLEASSIGNMENT = 9;
+  public int JJTMACROPROTOTYPE = 10;
+  public int JJTPARSEDSTATEMENTLIST = 11;
 
 
   public String[] jjtNodeName = {
@@ -25,9 +26,10 @@ public interface MetaCADParserTreeConstants
     "JEPFunctionCall",
     "UnaryExpression",
     "Expression",
+    "LocalVariableAssignment",
     "VariableAssignment",
     "MacroPrototype",
     "ParsedStatementList",
   };
 }
-/* JavaCC - OriginalChecksum=5fb6a3409133ba7ae09e90a0356ba12c (do not edit this line) */
+/* JavaCC - OriginalChecksum=266f8382a774f796913e835ddf402e00 (do not edit this line) */
