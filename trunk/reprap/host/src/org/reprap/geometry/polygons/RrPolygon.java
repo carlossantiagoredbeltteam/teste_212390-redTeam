@@ -516,11 +516,11 @@ public class RrPolygon
 	 * @param distance to backtrack
 	 * @return index of the inserted point
 	 */
-	public int backStep(double d, boolean outline)
+	public int backStep(double d)
 	{
 		Rr2Point last, p;
 		int start = size() - 1;
-		if(outline)
+		if(isClosed())
 			last = point(0);
 		else
 		{
@@ -553,6 +553,43 @@ public class RrPolygon
 				return(j);
 			}
 			last = p;
+		}
+		return 0;
+	}
+	
+	/**
+	 * Search back from the end of the polygon to find the vertex nearest to d back from the end
+	 * @param d
+	 * @return the index of the nearest vertex
+	 */
+	public int findBackPoint(double d)
+	{
+		Rr2Point last, p;
+		int start = size() - 1;
+		if(isClosed())
+			last = point(0);
+		else
+		{
+			last = point(start);
+			start--;
+		}
+		double sum = 0;
+		double lastSum = 0;
+		int lasti = 0;
+		for(int i = start; i >= 0; i--)
+		{
+			p = point(i);
+			sum += Rr2Point.d(p, last);
+			if(sum > d)
+			{
+				if(sum - d < d - lastSum)
+					return i;
+				else
+					return lasti;
+			}
+			last = p;
+			lastSum = sum;
+			lasti = i;
 		}
 		return 0;
 	}

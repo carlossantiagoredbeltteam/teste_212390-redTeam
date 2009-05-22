@@ -739,7 +739,7 @@ public class LayerProducer {
 	 * @throws ReprapException
 	 * @return
 	 */
-	private void plot(RrPolygon p, boolean outline, boolean firstOneInLayer) throws ReprapException, IOException
+	private void plot(RrPolygon p, boolean firstOneInLayer) throws ReprapException, IOException
 	{
 		Attributes att = p.getAttributes();
 		Printer printer = layerConditions.getPrinter();
@@ -785,27 +785,31 @@ public class LayerProducer {
 		printer.selectExtruder(att);
 		
 		// Warning: if incrementedStart is activated, this will override the randomStart
-		if(outline && printer.getExtruder().incrementedStart())
+//		if(outline && printer.getExtruder().incrementedStart())
+//			p = p.incrementedStart(layerConditions);
+//		else if(outline && printer.getExtruder().randomStart())
+//			p = p.randomStart();
+		if(p.isClosed() && printer.getExtruder().incrementedStart())
 			p = p.incrementedStart(layerConditions);
-		else if(outline && printer.getExtruder().randomStart())
+		else if(p.isClosed() && printer.getExtruder().randomStart())
 			p = p.randomStart();
 		
-		int stopExtruding = p.size() + 10;
-		int stopValve = stopExtruding;
+		int stopExtruding;
+		int stopValve;
 		double extrudeBackLength = printer.getExtruder().getExtrusionOverRun();
 		double valveBackLength = printer.getExtruder().getValveOverRun();
 		if(extrudeBackLength >= valveBackLength)
 		{
 			if(extrudeBackLength > 0)
-				stopExtruding = p.backStep(extrudeBackLength, outline);
+				stopExtruding = p.backStep(extrudeBackLength);
 			if(valveBackLength > 0)
-				stopValve = p.backStep(valveBackLength, outline);
+				stopValve = p.backStep(valveBackLength);
 		} else
 		{
 			if(valveBackLength > 0)
-				stopValve = p.backStep(valveBackLength, outline);
+				stopValve = p.backStep(valveBackLength);
 			if(extrudeBackLength > 0)
-				stopExtruding = p.backStep(extrudeBackLength, outline);			
+				stopExtruding = p.backStep(extrudeBackLength);			
 		}
 		
 		if (printer.isCancelled()) return;
@@ -818,6 +822,16 @@ public class LayerProducer {
 			p.setSpeeds(printer.getSlowFeedrateXY(), p.isClosed()?outlineFeedrate:infillFeedrate, 
 					printer.getMaxAcceleration());
 		
+		if(extrudeBackLength <= 0)
+			stopExtruding = p.size() + 10;
+		else
+			stopExtruding = p.findBackPoint(extrudeBackLength);
+		
+		if(valveBackLength <= 0)
+			stopValve = p.size() + 10;
+		else
+			stopValve = p.findBackPoint(valveBackLength);
+		
 		//printer.setFeedrate(printer.getFastFeedrateXY());
 
 		currentFeedrate = printer.getFastFeedrateXY();
@@ -828,7 +842,7 @@ public class LayerProducer {
 			currentFeedrate = p.speed(0);
 		else
 		{
-			if(outline)
+			if(p.isClosed())
 			{
 				//printer.setFeedrate(outlineFeedrate);
 				currentFeedrate = outlineFeedrate;			
@@ -845,25 +859,25 @@ public class LayerProducer {
 		// Print any lead-in.
 		printer.printStartDelay(firstOneInLayer);
 		
-		if(acc)
-			currentFeedrate = p.speed(0);
-		else
-		{
-			if(outline)
-			{
-				//printer.setFeedrate(outlineFeedrate);
-				currentFeedrate = outlineFeedrate;			
-			} else
-			{
-				//printer.setFeedrate(infillFeedrate);
-				currentFeedrate = infillFeedrate;			
-			}
-		}
+//		if(acc)
+//			currentFeedrate = p.speed(0);
+//		else
+//		{
+//			if(outline)
+//			{
+//				//printer.setFeedrate(outlineFeedrate);
+//				currentFeedrate = outlineFeedrate;			
+//			} else
+//			{
+//				//printer.setFeedrate(infillFeedrate);
+//				currentFeedrate = infillFeedrate;			
+//			}
+//		}
 
 		//printer.getExtruder().setMotor(true);
-		plot(p.point(0), p.point(1), false, false);
+//		plot(p.point(0), p.point(1), false, false);
 		
-		if(outline)
+		if(p.isClosed())
 		{
 			for(int j = 1; j <= p.size(); j++)
 			{
@@ -921,7 +935,7 @@ public class LayerProducer {
 		move(posNow(), posNow(), lift, lift, true);
 		
 		// The last point is near where we want to start next
-		if(outline)
+		if(p.isClosed())
 			startNearHere = p.point(0);	
 		else
 			startNearHere = p.point(p.size() - 1);
@@ -930,7 +944,7 @@ public class LayerProducer {
 	
 
 
-	private int plotOneMaterial(RrPolygonList polygons, int i, boolean outline, boolean firstOneInLayer)
+	private int plotOneMaterial(RrPolygonList polygons, int i, boolean firstOneInLayer)
 		throws ReprapException, IOException
 	{
 		String material = polygons.polygon(i).getAttributes().getMaterial();
@@ -939,7 +953,7 @@ public class LayerProducer {
 		{
 			if (layerConditions.getPrinter().isCancelled())
 				return i;
-			plot(polygons.polygon(i), outline, firstOneInLayer);
+			plot(polygons.polygon(i), firstOneInLayer);
 			firstOneInLayer = false;
 			i++;
 		}
@@ -1009,7 +1023,7 @@ public class LayerProducer {
 			{
 				if (printer.isCancelled())
 					break;
-				plot(borderPolygons.polygon(jb), true, firstOneInLayer);
+				plot(borderPolygons.polygon(jb), firstOneInLayer);
 				firstOneInLayer = false;
 			}
 			ib = commonBorder;
@@ -1018,17 +1032,17 @@ public class LayerProducer {
 			{
 				if (printer.isCancelled())
 					break;
-				plot(hatchedPolygons.polygon(jh), false, firstOneInLayer);
+				plot(hatchedPolygons.polygon(jh), firstOneInLayer);
 				firstOneInLayer = false;
 			}
 			ih = commonHatch;
 
 			firstOneInLayer = true;
 			borderPolygons = borderPolygons.nearEnds(startNearHere);
-			ib = plotOneMaterial(borderPolygons, ib, true, firstOneInLayer);
+			ib = plotOneMaterial(borderPolygons, ib, firstOneInLayer);
 			firstOneInLayer = false;
 			hatchedPolygons = hatchedPolygons.nearEnds(startNearHere);
-			ih = plotOneMaterial(hatchedPolygons, ih, false, firstOneInLayer);	
+			ih = plotOneMaterial(hatchedPolygons, ih, firstOneInLayer);	
 		}
 
 		firstOneInLayer = true; // Not sure about this - AB
@@ -1039,7 +1053,7 @@ public class LayerProducer {
 			{
 				if (printer.isCancelled())
 					break;
-				plot(borderPolygons.polygon(jb), true, firstOneInLayer);
+				plot(borderPolygons.polygon(jb), firstOneInLayer);
 				firstOneInLayer = false;
 			}
 		}
@@ -1050,7 +1064,7 @@ public class LayerProducer {
 			{
 				if (printer.isCancelled())
 					break;
-				plot(hatchedPolygons.polygon(jh), false, firstOneInLayer);
+				plot(hatchedPolygons.polygon(jh), firstOneInLayer);
 				firstOneInLayer = false;
 			}
 		}
