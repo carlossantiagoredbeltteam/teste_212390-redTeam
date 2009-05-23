@@ -25,8 +25,9 @@ class OpticalInterrupt : public Device,
                          public PeriodicCallback
 {
     int _inputPin;
+    bool _inverted;
 public:
-    OpticalInterrupt(int pin);
+    OpticalInterrupt(int pin, bool inverted = false);
     virtual void service();
 };
 

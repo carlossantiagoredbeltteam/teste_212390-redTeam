@@ -21,8 +21,6 @@ HeaterDevice::HeaterDevice(int8_t heaterPin)
 void HeaterDevice::set(int8_t value)
 {
     _value = value;
-    Serial.print("Heating to");
-    Serial.println(value, DEC);
     analogWrite(_heaterPin, value);
 }
 

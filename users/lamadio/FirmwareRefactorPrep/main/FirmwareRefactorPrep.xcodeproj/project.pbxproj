@@ -68,6 +68,7 @@
 		DE70696F0F925CAD007572B9 /* ThermisterDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ThermisterDevice.cpp; sourceTree = "<group>"; };
 		DE7069700F925CAD007572B9 /* ThermisterDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ThermisterDevice.h; sourceTree = "<group>"; };
 		DE706A0A0F92F320007572B9 /* test.gcode */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test.gcode; sourceTree = "<group>"; };
+		DE706B820F9314B3007572B9 /* main.pde */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; path = main.pde; sourceTree = "<group>"; };
 		DEA4F70F0EAA594900AE4546 /* Observable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Observable.h; sourceTree = "<group>"; };
 		DEA4F7100EAA594900AE4546 /* Observable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Observable.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -96,6 +97,7 @@
 		08FB7795FE84155DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				DE706B820F9314B3007572B9 /* main.pde */,
 				DE706A0A0F92F320007572B9 /* test.gcode */,
 				DE70695D0F925CAD007572B9 /* CartesianDevice.cpp */,
 				DE70695E0F925CAD007572B9 /* CartesianDevice.h */,

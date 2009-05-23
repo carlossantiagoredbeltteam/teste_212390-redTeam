@@ -61,58 +61,48 @@ void CartesianDevice::moveTo(float newX, float newY, float newZ)
         absDeltaY == 0.0f &&
         absDeltaZ == 0.0f)
     {
-        notify(CartesianDevice_MovingToNewPosition, this);
-        notify(CartesianDevice_ReachedNewPosition, this);
+        notifyObservers(CartesianDevice_MovingToNewPosition, this);
+        notifyObservers(CartesianDevice_ReachedNewPosition, this);
         return;
     }
     
     float distance = sqrt(absDeltaX * absDeltaX +
-                          absDeltaY * absDeltaY + 
-                          absDeltaZ * absDeltaZ);
+                          absDeltaY * absDeltaY);
                           
                     
     if (absDeltaX > 0.0f)
     {      
-        _x.setTempRate(absDeltaX / distance);
+//        _x.setTempRate(absDeltaX / distance);
         _x.moveTo(newX);
+        Serial.print("moving x - ");
+        Serial.println((int)newX);
         _xInMotion = true;
     }
     
     if (absDeltaY > 0.0f)
     {
-        _y.setTempRate(absDeltaY / distance);
+//        _y.setTempRate(absDeltaY / distance);
         _y.moveTo(newY);
+        Serial.print("moving y -");
+        Serial.println((int)newY);
         _yInMotion = true;
     }
     
     if (absDeltaZ > 0.0f)
     {
-        _z.setTempRate(absDeltaZ / distance);
         _z.moveTo(newZ);
         _zInMotion = true;
     }
     
     if (axesInMotion())
-        notify(CartesianDevice_MovingToNewPosition, this);
+        notifyObservers(CartesianDevice_MovingToNewPosition, this);
 }
 
 void CartesianDevice::moveHome()
 {
-    if (_x.currentPosition() > 0.0f)
-    {
-        _xInMotion = true;
-        _x.moveHome();
-    }
-    if (_y.currentPosition() > 0.0f)
-    {
-        _yInMotion = true;
-        _y.moveHome();
-    }
-    if (_z.currentPosition() > 0.0f)
-    {
-        _zInMotion = true;
-        _z.moveHome();
-    }
+    _x.moveHome();
+    _y.moveHome();
+//    _z.moveHome();
 }
 
 void CartesianDevice::notify(uint32_t eventId, void* context)
@@ -122,14 +112,31 @@ void CartesianDevice::notify(uint32_t eventId, void* context)
         case LinearActuator_Homed:
         {
             if (((LinearActuator*)context) == &_x)
+            {
+                Serial.println("X Homed");
                 _xInMotion = false;
+            }
+            
             if (((LinearActuator*)context) == &_y)
+            {
+                Serial.println("Y Homed");
                 _yInMotion = false;
+            }
+            
             if (((LinearActuator*)context) == &_z)
+            {
+                Serial.println("Z Homed");
                 _zInMotion = false;
+            }
                 
-            if (!axesInMotion())
-                notify(CartesianDevice_Homed, this);
+            if (axesInMotion())
+            {
+                Serial.println("Waiting on axis homing");
+            }
+            else
+            {
+                notifyObservers(CartesianDevice_Homed, this);
+            }
         }
         
         case LinearActuator_CompletedMove:
@@ -142,12 +149,15 @@ void CartesianDevice::notify(uint32_t eventId, void* context)
                 _zInMotion = false;
 
             if (!axesInMotion())
-                notify(CartesianDevice_ReachedNewPosition, this);
+                notifyObservers(CartesianDevice_ReachedNewPosition, this);
         }
         
         case LinearActuator_Extent:
         {
-            notify(CartesianDevice_PositionError, this);
+            _x.stop();
+            _y.stop();
+            _z.stop();
+            notifyObservers(CartesianDevice_PositionError, this);
         }
     }
 }

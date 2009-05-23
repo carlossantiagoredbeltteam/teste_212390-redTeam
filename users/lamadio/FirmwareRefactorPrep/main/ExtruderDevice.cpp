@@ -83,8 +83,6 @@ void ExtruderDevice::notify(uint32_t eventId, void* context)
         case ThermisterEvent_Change:
         {
             int16_t currentTemp = ((ThermisterDevice*)context)->temp();
-            Serial.print("Temp Change: now - ");
-            Serial.println(currentTemp, DEC);
             if (currentTemp < _extrusionTemp - TEMP_RANGE)
             {
                 notifyObservers(ExtruderDevice_OutOfTemp, this);

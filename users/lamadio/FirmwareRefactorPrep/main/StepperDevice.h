@@ -25,20 +25,26 @@ class StepperDevice : public EventLoopTimer,
 {
     int8_t _stepPin;
     int8_t _dirPin;
+	int8_t _enablePin;
     bool _forward;
+    bool _inverted;
     int _currentTick;
     int _targetTick;
     int _ticksPerRev;
     milliclock_t _maxRate;
+    bool _running;
 public:
-    StepperDevice(int8_t stepPin, int8_t dirPin, int ticksPerRev, milliclock_t rate);
+    StepperDevice(int8_t stepPin, int8_t dirPin, int8_t enablePin, int ticksPerRev, milliclock_t rate, bool inverted = false);
     
     void goForward();
     void goBackward();
+    inline bool running() { return _running; }
+    inline bool goingForward() { return _forward; }
     void turn(float numberOfRevolutions = 0.0f);
     void start();
     void stop();
     void pause();
+	void enable(bool enable);
     void setTempRate(float rate);
     virtual void fire();
 };

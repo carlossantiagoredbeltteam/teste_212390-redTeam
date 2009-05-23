@@ -23,42 +23,8 @@
 #include "CartesianDevice.h"
 #include "GCodeBehavior.h"
 
-FakeBot::FakeBot()
-: EventLoopTimer(300.0f)
-, _x(0.0f)
-, _y(0.0f)
-, _z(0.0f)
-{
-    
-}
 
-void FakeBot::moveTo(float newX, float newY, float newZ)
-{
-    start();
-}
-
-void FakeBot::pause()
-{
-    EventLoop::current()->removeTimer(this);
-}
-
-void FakeBot::start()
-{
-    EventLoop::current()->addTimer(this);
-}
-
-void FakeBot::moveHome()
-{
-    start();
-}
-
-void FakeBot::fire()
-{
-    notifyObservers(CartesianDevice_ReachedNewPosition, this);
-}
-
-
-GCodeBehavior::GCodeBehavior(ExtruderDevice& extruder, FakeBot& bot) // CartesianDevice& bot)
+GCodeBehavior::GCodeBehavior(ExtruderDevice& extruder, CartesianDevice& bot)
 : _extruder(extruder)
 , _bot(bot)
 , _commandState(GCodeState_Idle)

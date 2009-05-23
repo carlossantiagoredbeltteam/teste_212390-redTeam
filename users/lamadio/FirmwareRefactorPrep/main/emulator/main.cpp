@@ -41,29 +41,28 @@ int main()
 	EventLoop::current()->addPeriodicCallback(&hb);
 	
     // XAxis
-	StepperDevice xAxisStepper(2, 3, 300, 1000);
+	StepperDevice xAxisStepper(2, 3, 4, 300, 1000);
 	OpticalInterrupt xAxisFar(10);
 	OpticalInterrupt xAxisNear(11);
 	LinearActuator xLinearActuator(4.5f, xAxisStepper, xAxisFar, xAxisNear);
 	
     // ZAxis
-	StepperDevice yAxisStepper(2, 3, 300, 1000);
+	StepperDevice yAxisStepper(2, 3, 4, 300, 1000);
 	OpticalInterrupt yAxisFar(10);
 	OpticalInterrupt yAxisNear(11);
 	LinearActuator yLinearActuator(4.5f, yAxisStepper, yAxisFar, yAxisNear);
 	
     // ZAxis
-	StepperDevice zAxisStepper(2, 3, 300, 1000);
+	StepperDevice zAxisStepper(2, 3, 4, 300, 1000);
 	OpticalInterrupt zAxisFar(10);
 	OpticalInterrupt zAxisNear(11);
 	LinearActuator zLinearActuator(4.5f, zAxisStepper, zAxisFar, zAxisNear);
 	
     // Cartesian Bot
-    //CartesianDevice bot(xLinearActuator, yLinearActuator, zLinearActuator);
-    FakeBot bot;
+    CartesianDevice bot(xLinearActuator, yLinearActuator, zLinearActuator);
     
     // Extruder
-	StepperDevice extruderStepper(2, 3, 300, 1000);
+	StepperDevice extruderStepper(2, 3, 4, 300, 1000);
     HeaterDevice heater(1);
     ThermisterDevice thermister(1);
     ExtruderDevice extruder(200, extruderStepper, thermister, heater);

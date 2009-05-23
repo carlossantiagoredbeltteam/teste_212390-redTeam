@@ -13,21 +13,27 @@
 #include "EventLoop.h"
 #include "StepperDevice.h"
 
-#define FORWARD HIGH
-#define BACKWARD LOW
-
-StepperDevice::StepperDevice(int8_t stepPin, int8_t dirPin, int ticksPerRev, milliclock_t rate)
+StepperDevice::StepperDevice(int8_t stepPin, int8_t dirPin, 
+                             int8_t enablePin, int ticksPerRev, 
+                             milliclock_t rate, bool inverted)
 : EventLoopTimer(rate)
 , _stepPin(stepPin)
 , _dirPin(dirPin)
+, _enablePin(enablePin)
 , _ticksPerRev(ticksPerRev)
 , _currentTick(0)
 , _targetTick(0)
 , _maxRate(rate)
+, _forward(false)
+, _running(false)
+, _inverted(inverted)
 {
     pinMode(stepPin, OUTPUT);
     pinMode(dirPin, OUTPUT);
-    digitalWrite(_dirPin, FORWARD);
+    pinMode(enablePin, OUTPUT);
+    digitalWrite(_dirPin, HIGH);
+	
+	enable(false);
 }
 
 void StepperDevice::setTempRate(float rate)
@@ -37,6 +43,8 @@ void StepperDevice::setTempRate(float rate)
 
 void StepperDevice::start()
 {
+	enable(true);
+    _running = true;
     notifyObservers(StepperEvent_Start, this);
     EventLoop::current()->addTimer(this);
 }
@@ -48,22 +56,35 @@ void StepperDevice::pause()
 
 void StepperDevice::stop()
 {
+    _running = false;
     setPeriod(_maxRate);
     
+    _targetTick = 0;
+    _currentTick = 0;
+    
+	enable(false);
+
     notifyObservers(StepperEvent_Stop, this);
     EventLoop::current()->removeTimer(this);
 }
 
 void StepperDevice::goForward()
 {
+    _forward = true;
     stop();
-    digitalWrite(_dirPin, FORWARD);
+    digitalWrite(_dirPin, _inverted?LOW:HIGH);
 }
 
 void StepperDevice::goBackward()
 {
+    _forward = false;
     stop();
-    digitalWrite(_dirPin, BACKWARD);
+    digitalWrite(_dirPin, _inverted?HIGH:LOW);
+}
+
+void StepperDevice::enable(bool enable)
+{
+    digitalWrite(_enablePin, enable?HIGH:LOW);
 }
 
 void StepperDevice::turn(float numberOfRevolutions)
@@ -73,8 +94,11 @@ void StepperDevice::turn(float numberOfRevolutions)
         stop();
     }
     
-    _targetTick = (int)(numberOfRevolutions / _ticksPerRev);
+    
+    _targetTick = (int)(_ticksPerRev * numberOfRevolutions);
 
+	enable(true);
+    _running = true;
     notifyObservers(StepperEvent_Start, this);
     EventLoop::current()->addTimer(this);
 }

@@ -13,15 +13,17 @@
 #include "Observable.h"
 #include "OpticalInterrupt.h"
 
-OpticalInterrupt::OpticalInterrupt(int pin)
+OpticalInterrupt::OpticalInterrupt(int pin, bool inverted)
 : _inputPin(pin)
+, _inverted(inverted)
 {
+    pinMode(pin, INPUT);
 	EventLoop::current()->addPeriodicCallback(this);
 }
 
 void OpticalInterrupt::service()
 {
-	if (digitalRead(_inputPin) == HIGH)
+	if (digitalRead(_inputPin) == _inverted?HIGH:LOW)
 	{
 		notifyObservers(OpticalInterrupt_Interrupted, this);
 	}
