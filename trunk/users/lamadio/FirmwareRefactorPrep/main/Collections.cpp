@@ -185,6 +185,7 @@ DArray* DArray::shallowClone()
     {
         newArray->_count = _count;
         newArray->_array = (void**)malloc(_count * sizeof(void**));
+        newArray->_allocated = _count;
         if (newArray->_array)
         {
             memmove(newArray->_array, _array, _count * sizeof(void*));

@@ -79,39 +79,13 @@ public:
     inline void setPreviousCode(uint32_t code) { _G = code; _bits |= GCODE_G; }
 };
 
-class FakeBot : public Observable,
-                public EventLoopTimer
-
-{
-    float _x;
-    float _y;
-    float _z;
-public:
-    FakeBot();
-    inline CartesianPoint position() 
-        { return CartesianPoint(_x, _y, _z); }
-
-    inline void moveTo(CartesianPoint pt)
-        { moveTo(pt.x, pt.y, pt.z); }
-
-    void setRate(float) { }
-
-    void moveTo(float newX, float newY, float newZ);
-
-    void pause();
-    void start();
-
-    void moveHome();
-    virtual void fire();
-};
 
 class GCodeBehavior : public PeriodicCallback,
                       public Observer
 {
     int _previousGCode;
     ExtruderDevice& _extruder;
-    //CartesianDevice& _bot;
-    FakeBot& _bot;
+    CartesianDevice& _bot;
     enum tagGCodeState
     {
         GCodeState_Idle,
@@ -133,7 +107,7 @@ class GCodeBehavior : public PeriodicCallback,
     
     float translatePosition(float pos);
 public:
-    GCodeBehavior(ExtruderDevice& extruder, FakeBot& bot); //CartesianDevice& bot);
+    GCodeBehavior(ExtruderDevice& extruder, CartesianDevice& bot);
     
     virtual void service();
     virtual void notify(uint32_t eventId, void* context);

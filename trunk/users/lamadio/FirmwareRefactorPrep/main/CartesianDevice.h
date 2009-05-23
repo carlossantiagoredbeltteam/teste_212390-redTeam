@@ -72,7 +72,7 @@ public:
      void start();
      
      void moveHome();
-     inline bool axesInMotion() { return _xInMotion || _yInMotion || _zInMotion; }
+     inline bool axesInMotion() { return _x.running() || _y.running() || _z.running(); }
      
      void setRate(float rate) { _maxFeed = rate; }
      

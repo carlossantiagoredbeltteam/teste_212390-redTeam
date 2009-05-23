@@ -18,18 +18,21 @@
 
 LinearActuator::LinearActuator(float revPerMM, StepperDevice& stepper, 
                                              OpticalInterrupt& far, OpticalInterrupt& near)
-: _currentPos(0.0f)
+: _currentPos(-1.0f)
 , _revPerMM(revPerMM)
 , _stepper(stepper)
 , _nearInterrupter(near)
 , _farInterrupter(far)
 {
+    _nearInterrupter.addObserver(this);
+    _farInterrupter.addObserver(this);
+    _stepper.addObserver(this);
 }
 
 void LinearActuator::moveTo(float newPosMM)
 {
     float revs;
-    if (newPosMM == 0)
+    if (_currentPos < 0.0f)
     {
         _stepper.goBackward();
         _stepper.start();
@@ -39,21 +42,29 @@ void LinearActuator::moveTo(float newPosMM)
         if (newPosMM < _currentPos)
         {
             revs = (_currentPos - newPosMM) / _revPerMM;
-            _stepper.goBackward();
+            _stepper.goForward();
         }
         else
         {
             revs = (newPosMM - _currentPos) / _revPerMM;
-            _stepper.goForward();
+            _stepper.goBackward();
         }
         
+        Serial.print("Turning ");
+        Serial.println((int)revs);
         _stepper.turn(revs);
     }
 }
 
-void  LinearActuator::moveHome()
+void LinearActuator::moveHome()
 {
     moveTo(0.0f);
+}
+
+void LinearActuator::moveToExtent()
+{
+    _stepper.goForward();
+    _stepper.start();
 }
 
 void LinearActuator::notify(uint32_t eventId, void* context)
@@ -61,17 +72,22 @@ void LinearActuator::notify(uint32_t eventId, void* context)
     switch (eventId)
     {
         case StepperEvent_Complete:
-            notify(LinearActuator_CompletedMove, this);
+            notifyObservers(LinearActuator_CompletedMove, this);
             break;
         case OpticalInterrupt_Interrupted:
-            _stepper.stop();
-            if (context == &_nearInterrupter)
+            if (_stepper.running())
             {
-                notify(LinearActuator_Homed, this);
-            }
-            else if (context == &_farInterrupter)
-            {
-                notify(LinearActuator_Extent, this);
+                if (context == &_nearInterrupter && !_stepper.goingForward())
+                {
+                    _stepper.stop();
+                    _currentPos = 0.0f;
+                    notifyObservers(LinearActuator_Homed, this);
+                }
+                else if (context == &_farInterrupter && _stepper.goingForward())
+                {
+                    _stepper.stop();
+                    notifyObservers(LinearActuator_Extent, this);
+                }
             }
             break;
     }
