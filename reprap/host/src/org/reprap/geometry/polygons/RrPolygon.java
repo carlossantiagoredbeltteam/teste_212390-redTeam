@@ -259,6 +259,7 @@ public class RrPolygon
 			add(new Rr2Point(p.point(i)));
 		if(p.speeds != null)
 		{
+			speeds = new ArrayList<Double>();
 			for(int i = 0; i < p.size(); i++)
 				speeds.add(new Double(p.speed(i)));
 		}
@@ -632,18 +633,42 @@ public class RrPolygon
 			return new RrPolygon(this);
 		RrPolygon r = new RrPolygon(att, closed);
 		double d2 = d*d;
+
 		int v1 = findAngleStart(0, d2);
 		// We get back -1 if the points are in a straight line.
 		if (v1<0)
-			return new RrPolygon(this);
+		{
+			r.add(point(0));
+			r.add(point(leng-1));
+			return r;
+		}
+		
+		if(!isClosed())
+			r.add(point(0));
+
 		r.add(point(v1%leng));
 		int v2 = v1;
 		while(true)
 		{
 			// We get back -1 if the points are in a straight line. 
 			v2 = findAngleStart(v2, d2);
-			if((v2 > leng)||(v2<0))
+			if(v2<0)
+			{
+				System.err.println("RrPolygon.simplify(): points were not in a straight line; now they are!");
 				return(r);
+			}
+			
+			if(v2 > leng || (!isClosed() && v2 == leng))
+			{
+				return(r);
+			}
+			
+			if(v2 == leng && isClosed())
+			{
+				r.points.add(0, point(0));
+				r.re_box();
+				return r;
+			}
 			r.add(point(v2%leng));
 		}
 		// The compiler is very clever to spot that no return
@@ -815,6 +840,7 @@ public class RrPolygon
 		RrPolygon pg = simplify(Preferences.gridRes());
 		points = pg.points;
 		box = pg.box;
+		
 		boolean fixup[] = new boolean[size()];
 		setSpeed(0, minSpeed);
 		Rr2Point a, b, c, ab, bc;
@@ -840,6 +866,9 @@ public class RrPolygon
 			else
 				vCorner = 0.5*minSpeed*(2 + vCorner);
 			
+			if(!isClosed() && i == size() - 1)
+				vCorner = minSpeed;
+			
 			RrInterval aRange = accRange(oldV, s, acceleration);
 			
 			if(vCorner <= aRange.low())
@@ -860,8 +889,7 @@ public class RrPolygon
 			s = newS;
 		}
 		
-		if(!isClosed())
-			setSpeed(size() - 1, minSpeed);
+
 		
 		for(int i = isClosed()?size():size() - 1; i > 0; i--)
 		{

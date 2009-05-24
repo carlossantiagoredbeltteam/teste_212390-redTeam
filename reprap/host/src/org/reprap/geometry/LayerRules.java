@@ -5,6 +5,7 @@ import org.reprap.Printer;
 import org.reprap.Extruder;
 import org.reprap.devices.GenericExtruder;
 import org.reprap.geometry.polygons.RrHalfPlane;
+import org.reprap.geometry.polygons.RrRectangle;
 import org.reprap.geometry.polygons.Rr2Point;
 import org.reprap.geometry.polygons.RrCSGPolygonList;
 import org.reprap.Preferences;
@@ -101,6 +102,11 @@ public class LayerRules
 	private int layerPointer;
 	
 	/**
+	 * The XY rectangle that bounds the build
+	 */
+	private RrRectangle bBox;
+	
+	/**
 	 * 
 	 * @param p
 	 * @param modZMax
@@ -110,9 +116,11 @@ public class LayerRules
 	 * @param found
 	 */
 	public LayerRules(Printer p, double modZMax, double macZMax,
-			int modLMax, int macLMax, boolean found)
+			int modLMax, int macLMax, boolean found, RrRectangle bb)
 	{
 		printer = p;
+		
+		bBox = bb;
 		
 		notStartedYet = true;
 
@@ -161,6 +169,11 @@ public class LayerRules
 			layerRecord[i] = null;
 			recordNumber[i] = -1;
 		}
+	}
+	
+	public RrRectangle getBox()
+	{
+		return bBox;
 	}
 	
 	public void recordThisLayer(RrCSGPolygonList pl)

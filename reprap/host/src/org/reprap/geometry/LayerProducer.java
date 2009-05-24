@@ -246,12 +246,15 @@ public class LayerProducer {
 		
 		hatchedPolygons = pols;
 		
+		
 		if(simulationPlot != null)
 		{
 			if(!simulationPlot.isInitialised())
-				simulationPlot.init(hatchedPolygons.getBox(), false);
-			simulationPlot.add(hatchedPolygons);
-		}	
+				simulationPlot.init(lc.getBox(), false);
+			else
+				simulationPlot.cleanPolygons();
+		}
+
 	}
 	
 	
@@ -289,23 +292,18 @@ public class LayerProducer {
 			offBorder = csgP.offset(layerConditions, true);
 			offBorder.divide(Preferences.tiny(), 1.01);
 			borderPolygons = offBorder.megList();
-			//borderPolygons.setClosed(true);
 		}
 		
 		offHatch.divide(Preferences.tiny(), 1.01);		
 		hatchedPolygons = new RrPolygonList();
 		hatchedPolygons.add(offHatch.hatch(layerConditions));
-		//hatchedPolygons.setClosed(false);
 		
 		if(simulationPlot != null)
 		{
-			RrPolygonList pl = new RrPolygonList();
-			pl.add(hatchedPolygons);
-			if(borderPolygons != null)
-				pl.add(borderPolygons);
 			if(!simulationPlot.isInitialised())
-				simulationPlot.init(pl.getBox(), false);
-			simulationPlot.add(pl);
+				simulationPlot.init(lc.getBox(), false);
+			else
+				simulationPlot.cleanPolygons();
 		}
 	}
 	
@@ -772,30 +770,15 @@ public class LayerProducer {
 			return;
 		}	
 		
-		/* changed for feedrate stuff. - ZMS
-		int baseSpeed = att.getExtruder(printer.getExtruders()).getXYSpeed();
-		int outlineSpeed = LinePrinter.speedFix(baseSpeed, 
-				att.getExtruder(printer.getExtruders()).getOutlineSpeed(layerConditions));
-		int infillSpeed = LinePrinter.speedFix(baseSpeed, 
-				att.getExtruder(printer.getExtruders()).getInfillSpeed(layerConditions));
-		*/
-		
-		/* double baseFeedrate =  att.getExtruder(printer.getExtruders()).getXYFeedrate();*/
-		
 		printer.selectExtruder(att);
 		
-		// Warning: if incrementedStart is activated, this will override the randomStart
-//		if(outline && printer.getExtruder().incrementedStart())
-//			p = p.incrementedStart(layerConditions);
-//		else if(outline && printer.getExtruder().randomStart())
-//			p = p.randomStart();
 		if(p.isClosed() && printer.getExtruder().incrementedStart())
 			p = p.incrementedStart(layerConditions);
 		else if(p.isClosed() && printer.getExtruder().randomStart())
 			p = p.randomStart();
 		
-		int stopExtruding;
-		int stopValve;
+		int stopExtruding = p.size() + 10;
+		int stopValve = stopExtruding;
 		double extrudeBackLength = printer.getExtruder().getExtrusionOverRun();
 		double valveBackLength = printer.getExtruder().getValveOverRun();
 		if(extrudeBackLength >= valveBackLength)
@@ -824,19 +807,16 @@ public class LayerProducer {
 		
 		if(extrudeBackLength <= 0)
 			stopExtruding = p.size() + 10;
-		else
+		else if(acc)
 			stopExtruding = p.findBackPoint(extrudeBackLength);
 		
 		if(valveBackLength <= 0)
 			stopValve = p.size() + 10;
-		else
+		else if(acc)
 			stopValve = p.findBackPoint(valveBackLength);
-		
-		//printer.setFeedrate(printer.getFastFeedrateXY());
 
 		currentFeedrate = printer.getFastFeedrateXY();
 		singleMove(p.point(0));
-		//move(p.point(0), p.point(1), lift, false, true);
 		
 		if(acc)
 			currentFeedrate = p.speed(0);
@@ -844,38 +824,20 @@ public class LayerProducer {
 		{
 			if(p.isClosed())
 			{
-				//printer.setFeedrate(outlineFeedrate);
 				currentFeedrate = outlineFeedrate;			
 			} else
 			{
-				//printer.setFeedrate(infillFeedrate);
 				currentFeedrate = infillFeedrate;			
 			}
 		}
 
-		//printer.getExtruder().setMotor(true);
 		plot(p.point(0), p.point(1), false, false);
 		
 		// Print any lead-in.
 		printer.printStartDelay(firstOneInLayer);
 		
-//		if(acc)
-//			currentFeedrate = p.speed(0);
-//		else
-//		{
-//			if(outline)
-//			{
-//				//printer.setFeedrate(outlineFeedrate);
-//				currentFeedrate = outlineFeedrate;			
-//			} else
-//			{
-//				//printer.setFeedrate(infillFeedrate);
-//				currentFeedrate = infillFeedrate;			
-//			}
-//		}
-
-		//printer.getExtruder().setMotor(true);
-//		plot(p.point(0), p.point(1), false, false);
+		boolean extrudeOff;
+		boolean valveOff;
 		
 		if(p.isClosed())
 		{
@@ -893,15 +855,19 @@ public class LayerProducer {
 				}
 				if(acc)
 					currentFeedrate = p.speed(i);
-				if(j > stopExtruding || j == p.size())
-					plot(p.point(i), next, true, j == p.size()); //plot(p.point(i), next, lift, j == p.size());
-				else
-					plot(p.point(i), next, false, false);
 				
-				if(j > stopValve || j == p.size())
-					plot(p.point(i), next, j == p.size(), true); //plot(p.point(i), next, lift, j == p.size());
-				else
-					plot(p.point(i), next, false, false);
+				extrudeOff = j > stopExtruding || j == p.size();
+				valveOff = j > stopValve || j == p.size();
+				
+//				if(j > stopExtruding || j == p.size())
+//					plot(p.point(i), next, true, j == p.size()); //plot(p.point(i), next, lift, j == p.size());
+//				else
+//					plot(p.point(i), next, false, false);
+//				
+//				if(j > stopValve || j == p.size())
+//					plot(p.point(i), next, j == p.size(), true); //plot(p.point(i), next, lift, j == p.size());
+//				else
+					plot(p.point(i), next, extrudeOff, valveOff);
 			}
 		} else
 		{
@@ -920,15 +886,18 @@ public class LayerProducer {
 				if(acc)
 					currentFeedrate = p.speed(i);
 				
-				if(i > stopExtruding || i == p.size()-1)
-					plot(p.point(i), next, true, i == p.size()-1);
-				else
-					plot(p.point(i), next, false, false);
+				extrudeOff = i > stopExtruding || i == p.size()-1;
+				valveOff = i > stopValve || i == p.size()-1;
 				
-				if(i > stopValve || i == p.size()-1)
-					plot(p.point(i), next, i == p.size()-1, true); //plot(p.point(i), next, i == p.size()-1, lift);
-				else
-					plot(p.point(i), next, false, false);
+//				if(i > stopExtruding || i == p.size()-1)
+//					plot(p.point(i), next, true, i == p.size()-1);
+//				else
+//					plot(p.point(i), next, false, false);
+//				
+//				if(i > stopValve || i == p.size()-1)
+//					plot(p.point(i), next, i == p.size()-1, true); //plot(p.point(i), next, i == p.size()-1, lift);
+//				else
+					plot(p.point(i), next, extrudeOff, valveOff);
 			}
 		}
 		
@@ -939,6 +908,13 @@ public class LayerProducer {
 			startNearHere = p.point(0);	
 		else
 			startNearHere = p.point(p.size() - 1);
+		
+		if(simulationPlot != null)
+		{
+			RrPolygonList pgl = new RrPolygonList();
+			pgl.add(p);
+			simulationPlot.add(pgl);
+		}
 		
 	}
 	
