@@ -204,72 +204,75 @@ public class RrGraphics
 		initialised = false;
 	}
 	
-	
-	/**
-	 * Constructor for point-list polygon
-	 * @param pl
-	 * @param pb
-	 */
-	public RrGraphics(RrPolygonList pl) 
-	{
-		if(pl.size() <= 0)
-		{
-			System.err.println("Attempt to plot a null polygon list!");
-			return;
-		}
-		
-		p_list = pl;
-		hp = null;
-		csg_p = null;
-		stlc = null;
-		
-		init(pl.getBox(), true);
-	}
-	
-	/**
-	 * Constructor for CSG polygon
-	 * @param cp
-	 */
-	public RrGraphics(RrCSGPolygon cp) 
+	public void cleanPolygons()
 	{
 		p_list = null;
-		hp = null;
-		csg_p = cp;
-		stlc = null;
-		
-		init(csg_p.box(), true);
 	}
-	
-	/**
-	 * Constructor for CSG polygon and crossing lines
-	 * @param cp
-	 * @param pb
-	 */
-	public RrGraphics(RrCSGPolygon cp, List<RrHalfPlane> h) 
-	{
-		p_list = null;
-		csg_p = cp;
-		hp = h;
-		stlc = null;
-		
-		init(csg_p.box(), true);
-	}
-	
-	/**
-	 * Constructor for STL polygons
-	 * @param s
-	 * @param pb
-	 */
-	public RrGraphics(STLSlice s) 
-	{
-		p_list = null;
-		csg_p = null;
-		hp = null;
-		stlc = s;
-		
-		init(stlc.box(), true);
-	}
-	
+//	/**
+//	 * Constructor for point-list polygon
+//	 * @param pl
+//	 * @param pb
+//	 */
+//	public RrGraphics(RrPolygonList pl) 
+//	{
+//		if(pl.size() <= 0)
+//		{
+//			System.err.println("Attempt to plot a null polygon list!");
+//			return;
+//		}
+//		
+//		p_list = pl;
+//		hp = null;
+//		csg_p = null;
+//		stlc = null;
+//		
+//		init(pl.getBox(), true);
+//	}
+//	
+//	/**
+//	 * Constructor for CSG polygon
+//	 * @param cp
+//	 */
+//	public RrGraphics(RrCSGPolygon cp) 
+//	{
+//		p_list = null;
+//		hp = null;
+//		csg_p = cp;
+//		stlc = null;
+//		
+//		init(csg_p.box(), true);
+//	}
+//	
+//	/**
+//	 * Constructor for CSG polygon and crossing lines
+//	 * @param cp
+//	 * @param pb
+//	 */
+//	public RrGraphics(RrCSGPolygon cp, List<RrHalfPlane> h) 
+//	{
+//		p_list = null;
+//		csg_p = cp;
+//		hp = h;
+//		stlc = null;
+//		
+//		init(csg_p.box(), true);
+//	}
+//	
+//	/**
+//	 * Constructor for STL polygons
+//	 * @param s
+//	 * @param pb
+//	 */
+//	public RrGraphics(STLSlice s) 
+//	{
+//		p_list = null;
+//		csg_p = null;
+//		hp = null;
+//		stlc = s;
+//		
+//		init(stlc.box(), true);
+//	}
+//	
 
 	
 	private void setScales(RrRectangle b)
@@ -365,36 +368,39 @@ public class RrGraphics
 	 */
 	public void add(RrPolygonList pl)
 	{
-		p_list = pl;
+		if(p_list == null)
+			p_list = new RrPolygonList(pl);
+		else
+			p_list.add(pl);
 		jframe.repaint();
 	}
 	
-	/**
-	 * @param cp
-	 */
-	public void add(RrCSGPolygon cp)
-	{
-		csg_p = cp;
-		jframe.repaint();
-	}
-	
-	/**
-	 * @param s
-	 */
-	public void add(STLSlice s)
-	{
-		stlc = s;
-		jframe.repaint();
-	}
-	
-	/**
-	 * @param h
-	 */
-	public void add(List<RrHalfPlane>h)
-	{
-		hp = h;
-		jframe.repaint();
-	}
+//	/**
+//	 * @param cp
+//	 */
+//	public void add(RrCSGPolygon cp)
+//	{
+//		csg_p = cp;
+//		jframe.repaint();
+//	}
+//	
+//	/**
+//	 * @param s
+//	 */
+//	public void add(STLSlice s)
+//	{
+//		stlc = s;
+//		jframe.repaint();
+//	}
+//	
+//	/**
+//	 * @param h
+//	 */
+//	public void add(List<RrHalfPlane>h)
+//	{
+//		hp = h;
+//		jframe.repaint();
+//	}
 	
 	/**
 	 * Real-world coordinates to pixels

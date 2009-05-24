@@ -34,7 +34,8 @@ public class VelocityProfile
 			flat = 1;
 		else
 		{
-			s2 = s1 + 0.5*(v*v - vEnd*vEnd)/acceleration;
+			//s2 = s1 + 0.5*(v*v - vEnd*vEnd)/acceleration;
+			s2 = s - 0.5*(maxSpeed*maxSpeed - vEnd*vEnd)/acceleration;
 			f = s2/s;
 			if(f < 0 || f > 1)
 			{

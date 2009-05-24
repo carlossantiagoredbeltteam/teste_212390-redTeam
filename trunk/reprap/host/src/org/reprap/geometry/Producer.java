@@ -46,6 +46,8 @@ public class Producer {
 		bld = builder;	
 		
 		stlc = new STLSlice(bld.getSTLs());
+		
+		RrRectangle gp = stlc.ObjectPlanRectangle();
 
 		if(Preferences.loadGlobalBool("DisplaySimulation"))
 		{
@@ -60,7 +62,7 @@ public class Producer {
 		int modLMax = (int)(modZMax/stepZ);
 		
 		layerRules = new LayerRules(pr, modZMax, modZMax + foundationLayers*stepZ,
-				modLMax, modLMax + foundationLayers, true);
+				modLMax, modLMax + foundationLayers, true, gp);
 	}
 	
 	/**
@@ -134,7 +136,7 @@ public class Producer {
 	
 	public void produce() throws Exception
 	{
-		RrRectangle gp = stlc.ObjectPlanRectangle();
+		RrRectangle gp = layerRules.getBox();
 		
 		gp = new RrRectangle(new Rr2Point(gp.x().low() - 6, gp.y().low() - 6), 
 				new Rr2Point(gp.x().high() + 6, gp.y().high() + 6));

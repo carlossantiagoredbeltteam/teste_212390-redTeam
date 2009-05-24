@@ -414,8 +414,10 @@ public class GCodeRepRap extends GenericRepRap {
 			if(extruders[extruder].get4D())
 			{
 				qFeedrate(fastFeedrateXY);
-				extrudeLength = getExtruder().getDistanceFromTime(millis); // Fix the value for possible feedrate change
+				// Fix the value for possible feedrate change
+				extrudeLength = getExtruder().getDistanceFromTime(millis); 
 			}
+
 			if(extruders[extruder].getReversing())
 				extruders[extruder].getExtrudedLength().add(-extrudeLength);
 			else
@@ -423,6 +425,7 @@ public class GCodeRepRap extends GenericRepRap {
 			if(extruders[extruder].get4D())
 			{
 				gcode.queue("G1 E" + round(extruders[extruder].getExtrudedLength().length(), 1) + " ; extrude dwell");
+				qFeedrate(slowFeedrateXY);
 				return;
 			}
 		}
