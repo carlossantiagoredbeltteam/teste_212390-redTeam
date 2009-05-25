@@ -78,6 +78,9 @@ public class ObjFactory {
     else if (name.startsWith("file")) {
       return new FileObj();
     }
+    else if (name.startsWith("assign")) {
+      return new AssignObj();
+    }
     else {
       MacroPrototype macroPrototype = ctx.macros.get(name.toLowerCase());
       if (macroPrototype != null)
