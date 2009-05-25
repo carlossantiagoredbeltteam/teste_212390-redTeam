@@ -39,6 +39,7 @@ public class MetaCADContext {
     		"double sin(double a) { return Math.sin(a); }" +
     		"double cos(double a) { return Math.cos(a); }" +
     		"double tan(double a) { return Math.tan(a); }" +
+    		"double sqrt(double a) { return Math.sqrt(a); }" +
     		"double exp(double a, double b) { return Math.exp(a,b); }");
     Object v = this.interpreter.eval("sin(0)");
     this.interpreter.set("test", v);
@@ -127,7 +128,7 @@ public class MetaCADContext {
   // call this to "backup" the current state of the beanshell interpreter
   public void pushScope()
   {
-    this.scopes.add(this.currentScope);
+    this.scopes.addFirst(this.currentScope);
     this.currentScope = new Hashtable<String, Object>();
   }
   
