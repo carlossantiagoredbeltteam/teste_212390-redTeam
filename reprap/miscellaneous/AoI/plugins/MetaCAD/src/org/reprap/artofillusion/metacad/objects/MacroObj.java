@@ -22,24 +22,25 @@ public class MacroObj extends MetaCADObject {
     
     if (parameters.size() >= this.prototype.variables.size())
     {
-//      int n = this.prototype.variables.size();      
-//      ASTVarNode[] backup = new ASTVarNode[n];
-//      double[] values = new double[n];
-//      // backup variables
-//      for (int i = 0;  i < n; i++)
-//      {
-//        backup[i] = ctx.jep.getVarNode(this.prototype.variables.get(i)); 
-//        values[i] = ctx.evaluateExpression(parameters.get(i));
-//      }
-//      // replace variables
-//      for (int i = 0;  i < n; i++)
-//      {
-//        ctx.jep.setVarNode(this.prototype.variables.get(i), null);
-//        ctx.jep.addVariable(this.prototype.variables.get(i), values[i]);
-//      }
+      int n = this.prototype.variables.size();   
+      
+      ctx.pushScope();
+      double[] values = new double[n];
+      // evaluate parameters
+      for (int i = 0;  i < n; i++)
+      { 
+        values[i] = ctx.evaluateExpression(parameters.get(i));
+      }
+      // assign parameters
+      for (int i = 0;  i < n; i++)
+      {
+        ctx.assignValue(this.prototype.variables.get(i), values[i]);
+      }
       // evaluate
       List<ObjectInfo> result = ParsedTree.evaluate(ctx, this.prototype.children);
+      
       // restore previous variables
+      ctx.popScope();
 //      for (int i = 0;  i < n; i++)
 //      {
 //        ctx.jep.setVarNode(this.prototype.variables.get(i), backup[i]);
