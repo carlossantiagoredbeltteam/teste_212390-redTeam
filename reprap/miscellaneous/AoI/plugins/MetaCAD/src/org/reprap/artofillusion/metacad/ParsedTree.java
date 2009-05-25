@@ -32,6 +32,17 @@ public class ParsedTree {
     // FIXME: If we're native, we can probably skip the evaluation
     
     List<ObjectInfo> result = this.cadobj.evaluateObject(ctx, this.parameters, this.children);
+
+    // Make sure all evaluated objects have a texture. This is necessary for objects which don't have
+    // an associated aoiobj and where we need access to the texture (e.g. CSGObject inside macros which
+    // use the CSGObject.centerObject()).
+    for (ObjectInfo chinfo : result) {
+      Texture tex = chinfo.object.getTexture();
+      if (tex == null) tex = ctx.scene.getDefaultTexture();
+      TextureMapping map = chinfo.object.getTextureMapping();
+      if (map == null) map = ctx.scene.getDefaultTexture().getDefaultMapping(chinfo.object);
+      chinfo.object.setTexture(tex, map);
+    }
     
     //must have been a  native object
     if (result == null) {
