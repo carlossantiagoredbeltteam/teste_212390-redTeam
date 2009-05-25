@@ -35,14 +35,14 @@ public class MetaCADContext {
   
   public void evaluateParameters(String parameters) throws Exception {
     this.clearContext();
+    // basic functions andconstants that are usefull
     this.interpreter.eval("import java.lang.Math;" +
+                "pi = Math.PI;" +
     		"double sin(double a) { return Math.sin(a); }" +
     		"double cos(double a) { return Math.cos(a); }" +
     		"double tan(double a) { return Math.tan(a); }" +
     		"double sqrt(double a) { return Math.sqrt(a); }" +
     		"double exp(double a, double b) { return Math.exp(a,b); }");
-    Object v = this.interpreter.eval("sin(0)");
-    this.interpreter.set("test", v);
     
     List<ParsedStatement> statements = 
       MetaCADParser.parseParameters(parameters);
