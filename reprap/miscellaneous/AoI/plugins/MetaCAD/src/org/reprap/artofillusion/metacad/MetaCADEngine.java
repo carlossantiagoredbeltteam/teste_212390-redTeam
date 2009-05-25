@@ -345,7 +345,7 @@ Boolean convertObject(ObjectInfo parent) {
 String coordSysToString(CoordinateSystem cs) {
     Vec3 t = cs.getOrigin();
     double r[] = cs.getRotationAngles();
-    String str = "cs(" +
+    String str = "trans(" +
         String.format("%.2f", t.x) + "," +
         String.format("%.2f", t.y) + "," +
         String.format("%.2f", t.z);
