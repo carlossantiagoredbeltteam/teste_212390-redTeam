@@ -25,7 +25,6 @@ public class ParsedTree {
     this.children = new ArrayList<ParsedTree>();
   }
   
-  // experimental version without locked check
   public List<ObjectInfo> evaluate(MetaCADContext ctx) throws Exception {
 
     this.cadobj = ObjFactory.create(ctx, this.name);
@@ -51,50 +50,9 @@ public class ParsedTree {
     else {
      ObjectInfo collection = new ObjectInfo(new MetaCADObjectCollection(result), new CoordinateSystem(), "dummy");
      updateAOI(collection);
-//      updateAOI(ObjectHelper.join(result, 0.1));
     }
     return result;
   }
-
-  // this is the isLocked version - wasnot so nice to use
-  /*
-  public List<ObjectInfo> evaluate(MetaCADContext ctx) throws Exception {
-
-    try {
-      this.cadobj = ObjFactory.create(ctx, this.name);
-    }
-    catch (ObjFactoryException e) {
-      if (this.aoiobj.isLocked()) { // This object has previously been evaluated successfully
-        throw e; // Rethrow exception        
-      }
-      else {
-        this.name = "native";
-        this.cadobj = ObjFactory.create(ctx, this.name);
-      }
-    }
-
-    // FIXME: If we're native, we can probably skip the evaluation
-    
-    List<ObjectInfo> result = this.cadobj.evaluateObject(ctx, this.parameters, this.children);
-    if (result == null) {
-      result = new LinkedList<ObjectInfo>();
-      // duplicate native object to prevent accumulating cs
-      result.add(this.aoiobj.duplicate());
-    }
-    else if (result.size() == 0) {
-      updateAOI(ObjectHelper.getErrorObject());
-    }
-    else if (result.size() == 1) {
-      updateAOI(result.get(0));
-    }
-    else {
-     ObjectInfo collection = new ObjectInfo(new MetaCADObjectCollection(result), new CoordinateSystem(), "dummy");
-     updateAOI(collection);
-//      updateAOI(ObjectHelper.join(result, 0.1));
-    }
-    return result;
-  }
-  */
 
   public static List<ObjectInfo> evaluate(MetaCADContext ctx, List<ParsedTree> children) throws Exception {
     if (children.size() == 0) return null;
@@ -122,7 +80,6 @@ public class ParsedTree {
         this.aoiobj.object.setTexture(tex, map);
       }
       this.aoiobj.setVisible(true);
-      //this.aoiobj.setLocked(true); // Indicate that this object is a MetaCAD evaluated object
       this.aoiobj.clearCachedMeshes();
     }
   }
