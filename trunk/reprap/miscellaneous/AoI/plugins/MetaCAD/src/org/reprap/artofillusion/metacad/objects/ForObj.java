@@ -12,10 +12,10 @@ public class ForObj extends MetaCADObject {
   
   public List<ObjectInfo> evaluateObject(MetaCADContext ctx, 
                                          List<String> parameters, 
-                                         List<ParsedTree> children) throws Exception {
+                                         List<ParsedTree> children) throws Exception {    
+    ctx.pushScope();
     
     List<ObjectInfo> result = new LinkedList<ObjectInfo>();
-    
     // evaluate first part of for loop i.e. i=0
     ctx.evaluateAssignment(parameters.get(0));
 
@@ -28,6 +28,9 @@ public class ForObj extends MetaCADObject {
       ctx.evaluateAssignment(parameters.get(2));
       count++;
     }
+    
+    ctx.popScope();
+    
     return result;
   }
 

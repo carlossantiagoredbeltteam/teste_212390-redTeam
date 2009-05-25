@@ -1,5 +1,7 @@
 package org.reprap.artofillusion.metacad;
 
+// svn update ExtrudeObj.java -r 3025
+
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -22,14 +24,17 @@ public class MetaCADContext {
   public Scene scene;
   public Dictionary<String, MacroPrototype> macros;
   
+  // stores the variables
+  LinkedList<Hashtable<String, Object>> scopes;
+  Hashtable<String, Object> currentScope;
+  
   public MetaCADContext(Scene scene) {
     this.scene = scene;
-    this.macros = new Hashtable<String, MacroPrototype>();
-    //this.scopes = new LinkedList<Scope>();
+    clearContext();
   }
   
   public void evaluateParameters(String parameters) throws Exception {
-    this.interpreter = new Interpreter();
+    this.clearContext();
     this.interpreter.eval("import java.lang.Math;" +
     		"double sin(double a) { return Math.sin(a); }" +
     		"double cos(double a) { return Math.cos(a); }" +
@@ -78,8 +83,21 @@ public class MetaCADContext {
   
   public double evaluateAssignment(String name, String expr) throws Exception {
     double value = this.evaluateExpression(expr);
-    this.interpreter.set(name, value);
+    this.assignValue(name, value);
     return value;
+  }
+  
+  public void assignValue(String name, double value) throws Exception
+  {
+    // if we have not backed up the value of the variable then lets do taht now
+    if (!this.currentScope.containsKey(name))
+    {
+      Object obj = this.interpreter.get(name);
+      if (obj == null)
+        obj = new EmptyObject();
+      this.currentScope.put(name, obj);
+    }
+    this.interpreter.set(name, value);
   }
   
   public boolean evaluateBoolean(String expr) throws Exception {
@@ -98,28 +116,43 @@ public class MetaCADContext {
     }
   }
   
-  LinkedList<Hashtable<String, Object>> scopes;
-  Hashtable<String, Object> currentScope;
-  
-  public void pushScope()
+  public void clearContext()
   {
-    scopes.add(currentScope);
+    this.macros = new Hashtable<String, MacroPrototype>();
+    this.currentScope = new Hashtable<String, Object>();
+    this.scopes = new LinkedList<Hashtable<String,Object>>();
+    this.interpreter = new Interpreter();
   }
   
-//  public void popScope()
-//  {
-//    Hashtable<String, Object> scope = scopes.poll();
-//    
-//    for  (Map.Entry<String, Double> entry : scope.entrySet())
-//    {
-//      entry.getKey();
-//    }
-//  }
-//  
-//  protected class Scope
-//  {
-//    public 
-//    
-//  }
+  // call this to "backup" the current state of the beanshell interpreter
+  public void pushScope()
+  {
+    this.scopes.add(this.currentScope);
+    this.currentScope = new Hashtable<String, Object>();
+  }
+  
+  // to restore the old state of the beanshell interpreter
+  public void popScope() throws Exception
+  {
+    for  (Map.Entry<String, Object> entry : this.currentScope.entrySet())
+    {
+      String key = entry.getKey();
+      Object obj = entry.getValue();
+      
+      if (obj.getClass().equals(EmptyObject.class))
+      {
+        this.interpreter.set(key, null);
+      }
+      else
+      {
+        this.interpreter.set(key, obj);
+      }
+    }
+    
+    this.currentScope = this.scopes.poll(); 
+  }
+  
+  // dummy cluss to store null objects in scopes
+  protected class EmptyObject { };
 }
 

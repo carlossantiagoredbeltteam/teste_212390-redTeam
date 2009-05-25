@@ -21,6 +21,8 @@ public class VariableAssignment implements ParsedStatement {
     try {
       context.evaluateAssignment(this.name, this.formula);
     } catch (Exception ex) {
+      System.out.println(ex.toString());
+      ex.printStackTrace();
       return false;
     }
     return true;
