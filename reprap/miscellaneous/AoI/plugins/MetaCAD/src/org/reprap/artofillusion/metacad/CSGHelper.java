@@ -3,6 +3,7 @@ package org.reprap.artofillusion.metacad;
 import java.util.Iterator;
 
 import artofillusion.math.CoordinateSystem;
+import artofillusion.math.Vec3;
 import artofillusion.object.CSGObject;
 import artofillusion.object.Object3D;
 import artofillusion.object.ObjectInfo;
@@ -44,10 +45,12 @@ public class CSGHelper {
     else {
       if (this.sum == null) {
         this.sum = new CSGObject(this.buffer, obj, this.operation);
-        this.sumInfo = new ObjectInfo(this.sum, new CoordinateSystem(), "tmp");
+        Vec3 center = this.sum.centerObjects();
+        this.sumInfo = new ObjectInfo(this.sum, new CoordinateSystem(center, Vec3.vz(), Vec3.vy()), "tmp");
       } else {
         this.sum = new CSGObject(this.sumInfo, obj, this.operation);
-        this.sumInfo = new ObjectInfo(this.sum, new CoordinateSystem(), "tmp");
+        Vec3 center = this.sum.centerObjects();
+        this.sumInfo = new ObjectInfo(this.sum, new CoordinateSystem(center, Vec3.vz(), Vec3.vy()), "tmp");
       }
     }
     this.count++;
