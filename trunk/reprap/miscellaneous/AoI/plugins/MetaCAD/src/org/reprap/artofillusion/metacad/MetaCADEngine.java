@@ -10,6 +10,7 @@ import java.util.List;
 import org.cheffo.jeplite.JEP;
 import org.reprap.artofillusion.metacad.language.MacroPrototype;
 import org.reprap.artofillusion.metacad.language.ParsedStatement;
+import org.reprap.artofillusion.metacad.objects.AssignObj;
 import org.reprap.artofillusion.metacad.parser.MetaCADParser;
 import org.reprap.artofillusion.metacad.parser.ParseException;
 
@@ -94,7 +95,7 @@ public class MetaCADEngine
       root = MetaCADParser.parseTree(name + ";");
       root.aoiobj = parent;
     }
-    // not preceded by a * so it must be a native object
+    // not preceded by a = so it must be a native object
     else
     {
       root = new ParsedTree();
@@ -682,13 +683,60 @@ String coordSysToString(CoordinateSystem cs) {
     int[] oldSelection = this.window.getSelectedIndices();
     undo.addCommand(UndoRecord.SET_SCENE_SELECTION,
                     new Object[] { oldSelection });
-
     
-    BStandardDialog dlg = new BStandardDialog("", Translate.text("enterMacroName"), BStandardDialog.PLAIN);
-    String macroname = dlg.showInputDialog(this.window, null, "mymacro(param1, param2)");
-    if (macroname == null) return;
+    ParsedTree tree = extractTree(objects[0]);
     
-    createMacro(macroname, Arrays.asList(objects));
+    String macroname = null;
+    String macrocall = null;
+    
+    // see if this is an assign node 
+    if (objects.length==1 && tree.name.toLowerCase().startsWith("assign"))
+    {  
+       
+      int assignments = tree.parameters.size()/2;
+      macroname="mymacro(";
+      macrocall="(";
+      
+      for (int i = 0; i < assignments; i++) {
+        if (i!=0)
+        {
+          macroname+=',';
+          macrocall += ',';
+        }
+        macroname+=tree.parameters.get(i*2);
+        macrocall+=tree.parameters.get(i*2+1);
+      }
+      macroname+=')';
+      macrocall += ')';
+      
+      BStandardDialog dlg = new BStandardDialog("", Translate.text("enterMacroName"), BStandardDialog.PLAIN);
+      macroname = dlg.showInputDialog(this.window, null, macroname);
+      if (macroname == null) return;
+      
+      // create a macrocall suggestion
+      int bracketIndex = macroname.indexOf("(");
+      if (bracketIndex < 0)
+        bracketIndex = macroname.length();
+      macrocall = macroname.substring(0,bracketIndex) + macrocall;
+      
+      dlg = new BStandardDialog("", Translate.text("enterMacroCall"), BStandardDialog.PLAIN);
+      macrocall = dlg.showInputDialog(this.window, null, macrocall);
+      if (macrocall == null) return;
+      
+      createMacro(macroname, Arrays.asList(objects[0].getChildren()));
+    }
+    else
+    {
+      BStandardDialog dlg = new BStandardDialog("", Translate.text("enterMacroName"), BStandardDialog.PLAIN);
+      macroname = dlg.showInputDialog(this.window, null, "mymacro(param1, param2)");
+      if (macroname == null) return;
+      
+      dlg = new BStandardDialog("", Translate.text("enterMacroCall"), BStandardDialog.PLAIN);
+      macrocall = dlg.showInputDialog(this.window, null, macroname);
+      if (macrocall == null) return;
+      
+      createMacro(macroname, Arrays.asList(objects));
+    }
     
     Scene theScene = this.window.getScene();
     // delete selected objects
@@ -702,7 +750,7 @@ String coordSysToString(CoordinateSystem cs) {
     // Must rebuild before updating the selection to rebuild indices.
     this.window.rebuildItemList();
 
-    ObjectInfo result = createObjectFromString(macroname);
+    ObjectInfo result = createObjectFromString(macrocall);
     
     this.window.setSelection(this.window.getScene().indexOf(result));
 
