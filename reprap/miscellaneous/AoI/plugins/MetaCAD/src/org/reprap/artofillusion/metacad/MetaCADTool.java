@@ -37,7 +37,7 @@ public class MetaCADTool implements ModellingTool
 
   public MetaCADTool()
   { 
-    KeystrokeManager.addRecord(new KeystrokeRecord(KeyEvent.VK_M, 0, "MetaCAD Evaluator",
+    KeystrokeManager.addRecord(new KeystrokeRecord(KeyEvent.VK_M, 0, "MetaCAD",
         "ModellingTool plugin = (ModellingTool)" +
         "PluginRegistry.getPluginObject(\"org.reprap.artofillusion.metacad.MetaCADTool\");" +
         "plugin.commandSelected(window);"));
@@ -50,7 +50,7 @@ public class MetaCADTool implements ModellingTool
    */
   public String getName()
   {
-    return Translate.text("MetaCADEvaluator:name", "...");
+    return Translate.text("MetaCAD:name", "...");
   }
 
 
