@@ -576,28 +576,65 @@ String coordSysToString(CoordinateSystem cs) {
     createParentObject("for(i=0,i<1,i=i+1)", 1);
   }
   
-  public void inlinemacro() throws Exception
+  public void inlinemacro()
   {
-    ObjectInfo[] objects = getSelection();
-    if (objects.length != 1)
-    {
-      showMessage("Exactly one object must be selected.");
-      return;
-    }
-    
-    ParsedTree tree = extractTree(objects[0]);
-    MacroPrototype macro = this.context.macros.get(tree.name);
-    
-    if (macro !=  null)
-    {
-      for (ParsedTree c : macro.children)
+    try {
+      if (!this.readParameters())
       {
-        ObjectInfo cInfo = fromParsedTree(c, objects[0].object);
-        
-        objects[0].addChild(cInfo, objects[0].children.length);
+        showMessage("Get rid of any errors in the parameters before inlining a macro!");
+        return;
       }
+      
+      ObjectInfo[] objects = getSelection();
+      if (objects.length != 1)
+      {
+        showMessage("Exactly one macro must be selected that is to be inlined.");
+        return;
+      }
+      
+      ParsedTree tree = extractTree(objects[0]);
+      MacroPrototype macro = this.context.macros.get(tree.name.toLowerCase());
+      
+      if (macro == null)
+      {
+        showMessage("Macro with the name: " + tree.name + " was not found");
+        return;
+      }
+      
+      if (tree.parameters.size() < macro.variables.size())
+      {
+        showMessage("The macro call does not have enough paramaters: " + tree.parameters.size() + " given but expected " + macro.variables.size());
+        return;
+      }
+      
+      
+      String assignStatement = this.evaluateMePrefix + "assign(";
+      for (int i = 0; i < macro.variables.size(); i++)
+      {
+        if (i != 0)
+          assignStatement += ", ";
+        assignStatement +=macro.variables.get(i);
+        assignStatement += ",";
+        assignStatement += tree.parameters.get(i);
+      }
+      assignStatement += ")";
+      if (macro !=  null)
+      {
+        for (ParsedTree c : macro.children)
+        {
+          ObjectInfo cInfo = fromParsedTree(c, objects[0].object);
+          
+          objects[0].addChild(cInfo, objects[0].children.length);
+        }
+        objects[0].setName(assignStatement);
+      }
+      this.window.rebuildItemList();
     }
-    this.window.rebuildItemList();
+    catch (Exception ex)
+    {
+      ex.printStackTrace();
+      showMessage(ex.toString());
+    }
   }
   
   public ObjectInfo fromParsedTree(ParsedTree tree, Object3D inheritfrom)
@@ -632,8 +669,6 @@ String coordSysToString(CoordinateSystem cs) {
     return info;
   }
   
-  
-
   public void extractmacro() throws Exception
   {
     UndoRecord undo = new UndoRecord(this.window, false);
