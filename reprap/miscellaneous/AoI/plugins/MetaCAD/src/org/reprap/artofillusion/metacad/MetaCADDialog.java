@@ -65,10 +65,6 @@ class MetaCADDialog extends BDialog implements TextChangedListener
     bc.setDefaultLayout(new LayoutInfo(LayoutInfo.CENTER, LayoutInfo.BOTH));
     this.setContent(bc);
 
-//    ColumnContainer cc = new ColumnContainer();
-//    cc.setBackground(Color.BLACK);
-//    bc.add(cc, BorderContainer.CENTER, new LayoutInfo(LayoutInfo.CENTER, LayoutInfo.BOTH));
-
     String versionstr = MetaCADPlugin.getVersion();
     bc.add(new BLabel(Translate.text("MetaCAD:title", versionstr)), BorderContainer.NORTH, 
            new LayoutInfo(LayoutInfo.NORTH, LayoutInfo.NONE, new Insets(5,5,5,5), null));
@@ -76,6 +72,7 @@ class MetaCADDialog extends BDialog implements TextChangedListener
 
     // Tab widget
     BTabbedPane tabcontainer = new BTabbedPane();
+    tabcontainer.addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
     bc.add(tabcontainer, BorderContainer.CENTER, new LayoutInfo(LayoutInfo.CENTER, LayoutInfo.BOTH));
 
     //  Primitives tab
@@ -134,7 +131,7 @@ class MetaCADDialog extends BDialog implements TextChangedListener
     // Close button
     BButton closeButton;
     bottomgc.add(closeButton = Translate.button("close", this, "closeWindow"), 3, 0, new LayoutInfo(LayoutInfo.EAST, LayoutInfo.NONE));
-    //closeButton.addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
+//    closeButton.addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
     addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
     // FIXME: Other events (most noticeably Cmd-Z (undo)) are consumed and won't reach our
     // parent window.
