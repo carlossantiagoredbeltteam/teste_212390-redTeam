@@ -8,7 +8,6 @@
  */
 package org.reprap.artofillusion.metacad;
 
-import java.awt.Color;
 import java.awt.Insets;
 import java.awt.Rectangle;
 
@@ -23,13 +22,13 @@ import buoy.widget.BButton;
 import buoy.widget.BDialog;
 import buoy.widget.BLabel;
 import buoy.widget.BScrollPane;
+import buoy.widget.BSeparator;
 import buoy.widget.BTabbedPane;
 import buoy.widget.BTextArea;
 import buoy.widget.BorderContainer;
-import buoy.widget.ColumnContainer;
 import buoy.widget.FormContainer;
+import buoy.widget.GridContainer;
 import buoy.widget.LayoutInfo;
-import buoy.widget.RowContainer;
 
 /**
  * MetaCAD dialog
@@ -40,12 +39,16 @@ class MetaCADDialog extends BDialog implements TextChangedListener
   protected LayoutWindow window;
   protected String[] primfunctions = new String [] {
       "cube", "cylinder", "sphere",
-      "regular", "star", "roll"
+      "regular", "star", "roll",
+      "file"
   };
   protected String[] cadfunctions = new String [] {
-      "union", "intersection", "difference", "inset",
-      "move", "rotate", "scale", "trans", "group",
-      "extrude", "lathe", "mesh", "joincurves", "extractmacro", "inlinemacro", "file", "loop"
+      "union", "intersection", "difference",
+      "move", "rotate", "scale",
+      "trans", "group", "loop",
+      "joincurves", "inset", "mesh", 
+      "extrude", "lathe", null,
+      "extractmacro", "inlinemacro"
   };
   
   protected BTextArea paramtab;
@@ -62,19 +65,19 @@ class MetaCADDialog extends BDialog implements TextChangedListener
     bc.setDefaultLayout(new LayoutInfo(LayoutInfo.CENTER, LayoutInfo.BOTH));
     this.setContent(bc);
 
-    ColumnContainer cc = new ColumnContainer();
-    cc.setBackground(Color.BLACK);
-    bc.add(cc, BorderContainer.CENTER, new LayoutInfo(LayoutInfo.CENTER, LayoutInfo.BOTH));
+//    ColumnContainer cc = new ColumnContainer();
+//    cc.setBackground(Color.BLACK);
+//    bc.add(cc, BorderContainer.CENTER, new LayoutInfo(LayoutInfo.CENTER, LayoutInfo.BOTH));
 
     // Tab widget
     BTabbedPane tabcontainer = new BTabbedPane();
-    cc.add(tabcontainer, new LayoutInfo(LayoutInfo.CENTER, LayoutInfo.BOTH));
+    bc.add(tabcontainer, BorderContainer.CENTER, new LayoutInfo(LayoutInfo.CENTER, LayoutInfo.BOTH));
 
     String versionstr = MetaCADPlugin.getVersion();
     bc.add(new BLabel(Translate.text("MetaCAD:title", versionstr)), BorderContainer.NORTH);
 
     //  Primitives tab
-    FormContainer operationstab = new FormContainer(3, 2);
+    FormContainer operationstab = new FormContainer(3, 3);
     tabcontainer.add(operationstab, "Primitives");
 
     for (int i = 0; i < this.primfunctions.length; i++) {
@@ -88,10 +91,12 @@ class MetaCADDialog extends BDialog implements TextChangedListener
     FormContainer cadfuncs = new FormContainer(3, this.cadfunctions.length+1);
     tabcontainer.add(cadfuncs, "CAD");
     for (int i = 0; i < this.cadfunctions.length; i++) {
-      BButton button = new BButton(Translate.text("MetaCAD:"+this.cadfunctions[i]));
-      cadfuncs.add(button, i%3, i/3, new LayoutInfo(LayoutInfo.WEST, LayoutInfo.HORIZONTAL, new Insets(2, 0, 2, 0), null));
-      button.addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
-      button.addEventLink(CommandEvent.class, this.engine, this.cadfunctions[i]);
+      if (this.cadfunctions[i] != null) {
+        BButton button = new BButton(Translate.text("MetaCAD:"+this.cadfunctions[i]));
+        cadfuncs.add(button, i%3, i/3, new LayoutInfo(LayoutInfo.WEST, LayoutInfo.HORIZONTAL, new Insets(2, 0, 2, 0), null));
+        button.addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
+        button.addEventLink(CommandEvent.class, this.engine, this.cadfunctions[i]);
+      }
     }
 
     // Parameters tab
@@ -108,21 +113,25 @@ class MetaCADDialog extends BDialog implements TextChangedListener
     tabcontainer.add(scrollpane, "Parameters");
 
     // Evaluate & Devaluate
-    RowContainer rc = new RowContainer();
-    rc.setDefaultLayout(new LayoutInfo(LayoutInfo.CENTER, LayoutInfo.NONE));
+    GridContainer bottomgc = new GridContainer(4,1);
+    bottomgc.setDefaultLayout(new LayoutInfo(LayoutInfo.CENTER, LayoutInfo.NONE));
+    bc.add(bottomgc, BorderContainer.SOUTH, new LayoutInfo(LayoutInfo.CENTER, LayoutInfo.NONE, new Insets(5,5,5,5), null));
+    
     BButton button = new BButton(Translate.text("MetaCAD:evaluate"));
     button.addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
     button.addEventLink(CommandEvent.class, this.engine, "evaluate");
-    rc.add(button);
+    bottomgc.add(button, 0, 0, new LayoutInfo(LayoutInfo.WEST, LayoutInfo.NONE));    
     button = new BButton(Translate.text("MetaCAD:devaluate"));
     button.addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
     button.addEventLink(CommandEvent.class, this.engine, "devaluate");
-    rc.add(button);
-    cc.add(rc, new LayoutInfo(LayoutInfo.CENTER, LayoutInfo.NONE));        
+    bottomgc.add(button, 1, 0, new LayoutInfo(LayoutInfo.WEST, LayoutInfo.NONE));
     
+    bottomgc.add(new BSeparator(BSeparator.HORIZONTAL), 2, 0, 
+                 new LayoutInfo(LayoutInfo.CENTER, LayoutInfo.HORIZONTAL));
+
     // Close button
     BButton closeButton;
-    bc.add(closeButton = Translate.button("close", this, "closeWindow"), BorderContainer.SOUTH);
+    bottomgc.add(closeButton = Translate.button("close", this, "closeWindow"), 3, 0, new LayoutInfo(LayoutInfo.EAST, LayoutInfo.NONE));
     //closeButton.addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
     addEventLink(KeyPressedEvent.class, this, "keyPressed"); // For Esc support
     // FIXME: Other events (most noticeably Cmd-Z (undo)) are consumed and won't reach our
