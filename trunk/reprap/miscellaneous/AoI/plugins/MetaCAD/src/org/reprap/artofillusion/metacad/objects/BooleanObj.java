@@ -26,8 +26,9 @@ public class BooleanObj extends MetaCADObject {
     CSGHelper helper = new CSGHelper(this.type);
     helper.addAll(ParsedTree.evaluate(ctx, children).iterator());
     
-    if (helper.GetObjectInfo() !=  null)
+    if (helper.GetObjectInfo() != null) {
       result.add(helper.GetObjectInfo());
+    }
     return result;
     
   }
