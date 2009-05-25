@@ -69,12 +69,14 @@ class MetaCADDialog extends BDialog implements TextChangedListener
 //    cc.setBackground(Color.BLACK);
 //    bc.add(cc, BorderContainer.CENTER, new LayoutInfo(LayoutInfo.CENTER, LayoutInfo.BOTH));
 
+    String versionstr = MetaCADPlugin.getVersion();
+    bc.add(new BLabel(Translate.text("MetaCAD:title", versionstr)), BorderContainer.NORTH, 
+           new LayoutInfo(LayoutInfo.NORTH, LayoutInfo.NONE, new Insets(5,5,5,5), null));
+
+
     // Tab widget
     BTabbedPane tabcontainer = new BTabbedPane();
     bc.add(tabcontainer, BorderContainer.CENTER, new LayoutInfo(LayoutInfo.CENTER, LayoutInfo.BOTH));
-
-    String versionstr = MetaCADPlugin.getVersion();
-    bc.add(new BLabel(Translate.text("MetaCAD:title", versionstr)), BorderContainer.NORTH);
 
     //  Primitives tab
     FormContainer operationstab = new FormContainer(3, 3);
