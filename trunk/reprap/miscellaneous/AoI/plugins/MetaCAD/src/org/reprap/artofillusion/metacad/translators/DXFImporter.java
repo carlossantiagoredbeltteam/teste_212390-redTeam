@@ -80,7 +80,7 @@ public class DXFImporter {
    */
   private static Scene theScene = null;
   private static boolean appendFlag = false;
-  private static boolean debug = true;
+  private static boolean debug = false;
   
   Frame parent;
   Boolean enableMeshRepair;
