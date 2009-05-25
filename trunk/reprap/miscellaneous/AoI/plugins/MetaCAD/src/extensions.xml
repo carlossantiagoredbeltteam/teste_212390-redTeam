@@ -1,6 +1,6 @@
 <?xml version='1.0'?>
 
-<extension name="MetaCAD" version="0.8">
+<extension name="MetaCAD" version="0.9">
 
   <import name="Tools" />
 
@@ -11,13 +11,22 @@
 
   <author>Marius Kintel (marius@kintel.net), Philipp Tiefenbacher (wizards23@gmail.com)</author>
   <description>
-MetaCAD plugin. FIXME: Write descriptions here.
+  MetaCAD is a parametric solid modeler for Art of Illusion.
+  
+  This plugin uses the hierarchical tree-view in AoI to create parametric models built from 
+  booleans, extrusions and rotations of simple primitives or loaded DXF outlines.
 
-Documentation and tutorial:
-http://objects.reprap.org/wiki/Builders/Metalab/AoI_CSG_Evaluator
+  All primitives and operations takes parameters which can be constants, variables or evaluated formulas.
+  
+  The modeler is quite powerful and includes a simple macro language for describing sub-objects, which
+  can be instantiated multiple times with different parameters.
+  The plugin includes a text area for storage of variables, formulas and macros.
+  
+  Documentation and tutorial:
+  http://objects.reprap.org/wiki/Builders/Metalab/AoI_MetaCAD
 </description>
   <history> 
-    <log version="0.9" date="XX May 2009" author="all">
+    <log version="0.9" date="25 May 2009" author="all">
     - Initial release</log> 
   </history>
   <comments>
