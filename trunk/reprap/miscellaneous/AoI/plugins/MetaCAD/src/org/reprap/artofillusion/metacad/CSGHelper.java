@@ -2,6 +2,8 @@ package org.reprap.artofillusion.metacad;
 
 import java.util.Iterator;
 
+import artofillusion.animation.PositionTrack;
+import artofillusion.animation.RotationTrack;
 import artofillusion.math.CoordinateSystem;
 import artofillusion.math.Vec3;
 import artofillusion.object.CSGObject;
@@ -13,17 +15,11 @@ import artofillusion.object.ObjectInfo;
  *
  */
 public class CSGHelper {
-  int count;
   int operation;
-  ObjectInfo buffer;
-  CSGObject sum;
   ObjectInfo sumInfo;
 
   public CSGHelper(int op) {
     this.operation = op;
-    this.count = 0;
-    this.sum = null;
-    this.buffer = null;
   }
   
   static public ObjectInfo combine(Iterator<ObjectInfo> iter, int op) {
@@ -39,35 +35,22 @@ public class CSGHelper {
   }
   
   public void Add(ObjectInfo obj) {
-    if (this.count == 0) {
-      this.buffer = obj;
+    if (this.sumInfo == null) {
+      this.sumInfo = obj;
     }
     else {
-      if (this.sum == null) {
-        this.sum = new CSGObject(this.buffer, obj, this.operation);
-        Vec3 center = this.sum.centerObjects();
-        this.sumInfo = new ObjectInfo(this.sum, new CoordinateSystem(center, Vec3.vz(), Vec3.vy()), "tmp");
-      } else {
-        this.sum = new CSGObject(this.sumInfo, obj, this.operation);
-        Vec3 center = this.sum.centerObjects();
-        this.sumInfo = new ObjectInfo(this.sum, new CoordinateSystem(center, Vec3.vz(), Vec3.vy()), "tmp");
-      }
+      CSGObject csg = new CSGObject(this.sumInfo, obj, this.operation);
+      Vec3 center = csg.centerObjects();
+      this.sumInfo = new ObjectInfo(csg, new CoordinateSystem(center, Vec3.vz(), Vec3.vy()), "tmp");
     }
-    this.count++;
   }
 
   public ObjectInfo GetObjectInfo() {
-    if (this.count == 0) return null;
-    if (this.count == 1) return this.buffer;
-
     return this.sumInfo;
   }
 
   public Object3D GetObject() {
-    if (this.count == 0) return null;
-    if (this.count == 1) return this.buffer.object;
-
-    return this.sum;
+    if (this.sumInfo != null) return this.sumInfo.object;
+    return null;
   }
-
 }
