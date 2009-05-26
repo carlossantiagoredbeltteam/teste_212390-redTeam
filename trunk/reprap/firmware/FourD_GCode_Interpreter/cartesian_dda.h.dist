@@ -40,11 +40,15 @@ private:
   bool y_can_step;
   bool z_can_step;
   bool e_can_step;
-  bool t_can_step;
+  bool f_can_step;
 
 // Variables for acceleration calculations
 
   long total_steps;            // The number of steps to take along the longest movement axis
+  
+  long timestep;               // microseconds
+  int extcount;                // count for when to refresh the extruder
+  bool real_move;              // Flag to know if we've changed something physical
 
 // Internal functions that need not concern the user
 
@@ -77,6 +81,10 @@ private:
   
   void enable_steppers();
   void disable_steppers();
+  
+  // Go round the DDA
+  
+  void dda_loop();
   
   // Custom short delay function (microseconds)
   
