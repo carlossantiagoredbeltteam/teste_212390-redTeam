@@ -2,8 +2,6 @@ package org.reprap.artofillusion.metacad;
 
 import java.util.Iterator;
 
-import artofillusion.animation.PositionTrack;
-import artofillusion.animation.RotationTrack;
 import artofillusion.math.CoordinateSystem;
 import artofillusion.math.Vec3;
 import artofillusion.object.CSGObject;

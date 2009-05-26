@@ -8,14 +8,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import bsh.*;
-
-import org.cheffo.jeplite.JEP;
 import org.reprap.artofillusion.metacad.language.MacroPrototype;
 import org.reprap.artofillusion.metacad.language.ParsedStatement;
 import org.reprap.artofillusion.metacad.parser.MetaCADParser;
 
 import artofillusion.Scene;
+import bsh.Interpreter;
 
 public class MetaCADContext {
 
