@@ -12,11 +12,9 @@ package org.reprap.machines;
 
 import org.reprap.ReprapException;
 import org.reprap.Extruder;
-import org.reprap.Preferences;
 import org.reprap.comms.GCodeReaderAndWriter;
 import org.reprap.utilities.Debug;
 import org.reprap.devices.GCodeExtruder;
-import org.reprap.devices.ExtrudedLength;
 import org.reprap.devices.GCodeStepperMotor;
 import org.reprap.geometry.LayerRules;
 

@@ -897,55 +897,55 @@ public class CodeGenerator
 		return null;
 	}
 	
-	private static void oneCase3(Variable [] variables, int exp, int j, int k, boolean opposite, boolean fts)
-	{
-		BooleanExpression a = new BooleanExpression(variables, exp);
-		
-//		FunctionTable tt = new FunctionTable(a);
-//		System.out.println(tt.toString()+"\n\n");
-		
-		FunctionTable f = new FunctionTable(a, variables[j], variables[k], opposite);
-		
-		//BooleanExpression g = findEqualTwo(f, variables[j], variables[3-(j+k)]);
-		BooleanExpression g = findEqualTwo(f, eliminate(variables, k));
-				
-		int caseVal = 0;
-		if(opposite)
-			caseVal |= 1;
-		if(j == 1)
-			caseVal |= 2;
-		if(k == 2)
-			caseVal |= 4;
-		caseVal |= exp << 3;
-
-		System.out.println("\tcase " + caseVal + ": ");
-		if(fts)
-		{
-			System.out.println("\t// " + a.toJava());
-			System.out.print("\t// " + variables[j].name() + " = ");
-			if(opposite)
-				System.out.print("!");	
-			System.out.println(variables[k].name() + " ->");
-			System.out.println(f.toString());
-		}
-
-		if(g != null || f.allOnes() || f.allZeros())
-		{
-			if(f.allOnes())
-				System.out.println("\t\tr = RrCSG.universe();");
-			else if(f.allZeros())
-				System.out.println("\t\tr = RrCSG.nothing();");
-			else
-				System.out.println("\t\t" + g.toJava());
-//			if(fts)
-//			{
-//				FunctionTable h = new FunctionTable(g);
-//				System.out.println(h.toString());
-//			}
-		} else
-			System.out.println("\t\t// No equivalence." + "\n");
-		System.out.println("\t\tbreak;\n");
-	}
+//	private static void oneCase3(Variable [] variables, int exp, int j, int k, boolean opposite, boolean fts)
+//	{
+//		BooleanExpression a = new BooleanExpression(variables, exp);
+//		
+////		FunctionTable tt = new FunctionTable(a);
+////		System.out.println(tt.toString()+"\n\n");
+//		
+//		FunctionTable f = new FunctionTable(a, variables[j], variables[k], opposite);
+//		
+//		//BooleanExpression g = findEqualTwo(f, variables[j], variables[3-(j+k)]);
+//		BooleanExpression g = findEqualTwo(f, eliminate(variables, k));
+//				
+//		int caseVal = 0;
+//		if(opposite)
+//			caseVal |= 1;
+//		if(j == 1)
+//			caseVal |= 2;
+//		if(k == 2)
+//			caseVal |= 4;
+//		caseVal |= exp << 3;
+//
+//		System.out.println("\tcase " + caseVal + ": ");
+//		if(fts)
+//		{
+//			System.out.println("\t// " + a.toJava());
+//			System.out.print("\t// " + variables[j].name() + " = ");
+//			if(opposite)
+//				System.out.print("!");	
+//			System.out.println(variables[k].name() + " ->");
+//			System.out.println(f.toString());
+//		}
+//
+//		if(g != null || f.allOnes() || f.allZeros())
+//		{
+//			if(f.allOnes())
+//				System.out.println("\t\tr = RrCSG.universe();");
+//			else if(f.allZeros())
+//				System.out.println("\t\tr = RrCSG.nothing();");
+//			else
+//				System.out.println("\t\t" + g.toJava());
+////			if(fts)
+////			{
+////				FunctionTable h = new FunctionTable(g);
+////				System.out.println(h.toString());
+////			}
+//		} else
+//			System.out.println("\t\t// No equivalence." + "\n");
+//		System.out.println("\t\tbreak;\n");
+//	}
 	
 	private static void oneCase4(Variable [] variables, int exp, int j, int k, boolean opposite, boolean fts)
 	{
@@ -1018,19 +1018,19 @@ public class CodeGenerator
 		System.out.println("\t\tbreak;\n");
 	}
 	
-	private static void allCases3(Variable [] variables)
-	{	
-		for(int exp = 0; exp < 4; exp++)
-		{
-			for(int j = 0; j < 2; j++)
-				for(int k = j+1; k < 3; k++)
-				{
-					oneCase3(variables, exp, j, k, false, true);
-					oneCase3(variables, exp, j, k, true, true);
-				}
-		}		
-	}
-	
+//	private static void allCases3(Variable [] variables)
+//	{	
+//		for(int exp = 0; exp < 4; exp++)
+//		{
+//			for(int j = 0; j < 2; j++)
+//				for(int k = j+1; k < 3; k++)
+//				{
+//					oneCase3(variables, exp, j, k, false, true);
+//					oneCase3(variables, exp, j, k, true, true);
+//				}
+//		}		
+//	}
+//	
 	private static void allCases4(Variable [] variables)
 	{	
 		for(int exp = 0; exp < 16; exp++)

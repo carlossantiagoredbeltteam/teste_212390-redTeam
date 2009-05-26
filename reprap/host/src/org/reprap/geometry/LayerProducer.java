@@ -10,15 +10,12 @@ import java.io.IOException;
 import javax.media.j3d.BranchGroup;
 
 import org.reprap.Printer;
-import org.reprap.Extruder;
 import org.reprap.Attributes;
 import org.reprap.Preferences;
 import org.reprap.ReprapException;
 import org.reprap.devices.pseudo.LinePrinter;
-import org.reprap.devices.GenericExtruder;
 import org.reprap.geometry.polygons.Rr2Point;
 import org.reprap.geometry.polygons.RrCSGPolygonList;
-import org.reprap.geometry.polygons.RrCSGPolygon;
 import org.reprap.geometry.polygons.RrPolygon;
 import org.reprap.geometry.polygons.RrPolygonList;
 import org.reprap.utilities.Debug;
@@ -307,251 +304,251 @@ public class LayerProducer {
 		}
 	}
 	
-	/**
-	 * look at the layer above where we are, and support everything
-	 * in it that has nothing under it in this layer.
-	 *
-	 */
-	private void supportCalculations()
-	{
-		// We can only work out support if we're going top down
-		
-		if(!layerConditions.getTopDown())
-			return;
-		
-		// Get the layer immediately above
-		
-		RrCSGPolygonList above = layerConditions.getLayerAbove(1);
-		
-		// If there was no layer immediately above, record this layer to 
-		// be the one above for the next layer down and return.
-		
-		if(above == null)
-		{
-			layerConditions.recordThisLayer(csgP);
-			return;
-		}
-		
-		// Pick up our materials
-		
-		Extruder [] es = layerConditions.getPrinter().getExtruders();
-		
-		// A list for the supports for the materials in the layer above
-		
-		RrCSGPolygonList supports = new RrCSGPolygonList();
-		
-		// Each material in this layer unioned with the same material in the layer above
-		// This may be what needs support on the next layer down.
-		
-		RrCSGPolygonList thisForTheRecord = new RrCSGPolygonList();
-		
-		// Compute the union of everything on this layer and grow it by the
-		// extrusion height (i.e. grow to a 45 degree overhang).  Nothing in that region
-		// will need any support.
-		
-		RrCSGPolygon allThisLayer = new RrCSGPolygon();
-		for(int i = 0; i < csgP.size(); i++)
-		{
-			allThisLayer = RrCSGPolygon.union(csgP.get(i), allThisLayer);
-			if(i > 0)
-				allThisLayer = allThisLayer.reEvaluate();
-		}
-		RrCSGPolygon allThisLayerGrown = allThisLayer.offset(layerConditions.getZStep());
-	
-		// This material's shape in the above layer, its attributes,
-		// the extruder used for it, and the name of its support material.
-		
-		RrCSGPolygon pgAboveLevel;
-		Attributes aAboveLevel;
-		Extruder eAboveLevel;
-		String supportName;
-		
-		// The polygons at this level
-		
-		RrCSGPolygon thisLevel;
-		
-		// For each material in the layer above...
-		
-		for(int i = 0; i < above.size(); i++)
-		{
-			// Get this material's shape in the above layer, its attributes,
-			// the extruder used for it, and the name of its support material.
-			
-			pgAboveLevel = above.get(i);
-			aAboveLevel = pgAboveLevel.getAttributes();
-			eAboveLevel = aAboveLevel.getExtruder(es);
-			supportName = eAboveLevel.getSupportMaterial();
-			
-			// If this stuff's support is not called "null"...
-			
-			if(!supportName.contentEquals("null"))
-			{
-				// Pick up the support extruder
-				
-				Extruder supportExtruder = es[GenericExtruder.getNumberFromMaterial(supportName)];
-				
-				// Find the same material at this level
-				
-				thisLevel = csgP.find(aAboveLevel);
-				
-				// If the material is in this level and the one above...
-				
-				if(thisLevel != null)
-				{
-					// The union of them both is the shape that may need support at the next level down
-					
-					RrCSGPolygon toRemember = RrCSGPolygon.union(pgAboveLevel, thisLevel);
-					toRemember = toRemember.reEvaluate();
-					thisForTheRecord.add(toRemember);
-					
-					// The bit left over of the level above after we subtract all this layer
-					// is what needs support
-					
-					RrCSGPolygon sup = RrCSGPolygon.difference(pgAboveLevel, allThisLayerGrown);
-					sup = sup.reEvaluate();
-					sup.setAttributes(new Attributes(supportName, null, null, 
-							supportExtruder.getAppearance()));
-					supports.add(sup);
-				} else
-					
-					// If the material wasn't in this layer, carry the need to support it on down
-					
-					thisForTheRecord.add(pgAboveLevel);
-			}
-		}
-		
-		// Add every material in this layer that has no equivalent in the layer
-		// above as it may need support in the next layer down.
-		
-		for(int i = 0; i < csgP.size(); i++)
-		{
-			thisLevel = csgP.get(i);
-			if(above.find(thisLevel.getAttributes()) == null)
-				thisForTheRecord.add(thisLevel);	
-		}
-		
-		// Record everything in this layer as potentially needing support
-		// in the next layer down.
-		
-		layerConditions.recordThisLayer(thisForTheRecord);
-		
-		// Add all the supports needed to this layer
-		
-		csgP.add(supports);
-		
-	}
-	
-	/**
-	 * look at the layer above where we are, and calculate the infill depending
-	 * on whether something is an open surface or not.
-	 *
-	 */
-	private void inFillCalculations()
-	{
-		// We can only work out infill if we're going top down
-		
-		if(!layerConditions.getTopDown())
-			return;
-		
-		// Get the layer immediately above
-		
-		RrCSGPolygonList above = layerConditions.getLayerAbove(2);
-		if(above == null)
-		{
-			layerConditions.recordThisLayer(csgP);
-			return;
-		}
-		
-		// Pick up our materials
-		
-		Extruder [] es = layerConditions.getPrinter().getExtruders();
-		
-		//Horrid hack...
-		
-		if(layerConditions.getModelLayer() < es[0].getLowerFineLayers())
-			return;
-		
-		// Compute the union of everything on the layer above
-		// Nothing in that region will have a free surface in this layer.
-
-		RrCSGPolygon allAboveLayer = new RrCSGPolygon();
-		for(int i = 0; i < above.size(); i++)
-		{
-			allAboveLayer = RrCSGPolygon.union(above.get(i), allAboveLayer);
-			if(i > 0)
-				allAboveLayer = allAboveLayer.reEvaluate();
-		}
-		
-
-		
-		// A list for the infills
-		
-		RrCSGPolygonList inFills = new RrCSGPolygonList();
-		
-		// A list for the free surface bits
-		
-		RrCSGPolygonList surfaces = new RrCSGPolygonList();	
-
-		// This material's shape, its attributes,
-		// the extruder used for it, and the name of its infill material.
-		
-		RrCSGPolygon pgThisLevel;
-		Attributes aThisLevel;
-		Extruder eThisLevel;
-		String inFillName;
-		
-		// For each material in this layer
-		
-		for(int i = 0; i < csgP.size(); i++)
-		{
-			// Get this material's shape in the above layer, its attributes,
-			// the extruder used for it, and the name of its support material.
-			
-			pgThisLevel = csgP.get(i);
-			aThisLevel = pgThisLevel.getAttributes();
-			eThisLevel = aThisLevel.getExtruder(es);
-			inFillName = eThisLevel.getBroadInfillMaterial();
-			
-			// If this stuff's infill is not called "null"...
-
-			if(!inFillName.contentEquals("null"))
-			{
-				// Pick up the infill extruder
-
-				Extruder inFillExtruder = es[GenericExtruder.getNumberFromMaterial(inFillName)];
-
-				// The exposed region is whatever's in this layer that isn't above
-				
-				RrCSGPolygon exposed = RrCSGPolygon.difference(pgThisLevel, allAboveLayer);
-				exposed = exposed.reEvaluate();
-				
-				// Make the exposed layer bigger...
-				
-				exposed = exposed.offset(layerConditions.getZStep()*eThisLevel.getLowerFineLayers());
-				
-				// ...Then intersect it with what we have already.  That will cause the exposed
-				// region to penetrate the solid a bit.
-				
-				exposed = RrCSGPolygon.intersection(exposed, pgThisLevel);
-				exposed = exposed.reEvaluate();
-				surfaces.add(exposed);
-				
-				// What's left of this layer after the exposed bit is subtracted is the infill part
-				
-				pgThisLevel = RrCSGPolygon.difference(pgThisLevel, exposed);
-				pgThisLevel = pgThisLevel.reEvaluate();
-				pgThisLevel.setAttributes(new Attributes(inFillName, null, null, 
-						inFillExtruder.getAppearance()));
-				inFills.add(pgThisLevel);
-			}
-		}
-		
-		// We now have two new collections of polygons representing this layer
-		
-		csgP = inFills;
-		csgP.add(surfaces);
-		layerConditions.recordThisLayer(csgP);
-	}
+//	/**
+//	 * look at the layer above where we are, and support everything
+//	 * in it that has nothing under it in this layer.
+//	 *
+//	 */
+//	private void supportCalculations()
+//	{
+//		// We can only work out support if we're going top down
+//		
+//		if(!layerConditions.getTopDown())
+//			return;
+//		
+//		// Get the layer immediately above
+//		
+//		RrCSGPolygonList above = layerConditions.getLayerAbove(1);
+//		
+//		// If there was no layer immediately above, record this layer to 
+//		// be the one above for the next layer down and return.
+//		
+//		if(above == null)
+//		{
+//			layerConditions.recordThisLayer(csgP);
+//			return;
+//		}
+//		
+//		// Pick up our materials
+//		
+//		Extruder [] es = layerConditions.getPrinter().getExtruders();
+//		
+//		// A list for the supports for the materials in the layer above
+//		
+//		RrCSGPolygonList supports = new RrCSGPolygonList();
+//		
+//		// Each material in this layer unioned with the same material in the layer above
+//		// This may be what needs support on the next layer down.
+//		
+//		RrCSGPolygonList thisForTheRecord = new RrCSGPolygonList();
+//		
+//		// Compute the union of everything on this layer and grow it by the
+//		// extrusion height (i.e. grow to a 45 degree overhang).  Nothing in that region
+//		// will need any support.
+//		
+//		RrCSGPolygon allThisLayer = new RrCSGPolygon();
+//		for(int i = 0; i < csgP.size(); i++)
+//		{
+//			allThisLayer = RrCSGPolygon.union(csgP.get(i), allThisLayer);
+//			if(i > 0)
+//				allThisLayer = allThisLayer.reEvaluate();
+//		}
+//		RrCSGPolygon allThisLayerGrown = allThisLayer.offset(layerConditions.getZStep());
+//	
+//		// This material's shape in the above layer, its attributes,
+//		// the extruder used for it, and the name of its support material.
+//		
+//		RrCSGPolygon pgAboveLevel;
+//		Attributes aAboveLevel;
+//		Extruder eAboveLevel;
+//		String supportName;
+//		
+//		// The polygons at this level
+//		
+//		RrCSGPolygon thisLevel;
+//		
+//		// For each material in the layer above...
+//		
+//		for(int i = 0; i < above.size(); i++)
+//		{
+//			// Get this material's shape in the above layer, its attributes,
+//			// the extruder used for it, and the name of its support material.
+//			
+//			pgAboveLevel = above.get(i);
+//			aAboveLevel = pgAboveLevel.getAttributes();
+//			eAboveLevel = aAboveLevel.getExtruder(es);
+//			supportName = eAboveLevel.getSupportMaterial();
+//			
+//			// If this stuff's support is not called "null"...
+//			
+//			if(!supportName.contentEquals("null"))
+//			{
+//				// Pick up the support extruder
+//				
+//				Extruder supportExtruder = es[GenericExtruder.getNumberFromMaterial(supportName)];
+//				
+//				// Find the same material at this level
+//				
+//				thisLevel = csgP.find(aAboveLevel);
+//				
+//				// If the material is in this level and the one above...
+//				
+//				if(thisLevel != null)
+//				{
+//					// The union of them both is the shape that may need support at the next level down
+//					
+//					RrCSGPolygon toRemember = RrCSGPolygon.union(pgAboveLevel, thisLevel);
+//					toRemember = toRemember.reEvaluate();
+//					thisForTheRecord.add(toRemember);
+//					
+//					// The bit left over of the level above after we subtract all this layer
+//					// is what needs support
+//					
+//					RrCSGPolygon sup = RrCSGPolygon.difference(pgAboveLevel, allThisLayerGrown);
+//					sup = sup.reEvaluate();
+//					sup.setAttributes(new Attributes(supportName, null, null, 
+//							supportExtruder.getAppearance()));
+//					supports.add(sup);
+//				} else
+//					
+//					// If the material wasn't in this layer, carry the need to support it on down
+//					
+//					thisForTheRecord.add(pgAboveLevel);
+//			}
+//		}
+//		
+//		// Add every material in this layer that has no equivalent in the layer
+//		// above as it may need support in the next layer down.
+//		
+//		for(int i = 0; i < csgP.size(); i++)
+//		{
+//			thisLevel = csgP.get(i);
+//			if(above.find(thisLevel.getAttributes()) == null)
+//				thisForTheRecord.add(thisLevel);	
+//		}
+//		
+//		// Record everything in this layer as potentially needing support
+//		// in the next layer down.
+//		
+//		layerConditions.recordThisLayer(thisForTheRecord);
+//		
+//		// Add all the supports needed to this layer
+//		
+//		csgP.add(supports);
+//		
+//	}
+//	
+//	/**
+//	 * look at the layer above where we are, and calculate the infill depending
+//	 * on whether something is an open surface or not.
+//	 *
+//	 */
+//	private void inFillCalculations()
+//	{
+//		// We can only work out infill if we're going top down
+//		
+//		if(!layerConditions.getTopDown())
+//			return;
+//		
+//		// Get the layer immediately above
+//		
+//		RrCSGPolygonList above = layerConditions.getLayerAbove(2);
+//		if(above == null)
+//		{
+//			layerConditions.recordThisLayer(csgP);
+//			return;
+//		}
+//		
+//		// Pick up our materials
+//		
+//		Extruder [] es = layerConditions.getPrinter().getExtruders();
+//		
+//		//Horrid hack...
+//		
+//		if(layerConditions.getModelLayer() < es[0].getLowerFineLayers())
+//			return;
+//		
+//		// Compute the union of everything on the layer above
+//		// Nothing in that region will have a free surface in this layer.
+//
+//		RrCSGPolygon allAboveLayer = new RrCSGPolygon();
+//		for(int i = 0; i < above.size(); i++)
+//		{
+//			allAboveLayer = RrCSGPolygon.union(above.get(i), allAboveLayer);
+//			if(i > 0)
+//				allAboveLayer = allAboveLayer.reEvaluate();
+//		}
+//		
+//
+//		
+//		// A list for the infills
+//		
+//		RrCSGPolygonList inFills = new RrCSGPolygonList();
+//		
+//		// A list for the free surface bits
+//		
+//		RrCSGPolygonList surfaces = new RrCSGPolygonList();	
+//
+//		// This material's shape, its attributes,
+//		// the extruder used for it, and the name of its infill material.
+//		
+//		RrCSGPolygon pgThisLevel;
+//		Attributes aThisLevel;
+//		Extruder eThisLevel;
+//		String inFillName;
+//		
+//		// For each material in this layer
+//		
+//		for(int i = 0; i < csgP.size(); i++)
+//		{
+//			// Get this material's shape in the above layer, its attributes,
+//			// the extruder used for it, and the name of its support material.
+//			
+//			pgThisLevel = csgP.get(i);
+//			aThisLevel = pgThisLevel.getAttributes();
+//			eThisLevel = aThisLevel.getExtruder(es);
+//			inFillName = eThisLevel.getBroadInfillMaterial();
+//			
+//			// If this stuff's infill is not called "null"...
+//
+//			if(!inFillName.contentEquals("null"))
+//			{
+//				// Pick up the infill extruder
+//
+//				Extruder inFillExtruder = es[GenericExtruder.getNumberFromMaterial(inFillName)];
+//
+//				// The exposed region is whatever's in this layer that isn't above
+//				
+//				RrCSGPolygon exposed = RrCSGPolygon.difference(pgThisLevel, allAboveLayer);
+//				exposed = exposed.reEvaluate();
+//				
+//				// Make the exposed layer bigger...
+//				
+//				exposed = exposed.offset(layerConditions.getZStep()*eThisLevel.getLowerFineLayers());
+//				
+//				// ...Then intersect it with what we have already.  That will cause the exposed
+//				// region to penetrate the solid a bit.
+//				
+//				exposed = RrCSGPolygon.intersection(exposed, pgThisLevel);
+//				exposed = exposed.reEvaluate();
+//				surfaces.add(exposed);
+//				
+//				// What's left of this layer after the exposed bit is subtracted is the infill part
+//				
+//				pgThisLevel = RrCSGPolygon.difference(pgThisLevel, exposed);
+//				pgThisLevel = pgThisLevel.reEvaluate();
+//				pgThisLevel.setAttributes(new Attributes(inFillName, null, null, 
+//						inFillExtruder.getAppearance()));
+//				inFills.add(pgThisLevel);
+//			}
+//		}
+//		
+//		// We now have two new collections of polygons representing this layer
+//		
+//		csgP = inFills;
+//		csgP.add(surfaces);
+//		layerConditions.recordThisLayer(csgP);
+//	}
 	
 	/**
 	 * Stop printing

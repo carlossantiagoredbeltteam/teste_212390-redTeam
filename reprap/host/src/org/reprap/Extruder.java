@@ -1,7 +1,6 @@
 package org.reprap;
 
 import java.io.IOException;
-import org.reprap.geometry.LayerRules;
 import org.reprap.devices.ExtrudedLength;
 import javax.media.j3d.Appearance;
 
