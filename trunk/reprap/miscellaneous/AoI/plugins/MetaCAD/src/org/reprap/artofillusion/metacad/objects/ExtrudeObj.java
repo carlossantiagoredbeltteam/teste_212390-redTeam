@@ -117,18 +117,20 @@ public class ExtrudeObj extends MetaCADObject
         // Since the result is centered in the origin, offset the extruded object to 
         // move it back to its original position
         // FIXME: This only works for linear extrusions, not off-center twists.
-        BoundingBox mybox = profile.getBounds();        
-        if (dir.x < 0) mybox.minx -= dir.x;
-        else mybox.maxx += dir.x;
-        if (dir.y < 0) mybox.miny -= dir.y;
-        else mybox.maxy += dir.y;
-        if (dir.z < 0) mybox.minz -= dir.z;
-        else mybox.maxz += dir.z;
+//        BoundingBox mybox = profile.getBounds();        
+//        if (dir.x < 0) mybox.minx -= dir.x;
+//        else mybox.maxx += dir.x;
+//        if (dir.y < 0) mybox.miny -= dir.y;
+//        else mybox.maxy += dir.y;
+//        if (dir.z < 0) mybox.minz -= dir.z;
+//        else mybox.maxz += dir.z;
         
-        Vec3 offset = profile.getCoords().fromLocal().times(mybox.getCenter()).
-        minus(((Mesh)obj3D).getBounds().getCenter());
-        CoordinateSystem coordsys = new CoordinateSystem();
-        coordsys.setOrigin(offset);
+//        Vec3 offset = profile.getCoords().fromLocal().times(mybox.getCenter()).
+//        minus(((Mesh)obj3D).getBounds().getCenter());
+        Vec3 offset = profile.getCoords().fromLocal().times(((Mesh)profileobj).getVertices()[0].r).
+        minus(((Mesh)obj3D).getVertices()[0].r);
+        
+        CoordinateSystem coordsys = new CoordinateSystem(offset, Vec3.vz(), Vec3.vy());
         ObjectInfo objinfo = new ObjectInfo(obj3D, coordsys, "tmp");
         resultobjects.add(objinfo);
       }
