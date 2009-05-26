@@ -1,14 +1,10 @@
 package org.reprap.artofillusion.metacad.objects;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.reprap.artofillusion.metacad.MetaCADContext;
 import org.reprap.artofillusion.metacad.ParsedTree;
 
-import artofillusion.math.CoordinateSystem;
-import artofillusion.math.Vec3;
-import artofillusion.object.Object3D;
 import artofillusion.object.ObjectInfo;
 
 public class AssignObj extends MetaCADObject {
