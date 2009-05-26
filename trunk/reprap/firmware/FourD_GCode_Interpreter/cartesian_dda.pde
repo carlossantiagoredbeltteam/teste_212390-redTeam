@@ -134,31 +134,31 @@ bool cartesian_dda::set_target(const FloatPoint& p)
           return false;    
 
 #ifdef ACCELERATION_ON
-        //current_steps.t = calculate_feedrate_delay(current_position.f);
+        //current_steps.f = calculate_feedrate_delay(current_position.f);
 #else
-        //current_steps.t = calculate_feedrate_delay(target_position.f);
-        current_steps.t = round(target_position.f);
+        //current_steps.f = calculate_feedrate_delay(target_position.f);
+        current_steps.f = round(target_position.f);
 #endif
-        //if(current_steps.t <= 0)
+        //if(current_steps.f <= 0)
          // return false;
           
-        //target_steps.t = calculate_feedrate_delay(target_position.f);
-        delta_steps.t = abs(target_steps.t - current_steps.t);
+        //target_steps.f = calculate_feedrate_delay(target_position.f);
+        delta_steps.f = abs(target_steps.f - current_steps.f);
         t_scale = 1;
-        if(delta_steps.t > total_steps)
+        if(delta_steps.f > total_steps)
         {
-            t_scale = delta_steps.t/total_steps;
+            t_scale = delta_steps.f/total_steps;
             if(t_scale >= 3)
             {
-              target_steps.t = target_steps.t/t_scale;
-              current_steps.t = current_steps.t/t_scale;
-              delta_steps.t = abs(target_steps.t - current_steps.t);
-              if(delta_steps.t > total_steps)
-                total_steps =  delta_steps.t;
+              target_steps.f = target_steps.f/t_scale;
+              current_steps.f = current_steps.f/t_scale;
+              delta_steps.f = abs(target_steps.f - current_steps.f);
+              if(delta_steps.f > total_steps)
+                total_steps =  delta_steps.f;
             } else
             {
               t_scale = 1;
-              total_steps =  delta_steps.t;
+              total_steps =  delta_steps.f;
             }
         } 
         	
@@ -174,61 +174,21 @@ bool cartesian_dda::set_target(const FloatPoint& p)
 	dda_counter.y = dda_counter.x;
 	dda_counter.z = dda_counter.x;
         dda_counter.e = dda_counter.x;
-        dda_counter.t = dda_counter.x;
+        dda_counter.f = dda_counter.x;
   
         return true;        
 }
 
-
-// Run the DDA
-
-void cartesian_dda::dda_move()
+void cartesian_dda::dda_loop()
 {
-  // Set up the DDA
-  
-        long timestep;
-        int extcount;
-  
-  	//set our direction pins as well
-#if INVERT_X_DIR == 1
-	digitalWrite(X_DIR_PIN, !x_direction);
-#else
-	digitalWrite(X_DIR_PIN, x_direction);
-#endif
 
-#if INVERT_Y_DIR == 1
-	digitalWrite(Y_DIR_PIN, !y_direction);
-#else
-	digitalWrite(Y_DIR_PIN, y_direction);
-#endif
-
-#if INVERT_Z_DIR == 1
-	digitalWrite(Z_DIR_PIN, !z_direction);
-#else
-	digitalWrite(Z_DIR_PIN, z_direction);
-#endif
-        if(e_direction)
-          ext->set_direction(1);
-        else
-          ext->set_direction(0);
-  
-    //turn on steppers to start moving =)
-    
-	enable_steppers();
-
-        bool real_move; // Flag to know if we've changed something physical
-        
-        extcount = 0;
-
-  //do our DDA line!
-
-	do
-	{
+  do
+  {
 		x_can_step = can_step(X_MIN_PIN, X_MAX_PIN, current_steps.x, target_steps.x, x_direction);
 		y_can_step = can_step(Y_MIN_PIN, Y_MAX_PIN, current_steps.y, target_steps.y, y_direction);
 		z_can_step = can_step(Z_MIN_PIN, Z_MAX_PIN, current_steps.z, target_steps.z, z_direction);
                 e_can_step = can_step(-1, -1, current_steps.e, target_steps.e, e_direction);
-                t_can_step = can_step(-1, -1, current_steps.t, target_steps.t, t_direction);
+                f_can_step = can_step(-1, -1, current_steps.f, target_steps.f, t_direction);
                 
                 real_move = false;
                 
@@ -300,24 +260,24 @@ void cartesian_dda::dda_move()
 			}
 		}
 		
-		if (t_can_step)
+		if (f_can_step)
 		{
-			dda_counter.t += delta_steps.t;
+			dda_counter.f += delta_steps.f;
 			
-			if (dda_counter.t > 0)
+			if (dda_counter.f > 0)
 			{
-				dda_counter.t -= total_steps;
+				dda_counter.f -= total_steps;
 				if (t_direction)
-					current_steps.t++;
+					current_steps.f++;
 				else
-					current_steps.t--;
+					current_steps.f--;
 			}
 		}
 
 				
       // wait for next step.
       // Use milli- or micro-seconds, as appropriate
-      // If the only thing that changed was t; don't bother to delay
+      // If the only thing that changed was f; don't bother to delay
   
                 if(real_move)
                 {
@@ -329,17 +289,58 @@ void cartesian_dda::dda_move()
 		    manage_all_extruders();
                   }
                   if(t_scale > 1)
-                    timestep = t_scale*current_steps.t;
+                    timestep = t_scale*current_steps.f;
                   else
-                    timestep = current_steps.t;
+                    timestep = current_steps.f;
                   timestep = calculate_feedrate_delay((float) timestep);
 	          if (timestep >= 16383)
 		    delay(timestep/1000);
 	          else
 		    delayMicrosecondsInterruptible(timestep);
                 }
-                
-	} while (x_can_step || y_can_step || z_can_step  || e_can_step || t_can_step);
+  } while (!real_move && f_can_step);      
+  
+}
+
+
+// Run the DDA
+
+void cartesian_dda::dda_move()
+{
+  // Set up the DDA
+  
+  	//set our direction pins as well
+#if INVERT_X_DIR == 1
+	digitalWrite(X_DIR_PIN, !x_direction);
+#else
+	digitalWrite(X_DIR_PIN, x_direction);
+#endif
+
+#if INVERT_Y_DIR == 1
+	digitalWrite(Y_DIR_PIN, !y_direction);
+#else
+	digitalWrite(Y_DIR_PIN, y_direction);
+#endif
+
+#if INVERT_Z_DIR == 1
+	digitalWrite(Z_DIR_PIN, !z_direction);
+#else
+	digitalWrite(Z_DIR_PIN, z_direction);
+#endif
+        if(e_direction)
+          ext->set_direction(1);
+        else
+          ext->set_direction(0);
+  
+    //turn on steppers to start moving =)
+    
+	enable_steppers();
+        
+        extcount = 0;
+
+  //do our DDA line!
+
+	do { dda_loop(); } while (x_can_step || y_can_step || z_can_step  || e_can_step || f_can_step);
 	
   //set my current position to be where I now am.
 
