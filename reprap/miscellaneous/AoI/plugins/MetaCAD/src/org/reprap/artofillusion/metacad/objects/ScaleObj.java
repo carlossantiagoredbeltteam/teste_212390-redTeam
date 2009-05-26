@@ -19,16 +19,13 @@ public class ScaleObj extends MetaCADObject {
     
     List<ObjectInfo> chlist = ParsedTree.evaluate(ctx, children);
   
-    // workaround: duplicate all evaluated children to make sure we dont 
+    // workaround: duplicate all evaluated children to make sure we don't 
     // modify native objects
     List<ObjectInfo> newChlist = new ArrayList<ObjectInfo>(chlist.size());
-    for (ObjectInfo child : chlist)
-    {
-      ObjectInfo clone = child.duplicate(child.object.duplicate());
-      newChlist.add(clone);
+    for (ObjectInfo child : chlist) {
+      newChlist.add(child.duplicate(child.object.duplicate()));
     }  
     chlist = newChlist;
-   
     
     double scaleX = 1, scaleY = 1, scaleZ = 1;
     
@@ -41,36 +38,29 @@ public class ScaleObj extends MetaCADObject {
     }
     
     boolean absSize = false;
-    if (parameters.size() >= 4) {
-      if (parameters.get(3).toLowerCase().startsWith("abs"))
-        absSize =  true;
+    if (parameters.size() >= 4 && parameters.get(3).toLowerCase().startsWith("abs")) {
+      absSize =  true;
     }
     
-    for (ObjectInfo info : chlist)
-    {
+    for (ObjectInfo info : chlist) {
       try  {
         Object3D obj3D = info.object;
-        if (absSize)
-        {
+        if (absSize) {
           obj3D.setSize(scaleX, scaleY, scaleZ);
         }
-        else
-        {
+        else {
           Vec3 sizes = obj3D.getBounds().getSize();
           obj3D.setSize(sizes.x * scaleX, sizes.y * scaleY, sizes.z * scaleZ); 
         }
       }
-      catch (NullPointerException ex)
-      {
+      catch (NullPointerException ex) {
         // WORKAROUND for failing CSGObjects
         TriangleMesh mesh = info.object.convertToTriangleMesh(0.1);
         
-        if (absSize)
-        {
+        if (absSize) {
           mesh.setSize(scaleX, scaleY, scaleZ);
         }
-        else
-        {
+        else {
           Vec3 sizes = mesh.getBounds().getSize();
           mesh.setSize(sizes.x * scaleX, sizes.y * scaleY, sizes.z * scaleZ); 
         }
