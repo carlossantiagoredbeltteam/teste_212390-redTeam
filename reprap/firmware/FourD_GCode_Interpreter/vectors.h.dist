@@ -73,7 +73,7 @@ struct LongPoint
 	long y;
 	long z;
         long e;   // Extrusion
-        long t;   // Time delay
+        long f;   // Time delay
 };
 
 inline LongPoint operator+(const LongPoint& a, const LongPoint& b)
@@ -83,7 +83,7 @@ inline LongPoint operator+(const LongPoint& a, const LongPoint& b)
   result.y = a.y + b.y;
   result.z = a.z + b.z;
   result.e = a.e + b.e;
-  result.t = a.t + b.t;
+  result.f = a.f + b.f;
   return result;
 }  
 
@@ -94,7 +94,7 @@ inline LongPoint operator-(const LongPoint& a, const LongPoint& b)
   result.y = a.y - b.y;
   result.z = a.z - b.z;
   result.e = a.e - b.e;
-  result.t = a.t - b.t;
+  result.f = a.f - b.f;
   return result;
 } 
 
@@ -107,7 +107,7 @@ inline LongPoint operator*(const LongPoint& a, const LongPoint& b)
   result.y = a.y * b.y;
   result.z = a.z * b.z;
   result.e = a.e * b.e;
-  result.t = a.t * b.t;
+  result.f = a.f * b.f;
   return result;
 } 
 */
@@ -119,7 +119,7 @@ inline LongPoint absv(const LongPoint& a)
   result.y = abs(a.y);
   result.z = abs(a.z);
   result.e = abs(a.e);
-  result.t = abs(a.t);
+  result.f = abs(a.f);
   return result;
 } 
 
@@ -132,7 +132,7 @@ inline LongPoint roundv(const FloatPoint& a)
   result.y = round(a.y);
   result.z = round(a.z);
   result.e = round(a.e);
-  result.t = round(a.f);
+  result.f = round(a.f);
   return result;
 } 
 
