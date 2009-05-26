@@ -65,8 +65,6 @@ import javax.media.j3d.Group;
 import javax.media.j3d.SceneGraphObject;
 import javax.media.j3d.Shape3D;
 import javax.media.j3d.Transform3D;
-import javax.media.j3d.Bounds;
-import javax.media.j3d.BoundingBox;
 import javax.vecmath.Point3d;
 import javax.vecmath.Tuple3d;
 

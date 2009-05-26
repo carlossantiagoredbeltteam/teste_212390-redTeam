@@ -377,7 +377,7 @@ public void goTo(double xTo, double yTo, double zTo)
 		if(plotExtruderCheck.isSelected())
 		{
 			int eNum = Integer.parseInt(extruderToPlotWith.getText());
-			GenericExtruderTabPanel etp = parentBotConsoleFrame.getGenericExtruderTabPanel(eNum);
+			GenericExtruderTabPanel etp = BotConsoleFrame.getGenericExtruderTabPanel(eNum);
 			printer.selectExtruder(eNum);
 			printer.getExtruder().setExtrusion(etp.getExtruderSpeed());
 			printer.machineWait(printer.getExtruder().getExtrusionDelayForLayer());

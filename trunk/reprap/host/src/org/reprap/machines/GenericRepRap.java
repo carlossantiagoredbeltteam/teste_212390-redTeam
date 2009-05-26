@@ -5,8 +5,6 @@ import java.io.IOException;
 import javax.media.j3d.BranchGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
-import java.util.ArrayList;
-import java.util.List;
 import org.reprap.Attributes;
 import org.reprap.CartesianPrinter;
 import org.reprap.Preferences;

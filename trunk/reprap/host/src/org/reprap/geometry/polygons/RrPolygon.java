@@ -437,7 +437,6 @@ public class RrPolygon
 	 */
 	public RrPolygon newStart(int i)
 	{
-		int k = i;
 		if(!isClosed())
 			System.err.println("RrPolygon.newStart(i): reordering an open polygon!");
 		if(i < 0 || i >= size())
