@@ -7,10 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.cheffo.jeplite.JEP;
 import org.reprap.artofillusion.metacad.language.MacroPrototype;
-import org.reprap.artofillusion.metacad.language.ParsedStatement;
-import org.reprap.artofillusion.metacad.objects.AssignObj;
 import org.reprap.artofillusion.metacad.parser.MetaCADParser;
 import org.reprap.artofillusion.metacad.parser.ParseException;
 
