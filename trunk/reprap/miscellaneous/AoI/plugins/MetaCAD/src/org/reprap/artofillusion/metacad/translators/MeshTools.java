@@ -3,10 +3,11 @@ package org.reprap.artofillusion.metacad.translators;
  * utilities for messing with triangle meshes
  */
 
-import artofillusion.math.*;
-import buoy.widget.BFrame;
 import java.awt.Frame;
 import java.util.Vector;
+
+import artofillusion.math.Vec3;
+import buoy.widget.BFrame;
 
 /**
  * merge duplicate points
