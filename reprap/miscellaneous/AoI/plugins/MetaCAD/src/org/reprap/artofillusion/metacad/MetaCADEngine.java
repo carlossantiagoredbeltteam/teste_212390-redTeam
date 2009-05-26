@@ -606,7 +606,7 @@ String coordSysToString(CoordinateSystem cs) {
       }
       
       
-      String assignStatement = this.evaluateMePrefix + "assign(";
+      String assignStatement = evaluateMePrefix + "assign(";
       for (int i = 0; i < macro.variables.size(); i++)
       {
         if (i != 0)
