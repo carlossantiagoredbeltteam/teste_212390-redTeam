@@ -40,6 +40,7 @@ public class CSGHelper {
     }
     else {
       CSGObject csg = new CSGObject(this.sumInfo, obj, this.operation);
+      csg.copyTextureAndMaterial(this.sumInfo.object);
       Vec3 center = csg.centerObjects();
       this.sumInfo = new ObjectInfo(csg, new CoordinateSystem(center, Vec3.vz(), Vec3.vy()), "tmp");
     }
