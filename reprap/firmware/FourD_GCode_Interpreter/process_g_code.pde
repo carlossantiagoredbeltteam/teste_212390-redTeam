@@ -353,6 +353,10 @@ void process_string(char instruction[], int size)
 				 break;
 				 */
 
+// Now, with E codes, there is no longer any idea of turning the extruder on or off.
+// (But see valve on/off below.)
+
+/*
 			//turn extruder on, forward
 			case 101:
 				ex[extruder_in_use]->set_direction(1);
@@ -369,7 +373,7 @@ void process_string(char instruction[], int size)
 			case 103:
 				ex[extruder_in_use]->set_speed(0);
 				break;
-
+*/
 			//custom code for temperature control
 			case 104:
 				if (gc.seen & GCODE_S)
@@ -393,12 +397,17 @@ void process_string(char instruction[], int size)
 			case 107:
 				ex[extruder_in_use]->set_cooler(0);
 				break;
-
+/*
+// Extruder speed is now entirely controlled by E codes
 			//set max extruder speed, 0-255 PWM
 			case 108:
 				if (gc.seen & GCODE_S)
 					extruder_speed = gc.S;
 				break;
+*/
+
+// The valve (real, or virtual...) is now the way to control any extruder (such as
+// a pressurised paste extruder) that cannot move using E codes.
 
                         // Open the valve
                         case 126:
