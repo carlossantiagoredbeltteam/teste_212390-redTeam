@@ -2,7 +2,6 @@ package org.reprap.artofillusion.metacad.objects;
 
 import java.util.List;
 
-import org.cheffo.jeplite.ASTVarNode;
 import org.reprap.artofillusion.metacad.MetaCADContext;
 import org.reprap.artofillusion.metacad.ParsedTree;
 import org.reprap.artofillusion.metacad.language.MacroPrototype;
