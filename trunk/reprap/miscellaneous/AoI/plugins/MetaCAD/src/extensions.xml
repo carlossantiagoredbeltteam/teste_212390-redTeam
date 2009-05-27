@@ -1,6 +1,6 @@
 <?xml version='1.0'?>
 
-<extension name="MetaCAD" version="0.9">
+<extension name="MetaCAD" version="0.9.1">
 
   <import name="Tools" />
 
@@ -26,8 +26,11 @@
   http://objects.reprap.org/wiki/Builders/Metalab/AoI_MetaCAD
 </description>
   <history> 
-    <log version="0.9" date="25 May 2009" author="all">
+    <log version="0.9" date="26 May 2009" author="all">
     - Initial release</log> 
+    <log version="0.9.1" date="27 May 2009" author="all">
+    - Single =move() gave nullpointerexception
+    - Default to 16 segments for DXF arcs</log> 
   </history>
   <comments>
   </comments>
