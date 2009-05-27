@@ -426,7 +426,7 @@ public class DXFImporter {
 
   private Vec3[] createArc(YxxfGfxMatrix mat,
                            YxxfGfxPointW center, double radius, double startang, double endang) {
-    int num = 8; // FIXME: Calculate a suitable # of segments
+    int num = 16; // FIXME: Calculate a suitable # of segments
     double sweepang = (endang - startang)*Math.PI/180;
     while (sweepang < 0) sweepang += Math.PI*2;
     double delta = sweepang/num;
