@@ -1,6 +1,7 @@
 package org.reprap.artofillusion.metacad.objects;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.reprap.artofillusion.metacad.MetaCADContext;
@@ -17,9 +18,10 @@ public class CSObj extends MetaCADObject {
                                          List<String> parameters, 
                                          List<ParsedTree> children) throws Exception {
 
-    assert(children.size() == 1);
-    List<ObjectInfo> chlist = ParsedTree.evaluate(ctx, children);
+    if (children.size() == 0) return new LinkedList<ObjectInfo>();
     
+    List<ObjectInfo> chlist = ParsedTree.evaluate(ctx, children);
+
     CoordinateSystem coordsys = new CoordinateSystem();
     if (parameters.size() >= 3) {
       coordsys.setOrigin(new Vec3(ctx.evaluateExpression(parameters.get(0)),
