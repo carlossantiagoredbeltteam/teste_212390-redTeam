@@ -3,10 +3,11 @@
 	<classpathentry kind="src" output="CSGEvaluator/build" path="CSGEvaluator/src"/>
 	<classpathentry kind="src" output="MetaCAD/build" path="MetaCAD/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="CSGEvaluator/lib/jeplite-0.8.7a-bin.jar"/>
-	<classpathentry kind="lib" path="/AoI-2.7.2/ArtOfIllusion.jar"/>
+	<classpathentry kind="lib" path="MetaCAD/lib/jeplite-0.8.7a-bin.jar"/>
+	<classpathentry kind="lib" path="/AoI-2.7.2/ArtOfIllusion.jar" sourcepath="/Users/kintel/code/metalab/AoIsrc272/ArtOfIllusion/src"/>
 	<classpathentry kind="lib" path="/AoI-2.7.2/lib/jmf.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/AoI-2.7.2"/>
 	<classpathentry kind="lib" path="MetaCAD/classes"/>
+	<classpathentry kind="lib" path="/AoI-2.7.2/lib/jogl.jar"/>
 	<classpathentry kind="output" path="CSGEvaluator/build"/>
 </classpath>
