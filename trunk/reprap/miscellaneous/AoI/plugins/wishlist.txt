@@ -1,23 +1,30 @@
-MetaCADEvaluator:
+MetaCAD:
 
-o Regular polygon: Unintuitive in quad mode
-o named parameters: It's hard to remember parameter ordering
-o online help/tooltips/wizard or smth.?
-o Separate object editor (tabs in main dialog)
-o Set/compute a minimal size for the dialog
-o Have a way of toggling debug info on/off (e.g. message boxes)
-o Catch NullPointerExceptions in JEP (to avoid exit to debugger for common errors)
-
-o Sometimes the plugin hangs (for a long time)
-  for-loop-transform, ring-generator
-  -> Missing parameters?
-  -> display error on missing params?
-
-o Workflow questions:
-  1) Create dummy object
-  2) rename to e.g. "poly(reg, 5, 6, 5)"
-  3) With GUI, move object away from the origin
-  4) evaluate -> object is moved back to the origin.
-  -> Should we merge the user-defined origin with our coordsys?
-     Merge is hard, but we could replace it?
-
+- Regular polygon: Unintuitive in quad mode
+- online help/tooltips/wizard or smth.?
+- Separate object editor (tabs in main dialog)
+- Set/compute a minimal size for the dialog
+- Have a way of toggling debug inf- on/off (e.g. message boxes)
+- Support reading objects created with CSGEvaluator
+- error handling
+   - Detect missing jogl at startup
+   - clean up exception handling
+   - some illegal operations fail with a "unit cube" error -> null
+     object + error msg
+   - Error on missing required parameters (e.g. rotate with < 3
+     params)
+   - extrude-mesh-native.aoi bug: pop up some error dialog?
+   - Use NullObject as error object? color it red?
+   - better handling of "dummy"
+- caching
+- for loop or group as the positive part of a difference -> unintuitive behavior
+- Import STL files
+- Cleanup curves before inset, mesh, join some curves have duplicate vertices 
+  (e.g. polyline-M)
+- mesh of mesh -> simplify
+- scale doesn't work on vertical/horizontal lines (rect-lines.dxf,
+  z-mount.dxf)
+- file
+   - subdivide arcs in a smarter way (error metric instead of
+     fixed # of segments)
+   - Inline options or function to decouple from dxf file
