@@ -33,18 +33,7 @@ public class ParsedTree {
     
     List<ObjectInfo> result = this.cadobj.evaluateObject(ctx, this.parameters, this.children);
 
-    // Make sure all evaluated objects have a texture. This is necessary for objects which don't have
-    // an associated aoiobj and where we need access to the texture (e.g. CSGObject inside macros which
-    // use the CSGObject.centerObject()).
-    for (ObjectInfo chinfo : result) {
-      Texture tex = chinfo.object.getTexture();
-      if (tex == null) tex = ctx.scene.getDefaultTexture();
-      TextureMapping map = chinfo.object.getTextureMapping();
-      if (map == null) map = ctx.scene.getDefaultTexture().getDefaultMapping(chinfo.object);
-      chinfo.object.setTexture(tex, map);
-    }
-    
-    //must have been a  native object
+    //must have been a native object
     if (result == null) {
       result = new LinkedList<ObjectInfo>();
       // duplicate native object to prevent accumulating cs
@@ -52,15 +41,28 @@ public class ParsedTree {
       objInfo.setVisible(true);
       result.add(objInfo);
     }
-    else if (result.size() == 0) {
-      updateAOI(ObjectHelper.getErrorObject());
-    }
-    else if (result.size() == 1) {
-      updateAOI(result.get(0));
-    }
     else {
-     ObjectInfo collection = new ObjectInfo(new MetaCADObjectCollection(result), new CoordinateSystem(), "dummy");
-     updateAOI(collection);
+      // Make sure all evaluated objects have a texture. This is necessary for objects which don't have
+      // an associated aoiobj and where we need access to the texture (e.g. CSGObject inside macros which
+      // use the CSGObject.centerObject()).
+      for (ObjectInfo chinfo : result) {
+        Texture tex = chinfo.object.getTexture();
+        if (tex == null) tex = ctx.scene.getDefaultTexture();
+        TextureMapping map = chinfo.object.getTextureMapping();
+        if (map == null) map = ctx.scene.getDefaultTexture().getDefaultMapping(chinfo.object);
+        chinfo.object.setTexture(tex, map);
+      }
+      
+      if (result.size() == 0) {
+        updateAOI(ObjectHelper.getErrorObject());
+      }
+      else if (result.size() == 1) {
+        updateAOI(result.get(0));
+      }
+      else {
+        ObjectInfo collection = new ObjectInfo(new MetaCADObjectCollection(result), new CoordinateSystem(), "dummy");
+        updateAOI(collection);
+      }
     }
     return result;
   }
