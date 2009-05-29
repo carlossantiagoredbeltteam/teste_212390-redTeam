@@ -326,6 +326,28 @@ Boolean convertObject(ObjectInfo parent) {
       parent.setName(evaluateMePrefix + name);
       return true;
     }
+    // Upgrade files saved with CSG Evaluator
+    else if (parent.object instanceof CSGObject) {
+      String name = new String();
+      if (parent.name.startsWith("-") || parent.name.startsWith("+") ||
+          parent.name.startsWith("/") || parent.name.startsWith("&")) {
+        name = parent.name.substring(1);
+      }
+      
+      if (parent.name.startsWith("difference") || parent.name.startsWith("-")) {
+        parent.setName(name + "=difference()");
+        return true;
+      }
+      else if (parent.name.startsWith("union") || parent.name.startsWith("+")) {
+        parent.setName(name + "=union()");
+        return true;
+      }
+      else if (parent.name.startsWith("intersection") || parent.name.startsWith("/")) {
+        parent.setName(name + "=intersection()");
+        return true;
+      }
+    }
+    
     return false;
   }
 
@@ -340,20 +362,36 @@ Boolean convertObject(ObjectInfo parent) {
     return obj;
   }
 
+  /*!
+   * Returns a string describing the given cs, or an empty string if the cs is identity.
+   */
 String coordSysToString(CoordinateSystem cs) {
     Vec3 t = cs.getOrigin();
-    double r[] = cs.getRotationAngles();
-    String str = "trans(" +
-        String.format("%.2f", t.x) + "," +
-        String.format("%.2f", t.y) + "," +
-        String.format("%.2f", t.z);
-    
-    if (r[0] != 0.0 || r[1] != 0.0 || r[2] != 0.0) {
-      str += "," + String.format("%.2f", r[0]) +
-      "," + String.format("%.2f", r[1]) +
-      "," + String.format("%.2f", r[2]);
+    String movestr = null;
+    if (t.x != 0.0 || t.y != 0.0 || t.z != 0.0) {
+      movestr = String.format("%.2f", t.x) + "," +
+                String.format("%.2f", t.y) + "," + 
+                String.format("%.2f", t.z);
     }
-    str += ")";
+    String rotstr = null;
+    double r[] = cs.getRotationAngles();
+    if (r[0] != 0.0 || r[1] != 0.0 || r[2] != 0.0) {
+      rotstr = String.format("%.2f", r[0]) + "," +
+               String.format("%.2f", r[1]) + "," +
+               String.format("%.2f", r[2]);
+    }
+    
+    String str = new String();
+    if (movestr != null && rotstr != null) {
+      str = "trans(" + movestr + "," + rotstr + ")";
+    }
+    else if (movestr != null) {
+      str = "move(" + movestr + ")";
+    }
+    else if (rotstr != null) {
+      str = "rot(" + rotstr + ")";
+    }
+    
     return str;
   }
   
