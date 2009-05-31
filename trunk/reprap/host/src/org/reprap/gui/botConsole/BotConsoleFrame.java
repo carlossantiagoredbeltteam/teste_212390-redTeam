@@ -13,6 +13,8 @@
 package org.reprap.gui.botConsole;
 
 import org.reprap.Preferences;
+import org.reprap.utilities.Debug;
+
 import javax.swing.JOptionPane;
 //import org.reprap.machines.MachineFactory;
 
@@ -47,6 +49,7 @@ public class BotConsoleFrame extends javax.swing.JFrame {
         initComponents();
 
         this.setTitle("RepRap Console");
+
         
         /*
          * Fork off a thread to keep the panels up-to-date

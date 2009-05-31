@@ -166,19 +166,19 @@ public class GCodeReaderAndWriter
 
 		bufferThread = null;
 		
-		if(serialOutStream != null)
-		{
-			bufferThread = new Thread() 
-			{
-				public void run() 
-				{
-					Thread.currentThread().setName("GCodeWriter() Buffer Thread");
-					bufferDeQueue();
-				}
-			};
-
-			bufferThread.start();
-		}
+//		if(serialOutStream != null)
+//		{
+//			bufferThread = new Thread() 
+//			{
+//				public void run() 
+//				{
+//					Thread.currentThread().setName("GCodeWriter() Buffer Thread");
+//					bufferDeQueue();
+//				}
+//			};
+//
+//			bufferThread.start();
+//		}
 	}
 
 	
@@ -248,11 +248,11 @@ public class GCodeReaderAndWriter
 			return false;
 		}
 		
-		if(bufferThread == null)
-		{
-			System.err.println("GCodeWriter: attempt to write to non-existent buffer.");
-			return true;
-		}			
+//		if(bufferThread == null)
+//		{
+//			System.err.println("GCodeWriter: attempt to write to non-existent buffer.");
+//			return true;
+//		}			
 		
 		// Launch a thread to run through the file, so we can return control
 		// to the user
@@ -318,12 +318,12 @@ public class GCodeReaderAndWriter
 	{
 		Debug.d("disposing of GCodeReaderAndWriter.");
 		
-		// Wait for the ring buffer to be exhausted
-		if(fileOutStream == null && bufferThread != null)
-		{
-			exhaustBuffer = true;
-			while(exhaustBuffer) sleep(200);
-		}
+//		// Wait for the ring buffer to be exhausted
+//		if(fileOutStream == null && bufferThread != null)
+//		{
+//			exhaustBuffer = true;
+//			while(exhaustBuffer) sleep(200);
+//		}
 		
 		try
 		{
@@ -383,16 +383,21 @@ public class GCodeReaderAndWriter
 		if(com != 0)
 		{
 			cmd = cmd.trim();
-			serialOutStream.print(cmd + "\n");
-			// Message has effectively gone to the machine, so we can release the queuing thread
-			//threadLock = false;				
-			serialOutStream.flush();
-			//oneSent = true;
-			Debug.c("G-code: " + cmd + " dequeued and sent");
-			// Wait for the machine to respond before we send the next command
-			waitForOK();
-		} else
-			Debug.c("G-code: " + ringBuffer[tail] + " not sent");
+			if(cmd.length() > 0)
+			{
+				serialOutStream.print(cmd + "\n");
+				// Message has effectively gone to the machine, so we can release the queuing thread
+				//threadLock = false;				
+				serialOutStream.flush();
+				//oneSent = true;
+				Debug.c("G-code: " + cmd + " dequeued and sent");
+				// Wait for the machine to respond before we send the next command
+				waitForOK();
+			}
+			return;
+		}
+	
+		Debug.c("G-code: " + cmd + " not sent");
 		
 //		// Is the output thread running?
 //		if(bufferThread == null)
@@ -432,61 +437,61 @@ public class GCodeReaderAndWriter
 //		}
 	}
 	
-	/**
-	 * Loop getting the next thing in the buffer and transmitting it 
-	 * (or waiting for something to send if there's nothing there).
-	 *
-	 */
-	private void bufferDeQueue()
-	{
-		for(;;)
-		{
-			// Are we locked out by the queuing thread?
-			//while(threadLock) sleep(7);
-			// Wait for something to be there to send
-			while(bufferEmpty())
-			{
-				// If nothing more is ever coming, finish
-				if(exhaustBuffer)
-				{
-					exhaustBuffer = false;
-					return;
-				}
-				sleep(19);
-			}
-			// Lock out the queuing thread
-			//threadLock = true;
-			boolean oneSent = false;
-			synchronized(this)
-			{
-				// Pick up the next command in the buffer
-				tail++;
-				if(tail >= buflen) tail = 0;
-				// Strip any comment and send the command to the machine
-				String cmd = ringBuffer[tail];
-				int com = cmd.indexOf(';');
-				if(com > 0)
-					cmd = cmd.substring(0, com);
-				if(com != 0)
-				{
-					cmd = cmd.trim();
-					serialOutStream.print(cmd + "\n");
-					// Message has effectively gone to the machine, so we can release the queuing thread
-					//threadLock = false;				
-					serialOutStream.flush();
-					oneSent = true;
-					Debug.c("G-code: " + cmd + " dequeued and sent");
-					// Wait for the machine to respond before we send the next command
-					//waitForOK();
-				} else
-					Debug.c("G-code: " + ringBuffer[tail] + " not sent");
-				// Just for safety
-				//threadLock = false;
-			}
-			if(oneSent)
-				waitForOK();
-		}
-	}
+//	/**
+//	 * Loop getting the next thing in the buffer and transmitting it 
+//	 * (or waiting for something to send if there's nothing there).
+//	 *
+//	 */
+//	private void bufferDeQueue()
+//	{
+//		for(;;)
+//		{
+//			// Are we locked out by the queuing thread?
+//			//while(threadLock) sleep(7);
+//			// Wait for something to be there to send
+//			while(bufferEmpty())
+//			{
+//				// If nothing more is ever coming, finish
+//				if(exhaustBuffer)
+//				{
+//					exhaustBuffer = false;
+//					return;
+//				}
+//				sleep(19);
+//			}
+//			// Lock out the queuing thread
+//			//threadLock = true;
+//			boolean oneSent = false;
+//			synchronized(this)
+//			{
+//				// Pick up the next command in the buffer
+//				tail++;
+//				if(tail >= buflen) tail = 0;
+//				// Strip any comment and send the command to the machine
+//				String cmd = ringBuffer[tail];
+//				int com = cmd.indexOf(';');
+//				if(com > 0)
+//					cmd = cmd.substring(0, com);
+//				if(com != 0)
+//				{
+//					cmd = cmd.trim();
+//					serialOutStream.print(cmd + "\n");
+//					// Message has effectively gone to the machine, so we can release the queuing thread
+//					//threadLock = false;				
+//					serialOutStream.flush();
+//					oneSent = true;
+//					Debug.c("G-code: " + cmd + " dequeued and sent");
+//					// Wait for the machine to respond before we send the next command
+//					//waitForOK();
+//				} else
+//					Debug.c("G-code: " + ringBuffer[tail] + " not sent");
+//				// Just for safety
+//				//threadLock = false;
+//			}
+//			if(oneSent)
+//				waitForOK();
+//		}
+//	}
 
 	/**
 	 * Wait for the GCode interpreter in the RepRap machine to send back "ok\n".
@@ -518,7 +523,10 @@ public class GCodeReaderAndWriter
 				{
 					if (resp.startsWith("ok"))
 					{
-						Debug.c("GCode acknowledged");
+						if(resp.length() > 2)
+							Debug.c("GCode acknowledged with message: " + resp);
+						else
+							Debug.c("GCode acknowledged");
 						return;
 					} else if (resp.startsWith("T:"))
 					{
@@ -551,8 +559,6 @@ public class GCodeReaderAndWriter
 					resp = "";
 				} else
 					resp += c;
-				// We are running at high priority; give others a look in
-				//sleep(5);
 			}
 		}
 	}
@@ -582,11 +588,11 @@ public class GCodeReaderAndWriter
 	 */
 	public String queueRespond(String cmd)
 	{
-		if(bufferThread == null)
-		{
-			Debug.d("queueRespond: attempt to queue: " + cmd + " to a non-running output buffer.");
-			return "0000";
-		}
+//		if(bufferThread == null)
+//		{
+//			Debug.d("queueRespond: attempt to queue: " + cmd + " to a non-running output buffer.");
+//			return "0000";
+//		}
 		//trim it and cleanup.
 		cmd = cmd.trim();
 		cmd = cmd.replaceAll("  ", " ");
