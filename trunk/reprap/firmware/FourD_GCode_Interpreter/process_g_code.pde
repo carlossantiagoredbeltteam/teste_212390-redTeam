@@ -74,6 +74,7 @@ int scan_float(char *str, float *valp);
 
 GcodeParser gc;	/* string parse result */
 
+
 //init our string processing
 void init_process_string()
 {
@@ -128,7 +129,13 @@ void get_and_do_command()
 
                 // Say we're ready for the next one
                 
-                Serial.println("ok");
+                if(debugstring[0] != 0)
+                {
+                  Serial.print("ok ");
+                  Serial.println(debugstring);
+                  debugstring[0] = 0;
+                } else
+                  Serial.println("ok");
 	}
 }
 
@@ -173,7 +180,6 @@ int parse_string(struct GcodeParser * gc, char instruction[ ], int size)
 //Read the string and execute instructions
 void process_string(char instruction[], int size)
 {
-
 	//the character / means delete block... used for comments and stuff.
 	if (instruction[0] == '/')	
 		return;
@@ -207,7 +213,7 @@ void process_string(char instruction[], int size)
 	if (gc.seen & GCODE_G)
 	{
 		last_gcode_g = gc.G;	/* remember this for future instructions */
-		fp = cdda.where_i_am();
+		fp = where_i_am;
 		if (abs_mode)
 		{
 			if (gc.seen & GCODE_X)
@@ -234,81 +240,92 @@ void process_string(char instruction[], int size)
 		// Get feedrate if supplied - feedrates are always absolute???
 		if ( gc.seen & GCODE_F )
 			fp.f = gc.F;
+               
+                // Process the buffered move commands first
+                // If we get one, return immediately
 
-		//do something!
 		switch (gc.G)
-		{
+                {
 			//Rapid move
 			case 0:
                                 fr = fp.f;
                                 fp.f = FAST_XY_FEEDRATE;
-                                cdda.move(fp);
+                                qMove(fp);
                                 fp.f = fr;
-                                break;
+                                return;
                                 
                         // Controlled move
 			case 1:
-                                cdda.move(fp);
-                                break;
+                                qMove(fp);
+                                return;
+                                
+                        //go home.
+			case 28:
+                                sp.x = 0.0;
+                                sp.y = 0.0;
+                                sp.z = 0.0;
+                                if(abs_mode)
+                                  sp.e = where_i_am.e;
+                                else
+                                  sp.e = 0.0;
+                                if(where_i_am.z != 0.0)
+                                  sp.f = FAST_Z_FEEDRATE;                                 
+                                else
+                                  sp.f = FAST_XY_FEEDRATE;
+                                qMove(sp);
 
-			 //Dwell
+				return;
+
+			//go home via an intermediate point.
+			case 30:
+                                fr = fp.f;
+                                if(where_i_am.z != fp.z)
+                                  fp.f = FAST_Z_FEEDRATE;
+                                else
+                                  fp.f = FAST_XY_FEEDRATE;
+                                fp.f = fr;
+                                
+                                qMove(fp);
+                                sp.x = 0.0;
+                                sp.y = 0.0;
+                                sp.z = 0.0;
+                                if(abs_mode)
+                                  sp.e = where_i_am.e;
+                                else
+                                  sp.e = 0.0;  
+                                if(where_i_am.z != 0.0)
+                                  sp.f = FAST_Z_FEEDRATE;
+                                else
+                                  sp.f = FAST_XY_FEEDRATE;
+                                qMove(sp);
+
+				return;
+
+                  default:
+                                break;
+                }
+                
+		// Non-buffered G commands
+                // Wait till the buffer q is empty first
+                    
+                  while(!qEmpty()) delay(WAITING_DELAY);
+		  switch (gc.G)
+		  {
+
+  			 //Dwell
 			case 4:
 				delay((int)(gc.P + 0.5));  // Changed by AB from 1000*gc.P
 				break;
 
 			//Inches for Units
 			case 20:
-                                cdda.set_units(false);
+                                setUnits(false);
 				break;
 
 			//mm for Units
 			case 21:
-                                cdda.set_units(true);
+                                setUnits(true);
 				break;
-
-			//go home.
-			case 28:
-                                sp.x = 0.0;
-                                sp.y = 0.0;
-                                sp.z = 0.0;
-                                if(abs_mode)
-                                  sp.e = cdda.where_i_am().e;
-                                else
-                                  sp.e = 0.0;
-                                if(cdda.where_i_am().z != 0.0)
-                                  sp.f = FAST_Z_FEEDRATE;                                 
-                                else
-                                  sp.f = FAST_XY_FEEDRATE;
-                                cdda.move(sp);
-
-				break;
-
-			//go home via an intermediate point.
-			case 30:
-                                fr = fp.f;
-                                if(cdda.where_i_am().z != fp.z)
-                                  fp.f = FAST_Z_FEEDRATE;
-                                else
-                                  fp.f = FAST_XY_FEEDRATE;
-                                fp.f = fr;
-                                
-                                cdda.move(fp);
-                                sp.x = 0.0;
-                                sp.y = 0.0;
-                                sp.z = 0.0;
-                                if(abs_mode)
-                                  sp.e = cdda.where_i_am().e;
-                                else
-                                  sp.e = 0.0;  
-                                if(cdda.where_i_am().z != 0.0)
-                                  sp.f = FAST_Z_FEEDRATE;
-                                else
-                                  sp.f = FAST_XY_FEEDRATE;
-                                cdda.move(sp);
-
-				break;
-
-
 
 			//Absolute Positioning
 			case 90: 
@@ -322,18 +339,24 @@ void process_string(char instruction[], int size)
 
 			//Set position as fp
 			case 92: 
-				cdda.set_position(fp);
+                                setPosition(fp);
 				break;
 
 			default:
 				Serial.print("huh? G");
 				Serial.println(gc.G, DEC);
-		}
+		  }
 	}
 
+
+
+        
 	//find us an m code.
 	if (gc.seen & GCODE_M)
 	{
+            // Wait till the q is empty first
+            while(!qEmpty()) delay(WAITING_DELAY);
+            
 		switch (gc.M)
 		{
 			//TODO: this is a bug because search_string returns 0.  gotta fix that.
@@ -425,6 +448,7 @@ void process_string(char instruction[], int size)
 				Serial.println(gc.M, DEC);
 		}
 	}
+        
 }
 
 int scan_float(char *str, float *valp, unsigned int *seen, unsigned int flag)

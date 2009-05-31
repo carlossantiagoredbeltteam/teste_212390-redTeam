@@ -34,6 +34,13 @@ inline void setTimerCeiling(unsigned int c)
     OCR1A = c;
 }
 
+inline void resetTimer()
+{
+  TCNT2 = 0;
+}
+
+char debugstring[COMMAND_SIZE];
+
 // Maintain a list of extruders...
 byte extruder_in_use = 0;
 extruder* ex[EXTRUDER_COUNT];
@@ -43,33 +50,128 @@ extruder ex0(EXTRUDER_0_MOTOR_DIR_PIN, EXTRUDER_0_MOTOR_SPEED_PIN , EXTRUDER_0_H
             EXTRUDER_0_FAN_PIN,  EXTRUDER_0_TEMPERATURE_PIN, EXTRUDER_0_VALVE_DIR_PIN,
             EXTRUDER_0_VALVE_ENABLE_PIN, EXTRUDER_0_STEP_ENABLE_PIN);
 
-// This is our RepRap machine; this class handles all movement.
-cartesian_dda cdda;
+// Each entry in the buffer is an instance of cartesian_dda.
+
+cartesian_dda* cdda[BUFFER_SIZE];
+
+cartesian_dda cdda0;
+cartesian_dda cdda1;
+cartesian_dda cdda2;
+cartesian_dda cdda3;
+
+volatile byte head;
+volatile byte tail;
+
+// Where the machine is from the point of view of the command stream
+
+FloatPoint where_i_am;
 
 
 // Our interrupt function
 
 SIGNAL(SIG_OUTPUT_COMPARE1A)
 {
-  //ex[extruder_in_use]->interrupt();
+  disableTimerInterrupt();
+  
+  if(cdda[tail]->active())
+    cdda[tail]->dda_step();
+  else
+    dQMove();
+    
+  enableTimerInterrupt();
 }
 
 void setup()
 {
   disableTimerInterrupt();
   setupTimerInterrupt();
+  debugstring[0] = 0;
   extruder_in_use = 0;
   ex[extruder_in_use] = &ex0;
+  
+  head = 0;
+  tail = 0;
+  
+  cdda[0] = &cdda0;
+  cdda[1] = &cdda1;  
+  cdda[2] = &cdda2;  
+  cdda[3] = &cdda3;
+  
+  setExtruder();
+  init_process_string();
+  where_i_am.x = 0.0;
+  where_i_am.y = 0.0;
+  where_i_am.z = 0.0;
+  where_i_am.e = 0.0;
+  where_i_am.f = SLOW_XY_FEEDRATE;
+  
   Serial.begin(19200);
   Serial.println("start");
-  cdda.set_extruder(ex[extruder_in_use]);
-  init_process_string();
+  setTimer(DEFAULT_TICK);
+  enableTimerInterrupt();
 }
 
 void loop()
 {
 	manage_all_extruders();
         get_and_do_command();        
+}
+
+//******************************************************************************************
+
+// The move buffer
+
+bool qFull()
+{
+  if(tail == 0)
+    return head == (BUFFER_SIZE - 1);
+  else
+    return head == (tail - 1);
+}
+
+bool qEmpty()
+{
+   return tail == head && !cdda[tail]->active();
+}
+
+void qMove(FloatPoint p)
+{
+  while(qFull()) delay(WAITING_DELAY);
+  byte h = head; 
+  h++;
+  if(h >= BUFFER_SIZE)
+    h = 0;
+  cdda[h]->set_target(p);
+  head = h;
+}
+
+void dQMove()
+{
+  if(qEmpty())
+    return;
+  byte t = tail;  
+  t++;
+  if(t >= BUFFER_SIZE)
+    t = 0;
+  cdda[t]->dda_start();
+  tail = t; 
+}
+
+void setUnits(bool u)
+{
+   for(byte i = 0; i < BUFFER_SIZE; i++)
+     cdda[i]->set_units(u); 
+}
+
+void setExtruder()
+{
+   for(byte i = 0; i < BUFFER_SIZE; i++)
+    cdda[i]->set_extruder(ex[extruder_in_use]);
+}
+
+void setPosition(FloatPoint p)
+{
+  where_i_am = p;  
 }
 
 //******************************************************************************************
@@ -223,7 +325,6 @@ void setTimer(long delay)
         
         delay <<= 4;
         
-	disableTimerInterrupt();
 	setTimerCeiling(getTimerCeiling(delay));
 	setTimerResolution(getTimerResolution(delay));
 }
