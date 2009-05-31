@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "parameters.h"
 #include "pins.h"
 #include "extruder.h"
@@ -10,21 +11,19 @@
 
 cartesian_dda::cartesian_dda()
 {
+        live = false;
+        nullmove = false;
+        
   // Default is going forward
   
         x_direction = 1;
         y_direction = 1;
         z_direction = 1;
         e_direction = 1;
-        t_direction = 1;
+        f_direction = 1;
         
   // Default to the origin and not going anywhere
   
-	current_position.x = 0.0;
-	current_position.y = 0.0;
-	current_position.z = 0.0;
-	current_position.e = 0.0;
-        current_position.f = SLOW_XY_FEEDRATE;
 	target_position.x = 0.0;
 	target_position.y = 0.0;
 	target_position.z = 0.0;
@@ -91,16 +90,15 @@ void cartesian_dda::set_units(bool using_mm)
 }
 
 
-
-
-bool cartesian_dda::set_target(const FloatPoint& p)
+void cartesian_dda::set_target(const FloatPoint& p)
 {
         target_position = p;
+        nullmove = false;
         
 	//figure our deltas.
 
-	delta_position = fabsv(target_position - current_position);
-
+        delta_position = fabsv(target_position - where_i_am);
+        
         // The feedrate values refer to distance in (X, Y, Z) space, so ignore e and f
         // values unless they're the only thing there.
 
@@ -113,16 +111,15 @@ bool cartesian_dda::set_target(const FloatPoint& p)
         if(distance <= 0.0)
           distance = squares.f;
         distance = sqrt(distance);          
-                                                                         
-                          			
+                                                                                   			
 	//set our steps current, target, and delta
 
-	current_steps = to_steps(units, current_position);
+        current_steps = to_steps(units, where_i_am);
 	target_steps = to_steps(units, target_position);
 	delta_steps = absv(target_steps - current_steps);
 
 	// find the dominant axis.
-        // NB we ignore the t values here, as it takes no time to take a step in time :-)
+        // NB we ignore the f values here, as it takes no time to take a step in time :-)
 
         total_steps = max(delta_steps.x, delta_steps.y);
         total_steps = max(total_steps, delta_steps.z);
@@ -131,19 +128,20 @@ bool cartesian_dda::set_target(const FloatPoint& p)
         // If we're not going anywhere, flag the fact
         
         if(total_steps == 0)
-          return false;    
+        {
+          nullmove = true;
+          where_i_am = p;
+          return;
+        }    
 
-#ifdef ACCELERATION_ON
-        //current_steps.f = calculate_feedrate_delay(current_position.f);
-#else
-        //current_steps.f = calculate_feedrate_delay(target_position.f);
+#ifndef ACCELERATION_ON
         current_steps.f = round(target_position.f);
 #endif
-        //if(current_steps.f <= 0)
-         // return false;
-          
-        //target_steps.f = calculate_feedrate_delay(target_position.f);
+
         delta_steps.f = abs(target_steps.f - current_steps.f);
+        
+        // Rescale the feedrate so it doesn't take lots of steps to do
+        
         t_scale = 1;
         if(delta_steps.f > total_steps)
         {
@@ -164,11 +162,11 @@ bool cartesian_dda::set_target(const FloatPoint& p)
         	
 	//what is our direction?
 
-	x_direction = (target_position.x >= current_position.x);
-	y_direction = (target_position.y >= current_position.y);
-	z_direction = (target_position.z >= current_position.z);
-	e_direction = (target_position.e >= current_position.e);
-	t_direction = (target_position.f >= current_position.f);
+	x_direction = (target_position.x >= where_i_am.x);
+	y_direction = (target_position.y >= where_i_am.y);
+	z_direction = (target_position.z >= where_i_am.z);
+	e_direction = (target_position.e >= where_i_am.e);
+	f_direction = (target_position.f >= where_i_am.f);
 
 	dda_counter.x = -total_steps/2;
 	dda_counter.y = dda_counter.x;
@@ -176,19 +174,25 @@ bool cartesian_dda::set_target(const FloatPoint& p)
         dda_counter.e = dda_counter.x;
         dda_counter.f = dda_counter.x;
   
-        return true;        
+        where_i_am = p;
+        
+        return;        
 }
 
-void cartesian_dda::dda_loop()
-{
 
+
+void cartesian_dda::dda_step()
+{  
+  if(!live)
+   return;
+   
   do
   {
 		x_can_step = can_step(X_MIN_PIN, X_MAX_PIN, current_steps.x, target_steps.x, x_direction);
 		y_can_step = can_step(Y_MIN_PIN, Y_MAX_PIN, current_steps.y, target_steps.y, y_direction);
 		z_can_step = can_step(Z_MIN_PIN, Z_MAX_PIN, current_steps.z, target_steps.z, z_direction);
                 e_can_step = can_step(-1, -1, current_steps.e, target_steps.e, e_direction);
-                f_can_step = can_step(-1, -1, current_steps.f, target_steps.f, t_direction);
+                f_can_step = can_step(-1, -1, current_steps.f, target_steps.f, f_direction);
                 
                 real_move = false;
                 
@@ -267,7 +271,7 @@ void cartesian_dda::dda_loop()
 			if (dda_counter.f > 0)
 			{
 				dda_counter.f -= total_steps;
-				if (t_direction)
+				if (f_direction)
 					current_steps.f++;
 				else
 					current_steps.f--;
@@ -277,38 +281,42 @@ void cartesian_dda::dda_loop()
 				
       // wait for next step.
       // Use milli- or micro-seconds, as appropriate
-      // If the only thing that changed was f; don't bother to delay
+      // If the only thing that changed was f keep looping
   
                 if(real_move)
                 {
-                  // keep it hot =)
-                  extcount++;
-                  if(extcount > 50)
-                  {
-                    extcount = 0;
-		    manage_all_extruders();
-                  }
                   if(t_scale > 1)
                     timestep = t_scale*current_steps.f;
                   else
                     timestep = current_steps.f;
                   timestep = calculate_feedrate_delay((float) timestep);
-	          if (timestep >= 16383)
-		    delay(timestep/1000);
-	          else
-		    delayMicrosecondsInterruptible(timestep);
+                  setTimer(timestep);
                 }
-  } while (!real_move && f_can_step);      
+  } while (!real_move && f_can_step);
+
+  live = (x_can_step || y_can_step || z_can_step  || e_can_step || f_can_step);
+
+// Wrap up at the end of a line
+
+  if(!live)
+  {
+      disable_steppers();
+      setTimer(DEFAULT_TICK);
+  }    
   
 }
 
 
 // Run the DDA
 
-void cartesian_dda::dda_move()
-{
+void cartesian_dda::dda_start()
+{    
   // Set up the DDA
+  //sprintf(debugstring, "%d %d", x_direction, nullmove);
   
+  if(nullmove)
+    return;
+    
   	//set our direction pins as well
 #if INVERT_X_DIR == 1
 	digitalWrite(X_DIR_PIN, !x_direction);
@@ -336,20 +344,12 @@ void cartesian_dda::dda_move()
     
 	enable_steppers();
         
-        extcount = 0;
+       // extcount = 0;
 
-  //do our DDA line!
-
-	do { dda_loop(); } while (x_can_step || y_can_step || z_can_step  || e_can_step || f_can_step);
-	
-  //set my current position to be where I now am.
-
-	current_position = target_position;
-
-  // Motors off
-  
-        disable_steppers();
+        setTimer(DEFAULT_TICK);
+	live = true;
 }
+
 
 bool cartesian_dda::can_step(byte min_pin, byte max_pin, long current, long target, byte dir)
 {
@@ -387,29 +387,16 @@ bool cartesian_dda::can_step(byte min_pin, byte max_pin, long current, long targ
 }
 
 
-
-bool cartesian_dda::read_switch(byte pin)
-{
-	//dual read as crude debounce
-
-	#if ENDSTOPS_INVERTING == 1
-		return !digitalRead(pin) && !digitalRead(pin);
-	#else
-		return digitalRead(pin) && digitalRead(pin);
-	#endif
-}
-
-
 void cartesian_dda::enable_steppers()
 {
 #ifdef SANGUINO
-  if(target_position.x != current_position.x)
+  if(delta_steps.x)
     digitalWrite(X_ENABLE_PIN, ENABLE_ON);
-  if(target_position.y != current_position.y)    
+  if(delta_steps.y)    
     digitalWrite(Y_ENABLE_PIN, ENABLE_ON);
-  if(target_position.z != current_position.z)
+  if(delta_steps.z)
     digitalWrite(Z_ENABLE_PIN, ENABLE_ON);
-  if(target_position.e != current_position.e)
+  if(delta_steps.e)
     ext->enableStep();   
 #endif  
 }
@@ -430,6 +417,8 @@ void cartesian_dda::disable_steppers()
         //ext->disableStep();       
 #endif
 }
+
+/*
 
 void cartesian_dda::delayMicrosecondsInterruptible(unsigned int us)
 {
@@ -476,4 +465,4 @@ void cartesian_dda::delayMicrosecondsInterruptible(unsigned int us)
 		"brne 1b" : "=w" (us) : "0" (us) // 2 cycles
 	);
 }
-
+*/

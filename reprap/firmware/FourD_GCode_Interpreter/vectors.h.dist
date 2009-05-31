@@ -52,7 +52,7 @@ inline FloatPoint operator*(const FloatPoint& a, const FloatPoint& b)
   return result;
 } 
 
-// Can't use abs for this as it's defined somewhere in a #define
+// Can't use fabs for this as it's defined somewhere in a #define
 
 inline FloatPoint fabsv(const FloatPoint& a)
 {
@@ -73,7 +73,7 @@ struct LongPoint
 	long y;
 	long z;
         long e;   // Extrusion
-        long f;   // Time delay
+        long f;   // Feedrate
 };
 
 inline LongPoint operator+(const LongPoint& a, const LongPoint& b)
@@ -98,19 +98,6 @@ inline LongPoint operator-(const LongPoint& a, const LongPoint& b)
   return result;
 } 
 
-// NB - the next gives neither the scalar nor the vector product
-/*
-inline LongPoint operator*(const LongPoint& a, const LongPoint& b)
-{
-  LongPoint result;
-  result.x = a.x * b.x;
-  result.y = a.y * b.y;
-  result.z = a.z * b.z;
-  result.e = a.e * b.e;
-  result.f = a.f * b.f;
-  return result;
-} 
-*/
 
 inline LongPoint absv(const LongPoint& a)
 {
@@ -123,7 +110,6 @@ inline LongPoint absv(const LongPoint& a)
   return result;
 } 
 
-// NB - watch the f -> t; you need to do something about it
 
 inline LongPoint roundv(const FloatPoint& a)
 {
