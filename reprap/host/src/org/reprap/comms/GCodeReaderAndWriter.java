@@ -377,6 +377,11 @@ public class GCodeReaderAndWriter
 	 */
 	private void bufferQueue(String cmd)
 	{
+		if(serialOutStream == null)
+		{
+			Debug.d("bufferQueue: attempt to queue: " + cmd + " to a non-running output buffer.");
+			return;
+		}
 		int com = cmd.indexOf(';');
 		if(com > 0)
 			cmd = cmd.substring(0, com);

@@ -833,8 +833,9 @@ public class LayerProducer {
 		// Print any lead-in.
 		printer.printStartDelay(firstOneInLayer);
 		
-		boolean extrudeOff;
-		boolean valveOff;
+		boolean extrudeOff = false;
+		boolean valveOff = false;
+		boolean oldexoff;
 		
 		if(p.isClosed())
 		{
@@ -853,18 +854,13 @@ public class LayerProducer {
 				if(acc)
 					currentFeedrate = p.speed(i);
 				
+				oldexoff = extrudeOff;
 				extrudeOff = j > stopExtruding || j == p.size();
 				valveOff = j > stopValve || j == p.size();
 				
-//				if(j > stopExtruding || j == p.size())
-//					plot(p.point(i), next, true, j == p.size()); //plot(p.point(i), next, lift, j == p.size());
-//				else
-//					plot(p.point(i), next, false, false);
-//				
-//				if(j > stopValve || j == p.size())
-//					plot(p.point(i), next, j == p.size(), true); //plot(p.point(i), next, lift, j == p.size());
-//				else
-					plot(p.point(i), next, extrudeOff, valveOff);
+				plot(p.point(i), next, extrudeOff, valveOff);
+				if(oldexoff ^ extrudeOff)
+					printer.printEndReverse();
 			}
 		} else
 		{
@@ -883,18 +879,13 @@ public class LayerProducer {
 				if(acc)
 					currentFeedrate = p.speed(i);
 				
+				oldexoff = extrudeOff;
 				extrudeOff = i > stopExtruding || i == p.size()-1;
 				valveOff = i > stopValve || i == p.size()-1;
 				
-//				if(i > stopExtruding || i == p.size()-1)
-//					plot(p.point(i), next, true, i == p.size()-1);
-//				else
-//					plot(p.point(i), next, false, false);
-//				
-//				if(i > stopValve || i == p.size()-1)
-//					plot(p.point(i), next, i == p.size()-1, true); //plot(p.point(i), next, i == p.size()-1, lift);
-//				else
-					plot(p.point(i), next, extrudeOff, valveOff);
+				plot(p.point(i), next, extrudeOff, valveOff);
+				if(oldexoff ^ extrudeOff)
+					printer.printEndReverse();
 			}
 		}
 		
