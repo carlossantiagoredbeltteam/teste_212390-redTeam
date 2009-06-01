@@ -377,6 +377,13 @@ public interface Extruder
     public double getExtrusionDelayForPolygon();
     
     /**
+	 * Gets the number of milliseconds to reverse the extrude motor
+	 * at the end of a track
+	 * @return
+     */
+    public double getExtrusionReverseDelay();
+    
+    /**
 	 * Gets the number of milliseconds to wait before opening the valve
 	 * for the first track of a layer
 	 * @return

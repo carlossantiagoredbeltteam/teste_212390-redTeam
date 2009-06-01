@@ -355,8 +355,8 @@ public class Producer {
 			reprap.betweenLayers(layerRules);
 			layer = null;
 			
-			//slice.destroy();
-			//stlc.destroyLayer();
+			slice.destroy();
+			stlc.destroyLayer();
 
 			layerRules.step(reprap.getExtruder());
 		}

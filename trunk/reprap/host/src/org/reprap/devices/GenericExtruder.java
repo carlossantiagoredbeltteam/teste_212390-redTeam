@@ -267,6 +267,11 @@ public abstract class GenericExtruder implements Extruder
 	protected double extrusionDelayForPolygon = 0;
 	
 	/**
+	 * The number of milliseconds to reverse at the end of a track
+	 */
+	protected double extrusionReverseDelay = -1;
+	
+	/**
 	 * The number of milliseconds to wait before starting a border track
 	 */
 	protected double valveDelayForLayer = 0;
@@ -410,6 +415,7 @@ public abstract class GenericExtruder implements Extruder
 			extrusionOverRun = Preferences.loadGlobalDouble(prefName + "ExtrusionOverRun(mm)");
 			valveDelayForLayer = Preferences.loadGlobalDouble(prefName + "ValveDelayForLayer(ms)");
 			valveDelayForPolygon = Preferences.loadGlobalDouble(prefName + "ValveDelayForPolygon(ms)");
+			extrusionReverseDelay = Preferences.loadGlobalDouble(prefName + "Reverse(ms)");
 			valveOverRun = Preferences.loadGlobalDouble(prefName + "ValveOverRun(mm)");		
 			minLiftedZ = Preferences.loadGlobalDouble(prefName + "MinimumZClearance(mm)");
 			// NB - store as 2ms ticks to allow longer pulses
@@ -911,6 +917,16 @@ public abstract class GenericExtruder implements Extruder
     	return extrusionDelayForPolygon; 
     }
     
+    
+    /**
+	 * Gets the number of milliseconds to reverse the extrude motor
+	 * at the end of a track
+	 * @return
+     */
+    public double getExtrusionReverseDelay()
+    {
+    	return extrusionReverseDelay;
+    }
     /**
 	 * Gets the number of milliseconds to wait before opening the valve
 	 * for the first track of a layer

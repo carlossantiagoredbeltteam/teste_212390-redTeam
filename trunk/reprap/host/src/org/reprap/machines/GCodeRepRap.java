@@ -422,7 +422,12 @@ public class GCodeRepRap extends GenericRepRap {
 				extruders[extruder].getExtrudedLength().add(extrudeLength);
 			if(extruders[extruder].get4D())
 			{
-				gcode.queue("G1 E" + round(extruders[extruder].getExtrudedLength().length(), 1) + " ; extrude dwell");
+				String op = "G1 E" + round(extruders[extruder].getExtrudedLength().length(), 1);
+				if(extruders[extruder].getReversing())
+					op += "; extruder retraction";
+				else
+					op += "; extruder dwell";
+				gcode.queue(op);
 				qFeedrate(slowFeedrateXY);
 				return;
 			}

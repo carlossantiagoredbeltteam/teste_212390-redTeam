@@ -79,6 +79,10 @@ public interface Printer {
 	public void printStartDelay(boolean firstOneInLayer);	
 	
 	/**
+	 * Maybe reverse the extruder at the end of a track
+	 */
+	public void printEndReverse();	
+	/**
 	 * Sync to zero X location.
 	 * @throws ReprapException
 	 * @throws IOException

@@ -493,16 +493,16 @@ public abstract class GenericRepRap implements CartesianPrinter
 	{
 		// Extrude motor and valve delays (ms)
 		
-		long eDelay, vDelay;
+		double eDelay, vDelay;
 		
 		if(firstOneInLayer)
 		{
-			eDelay = (long)extruders[extruder].getExtrusionDelayForLayer();
-			vDelay = (long)extruders[extruder].getValveDelayForLayer();
+			eDelay = extruders[extruder].getExtrusionDelayForLayer();
+			vDelay = extruders[extruder].getValveDelayForLayer();
 		} else
 		{
-			eDelay = (long)extruders[extruder].getExtrusionDelayForPolygon();
-			vDelay = (long)extruders[extruder].getValveDelayForPolygon();			
+			eDelay = extruders[extruder].getExtrusionDelayForPolygon();
+			vDelay = extruders[extruder].getValveDelayForPolygon();			
 		}
 		
 		try
@@ -525,6 +525,28 @@ public abstract class GenericRepRap implements CartesianPrinter
 		{
 			// If anything goes wrong, we'll let someone else catch it.
 		}
+	}
+	
+	/**
+	 * Extrude backwards for the given time in milliseconds, so that polymer is stopped flowing
+	 * at the end of a track.
+	 */
+	public void printEndReverse() 
+	{
+		// Extrude motor and valve delays (ms)
+		
+		double delay = getExtruder().getExtrusionReverseDelay();
+		
+		if(delay <= 0)
+			return;
+		
+		try
+		{
+			getExtruder().setExtrusion(getExtruder().getExtruderSpeed(), true);
+			machineWait(delay);
+			getExtruder().stopExtruding();
+		} catch (Exception e)
+		{}
 	}
 	
 	/**
