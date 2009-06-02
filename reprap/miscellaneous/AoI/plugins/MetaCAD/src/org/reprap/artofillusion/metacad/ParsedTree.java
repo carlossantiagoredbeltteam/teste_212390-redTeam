@@ -70,9 +70,7 @@ public class ParsedTree {
   public static List<ObjectInfo> evaluate(MetaCADContext ctx, List<ParsedTree> children) throws Exception {
     if (children.size() == 0) return null;
     List<ObjectInfo> resultchildren = new LinkedList<ObjectInfo>();
-    Iterator<ParsedTree> iter = children.iterator();
-    while (iter.hasNext()) {
-      ParsedTree treeobject = iter.next();
+    for (ParsedTree treeobject : children) {
       resultchildren.addAll(treeobject.evaluate(ctx));
       if (treeobject.aoiobj != null) {
         treeobject.aoiobj.setVisible(false);
