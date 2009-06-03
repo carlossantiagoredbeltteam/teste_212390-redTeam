@@ -818,6 +818,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 */
 	public void startingLayer(LayerRules lc) throws Exception
 	{
+		lc.setFractionDone();
 		double datumX = getExtruder().getNozzleWipeDatumX();
 		double datumY = getExtruder().getNozzleWipeDatumY();
 		double strokeY = getExtruder().getNozzleWipeStrokeY();
