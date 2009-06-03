@@ -387,4 +387,15 @@ public class LayerRules
 //		}
 	}
 	
+	public void setFractionDone()
+	{
+//		double f = machineZ/machineZMax;
+//		if(topDown)
+//			f = 1 - f;
+		
+		// Set -ve to force the system to query the layer rules
+		
+		org.reprap.gui.botConsole.BotConsoleFrame.getBotConsoleFrame().setFractionDone(-1);
+	}
+	
 }

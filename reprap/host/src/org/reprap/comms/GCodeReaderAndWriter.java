@@ -593,11 +593,11 @@ public class GCodeReaderAndWriter
 	 */
 	public String queueRespond(String cmd)
 	{
-//		if(bufferThread == null)
-//		{
-//			Debug.d("queueRespond: attempt to queue: " + cmd + " to a non-running output buffer.");
-//			return "0000";
-//		}
+		if(serialOutStream == null)
+		{
+			Debug.d("queueRespond: attempt to queue: " + cmd + " to a non-running output buffer.");
+			return "0000";
+		}
 		//trim it and cleanup.
 		cmd = cmd.trim();
 		cmd = cmd.replaceAll("  ", " ");

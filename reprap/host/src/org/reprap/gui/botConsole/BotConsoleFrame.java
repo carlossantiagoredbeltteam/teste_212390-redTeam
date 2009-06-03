@@ -29,7 +29,6 @@ public class BotConsoleFrame extends javax.swing.JFrame {
 	private static final long serialVersionUID = 1L;
 
     private Thread pollThread = null;
-    private boolean pollThreadExiting = false;
     private boolean carryOnPolling = true;
     private GenericExtruderTabPanel[] extruderPanels;
     double fractionDone = -1;
@@ -59,7 +58,7 @@ public class BotConsoleFrame extends javax.swing.JFrame {
         	public void run() 
         	{
         		Thread.currentThread().setName("GUI Poll");
-        		while(!pollThreadExiting) 
+        		while(true)
         		{
         			try 
         			{
