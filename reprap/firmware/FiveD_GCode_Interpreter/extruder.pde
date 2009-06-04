@@ -119,25 +119,7 @@ byte extruder::wait_till_cool()
 }
 */
 
-void extruder::temperature_error()
-{
-      Serial.print("E: ");
-      Serial.println(get_temperature());  
-}
 
-//warmup if we're too cold; cool down if we're too hot
-void extruder::wait_for_temperature()
-{
-/*
-  if(wait_till_cool())
-   {
-      temperature_error();
-      return;
-   }
-*/
-   if(wait_till_hot())
-     temperature_error();
-}
 
 void extruder::valve_set(bool open, int millis)
 {
@@ -149,19 +131,6 @@ void extruder::valve_set(bool open, int millis)
         digitalWrite(valve_en_pin, 0);
 }
 
-
-void extruder::set_direction(bool dir)
-{
-	e_direction = dir;
-	digitalWrite(motor_dir_pin, e_direction);
-}
-
-void extruder::set_cooler(byte sp)
-{
-  if(step_en_pin >= 0) // Step enable conflicts with the fan
-    return;
-	analogWrite(fan_pin, sp);
-}
 
 void extruder::set_temperature(int temp)
 {
