@@ -192,6 +192,10 @@ void cancellable_delay(unsigned int duration, byte state)
 	      motor1_reversal_count++;
       else if (state == 2)
       	motor1_reversal_count--;
+      	
+      //dont let it go below zero or above our forward duration.
+      motor1_reversal_count = max(0, motor1_reversal_count);
+      motor1_reversal_count = min(MOTOR_FORWARD_DURATION, motor1_reversal_count);
 
 			//check for packets.
       process_packets();
