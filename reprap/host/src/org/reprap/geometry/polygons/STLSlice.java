@@ -1538,7 +1538,7 @@ public class STLSlice
 				
 				// Fix small radii
 				
-				pgl = pgl.arcCompensate(es);
+				pgl = pgl.arcCompensate();
 				
 				//RrGraphics g = new RrGraphics(pgl, false);
 

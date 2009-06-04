@@ -747,14 +747,14 @@ public class RrPolygonList
 	 *
 	 * @param es
 	 */	
-	public RrPolygonList arcCompensate(Extruder[] es)
+	public RrPolygonList arcCompensate()
 	{
 		RrPolygonList r = new RrPolygonList();
 		
 		for(int i = 0; i < size(); i++)
 		{
 			RrPolygon p = polygon(i);
-			r.add(p.arcCompensate(es));
+			r.add(p.arcCompensate());
 		}
 		
 		return r;		

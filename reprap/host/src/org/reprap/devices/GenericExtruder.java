@@ -111,9 +111,19 @@ public abstract class GenericExtruder implements Extruder
 	protected double coolingPeriod;
 	
 	/**
-	 * The speed of movement in XY when depositing
+	 * The fastest speed of movement in XY when depositing
 	 */
-	protected double xyFeedrate; 
+	protected double fastXYFeedrate;
+	
+	/**
+	 * The speed from which that machine can do a standing start with this extruder
+	 */
+	protected double slowXYFeedrate;
+	
+	/**
+	 * The fastest the machine can accelerate with this extruder
+	 */
+	protected double maxAcceleration;
 	
 	/**
 	 * Zero torque speed 
@@ -385,7 +395,9 @@ public abstract class GenericExtruder implements Extruder
 			upperFineLayers = Preferences.loadGlobalInt(prefName + "UpperFineLayers(0...)");
 			extrusionBroadWidth = Preferences.loadGlobalDouble(prefName + "ExtrusionBroadWidth(mm)");		
 			coolingPeriod = Preferences.loadGlobalDouble(prefName + "CoolingPeriod(s)");
-			xyFeedrate = Preferences.loadGlobalDouble(prefName + "XYFeedrate(mm/minute)");
+			fastXYFeedrate = Preferences.loadGlobalDouble(prefName + "FastXYFeedrate(mm/minute)");
+			slowXYFeedrate = Preferences.loadGlobalDouble(prefName + "SlowXYFeedrate(mm/minute)");
+			maxAcceleration = Preferences.loadGlobalDouble(prefName + "MaxAcceleration(mm/minute/minute)");
 			t0 = Preferences.loadGlobalInt(prefName + "t0(0..255)");
 			iSpeed = Preferences.loadGlobalDouble(prefName + "InfillSpeed(0..1)");
 			oSpeed = Preferences.loadGlobalDouble(prefName + "OutlineSpeed(0..1)");
@@ -441,6 +453,14 @@ public abstract class GenericExtruder implements Extruder
 		{
 			System.err.println("Refresh extruder preferences: " + ex.toString());
 		}
+//		if(printer == null)
+//			System.err.println("Extruder.refreshPreferences() - null printer!");
+//		else
+//		{
+//			fastXYFeedrate = Math.min(printer.getFastXYFeedrate(), fastXYFeedrate);
+//			slowXYFeedrate = Math.min(printer.getSlowXYFeedrate(), slowXYFeedrate);
+//			maxAcceleration = Math.min(printer.getMaxAcceleration(), maxAcceleration);			
+//		}
 	}
 	
 	/* (non-Javadoc)
@@ -577,7 +597,7 @@ public abstract class GenericExtruder implements Extruder
 	 */
 	public double getInfillFeedrate()
 	{
-		return getInfillSpeedFactor() * getXYFeedrate();
+		return getInfillSpeedFactor() * getFastXYFeedrate();
 	}
 
 	/* (non-Javadoc)
@@ -593,7 +613,7 @@ public abstract class GenericExtruder implements Extruder
 	 */
 	public double getOutlineFeedrate()
 	{
-		return getOutlineSpeedFactor() * getXYFeedrate();
+		return getOutlineSpeedFactor() * getFastXYFeedrate();
 	}
 	
 	/**
@@ -622,7 +642,7 @@ public abstract class GenericExtruder implements Extruder
 	
 	public double getAngleFeedrate()
 	{
-		return getAngleSpeedFactor() * getXYFeedrate();
+		return getAngleSpeedFactor() * getFastXYFeedrate();
 	}
 	
 	/* (non-Javadoc)
@@ -637,10 +657,26 @@ public abstract class GenericExtruder implements Extruder
     /* (non-Javadoc)
      * @see org.reprap.Extruder#getXYSpeed()
      */
-    public double getXYFeedrate()
+    public double getFastXYFeedrate()
     {
-    	return xyFeedrate;
+    	return fastXYFeedrate;
     }
+    
+	/**
+	 * @return slow XY movement feedrate in mm/minute
+	 */
+	public double getSlowXYFeedrate()
+	{
+		return slowXYFeedrate;
+	}
+	
+	/**
+	 * @return the fastest the machine can accelerate
+	 */
+	public double getMaxAcceleration()
+	{
+		return maxAcceleration;
+	}
     
     /* (non-Javadoc)
      * @see org.reprap.Extruder#getExtruderSpeed()
@@ -766,17 +802,15 @@ public abstract class GenericExtruder implements Extruder
     	return materialColour;
     }  
     
-//    /**
-//     * @return the name of the material
-//     * TODO: should this give more information?
-//     */
-//    public String toString()
-//    {
-//    	return material;
-//    }
+    /**
+     * @return the name of the material
+     * TODO: should this give more information?
+     */
+    public String toString()
+    {
+    	return material;
+    }
     
-
-	
     /**
      * @return determine whether nozzle wipe method is enabled or not 
      */
@@ -886,7 +920,7 @@ public abstract class GenericExtruder implements Extruder
 	 */
 	public double getShortLineFeedrate()
 	{
-		return getShortLineSpeedFactor() * getXYFeedrate();
+		return getShortLineSpeedFactor() * getFastXYFeedrate();
 	}
     
     /**

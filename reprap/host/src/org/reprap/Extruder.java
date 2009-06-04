@@ -171,7 +171,17 @@ public interface Extruder
      * The speed of X and Y movement
      * @return the XY feedrate in mm/minute
      */
-    public double getXYFeedrate();
+    public double getFastXYFeedrate();
+    
+	/**
+	 * @return slow XY movement feedrate in mm/minute
+	 */
+	public double getSlowXYFeedrate();
+	
+	/**
+	 * @return the fastest the machine can accelerate
+	 */
+	public double getMaxAcceleration();
  
     /**
      * @return the extruder speeds
