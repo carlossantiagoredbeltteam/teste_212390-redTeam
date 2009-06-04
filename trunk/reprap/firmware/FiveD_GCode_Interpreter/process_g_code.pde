@@ -76,7 +76,7 @@ GcodeParser gc;	/* string parse result */
 
 
 //init our string processing
-void init_process_string()
+inline void init_process_string()
 {
 	serial_count = 0;
         comment = false;
@@ -276,6 +276,8 @@ void process_string(char instruction[], int size)
 
 				return;
 
+/*
+// We never use this...
 			//go home via an intermediate point.
 			case 30:
                                 fr = fp.f;
@@ -300,7 +302,7 @@ void process_string(char instruction[], int size)
                                 qMove(sp);
 
 				return;
-
+*/
                   default:
                                 break;
                 }

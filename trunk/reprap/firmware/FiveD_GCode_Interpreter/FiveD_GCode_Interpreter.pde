@@ -121,7 +121,7 @@ void loop()
 
 // The move buffer
 
-bool qFull()
+inline bool qFull()
 {
   if(tail == 0)
     return head == (BUFFER_SIZE - 1);
@@ -129,12 +129,12 @@ bool qFull()
     return head == (tail - 1);
 }
 
-bool qEmpty()
+inline bool qEmpty()
 {
    return tail == head && !cdda[tail]->active();
 }
 
-void qMove(FloatPoint p)
+inline void qMove(FloatPoint p)
 {
   while(qFull()) delay(WAITING_DELAY);
   byte h = head; 
@@ -145,7 +145,7 @@ void qMove(FloatPoint p)
   head = h;
 }
 
-void dQMove()
+inline void dQMove()
 {
   if(qEmpty())
     return;
@@ -157,19 +157,19 @@ void dQMove()
   tail = t; 
 }
 
-void setUnits(bool u)
+inline void setUnits(bool u)
 {
    for(byte i = 0; i < BUFFER_SIZE; i++)
      cdda[i]->set_units(u); 
 }
 
-void setExtruder()
+inline void setExtruder()
 {
    for(byte i = 0; i < BUFFER_SIZE; i++)
     cdda[i]->set_extruder(ex[extruder_in_use]);
 }
 
-void setPosition(FloatPoint p)
+inline void setPosition(FloatPoint p)
 {
   where_i_am = p;  
 }
@@ -312,7 +312,7 @@ byte getTimerResolution(long delay)
 // Note - it is up to the user to call enableTimerInterrupt() after a call
 // to this function.
 
-void setTimer(long delay)
+inline void setTimer(long delay)
 {
 	// delay is the delay between steps in microsecond ticks.
 	//
