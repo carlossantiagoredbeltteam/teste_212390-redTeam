@@ -98,10 +98,10 @@ public class GCodeStepperMotor extends GenericStepperMotor {
 			switch(mid)
 			{
 			case 1:
-				printer.moveTo(x + 1.0/printer.getXStepsPerMM(), y, z, printer.getSlowFeedrateXY(), false, false);
+				printer.moveTo(x + 1.0/printer.getXStepsPerMM(), y, z, printer.getExtruder().getSlowXYFeedrate(), false, false);
 				break;
 			case 2:
-				printer.moveTo(x, y + 1.0/printer.getYStepsPerMM(), z, printer.getSlowFeedrateXY(), false, false);
+				printer.moveTo(x, y + 1.0/printer.getYStepsPerMM(), z, printer.getExtruder().getSlowXYFeedrate(), false, false);
 				break;
 			case 3:
 				printer.moveTo(x, y, z + 1.0/printer.getZStepsPerMM(), printer.getFastFeedrateZ(), false, false);
@@ -126,10 +126,10 @@ public class GCodeStepperMotor extends GenericStepperMotor {
 			switch(mid)
 			{
 			case 1:
-				printer.moveTo(x - 1.0/printer.getXStepsPerMM(), y, z, printer.getSlowFeedrateXY(), false, false);
+				printer.moveTo(x - 1.0/printer.getXStepsPerMM(), y, z, printer.getExtruder().getSlowXYFeedrate(), false, false);
 				break;
 			case 2:
-				printer.moveTo(x, y - 1.0/printer.getYStepsPerMM(), z, printer.getSlowFeedrateXY(), false, false);
+				printer.moveTo(x, y - 1.0/printer.getYStepsPerMM(), z, printer.getExtruder().getSlowXYFeedrate(), false, false);
 				break;
 			case 3:
 				printer.moveTo(x, y, z - 1.0/printer.getZStepsPerMM(), printer.getFastFeedrateZ(), false, false);

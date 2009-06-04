@@ -725,9 +725,9 @@ public class RrPolygon
 	 * This ignores speeds
 	 * @param es
 	 */
-	public RrPolygon arcCompensate(Extruder[] es)
+	public RrPolygon arcCompensate()
 	{
-		Extruder e = att.getExtruder(es);
+		Extruder e = att.getExtruder();
 		
 		// Multiply the geometrically correct result by factor
 		

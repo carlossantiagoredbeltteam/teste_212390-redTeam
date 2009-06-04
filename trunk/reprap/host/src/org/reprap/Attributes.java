@@ -95,10 +95,23 @@ public class Attributes {
 	 * @param es The extruders currently in the printer.
 	 * @return my extruder
 	 */
-	public Extruder getExtruder(Extruder[] es)
+	public Extruder getExtruder()
 	{
 		if(e == null)
-			e = es[GenericExtruder.getNumberFromMaterial(material)];
+		{
+			Printer p = org.reprap.Main.gui.getPrinter();
+			if(p == null)
+			{
+				System.err.println("Attributes.getExtruder(): null printer!");
+				return null;
+			}
+			e = p.getExtruder(material); //)es[GenericExtruder.getNumberFromMaterial(material)];
+			if(e == null)
+			{
+				System.err.println("Attributes.getExtruder(): null extruder for " + material);
+				return null;
+			}
+		}
 		return e;
 	}
 	

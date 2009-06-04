@@ -157,7 +157,7 @@ public class RrCSGPolygonList {
 					shells = 1;
 				} else
 				{
-					e = att.getExtruder(es);
+					e = att.getExtruder();
 					shells = e.getShells();					
 				}
 				if(outline)
@@ -195,13 +195,13 @@ public class RrCSGPolygonList {
 		RrRectangle b = get(0).box();
 		Attributes a = get(0).getAttributes();
 		Boolean foundAttribute0 = false;
-		if(a.getExtruder(es) == es[0])
+		if(a.getExtruder() == es[0])
 			foundAttribute0 = true;
 		for(int i = 1; i < size(); i++)
 		{
 			if(!foundAttribute0)
 			{
-				if(get(i).getAttributes().getExtruder(es) == es[0])
+				if(get(i).getAttributes().getExtruder() == es[0])
 				{
 					a = get(i).getAttributes();
 					foundAttribute0 = true;
@@ -256,7 +256,7 @@ public class RrCSGPolygonList {
 			if(foundation)
 				e = es[0]; // Extruder 0 is used for foundations
 			else
-				e = get(i).getAttributes().getExtruder(es);
+				e = get(i).getAttributes().getExtruder();
 //			double width = lc.getHatchWidth(e);
 //			if(foundation)
 //				width = e.getExtrusionFoundationWidth();

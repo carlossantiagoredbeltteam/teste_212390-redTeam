@@ -26,9 +26,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	protected boolean stlLoaded = false;
 	protected boolean gcodeLoaded = false;
 	
-	protected boolean accelerating;
-	protected double maxAcceleration;
-	protected double slowFeedrateXY;
+	//protected boolean accelerating;
 	
 	/**
 	 * 
@@ -83,9 +81,9 @@ public abstract class GenericRepRap implements CartesianPrinter
 	protected double currentX, currentY, currentZ;
 	
 	/**
-	 * Maximum feedrate for X, Y, and Z axes
+	 * Maximum feedrate for Z axis
 	 */
-	protected double maxFeedrateX, maxFeedrateY, maxFeedrateZ;
+	protected double maxFeedrateZ;
 	
 	/**
 	* Current feedrate for the machine.
@@ -95,7 +93,17 @@ public abstract class GenericRepRap implements CartesianPrinter
 	/**
 	* Feedrate for fast XY moves on the machine.
 	*/
-	protected double fastFeedrateXY;
+	protected double fastXYFeedrate;
+	
+	/**
+	 * The fastest the machine can accelerate
+	 */
+	protected double maxAcceleration;
+	
+	/**
+	 * The speed from which the machine can do a standing start
+	 */
+	protected double slowXYFeedrate;
 	
 	/**
 	* Feedrate for fast Z moves on the machine.
@@ -228,16 +236,15 @@ public abstract class GenericRepRap implements CartesianPrinter
 			scaleZ = Preferences.loadGlobalDouble("ZAxisScale(steps/mm)");
 
 			// Load our maximum feedrate variables
-			maxFeedrateX = Preferences.loadGlobalDouble("MaximumFeedrateX(mm/minute)");
-			maxFeedrateY = Preferences.loadGlobalDouble("MaximumFeedrateY(mm/minute)");
+			double maxFeedrateX = Preferences.loadGlobalDouble("MaximumFeedrateX(mm/minute)");
+			double maxFeedrateY = Preferences.loadGlobalDouble("MaximumFeedrateY(mm/minute)");
 			maxFeedrateZ = Preferences.loadGlobalDouble("MaximumFeedrateZ(mm/minute)");
 			
-			accelerating = Preferences.loadGlobalBool("Accelerating");
 			maxAcceleration = Preferences.loadGlobalDouble("MaxAcceleration(mm/mininute/minute)");
-			slowFeedrateXY = Preferences.loadGlobalDouble("SlowFeedrateXY(mm/minute)");
+			slowXYFeedrate = Preferences.loadGlobalDouble("SlowXYFeedrate(mm/minute)");
 			
 			//set our standard feedrates.
-			setFastFeedrateXY(Math.min(maxFeedrateX, maxFeedrateY));
+			fastXYFeedrate = Math.min(maxFeedrateX, maxFeedrateY);
 			setFastFeedrateZ(maxFeedrateZ);
 			
 			idleZ = Preferences.loadGlobalBool("IdleZAxis");
@@ -293,10 +300,10 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 */
 	public void terminate() throws Exception
 	{
-		moveTo(0.5, 0.5, getZ(), this.fastFeedrateXY, true, true);
-		extruders[extruder].setMotor(false);
-		extruders[extruder].setValve(false);
-		extruders[extruder].setTemperature(0);
+		moveTo(0.5, 0.5, getZ(), getExtruder().getFastXYFeedrate(), true, true);
+		getExtruder().setMotor(false);
+		getExtruder().setValve(false);
+		getExtruder().setTemperature(0);
 	}
 	
 
@@ -320,10 +327,10 @@ public abstract class GenericRepRap implements CartesianPrinter
 			extruder = materialIndex;
 
 		//todo: move back to cartesian snap
-		//layerPrinter.changeExtruder(extruders[extruder]);
+		//layerPrinter.changeExtruder(getExtruder());
 
 //		if (previewer != null)
-//			previewer.setExtruder(extruders[extruder]);
+//			previewer.setExtruder(getExtruder());
 
 		if (isCancelled())
 			return;
@@ -352,7 +359,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 * @return
 	 */
 	protected int convertToStepX(double n) {
-		return (int)((n + extruders[extruder].getOffsetX()) * scaleX);
+		return (int)((n + getExtruder().getOffsetX()) * scaleX);
 	}
 
 	/**
@@ -360,7 +367,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 * @return
 	 */
 	protected int convertToStepY(double n) {
-		return (int)((n + extruders[extruder].getOffsetY()) * scaleY);
+		return (int)((n + getExtruder().getOffsetY()) * scaleY);
 	}
 
 	/**
@@ -368,7 +375,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 * @return
 	 */
 	protected int convertToStepZ(double n) {
-		return (int)((n + extruders[extruder].getOffsetZ()) * scaleZ);
+		return (int)((n + getExtruder().getOffsetZ()) * scaleZ);
 	}
 
 	/**
@@ -376,7 +383,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 * @return
 	 */
 	protected double convertToPositionX(int n) {
-		return n / scaleX - extruders[extruder].getOffsetX();
+		return n / scaleX - getExtruder().getOffsetX();
 	}
 
 	/**
@@ -384,7 +391,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 * @return
 	 */
 	protected double convertToPositionY(int n) {
-		return n / scaleY - extruders[extruder].getOffsetY();
+		return n / scaleY - getExtruder().getOffsetY();
 	}
 
 	/**
@@ -392,7 +399,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 * @return
 	 */
 	protected double convertToPositionZ(int n) {
-		return n / scaleZ - extruders[extruder].getOffsetZ();
+		return n / scaleZ - getExtruder().getOffsetZ();
 	}
 	
 	/* (non-Javadoc)
@@ -497,30 +504,30 @@ public abstract class GenericRepRap implements CartesianPrinter
 		
 		if(firstOneInLayer)
 		{
-			eDelay = extruders[extruder].getExtrusionDelayForLayer();
-			vDelay = extruders[extruder].getValveDelayForLayer();
+			eDelay = getExtruder().getExtrusionDelayForLayer();
+			vDelay = getExtruder().getValveDelayForLayer();
 		} else
 		{
-			eDelay = extruders[extruder].getExtrusionDelayForPolygon();
-			vDelay = extruders[extruder].getValveDelayForPolygon();			
+			eDelay = getExtruder().getExtrusionDelayForPolygon();
+			vDelay = getExtruder().getValveDelayForPolygon();			
 		}
 		
 		try
 		{
 			if(eDelay >= vDelay)
 			{
-				extruders[extruder].setMotor(true);
+				getExtruder().setMotor(true);
 				machineWait(eDelay - vDelay);
-				extruders[extruder].setValve(true);
+				getExtruder().setValve(true);
 				machineWait(vDelay);
 			} else
 			{
-				extruders[extruder].setValve(true);
+				getExtruder().setValve(true);
 				machineWait(vDelay - eDelay);
-				extruders[extruder].setMotor(true);
+				getExtruder().setMotor(true);
 				machineWait(eDelay);
 			}
-			//extruders[extruder].setMotor(false);  // What's this for?  - AB
+			//getExtruder().setMotor(false);  // What's this for?  - AB
 		} catch(Exception e)
 		{
 			// If anything goes wrong, we'll let someone else catch it.
@@ -638,11 +645,11 @@ public abstract class GenericRepRap implements CartesianPrinter
 
 		double oldFeedrate = getFeedrate();
 
-		extruders[extruder].setValve(false);
-		extruders[extruder].setMotor(false);
+		getExtruder().setValve(false);
+		getExtruder().setMotor(false);
 		if (!excludeZ)
 		{
-			double liftedZ = currentZ + (extruders[extruder].getMinLiftedZ());
+			double liftedZ = currentZ + (getExtruder().getMinLiftedZ());
 
 			//setFeedrate(getFastFeedrateZ());
 			moveTo(currentX, currentY, liftedZ, getFastFeedrateZ(), false, false);
@@ -653,12 +660,12 @@ public abstract class GenericRepRap implements CartesianPrinter
 		homeToZeroX();
 		homeToZeroY();
 		
-		//setFeedrate(getFastFeedrateXY());
-		moveTo(oldX, oldY, currentZ, getFastFeedrateXY(), false, false);
+		//setFeedrate(getFastXYFeedrate());
+		moveTo(oldX, oldY, currentZ, getExtruder().getFastXYFeedrate(), false, false);
 		
 		if (!excludeZ)
 		{
-			double liftedZ = currentZ - (extruders[extruder].getMinLiftedZ());
+			double liftedZ = currentZ - (getExtruder().getMinLiftedZ());
 
 			//setFeedrate(getFastFeedrateZ());
 			moveTo(currentX, currentY, liftedZ, getFastFeedrateZ(), false, false);
@@ -674,7 +681,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 * @throws IOException
 	 */
 	public void setCooling(boolean enable) throws IOException {
-		extruders[extruder].setCooler(enable);
+		getExtruder().setCooler(enable);
 	}
 		
 	/* (non-Javadoc)
@@ -703,17 +710,17 @@ public abstract class GenericRepRap implements CartesianPrinter
 		return currentFeedrate;
 	}
 
-	public void setFastFeedrateXY(double feedrate)
-	{
-		fastFeedrateXY = feedrate;
-	}
+//	private void setFastXYFeedrate(double feedrate)
+//	{
+//		fastXYFeedrate = feedrate;
+//	}
 	
-	public double getFastFeedrateXY()
-	{
-		return fastFeedrateXY;
-	}
+//	public double getFastXYFeedrate()
+//	{
+//		return getExtruder().getFastXYFeedrate();
+//	}
 
-	public void setFastFeedrateZ(double feedrate)
+	private void setFastFeedrateZ(double feedrate)
 	{
 		fastFeedrateZ = feedrate;
 	}
@@ -759,15 +766,15 @@ public abstract class GenericRepRap implements CartesianPrinter
 		currentX = currentY = currentZ = 0.0;
 	}
 	
-	public double getMaxFeedrateX()
-	{
-		return maxFeedrateX;
-	}
+//	public double getMaxFeedrateX()
+//	{
+//		return maxFeedrateX;
+//	}
 
-	public double getMaxFeedrateY()
-	{
-		return maxFeedrateY;
-	}
+//	public double getMaxFeedrateY()
+//	{
+//		return maxFeedrateY;
+//	}
 
 	public double getMaxFeedrateZ()
 	{
@@ -787,7 +794,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		if(coolTime > 0 && !lc.notStartedYet()) {
 			getExtruder().setCooler(true);
 			Debug.d("Start of cooling period");
-			//setFeedrate(getFastFeedrateXY());
+			//setFeedrate(getFastXYFeedrate());
 			
 			// Go home. Seek (0,0) then callibrate X first
 			homeToZeroX();
@@ -888,7 +895,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 			moveTo(datumX, datumY + strokeY, currentZ, currentFeedrate, false, false);
 		}
 		
-		//setFeedrate(getFastFeedrateXY());
+		//setFeedrate(getFastXYFeedrate());
 
 	}
 
@@ -902,8 +909,8 @@ public abstract class GenericRepRap implements CartesianPrinter
 	protected void segmentPause() {
 		try
 		{
-			extruders[extruder].setValve(false);
-			extruders[extruder].setMotor(false);
+			getExtruder().setValve(false);
+			getExtruder().setMotor(false);
 		} catch (Exception ex) {}
 		ContinuationMesage msg =
 			new ContinuationMesage(null, "A new segment is about to be produced");
@@ -921,8 +928,8 @@ public abstract class GenericRepRap implements CartesianPrinter
 		{
 			try
 			{
-				extruders[extruder].setExtrusion(extruders[extruder].getExtruderSpeed());
-				extruders[extruder].setValve(false);
+				getExtruder().setExtrusion(getExtruder().getExtruderSpeed());
+				getExtruder().setValve(false);
 			} catch (Exception ex) {}
 		}
 		msg.dispose();
@@ -1154,9 +1161,17 @@ public abstract class GenericRepRap implements CartesianPrinter
 	/**
 	 * @return slow XY movement feedrate in mm/minute
 	 */
-	public double getSlowFeedrateXY()
+	public double getFastXYFeedrate()
 	{
-		return slowFeedrateXY;
+		return fastXYFeedrate;
+	}
+	
+	/**
+	 * @return slow XY movement feedrate in mm/minute
+	 */
+	public double getSlowXYFeedrate()
+	{
+		return slowXYFeedrate;
 	}
 	
 	/**

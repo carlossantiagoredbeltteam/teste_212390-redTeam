@@ -260,7 +260,7 @@ public class SNAPReprap extends GenericRepRap
 			if(segmentPauseCheckbox.isSelected())
 				segmentPause();
 
-		int currentSpeedXY = convertFeedrateToSpeedXY(getExtruder().getXYFeedrate());
+		int currentSpeedXY = convertFeedrateToSpeedXY(getExtruder().getFastXYFeedrate());
 		//System.out.println("close: " + closeValve + ", stop ex:" + stopExtruder);
 		layerPrinter.printTo(stepperX, stepperY, currentSpeedXY, getExtruder().getExtruderSpeed(), stopExtruder, closeValve);
 		currentX = x;
@@ -283,7 +283,7 @@ public class SNAPReprap extends GenericRepRap
 	 */
 	public void homeToZeroX() throws ReprapException, IOException {
 		
-		int fastSpeedXY = convertFeedrateToSpeedXY(getFastFeedrateXY());
+		int fastSpeedXY = convertFeedrateToSpeedXY(getExtruder().getFastXYFeedrate());
 		motorX.homeReset(fastSpeedXY);
 		layerPrinter.zeroX();
 
@@ -296,7 +296,7 @@ public class SNAPReprap extends GenericRepRap
 	 */
 	public void homeToZeroY() throws ReprapException, IOException {
 		
-		int fastSpeedXY = convertFeedrateToSpeedXY(getFastFeedrateXY());
+		int fastSpeedXY = convertFeedrateToSpeedXY(getExtruder().getFastXYFeedrate());
 		motorY.homeReset(fastSpeedXY);
 		layerPrinter.zeroY();
 
@@ -319,7 +319,7 @@ public class SNAPReprap extends GenericRepRap
 	{
 		try
 		{
-			int fastSpeedXY = convertFeedrateToSpeedXY(getFastFeedrateXY());
+			int fastSpeedXY = convertFeedrateToSpeedXY(getExtruder().getFastXYFeedrate());
 			int fastSpeedZ = convertFeedrateToSpeedZ(getFastFeedrateZ());
 
 			motorX.homeReset(fastSpeedXY);
@@ -444,7 +444,7 @@ public class SNAPReprap extends GenericRepRap
 	 */
 	private void moveToHeatingZone() throws ReprapException, IOException {
 		//setFeedrate(getFastFeedrateXY());
-		moveTo(1, 1, currentZ, getFastFeedrateXY(), true, false);
+		moveTo(1, 1, currentZ, getExtruder().getFastXYFeedrate(), true, false);
 	}
 	
 	/* (non-Javadoc)

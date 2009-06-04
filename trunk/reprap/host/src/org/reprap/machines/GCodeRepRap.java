@@ -77,7 +77,7 @@ public class GCodeRepRap extends GenericRepRap {
 		double dx = x - currentX;
 		double dy = y - currentY;
 		
-		double xyFeedrate = round(extruders[extruder].getXYFeedrate(), 1);
+		double xyFeedrate = round(extruders[extruder].getFastXYFeedrate(), 1);
 		
 		if(xyFeedrate < feedrate)
 		{
@@ -85,7 +85,7 @@ public class GCodeRepRap extends GenericRepRap {
 			feedrate = xyFeedrate;
 		}
 		
-		if(!accelerating)
+		if(getExtruder().getMaxAcceleration() <= 0)
 			qFeedrate(feedrate);
 		
 		if(dx == 0.0 && dy == 0.0)
@@ -255,7 +255,7 @@ public class GCodeRepRap extends GenericRepRap {
 		
 		try
 		{
-			if(!accelerating)
+			if(getExtruder().getMaxAcceleration() <= 0)
 			{
 				moveTo(x, y, z, feedrate, false, false);
 				return;
@@ -265,7 +265,8 @@ public class GCodeRepRap extends GenericRepRap {
 			{
 				double s = Math.sqrt(dx*dx + dy*dy);
 
-				VelocityProfile vp = new VelocityProfile(s, slowFeedrateXY, feedrate, slowFeedrateXY, maxAcceleration);
+				VelocityProfile vp = new VelocityProfile(s, getExtruder().getSlowXYFeedrate(), 
+						feedrate, getExtruder().getSlowXYFeedrate(), getExtruder().getMaxAcceleration());
 				switch(vp.flat())
 				{
 				case 0:
@@ -274,16 +275,16 @@ public class GCodeRepRap extends GenericRepRap {
 					break;
 					
 				case 1:
-					qFeedrate(slowFeedrateXY);
+					qFeedrate(getExtruder().getSlowXYFeedrate());
 					moveTo(x0 + dx*vp.s1()/s, y0 + dy*vp.s1()/s, z0, vp.v(), false, false);
-					moveTo(x, y, z0, slowFeedrateXY, false, false);
+					moveTo(x, y, z0, getExtruder().getSlowXYFeedrate(), false, false);
 					break;
 					
 				case 2:
-					qFeedrate(slowFeedrateXY);
+					qFeedrate(getExtruder().getSlowXYFeedrate());
 					moveTo(x0 + dx*vp.s1()/s, y0 + dy*vp.s1()/s, z0, feedrate, false, false);
 					moveTo(x0 + dx*vp.s2()/s, y0 + dy*vp.s2()/s, z0, feedrate, false, false);
-					moveTo(x, y, z0, slowFeedrateXY, false, false);
+					moveTo(x, y, z0, getExtruder().getSlowXYFeedrate(), false, false);
 					break;
 					
 				default:
@@ -411,7 +412,7 @@ public class GCodeRepRap extends GenericRepRap {
 		{
 			if(extruders[extruder].get4D())
 			{
-				qFeedrate(fastFeedrateXY);
+				qFeedrate(getExtruder().getFastXYFeedrate());
 				// Fix the value for possible feedrate change
 				extrudeLength = getExtruder().getDistanceFromTime(millis); 
 			}
@@ -428,7 +429,7 @@ public class GCodeRepRap extends GenericRepRap {
 				else
 					op += "; extruder dwell";
 				gcode.queue(op);
-				qFeedrate(slowFeedrateXY);
+				qFeedrate(getExtruder().getSlowXYFeedrate());
 				return;
 			}
 		}
@@ -445,7 +446,7 @@ public class GCodeRepRap extends GenericRepRap {
 		// Assume extruder is off...
 		try
 		{
-			singleMove(-250, currentY, currentZ, fastFeedrateXY);
+			singleMove(-250, currentY, currentZ, getExtruder().getFastXYFeedrate());
 		} catch (Exception e)
 		{}
 		gcode.queue("G92 X0 ;set x 0");
@@ -461,7 +462,7 @@ public class GCodeRepRap extends GenericRepRap {
 		
 		try
 		{
-			singleMove(currentX, -250, currentZ, fastFeedrateXY);
+			singleMove(currentX, -250, currentZ, getExtruder().getFastXYFeedrate());
 		} catch (Exception e)
 		{}
 		gcode.queue("G92 Y0 ;set y 0");

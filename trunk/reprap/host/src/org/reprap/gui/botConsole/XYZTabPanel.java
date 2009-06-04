@@ -26,7 +26,7 @@ public class XYZTabPanel extends javax.swing.JPanel {
         //XYfastSpeed = Preferences.loadGlobalInt("FastSpeed(0..255)");
         //ZfastSpeed = Preferences.loadGlobalInt("MovementSpeedZ(0..255)");
     	
-    	XYfastSpeed = printer.getFastFeedrateXY();
+    	XYfastSpeed = printer.getExtruder().getFastXYFeedrate();
     	ZfastSpeed = printer.getFastFeedrateZ();
         
         xySpeedField.setText(String.valueOf(XYfastSpeed));

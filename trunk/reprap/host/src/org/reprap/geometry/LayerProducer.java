@@ -696,7 +696,7 @@ public class LayerProducer {
 		if(fast)
 		{
 			//printer.setFeedrate(printer.getFastFeedrateXY());
-			printer.moveTo(first.x(), first.y(), z, printer.getFastFeedrateXY(), startUp, endUp);
+			printer.moveTo(first.x(), first.y(), z, printer.getExtruder().getFastXYFeedrate(), startUp, endUp);
 			return;
 		}
 		
@@ -738,10 +738,10 @@ public class LayerProducer {
 	{
 		Attributes att = p.getAttributes();
 		Printer printer = layerConditions.getPrinter();
-		double outlineFeedrate = att.getExtruder(printer.getExtruders()).getOutlineFeedrate();
-		double infillFeedrate = att.getExtruder(printer.getExtruders()).getInfillFeedrate();
+		double outlineFeedrate = att.getExtruder().getOutlineFeedrate();
+		double infillFeedrate = att.getExtruder().getInfillFeedrate();
 		
-		boolean acc = Preferences.loadGlobalBool("Accelerating");
+		boolean acc = att.getExtruder().getMaxAcceleration() <= 0; //Preferences.loadGlobalBool("Accelerating");
 			
 		//int leng = p.size();
 	
@@ -769,15 +769,15 @@ public class LayerProducer {
 		
 		printer.selectExtruder(att);
 		
-		if(p.isClosed() && printer.getExtruder().incrementedStart())
+		if(p.isClosed() && att.getExtruder().incrementedStart())
 			p = p.incrementedStart(layerConditions);
-		else if(p.isClosed() && printer.getExtruder().randomStart())
+		else if(p.isClosed() && att.getExtruder().randomStart())
 			p = p.randomStart();
 		
 		int stopExtruding = p.size() + 10;
 		int stopValve = stopExtruding;
-		double extrudeBackLength = printer.getExtruder().getExtrusionOverRun();
-		double valveBackLength = printer.getExtruder().getValveOverRun();
+		double extrudeBackLength = att.getExtruder().getExtrusionOverRun();
+		double valveBackLength = att.getExtruder().getValveOverRun();
 		if(extrudeBackLength >= valveBackLength)
 		{
 			if(extrudeBackLength > 0)
@@ -796,11 +796,11 @@ public class LayerProducer {
 		
 		// If getMinLiftedZ() is negative, never lift the head
 		
-		Boolean lift = printer.getExtruder().getMinLiftedZ() >= 0;
+		Boolean lift = att.getExtruder().getMinLiftedZ() >= 0;
 		
 		if(acc)
-			p.setSpeeds(printer.getSlowFeedrateXY(), p.isClosed()?outlineFeedrate:infillFeedrate, 
-					printer.getMaxAcceleration());
+			p.setSpeeds(att.getExtruder().getSlowXYFeedrate(), p.isClosed()?outlineFeedrate:infillFeedrate, 
+					att.getExtruder().getMaxAcceleration());
 		
 		if(extrudeBackLength <= 0)
 			stopExtruding = p.size() + 10;
@@ -812,7 +812,7 @@ public class LayerProducer {
 		else if(acc)
 			stopValve = p.findBackPoint(valveBackLength);
 
-		currentFeedrate = printer.getFastFeedrateXY();
+		currentFeedrate = att.getExtruder().getFastXYFeedrate();
 		singleMove(p.point(0));
 		
 		if(acc)

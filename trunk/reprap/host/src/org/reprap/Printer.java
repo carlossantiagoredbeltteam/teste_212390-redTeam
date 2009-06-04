@@ -141,17 +141,17 @@ public interface Printer {
 	/**
 	 * @param feedrate in mm/minute
 	 */
-	public void setFastFeedrateXY(double feedrate);
+//	public void setFastFeedrateXY(double feedrate);
 	
 	/**
 	 * @return fast XY movement feedrate in mm/minute
 	 */
-	public double getFastFeedrateXY();
+	public double getFastXYFeedrate();
 	
 	/**
 	 * @return slow XY movement feedrate in mm/minute
 	 */
-	public double getSlowFeedrateXY();
+	public double getSlowXYFeedrate();
 	
 	/**
 	 * @return the fastest the machine can accelerate
@@ -161,7 +161,7 @@ public interface Printer {
 	/**
 	 * @param feedrate in mm/minute
 	 */
-	public void setFastFeedrateZ(double feedrate);
+	//public void setFastFeedrateZ(double feedrate);
 	
 	/**
 	 * @return the extruder feedrate in mm/minute
