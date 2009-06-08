@@ -221,14 +221,12 @@ void handle_commands()
     //peek at our command.
     cmd = commandBuffer[0];
 
-    //TODO: only jump in if its command we can handle now
-    //ie: queue at zero, or queue has room and its a queue point cmd.
-    //then remove all the wait until target reached.
-    //queue point?  do we have enough room?
-    /*  HOST_CMD_QUEUE_POINT_INC is deprecated.
-    if ((cmd == HOST_CMD_QUEUE_POINT_INC || cmd == HOST_CMD_QUEUE_POINT_INC) && pointBuffer.remainingCapacity() < POINT_SIZE)
+    // Do it later if it's a point queueing command and we don't have room yet.
+    if ((cmd == HOST_CMD_QUEUE_POINT_ABS /* || cmd == HOST_CMD_QUEUE_POINT_INC */) && 
+	pointBuffer.remainingCapacity() < POINT_SIZE) {
       return;
-    */
+    }
+
     //okay, which command are we handling?
     cmd = commandBuffer.remove_8();
 
