@@ -1,0 +1,196 @@
+<?xml version="1.1" encoding="utf-8"?>
+<machines>
+	<!-- do not remove this machine configuration!!! -->
+	<machine>
+		<name>3-Axis Simulator</name>
+		<geometry type="cartesian">
+			<axis id="x" length="300" maxfeedrate="1000" scale="11.4485"/>
+			<axis id="y" length="300" maxfeedrate="1000" scale="11.4485"/>
+			<axis id="z" length="300" maxfeedrate="100" scale="320"/>
+		</geometry>
+		<tools>
+			<tool name="Pinch Wheel Extruder v1.1" type="extruder" material="abs" motor="true" floodcoolant="false" mistcoolant="false" fan="true" valve="false" collet="false" heater="true"/>
+		</tools>
+		<clamps></clamps>
+		<driver name="null"> <!-- use a fake driver -->
+			<speedup>20</speedup> <!-- amount to speed up print process:  1 = realtime, 2 = 2x, 10 = 10x, etc. -->
+		</driver>
+	</machine>
+	<!-- Cupcake prototype description -->
+	<machine>
+		<name>Cupcake CNC</name>
+		<geometry type="cartesian">
+			<!-- different pulleys on X and Y axii -->
+			<axis id="x" length="300" maxfeedrate="5000" scale="47.069852"/> 
+			<axis id="y" length="300" maxfeedrate="5000" scale="47.069852"/>
+			<axis id="z" length="300" maxfeedrate="150" scale="1280"/>
+		</geometry>
+		<tools>
+			<tool name="Pinch Wheel Extruder v1.1" type="extruder" material="abs" motor="true" floodcoolant="false" mistcoolant="false" fan="true" valve="false" collet="false" heater="true"/>
+		</tools>
+		<clamps></clamps>
+		<driver name="sanguino3g">
+			<!-- optional, defaults to first serial port found.    <portname>COM1</portname> -->
+			<!-- required: we need 8 bit and 38400 baud. -->
+			<rate>38400</rate>
+			<parity>8</parity>
+			<!-- optional, defaults to 1.                          <databits>1</databits> -->
+			<!-- optional, defaults to N.                          <stopbits>N</stopbits> -->
+			<debuglevel>0</debuglevel>
+		</driver>
+		<warmup>
+(homing routing)
+G21
+G90
+G92 X0 Y0 Z0
+M104 S220 T0
+
+G1 Z0.86 F73.50
+G4 P50
+G1 Z1.72 F73.50
+G4 P50
+G1 Z2.57 F73.50
+G4 P50
+G1 Z3.07 F58.34
+G4 P50
+G1 Z3.27 F87.41
+G4 P50
+G1 Z4.13 F73.50
+G4 P50
+G1 Z4.63 F58.34
+G4 P50
+G1 Z4.83 F87.41
+G4 P50
+G1 Z6.60 F73.50
+G4 P50
+G1 Z7.89 F110.12
+G4 P50
+G1 Z9.17 F110.12
+G4 P50
+G1 Z10.46 F110.12
+G4 P50
+G1 Z11.45 F116.67
+G4 P50
+G1 Z11.65 F87.41
+G4 P50
+G1 Z12.51 F73.50
+G4 P50
+G1 Z13.01 F58.34
+G4 P50
+G1 Z13.21 F87.41
+G4 P50
+G1 Z14.99 F73.50
+G4 P50
+G1 Z16.70 F147.00
+G4 P50
+G1 Z17.33 F73.50
+G4 P50
+G1 Z17.50 F73.50
+G4 P50
+G1 Z19.21 F147.00
+G4 P50
+G1 Z20.40 F138.75
+G4 P50
+G1 Z20.70 F130.96
+G4 P50
+G1 Z20.98 F123.61
+G4 P50
+G1 Z21.25 F116.67
+G4 P50
+G1 Z22.69 F123.61
+G4 P50
+G1 Z23.11 F77.87
+G4 P50
+G1 Z24.33 F103.94
+G4 P50
+G1 Z25.16 F98.11
+G4 P50
+G1 Z25.38 F92.60
+G4 P50
+G1 Z25.58 F87.41
+G4 P50
+G1 Z25.77 F82.50
+G4 P50
+G1 Z26.79 F87.41
+G4 P50
+G1 Z27.10 F58.34
+G4 P50
+G1 Z27.91 F69.37
+G4 P50
+G1 Z28.41 F58.34
+G4 P50
+G1 Z28.57 F69.37
+G4 P50
+G1 Z29.59 F87.41
+G4 P50
+G1 Z30.22 F73.50
+G4 P50
+G1 Z30.42 F87.41
+G4 P50
+G1 Z33.08 F110.12
+G4 P50
+G1 Z34.79 F147.00
+G4 P50
+G1 Z35.42 F73.50
+G4 P50
+G1 Z35.59 F73.50
+G4 P50
+G1 Z37.30 F147.00
+G4 P50
+G1 Z38.49 F138.75
+G4 P50
+G1 Z38.79 F130.96
+G4 P50
+G1 Z39.07 F123.61
+G4 P50
+G1 Z39.34 F116.67
+G4 P50
+G1 Z40.78 F123.61
+G4 P50
+G1 Z41.20 F77.87
+G4 P50
+G1 Z42.42 F103.94
+G4 P50
+G1 Z43.25 F98.11
+G4 P50
+G1 Z43.47 F92.60
+G4 P50
+G1 Z43.67 F87.41
+G4 P50
+G1 Z43.86 F82.50
+G4 P50
+G1 Z44.87 F87.41
+G4 P50
+G1 Z45.19 F58.34
+G4 P50
+G1 Z46.00 F69.37
+G4 P50
+G1 Z46.50 F58.34
+G4 P50
+G1 Z46.70 F87.41
+G4 P50
+G1 Z47.56 F73.50
+G4 P50
+G1 Z48.05 F58.34
+G4 P50
+G1 Z48.25 F87.41
+G4 P50
+G1 Z50.03 F73.50
+G4 P50
+
+M108 S255
+M6 T0
+G04 P5000
+M101
+G04 P5000
+M103
+		</warmup>
+		<cooldown>
+(end of the file, cooldown routines)
+M103
+M104 S0
+G91
+G1 Z10
+		</cooldown>
+	</machine>
+</machines>
