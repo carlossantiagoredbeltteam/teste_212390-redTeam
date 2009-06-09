@@ -3,6 +3,7 @@ package org.reprap.devices;
 import java.io.IOException;
 
 import org.reprap.comms.GCodeReaderAndWriter;
+import org.reprap.Printer;
 import org.reprap.Preferences;
 
 public class GCodeExtruder extends GenericExtruder
@@ -13,9 +14,9 @@ public class GCodeExtruder extends GenericExtruder
 	 * @param prefs
 	 * @param extruderId
 	 */
-	public GCodeExtruder(GCodeReaderAndWriter writer, int extruderId)
+	public GCodeExtruder(GCodeReaderAndWriter writer, int extruderId, Printer p)
 	{
-		super(extruderId);
+		super(extruderId, p);
 		currentSpeed = 0;
 		gcode = writer;
 	}

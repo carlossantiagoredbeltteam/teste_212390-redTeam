@@ -90,11 +90,11 @@ public class SNAPReprap extends GenericRepRap
 		{
 			String prefix = "Extruder" + count + "_";
 			SNAPAddress addy = new SNAPAddress(Preferences.loadGlobalInt(prefix + "Address"));
-			return new SNAPExtruder(org.reprap.Main.getCommunicator(), addy, count);
+			return new SNAPExtruder(org.reprap.Main.getCommunicator(), addy, count, this);
 		}
 		catch (Exception e)
 		{
-			return new NullExtruder(count);
+			return new NullExtruder(count, this);
 		}
 	}
 	

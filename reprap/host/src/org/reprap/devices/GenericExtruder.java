@@ -343,8 +343,9 @@ public abstract class GenericExtruder implements Extruder
 	/**
 	 * @param extruderId
 	 */
-	public GenericExtruder(int extruderId)
+	public GenericExtruder(int extruderId, Printer p)
 	{
+		printer = p;
 		try
 		{
 			fourD = Preferences.loadGlobalBool("FourD");
@@ -453,14 +454,16 @@ public abstract class GenericExtruder implements Extruder
 		{
 			System.err.println("Refresh extruder preferences: " + ex.toString());
 		}
-//		if(printer == null)
-//			System.err.println("Extruder.refreshPreferences() - null printer!");
-//		else
-//		{
-//			fastXYFeedrate = Math.min(printer.getFastXYFeedrate(), fastXYFeedrate);
-//			slowXYFeedrate = Math.min(printer.getSlowXYFeedrate(), slowXYFeedrate);
-//			maxAcceleration = Math.min(printer.getMaxAcceleration(), maxAcceleration);			
-//		}
+		
+		if(printer == null)
+		{
+			System.err.println("GenericExtruder(): printer is null!");
+		} else
+		{
+			fastXYFeedrate = Math.min(printer.getFastXYFeedrate(), fastXYFeedrate);
+			slowXYFeedrate = Math.min(printer.getSlowXYFeedrate(), slowXYFeedrate);
+			maxAcceleration = Math.min(printer.getMaxAcceleration(), maxAcceleration);			
+		}
 	}
 	
 	/* (non-Javadoc)

@@ -216,7 +216,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	
 	public Extruder extruderFactory(int count)
 	{
-		return new NullExtruder(count);
+		return new NullExtruder(count, this);
 	}
 	
 	public void refreshPreferences()

@@ -3,6 +3,7 @@ package org.reprap.devices;
 import java.io.IOException;
 
 import org.reprap.Device;
+import org.reprap.Printer;
 import org.reprap.Preferences;
 import org.reprap.utilities.Debug;
 import org.reprap.comms.Address;
@@ -159,9 +160,9 @@ public class SNAPExtruder extends GenericExtruder
 	 */
 	private long lastTemperatureUpdate = 0;
 	
-	public SNAPExtruder(Communicator com, Address address, int extruderId)
+	public SNAPExtruder(Communicator com, Address address, int extruderId, Printer p)
 	{
-		super(extruderId);
+		super(extruderId, p);
 		communicator = com;
 		snap = new Device(communicator, address);
 		isAvailable();
