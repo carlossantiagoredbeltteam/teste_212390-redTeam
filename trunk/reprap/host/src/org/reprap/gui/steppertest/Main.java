@@ -89,7 +89,7 @@ public class Main extends javax.swing.JDialog implements ChangeListener {
 		{
 			extruder = new SNAPExtruder(org.reprap.Main.getCommunicator(),
 					new SNAPAddress(Preferences.loadGlobalString("Extruder0_Address")),
-					 0);
+					 0, null);
 		
 			initGUI();
 	        Utility.centerWindowOnScreen(this);

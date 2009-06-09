@@ -61,7 +61,7 @@ public class GCodeRepRap extends GenericRepRap {
 	
 	public Extruder extruderFactory(int count)
 	{
-		return new GCodeExtruder(gcode, count);
+		return new GCodeExtruder(gcode, count, this);
 	}
 	
 	private void qFeedrate(double feedrate)

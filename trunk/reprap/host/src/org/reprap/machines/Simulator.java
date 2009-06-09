@@ -27,7 +27,7 @@ public class Simulator extends GenericRepRap {
 	
 	public Extruder extruderFactory(int count)
 	{
-		return new NullExtruder(count);
+		return new NullExtruder(count, this);
 	}
 	
 	public void startRun()

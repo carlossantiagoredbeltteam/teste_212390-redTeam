@@ -4,6 +4,7 @@
 package org.reprap.devices;
 
 import java.io.IOException;
+import org.reprap.Printer;
 
 /**
  * @author Adrian
@@ -14,9 +15,9 @@ public class NullExtruder extends GenericExtruder
 	/**
 	 * @param extruderId
 	 */
-	public NullExtruder(int extruderId)
+	public NullExtruder(int extruderId, Printer p)
 	{
-		super(extruderId);
+		super(extruderId, p);
 	}
 	
 	public void setExtrusion(double speed, boolean reverse) throws IOException {}

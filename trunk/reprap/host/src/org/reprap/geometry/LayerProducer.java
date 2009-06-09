@@ -663,7 +663,7 @@ public class LayerProducer {
 	private void singleMove(Rr2Point p)
 	{
 		Printer pt = layerConditions.getPrinter();
-		pt.singleMove(p.x(), p.y(), pt.getZ(), currentFeedrate);
+		pt.singleMove(p.x(), p.y(), pt.getZ(), pt.getFastXYFeedrate());
 	}
 	
 	/**
@@ -741,7 +741,7 @@ public class LayerProducer {
 		double outlineFeedrate = att.getExtruder().getOutlineFeedrate();
 		double infillFeedrate = att.getExtruder().getInfillFeedrate();
 		
-		boolean acc = att.getExtruder().getMaxAcceleration() <= 0; //Preferences.loadGlobalBool("Accelerating");
+		boolean acc = att.getExtruder().getMaxAcceleration() > 0; //Preferences.loadGlobalBool("Accelerating");
 			
 		//int leng = p.size();
 	
