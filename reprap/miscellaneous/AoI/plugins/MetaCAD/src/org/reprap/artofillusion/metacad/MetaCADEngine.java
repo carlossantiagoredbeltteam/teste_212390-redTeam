@@ -37,7 +37,7 @@ public class MetaCADEngine
 
   public MetaCADEngine(LayoutWindow window) {
     this.window = window;
-    this.context = new MetaCADContext(window.getScene());
+    this.context = new MetaCADContext(window);
   }
   
   public void setParameters(String text) {

@@ -13,6 +13,7 @@ import org.reprap.artofillusion.metacad.language.ParsedStatement;
 import org.reprap.artofillusion.metacad.parser.MetaCADParser;
 
 import artofillusion.Scene;
+import artofillusion.LayoutWindow;
 import bsh.Interpreter;
 
 public class MetaCADContext {
@@ -20,14 +21,16 @@ public class MetaCADContext {
   //private JEP jep = new JEP();
   bsh.Interpreter interpreter;
   public Scene scene;
+  public LayoutWindow window;
   public Dictionary<String, MacroPrototype> macros;
   
   // stores the variables
   LinkedList<Hashtable<String, Object>> scopes;
   Hashtable<String, Object> currentScope;
   
-  public MetaCADContext(Scene scene) {
-    this.scene = scene;
+  public MetaCADContext(LayoutWindow window) {
+    this.window = window;
+    this.scene = window.getScene();
     clearContext();
   }
   
