@@ -8,6 +8,7 @@
   <property name="package" value="${ant.project.name}" />
   <property name="src" value="${package}/src" />
   <property name="build" value="${package}/build" />
+  <property name="classes" value="${package}/classes" />
   <property name="docs" value="${package}/docs" />
   <property name="dist" value="Plugins" />
   <property name="aoijar" value="${aoidir}/ArtOfIllusion.jar" />
@@ -26,13 +27,14 @@
   <target name="compile" depends="init,javacc">
     <!-- Compile the java code from ${src} into ${build} -->
     <javac source="1.5" target="1.5" srcdir="${src}" destdir="${build}"
-	   classpath="${aoijar};${toolsjar};${jeplite}" debug="on" extdirs="" />
+	   classpath="${classes};${aoijar};${toolsjar};${jeplite}" debug="on" extdirs="" />
   </target>
 
   <target name="dist" depends="compile">
     <!-- create the jar, including all required files -->
     <jar jarfile="${dist}/${package}.jar" basedir="${build}" >
     	<fileset dir="${src}" includes="extensions.xml, *.properties, icons/**" />
+        <fileset dir="${classes}" includes="**/*.class" />
 <!--        <zipfileset prefix="help" dir="${help}/help" />  -->
         <zipfileset src="${jeplite}"/>
     </jar>	
