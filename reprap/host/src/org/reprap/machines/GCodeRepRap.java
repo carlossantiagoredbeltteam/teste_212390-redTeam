@@ -553,9 +553,9 @@ public class GCodeRepRap extends GenericRepRap {
 	 * Set an output file
 	 * @return
 	 */
-	public String setGCodeFileForOutput()
+	public String setGCodeFileForOutput(String fileRoot)
 	{
-		return gcode.setGCodeFileForOutput(getTopDown());
+		return gcode.setGCodeFileForOutput(getTopDown(), fileRoot);
 	}
 	
 	/**

@@ -447,8 +447,24 @@ private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     org.reprap.Main.gui.mouseToWorld();
     if(gCodeToFileRadioButton.isSelected())
     {
-    	printer.setTopDown(true);
-    	if(printer.setGCodeFileForOutput() == null)
+    	int sp = loadedFiles.length();
+    	if(sp <= 0)
+    	{
+    		JOptionPane.showMessageDialog(null, "There are no STLs loaded to print to file.");
+    		return;
+    	}
+    	sp = loadedFiles.indexOf(".stl") - 1;
+    	if(sp <= 0)
+       	{
+    		sp = loadedFiles.indexOf(".STL") - 1;
+    		if(sp <= 0)
+    		{
+    			JOptionPane.showMessageDialog(null, "The loaded file is not an STL file.");
+    			return;
+    		}
+    	}   		
+    	printer.setTopDown(true);	
+    	if(printer.setGCodeFileForOutput(loadedFiles.substring(0, sp)) == null)
     		return;
     }
     if(!printer.filePlay())

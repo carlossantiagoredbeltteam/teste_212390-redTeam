@@ -744,9 +744,12 @@ public class GCodeReaderAndWriter
 		return null;
 	}
 	
-	public String setGCodeFileForOutput(boolean topDown)
+	public String setGCodeFileForOutput(boolean topDown, String fileRoot)
 	{
+
+		File defaultFile = new File(fileRoot + ".gcode");
 		JFileChooser chooser = new JFileChooser();
+		chooser.setSelectedFile(defaultFile);
 		FileFilter filter;
 		filter = new ExtensionFileFilter("G Code file to write to", new String[] { "gcode" });
 		chooser.setFileFilter(filter);

@@ -511,7 +511,7 @@ public class SNAPReprap extends GenericRepRap
 	 * Set an output file
 	 * @return
 	 */
-	public String setGCodeFileForOutput()
+	public String setGCodeFileForOutput(String fileRoot)
 	{
 		System.err.println("SNAP RepRap: cannot generate GCode file.");
 		return null;		
