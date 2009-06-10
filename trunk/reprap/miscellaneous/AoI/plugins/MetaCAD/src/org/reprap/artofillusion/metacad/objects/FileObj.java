@@ -49,11 +49,11 @@ public class FileObj extends MetaCADObject
       }
       catch (NoSuchMethodException nsme) {
         nsme.printStackTrace();
-        new MessageDialog(null, "Unable to access STL Translator.\nVerify that the STL Translator plugin is installed.");
+        new MessageDialog(ctx.window, "Unable to access STL Translator.\nVerify that the STL Translator plugin is installed.");
       }
       catch (InvocationTargetException ite) {
         ite.printStackTrace();
-        new MessageDialog(null, "Unable to access STL Translator.\nVerify that the STL Translator plugin is installed.");
+        new MessageDialog(ctx.window, "Unable to access STL Translator.\nVerify that the STL Translator plugin is installed.");
       }
     }
   
