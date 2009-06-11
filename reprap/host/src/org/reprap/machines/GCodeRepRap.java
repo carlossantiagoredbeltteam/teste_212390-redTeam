@@ -139,7 +139,7 @@ public class GCodeRepRap extends GenericRepRap {
 			feedrate = zFeedrate;
 		}
 		
-		if(currentFeedrate != feedrate)
+		if(getMaxZAcceleration() <= 0)
 			qFeedrate(feedrate);
 		
 		double dz = z - currentZ;
@@ -162,6 +162,12 @@ public class GCodeRepRap extends GenericRepRap {
 				extruders[extruder].getExtrudedLength().add(extrudeLength);
 			if(extruders[extruder].get4D())
 				code += " E" + round(extruders[extruder].getExtrudedLength().length(), 1);
+		}
+		
+		if (currentFeedrate != feedrate)
+		{
+			code += " F" + feedrate;
+			currentFeedrate = feedrate;
 		}
 		
 		code += " ;z move";
@@ -232,6 +238,8 @@ public class GCodeRepRap extends GenericRepRap {
 		super.moveTo(x, y, z, feedrate, startUp, endUp);
 	}
 	
+
+	
 	/**
 	 * make a single, non building move (between plots, or zeroing an axis etc.)
 	 */
@@ -248,7 +256,7 @@ public class GCodeRepRap extends GenericRepRap {
 		double dz = z - z0;
 		
 		boolean zMove = dz != 0;
-		boolean xyMove = dx!= 0 || dy != 0;
+		boolean xyMove = dx != 0 || dy != 0;
 		
 		if(zMove && xyMove)
 			System.err.println("GcodeRepRap.singleMove(): attempt to move in X|Y and Z simultaneously: (x, y, z) = (" + x + ", " + y + ", " + z + ")");
@@ -288,12 +296,42 @@ public class GCodeRepRap extends GenericRepRap {
 					break;
 					
 				default:
-					System.err.println("GCodeRepRap.singleMove(): dud VelocityProfile flat value.");	
+					System.err.println("GCodeRepRap.singleMove(): dud VelocityProfile XY flat value.");	
 				}
 			}
 
 			if(zMove)
-				moveTo(getX(), getY(), z, feedrate, false, false);
+			{
+				VelocityProfile vp = new VelocityProfile(Math.abs(dz), getSlowZFeedrate(), 
+						feedrate, getSlowZFeedrate(), getMaxZAcceleration());
+				//System.out.println("\n" + z + " " + z0 + " " + dz + " " + vp.flat() + " " + vp.v() + " " + vp.s1() + " " + vp.s2() + "\n");
+				double s = 1;
+				if(dz < 0)
+					s = -1;
+				switch(vp.flat())
+				{
+				case 0:
+					qFeedrate(feedrate);
+					moveTo(x0, y0, z, feedrate, false, false);
+					break;
+					
+				case 1:
+					qFeedrate(getSlowZFeedrate());
+					moveTo(x0, y0, z0 + s*vp.s1(), vp.v(), false, false);
+					moveTo(x0, y0, z, getSlowZFeedrate(), false, false);
+					break;
+					
+				case 2:
+					qFeedrate(getSlowZFeedrate());
+					moveTo(x0, y0, z0 + s*vp.s1(), feedrate, false, false);
+					moveTo(x0, y0, z0 + s*vp.s2(), feedrate, false, false);
+					moveTo(x0, y0, z, getSlowZFeedrate(), false, false);
+					break;
+					
+				default:
+					System.err.println("GCodeRepRap.singleMove(): dud VelocityProfile Z flat value.");	
+				}				
+			}
 		} catch (Exception e)
 		{
 			System.err.println(e.toString());
@@ -591,6 +629,16 @@ public class GCodeRepRap extends GenericRepRap {
 		gcode.startingLayer(lc);
 		gcode.queue(";#!LAYER: " + (lc.getMachineLayer() + 1) + "/" + lc.getMachineLayerMax());		
 		super.startingLayer(lc);
+	}
+	
+	/**
+	 * Tell the printer class it's Z position.  Only to be used if
+	 * you know what you're doing...
+	 * @param z
+	 */
+	public void setZ(double z)
+	{
+		currentZ = round(z, 4);
 	}
 	
 	public void finishedLayer(LayerRules lc) throws Exception

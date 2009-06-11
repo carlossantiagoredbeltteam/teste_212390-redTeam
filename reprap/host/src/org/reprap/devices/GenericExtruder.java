@@ -462,7 +462,7 @@ public abstract class GenericExtruder implements Extruder
 		{
 			fastXYFeedrate = Math.min(printer.getFastXYFeedrate(), fastXYFeedrate);
 			slowXYFeedrate = Math.min(printer.getSlowXYFeedrate(), slowXYFeedrate);
-			maxAcceleration = Math.min(printer.getMaxAcceleration(), maxAcceleration);			
+			maxAcceleration = Math.min(printer.getMaxXYAcceleration(), maxAcceleration);			
 		}
 	}
 	

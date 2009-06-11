@@ -360,6 +360,16 @@ public class LayerRules
 		}
 	}
 	
+	public void moveZAtStartOfLayer()
+	{
+		double z = getMachineZ();
+		if(topDown)
+		{
+			printer.setZ(z - (zStep + addToStep));
+		}
+		printer.singleMove(printer.getX(), printer.getY(), z, printer.getFastFeedrateZ());
+	}
+	
 	/**
 	 * Move both the model and the machine up/down a layer
 	 * @param e

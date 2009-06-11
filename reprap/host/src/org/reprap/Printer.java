@@ -154,9 +154,19 @@ public interface Printer {
 	public double getSlowXYFeedrate();
 	
 	/**
+	 * @return slow Z movement feedrate in mm/minute
+	 */
+	public double getSlowZFeedrate();	
+	
+	/**
 	 * @return the fastest the machine can accelerate
 	 */
-	public double getMaxAcceleration();
+	public double getMaxXYAcceleration();
+	
+	/**
+	 * @return the fastest the machine can accelerate
+	 */
+	public double getMaxZAcceleration();
 	
 	/**
 	 * @param feedrate in mm/minute
@@ -197,6 +207,13 @@ public interface Printer {
 	 * @return current Z position
 	 */
 	public double getZ();
+	
+	/**
+	 * Tell the printer class it's Z position.  Only to be used if
+	 * you know what you're doing...
+	 * @param z
+	 */
+	public void setZ(double z);
 
 	/**
 	 * @return the extruder currently in use
