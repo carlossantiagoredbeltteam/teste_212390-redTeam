@@ -111,7 +111,7 @@ public class GCodeRepRap extends GenericRepRap {
 				extruders[extruder].getExtrudedLength().add(-extrudeLength);
 			else
 				extruders[extruder].getExtrudedLength().add(extrudeLength);
-			if(extruders[extruder].get4D())
+			if(extruders[extruder].get5D())
 				code += " E" + round(extruders[extruder].getExtrudedLength().length(), 1);
 		}
 		
@@ -160,7 +160,7 @@ public class GCodeRepRap extends GenericRepRap {
 				extruders[extruder].getExtrudedLength().add(-extrudeLength);
 			else
 				extruders[extruder].getExtrudedLength().add(extrudeLength);
-			if(extruders[extruder].get4D())
+			if(extruders[extruder].get5D())
 				code += " E" + round(extruders[extruder].getExtrudedLength().length(), 1);
 		}
 		
@@ -437,7 +437,7 @@ public class GCodeRepRap extends GenericRepRap {
 			
 		}
 
-		if(extruders[extruder].get4D())
+		if(extruders[extruder].get5D())
 			gcode.queue("G92 E0; set extruder home");
 
 		super.home();
@@ -448,7 +448,7 @@ public class GCodeRepRap extends GenericRepRap {
 		double extrudeLength = getExtruder().getDistanceFromTime(millis);
 		if(extrudeLength > 0)
 		{
-			if(extruders[extruder].get4D())
+			if(extruders[extruder].get5D())
 			{
 				qFeedrate(getExtruder().getFastXYFeedrate());
 				// Fix the value for possible feedrate change
@@ -459,7 +459,7 @@ public class GCodeRepRap extends GenericRepRap {
 				extruders[extruder].getExtrudedLength().add(-extrudeLength);
 			else
 				extruders[extruder].getExtrudedLength().add(extrudeLength);
-			if(extruders[extruder].get4D())
+			if(extruders[extruder].get5D())
 			{
 				String op = "G1 E" + round(extruders[extruder].getExtrudedLength().length(), 1);
 				if(extruders[extruder].getReversing())

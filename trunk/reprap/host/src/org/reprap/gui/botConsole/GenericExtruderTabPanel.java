@@ -500,7 +500,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
         }
         parentBotConsoleFrame.suspendPolling();
         setExtruderSpeed();
-        if(extruder.get4D() && extruding)
+        if(extruder.get5D() && extruding)
 		{
 			extruder.getPrinter().machineWait(5000);
 			extruding = false;

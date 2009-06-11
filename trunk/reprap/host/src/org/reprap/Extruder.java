@@ -222,10 +222,10 @@ public interface Extruder
     public boolean getReversing();
     
     /**
-     * Find out if we're working in 4D
+     * Find out if we're working in 5D
      * @return
      */
-    public boolean get4D();
+    public boolean get5D();
  
     /**
      * Get how much extrudate is deposited in a given time

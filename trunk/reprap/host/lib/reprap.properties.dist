@@ -1,5 +1,5 @@
 #Reprap properties http://reprap.org/
-#Thu Jun 11 12:46:08 BST 2009
+#Thu Jun 11 21:55:27 BST 2009
 AxisCount=3
 BackColourB(0..1)=0.9
 BackColourG(0..1)=0.9
@@ -8,7 +8,7 @@ BackFactor=2.0
 BaudRate=19200
 BoundFactor=3.0
 CommsDebug=false
-Debug=false
+Debug=true
 DisplaySimulation=false
 Extruder0_Address=8
 Extruder0_AngleSpeedFactor(0..1)=0.5
@@ -210,8 +210,8 @@ Extruder2_hb(C)=20
 Extruder2_hm(C/pwr)=0.86
 Extruder2_t0(0..255)=0
 FastSpeed(-1..255)=240
+FiveD=false
 FoundationLayers=0
-FourD=true
 FrontFactor=0.001
 GCodeUseSerial=true
 IdleZAxis=true
@@ -219,8 +219,8 @@ InterLayerCooling=true
 MachineColourB(0..1)=0.3
 MachineColourG(0..1)=0.4
 MachineColourR(0..1)=0.3
-MaxXYAcceleration(mm/mininute/minute)=1200000
-MaxZAcceleration(mm/mininute/minute)=3000
+MaxXYAcceleration(mm/mininute/minute)=-1
+MaxZAcceleration(mm/mininute/minute)=-1
 MaximumFeedrateX(mm/minute)=3000
 MaximumFeedrateY(mm/minute)=3000
 MaximumFeedrateZ(mm/minute)=50

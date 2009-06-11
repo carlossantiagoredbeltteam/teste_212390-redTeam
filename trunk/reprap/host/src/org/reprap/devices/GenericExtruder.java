@@ -31,7 +31,7 @@ public abstract class GenericExtruder implements Extruder
 	 * (i.e. it processes extrude lengths along with X, Y, and Z
 	 * lengths in a 4D Bressenham DDA)
 	 */
-	protected boolean fourD;
+	protected boolean fiveD;
 	
 	/**
 	 * Flag to record if we're going backwards
@@ -348,10 +348,10 @@ public abstract class GenericExtruder implements Extruder
 		printer = p;
 		try
 		{
-			fourD = Preferences.loadGlobalBool("FourD");
+			fiveD = Preferences.loadGlobalBool("FiveD");
 		} catch (Exception e)
 		{
-			fourD = false;
+			fiveD = false;
 		}
 		reversing = false;
 		el = new ExtrudedLength();
@@ -1203,12 +1203,12 @@ public abstract class GenericExtruder implements Extruder
     }
 	
     /**
-     * Find out if we're working in 4D
+     * Find out if we're working in 5D
      * @return
      */
-    public boolean get4D()
+    public boolean get5D()
     {
-    	return fourD;
+    	return fiveD;
     }
     /**
      * Find out how far we have extruded so far
