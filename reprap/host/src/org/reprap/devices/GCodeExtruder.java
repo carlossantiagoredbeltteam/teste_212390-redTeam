@@ -52,13 +52,13 @@ public class GCodeExtruder extends GenericExtruder
 		
 		if (speed < Preferences.tiny())
 		{
-			if(!fourD)
+			if(!fiveD)
 				gcode.queue("M103" + " ;extruder off");
 			currentSpeed = 0;
 			isExtruding = false;
 		} else
 		{
-			if(!fourD)
+			if(!fiveD)
 			{
 				if (speed != currentSpeed)
 					gcode.queue("M108 S" + speed + " ;extruder speed in RPM");
