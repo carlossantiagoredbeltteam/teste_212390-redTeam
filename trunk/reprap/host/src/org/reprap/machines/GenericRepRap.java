@@ -96,14 +96,24 @@ public abstract class GenericRepRap implements CartesianPrinter
 	protected double fastXYFeedrate;
 	
 	/**
-	 * The fastest the machine can accelerate
+	 * The fastest the machine can accelerate in X and Y
 	 */
-	protected double maxAcceleration;
+	protected double maxXYAcceleration;
 	
 	/**
 	 * The speed from which the machine can do a standing start
 	 */
 	protected double slowXYFeedrate;
+	
+	/**
+	 * The fastest the machine can accelerate in Z
+	 */
+	protected double maxZAcceleration;
+	
+	/**
+	 * The speed from which the machine can do a standing start in Z
+	 */
+	protected double slowZFeedrate;
 	
 	/**
 	* Feedrate for fast Z moves on the machine.
@@ -240,8 +250,11 @@ public abstract class GenericRepRap implements CartesianPrinter
 			double maxFeedrateY = Preferences.loadGlobalDouble("MaximumFeedrateY(mm/minute)");
 			maxFeedrateZ = Preferences.loadGlobalDouble("MaximumFeedrateZ(mm/minute)");
 			
-			maxAcceleration = Preferences.loadGlobalDouble("MaxAcceleration(mm/mininute/minute)");
+			maxXYAcceleration = Preferences.loadGlobalDouble("MaxXYAcceleration(mm/mininute/minute)");
 			slowXYFeedrate = Preferences.loadGlobalDouble("SlowXYFeedrate(mm/minute)");
+			
+			maxZAcceleration = Preferences.loadGlobalDouble("MaxZAcceleration(mm/mininute/minute)");
+			slowZFeedrate = Preferences.loadGlobalDouble("SlowZFeedrate(mm/minute)");
 			
 			//set our standard feedrates.
 			fastXYFeedrate = Math.min(maxFeedrateX, maxFeedrateY);
@@ -857,7 +870,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		if(startCooling >= 0)
 		{	
 			cool = coolTime - cool;
-			// NB - if cool is -ve macineWait will return immediately
+			// NB - if cool is -ve machineWait will return immediately
 			machineWait(1000*cool);
 		}
 		// Fan off
@@ -880,7 +893,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 			//setFeedrate(getExtruder().getOutlineFeedrate());
 			
 			// Now hunt down the wiper.
-			moveTo(datumX, datumY, currentZ, getExtruder().getOutlineFeedrate(), false, false);
+			singleMove(datumX, datumY, currentZ, getExtruder().getOutlineFeedrate());
 			
 			if(clearTime > 0)
 			{
@@ -892,9 +905,10 @@ public abstract class GenericRepRap implements CartesianPrinter
 				machineWait(1000*waitTime);
 			}
 
-			moveTo(datumX, datumY + strokeY, currentZ, currentFeedrate, false, false);
+			singleMove(datumX, datumY + strokeY, currentZ, currentFeedrate);
 		}
 		
+		lc.moveZAtStartOfLayer();
 		//setFeedrate(getFastXYFeedrate());
 
 	}
@@ -1177,8 +1191,34 @@ public abstract class GenericRepRap implements CartesianPrinter
 	/**
 	 * @return the fastest the machine can accelerate
 	 */
-	public double getMaxAcceleration()
+	public double getMaxXYAcceleration()
 	{
-		return maxAcceleration;
+		return maxXYAcceleration;
+	}
+	
+	/**
+	 * @return slow XY movement feedrate in mm/minute
+	 */
+	public double getSlowZFeedrate()
+	{
+		return slowZFeedrate;
+	}
+	
+	/**
+	 * @return the fastest the machine can accelerate
+	 */
+	public double getMaxZAcceleration()
+	{
+		return maxZAcceleration;
+	}
+	
+	/**
+	 * Tell the printer class it's Z position.  Only to be used if
+	 * you know what you're doing...
+	 * @param z
+	 */
+	public void setZ(double z)
+	{
+		currentZ = z;
 	}
 }

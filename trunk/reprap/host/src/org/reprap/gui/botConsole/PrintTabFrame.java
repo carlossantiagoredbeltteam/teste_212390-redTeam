@@ -453,10 +453,10 @@ private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     		JOptionPane.showMessageDialog(null, "There are no STLs loaded to print to file.");
     		return;
     	}
-    	sp = loadedFiles.indexOf(".stl") - 1;
+    	sp = loadedFiles.indexOf(".stl");
     	if(sp <= 0)
        	{
-    		sp = loadedFiles.indexOf(".STL") - 1;
+    		sp = loadedFiles.indexOf(".STL");
     		if(sp <= 0)
     		{
     			JOptionPane.showMessageDialog(null, "The loaded file is not an STL file.");
