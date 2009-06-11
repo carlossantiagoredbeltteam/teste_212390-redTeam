@@ -122,6 +122,7 @@ public class Preferences {
 		
 		String result = "";
 		int count = 0;
+		boolean noDifference = true;
 		
 		while(usersLot.hasMoreElements())
 		{
@@ -141,6 +142,7 @@ public class Preferences {
 				result += "is";
 			result += " not in the distribution preferences file.";
 			Debug.d(result);
+			noDifference = false;
 		}
 		
 		result = "";
@@ -164,7 +166,11 @@ public class Preferences {
 				result += "is";
 			result += " not in your preferences file.";
 			Debug.d(result);
+			noDifference = false;
 		}
+		
+		if(noDifference)
+			Debug.d("The distribution preferences file and yours match.  This is good.");
 	}
 
 	public void save() throws FileNotFoundException, IOException {
