@@ -808,15 +808,17 @@ public class STLObject
         rClick(x90);
     }
     
+    // Do Zs by 45 deg
+    
     public void zClick()
     {
         if(mouse == null)
             return;
         
-        Transform3D x90 = new Transform3D();
-        x90.set(new AxisAngle4d(0, 0, 1, 0.5*Math.PI));
+        Transform3D x45 = new Transform3D();
+        x45.set(new AxisAngle4d(0, 0, 1, 0.25*Math.PI));
         
-        rClick(x90);
+        rClick(x45);
     } 
     
     // This is called when the user wants to convert the object from
