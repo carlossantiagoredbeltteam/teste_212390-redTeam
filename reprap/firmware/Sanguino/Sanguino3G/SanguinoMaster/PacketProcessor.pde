@@ -213,13 +213,11 @@ void handle_commands()
   //do we have any commands?
   if (commandBuffer.size() > 0)
   {
-    /*
-    Serial.print("size: ");
-    Serial.println(commandBuffer.size(), DEC);
-    */
+    CircularBuffer::Cursor cursor = commandBuffer.newCursor();
     
-    //peek at our command.
-    cmd = commandBuffer[0];
+    uint16_t index = 0;
+
+    cmd = cursor.read_8();
 
     // Do it later if it's a point queueing command and we don't have room yet.
     if ((cmd == HOST_CMD_QUEUE_POINT_ABS /* || cmd == HOST_CMD_QUEUE_POINT_INC */) && 
@@ -227,51 +225,45 @@ void handle_commands()
       return;
     }
 
-    //okay, which command are we handling?
-    cmd = commandBuffer.remove_8();
-
-    /*
-    Serial.print("cmd: ");
-    Serial.println(cmd, DEC);
-    */
-    
     switch(cmd)
     {
       case HOST_CMD_QUEUE_POINT_ABS:
-        x = (long)commandBuffer.remove_32();
-        y = (long)commandBuffer.remove_32();
-        z = (long)commandBuffer.remove_32();
-        step_delay = (unsigned long)commandBuffer.remove_32();
+        x = (long)cursor.read_32();
+        y = (long)cursor.read_32();
+        z = (long)cursor.read_32();
+        step_delay = (unsigned long)cursor.read_32();
           
         queue_absolute_point(x, y, z, step_delay);
       
         break;
 
       case HOST_CMD_SET_POSITION:
-        wait_until_target_reached(); //dont want to get hasty.
+	// Belay until we're at a good location.
+	if (!is_point_buffer_empty()) { return; }
 	cli();
-        target_steps.x = current_steps.x = (long)commandBuffer.remove_32();
-        target_steps.y = current_steps.y = (long)commandBuffer.remove_32();
-        target_steps.z = current_steps.z = (long)commandBuffer.remove_32();
+        target_steps.x = current_steps.x = (long)cursor.read_32();
+        target_steps.y = current_steps.y = (long)cursor.read_32();
+        target_steps.z = current_steps.z = (long)cursor.read_32();
 	sei();
         break;
 
       case HOST_CMD_FIND_AXES_MINIMUM:
-        wait_until_target_reached(); //dont want to get hasty.
+	// Belay until we're at a good location.
+	if (!is_point_buffer_empty()) { return; }
 
         //no dda interrupts.
         disableTimer1Interrupt();
 
         //which ones are we going to?
-        flags = commandBuffer.remove_8();
+        flags = cursor.read_8();
 
         //find them!
         seek_minimums(
           flags & 1,
           flags & 2,
           flags & 4,
-          commandBuffer.remove_32(),
-          commandBuffer.remove_16());
+          cursor.read_32(),
+          cursor.read_16());
 
         //turn on point seeking agian.
         enableTimer1Interrupt();
@@ -279,7 +271,8 @@ void handle_commands()
         break;
 
       case HOST_CMD_FIND_AXES_MAXIMUM:
-        wait_until_target_reached(); //dont want to get hasty.
+	// Belay until we're at a good location.
+	if (!is_point_buffer_empty()) { return; }
 
         //no dda interrupts.
         disableTimer1Interrupt();
@@ -289,8 +282,8 @@ void handle_commands()
           flags & 1,
           flags & 2,
           flags & 4,
-          commandBuffer.remove_32(),
-          commandBuffer.remove_16());
+          cursor.read_32(),
+          cursor.read_16());
 
         //turn on point seeking agian.
         enableTimer1Interrupt();
@@ -298,28 +291,31 @@ void handle_commands()
         break;
 
       case HOST_CMD_DELAY:
-        wait_until_target_reached(); //dont want to get hasty.
+	// Belay until we're at a good location.
+	if (!is_point_buffer_empty()) { return; }
 
         //take it easy.
-        delay(commandBuffer.remove_32());
+        delay(cursor.read_32());
         break;
 
       case HOST_CMD_CHANGE_TOOL:
-        wait_until_target_reached(); //dont want to get hasty.
+	// Belay until we're at a good location.
+	if (!is_point_buffer_empty()) { return; }
 
         //extruder, i choose you!
-        select_tool(commandBuffer.remove_8());
+        select_tool(cursor.read_8());
         break;
 
       case HOST_CMD_WAIT_FOR_TOOL:
-        wait_until_target_reached(); //dont want to get hasty.
+	// Belay until we're at a good location.
+	if (!is_point_buffer_empty()) { return; }
 
         //get your temp in gear, you lazy bum.
         
         //what tool / timeout /etc?
-        currentToolIndex = commandBuffer.remove_8();
-        toolPingDelay = (unsigned int)commandBuffer.remove_16();
-        toolTimeout = (unsigned int)commandBuffer.remove_16();
+        currentToolIndex = cursor.read_8();
+        toolPingDelay = (unsigned int)cursor.read_16();
+        toolTimeout = (unsigned int)cursor.read_16();
 
         //check to see if its ready now
         if (!is_tool_ready(currentToolIndex))
@@ -334,14 +330,16 @@ void handle_commands()
         break;
 
       case HOST_CMD_TOOL_COMMAND:
-        wait_until_target_reached(); //dont want to get hasty.
+	// Belay until we're at a good location.
+	if (!is_point_buffer_empty()) { return; }
         
         send_tool_command();
         break;
     case HOST_CMD_ENABLE_AXES:
-      wait_until_target_reached();
+      // Belay until we're at a good location.
+      if (!is_point_buffer_empty()) { return; }
       {
-	unsigned char param = commandBuffer.remove_8();
+	unsigned char param = cursor.read_8();
 	bool x = (param & 0x01) != 0;
 	bool y = (param & 0x02) != 0;
 	bool z = (param & 0x04) != 0;
@@ -356,5 +354,6 @@ void handle_commands()
       default:
         hostPacket.unsupported();
     }
+    cursor.commit();
   }
 }

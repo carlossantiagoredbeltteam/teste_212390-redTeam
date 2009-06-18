@@ -127,7 +127,7 @@ private:
   /**
    * Internal: Remove the first byte of the buffer's data and return it.
    */
-  uint8_t removeInternal() {
+  inline uint8_t removeInternal() {
     if (currentSize == 0)
       return 0;
     else
@@ -173,6 +173,47 @@ public:
       ((uint32_t)v[2] << 16) |
       ((uint32_t)v[3] << 24);
   }
+
+  void removeCount( uint16_t count ) {
+    if (currentSize < count)
+      count = currentSize;
+    tail = (tail + count) % capacity;
+    currentSize -= count;
+  }
+
+  class Cursor {
+  private:
+    CircularBuffer& buffer;
+    uint16_t idx;
+  public:
+    Cursor(CircularBuffer& src) : buffer(src), idx(0) {}
+    uint8_t read_8() {
+      return buffer[idx++];
+    }
+    uint16_t read_16() {
+      return 
+	((uint16_t)read_8() << 0) |
+	((uint16_t)read_8() << 8);
+    }
+    uint32_t read_32() {
+      return 
+	((uint32_t)read_8() << 0) |
+	((uint32_t)read_8() << 8) |
+	((uint32_t)read_8() << 16) |
+	((uint32_t)read_8() << 24);
+    }
+    void commit() {
+      buffer.removeCount(idx);
+    }
+    void rollback() {
+      idx = 0;
+    }
+  };
+
+  Cursor newCursor() {
+    return Cursor(*this);
+  }
+
 };
 
 #endif // _CIRCULAR_BUFFER_H_
