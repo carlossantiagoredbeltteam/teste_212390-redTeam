@@ -17,47 +17,31 @@
 #include "vectors.h"
 #include "cartesian_dda.h"
 
-// Inline interrupt control functions
 
-inline void enableTimerInterrupt() 
-{
-   TIMSK1 |= (1<<OCIE1A);
-}
-	
-inline void disableTimerInterrupt() 
-{
-     TIMSK1 &= ~(1<<OCIE1A);
-}
-        
-inline void setTimerCeiling(unsigned int c) 
-{
-    OCR1A = c;
-}
 
-inline void resetTimer()
-{
-  TCNT2 = 0;
-}
-
-char debugstring[COMMAND_SIZE];
+char debugstring[10];
 
 // Maintain a list of extruders...
 byte extruder_in_use = 0;
 extruder* ex[EXTRUDER_COUNT];
 
 // ...creating static instances of them here
-extruder ex0(EXTRUDER_0_MOTOR_DIR_PIN, EXTRUDER_0_MOTOR_SPEED_PIN , EXTRUDER_0_HEATER_PIN,
+static extruder ex0(EXTRUDER_0_MOTOR_DIR_PIN, EXTRUDER_0_MOTOR_SPEED_PIN , EXTRUDER_0_HEATER_PIN,
             EXTRUDER_0_FAN_PIN,  EXTRUDER_0_TEMPERATURE_PIN, EXTRUDER_0_VALVE_DIR_PIN,
             EXTRUDER_0_VALVE_ENABLE_PIN, EXTRUDER_0_STEP_ENABLE_PIN);
+            
+static extruder ex1(EXTRUDER_1_MOTOR_DIR_PIN, EXTRUDER_1_MOTOR_SPEED_PIN , EXTRUDER_1_HEATER_PIN,
+              EXTRUDER_1_FAN_PIN,  EXTRUDER_1_TEMPERATURE_PIN, EXTRUDER_1_VALVE_DIR_PIN,
+              EXTRUDER_1_VALVE_ENABLE_PIN, EXTRUDER_1_STEP_ENABLE_PIN);            
 
 // Each entry in the buffer is an instance of cartesian_dda.
 
 cartesian_dda* cdda[BUFFER_SIZE];
 
-cartesian_dda cdda0;
-cartesian_dda cdda1;
-cartesian_dda cdda2;
-cartesian_dda cdda3;
+static cartesian_dda cdda0;
+static cartesian_dda cdda1;
+static cartesian_dda cdda2;
+static cartesian_dda cdda3;
 
 volatile byte head;
 volatile byte tail;
@@ -65,6 +49,14 @@ volatile byte tail;
 // Where the machine is from the point of view of the command stream
 
 FloatPoint where_i_am;
+
+// Make sure each DDA knows which extruder to use
+
+inline void setExtruder()
+{
+   for(byte i = 0; i < BUFFER_SIZE; i++)
+    cdda[i]->set_extruder(ex[extruder_in_use]);
+}
 
 
 // Our interrupt function
@@ -86,8 +78,10 @@ void setup()
   disableTimerInterrupt();
   setupTimerInterrupt();
   debugstring[0] = 0;
-  extruder_in_use = 0;
-  ex[extruder_in_use] = &ex0;
+  
+  ex[0] = &ex0;
+  ex[1] = &ex1;  
+  extruder_in_use = 0; 
   
   head = 0;
   tail = 0;
@@ -98,7 +92,9 @@ void setup()
   cdda[3] = &cdda3;
   
   setExtruder();
+  
   init_process_string();
+  
   where_i_am.x = 0.0;
   where_i_am.y = 0.0;
   where_i_am.z = 0.0;
@@ -107,6 +103,7 @@ void setup()
   
   Serial.begin(19200);
   Serial.println("start");
+  
   setTimer(DEFAULT_TICK);
   enableTimerInterrupt();
 }
@@ -163,11 +160,6 @@ inline void setUnits(bool u)
      cdda[i]->set_units(u); 
 }
 
-inline void setExtruder()
-{
-   for(byte i = 0; i < BUFFER_SIZE; i++)
-    cdda[i]->set_extruder(ex[extruder_in_use]);
-}
 
 inline void setPosition(FloatPoint p)
 {

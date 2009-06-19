@@ -409,7 +409,7 @@ void cartesian_dda::disable_steppers()
 	//disable our steppers
 	digitalWrite(X_ENABLE_PIN, !ENABLE_ON);
 	digitalWrite(Y_ENABLE_PIN, !ENABLE_ON);
-	digitalWrite(Z_ENABLE_PIN, !ENABLE_ON);
+	//digitalWrite(Z_ENABLE_PIN, !ENABLE_ON);
 
         // Disabling the extrude stepper causes the backpressure to
         // turn the motor the wrong way.  Leave it on.
