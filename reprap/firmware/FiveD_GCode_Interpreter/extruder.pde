@@ -4,10 +4,28 @@
 #include "ThermistorTable.h"
 #include "extruder.h" 
 
+// Keep all extruders up to temperature etc.
+
 void manage_all_extruders()
 {
     for(byte i = 0; i < EXTRUDER_COUNT; i++)
        ex[i]->manage();
+}
+
+// Select a new extruder
+
+void new_extruder(byte e)
+{
+  if(e < 0)
+    e = 0;
+  if(e >= EXTRUDER_COUNT)
+    e = EXTRUDER_COUNT - 1;
+  
+  if(e != extruder_in_use)
+  {  
+    extruder_in_use = e;
+    setExtruder();
+  }
 }
    
 extruder::extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin, byte vd_pin, byte ve_pin, byte se_pin)
@@ -139,7 +157,7 @@ void extruder::set_temperature(int temp)
 
         // If we've turned the heat off, we might as well disable the extrude stepper
         if(target_celsius < 1)
-          ex[extruder_in_use]->disableStep(); 
+          disableStep(); 
 }
 
 /**

@@ -19,7 +19,6 @@ private:
 
   FloatPoint units;            // Factors for converting either mm or inches to steps
 
-//  FloatPoint current_position; // Where the machine is
   FloatPoint target_position;  // Where it's going
   FloatPoint delta_position;   // The difference between the two
   float distance;              // How long the path is

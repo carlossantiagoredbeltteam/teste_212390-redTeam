@@ -20,6 +20,7 @@
 #define GCODE_Q	(1<<11)
 #define GCODE_R	(1<<12)
 #define GCODE_E	(1<<13)
+#define GCODE_T	(1<<14)
 
 
 #define PARSE_INT(ch, str, len, val, seen, flag) \
@@ -38,6 +39,7 @@ struct GcodeParser
     unsigned int seen;
     int G;
     int M;
+    int T;
     float P;
     float X;
     float Y;
@@ -159,6 +161,7 @@ int parse_string(struct GcodeParser * gc, char instruction[ ], int size)
 		{
 			  PARSE_INT('G', &instruction[ind+1], len, gc->G, gc->seen, GCODE_G);
 			  PARSE_INT('M', &instruction[ind+1], len, gc->M, gc->seen, GCODE_M);
+			  PARSE_INT('T', &instruction[ind+1], len, gc->T, gc->seen, GCODE_T);
 			PARSE_FLOAT('S', &instruction[ind+1], len, gc->S, gc->seen, GCODE_S);
 			PARSE_FLOAT('P', &instruction[ind+1], len, gc->P, gc->seen, GCODE_P);
 			PARSE_FLOAT('X', &instruction[ind+1], len, gc->X, gc->seen, GCODE_X);
@@ -449,8 +452,17 @@ void process_string(char instruction[], int size)
 				Serial.print("Huh? M");
 				Serial.println(gc.M, DEC);
 		}
+
+                
+
 	}
-        
+
+// Tool (i.e. extruder) change?
+                
+        if (gc.seen & GCODE_T)
+        {
+            new_extruder(gc.T);
+        }
 }
 
 int scan_float(char *str, float *valp, unsigned int *seen, unsigned int flag)

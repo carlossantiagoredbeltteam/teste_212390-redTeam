@@ -9,9 +9,11 @@
 #define EXTRUDER_FORWARD true
 #define EXTRUDER_REVERSE false
 
-#define EXTRUDER_COUNT 1
+#define EXTRUDER_COUNT 2
 
 void manage_all_extruders();
+
+void new_extruder(byte e);
 
 class extruder
 {
@@ -60,7 +62,7 @@ public:
    
    // Interrupt setup and handling functions for stepper-driven extruders
    
-   void interrupt();
+//   void interrupt();
    void step();
 
    void enableStep();
@@ -121,5 +123,7 @@ inline void extruder::set_cooler(byte sp)
     return;
   analogWrite(fan_pin, sp);
 }
+
+
 
 #endif
