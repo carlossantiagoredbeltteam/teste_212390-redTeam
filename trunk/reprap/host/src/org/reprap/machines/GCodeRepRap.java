@@ -646,4 +646,11 @@ public class GCodeRepRap extends GenericRepRap {
 		super.finishedLayer(lc);
 		gcode.finishedLayer();
 	}
+	
+	public void selectExtruder(int materialIndex)
+	{
+		super.selectExtruder(materialIndex);
+		int newPhysicalExtruder = getExtruder().getPhysicalExtruderNumber();
+		gcode.queue("T" + newPhysicalExtruder + "; select new extruder");
+	}
 }

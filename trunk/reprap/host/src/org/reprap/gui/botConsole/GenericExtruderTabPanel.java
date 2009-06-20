@@ -33,6 +33,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
     private double startTemp = -1;
 	private BotConsoleFrame parentBotConsoleFrame = null;
     private Extruder extruder;
+    private String prefix;
  
     /** Creates new form GenericExtruderTabPanel */
     public GenericExtruderTabPanel() {
@@ -42,6 +43,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
 
         initComponents(); 
         RampRate.setText("0.2"); // Sensible default
+        
     }
     
     /**
@@ -85,17 +87,11 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
 
     }
     
-    private String prefix;
 
     public void initialiseExtruders(int id) throws Exception {
            	
         extruderID = id;
-        prefix = "Extruder" + id + "_";
-                
-//        extruder = new GenericExtruder(org.reprap.Main.getCommunicator(),
-//                    new SNAPAddress(Preferences.loadGlobalInt(prefix + "Address")), 
-//                    Preferences.getGlobalPreferences(), extruderID);
-        
+        prefix = "Extruder" + id + "_";        
 
         Printer p = org.reprap.Main.gui.getPrinter();
         Extruder extruders[] = p.getExtruders();
@@ -106,6 +102,11 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
             deactivatePanel();
         }
             
+    }
+    
+    public void selectExtruder()
+    {
+    	org.reprap.Main.gui.getPrinter().selectExtruder(extruderID);
     }
     
     /** This method is called from within the constructor to
@@ -438,8 +439,9 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void coolingCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_coolingCheckActionPerformed
+private void coolingCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_coolingCheckActionPerformed
     	parentBotConsoleFrame.suspendPolling();
+    	selectExtruder();
         try {
             extruder.setCooler(coolingCheck.isSelected());
         }
@@ -450,14 +452,15 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
         parentBotConsoleFrame.resumePolling();
 }//GEN-LAST:event_coolingCheckActionPerformed
 
-    private void motorReverseCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_motorReverseCheckActionPerformed
+private void motorReverseCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_motorReverseCheckActionPerformed
         // TODO add your handling code here:
 }//GEN-LAST:event_motorReverseCheckActionPerformed
 
 
     
-    private void heatButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_heatButtonActionPerformed
+private void heatButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_heatButtonActionPerformed
     	parentBotConsoleFrame.suspendPolling();
+    	selectExtruder();
     	if (heatPushed) {
     		rampOff();
     		try {
@@ -499,6 +502,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
                 //System.out.println("Extruding at speed: " + motorSpeedField.getText());
         }
         parentBotConsoleFrame.suspendPolling();
+        selectExtruder();
         setExtruderSpeed();
         if(extruder.get5D() && extruding)
 		{
@@ -517,6 +521,7 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
 
     private void valveToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_valveToggleButtonActionPerformed
     	parentBotConsoleFrame.suspendPolling();
+    	selectExtruder();
         if (valveToggleButton.isSelected()) {
         	try
         	{
@@ -564,14 +569,14 @@ private void moveToSwapPointAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:
 	BotConsoleFrame.getXYZTabPanel().goTo(10, 160, BotConsoleFrame.getXYZTabPanel().getPrinter().getZ());
 }//GEN-LAST:event_moveToSwapPointAction
 
-    private void setExtruderSpeed() {
+private void setExtruderSpeed() {
         try {
                 extruder.setExtrusion(extruding?Double.parseDouble(motorSpeedField.getText()):0, motorReverseCheck.isSelected());
         } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, "Extruder exception: " + ex);
                 ex.printStackTrace();
         }
-    }
+}
     
     public double getExtruderSpeed()
     {
