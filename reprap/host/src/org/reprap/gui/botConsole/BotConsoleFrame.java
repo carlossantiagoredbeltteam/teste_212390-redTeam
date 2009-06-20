@@ -33,6 +33,7 @@ public class BotConsoleFrame extends javax.swing.JFrame {
     private GenericExtruderTabPanel[] extruderPanels;
     double fractionDone = -1;
     private static BotConsoleFrame bcf = null;
+    private static int exPanelNumber;
     
     /** Creates new form BotConsoleFrame */
     public BotConsoleFrame() {
@@ -53,6 +54,7 @@ public class BotConsoleFrame extends javax.swing.JFrame {
         /*
          * Fork off a thread to keep the panels up-to-date
          */
+        exPanelNumber = 0;
         pollThread = new Thread() 
         {
         	public void run() 
@@ -62,7 +64,7 @@ public class BotConsoleFrame extends javax.swing.JFrame {
         		{
         			try 
         			{
-        				Thread.sleep(5000);
+        				Thread.sleep(1500);
         				updateProgress();
         				if(carryOnPolling)
         					updatePanels();   
@@ -85,8 +87,15 @@ public class BotConsoleFrame extends javax.swing.JFrame {
      */
     private void updatePanels()
     {
-    	for(int i = 0; i < extruderPanels.length; i++)
-    		extruderPanels[i].refreshTemperature();
+    	int currentExtruder = org.reprap.Main.gui.getPrinter().getExtruder().getID();
+    	
+    	org.reprap.Main.gui.getPrinter().selectExtruder(exPanelNumber);
+    	extruderPanels[exPanelNumber].refreshTemperature();
+    	org.reprap.Main.gui.getPrinter().selectExtruder(currentExtruder);
+    	
+    	exPanelNumber++;
+    	if(exPanelNumber >= extruderPanels.length)
+    		exPanelNumber = 0;   		
     }
     
     /**

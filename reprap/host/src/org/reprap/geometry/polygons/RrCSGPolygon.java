@@ -61,6 +61,7 @@ import java.util.List;
 
 import org.reprap.Attributes;
 import org.reprap.Preferences;
+import org.reprap.utilities.Debug;
 
 /**
  * This class stores ends of the zig-zag infill pattern.
@@ -1118,7 +1119,7 @@ public class RrCSGPolygon
 			break;
 			
 		default:
-			System.err.println("RrCSGPolygon.hatch(): The atan2 function doesn't seem to work...");
+			Debug.d("RrCSGPolygon.hatch(): The atan2 function doesn't seem to work...");
 		}
 		
 		RrHalfPlane hatcher = new 
