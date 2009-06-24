@@ -139,13 +139,13 @@ byte extruder::wait_till_cool()
 
 
 
-void extruder::valve_set(bool open, int millis)
+void extruder::valve_set(bool open, int dTime)
 {
         wait_for_temperature();
 	valve_open = open;
 	digitalWrite(valve_dir_pin, open);
         digitalWrite(valve_en_pin, 1);
-        delay(millis);
+        delay(dTime);
         digitalWrite(valve_en_pin, 0);
 }
 
