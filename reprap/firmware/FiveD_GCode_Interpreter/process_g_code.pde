@@ -53,11 +53,40 @@ struct GcodeParser
     float Q;
 };
 
+
 //our command string
 char cmdbuffer[COMMAND_SIZE];
 char c = '?';
 byte serial_count = 0;
 boolean comment = false;
+FloatPoint fp;
+FloatPoint sp;
+        
+// The following three inline functions are used for things like return to 0
+
+inline void specialMoveX(const float& x, const float& feed)
+{
+  sp = where_i_am;
+  sp.x = x;
+  sp.f = feed;
+  qMove(sp);
+}
+
+inline void specialMoveY(const float& y, const float& feed)
+{
+  sp = where_i_am;
+  sp.y = y;
+  sp.f = feed;
+  qMove(sp);
+}
+
+inline void specialMoveZ(const float& z, const float& feed)
+{
+  sp = where_i_am;
+  sp.z = z; 
+  sp.f = feed;
+  qMove(sp);
+}
 
 //our feedrate variables.
 //float feedrate = SLOW_XY_FEEDRATE;
@@ -187,9 +216,6 @@ void process_string(char instruction[], int size)
 	if (instruction[0] == '/')	
 		return;
 
-	//init baby!
-	FloatPoint fp;
-        FloatPoint sp;
         float fr;
         
 	fp.x = 0.0;
@@ -203,7 +229,7 @@ void process_string(char instruction[], int size)
 	/* if no command was seen, but parameters were, then use the last G code as 
 	 * the current command
 	 */
-	if ((!(gc.seen & (GCODE_G | GCODE_M))) && 
+	if ((!(gc.seen & (GCODE_G | GCODE_M | GCODE_T))) && 
 	    ((gc.seen != 0) &&
 		(last_gcode_g >= 0))
 	)
@@ -264,48 +290,36 @@ void process_string(char instruction[], int size)
                                 
                         //go home.
 			case 28:
-                                sp.x = 0.0;
-                                sp.y = 0.0;
-                                sp.z = 0.0;
-                                if(abs_mode)
-                                  sp.e = where_i_am.e;
-                                else
-                                  sp.e = 0.0;
-                                if(where_i_am.z != 0.0)
-                                  sp.f = FAST_Z_FEEDRATE;                                 
-                                else
-                                  sp.f = FAST_XY_FEEDRATE;
-                                qMove(sp);
-
-				return;
-
-/*
-// We never use this...
-			//go home via an intermediate point.
-			case 30:
-                                fr = fp.f;
-                                if(where_i_am.z != fp.z)
-                                  fp.f = FAST_Z_FEEDRATE;
-                                else
-                                  fp.f = FAST_XY_FEEDRATE;
-                                fp.f = fr;
+                                where_i_am.f = SLOW_XY_FEEDRATE;
+                                specialMoveX(where_i_am.x - 5, FAST_XY_FEEDRATE);
+                                specialMoveX(where_i_am.x - 250, FAST_XY_FEEDRATE);
+                                where_i_am.x = 0;
+                                where_i_am.f = SLOW_XY_FEEDRATE;
+                                specialMoveX(where_i_am.x + 1, SLOW_XY_FEEDRATE);
+                                specialMoveX(where_i_am.x - 10, SLOW_XY_FEEDRATE);                                
+                                where_i_am.x = 0;
                                 
-                                qMove(fp);
-                                sp.x = 0.0;
-                                sp.y = 0.0;
-                                sp.z = 0.0;
-                                if(abs_mode)
-                                  sp.e = where_i_am.e;
-                                else
-                                  sp.e = 0.0;  
-                                if(where_i_am.z != 0.0)
-                                  sp.f = FAST_Z_FEEDRATE;
-                                else
-                                  sp.f = FAST_XY_FEEDRATE;
-                                qMove(sp);
+                                specialMoveY(where_i_am.y - 5, FAST_XY_FEEDRATE);
+                                specialMoveY(where_i_am.y - 250, FAST_XY_FEEDRATE);
+                                where_i_am.y = 0;
+                                where_i_am.f = SLOW_XY_FEEDRATE;
+                                specialMoveY(where_i_am.y + 1, SLOW_XY_FEEDRATE);
+                                specialMoveY(where_i_am.y - 10, SLOW_XY_FEEDRATE);                                
+                                where_i_am.y = 0; 
+ 
+                                where_i_am.f = SLOW_Z_FEEDRATE;
+                                specialMoveZ(where_i_am.z - 0.5, FAST_Z_FEEDRATE);
+                                specialMoveZ(where_i_am.z - 250, FAST_Z_FEEDRATE);
+                                where_i_am.z = 0;
+                                where_i_am.f = SLOW_Z_FEEDRATE;
+                                specialMoveZ(where_i_am.z + 1, SLOW_Z_FEEDRATE);
+                                specialMoveZ(where_i_am.z - 2, SLOW_Z_FEEDRATE);                                
+                                where_i_am.z = 0;
+                                where_i_am.f = SLOW_XY_FEEDRATE;     // Most sensible feedrate to leave it in                    
 
 				return;
-*/
+
+
                   default:
                                 break;
                 }
@@ -319,7 +333,7 @@ void process_string(char instruction[], int size)
 
   			 //Dwell
 			case 4:
-				delay((int)(gc.P + 0.5));  // Changed by AB from 1000*gc.P
+				delay((int)(gc.P + 0.5));  
 				break;
 
 			//Inches for Units

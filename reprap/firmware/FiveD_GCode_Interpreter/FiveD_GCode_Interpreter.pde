@@ -29,10 +29,12 @@ extruder* ex[EXTRUDER_COUNT];
 static extruder ex0(EXTRUDER_0_MOTOR_DIR_PIN, EXTRUDER_0_MOTOR_SPEED_PIN , EXTRUDER_0_HEATER_PIN,
             EXTRUDER_0_FAN_PIN,  EXTRUDER_0_TEMPERATURE_PIN, EXTRUDER_0_VALVE_DIR_PIN,
             EXTRUDER_0_VALVE_ENABLE_PIN, EXTRUDER_0_STEP_ENABLE_PIN);
-            
+     
+#if EXTRUDER_COUNT == 2            
 static extruder ex1(EXTRUDER_1_MOTOR_DIR_PIN, EXTRUDER_1_MOTOR_SPEED_PIN , EXTRUDER_1_HEATER_PIN,
               EXTRUDER_1_FAN_PIN,  EXTRUDER_1_TEMPERATURE_PIN, EXTRUDER_1_VALVE_DIR_PIN,
               EXTRUDER_1_VALVE_ENABLE_PIN, EXTRUDER_1_STEP_ENABLE_PIN);            
+#endif
 
 // Each entry in the buffer is an instance of cartesian_dda.
 
@@ -80,7 +82,9 @@ void setup()
   debugstring[0] = 0;
   
   ex[0] = &ex0;
-  ex[1] = &ex1;  
+#if EXTRUDER_COUNT == 2  
+  ex[1] = &ex1;
+#endif  
   extruder_in_use = 0; 
   
   head = 0;
@@ -131,7 +135,7 @@ inline bool qEmpty()
    return tail == head && !cdda[tail]->active();
 }
 
-inline void qMove(FloatPoint p)
+inline void qMove(const FloatPoint& p)
 {
   while(qFull()) delay(WAITING_DELAY);
   byte h = head; 
@@ -161,10 +165,11 @@ inline void setUnits(bool u)
 }
 
 
-inline void setPosition(FloatPoint p)
+inline void setPosition(const FloatPoint& p)
 {
   where_i_am = p;  
 }
+
 
 //******************************************************************************************
 
@@ -245,7 +250,7 @@ void setTimerResolution(byte r)
 	}
 }
 
-unsigned int getTimerCeiling(long delay)
+unsigned int getTimerCeiling(const long& delay)
 {
 	// our slowest speed at our highest resolution ( (2^16-1) * 0.0625 usecs = 4095 usecs)
 	if (delay <= 65535L)
@@ -267,7 +272,7 @@ unsigned int getTimerCeiling(long delay)
 		return 65535;
 }
 
-byte getTimerResolution(long delay)
+byte getTimerResolution(const long& delay)
 {
 	// these also represent frequency: 1000000 / delay / 2 = frequency in hz.
 	

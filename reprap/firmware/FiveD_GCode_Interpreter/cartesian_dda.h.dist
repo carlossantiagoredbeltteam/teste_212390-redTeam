@@ -69,7 +69,7 @@ private:
   
   // Work out the number of microseconds between steps
   
-  long calculate_feedrate_delay(float feedrate);
+  long calculate_feedrate_delay(const float& feedrate);
   
   // Switch the steppers on and off
   
@@ -149,7 +149,7 @@ inline void cartesian_dda::do_e_step()
         ext->step();
 }
 
-inline long cartesian_dda::calculate_feedrate_delay(float feedrate)
+inline long cartesian_dda::calculate_feedrate_delay(const float& feedrate)
 {  
         
 	// Calculate delay between steps in microseconds.  Here it is in English:
