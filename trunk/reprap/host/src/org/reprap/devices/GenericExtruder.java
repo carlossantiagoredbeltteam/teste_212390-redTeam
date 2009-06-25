@@ -22,9 +22,9 @@ public abstract class GenericExtruder implements Extruder
 	protected boolean separating;
 	
 	/**
-	 * How far we have extruded
+	 * How far we have extruded plus other things like temperature
 	 */
-	protected ExtrudedLength el;
+	protected ExtruderState es;
 	
 	/**
 	 * Flag to decide if the machine implements 4D extruding
@@ -36,12 +36,12 @@ public abstract class GenericExtruder implements Extruder
 	/**
 	 * Flag to record if we're going backwards
 	 */
-	protected boolean reversing;
+	//protected boolean reversing;
 	
 	/**
 	 * The current extrude speed
 	 */
-	protected double currentSpeed = 0;
+	//protected double currentSpeed = 0;
 	
 	/**
 	 * Offset of 0 degrees centigrade from absolute zero
@@ -49,14 +49,9 @@ public abstract class GenericExtruder implements Extruder
 	public static final double absZero = 273.15;
 	
 	/**
-	 * The temperature to maintain 
-	 */
-	protected double requestedTemperature = 0;
-	
-	/**
 	 * The temperature most recently read from the device 
 	 */
-	protected double currentTemperature = 0; 
+	//protected double currentTemperature = 0; 
 
 	/**
 	 * Maximum motor speed (value between 0-255)
@@ -179,7 +174,7 @@ public abstract class GenericExtruder implements Extruder
 	/**
 	 * 
 	 */
-	protected long lastTemperatureUpdate = 0;
+	//protected long lastTemperatureUpdate = 0;
 	
 	/**
 	 * Identifier of the extruder 
@@ -192,7 +187,7 @@ public abstract class GenericExtruder implements Extruder
 	 * for each actual extruder, derived from the old SNAP address of the extruder,
 	 * which is necessarily unique.
 	 */
-	protected int physicalExtruder;
+	//protected int physicalExtruder;
 	
 	/**
 	* prefix for our preferences.
@@ -319,7 +314,7 @@ public abstract class GenericExtruder implements Extruder
 	/**
 	* Are we currently extruding?
 	*/
-	protected boolean isExtruding = false;
+	//protected boolean isExtruding = false;
 	
 	private double extrusionFoundationWidth;
 	private double extrusionLastFoundationWidth;
@@ -353,11 +348,10 @@ public abstract class GenericExtruder implements Extruder
 		{
 			fiveD = false;
 		}
-		reversing = false;
-		el = new ExtrudedLength();
 		myExtruderID = extruderId;
 		separating = false;
-		refreshPreferences();
+		es = new ExtruderState(refreshPreferences());
+		es.setReverse(false);
 	}
 
 	/**
@@ -365,9 +359,9 @@ public abstract class GenericExtruder implements Extruder
 	 * talking to one physical extruder can use the same length instance.
 	 * @param e
 	 */
-	public void setExtrudeLength(ExtrudedLength e)
+	public void setExtrudeState(ExtruderState e)
 	{
-		el = e;
+		es = e;
 	}
 	
 	/**
@@ -376,16 +370,16 @@ public abstract class GenericExtruder implements Extruder
 	 */
 	public void zeroExtrudedLength()
 	{
-		el.zero();
+		es.zero();
 	}
 	
-	public void refreshPreferences()
+	public int refreshPreferences()
 	{
 		prefName = "Extruder" + myExtruderID + "_";
-
+		int result = -1;
 		try
 		{
-			physicalExtruder = Preferences.loadGlobalInt(prefName + "Address");
+			result = Preferences.loadGlobalInt(prefName + "Address");
 			maxExtruderSpeed = Preferences.loadGlobalInt(prefName + "MaxSpeed(0..255)");
 			extrusionSpeed = Preferences.loadGlobalDouble(prefName + "ExtrusionSpeed(mm/minute)");
 			extrusionTemp = Preferences.loadGlobalDouble(prefName + "ExtrusionTemp(C)");
@@ -464,6 +458,8 @@ public abstract class GenericExtruder implements Extruder
 			slowXYFeedrate = Math.min(printer.getSlowXYFeedrate(), slowXYFeedrate);
 			maxAcceleration = Math.min(printer.getMaxXYAcceleration(), maxAcceleration);			
 		}
+		
+		return result;
 	}
 	
 	/* (non-Javadoc)
@@ -505,43 +501,47 @@ public abstract class GenericExtruder implements Extruder
 	 * @param speed The speed to drive the motor at (0-255)
 	 * @throws IOException
 	 */
-	public void setExtrusion(double speed) throws IOException
+	public void setExtrusion(double speed, boolean rev) throws IOException
 	{
 		if (speed > 0)
-			isExtruding = true;
+			es.setExtruding(true);
 		else
-			isExtruding = false;
+			es.setExtruding(false);
 			
-		setExtrusion(speed, false);
-		currentSpeed = speed;
-		reversing = false;
+		es.setSpeed(speed);
+		es.setReverse(rev);
+	}
+	
+	public void setTemperature(double temperature) throws Exception
+	{
+		es.setTargetTemperature(temperature);
 	}
 	
 	public void startExtruding()
 	{
-		if (!isExtruding)
+		if (!es.isExtruding())
 		{
 			try
 			{
-				setExtrusion(getExtruderSpeed());
+				setExtrusion(getExtruderSpeed(), false);
 			} catch (Exception e) {
 				//hmm.
 			}
-			isExtruding = true;
+			es.setExtruding(true);
 		}
 	}
 	
 	public void stopExtruding()
 	{
-		if (isExtruding)
+		if (es.isExtruding())
 		{
 			try
 			{
-				setExtrusion(0);
+				setExtrusion(0, false);
 			} catch (Exception e) {
 				//hmm.
 			}
-			isExtruding = false;
+			es.setExtruding(false);
 		}
 	}
 	
@@ -553,14 +553,13 @@ public abstract class GenericExtruder implements Extruder
 		if(motorOn)
 		{
 			setExtrusion(getExtruderSpeed(), false);
-			currentSpeed = getExtruderSpeed();
-			reversing = false;
+			es.setSpeed(getExtruderSpeed());
 		} else
 		{
 			setExtrusion(0, false);
-			currentSpeed = 0;
-			reversing = false;
+			es.setSpeed(0);
 		}
+		es.setReverse(false);
 	}
 
 	public void heatOn() throws Exception 
@@ -577,7 +576,7 @@ public abstract class GenericExtruder implements Extruder
 	 * @see org.reprap.Extruder#getTemperatureTarget()
 	 */
 	public double getTemperatureTarget() {
-		return requestedTemperature;
+		return es.targetTemperature();
 	}
 
 	/* (non-Javadoc)
@@ -1163,7 +1162,7 @@ public abstract class GenericExtruder implements Extruder
      */
     public double getCurrentSpeed()
     {
-    	return currentSpeed;
+    	return es.speed();
     }
     
     /**
@@ -1172,7 +1171,7 @@ public abstract class GenericExtruder implements Extruder
      */
     public boolean getReversing()
     {
-    	return reversing;
+    	return es.reverse();
     }
     
     /**
@@ -1183,7 +1182,7 @@ public abstract class GenericExtruder implements Extruder
      */
     public double getDistanceFromTime(double time)
     {
-    	if(!isExtruding)
+    	if(!es.isExtruding())
     		return 0;
     	return printer.getCurrentFeedrate()*time/60000.0;
     }
@@ -1197,7 +1196,7 @@ public abstract class GenericExtruder implements Extruder
      */
     public double getDistance(double distance)
     {
-    	if(!isExtruding)
+    	if(!es.isExtruding())
     		return 0;
     	return extrudeRatio*distance;
     }
@@ -1214,9 +1213,9 @@ public abstract class GenericExtruder implements Extruder
      * Find out how far we have extruded so far
      * @return
      */
-    public ExtrudedLength getExtrudedLength()
+    public ExtruderState getExtruderState()
     {
-    	return el;
+    	return es;
     }
     
     /**
@@ -1225,8 +1224,7 @@ public abstract class GenericExtruder implements Extruder
      */
     public void addExtrudedLength(double l)
     {
-    	System.out.println("addExtrudedLength: " + el.length() + " + " + l);
-    	el.add(l);
+    	es.add(l);
     }
     
     /**
@@ -1245,7 +1243,7 @@ public abstract class GenericExtruder implements Extruder
      */
     public int getPhysicalExtruderNumber()
     {
-    	return physicalExtruder;
+    	return es.physicalExtruder();
     }
     
 }

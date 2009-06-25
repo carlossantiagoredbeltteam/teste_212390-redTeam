@@ -108,11 +108,11 @@ public class GCodeRepRap extends GenericRepRap {
 		if(extrudeLength > 0)
 		{
 			if(extruders[extruder].getReversing())
-				extruders[extruder].getExtrudedLength().add(-extrudeLength);
+				extruders[extruder].getExtruderState().add(-extrudeLength);
 			else
-				extruders[extruder].getExtrudedLength().add(extrudeLength);
+				extruders[extruder].getExtruderState().add(extrudeLength);
 			if(extruders[extruder].get5D())
-				code += " E" + round(extruders[extruder].getExtrudedLength().length(), 1);
+				code += " E" + round(extruders[extruder].getExtruderState().length(), 1);
 		}
 		
 		if (currentFeedrate != feedrate)
@@ -157,11 +157,11 @@ public class GCodeRepRap extends GenericRepRap {
 		if(extrudeLength > 0)
 		{
 			if(extruders[extruder].getReversing())
-				extruders[extruder].getExtrudedLength().add(-extrudeLength);
+				extruders[extruder].getExtruderState().add(-extrudeLength);
 			else
-				extruders[extruder].getExtrudedLength().add(extrudeLength);
+				extruders[extruder].getExtruderState().add(extrudeLength);
 			if(extruders[extruder].get5D())
-				code += " E" + round(extruders[extruder].getExtrudedLength().length(), 1);
+				code += " E" + round(extruders[extruder].getExtruderState().length(), 1);
 		}
 		
 		if (currentFeedrate != feedrate)
@@ -263,7 +263,7 @@ public class GCodeRepRap extends GenericRepRap {
 		
 		try
 		{
-			if(getExtruder().getMaxAcceleration() <= 0)
+			if(xyMove && getExtruder().getMaxAcceleration() <= 0)
 			{
 				moveTo(x, y, z, feedrate, false, false);
 				return;
@@ -304,7 +304,6 @@ public class GCodeRepRap extends GenericRepRap {
 			{
 				VelocityProfile vp = new VelocityProfile(Math.abs(dz), getSlowZFeedrate(), 
 						feedrate, getSlowZFeedrate(), getMaxZAcceleration());
-				//System.out.println("\n" + z + " " + z0 + " " + dz + " " + vp.flat() + " " + vp.v() + " " + vp.s1() + " " + vp.s2() + "\n");
 				double s = 1;
 				if(dz < 0)
 					s = -1;
@@ -363,7 +362,7 @@ public class GCodeRepRap extends GenericRepRap {
 			getExtruder().setCooler(false);
 
 			// Extruder off
-			getExtruder().setExtrusion(0);
+			getExtruder().setExtrusion(0, false);
 
 			// heater off
 			getExtruder().heatOff();
@@ -426,16 +425,17 @@ public class GCodeRepRap extends GenericRepRap {
 
 	public void home() {
 
-		// Assume the extruder is off...
-		try
-		{
-			homeToZeroX();
-			homeToZeroY();
-			homeToZeroZ();
-		} catch (Exception e)
-		{
-			
-		}
+		gcode.queue("G28; go home");
+//		// Assume the extruder is off...
+//		try
+//		{
+//			homeToZeroX();
+//			homeToZeroY();
+//			homeToZeroZ();
+//		} catch (Exception e)
+//		{
+//			
+//		}
 
 		if(extruders[extruder].get5D())
 			gcode.queue("G92 E0; set extruder home");
@@ -456,12 +456,12 @@ public class GCodeRepRap extends GenericRepRap {
 			}
 
 			if(extruders[extruder].getReversing())
-				extruders[extruder].getExtrudedLength().add(-extrudeLength);
+				extruders[extruder].getExtruderState().add(-extrudeLength);
 			else
-				extruders[extruder].getExtrudedLength().add(extrudeLength);
+				extruders[extruder].getExtruderState().add(extrudeLength);
 			if(extruders[extruder].get5D())
 			{
-				String op = "G1 E" + round(extruders[extruder].getExtrudedLength().length(), 1);
+				String op = "G1 E" + round(extruders[extruder].getExtruderState().length(), 1);
 				if(extruders[extruder].getReversing())
 					op += "; extruder retraction";
 				else

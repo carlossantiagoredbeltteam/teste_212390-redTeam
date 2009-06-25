@@ -81,7 +81,14 @@ public interface Printer {
 	/**
 	 * Maybe reverse the extruder at the end of a track
 	 */
-	public void printEndReverse();	
+	public void printEndReverse();
+	
+	/**
+	 * Home all axes
+	 *
+	 */
+	public void home();
+	
 	/**
 	 * Sync to zero X location.
 	 * @throws ReprapException
@@ -219,6 +226,11 @@ public interface Printer {
 	 * @return the extruder currently in use
 	 */
 	public Extruder getExtruder();
+	
+	/**
+	 * @return the index of the extruder currently in use
+	 */
+	public int getExtruderNumber();
 	
 	/**
 	 * @param name
