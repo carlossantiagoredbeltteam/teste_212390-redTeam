@@ -97,7 +97,7 @@ public class ExtruderPanel extends JPanel {
 	 */
 	private void setExtruderSpeed() {
 		try {
-			extruder.setExtrusion(extruding?speed.getValue():0);
+			extruder.setExtrusion(extruding?speed.getValue():0, false);
 		} catch (Exception ex) {
 			JOptionPane.showMessageDialog(null, "Extruder exception: " + ex);
 			ex.printStackTrace();

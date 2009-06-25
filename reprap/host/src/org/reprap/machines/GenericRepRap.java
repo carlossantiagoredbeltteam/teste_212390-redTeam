@@ -213,7 +213,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 			{
 				if(extruders[j].getPhysicalExtruderNumber() == pe)
 				{
-					extruders[i].setExtrudeLength(extruders[j].getExtrudedLength());
+					extruders[i].setExtrudeState(extruders[j].getExtruderState());
 					break;
 				}
 			}
@@ -339,6 +339,8 @@ public abstract class GenericRepRap implements CartesianPrinter
 		else
 			extruder = materialIndex;
 
+
+		
 		//todo: move back to cartesian snap
 		//layerPrinter.changeExtruder(getExtruder());
 
@@ -779,6 +781,11 @@ public abstract class GenericRepRap implements CartesianPrinter
 		currentX = currentY = currentZ = 0.0;
 	}
 	
+	public int getExtruderNumber()
+	{
+		return extruder;
+	}
+	
 //	public double getMaxFeedrateX()
 //	{
 //		return maxFeedrateX;
@@ -812,8 +819,16 @@ public abstract class GenericRepRap implements CartesianPrinter
 			// Go home. Seek (0,0) then callibrate X first
 			homeToZeroX();
 			homeToZeroY();
+			int extruderNow = extruder;
 			for(int i = 0; i < extruderCount; i++)
-				extruders[i].zeroExtrudedLength();
+			{
+				if(extruders[i].getExtruderState().length() > 0)
+				{
+					selectExtruder(i);
+					extruders[i].zeroExtrudedLength();
+				}
+			}
+			selectExtruder(extruderNow);
 			startCooling = Timer.elapsed();
 		}
 
@@ -942,7 +957,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		{
 			try
 			{
-				getExtruder().setExtrusion(getExtruder().getExtruderSpeed());
+				getExtruder().setExtrusion(getExtruder().getExtruderSpeed(), false);
 				getExtruder().setValve(false);
 			} catch (Exception ex) {}
 		}

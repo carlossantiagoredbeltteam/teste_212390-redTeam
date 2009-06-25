@@ -327,11 +327,15 @@ private void nudgeSizeRB3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
 public void homeAll()
 {
-	//parentBotConsoleFrame.suspendPolling();
-    xStepperPositionJPanel.homeAxis();
-    yStepperPositionJPanel.homeAxis();
-    zStepperPositionJPanel.homeAxis();
-    //parentBotConsoleFrame.resumePolling();
+	parentBotConsoleFrame.suspendPolling();
+	printer.home();
+	xStepperPositionJPanel.zeroBox();
+	yStepperPositionJPanel.zeroBox();
+	zStepperPositionJPanel.zeroBox();
+//    xStepperPositionJPanel.homeAxis();
+//    yStepperPositionJPanel.homeAxis();
+//    zStepperPositionJPanel.homeAxis();
+    parentBotConsoleFrame.resumePolling();
 }
 
 private void homeAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homeAllButtonActionPerformed
@@ -379,7 +383,7 @@ public void goTo(double xTo, double yTo, double zTo)
 			int eNum = Integer.parseInt(extruderToPlotWith.getText());
 			GenericExtruderTabPanel etp = BotConsoleFrame.getGenericExtruderTabPanel(eNum);
 			printer.selectExtruder(eNum);
-			printer.getExtruder().setExtrusion(etp.getExtruderSpeed());
+			printer.getExtruder().setExtrusion(etp.getExtruderSpeed(), false);
 			printer.machineWait(printer.getExtruder().getExtrusionDelayForLayer());
 		}
 		if(z >= zTo)
@@ -396,7 +400,7 @@ public void goTo(double xTo, double yTo, double zTo)
 			printer.singleMove(xTo, yTo, zTo, Double.parseDouble(xySpeedField.getText()));	
 		}
 		if(plotExtruderCheck.isSelected())
-			printer.getExtruder().setExtrusion(0);
+			printer.getExtruder().setExtrusion(0, false);
 	} catch (Exception e)
 	{}	
 	parentBotConsoleFrame.resumePolling();

@@ -1,7 +1,7 @@
 package org.reprap;
 
 import java.io.IOException;
-import org.reprap.devices.ExtrudedLength;
+import org.reprap.devices.ExtruderState;
 import javax.media.j3d.Appearance;
 
 public interface Extruder
@@ -16,7 +16,7 @@ public interface Extruder
 	 * Reload the preferences from the preferences file
 	 *
 	 */
-	public void refreshPreferences();
+	public int refreshPreferences();
 
 	/**
 	 * Start the extruder motor at a given speed.  For old extruders this ranges from 0
@@ -27,7 +27,7 @@ public interface Extruder
 	 * @param speed The speed to drive the motor at (0-255)
 	 * @throws IOException
 	 */
-	public void setExtrusion(double speed) throws IOException;
+	//public void setExtrusion(double speed) throws IOException;
 	
 	/**
 	 * Start the extruder motor at a given speed.  For old extruders this ranges from 0
@@ -245,14 +245,14 @@ public interface Extruder
      * Find out how far we have extruded so far
      * @return
      */
-    public ExtrudedLength getExtrudedLength();
+    public ExtruderState getExtruderState();
     
 	/**
 	 * Allow otthers to set our extrude length so that all logical extruders
 	 * talking to one physical extruder can use the same length instance.
 	 * @param e
 	 */
-	public void setExtrudeLength(ExtrudedLength e);
+	public void setExtrudeState(ExtruderState e);
 	
 	/**
 	 * Zero the extruded length

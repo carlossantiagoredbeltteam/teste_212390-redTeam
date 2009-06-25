@@ -280,9 +280,9 @@ public class SNAPExtruder extends GenericExtruder
 	}
 	
 	
-	public void refreshPreferences()
+	public int refreshPreferences()
 	{
-		super.refreshPreferences();
+		int result = super.refreshPreferences();
 		
 		try
 		{
@@ -295,6 +295,8 @@ public class SNAPExtruder extends GenericExtruder
 		{
 			System.err.println("Refresh extruder preferences: " + ex.toString());
 		}
+		
+		return result;
 	}
 	
 	/* (non-Javadoc)
@@ -399,10 +401,10 @@ public class SNAPExtruder extends GenericExtruder
 	 * @throws Exception
 	 */
 	private void setTemperature(double temperature, boolean lock) throws Exception {
-		requestedTemperature = temperature;
-		if(Math.abs(requestedTemperature - extrusionTemp) > 5)
+		es.setTargetTemperature(temperature);
+		if(Math.abs(es.targetTemperature() - extrusionTemp) > 5)
 		{
-			Debug.d(material + " extruder temperature set to " + requestedTemperature +
+			Debug.d(material + " extruder temperature set to " + es.targetTemperature() +
 				"C, which is not the standard temperature (" + extrusionTemp + "C).");
 		}
 		// Aim for 10% above our target to ensure we reach it.  It doesn't matter
@@ -580,8 +582,8 @@ public class SNAPExtruder extends GenericExtruder
 		tempScaler = 7 - (vRefFactor >> 1);
 	    setVref(vRefFactor);
 		setTempScaler(tempScaler);
-		if (requestedTemperature != 0)
-			setTemperature(requestedTemperature, false);
+		if (es.targetTemperature() != 0)
+			setTemperature(es.targetTemperature(), false);
 	}
 	
 	/**
@@ -656,7 +658,7 @@ public class SNAPExtruder extends GenericExtruder
 		awaitSensorsInitialised();
 		TEMPpollcheck();
 		//return tempVote();
-		return currentTemperature;
+		return es.currentTemperature();
 	}
 	
 	/* (non-Javadoc)
@@ -743,8 +745,8 @@ public class SNAPExtruder extends GenericExtruder
 			
 			double resistance = calculateResistance(rawHeat, calibration);
 			
-			currentTemperature = calculateTemperature(resistance);
-			Debug.d(material + " extruder current temp " + currentTemperature);
+			es.setCurrentTemperature(calculateTemperature(resistance));
+			Debug.d(material + " extruder current temp " + es.currentTemperature());
 			
 			lastTemperatureUpdate = System.currentTimeMillis();
 		}

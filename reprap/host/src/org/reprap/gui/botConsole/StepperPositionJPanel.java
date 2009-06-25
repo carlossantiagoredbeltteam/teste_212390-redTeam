@@ -117,6 +117,11 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
 //    		return printer.convertFeedrateToSpeedXY(f);
 //    }
     
+    public void zeroBox()
+    {
+    	targetPosition.setText("0");
+    }
+    
     public void homeAxis() {
     	parentBotConsoleFrame.suspendPolling();
         try {
@@ -136,7 +141,7 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
 				System.err.println("StepperPositionPanel - homeReset.  Dud motor id: " + motorID);
 			}
             //motor.homeReset(getSpeedFromFeed(currentSpeed));
-            targetPosition.setText("0");
+            zeroBox();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, "Could not home motor: " + ex);
         }
