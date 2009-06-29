@@ -1184,7 +1184,7 @@ public abstract class GenericExtruder implements Extruder
     {
     	if(!es.isExtruding())
     		return 0;
-    	return printer.getCurrentFeedrate()*time/60000.0;
+    	return es.speed()*time/60000.0;
     }
     
     /**
