@@ -15,7 +15,7 @@ class cartesian_dda
 {
 private:
 
-  extruder* ext;               // The extruder I'm currently using - keep this up to date...
+  //extruder* ext;               // The extruder I'm currently using - keep this up to date...
 
   FloatPoint units;            // Factors for converting either mm or inches to steps
 
@@ -107,16 +107,16 @@ public:
   
   // Record the selection of a new extruder
   
-  void set_extruder(extruder* ex);
+  //void set_extruder(extruder* ex);
 };
 
 // Short functions inline to save memory; particularly useful in the Arduino
 
 
-inline void cartesian_dda::set_extruder(extruder* ex)
-{
-  ext = ex;
-}
+//inline void cartesian_dda::set_extruder(extruder* ex)
+//{
+//  ext = ex;
+//}
 
 inline bool cartesian_dda::active()
 {
@@ -146,7 +146,7 @@ inline void cartesian_dda::do_z_step()
 
 inline void cartesian_dda::do_e_step()
 {
-        ext->step();
+        ex[extruder_in_use]->step();
 }
 
 inline long cartesian_dda::calculate_feedrate_delay(const float& feedrate)

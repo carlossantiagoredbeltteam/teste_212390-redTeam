@@ -24,7 +24,7 @@ void new_extruder(byte e)
   if(e != extruder_in_use)
   {  
     extruder_in_use = e;
-    setExtruder();
+    //setExtruder();
   }
 }
    
@@ -79,11 +79,11 @@ extruder::extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin,
         valve_open = false;
         
 //this is for doing encoder based extruder control
-        rpm = 0;
-        e_delay = 0;
-        error = 0;
-        last_extruder_error = 0;
-        error_delta = 0;
+//        rpm = 0;
+//        e_delay = 0;
+//        error = 0;
+//        last_extruder_error = 0;
+//        error_delta = 0;
         e_direction = EXTRUDER_FORWARD;
         
         //default to cool
@@ -156,8 +156,8 @@ void extruder::set_temperature(int temp)
 	max_celsius = (temp*11)/10;
 
         // If we've turned the heat off, we might as well disable the extrude stepper
-        if(target_celsius < 1)
-          disableStep(); 
+       // if(target_celsius < 1)
+        //  disableStep(); 
 }
 
 /**
@@ -193,7 +193,7 @@ int extruder::get_temperature()
 
 	return celsius;
 #else
-  return ( 5.0 * sample_temperature(temp_pin) * 100.0) / 1024.0;
+  return ( 5.0 * sample_temperature() * 100.0) / 1024.0;
 #endif
 }
 
@@ -202,13 +202,13 @@ int extruder::get_temperature()
 /*
 * This function gives us an averaged sample of the analog temperature pin.
 */
-int extruder::sample_temperature(byte pin)
+int extruder::sample_temperature()
 {
 	int raw = 0;
 	
 	//read in a certain number of samples
 	for (byte i=0; i<TEMPERATURE_SAMPLES; i++)
-		raw += analogRead(pin);
+		raw += analogRead(temp_pin);
 		
 	//average the samples
 	raw = raw/TEMPERATURE_SAMPLES;
