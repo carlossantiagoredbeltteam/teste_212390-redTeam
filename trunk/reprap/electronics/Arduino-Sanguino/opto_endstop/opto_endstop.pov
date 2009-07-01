@@ -1,6 +1,6 @@
 //POVRay-File created by 3d41.ulp v1.05
 ///home/hoeken/Desktop/reprap/trunk/reprap/electronics/Arduino-Sanguino/opto_endstop/opto_endstop.brd
-//6/28/09 3:50 PM
+//6/30/09 9:34 PM
 
 #version 3.5;
 
@@ -92,7 +92,7 @@
 #declare pcb_layer1_used = 1;
 #declare pcb_layer16_used = 1;
 #declare inc_testmode = off;
-#declare global_seed=seed(405);
+#declare global_seed=seed(269);
 #declare global_pcb_layer_dis = array[16]
 {
 	0.000000,
