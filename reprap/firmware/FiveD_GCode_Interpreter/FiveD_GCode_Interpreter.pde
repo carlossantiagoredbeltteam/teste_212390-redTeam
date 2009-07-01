@@ -8,33 +8,37 @@
 // Sanguino v1.4 by Adrian Bowyer - added the Sanguino; extensive mods... (a.bowyer@bath.ac.uk)
 // Sanguino v1.5 by Adrian Bowyer - implemented 4D Bressenham XYZ+ stepper control... (a.bowyer@bath.ac.uk)
 
+char debugstring[10];
+byte extruder_in_use = 0;
+
 #include <ctype.h>
 #include <HardwareSerial.h>
 #include "WProgram.h"
 #include "parameters.h"
 #include "pins.h"
 #include "extruder.h"
+
+// Maintain a list of extruders...
+
+extruder* ex[EXTRUDER_COUNT];
+
 #include "vectors.h"
 #include "cartesian_dda.h"
 
-
-
-char debugstring[10];
-
-// Maintain a list of extruders...
-byte extruder_in_use = 0;
-extruder* ex[EXTRUDER_COUNT];
-
-// ...creating static instances of them here
-static extruder ex0(EXTRUDER_0_MOTOR_DIR_PIN, EXTRUDER_0_MOTOR_SPEED_PIN , EXTRUDER_0_HEATER_PIN,
-            EXTRUDER_0_FAN_PIN,  EXTRUDER_0_TEMPERATURE_PIN, EXTRUDER_0_VALVE_DIR_PIN,
-            EXTRUDER_0_VALVE_ENABLE_PIN, EXTRUDER_0_STEP_ENABLE_PIN);
+// TODO: For some reason, if you declare the following two in the order ex0 ex1 then
+// ex0 won't drive its stepper.  They seem fine this way round though.  But that's got
+// to be a bug.
      
 #if EXTRUDER_COUNT == 2            
 static extruder ex1(EXTRUDER_1_MOTOR_DIR_PIN, EXTRUDER_1_MOTOR_SPEED_PIN , EXTRUDER_1_HEATER_PIN,
               EXTRUDER_1_FAN_PIN,  EXTRUDER_1_TEMPERATURE_PIN, EXTRUDER_1_VALVE_DIR_PIN,
               EXTRUDER_1_VALVE_ENABLE_PIN, EXTRUDER_1_STEP_ENABLE_PIN);            
 #endif
+
+static extruder ex0(EXTRUDER_0_MOTOR_DIR_PIN, EXTRUDER_0_MOTOR_SPEED_PIN , EXTRUDER_0_HEATER_PIN,
+            EXTRUDER_0_FAN_PIN,  EXTRUDER_0_TEMPERATURE_PIN, EXTRUDER_0_VALVE_DIR_PIN,
+            EXTRUDER_0_VALVE_ENABLE_PIN, EXTRUDER_0_STEP_ENABLE_PIN);
+
 
 // Each entry in the buffer is an instance of cartesian_dda.
 
@@ -54,11 +58,11 @@ FloatPoint where_i_am;
 
 // Make sure each DDA knows which extruder to use
 
-inline void setExtruder()
-{
-   for(byte i = 0; i < BUFFER_SIZE; i++)
-    cdda[i]->set_extruder(ex[extruder_in_use]);
-}
+//inline void setExtruder()
+//{
+//   for(byte i = 0; i < BUFFER_SIZE; i++)
+//    cdda[i]->set_extruder(ex[extruder_in_use]);
+//}
 
 
 // Our interrupt function
@@ -95,7 +99,7 @@ void setup()
   cdda[2] = &cdda2;  
   cdda[3] = &cdda3;
   
-  setExtruder();
+  //setExtruder();
   
   init_process_string();
   

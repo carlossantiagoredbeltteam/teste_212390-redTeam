@@ -33,11 +33,11 @@ private:
     int oldT, newT;
     
 //this is for doing encoder based extruder control
-    int rpm;
-    long e_delay;
-    int error;
-    int last_extruder_error;
-    int error_delta;
+//    int rpm;
+//    long e_delay;
+//    int error;
+//    int last_extruder_error;
+//    int error_delta;
     bool e_direction;
     bool valve_open;
 
@@ -57,7 +57,7 @@ public:
    void set_cooler(byte e_speed);
    void set_temperature(int temp);
    int get_temperature();
-   int sample_temperature(byte pin);
+   int sample_temperature();
    void manage();
    
    // Interrupt setup and handling functions for stepper-driven extruders
@@ -88,7 +88,7 @@ inline void extruder::step()
 {
    digitalWrite(motor_speed_pin, HIGH);
    delayMicroseconds(5);
-   digitalWrite(motor_speed_pin, LOW); 
+   digitalWrite(motor_speed_pin, LOW);
 }
 
 inline void extruder::temperature_error()
