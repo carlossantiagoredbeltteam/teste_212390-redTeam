@@ -41,7 +41,7 @@ cartesian_dda::cartesian_dda()
 	pinMode(Z_STEP_PIN, OUTPUT);
 	pinMode(Z_DIR_PIN, OUTPUT);
 
-#ifdef SANGUINO
+#if MOTHERBOARD > 0
 	pinMode(X_ENABLE_PIN, OUTPUT);
 	pinMode(Y_ENABLE_PIN, OUTPUT);
 	pinMode(Z_ENABLE_PIN, OUTPUT);
@@ -389,11 +389,11 @@ bool cartesian_dda::can_step(byte min_pin, byte max_pin, long current, long targ
 
 void cartesian_dda::enable_steppers()
 {
-#ifdef SANGUINO
-  if(delta_steps.x)
-    digitalWrite(X_ENABLE_PIN, 1); //ENABLE_ON);
+#if MOTHERBOARD > 0
+ if(delta_steps.x)
+    digitalWrite(X_ENABLE_PIN, ENABLE_ON);
   if(delta_steps.y)    
-    digitalWrite(Y_ENABLE_PIN, 1); //ENABLE_ON);
+    digitalWrite(Y_ENABLE_PIN, ENABLE_ON);
   if(delta_steps.z)
     digitalWrite(Z_ENABLE_PIN, ENABLE_ON);
   if(delta_steps.e)
@@ -405,10 +405,10 @@ void cartesian_dda::enable_steppers()
 
 void cartesian_dda::disable_steppers()
 {
-#ifdef SANGUINO 
+#if MOTHERBOARD > 0
 	//disable our steppers
-	digitalWrite(X_ENABLE_PIN, 0); //!ENABLE_ON);
-	digitalWrite(Y_ENABLE_PIN, 0); //!ENABLE_ON);
+	digitalWrite(X_ENABLE_PIN, !ENABLE_ON);
+	digitalWrite(Y_ENABLE_PIN, !ENABLE_ON);
 	digitalWrite(Z_ENABLE_PIN, !ENABLE_ON);
 
         // Disabling the extrude stepper causes the backpressure to

@@ -1,8 +1,13 @@
 #ifndef PARAMETERS_H
 #define PARAMETERS_H
 
-// Comment the next line out to use the Arduino
-#define SANGUINO
+// Here are the moterboard codes; set MOTHERBOARD to the right one
+// (Arduino: 0 - no longer in use)
+// Sanguino & RepRap Motherboard Version 1.0: 1
+// RepRap Motherboard Version 1.x (x >= 1): 2
+// Arduino Mega: 3
+
+#define MOTHERBOARD 1
 
 // Set 1s where you have endstops; 0s where you don't
 #define ENDSTOPS_MIN_ENABLED 1

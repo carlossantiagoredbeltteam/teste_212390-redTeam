@@ -6,14 +6,22 @@
 #ifndef EXTRUDER_H
 #define EXTRUDER_H
 
-#define EXTRUDER_FORWARD true
-#define EXTRUDER_REVERSE false
-
 #define EXTRUDER_COUNT 2
 
 void manage_all_extruders();
 
 void new_extruder(byte e);
+
+/**********************************************************************************************
+
+* Sanguino/RepRap Motherboard v 1.0
+
+*/
+
+#if MOTHERBOARD < 2
+
+#define EXTRUDER_FORWARD true
+#define EXTRUDER_REVERSE false
 
 class extruder
 {
@@ -44,23 +52,23 @@ private:
 // The pins we control
     byte motor_dir_pin, motor_speed_pin, heater_pin, fan_pin, temp_pin, valve_dir_pin, valve_en_pin, step_en_pin;
     
+     byte wait_till_hot();
+     //byte wait_till_cool();
+     void temperature_error(); 
+     int sample_temperature();
+     
 public:
 
    extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin, byte vd_pin, byte ve_pin, byte se_pin);
    void wait_for_temperature();
-   //byte wait_till_cool();
-   byte wait_till_hot();
-   void temperature_error();  
    void valve_set(bool open, int dTime);
    void set_direction(bool direction);
 //   void set_speed(float es);
    void set_cooler(byte e_speed);
    void set_temperature(int temp);
    int get_temperature();
-   int sample_temperature();
    void manage();
-   
-   // Interrupt setup and handling functions for stepper-driven extruders
+// Interrupt setup and handling functions for stepper-driven extruders
    
 //   void interrupt();
    void step();
@@ -124,6 +132,92 @@ inline void extruder::set_cooler(byte sp)
   analogWrite(fan_pin, sp);
 }
 
+/**********************************************************************************************
 
+* RepRap Motherboard v 1.x (x >= 1)
+* Extruder is now on RS485
+
+*/
+
+#else
+
+class extruder
+{
+private:
+
+  byte address;
+ 
+public:
+   extruder(byte a);
+   void wait_for_temperature();
+   void valve_set(bool open, int dTime);
+   void set_direction(bool direction);
+   void set_cooler(byte e_speed);
+   void set_temperature(int temp);
+   int get_temperature();
+   void manage();
+   void step();
+
+   void enableStep();
+   void disableStep();
+   
+};
+
+inline extruder::extruder(byte a)
+{
+  address = a;
+}
+
+inline  void extruder::wait_for_temperature()
+{
+  
+}
+
+inline  void extruder::valve_set(bool open, int dTime)
+{
+  
+}
+
+inline void extruder::set_direction(bool direction)
+{
+  
+}
+
+inline  void extruder::set_cooler(byte e_speed)
+{
+  
+}
+
+inline  void extruder::set_temperature(int temp)
+{
+  
+}
+
+inline  int extruder::get_temperature()
+{
+  return 1;  
+}
+
+inline  void extruder::manage()
+{
+  
+}
+
+inline  void extruder::step()
+{
+  
+}
+
+inline  void extruder::enableStep()
+{
+  
+}
+
+inline  void extruder::disableStep()
+{
+  
+}
+
+#endif
 
 #endif

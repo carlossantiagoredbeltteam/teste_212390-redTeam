@@ -27,7 +27,16 @@ void new_extruder(byte e)
     //setExtruder();
   }
 }
-   
+
+/***************************************************************************************************************************
+
+If we have a new motherboard (V 1.x, x >= 1), the extruder is entirely controlled via the RS485, and all  the functions to do
+it are simple inlines in extruder.h
+
+Otherwise, we have to do the work ourselves...
+*/
+
+#if MOTHERBOARD < 2   
 extruder::extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin, byte vd_pin, byte ve_pin, byte se_pin)
 {
          motor_dir_pin = md_pin;
@@ -294,5 +303,6 @@ void extruder::interrupt()
     }
 }
 
+#endif
 #endif
 
