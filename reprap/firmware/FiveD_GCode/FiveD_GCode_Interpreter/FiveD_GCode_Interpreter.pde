@@ -8,8 +8,6 @@
 // Sanguino v1.4 by Adrian Bowyer - added the Sanguino; extensive mods... (a.bowyer@bath.ac.uk)
 // Sanguino v1.5 by Adrian Bowyer - implemented 4D Bressenham XYZ+ stepper control... (a.bowyer@bath.ac.uk)
 
-char debugstring[10];
-byte extruder_in_use = 0;
 
 #include <ctype.h>
 #include <HardwareSerial.h>
@@ -24,13 +22,17 @@ byte extruder_in_use = 0;
 // Maintain a list of extruders...
 
 extruder* ex[EXTRUDER_COUNT];
+byte extruder_in_use = 0;
 
+// Text placed in this (terminated with 0) will be transmitted back to the host
+// along with the next G Code acknowledgement.
+char debugstring[10];
+
+#if MOTHERBOARD < 2
 
 // TODO: For some reason, if you declare the following two in the order ex0 ex1 then
 // ex0 won't drive its stepper.  They seem fine this way round though.  But that's got
 // to be a bug.
-
-#if MOTHERBOARD < 2
 
 #if EXTRUDER_COUNT == 2            
 static extruder ex1(EXTRUDER_1_MOTOR_DIR_PIN, EXTRUDER_1_MOTOR_SPEED_PIN , EXTRUDER_1_HEATER_PIN,
