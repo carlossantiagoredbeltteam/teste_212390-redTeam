@@ -175,7 +175,11 @@ inline  void extruder::wait_for_temperature()
 
 inline  void extruder::valve_set(bool open, int dTime)
 {
-  
+   if(open)
+     talker.sendPacket(address, "V1");
+   else
+     talker.sendPacket(address, "V0");
+   delay(dTime);
 }
 
 inline void extruder::set_direction(bool direction)
@@ -219,5 +223,7 @@ inline  void extruder::disableStep()
 }
 
 #endif
+
+extern extruder* ex[];
 
 #endif

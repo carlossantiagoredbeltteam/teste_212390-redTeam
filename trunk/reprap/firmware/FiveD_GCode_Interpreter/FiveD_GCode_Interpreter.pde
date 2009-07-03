@@ -14,16 +14,17 @@ byte extruder_in_use = 0;
 #include <ctype.h>
 #include <HardwareSerial.h>
 #include "WProgram.h"
+#include "vectors.h"
 #include "parameters.h"
+#include "intercom.h"
 #include "pins.h"
 #include "extruder.h"
+#include "cartesian_dda.h"
 
 // Maintain a list of extruders...
 
 extruder* ex[EXTRUDER_COUNT];
 
-#include "vectors.h"
-#include "cartesian_dda.h"
 
 // TODO: For some reason, if you declare the following two in the order ex0 ex1 then
 // ex0 won't drive its stepper.  They seem fine this way round though.  But that's got
@@ -49,6 +50,9 @@ static extruder ex1(2);
 #endif
 
 static extruder ex0(1);
+
+intercom talker;
+
 #endif
 
 // Each entry in the buffer is an instance of cartesian_dda.

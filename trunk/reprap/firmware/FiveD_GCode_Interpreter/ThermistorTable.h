@@ -1,6 +1,8 @@
 #ifndef THERMISTORTABLE_H_
 #define THERMISTORTABLE_H_
 
+#if MOTHERBOARD < 2
+
 // Uncomment the next line if you are using a thermistor; leave it if you have a thermocouple
 //#define USE_THERMISTOR
 
@@ -46,5 +48,7 @@ short temptable[NUMTEMPS][2] = {
    {955, 34},
    {1008, 3}
 };
+
+#endif
 #endif
 #endif
