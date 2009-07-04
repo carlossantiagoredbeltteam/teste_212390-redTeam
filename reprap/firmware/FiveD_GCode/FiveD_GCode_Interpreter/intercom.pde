@@ -11,13 +11,19 @@
 
 intercom::intercom()
 {
+  pinMode(RX_ENABLE_PIN, OUTPUT);
+  pinMode(TX_ENABLE_PIN, OUTPUT);
+  digitalWrite(RX_ENABLE_PIN, 0); //always listen.
   Serial1.begin(38400);  
 }
 
 void intercom::sendPacket(byte address, char* string)
 {
+  digitalWrite(TX_ENABLE_PIN, 1);
   Serial1.print(address, HEX);
+  Serial1.print(MASTER_ADDRESS);
   Serial1.println(string);
+  digitalWrite(TX_ENABLE_PIN, 0);
   getPacket(myBuffer, IC_BUFFER);
   if(myBuffer[0] != MASTER_ADDRESS[0] ||  myBuffer[1] != MASTER_ADDRESS[1])
   {

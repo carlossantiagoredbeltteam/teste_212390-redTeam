@@ -225,5 +225,6 @@ inline  void extruder::disableStep()
 #endif
 
 extern extruder* ex[];
+extern byte extruder_in_use;
 
 #endif
