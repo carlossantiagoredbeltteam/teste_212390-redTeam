@@ -7,7 +7,11 @@
 // v1.3 by Zach Hoeken - added thermocouple support and multi-sample temp readings. (hoeken@gmail.com)
 // Sanguino v1.4 by Adrian Bowyer - added the Sanguino; extensive mods... (a.bowyer@bath.ac.uk)
 // Sanguino v1.5 by Adrian Bowyer - implemented 4D Bressenham XYZ+ stepper control... (a.bowyer@bath.ac.uk)
+// Sanguino v1.6 by Adrian Bowyer - implemented RS485 extruders
 
+#ifndef __AVR_ATmega644P__
+#error Oops!  Make sure you have 'Sanguino' selected from the 'Tools -> Boards' menu.
+#endif
 
 #include <ctype.h>
 #include <HardwareSerial.h>

@@ -3,8 +3,8 @@
 
 // Here are the moterboard codes; set MOTHERBOARD to the right one
 // (Arduino: 0 - no longer in use)
-// Sanguino & RepRap Motherboard Version 1.0: 1
-// RepRap Motherboard Version 1.x (x >= 1): 2
+// Sanguino or RepRap Motherboard with direct drive extruders: 1
+// RepRap Motherboard with RS485 extruders: 2
 // Arduino Mega: 3
 
 #define MOTHERBOARD 1
