@@ -2,24 +2,24 @@ EAGLE AutoRouter Statistics:
 
 Job           : /home/ensab/workspace/adrian/Experimental-electronics/extruder-controller.brd
 
-Start at      : 11:32:01 (10/07/2009)
-End at        : 11:32:14 (10/07/2009)
-Elapsed time  : 00:00:13
+Start at      : 12:47:28 (11/07/2009)
+End at        : 12:47:57 (11/07/2009)
+Elapsed time  : 00:00:29
 
-Signals       :    74   RoutingGrid: 5 mil  Layers: 2
-Connections   :   239   predefined:  231 ( 98 Vias )
+Signals       :    73   RoutingGrid: 5 mil  Layers: 2
+Connections   :   243   predefined:  236 ( 100 Vias )
 
-Router memory :   2416780
+Router memory :   3157920
 
 Passname          :     Route Optimize1 Optimize2 Optimize3 Optimize4
 
-Time per pass     :  00:00:02  00:00:02  00:00:03  00:00:03  00:00:03
-Number of Ripups  :         1         0         0         0         0
-max. Level        :         1         0         0         0         0
-max. Total        :         1         0         0         0         0
+Time per pass     :  00:00:04  00:00:05  00:00:07  00:00:06  00:00:07
+Number of Ripups  :         0         0         0         0         0
+max. Level        :         0         0         0         0         0
+max. Total        :         0         0         0         0         0
 
-Routed            :         8         8         8         8         8
-Vias              :        10         9         8         8         8
+Routed            :         7         7         7         7         7
+Vias              :         7         5         5         5         5
 Resolution        :   100.0 %   100.0 %   100.0 %   100.0 %   100.0 %
 
 Final             : 100.0% finished
