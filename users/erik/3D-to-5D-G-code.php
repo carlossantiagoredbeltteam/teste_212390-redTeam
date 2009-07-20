@@ -7,6 +7,7 @@
  * 0.5 Erik		14/07/09	Software anti-backlash (TODO: differentiate between dynamic and static friction)
  * 0.6 Erik		15/07/09	Output to file --output_file filename.gcode Default: out-5D.gcode
  * 0.7 Erik		19/07/09	Condition based actions (change lines based on a list of criteria).
+ * 0.8 Erik		20/07/09	Added start and stop conditions in addition to 'while'.
  */
 ini_set('memory_limit','128M');
 
@@ -24,7 +25,11 @@ $setting['replace_strings'] = array(
 	//'F330.0'=>'F430.0', // moderately speed up the raft-making
 );  // 
 $setting['actions'] = array(
-	array('condition'=>array('match','F330.0'),'actions'=>array('E_mul'=>7,'F_mul'=>0.7)), // raft making: slow down XY-moves, speed up extrusion.
+	//array('while'=>array('match','F330.0'),'actions'=>array('E_mul'=>7,'F_mul'=>0.7)), // raft making: slow down XY-moves, speed up extrusion.
+	array(
+          'condition_start'=>array('match','<layer> 0.5'),
+          'condition_stop'=>array('match','</layer>'),
+          'actions'=>array('E_mul'=>7,'F_mul'=>0.7)), // raft making: slow down XY-moves, speed up extrusion.
 );
 $setting['remove_comments'] = true;  // Set true/false to remove comments from input file or not.
 $setting['soften_z_move_factor'] = 0.4;  // this slows down the move in the Z direction to this speed
@@ -52,6 +57,8 @@ foreach($setting as $sName => $sVal)
 
 }
 
+
+$conditionOk = false;
 
 // The *OLD*, 3D (lame!) way:
 // M108S200 ; extruder motor speed at 200 PWM
@@ -238,17 +245,24 @@ foreach($lines as $line)
   $orrigLine = $line;
   foreach($setting['actions'] as $action)
   { //array('condition'=>array('match','F330.0'),'actions'=>array('E_mul'=>2,'F_mul'=>0.5)), // raft making: slow down XY-moves, speed up extrusion.
-    $conditionOk = false;
     // conditions:
     // Implemented: match a string. To implement: match a Z-layer, < > or =.?
-    if($action['condition'][0]=='match')
+    if($action['while'][0]=='match')
     {
-      if(strpos($orrigLine,$action['condition'][1]))
+      if(isset($action['while']))
+        $conditionOk = false;
+      if(strpos($orrigLine,$action['while'][1]))
       {
         //echo "(line matches $action[condition]";
         $conditionOk = true;
       }
-    }
+    } // I know, this is not coded in a very elegant way... EdB
+    if(($action['condition_start'][0]=='match') && (strpos($orrigLine,$action['condition_start'][1])))
+      $conditionOk = true;
+    if(($action['condition_stop'][0]=='match') && (strpos($orrigLine,$action['condition_stop'][1])))
+      $conditionOk = false;
+
+
     if($conditionOk)
     {
 	    foreach($action['actions'] as $actParam => $actVal)
