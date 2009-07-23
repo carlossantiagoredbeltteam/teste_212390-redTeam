@@ -62,6 +62,69 @@ import java.util.List;
 import org.reprap.Extruder;
 
 /**
+ * Small class to hold a polygon index and the index of a point within it
+ * @author ensab
+ *
+ */
+class PolPoint
+{
+	private int pNear;
+	private int pNext;
+	private int pg;
+	private RrPolygon pol;
+	private double leng;
+	
+	public PolPoint()
+	{	
+	}
+	
+	public int near() { return pNear; }
+	public int next() { return pNext; }
+	public int pIndex() { return pg; }
+	public double length() { return leng; }
+	
+	public void set(int pnr, int pgn, RrPolygon poly)
+	{
+		pNear = pnr;
+		pg = pgn;
+		pol = poly;
+	}
+	
+	/**
+	 * Find the longest polygon edge away from point pNear
+	 * and put its index in pNext.
+	 */
+	public void findLongest()
+	{
+		double d1, d2;
+		int p1 = pNear + 1;
+		if(p1 >= pol.size())
+			p1 = pNear - 1;
+		int p2 = pNear - 1;
+		d1 = Rr2Point.dSquared(pol.point(pNear), pol.point(p1));
+		if(p2 >= 0)
+			d2 = Rr2Point.dSquared(pol.point(pNear), pol.point(p2));
+		else
+			d2 = -1;
+		if(d1 >= d2)
+		{
+			pNext = p1;
+			leng = Math.sqrt(d1);
+		} else
+		{
+			pNext = p2;
+			leng = Math.sqrt(d2);
+		}
+	}
+	
+	public Rr2Point halfWay()
+	{
+		Rr2Point result = Rr2Point.add(pol.point(pNear), pol.point(pNext));
+		return Rr2Point.mul(result, 0.5);
+	}
+}
+
+/**
  * chPair - small class to hold double pointers for convex hull calculations.
  */
 class chPair
@@ -739,6 +802,64 @@ public class RrPolygonList
 		}
 		
 		return r;
+	}
+	
+	/**
+	 * Search a polygon list to find the nearest point on all the polygons within it
+	 * to the point p.
+	 * 
+	 * @param p
+	 * @return
+	 */
+	private PolPoint ppSearch(Rr2Point p)
+	{
+		double d = Double.POSITIVE_INFINITY;
+		PolPoint result = null;
+		
+		for(int i = 0; i < size(); i++)
+		{
+			RrPolygon pgon = polygon(i);
+			int n = pgon.nearestVertex(p);
+			double d2 = Rr2Point.dSquared(p, pgon.point(i));
+			if(d2 < d)
+			{
+				if(result == null)
+					result = new PolPoint();
+				result.set(n, i, pgon);
+				d = d2;
+			}
+		}
+		
+		if(result == null)
+			System.err.println("RrPolygonList.ppSearch(): no point found!");
+		
+		return result;
+	}
+	
+	
+	/**
+	 * This assumes that the RrPolygonList for which it is called is all the outline
+	 * polygons, and that hatching is their infill hatch.  It goes through the outlines
+	 * and the hatch modifying both so that that outlines actually start and end half-way 
+	 * along a hatch line (that half of the hatch line being deleted).  When the outlines
+	 * are then printed, they start and end in the middle of a solid area, thus minimising dribble.
+	 * 
+	 * @param hatching
+	 */
+	public void middleStarts(RrPolygonList hatching)
+	{
+		for(int i = 0; i < size(); i++)
+		{
+			RrPolygon outline = polygon(i);
+			Rr2Point start = outline.point(0);
+			PolPoint pp = hatching.ppSearch(start);
+			pp.findLongest();
+			//TODO: Check pp.length() to make sure it's not too short; if it is rotate the start point of outline
+			outline.add(outline.point(0));
+			outline.add(0, outline.point(pp.near()));
+			outline.add(0, pp.halfWay());
+			//TODO: also modify the hatch polygon
+		}
 	}
 	
 	/**

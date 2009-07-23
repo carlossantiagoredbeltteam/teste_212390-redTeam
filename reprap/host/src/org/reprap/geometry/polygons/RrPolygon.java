@@ -274,20 +274,34 @@ public class RrPolygon
 	public void add(Rr2Point p)
 	{
 		if(speeds != null)
-			System.err.println("Rr2Point.add(): adding a point to a polygon with it's speeds set.");
+			System.err.println("Rr2Point.add(): adding a point to a polygon with its speeds set.");
 		points.add(new Rr2Point(p));
 		box.expand(p);
 	}
 	
 	/**
 	 * Insert a new point into the polygon
+	 * @param i
 	 * @param p
-	 * @param f
+	 */
+	public void add(int i, Rr2Point p)
+	{
+		if(speeds != null)
+			System.err.println("Rr2Point.add(): adding a point to a polygon with its speeds set.");
+		points.add(i, new Rr2Point(p));
+		box.expand(p);
+	}	
+
+	/**
+	 * Insert a new point and speed into the polygon
+	 * @param i
+	 * @param p
+	 * @param s
 	 */
 	public void add(int i, Rr2Point p, double s)
 	{
 		if(speeds == null)
-			System.err.println("Rr2Point.add(): adding a point and a speed to a polygon without it's speeds set.");
+			System.err.println("Rr2Point.add(): adding a point and a speed to a polygon without its speeds set.");
 		points.add(i, new Rr2Point(p));
 		speeds.add(i, s);
 		box.expand(p);
