@@ -844,13 +844,17 @@ public class RrPolygonList
 	 * along a hatch line (that half of the hatch line being deleted).  When the outlines
 	 * are then printed, they start and end in the middle of a solid area, thus minimising dribble.
 	 * 
+	 * The outline polygons are re-ordered before the start so that their first point is
+	 * the most extreme one in the direction, dir.
+	 * 
 	 * @param hatching
+	 * @param direction
 	 */
-	public void middleStarts(RrPolygonList hatching)
+	public void middleStarts(RrPolygonList hatching, RrLine dir)
 	{
 		for(int i = 0; i < size(); i++)
 		{
-			RrPolygon outline = polygon(i);
+			RrPolygon outline = polygon(i).newStart(polygon(i).maximalVertex(dir));
 			Rr2Point start = outline.point(0);
 			PolPoint pp = hatching.ppSearch(start);
 			pp.findLongest();

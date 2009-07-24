@@ -507,6 +507,30 @@ public class RrPolygon
 	}
 	
 	/**
+	 * Find the index of the point that has the maximal parametric projection
+	 * onto a line.
+	 * @param ln
+	 * @return
+	 */
+	public int maximalVertex(RrLine ln)
+	{
+		double d = Double.NEGATIVE_INFINITY;
+		int result = -1;
+		for(int i = 0; i < size(); i++)
+		{
+			double d2 = ln.projection(point(i));
+			if(d2 > d)
+			{
+				d = d2;
+				result = i;
+			}
+		}
+		if(result < 0)
+			System.err.println("maximalVertex: no point found!");
+		return result;		
+	}
+	
+	/**
 	 * Signed area (-ve result means polygon goes anti-clockwise)
 	 * @return signed area
 	 */
@@ -801,6 +825,11 @@ public class RrPolygon
 		
 		return result;
 	}
+	
+	// *****************************************************************************************************
+	//
+	// Speed and acceleration calculations
+	
 	
 	private RrInterval accRange(double startV, double s, double acc)
 	{

@@ -273,4 +273,15 @@ public class RrLine
 		double t = Rr2Point.mul(direction, j0)*finv;
 		return new Rr2Point(d2, t);
 	}
+	
+	/**
+	 * The parameter value of the point on the line closest to point p
+	 * @param p
+	 * @return
+	 */
+	public double projection(Rr2Point p)
+	{
+		Rr2Point s = Rr2Point.sub(p, origin);
+		return Rr2Point.mul(direction, s);
+	}
 }
