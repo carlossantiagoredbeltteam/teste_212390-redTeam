@@ -69,7 +69,7 @@ import org.reprap.Extruder;
 class PolPoint
 {
 	private int pNear;
-	private int pNext;
+	private int pEnd;
 	private int pg;
 	private RrPolygon pol;
 	private double leng;
@@ -79,8 +79,9 @@ class PolPoint
 	}
 	
 	public int near() { return pNear; }
-	public int next() { return pNext; }
+	public int end() { return pEnd; }
 	public int pIndex() { return pg; }
+	public RrPolygon polygon() { return pol; }
 	public double length() { return leng; }
 	
 	public void set(int pnr, int pgn, RrPolygon poly)
@@ -90,37 +91,53 @@ class PolPoint
 		pol = poly;
 	}
 	
-	/**
-	 * Find the longest polygon edge away from point pNear
-	 * and put its index in pNext.
-	 */
-	public void findLongest()
+	private void midPoint(int i, int j)
 	{
-		double d1, d2;
-		int p1 = pNear + 1;
-		if(p1 >= pol.size())
-			p1 = pNear - 1;
-		int p2 = pNear - 1;
-		d1 = Rr2Point.dSquared(pol.point(pNear), pol.point(p1));
-		if(p2 >= 0)
-			d2 = Rr2Point.dSquared(pol.point(pNear), pol.point(p2));
-		else
-			d2 = -1;
-		if(d1 >= d2)
-		{
-			pNext = p1;
-			leng = Math.sqrt(d1);
-		} else
-		{
-			pNext = p2;
-			leng = Math.sqrt(d2);
-		}
+		if(j > 0)
+			i--;
+		j = i+1;
+		
+		Rr2Point p = Rr2Point.add(pol.point(i), pol.point(j));
+		p = Rr2Point.mul(p, 0.5);
+		pol.add(j, p);
+		pEnd = j;
 	}
 	
-	public Rr2Point halfWay()
+	/**
+	 * Find the a long-enough polygon edge away from point pNear
+	 * and put its index in pNext.
+	 */
+	public void findLongEnough(double longEnough, double searchFor)
 	{
-		Rr2Point result = Rr2Point.add(pol.point(pNear), pol.point(pNext));
-		return Rr2Point.mul(result, 0.5);
+		double d;
+		double sum = 0;
+		double longest = -1;
+		int iLongest = -1;
+		Rr2Point p = pol.point(pNear);
+		Rr2Point q;
+		int inc = 1;
+		if(pNear > pol.size()/2)
+			inc = -1;
+		int i = pNear;
+		while(i > 0 && i < pol.size() - 1 && sum < searchFor)
+		{
+			i += inc;
+			q = pol.point(i);
+			d = Rr2Point.d(p, q);
+			if(d >= longEnough)
+			{
+				midPoint(i, inc);
+				return;
+			}
+			if(d > longest)
+			{
+				longest = d;
+				iLongest = i;
+			}
+			sum += d;
+			p = q;
+		}
+		midPoint(iLongest, inc);
 	}
 }
 
@@ -805,6 +822,33 @@ public class RrPolygonList
 	}
 	
 	/**
+	 * Remove polygon pol from the list, replacing it with two polygons, the
+	 * first being pol's vertices from 0 to st inclusive, and the second being
+	 * pol's vertices from en to its end inclusive.  It is permissible for 
+	 * st == en (indeed, you can have st > en, in which case the two will
+	 * partially overlap).
+	 * 
+	 * The two new polygons are put on the end of the list.
+	 * 
+	 * @param pol
+	 * @param st
+	 * @param en
+	 */
+	private void cutPolygon(int pol, int st, int en)
+	{
+		RrPolygon old = polygon(pol);
+		RrPolygon p1 = new RrPolygon(old.getAttributes(), old.isClosed());
+		RrPolygon p2 = new RrPolygon(old.getAttributes(), old.isClosed());
+		for(int i = 0; i <= st; i++)
+			p1.add(old.point(i));
+		for(int i = en; i < old.size(); i++)
+			p2.add(old.point(i));
+		remove(pol);
+		add(p1);
+		add(p2);
+	}
+	
+	/**
 	 * Search a polygon list to find the nearest point on all the polygons within it
 	 * to the point p.
 	 * 
@@ -857,12 +901,28 @@ public class RrPolygonList
 			RrPolygon outline = polygon(i).newStart(polygon(i).maximalVertex(dir));
 			Rr2Point start = outline.point(0);
 			PolPoint pp = hatching.ppSearch(start);
-			pp.findLongest();
-			//TODO: Check pp.length() to make sure it's not too short; if it is rotate the start point of outline
+			pp.findLongEnough(10, 30);
+
+			int st = pp.near();
+			int en = pp.end();
+
+			RrPolygon pg = pp.polygon();
+			
 			outline.add(outline.point(0));
-			outline.add(0, outline.point(pp.near()));
-			outline.add(0, pp.halfWay());
-			//TODO: also modify the hatch polygon
+			
+			if(en >= st)
+			{
+				for(int j = st; j <= en; j++)
+					outline.add(0, pg.point(j));
+			} else
+			{
+				for(int j = st; j >= en; j--)
+					outline.add(0, pg.point(j));
+			}
+			
+			polygons.set(i, outline);
+			
+			hatching.cutPolygon(pp.pIndex(), st, en);
 		}
 	}
 	

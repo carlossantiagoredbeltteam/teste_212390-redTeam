@@ -288,7 +288,7 @@ public class Rr2Point
 	 * distance
 	 * @param a
 	 * @param b
-	 * @return squared distance
+	 * @return distance
 	 */
 	public static double d(Rr2Point a, Rr2Point b)
 	{
