@@ -60,6 +60,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.reprap.Extruder;
+import org.reprap.geometry.LayerRules;
 
 /**
  * Small class to hold a polygon index and the index of a point within it
@@ -72,7 +73,6 @@ class PolPoint
 	private int pEnd;
 	private int pg;
 	private RrPolygon pol;
-	private double leng;
 	
 	public PolPoint()
 	{	
@@ -82,7 +82,6 @@ class PolPoint
 	public int end() { return pEnd; }
 	public int pIndex() { return pg; }
 	public RrPolygon polygon() { return pol; }
-	public double length() { return leng; }
 	
 	public void set(int pnr, int pgn, RrPolygon poly)
 	{
@@ -93,9 +92,15 @@ class PolPoint
 	
 	private void midPoint(int i, int j)
 	{
-		if(j > 0)
-			i--;
-		j = i+1;
+		if(i > j)
+		{
+			int temp = i;
+			i = j;
+			j = temp;
+		}
+		
+		if(i < 0 || i > pol.size() -1 || j < 0 || j > pol.size() -1)
+			System.err.println("RrPolygonList.midPoint(): i and/or j wrong: i = " + i + ", j = " + j);
 		
 		Rr2Point p = Rr2Point.add(pol.point(i), pol.point(j));
 		p = Rr2Point.mul(p, 0.5);
@@ -112,13 +117,15 @@ class PolPoint
 		double d;
 		double sum = 0;
 		double longest = -1;
-		int iLongest = -1;
 		Rr2Point p = pol.point(pNear);
 		Rr2Point q;
 		int inc = 1;
-		if(pNear > pol.size()/2)
+		if(pNear > pol.size()/2 - 1)
 			inc = -1;
 		int i = pNear;
+		int iLongest = i;
+		int jLongest = i;
+		int j = i;
 		while(i > 0 && i < pol.size() - 1 && sum < searchFor)
 		{
 			i += inc;
@@ -126,18 +133,20 @@ class PolPoint
 			d = Rr2Point.d(p, q);
 			if(d >= longEnough)
 			{
-				midPoint(i, inc);
+				midPoint(i, j);
 				return;
 			}
 			if(d > longest)
 			{
 				longest = d;
 				iLongest = i;
+				jLongest = j;
 			}
 			sum += d;
 			p = q;
+			j = i;
 		}
-		midPoint(iLongest, inc);
+		midPoint(iLongest, jLongest);
 	}
 }
 
@@ -686,7 +695,7 @@ public class RrPolygonList
 	 * Re-order and (if need be) reverse the order of the polygons
 	 * in a list so the end of the first is near the start of the second and so on.
 	 * This is a heuristic - it does not do a full traveling salesman...
-	 * This deals with both open and closed polygons, but it does not allow the first one to
+	 * This deals with both open and closed polygons, but it does not allow closed ones to
 	 * be re-ordered, even if that would give a shorter path.
 	 * @return new ordered polygon list
 	 */
@@ -768,19 +777,19 @@ public class RrPolygonList
 				pgp = r.polygon(i);
 				e1 = pgp.point(0);
 				
-				if(pgp.isClosed())
-				{
-					int nv = pgp.nearestVertex(e1);
-					d2 = Rr2Point.dSquared(pgp.point(nv), e1);
-					if(d2 < d)
-					{
-						near = i;
-						d = d2;
-						neg = false;
-						nearv = nv;
-					} 
-				} else
-				{
+//				if(pgp.isClosed())
+//				{
+//					int nv = pgp.nearestVertex(e1);
+//					d2 = Rr2Point.dSquared(pgp.point(nv), e1);
+//					if(d2 < d)
+//					{
+//						near = i;
+//						d = d2;
+//						neg = false;
+//						nearv = nv;
+//					} 
+//				} else
+//				{
 					d2 = Rr2Point.dSquared(end, e1);
 					if(d2 < d)
 					{
@@ -796,10 +805,10 @@ public class RrPolygonList
 					{
 						near = i;
 						d = d2;
-						neg = true;
+						neg = true && !pgp.isClosed();
 						nearv = -1;
 					}
-				}
+//				}
 			}
 			
 			if(near < 0)
@@ -825,8 +834,7 @@ public class RrPolygonList
 	 * Remove polygon pol from the list, replacing it with two polygons, the
 	 * first being pol's vertices from 0 to st inclusive, and the second being
 	 * pol's vertices from en to its end inclusive.  It is permissible for 
-	 * st == en (indeed, you can have st > en, in which case the two will
-	 * partially overlap).
+	 * st == en, but if st > en, then they are swapped.
 	 * 
 	 * The two new polygons are put on the end of the list.
 	 * 
@@ -839,13 +847,27 @@ public class RrPolygonList
 		RrPolygon old = polygon(pol);
 		RrPolygon p1 = new RrPolygon(old.getAttributes(), old.isClosed());
 		RrPolygon p2 = new RrPolygon(old.getAttributes(), old.isClosed());
-		for(int i = 0; i <= st; i++)
-			p1.add(old.point(i));
-		for(int i = en; i < old.size(); i++)
-			p2.add(old.point(i));
+		if(st > en)
+		{
+			int temp = st;
+			st = en;
+			en = temp;
+		}
+		if(st > 0)
+		{
+			for(int i = 0; i <= st; i++)
+				p1.add(old.point(i));
+		}
+		if(en < old.size() - 1)
+		{
+			for(int i = en; i < old.size(); i++)
+				p2.add(old.point(i));
+		}
 		remove(pol);
-		add(p1);
-		add(p2);
+		if(p1.size() > 1)
+			add(p1);
+		if(p2.size() > 1)
+			add(p2);
 	}
 	
 	/**
@@ -864,7 +886,7 @@ public class RrPolygonList
 		{
 			RrPolygon pgon = polygon(i);
 			int n = pgon.nearestVertex(p);
-			double d2 = Rr2Point.dSquared(p, pgon.point(i));
+			double d2 = Rr2Point.dSquared(p, pgon.point(n));
 			if(d2 < d)
 			{
 				if(result == null)
@@ -889,16 +911,22 @@ public class RrPolygonList
 	 * are then printed, they start and end in the middle of a solid area, thus minimising dribble.
 	 * 
 	 * The outline polygons are re-ordered before the start so that their first point is
-	 * the most extreme one in the direction, dir.
+	 * the most extreme one in the current hatch direction.
 	 * 
 	 * @param hatching
-	 * @param direction
+	 * @param lc
 	 */
-	public void middleStarts(RrPolygonList hatching, RrLine dir)
+	public void middleStarts(RrPolygonList hatching, LayerRules lc)
 	{
 		for(int i = 0; i < size(); i++)
 		{
-			RrPolygon outline = polygon(i).newStart(polygon(i).maximalVertex(dir));
+			RrPolygon outline = polygon(i);
+			Extruder ex = outline.getAttributes().getExtruder();
+			RrLine l = lc.getHatchDirection(ex).pLine();
+			if(i%2 != 0 ^ lc.getMachineLayer()%4 > 1)
+				l = l.neg();
+			outline = outline.newStart(outline.maximalVertex(l));
+
 			Rr2Point start = outline.point(0);
 			PolPoint pp = hatching.ppSearch(start);
 			pp.findLongEnough(10, 30);
@@ -908,7 +936,7 @@ public class RrPolygonList
 
 			RrPolygon pg = pp.polygon();
 			
-			outline.add(outline.point(0));
+			outline.add(start);
 			
 			if(en >= st)
 			{
@@ -920,9 +948,10 @@ public class RrPolygonList
 					outline.add(0, pg.point(j));
 			}
 			
-			polygons.set(i, outline);
+			set(i, outline);
 			
 			hatching.cutPolygon(pp.pIndex(), st, en);
+			
 		}
 	}
 	

@@ -295,6 +295,9 @@ public class LayerProducer {
 		hatchedPolygons = new RrPolygonList();
 		hatchedPolygons.add(offHatch.hatch(layerConditions));
 		
+		if(borderPolygons != null)
+			borderPolygons.middleStarts(hatchedPolygons, layerConditions);
+		
 		if(simulationPlot != null)
 		{
 			if(!simulationPlot.isInitialised())
@@ -769,10 +772,12 @@ public class LayerProducer {
 		
 		printer.selectExtruder(att);
 		
-		if(p.isClosed() && att.getExtruder().incrementedStart())
-			p = p.incrementedStart(layerConditions);
-		else if(p.isClosed() && att.getExtruder().randomStart())
-			p = p.randomStart();
+// Don't do these with mid-point starting
+		
+//		if(p.isClosed() && att.getExtruder().incrementedStart())
+//			p = p.incrementedStart(layerConditions);
+//		else if(p.isClosed() && att.getExtruder().randomStart())
+//			p = p.randomStart();
 		
 		int stopExtruding = p.size() + 10;
 		int stopValve = stopExtruding;
@@ -802,13 +807,14 @@ public class LayerProducer {
 			p.setSpeeds(att.getExtruder().getSlowXYFeedrate(), p.isClosed()?outlineFeedrate:infillFeedrate, 
 					att.getExtruder().getMaxAcceleration());
 		
+		
 		if(extrudeBackLength <= 0)
-			stopExtruding = p.size() + 10;
+			stopExtruding = Integer.MAX_VALUE;
 		else if(acc)
 			stopExtruding = p.findBackPoint(extrudeBackLength);
 		
 		if(valveBackLength <= 0)
-			stopValve = p.size() + 10;
+			stopValve = Integer.MAX_VALUE;
 		else if(acc)
 			stopValve = p.findBackPoint(valveBackLength);
 
@@ -827,7 +833,7 @@ public class LayerProducer {
 				currentFeedrate = infillFeedrate;			
 			}
 		}
-
+		
 		plot(p.point(0), p.point(1), false, false);
 		
 		// Print any lead-in.
@@ -837,33 +843,34 @@ public class LayerProducer {
 		boolean valveOff = false;
 		boolean oldexoff;
 		
-		if(p.isClosed())
-		{
-			for(int j = 1; j <= p.size(); j++)
-			{
-				int i = j%p.size();
-				Rr2Point next = p.point((j+1)%p.size());
-				
-				if (printer.isCancelled())
-				{
-					printer.stopMotor();
-					singleMove(posNow());
-					move(posNow(), posNow(), lift, true, true);
-					return;
-				}
-				if(acc)
-					currentFeedrate = p.speed(i);
-				
-				oldexoff = extrudeOff;
-				extrudeOff = j > stopExtruding || j == p.size();
-				valveOff = j > stopValve || j == p.size();
-				
-				plot(p.point(i), next, extrudeOff, valveOff);
-				if(oldexoff ^ extrudeOff)
-					printer.printEndReverse();
-			}
-		} else
-		{
+//		if(p.isClosed())
+//		{
+//			for(int j = 1; j <= p.size(); j++)
+//			{
+//				int i = j%p.size();
+//				Rr2Point next = p.point((j+1)%p.size());
+//				
+//				if (printer.isCancelled())
+//				{
+//					printer.stopMotor();
+//					singleMove(posNow());
+//					move(posNow(), posNow(), lift, true, true);
+//					return;
+//				}
+//				if(acc)
+//					currentFeedrate = p.speed(i);
+//				
+//				oldexoff = extrudeOff;
+//				extrudeOff = j > stopExtruding || j == p.size();
+//				valveOff = j > stopValve || j == p.size();
+//				
+//				plot(p.point(i), next, extrudeOff, valveOff);
+//				if(oldexoff ^ extrudeOff)
+//					printer.printEndReverse();
+//			}
+//		} else
+		
+//		{
 			for(int i = 1; i < p.size(); i++)
 			{
 				Rr2Point next = p.point((i+1)%p.size());
@@ -887,8 +894,11 @@ public class LayerProducer {
 				if(oldexoff ^ extrudeOff)
 					printer.printEndReverse();
 			}
-		}
+//		}
 		
+		if(p.isClosed())
+			move(p.point(0), p.point(0), false, false, true);
+			
 		move(posNow(), posNow(), lift, lift, true);
 		
 		// The last point is near where we want to start next
@@ -1003,6 +1013,7 @@ public class LayerProducer {
 
 			firstOneInLayer = true;
 			borderPolygons = borderPolygons.nearEnds(startNearHere);
+			
 			ib = plotOneMaterial(borderPolygons, ib, firstOneInLayer);
 			firstOneInLayer = false;
 			hatchedPolygons = hatchedPolygons.nearEnds(startNearHere);
