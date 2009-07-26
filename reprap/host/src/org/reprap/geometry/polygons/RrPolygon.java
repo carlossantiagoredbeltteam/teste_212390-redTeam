@@ -224,7 +224,9 @@ public class RrPolygon
 		{
 			result += point(i).toString();
 			if(speeds != null)
-				result += "(" + speed(i) + ") ";
+				result += "(" + speed(i) + "); ";
+			else
+				result += "; ";
 		}
 		
 		return result;
@@ -461,7 +463,7 @@ public class RrPolygon
 		RrPolygon result = new RrPolygon(att, closed);
 		for(int j = 0; j < size(); j++)
 		{
-			result.add(new Rr2Point(point(i)));
+			result.add(point(i));
 			if(speeds != null)
 				result.setSpeed(j, speed(i));
 			i++;
@@ -502,12 +504,12 @@ public class RrPolygon
 			}
 		}
 		if(result < 0)
-			System.err.println("nearestVertex: no point found!");
+			System.err.println("RrPolygon.nearestVertex(): no point found!");
 		return result;
 	}
 	
 	/**
-	 * Find the index of the point that has the maximal parametric projection
+	 * Find the index of the polygon point that has the maximal parametric projection
 	 * onto a line.
 	 * @param ln
 	 * @return
@@ -526,7 +528,7 @@ public class RrPolygon
 			}
 		}
 		if(result < 0)
-			System.err.println("maximalVertex: no point found!");
+			System.err.println("RrPolygon.maximalVertex(): no point found!");
 		return result;		
 	}
 	
@@ -879,9 +881,12 @@ public class RrPolygon
 	 */
 	public void setSpeeds(double minSpeed, double maxSpeed, double acceleration)
 	{
-		RrPolygon pg = simplify(Preferences.gridRes());
-		points = pg.points;
-		box = pg.box;
+		//if(isClosed())System.out.println(toString());
+		//RrPolygon pg = simplify(Preferences.gridRes());
+
+		//points = pg.points;
+		//box = pg.box;
+		//if(isClosed())System.out.println(toString());
 		
 		boolean fixup[] = new boolean[size()];
 		setSpeed(0, minSpeed);
@@ -931,7 +936,6 @@ public class RrPolygon
 			s = newS;
 		}
 		
-
 		
 		for(int i = isClosed()?size():size() - 1; i > 0; i--)
 		{
@@ -969,6 +973,7 @@ public class RrPolygon
 				}
 			} 
 		}
+
 		
 		if(speeds.size() != points.size())
 			System.err.println("Speeds and points arrays different: " + speeds.size() + ", " + points.size());
