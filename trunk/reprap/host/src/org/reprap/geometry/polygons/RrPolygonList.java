@@ -929,29 +929,31 @@ public class RrPolygonList
 
 			Rr2Point start = outline.point(0);
 			PolPoint pp = hatching.ppSearch(start);
-			pp.findLongEnough(10, 30);
-
-			int st = pp.near();
-			int en = pp.end();
-
-			RrPolygon pg = pp.polygon();
-			
-			outline.add(start);
-			
-			if(en >= st)
+			if(pp != null)
 			{
-				for(int j = st; j <= en; j++)
-					outline.add(0, pg.point(j));
-			} else
-			{
-				for(int j = st; j >= en; j--)
-					outline.add(0, pg.point(j));
+				pp.findLongEnough(10, 30);
+
+				int st = pp.near();
+				int en = pp.end();
+
+				RrPolygon pg = pp.polygon();
+
+				outline.add(start);
+
+				if(en >= st)
+				{
+					for(int j = st; j <= en; j++)
+						outline.add(0, pg.point(j));
+				} else
+				{
+					for(int j = st; j >= en; j--)
+						outline.add(0, pg.point(j));
+				}
+
+				set(i, outline);
+
+				hatching.cutPolygon(pp.pIndex(), st, en);
 			}
-			
-			set(i, outline);
-			
-			hatching.cutPolygon(pp.pIndex(), st, en);
-			
 		}
 	}
 	
