@@ -18,6 +18,7 @@ import org.reprap.geometry.polygons.Rr2Point;
 import org.reprap.geometry.polygons.RrCSGPolygonList;
 import org.reprap.geometry.polygons.RrPolygon;
 import org.reprap.geometry.polygons.RrPolygonList;
+import org.reprap.geometry.polygons.RrRectangle;
 import org.reprap.utilities.Debug;
 import org.reprap.utilities.RrGraphics;
 
@@ -296,7 +297,18 @@ public class LayerProducer {
 		hatchedPolygons.add(offHatch.hatch(layerConditions));
 		
 		if(borderPolygons != null)
+		{
 			borderPolygons.middleStarts(hatchedPolygons, layerConditions);
+
+//			RrRectangle rr = lc.getBox();
+//			Rr2Point corner = Rr2Point.sub(rr.sw(), new Rr2Point(-3, -3));
+//			RrPolygon ell = new RrPolygon(borderPolygons.polygon(0).getAttributes(), false);
+//			ell.add(corner);
+//			ell.add(Rr2Point.add(corner, new Rr2Point(-2, 10)));
+//			ell.add(Rr2Point.add(corner, new Rr2Point(-2, -2)));
+//			ell.add(Rr2Point.add(corner, new Rr2Point(20, -2)));
+//			borderPolygons.add(0, ell);
+		}
 		
 		if(simulationPlot != null)
 		{
