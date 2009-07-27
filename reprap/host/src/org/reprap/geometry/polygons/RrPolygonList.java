@@ -570,6 +570,16 @@ public class RrPolygonList
 	}
 	
 	/**
+	 * Add one new polygon to the list at location i
+	 * @param p polygon to add to the list
+	 */
+	public void add(int i, RrPolygon p)
+	{
+		polygons.add(i, p);
+		box.expand(p.getBox());
+	}
+	
+	/**
 	 * Swap two in the list
 	 * @param i
 	 * @param j
