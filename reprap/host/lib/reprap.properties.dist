@@ -8,6 +8,7 @@ BackFactor=2.0
 BaudRate=19200
 BoundFactor=3.0
 CommsDebug=false
+Shield=false
 Debug=true
 DisplaySimulation=false
 Extruder0_Address=8
