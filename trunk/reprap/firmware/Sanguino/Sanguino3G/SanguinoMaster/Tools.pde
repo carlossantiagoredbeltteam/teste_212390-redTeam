@@ -145,19 +145,19 @@ void send_tool_query()
     hostPacket.add_8(slavePacket.get_8(i));
 }
 
-void send_tool_command()
+void send_tool_command(CircularBuffer::Cursor& cursor)
 {
   //zero out our packet
   slavePacket.init();
 
   //add in our tool id and command.
-  slavePacket.add_8(commandBuffer.remove_8());
-  slavePacket.add_8(commandBuffer.remove_8());
+  slavePacket.add_8(cursor.read_8());
+  slavePacket.add_8(cursor.read_8());
 
   //load up our packet.
-  byte len = commandBuffer.remove_8();
+  byte len = cursor.read_8();
   for (byte i=0; i<len; i++)
-    slavePacket.add_8(commandBuffer.remove_8());
+    slavePacket.add_8(cursor.read_8());
 
   //send it and then get our response
   send_packet();
