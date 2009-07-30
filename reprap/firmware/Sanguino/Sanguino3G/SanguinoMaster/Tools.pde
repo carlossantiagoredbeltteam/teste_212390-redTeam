@@ -163,6 +163,19 @@ void send_tool_command(CircularBuffer::Cursor& cursor)
   send_packet();
 }
 
+void send_tool_simple_command(byte tool, byte command)
+{
+  slavePacket.init();
+  slavePacket.add_8(tool);
+  slavePacket.add_8(command);
+  send_packet();
+}
+
+void abort_current_tool()
+{
+  send_tool_simple_command(currentToolIndex, SLAVE_CMD_ABORT);
+}
+
 boolean send_packet()
 {
   //take it easy.  no stomping on each other.

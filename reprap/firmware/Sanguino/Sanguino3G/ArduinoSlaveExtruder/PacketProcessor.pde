@@ -23,6 +23,8 @@
 #define SLAVE_CMD_GET_MOTOR_2_RPM       20
 #define SLAVE_CMD_SELECT_TOOL           21
 #define SLAVE_CMD_IS_TOOL_READY         22
+#define SLAVE_CMD_PAUSE_UNPAUSE         23
+#define SLAVE_CMD_ABORT                 24
 
 //initialize the firmware to default state.
 void init_commands()
@@ -285,6 +287,10 @@ void handle_query()
   //WORKING
   case SLAVE_CMD_IS_TOOL_READY:
     masterPacket.add_8(is_tool_ready());
+    break;
+
+  case SLAVE_CMD_ABORT:
+    initialize();
     break;
   }
 }
