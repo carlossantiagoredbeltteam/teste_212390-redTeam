@@ -96,6 +96,8 @@ void abort_print()
   disableTimer1Interrupt();
   disable_steppers();
 
+  commandBuffer.clear();
+
   //initalize everything to the beginning
   initialize();
 }
