@@ -1,5 +1,8 @@
 // Yep, this is actually -*- c++ -*-
 
+// Prototype of fn defined in Tools.pde
+void send_tool_command(CircularBuffer::Cursor& cursor);
+
 //initialize the firmware to default state.
 inline void init_commands()
 {
@@ -333,7 +336,7 @@ void handle_commands()
 	// Belay until we're at a good location.
 	if (!is_point_buffer_empty()) { return; }
         
-        send_tool_command();
+        send_tool_command(cursor);
         break;
     case HOST_CMD_ENABLE_AXES:
       // Belay until we're at a good location.
