@@ -87,10 +87,14 @@ void loop()
   check_endstops();
 }
 
+// prototype of fn defined in Tools.pde
+void abort_current_tool();
+
 //handle the abortion of a print job
 void abort_print()
 {
-  //TODO: turn off all of our tools.
+  //turn off all of our tools.
+  abort_current_tool();
 
   //turn off steppers too.
   disableTimer1Interrupt();
