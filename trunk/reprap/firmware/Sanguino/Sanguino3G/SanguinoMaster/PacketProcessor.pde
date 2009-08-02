@@ -1,3 +1,5 @@
+#include <EEPROM.h>
+
 // Yep, this is actually -*- c++ -*-
 
 // Prototype of fn defined in Tools.pde
@@ -197,7 +199,34 @@ void handle_query(byte cmd)
       break;
     }
 
-    default:
+  case HOST_CMD_READ_EEPROM:
+    {
+      const uint16_t offset = hostPacket.get_16(1);
+      const uint8_t count = hostPacket.get_8(3);
+      if (count > 16) {
+	hostPacket.overflow();
+      } else {
+	for (uint8_t i = 0; i < count; i++) {
+	  hostPacket.add_8(EEPROM.read(offset+i));
+	}
+      }
+    }
+    break;
+  case HOST_CMD_WRITE_EEPROM:
+    {
+      uint16_t offset = hostPacket.get_16(1);
+      uint8_t count = hostPacket.get_8(3);
+      if (count > 16) {
+	hostPacket.overflow();
+      } else {
+	for (uint8_t i = 0; i < count; i++) {
+	  EEPROM.write(offset+i,hostPacket.get_8(4+i));
+	}
+	hostPacket.add_8(count);
+      }
+    }
+    break;
+  default:
       hostPacket.unsupported();
   }
 }

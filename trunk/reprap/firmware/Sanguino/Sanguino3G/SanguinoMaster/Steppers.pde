@@ -452,13 +452,13 @@ byte get_endstop_states()
 //TODO: make me work!
 void write_range_to_eeprom()
 {
-
+  // Please don't-- these are superceded by the general eeprom read/write commands
 }
 
 //TODO: make me work!
 void read_range_from_eeprom()
 {
-
+  // Please don't-- these are superceded by the general eeprom read/write commands
 }
 
 //queue a point for us to move to
