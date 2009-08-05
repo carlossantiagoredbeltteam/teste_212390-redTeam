@@ -1,3 +1,6 @@
+#include "EEPROMOffsets.h"
+#include <EEPROM.h>
+
 /**
  *  Sanguino 3rd Generation Firmware (S3G)
  *
@@ -8,6 +11,10 @@
  *  Authors: Marius Kintel, Adam Mayer, and Zach Hoeken
  */
 
+/// We need a logical XOR, so we'll implement it here.
+inline bool logic_xor(bool a, bool b) {
+  return a?!b:b;
+}
 
 /// Initialize the stepper driver state.
 void init_steppers();
@@ -23,9 +30,7 @@ void seek_minimums(boolean find_x, boolean find_y, boolean find_z, unsigned long
 /// Move the axis one step in towards the minimum.  If the min endstop is
 /// triggered, back up until it is only triggered by a single step.
 /// \return true if the minimum endstop is triggered.
-boolean find_axis_min(byte step_pin, byte dir_pin, byte min_pin);
 void seek_maximums(boolean find_x, boolean find_y, boolean find_z, unsigned long step_delay, unsigned int timeout_seconds);
-boolean find_axis_max(byte step_pin, byte dir_pin, byte max_pin);
 inline void grab_next_point();
 inline void do_step(byte step_pin);
 inline bool read_switch(byte pin);
@@ -42,6 +47,9 @@ inline boolean is_point_buffer_empty();
 inline boolean at_target();
 inline void wait_until_target_reached();
 
+bool x_invert;
+bool y_invert;
+bool z_invert;
 
 //initialize our stepper drivers
 void init_steppers()
@@ -71,6 +79,15 @@ void init_steppers()
   pinMode(Z_MIN_PIN, INPUT);
   pinMode(Z_MAX_PIN, INPUT);
 
+  // Load the inversion data if it's available.
+  if (hasEEPROMSettings()) {
+    uint8_t inversions = EEPROM.read(EEPROM_AXIS_INVERSION_OFFSET);
+    x_invert = (inversions & (0x01 << 0)) != 0;
+    y_invert = (inversions & (0x01 << 1)) != 0;
+    z_invert = (inversions & (0x01 << 2)) != 0;
+  } else {
+    x_invert = y_invert = z_invert = false;
+  }
 #if SENSORS_INVERTING == 1
   // If we are using inverting endstops, we'll turn on the pull-ups on these pins.
   // This enables us to operate without endstops if necessary.
@@ -121,17 +138,17 @@ void seek_minimums(boolean find_x, boolean find_y, boolean find_z, unsigned long
     //do our steps and check for mins.
     if (find_x && !found_x)
     {
-      found_x = find_axis_min(X_STEP_PIN, X_DIR_PIN, X_MIN_PIN);
+      found_x = find_axis_dir(X_STEP_PIN, X_DIR_PIN, X_MIN_PIN, x_invert);
       current_steps.x = 0;
     }
     if (find_y && !found_y)
     {
-      found_y = find_axis_min(Y_STEP_PIN, Y_DIR_PIN, Y_MIN_PIN);
+      found_y = find_axis_dir(Y_STEP_PIN, Y_DIR_PIN, Y_MIN_PIN, y_invert);
       current_steps.y = 0;
     }
     if (find_z && !found_z)
     {
-      found_z = find_axis_min(Z_STEP_PIN, Z_DIR_PIN, Z_MIN_PIN);
+      found_z = find_axis_dir(Z_STEP_PIN, Z_DIR_PIN, Z_MIN_PIN, z_invert);
       current_steps.z = 0;
     }
 
@@ -172,17 +189,17 @@ void seek_maximums(boolean find_x, boolean find_y, boolean find_z, unsigned long
     //do our steps and check for mins.
     if (find_x && !found_x)
     {
-      found_x = find_axis_max(X_STEP_PIN, X_DIR_PIN, X_MAX_PIN);
+      found_x = find_axis_dir(X_STEP_PIN, X_DIR_PIN, X_MAX_PIN, !x_invert);
       range_steps.x = current_steps.x;
     }
     if (find_y && !found_y)
     {
-      found_y = find_axis_max(Y_STEP_PIN, Y_DIR_PIN, Y_MAX_PIN);
+      found_y = find_axis_dir(Y_STEP_PIN, Y_DIR_PIN, Y_MAX_PIN, !y_invert);
       range_steps.y = current_steps.y;
     }
     if (find_z && !found_z)
     {
-      found_z = find_axis_max(Z_STEP_PIN, Z_DIR_PIN, Z_MAX_PIN);
+      found_z = find_axis_dir(Z_STEP_PIN, Z_DIR_PIN, Z_MAX_PIN, !z_invert);
       range_steps.z = current_steps.z;
     }
 
@@ -266,9 +283,9 @@ inline void grab_next_point()
     z_direction = delta_steps.z >= 0;
 
     //set our direction pins as well
-    digitalWrite(X_DIR_PIN, x_direction);
-    digitalWrite(Y_DIR_PIN, y_direction);
-    digitalWrite(Z_DIR_PIN, z_direction);
+    digitalWrite(X_DIR_PIN, logic_xor(x_invert,x_direction));
+    digitalWrite(Y_DIR_PIN, logic_xor(y_invert,y_direction));
+    digitalWrite(Z_DIR_PIN, logic_xor(z_invert,z_direction));
 
     //now get us absolute coords
     delta_steps.x = abs(delta_steps.x);
