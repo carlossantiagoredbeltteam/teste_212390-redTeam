@@ -1,3 +1,5 @@
+#include <EEPROM.h>
+
 // Yep, this is actually -*- c++ -*-
 // These are our query commands from the host
 #define SLAVE_CMD_VERSION                0
@@ -25,6 +27,8 @@
 #define SLAVE_CMD_IS_TOOL_READY         22
 #define SLAVE_CMD_PAUSE_UNPAUSE         23
 #define SLAVE_CMD_ABORT                 24
+#define SLAVE_CMD_READ_FROM_EEPROM      25
+#define SLAVE_CMD_WRITE_TO_EEPROM       26
 
 //initialize the firmware to default state.
 void init_commands()
@@ -291,6 +295,33 @@ void handle_query()
 
   case SLAVE_CMD_ABORT:
     initialize();
+    break;
+  case SLAVE_CMD_READ_FROM_EEPROM:
+    {
+      const uint16_t offset = masterPacket.get_16(2);
+      const uint8_t count = masterPacket.get_8(4);
+      if (count > 16) {
+	masterPacket.overflow();
+      } else {
+	for (uint8_t i = 0; i < count; i++) {
+	  masterPacket.add_8(EEPROM.read(offset+i));
+	}
+      }
+    }
+    break;
+  case SLAVE_CMD_WRITE_TO_EEPROM:
+    {
+      uint16_t offset = masterPacket.get_16(2);
+      uint8_t count = masterPacket.get_8(4);
+      if (count > 16) {
+	masterPacket.overflow();
+      } else {
+	for (uint8_t i = 0; i < count; i++) {
+	  EEPROM.write(offset+i,masterPacket.get_8(5+i));
+	}
+	masterPacket.add_8(count);
+      }
+    }
     break;
   }
 }
