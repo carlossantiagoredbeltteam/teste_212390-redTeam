@@ -8,10 +8,11 @@
  * 0.6 Erik		15/07/09	Output to file --output_file filename.gcode Default: out-5D.gcode
  * 0.7 Erik		19/07/09	Condition based actions (change lines based on a list of criteria).
  * 0.8 Erik		20/07/09	Added start and stop conditions in addition to 'while'.
+ * 0.9 Erik		11/08/09	Possibly fixed non-incremental extrusion mode. Needs testing though. Siert, tnx for bug report.
  */
 ini_set('memory_limit','128M');
 
-$version = 0.7;
+$version = 0.9;
 out("\n( Modified by 3D-to-5D-Gcode v$version on ".date("c").')');
 // Settings:
 
@@ -25,16 +26,26 @@ $setting['replace_strings'] = array(
 	//'F330.0'=>'F430.0', // moderately speed up the raft-making
 );  // 
 $setting['actions'] = array(
-	//array('while'=>array('match','F330.0'),'actions'=>array('E_mul'=>7,'F_mul'=>0.7)), // raft making: slow down XY-moves, speed up extrusion.
-	array(
-          'condition_start'=>array('match','<layer> 0.5'),
+	array('while'=>array('match','F330.0'),'actions'=>array('E_mul'=>6,'F_mul'=>0.7)), // raft making: slow down XY-moves, speed up extrusion.
+	array('while'=>array('match','F1320.0'),'actions'=>array('E_mul'=>2.2,'F_mul'=>0.8)), // raft making: slow down XY-moves, speed up extrusion.
+/*
+	array( // raft making: slow down XY-moves, speed up extrusion. Does the same as the above if the raft is set for feedrate 330.0 in skeinforge. This might be more reliable though...
+          'condition_start'=>array('match','<layer> 0.5'), // set it to match the foundation layer of your raft.
           'condition_stop'=>array('match','</layer>'),
-          'actions'=>array('E_mul'=>7,'F_mul'=>0.7)), // raft making: slow down XY-moves, speed up extrusion.
+          'actions'=>array('E_mul'=>15,'F_mul'=>0.75)
+        ),
+	array( // raft making: the same, but now for interface layer
+          'condition_start'=>array('match','<layer> 0.86'), // set it to match the foundation layer of your raft.
+          'condition_stop'=>array('match','</layer>'),
+          'actions'=>array('E_mul'=>4,'F_mul'=>0.8)
+        ),
+*/
+
 );
 $setting['remove_comments'] = true;  // Set true/false to remove comments from input file or not.
 $setting['soften_z_move_factor'] = 0.4;  // this slows down the move in the Z direction to this speed
 $setting['anti-backlash'] = array(
-	'X'=>array('fwd_dynamic'=>0.10/*mm*/, 'rev_dynamic'=>0.10/*mm*/,'fwd_static'=>0.1/*mm*/, 'rev_static'=>0.1/*mm*/ ), // Backlash on X-axis
+	'X'=>array('fwd_dynamic'=>0.20/*mm*/, 'rev_dynamic'=>0.20/*mm*/,'fwd_static'=>0.1/*mm*/, 'rev_static'=>0.1/*mm*/ ), // Backlash on X-axis
 	'Y'=>array('fwd_dynamic'=>0.45/*mm*/, 'rev_dynamic'=>0.45/*mm*/,'fwd_static'=>0.1/*mm*/, 'rev_static'=>0.1/*mm*/ ), // Backlash on Y-axis
 );
 $setting['output_file'] = 'out-5D.gcode'; // null = output directly.
@@ -104,7 +115,7 @@ foreach($lines as $line)
 
   if(ereg("M[ ]*108[ ]S([0-9.]+)",$line,$regs))
   {
-    $line .= " ; fw/bck/off";
+    $line = trim($line)." ; fw/bck/off";
     $speed = $regs[1];
     out("(".trim($line).")\n");
     continue;
@@ -178,7 +189,7 @@ foreach($lines as $line)
   //{}
 
   $line = trim($line);
-  if($extruder_starting)
+  if(($extruder_starting) && ($setting['extrude_incremental'] == 1)) // FIXME: Needs testing. Does the non-incremental work now?
   {
     $line .= " E0";
     $dist = 0;
@@ -241,6 +252,7 @@ foreach($lines as $line)
   {
     $line = str_replace("$oldRate","$newRate",$line);
   }
+
   // Actions:
   $orrigLine = $line;
   foreach($setting['actions'] as $action)
