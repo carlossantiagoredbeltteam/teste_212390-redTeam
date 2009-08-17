@@ -36,6 +36,10 @@
 #define HOST_CMD_READ_EEPROM    12
 #define HOST_CMD_WRITE_EEPROM   13
 
+#define HOST_CMD_CAPTURE_TO_FILE   14
+#define HOST_CMD_END_CAPTURE       15
+#define HOST_CMD_PLAYBACK_CAPTURE  16
+
 // These are our bufferable commands from the host
 // #define HOST_CMD_QUEUE_POINT_INC   128  // deprecated
 #define HOST_CMD_QUEUE_POINT_ABS   129
