@@ -63,6 +63,13 @@
 
     #define select_card() PORTB &= ~(1 << PB2)
     #define unselect_card() PORTB |= (1 << PB2)
+
+    // No lock pin check on standard arduino at this point
+    #define configure_pin_available() 1
+    #define configure_pin_locked() 1
+
+    #define get_pin_available() 1
+    #define get_pin_locked() 1
 #elif defined(__AVR_ATmega16__) || \
       defined(__AVR_ATmega32__) || \
       defined(__AVR_ATmega644__) || \
@@ -74,6 +81,12 @@
 
     #define select_card() PORTB &= ~(1 << PB4)
     #define unselect_card() PORTB |= (1 << PB4)
+
+    #define configure_pin_available() DDRA &= ~(1 << DDA7)
+    #define configure_pin_locked() DDRA &= ~(1 << DDA3)
+
+    #define get_pin_available() ((PINA >> PC7) & 0x01)
+    #define get_pin_locked() ((PINA >> PC3) & 0x01)
 #elif defined(__AVR_ATmega64__) || \
       defined(__AVR_ATmega128__) || \
       defined(__AVR_ATmega169__)
@@ -85,15 +98,17 @@
   //TODO: update with real values.
     #define select_card() PORTB &= ~(1 << PB0)
     #define unselect_card() PORTB |= (1 << PB0)
+
+    // No lock pin check on 169 at this point
+    #define configure_pin_available() 1
+    #define configure_pin_locked() 1
+
+    #define get_pin_available() 1
+    #define get_pin_locked() 1
 #else
     #error "no sd/mmc pin mapping available!"
 #endif
 
-#define configure_pin_available() DDRA &= ~(1 << DDA7)
-#define configure_pin_locked() DDRA &= ~(1 << DDA3)
-
-#define get_pin_available() ((PINA >> PC7) & 0x01)
-#define get_pin_locked() ((PINA >> PC3) & 0x01)
 
 /**
  * @}
