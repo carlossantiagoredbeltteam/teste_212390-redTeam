@@ -394,6 +394,11 @@ class MaterialLists
 public class STLSlice 
 {
 	/**
+	 * For debugging
+	 */
+	private static RrGraphics picture = null;
+	
+	/**
 	 * Used to make unbiased but arbitrary decisions
 	 */
 	private static Random rangen = new Random(739127);
@@ -1540,15 +1545,23 @@ public class STLSlice
 				
 				pgl = pgl.arcCompensate();
 				
-				//RrGraphics g = new RrGraphics(pgl, false);
 
 				// Check for a silly result.
 				
 				if(pgl.size() > 0)
+				{
 					rl.add(pgl.toCSG(Preferences.tiny()));
+				}
 			}
 		}
-
+//		if(picture == null)
+//		{
+//			picture = new RrGraphics("STL Slice");
+//			picture.init(ObjectPlanRectangle(), false);
+//		}
+//		
+//		picture.cleanPolygons();
+//		picture.add(rl.get(0));
 		return rl;
 	}
 }
