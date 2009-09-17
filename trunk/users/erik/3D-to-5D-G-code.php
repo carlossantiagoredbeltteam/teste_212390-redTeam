@@ -2,32 +2,50 @@
 <?php
 // By Erik de Bruijn <reprap@erikdebruijn.nl>
 // Description: this script will parse a G-Code file and reformat it to work with the newer RepRap G-Code interpreter firmware.
-// Licence: GPL
+// Licence: GPLv3 or later
 /* Changelog:
  * 0.5 Erik		14/07/09	Software anti-backlash (TODO: differentiate between dynamic and static friction)
  * 0.6 Erik		15/07/09	Output to file --output_file filename.gcode Default: out-5D.gcode
  * 0.7 Erik		19/07/09	Condition based actions (change lines based on a list of criteria).
  * 0.8 Erik		20/07/09	Added start and stop conditions in addition to 'while'.
  * 0.9 Erik		11/08/09	Possibly fixed non-incremental extrusion mode. Needs testing though. Siert, tnx for bug report.
+ * 0.10Erik		11/08/09	Several bugfixes. Of course I shouldn't use str_replace this much...
+ * 0.11Erik		17/09/09	Bugfix: order of processing improved. Anti-backlash is applied first, then better distances will be measured
+ * 0.12Erik		17/09/09	Softener of Z-moves was relative and for EVERY Z move, also those that were already slow. This is not based
+ *					on the maximum speed the Z-axis should move and if it's high the feedrate is adjusted so that it effectively moves
+ *					at this maximum speed along the Z-axis.
+ * 0.13Erik		17/09/09	Bugfix: dZ is used absolute for softening. This is what caused towering to go bad, the printhead has to move down 
+ *					(negative Z) but it tends to skip steps when movement speed is not capped to a sensible max.
+ * 0.14Erik		17/09/09	Bugfix: minor problem in anti-backlash. Would sometimes match and replace too many values.
+ * 0.15Erik		17/09/09	Feature: added anti-ooze system for Bowden extruder. Still experimental, stops pullback after a while, WHY?!
  */
 ini_set('memory_limit','128M');
 
-$version = 0.9;
+$version = 0.13;
 out("\n( Modified by 3D-to-5D-Gcode v$version on ".date("c").')');
 // Settings:
 
-$setting['prepend_gcode'] = "";  // begin with this Gcode
-$setting['append_gcode'] = "G91\nG1 Z4F100\nG90\nM104S200";  // add this Gcode at the end
+$setting['prepend_gcode'] = "G1 Z0.3 F80\n";  // begin with this Gcode
+//$setting['append_gcode'] = "G91\nG1 Z4F40\nG90\nM104S200";  // add this Gcode at the end
+$setting['append_gcode'] = "G91\nG1 Z4F40\nG90\nM104S150";  // add this Gcode at the end
 $setting['extrusion_adjust'] = 1.5;  // factor to adjust extruded distances with
+#$setting['extruder_backlash_fwd']=200.0;
+#$setting['extruder_backlash_rev']=200.0;
 $setting['extrude_incremental'] = 1;  // E values are incremental. Better for making small adjustments
 //$setting['replace_ereg'] = array('F330.0[^0-9]'=>'F1320.0');  // 
 $setting['replace_strings'] = array(
+	'Z1.2 F960.0 '=>'Z1.2 F500.0 ', // hugely speed up the raft-making
+	//'Z0.9 F1320.0 '=>'Z0.9 F1320.0 ', // hugely speed up the raft-making
 	//'F330.0'=>'F1320.0', // hugely speed up the raft-making
 	//'F330.0'=>'F430.0', // moderately speed up the raft-making
 );  // 
 $setting['actions'] = array(
-	array('while'=>array('match','F330.0'),'actions'=>array('E_mul'=>6,'F_mul'=>0.7)), // raft making: slow down XY-moves, speed up extrusion.
-	array('while'=>array('match','F1320.0'),'actions'=>array('E_mul'=>2.2,'F_mul'=>0.8)), // raft making: slow down XY-moves, speed up extrusion.
+	//array('while'=>array('match','F330.0'),'actions'=>array('E_mul'=>6,'F_mul'=>0.7)), // raft making: slow down XY-moves, speed up extrusion.
+//Z0.39 F330.0
+	array('while'=>array('match','Z0.61'),'actions'=>array('E_mul'=>6,'F_mul'=>0.7)), // raft making: slow down XY-moves, speed up extrusion.
+	array('while'=>array('match','Z1.05'),'actions'=>array('E_mul'=>1.7,'F_mul'=>1/2.1)), // raft making: slow down XY-moves, speed up extrusion.
+	array('while'=>array('match','Z1.16 F1320.0 '),'actions'=>array('E_mul'=>1.7,'F_mul'=>1/2.1)), // raft making: slow down XY-moves, speed up extrusion.
+	//array('while'=>array('match','F1320.0'),'actions'=>array('E_mul'=>2.2,'F_mul'=>0.8)), // raft making: slow down XY-moves, speed up extrusion.
 /*
 	array( // raft making: slow down XY-moves, speed up extrusion. Does the same as the above if the raft is set for feedrate 330.0 in skeinforge. This might be more reliable though...
           'condition_start'=>array('match','<layer> 0.5'), // set it to match the foundation layer of your raft.
@@ -43,12 +61,14 @@ $setting['actions'] = array(
 
 );
 $setting['remove_comments'] = true;  // Set true/false to remove comments from input file or not.
-$setting['soften_z_move_factor'] = 0.4;  // this slows down the move in the Z direction to this speed
+$setting['soften_z_move_factor'] = .4;  // this slows down the move in the Z direction to this speed
 $setting['anti-backlash'] = array(
 	'X'=>array('fwd_dynamic'=>0.20/*mm*/, 'rev_dynamic'=>0.20/*mm*/,'fwd_static'=>0.1/*mm*/, 'rev_static'=>0.1/*mm*/ ), // Backlash on X-axis
-	'Y'=>array('fwd_dynamic'=>0.45/*mm*/, 'rev_dynamic'=>0.45/*mm*/,'fwd_static'=>0.1/*mm*/, 'rev_static'=>0.1/*mm*/ ), // Backlash on Y-axis
+	'Y'=>array('fwd_dynamic'=>0.30/*mm*/, 'rev_dynamic'=>0.30/*mm*/,'fwd_static'=>0.1/*mm*/, 'rev_static'=>0.1/*mm*/ ), // Backlash on Y-axis
+	//'Y'=>array('fwd_dynamic'=>0.45/*mm*/, 'rev_dynamic'=>0.45/*mm*/,'fwd_static'=>0.1/*mm*/, 'rev_static'=>0.1/*mm*/ ), // Backlash on Y-axis
 );
 $setting['output_file'] = 'out-5D.gcode'; // null = output directly.
+$setting['default_output_path'] = '/home/erik/RepRap/gcode/';
 
 $settings_file = $_SERVER['HOME']."/.reprap/3D-to-5D.settings";
 if(file_exists($settings_file))
@@ -68,6 +88,8 @@ foreach($setting as $sName => $sVal)
 
 }
 
+if(!strpos($setting['output_file'],'/'))
+  $setting['output_file'] = $setting['default_output_path'].$setting['output_file'];
 
 $conditionOk = false;
 
@@ -131,14 +153,27 @@ foreach($lines as $line)
     $Y = $regs[1];
   if(ereg("Z[ ]*(-?[0-9.]+)",$line,$regs))
     $Z = $regs[1];
+  if(ereg("F[ ]*(-?[0-9.]+)",$line,$regs))
+    $F = $regs[1];
 
   if(ereg("M[ ]*10([123])",$line,$regs))
   {
+    $last_dir = $dir;//Anti-Ooze
     switch($regs[1])
     {
       case "1":
         $dir = 1;
         $extruder_starting = true;
+	if(isset($extrusion_has_started))
+	{
+          if(isset($setting['extruder_backlash_fwd']))
+          {
+	    out("G1 E".(0.6*$setting['extruder_backlash_fwd']).".0 F16000.0\n");
+	    out("G1 E".(0.4*$setting['extruder_backlash_fwd']).".0 F7000.0\n");
+	    out("G1 F".($F*1.0)."\n"); // restore previous F
+          }
+	}
+	$extrusion_has_started = true;
         // When starting extrusion, E = 0?
       break;
       case "2";
@@ -146,6 +181,15 @@ foreach($lines as $line)
       break;
       case "3":
         $dir = 0;
+        if(isset($setting['extruder_backlash_rev']))
+        {
+	  if($last_dir != $dir)
+	    #$dist -= $setting['extruder_backlash_rev'];// Needs testing
+	    #$line .= "E-".(1.0*$setting['extruder_backlash_rev']);
+	    out("G1 E-".(1.0*$setting['extruder_backlash_rev']).".0 F70000.0\n");
+            #out("(Turning extruder off. $E)\n");
+	    out("G1 F".($F*1.0)."\n"); // restore previous F
+        }
       break;
     }
     //$comment .= " dir $dir";
@@ -191,27 +235,19 @@ foreach($lines as $line)
   $line = trim($line);
   if(($extruder_starting) && ($setting['extrude_incremental'] == 1)) // FIXME: Needs testing. Does the non-incremental work now?
   {
-    $line .= " E0";
+    //$line .= " E0";// Causes multiple E's!
+//out ("(starting extruder \$E=$E)\n");
+
     $dist = 0;
+    #echo "\n$E was... now making it ".$setting['extruder_backlash_fwd'];
+    //$E += $setting['extruder_backlash_fwd'];
     $extruder_starting = false;
   }
-  if($dZ>0.1)
-  {
-    // Smooth-Z:
-    if($setting['soften_z_move_factor'])
-    {
-      if(ereg("F([0-9\.]+)",$line,$regs))
-      {
-        $newF = bcmul($setting['soften_z_move_factor'],$regs[1]);
-        if($setting['debug'])
-          out("(Smooth-Z dZ > 0.1 F=$regs[1], newF=$newF)\n");
-        $line = ereg_replace("F[0-9\.]+","F$newF",$line);
-      }
-    }//end if smooth
-  }
+// LET OP, moet misschien IF zijn!??!
   elseif($E)
+  {
     $line .= " E".sprintf("%.2f",bcmul($E,$dir)); // number w/ four decimals
-
+  }
   // Anti-backlash:
   if(is_array($setting['anti-backlash']))
   {
@@ -222,7 +258,6 @@ foreach($lines as $line)
       {
 	$axisPos = $X;
         $axisDelta = $dX;
-
       }
  
       if($thisAxis == 'Y')
@@ -286,14 +321,45 @@ foreach($lines as $line)
 		if(ereg("$actOnAxis([0-9\.]+)",$orrigLine,$regs2)) // eval action against original line?
 		{
 		  $newRate = bcmul($regs2[1],$actVal);
-		  $line = str_replace("$regs2[1]","$newRate",$line);
+		  $line = str_replace("$actOnAxis$regs2[1]","$actOnAxis$newRate",$line);
 		}
 	      }
 
 	    }
     }
   }
-  
+
+  if(abs($dZ)>0.1)
+  {
+    // Smooth-Z:
+    if($setting['soften_z_move_factor'])
+    { // F  =mm/s
+      // (mm/s)/mm = /s
+      // mm/(mm/s) = s
+      // dZmm/s = ...
+        //out("(dist=$dist, dZ=$dZ, F=$regs[1], time=".($dist/$regs[1])."s Z-speed=".($dZ/($dist/$regs[1])).")");
+      if(ereg("F([0-9\.]+)",$line,$regs))
+      {
+        //out("(dist=$dist,F=$regs[1])");
+        $Zspeed = (abs($dZ)/($dist/$regs[1]));
+        if($Zspeed>100)//if($dZ/($dist/$regs[1])>500.0)
+        {
+        #$newF = bcmul($setting['soften_z_move_factor'],$regs[1]);
+        #EXPERIMENTAL: reduce speed so that effective Zspeed is at most 100.
+        $newF = bcmul(100/$Zspeed,$regs[1]);
+        $Znewspeed = (abs($dZ)/($dist/$newF));
+        //if($setting['debug'])
+	$oldlline= $line;
+        $line = ereg_replace("F[0-9\.]+","F$newF",$line);
+        //out("(f was SLOWeD DOWN, dist=$dist f/dist=".($regs[1]/$dist)." oldLine: $oldlline, new $line)\n");
+
+        } //else out("(f was slow enough, not softened, dist=$dist f/dist=".($regs[1]/$dist).")\n");
+          //out("(Smooth-Z dZ > 0.1 F=$regs[1], newF=$newF. $Zspeed=$Zspeed, now: $Znewspeed )\n");
+      } 
+    }//end if smooth
+  }
+
+ 
   out($line);
   if($E > 999)
   {
