@@ -142,6 +142,8 @@ void setup()
   enableTimerInterrupt();
 }
 
+long count = 0;
+
 void loop()
 {
    manage_all_extruders();
@@ -149,17 +151,13 @@ void loop()
 #if MOTHERBOARD > 1
    talker.tick();
 #endif 
-/*  if(Serial.available())
-  {
-    talker.talk();
-    delay(1);
-    Serial1.print(Serial.read(), BYTE);
-    delay(1);
-    talker.listen();
-  }
-  if(Serial1.available())
-    Serial.print(Serial1.read(), BYTE); 
- */   
+/*
+  while(talker.busy()) talker.tick();
+  ex[0]->ping();
+  count++;
+  if(!count%100)
+    Serial.print(count);
+    */
 }
 
 //******************************************************************************************
