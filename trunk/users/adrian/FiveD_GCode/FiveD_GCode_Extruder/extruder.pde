@@ -11,6 +11,8 @@ extruder::extruder()
   pinMode(OUTPUT_C, OUTPUT);  
   pinMode(POT, INPUT);
   
+  disableStep();
+  
   // Change the frequency of Timer 0 so that PWM on pins H1E and H2E goes at
   // a very high frequency (64kHz see: 
   // http://tzechienchu.typepad.com/tc_chus_point/2009/05/changing-pwm-frequency-on-the-arduino-diecimila.html)
@@ -21,6 +23,11 @@ extruder::extruder()
   coilPosition = 0;  
   forward = true;
   
+  // How much is the pot turned up?
+  // Divide it by 4 to spread the valid readings out a bit.
+  // This is about right for a 1A 3-ohm/coil stepper.
+  
+  potValue = analogRead(POT)>>2;
 }
 
 void extruder::wait_for_temperature()
@@ -158,7 +165,7 @@ void extruder::step()
   // Divide it by 4 to spread the valid readings out a bit.
   // This is about right for a 1A 3-ohm/coil stepper.
   
-  potValue = analogRead(POT)>>2;
+  //potValue = analogRead(POT)>>2;
   
   // Send the appropriate PWM values
   

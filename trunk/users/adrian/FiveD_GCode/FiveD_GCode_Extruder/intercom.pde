@@ -14,6 +14,8 @@ intercom::intercom()
 {
   outBuffer[0] = 0;
   outPointer = 0;
+  echoPointer = 0;
+  newPacket = false;
   reset();
   pinMode(RX_ENABLE_PIN, OUTPUT);
   pinMode(TX_ENABLE_PIN, OUTPUT);
@@ -23,7 +25,7 @@ intercom::intercom()
 
 void intercom::listen()
 {
-   digitalWrite(TX_ENABLE_PIN, 0);   
+   digitalWrite(TX_ENABLE_PIN, 0); 
 }
 
 void intercom::talk()
@@ -45,7 +47,7 @@ bool intercom::waitInput()
 bool intercom::waitOutput()
 {
   long zero = millis();
-  while(outBuffer[0])
+  while(outBuffer[echoPointer])
   {
     tick();
     if(millis() - zero > TIMEOUT)
@@ -62,45 +64,62 @@ void intercom::reset()
    reply[0] = 0;
 }
 
-void intercom::sendByte(char b)
+
+void intercom::dudEcho(byte b, byte echo)
 {
-  char echo;
-  bool timeOK;
-  rs485Interface.print(b, BYTE);
-  timeOK = waitInput();
-  echo = rs485Interface.read();
-  if(echo == b)
-    return;
-
-// Ooops...
-
 #if RS485_MASTER == 1
     char be[3];
-    debugstring[0] = 0;
-    if(!timeOK)
-      strcat(debugstring,"T, ");
-    strcat(debugstring, "ECHOX: ");
+    strcpy(debugstring, "ECHOX: ");
     be[0] = b;
     be[1] = echo;
     be[2] = 0;
     strcat(debugstring, be);
-#endif
+#endif 
 }
-
 
 void intercom::tick()
 {
-  if(outBuffer[outPointer])
+  byte b, echo;
+  
+  // Setup transmission
+  
+  if(newPacket)
   {
-   sendByte(outBuffer[outPointer]);
-   outPointer++;
-   return;
-  }
-  if(!outPointer)
+    talk();
+    while(rs485Interface.available()) rs485Interface.read(); // Empty any junk from the input buffer
+    newPacket = false;
     return;
-  listen();
-  outBuffer[0] = 0;
-  outPointer = 0;
+  }
+  
+  // Are we waiting for an echo?
+  
+  b = outBuffer[echoPointer];
+  if(b)
+  {  // Yes
+    if(rs485Interface.available())
+    {
+      echo = rs485Interface.read();
+      echoPointer++;
+      if(echo != b)
+        dudEcho(b, echo);
+    }
+  } else if(echoPointer)  // No - if at the end, reset
+  {  
+    listen();
+    outBuffer[0] = 0;
+    outPointer = 0;
+    echoPointer = 0;
+    return;    
+  }
+  
+  // Do we have anything to send?
+  
+  b = outBuffer[outPointer];
+  if(!b)
+    return;
+    
+  rs485Interface.print(b, BYTE);
+  outPointer++;
 }
 
 
@@ -120,6 +139,8 @@ byte intercom::mystrcpy(char* buf, char* s)
 
 void intercom::queuePacket(char to, char* string)
 {
+    byte len;
+    
 #if RS485_MASTER == 1
   if(outBuffer[0])
   {
@@ -128,9 +149,6 @@ void intercom::queuePacket(char to, char* string)
   }
 #endif
 
-  byte len;
-  talk();
-  while(rs485Interface.available()) rs485Interface.read(); // Empty any junk from the input buffer
   outBuffer[0] = RS485_START;
   outBuffer[1] = to;
   outBuffer[2] = MY_NAME;
@@ -139,6 +157,8 @@ void intercom::queuePacket(char to, char* string)
   len++;
   outBuffer[len] = 0;
   outPointer = 0;
+  echoPointer = 0;
+  newPacket = true;
 }
 
 #if RS485_MASTER == 1
@@ -147,7 +167,7 @@ bool intercom::getPacket(char* string, int len)
 {
     if(!waitOutput())
     {
-       strcat(debugstring,"Timeout on sendpacket!");
+       strcpy(debugstring,"Timeout on sendpacket!");
        return false;
     }
     

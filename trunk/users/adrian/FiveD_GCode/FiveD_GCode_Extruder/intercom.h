@@ -38,8 +38,8 @@
 
 // Communication speed
 
-#define RS485_BAUD 115200
-
+//#define RS485_BAUD 115200
+#define RS485_BAUD 1000000
 
 // The acknowledge, start, end and error characters
 #define RS485_ACK 'A'
@@ -60,7 +60,9 @@ class intercom
     volatile byte inPointer;
     char outBuffer[RS485_BUF_LEN];
     volatile byte outPointer;
+    volatile byte echoPointer;
     bool inPacket;
+    bool newPacket;
 
 /*
  Any short message can be returned with the next acknowledgement in the string reply[].
@@ -87,7 +89,8 @@ class intercom
    char reply[RS485_BUF_LEN];
    void queuePacket(char to, char* string);
    byte mystrcpy(char* buf, char* s);
-   void sendByte(char b);
+   //void sendByte(char b);
+   void dudEcho(byte b, byte echo);
    void reset();
    void talk();
    void listen();
