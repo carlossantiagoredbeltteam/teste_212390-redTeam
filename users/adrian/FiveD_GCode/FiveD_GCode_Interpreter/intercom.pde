@@ -63,12 +63,23 @@ char intercom::checksum(char* string)
   return RS485_CHECK + cs;
 }
 
-// Build a packet to device to from an input string.  See intercom.h for the
-// packet structure.
+// Check the checksum of a string, presumed to be in the third (x[2]) byte
 
-void intercom::buildPacket(char to, char* string)
+bool intercom::checkChecksum(char* string)
 {
-  int i, j;
+  char cs = string[2];
+  string[2] = 0;
+  char c = checksum(string);
+  string[2] = cs;
+  return (c == cs);
+}
+
+// Build a packet to device to from an input string.  See intercom.h for the
+// packet structure.  ack should either be RS485_ACK or RS485_ERROR.
+
+void intercom::buildPacket(char to, char ack, char* string)
+{
+  byte i, j, k;
   j = 0;
   while(j < RS485_START_BYTES)
   {
@@ -79,6 +90,11 @@ void intercom::buildPacket(char to, char* string)
   j++;
   outBuffer[j] = MY_NAME;
   j++;
+  outBuffer[j] = 0; // Where the checksum will go
+  k = j;
+  j++;
+  outBuffer[j] = ack;
+  j++;
   i = 0;
   while(string[i] && j < RS485_BUF_LEN - 4)
   {
@@ -86,8 +102,8 @@ void intercom::buildPacket(char to, char* string)
     j++;
     i++;
   }
-  outBuffer[j] = checksum(string);
-  j++
+  outBuffer[j] = 0;
+  outBuffer[k] = checksum(&outBuffer[RS485_START_BYTES]);
   outBuffer[j] = RS485_END;
   j++;
   outBuffer[j] = 0;  
@@ -174,7 +190,7 @@ void intercom::tick()
       {
         // Yes - reset the output buffer and go back to listening
         
-        reset_otput();
+        resetOutput();
         listen();
         return;            
       }
@@ -300,10 +316,11 @@ bool intercom::sendPacketAndCheckAcknowledgement(char to, char* string)
 {
   byte retries = 0;
   bool ok = false;
-  while((inBuffer[0] != MY_NAME || inBuffer[2] != RS485_ACK || inBuffer[3] == RS485_ERROR) && retries < RS485_RETRIES && !ok)
+  while((inBuffer[0] != MY_NAME || inBuffer[3] != RS485_ACK || inBuffer[3] == RS485_ERROR) && retries < RS485_RETRIES && !ok)
   {
     if(queuePacket(to, string))
       ok = waitForPacket();
+    ok = ok && checkChecksum(inBuffer);
     if(!ok)
      delay(2*TIMEOUT);  // Wait twice timeout, and everything should have reset itself
     retries++;   
@@ -314,11 +331,10 @@ bool intercom::sendPacketAndCheckAcknowledgement(char to, char* string)
 char* intercom::sendPacketAndGetReply(char to, char* string)
 {
   if(!sendPacketAndCheckAcknowledgement(to, string))
-    inBuffer[3] = 0;
-  strcpy(reply, &inBuffer[3]);
+    inBuffer[4] = 0;
+  strcpy(reply, &inBuffer[4]);
   return reply;
 }
-
 
   
 void intercom::processPacket()
@@ -328,13 +344,15 @@ void intercom::processPacket()
     resetInput();
     return;
   }  
-#if RS485_MASTER == 1
-
-
-#else
-
-
-
+#if !(RS485_MASTER == 1)
+  if(checkChecksum(inBuffer))
+    queuePacket(inBuffer[1], RS485_ACK, ex->processCommand(&inBuffer[4]));
+  else
+  {
+    reply[0] = 0;
+    queuePacket(inBuffer[1], RS485_ERROR, reply);
+  }
+  resetInput();
 #endif
   packetReceived = true;
 }
