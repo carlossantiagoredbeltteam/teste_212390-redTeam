@@ -231,8 +231,11 @@ void intercom::tick()
           break;
         
         case RS485_END:   // End character - terminate, then process, the packet
-          inBuffer[inPointer] = 0;
-          processPacket();
+          if(inPacket)
+          {
+            inBuffer[inPointer] = 0;
+            processPacket();
+          }
           break;
 
         default:     // Neither start or end - if we're in a packet it must be data
@@ -281,19 +284,19 @@ bool intercom::busy()
 
 // Send string to device to.
 
-bool intercom::queuePacket(char to, char* string)
+bool intercom::queuePacket(char to, char ack, char* string)
 {
   if(busy())
   {
     talkCollision();
     return false;
   }
-  buildPacket(to, string);
+  buildPacket(to, ack, string);
   talk();
   return true;
 }
 
-// Wait for a packet to arrive.  The packet will be in inBuffer[]
+// Wait for a packet to arrive.  The packet will be in inBuffer[ ]
 
 bool intercom::waitForPacket()
 {
@@ -311,22 +314,26 @@ bool intercom::waitForPacket()
   return true;
 }
 
+// Send a packet and get an acknowledgement - used when no data is to bereturned.
 
 bool intercom::sendPacketAndCheckAcknowledgement(char to, char* string)
 {
   byte retries = 0;
   bool ok = false;
-  while((inBuffer[0] != MY_NAME || inBuffer[3] != RS485_ACK || inBuffer[3] == RS485_ERROR) && retries < RS485_RETRIES && !ok)
+  while((inBuffer[0] != MY_NAME || inBuffer[3] != RS485_ACK) && retries < RS485_RETRIES && !ok)
   {
-    if(queuePacket(to, string))
+    if(queuePacket(to, RS485_ACK, string))
       ok = waitForPacket();
-    ok = ok && checkChecksum(inBuffer);
+    ok &&= checkChecksum(inBuffer);
     if(!ok)
      delay(2*TIMEOUT);  // Wait twice timeout, and everything should have reset itself
     retries++;   
   }
   return ok;  
 }
+
+// Send a packet and get data in reply.  The string returned is just the data;
+// it has no packet housekeeping information in.
 
 char* intercom::sendPacketAndGetReply(char to, char* string)
 {
@@ -336,7 +343,8 @@ char* intercom::sendPacketAndGetReply(char to, char* string)
   return reply;
 }
 
-  
+// This function is called when a packet has been received
+
 void intercom::processPacket()
 {
   if(inBuffer[0] != MY_NAME)
@@ -366,7 +374,7 @@ void intercom::processPacket()
 
 void intercom::outputBufferOverflow()
 {
-  
+  outPointer = 0;  
 }
 
 
@@ -374,7 +382,7 @@ void intercom::outputBufferOverflow()
 
 void intercom::inputBufferOverflow()
 {
-  
+  resetInput();  
 }
 
 // An attempt has been made to start sending a new message before
