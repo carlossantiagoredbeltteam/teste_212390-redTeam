@@ -1,6 +1,8 @@
 #ifndef EXTRUDER_H
 #define EXTRUDER_H
 
+#define REPLY_LENGTH 20
+
 #define WAIT_T 'W'        // wait_for_temperature();
 #define VALVE 'V'          // valve_set(bool open, int dTime);
 #define DIRECTION 'D'   // set_direction(bool direction);
@@ -30,6 +32,7 @@ private:
   bool h1Enable;
   bool h2Enable;
   bool forward;
+  char reply[REPLY_LENGTH];
 
  
 public:
@@ -44,7 +47,7 @@ public:
    void step();
    void enableStep();
    void disableStep();
-   bool processCommand(char command[]);
+   char* processCommand(char command[]);
    
 };
 

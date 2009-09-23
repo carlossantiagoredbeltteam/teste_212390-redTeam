@@ -192,56 +192,52 @@ void extruder::disableStep()
     analogWrite(H2E, 0);  
 }
 
-bool extruder::processCommand(char command[])
+char* extruder::processCommand(char command[])
 {
+  reply[0] = 0;
   switch(command[0])
   {
     case WAIT_T:
       wait_for_temperature();
-      return true;
+      break;
       
     case VALVE:
       valve_set(command[1] == '1');
-      return true;
+      break;
       
     case DIRECTION:
       set_direction(command[1] == '1');
-      return false;
+      break;
       
      case COOL:
        set_cooler(atoi(&command[1]));
-       return true;
+       break;
        
      case SET_T:
        set_temperature(atoi(&command[1]));
-       return true;
+       break;
        
-      case GET_T:
-        itoa(get_temperature(), &(talker.getReply())[1], 10);
-        (talker.getReply())[0] = ' ';
-        return true;
+     case GET_T:
+       itoa(get_temperature(), reply, 10);
+       break;
         
-      case STEP:
-        step();
-        return false;
+     case STEP:
+       step();
+       break;
         
-      case ENABLE:
-        enableStep();
-        return true;
+     case ENABLE:
+       enableStep();
+       break;
         
-      case DISABLE:
-        disableStep();
-        return true;
+     case DISABLE:
+       disableStep();
+       break;
         
-      case PING:
-        return true;
+     case PING:
+       break;
         
-      default:
-        // Dud command, so it doesn't matter if we corrupt it -
-        // pick out just the first char:
-        command[1] = 0;
-        talker.setReply(" !Dud command: ");
-        talker.addReply(command);
+     default:
+        return 0; // Flag up dud command
     }
-   return true; 
+   return reply; 
 }

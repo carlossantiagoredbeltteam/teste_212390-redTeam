@@ -10,305 +10,450 @@
 #if MOTHERBOARD > 1
 
 
+#if RS485_MASTER == 1
 intercom::intercom()
+#else
+intercom::intercom(extruder* e)
+#endif
 {
-  outBuffer[0] = 0;
-  outPointer = 0;
-  echoPointer = 0;
-  newPacket = false;
-  reset();
-  pinMode(RX_ENABLE_PIN, OUTPUT);
-  pinMode(TX_ENABLE_PIN, OUTPUT);
-  digitalWrite(RX_ENABLE_PIN, 0); // Listen is always on
+#if !(RS485_MASTER == 1)
+  ex = e;
+#endif
+  //pinMode(RX_ENABLE_PIN, OUTPUT);
+  //pinMode(TX_ENABLE_PIN, OUTPUT);
+  //digitalWrite(RX_ENABLE_PIN, 0); // Listen is always on
+  resetOutput();
+  resetInput();
   listen();
 }
 
-void intercom::listen()
+
+// Reset the output buffer and its associated variables
+
+void intercom::resetOutput()
 {
-   digitalWrite(TX_ENABLE_PIN, 0); 
+  outBuffer[0] = 0;
+  outPointer = 0;
 }
 
-void intercom::talk()
+// Reset the input buffer and its associated variables
+
+void intercom::resetInput()
 {
-   digitalWrite(TX_ENABLE_PIN, 1);   
+  inBuffer[0] = 0;
+  inPointer = 0;
+  inPacket = false;
+  packetReceived = false;  
 }
 
-bool intercom::waitInput()
+// The checksum for a string is the least-significant nibble of the sum
+// of the string's bytes added to the character RS485_CHECK.  It can thus take
+// one of sixteen values, all printable.
+
+char intercom::checksum(char* string)
 {
-  long zero = millis();
-  while(!rs485Interface.available())
+  int cs = 0;
+  int i = 0;
+  while(string[i]) 
   {
-    if(millis() - zero > TIMEOUT)
-      return false;
+    cs += string[i];
+    i++;
   }
-  return true;
+  cs--;                      // This... -> A
+  cs &= 0xF;
+  return (char)(RS485_CHECK + cs);
 }
 
-bool intercom::waitOutput()
+// Check the checksum of a string, presumed to be in the third (x[2]) byte
+
+bool intercom::checkChecksum(char* string)
 {
-  long zero = millis();
-  while(outBuffer[echoPointer])
+  char cs = string[2];
+  string[2] = 1;             // A -> ...is a bit subtle
+  char c = checksum(string);
+  string[2] = cs;
+  return (c == cs);
+}
+
+// Build a packet to device to from an input string.  See intercom.h for the
+// packet structure.  ack should either be RS485_ACK or RS485_ERROR.
+
+void intercom::buildPacket(char to, char ack, char* string)
+{
+  byte i, j, k;
+  j = 0;
+  while(j < RS485_START_BYTES)
   {
-    tick();
-    if(millis() - zero > TIMEOUT)
-      return false;
+     outBuffer[j] = RS485_START;
+     j++;
   }
-  return true;
+  outBuffer[j] = to;
+  j++;
+  outBuffer[j] = MY_NAME;
+  j++;
+  outBuffer[j] = 0; // Where the checksum will go
+  k = j;
+  j++;
+  outBuffer[j] = ack;
+  j++;
+  i = 0;
+  while(string[i] && j < RS485_BUF_LEN - 4)
+  {
+    outBuffer[j] = string[i];
+    j++;
+    i++;
+  }
+  outBuffer[j] = 0;
+  outBuffer[k] = checksum(&outBuffer[RS485_START_BYTES]);
+  outBuffer[j] = RS485_END;
+  j++;
+  outBuffer[j] = 0;
 }
 
+// Switch to listen mode
 
-void intercom::reset()
+bool intercom::listen()
 {
-   inPacket = false;
-   inPointer = 0;
-   reply[0] = 0;
+   if(inPacket)
+   {
+      listenCollision();
+      return false;
+   }
+   //digitalWrite(TX_ENABLE_PIN, 0);
+   state = RS485_LISTEN;
+   delayMicrosecondsInterruptible(RS485_STABILISE);
+   resetWait();
+   return true;
 }
 
+// Switch to talk mode
 
-void intercom::dudEcho(byte b, byte echo)
+bool intercom::talk()
 {
-#if RS485_MASTER == 1
-    char be[3];
-    strcpy(debugstring, "ECHOX: ");
-    be[0] = b;
-    be[1] = echo;
-    be[2] = 0;
-    strcat(debugstring, be);
-#endif 
+   if(state == RS485_TALK)
+   {
+      talkCollision();
+      return false;
+   }
+   //digitalWrite(TX_ENABLE_PIN, 1);
+   state = RS485_TALK;
+   delayMicrosecondsInterruptible(RS485_STABILISE);
+   while(rs485Interface.available()) rs485Interface.read(); // Empty any junk from the input buffer
+   resetWait();
+   return true; 
 }
+
+// Something useful has happened; reset the timeout time
+
+void intercom::resetWait()
+{
+   wait_zero = millis();
+}
+
+// Have we waited too long for something to happen?
+
+bool intercom::tooLong()
+{
+  return (millis() - wait_zero > TIMEOUT);
+}
+
+
+// The master processing function.  Call this in a fast loop, or from a fast repeated interrupt
 
 void intercom::tick()
 {
-  byte b, echo;
-  
-  // Setup transmission
-  
-  if(newPacket)
+  char b = 0;
+    
+  switch(state)
   {
-    talk();
-    while(rs485Interface.available()) rs485Interface.read(); // Empty any junk from the input buffer
-    newPacket = false;
-    return;
-  }
+  case RS485_TALK:
   
-  // Are we waiting for an echo?
-  
-  b = outBuffer[echoPointer];
-  if(b)
-  {  // Yes
-    if(rs485Interface.available())
-    {
-      echo = rs485Interface.read();
-      echoPointer++;
-      if(echo != b)
-        dudEcho(b, echo);
-    }
-  } else if(echoPointer)  // No - if at the end, reset
-  {  
-    listen();
-    outBuffer[0] = 0;
-    outPointer = 0;
-    echoPointer = 0;
-    return;    
-  }
-  
-  // Do we have anything to send?
-  
-  b = outBuffer[outPointer];
-  if(!b)
-    return;
-    
-  rs485Interface.print(b, BYTE);
-  outPointer++;
-}
-
-
-
-byte intercom::mystrcpy(char* buf, char* s)
-{
-  byte i = 0;
-  while(s[i])
-  {
-    buf[i] = s[i];
-    i++;
-  }
-  buf[i] = 0;
-  return i;  
-}
-
-
-void intercom::queuePacket(char to, char* string)
-{
-    byte len;
-    
-#if RS485_MASTER == 1
-  if(outBuffer[0])
-  {
-    strcpy(debugstring, "Packet collision!");
-    return;
-  }
-#endif
-
-  outBuffer[0] = RS485_START;
-  outBuffer[1] = to;
-  outBuffer[2] = MY_NAME;
-  len = mystrcpy(&outBuffer[3], string) + 3;
-  outBuffer[len] = RS485_END;
-  len++;
-  outBuffer[len] = 0;
-  outPointer = 0;
-  echoPointer = 0;
-  newPacket = true;
-}
-
-#if RS485_MASTER == 1
-
-bool intercom::getPacket(char* string, int len)
-{
-    if(!waitOutput())
-    {
-       strcpy(debugstring,"Timeout on sendpacket!");
-       return false;
-    }
-    
-    int i = -1;
-    inPacket = false;
-    
-    do
-    {
-      if(!waitInput())
+      // Has what we last sent (if anything) been echoed?
+      
+      if(rs485Interface.available())
       {
-        string[i+1] = 0;
-        return false;
-      }
-      inputByte = rs485Interface.read();
-      inPacket = (inputByte == RS485_START);
-    } while(!inPacket); 
-  
-    do
-    {
-      if(!waitInput())
-      {
-        inPacket = false;
-        string[i+1] = 0;
-        return false;
-      }
-      inputByte = rs485Interface.read();
-      i++;
-      // Stop runaway buffer overflow
-      if(i >= len)
-      {
-        inPacket = false; 
-        i--;
+        b = rs485Interface.read();
+        resetWait();
       } else
-      string[i] = inputByte;
-    } while(inputByte != RS485_END && inPacket);
-    string[i] = 0;
-    if(!inPacket)
-      return false;
-    inPacket = false;
-    return true;
+      {
+        // Have we waited too long for an echo?
+        
+        if(tooLong())  
+        {
+          talkTimeout();
+          return;  
+        }
+      }
+      
+      // Was the echo (if any) the last character of a packet?
+      
+      if(b == RS485_END)
+      {
+        // Yes - reset the output buffer and go back to listening
+        
+        resetOutput();
+        listen();
+        return;            
+      }
+        
+      // Do we have anything to send?
+  
+      b = outBuffer[outPointer];
+      if(!b)
+        return;
+      
+      // Yes - send it and reset the timeout timer
+      
+      rs485Interface.print(b, BYTE);
+      outPointer++;
+      if(outPointer >= RS485_BUF_LEN)
+              outputBufferOverflow();
+      resetWait();
+      break;
+      
+  // If we have timed out while sending, reset everything and go
+  // back to listen mode
+      
+  case RS485_TALK_TIMEOUT:
+      resetOutput();
+      resetInput();
+      listen();
+      break;
+      
+  case RS485_LISTEN:
+      if(rs485Interface.available())  // Got anything?
+      {
+        b = rs485Interface.read();
+        switch(b)
+        {
+        case RS485_START:  // Start character - reset the input buffer
+          inPointer = 0;
+          inPacket = true;
+          break;
+        
+        case RS485_END:   // End character - terminate, then process, the packet
+          if(inPacket)
+          {
+            inPacket = false;
+            inBuffer[inPointer] = 0;
+            processPacket();
+          }
+          break;
+
+        default:     // Neither start or end - if we're in a packet it must be data
+                     // if not, ignore it.
+          if(inPacket)
+          {
+            inBuffer[inPointer] = b;
+            inPointer++;
+            if(inPointer >= RS485_BUF_LEN)
+              inputBufferOverflow();
+          }
+        }
+        
+        // We just received something, so reset the timeout time
+        
+        resetWait();
+      } else
+      {
+        
+        // If we're in a packet and we've been waiting too long for the next byte
+        // the packet has timed out.
+        
+        if(inPacket && tooLong())
+          listenTimeout();
+      }
+      break;
+        
+  case RS485_LISTEN_TIMEOUT:
+      resetInput();
+      listen();
+      break;
+      
+  default:
+      corrupt();
+      break;
+  }
 }
 
-void intercom::fireAndForget(char to, char* string)
+// We are busy if we are talking, or in the middle of receiving a packet
+
+bool intercom::busy()
 {
-  queuePacket(to, string);  
+  return (state == RS485_TALK) || inPacket;
 }
+
+
+// Send string to device to.
+
+bool intercom::queuePacket(char to, char ack, char* string)
+{
+  if(busy())
+  {
+    talkCollision();
+    return false;
+  }
+  buildPacket(to, ack, string);
+  talk();
+  return true;
+}
+
+// Wait for a packet to arrive.  The packet will be in inBuffer[ ]
+
+bool intercom::waitForPacket()
+{
+  long timeNow = millis();
+  while(!packetReceived)
+  {
+     if(millis() - timeNow > TIMEOUT)
+     {
+       waitTimeout();
+       packetReceived = false;
+       return false;
+     }
+  }
+  packetReceived = false;
+  return true;
+}
+
+// Send a packet and get an acknowledgement - used when no data is to bereturned.
+
+bool intercom::sendPacketAndCheckAcknowledgement(char to, char* string)
+{
+  byte retries = 0;
+  bool ok = false;
+  while((inBuffer[0] != MY_NAME || inBuffer[3] != RS485_ACK) && retries < RS485_RETRIES && !ok)
+  {
+    if(queuePacket(to, RS485_ACK, string))
+      ok = waitForPacket();
+    ok = ok && checkChecksum(inBuffer);
+    if(!ok)
+     delay(2*TIMEOUT);  // Wait twice timeout, and everything should have reset itself
+    retries++;   
+  }
+  return ok;  
+}
+
+// Send a packet and get data in reply.  The string returned is just the data;
+// it has no packet housekeeping information in.
 
 char* intercom::sendPacketAndGetReply(char to, char* string)
 {
-  reply[0] = 0;
-  byte retries = 0;
-  bool ok = false;
-  while((reply[0] != MY_NAME || reply[2] != RS485_ACK || reply[3] == RS485_ERROR) && retries < 3 && !ok)
-  {
-    queuePacket(to, string);
-    ok = getPacket(reply, RS485_BUF_LEN - 5); 
-    retries++;   
-  }
-  
-  debugstring[0] = 0;
-  
-  if(!ok)
-      strcat(debugstring, "G, ");  
-  
-  if(reply[0] != MY_NAME)
-  {
-      strcat(debugstring, "N, ");
-      ok = false;
-  }
-  
-  if(reply[2] != RS485_ACK || reply[3] == RS485_ERROR)
-  {
-      strcat(debugstring, "E: ");
-      ok = false;
-  }
-  
-  if(!ok)    
-    strcat(debugstring, reply);
-   
-  return &reply[3];
+  if(!sendPacketAndCheckAcknowledgement(to, string))
+    inBuffer[4] = 0;
+  strcpy(reply, &inBuffer[4]);
+  return reply;
 }
 
-#else
+// This function is called when a packet has been received
 
-void intercom::acknowledgeAndReset(char to)
+void intercom::processPacket()
 {
-  if(!reply[0])
-    reply[1] = 0;
-  reply[0] = RS485_ACK;
-  queuePacket(to, reply);
-  reset();
-}
-  
-void intercom::getAndProcessCommand()
-{
-  if(!rs485Interface.available())
+  char* erep = 0;
+  if(inBuffer[0] != MY_NAME)
+  {
+    resetInput();
     return;
-  inputByte = rs485Interface.read();
-  if(inPacket)
+  }  
+#if !(RS485_MASTER == 1)
+
+  if(checkChecksum(inBuffer))
   {
-    if(inputByte == RS485_END)
-    {
-      inBuffer[inPointer] = 0;
-      if(inBuffer[0] != MY_NAME) // For me?
-      {
-        reset(); // No
-        return;
-      }
-      if(ex.processCommand(&inBuffer[2]))
-        acknowledgeAndReset(inBuffer[1]);
-    }else
-    {
-      inBuffer[inPointer] = inputByte;
-      inPointer++;      
-    }
-    if(inPointer >= RS485_BUF_LEN)
-    {
-     reset();
-     setReply(" !Buffer overrun");
-    }
-  }else
-  {
-     if(inputByte == RS485_START)
-       inPacket = true;
+    erep = ex->processCommand(&inBuffer[4]);
+    if(erep) 
+      queuePacket(inBuffer[1], RS485_ACK, erep);
   }
-}
-
-void intercom::setReply(char* string)
-{
-  strcpy(reply, string);
-}
-
-void intercom::addReply(char* string)
-{
-  strcat(reply, string);  
-}
-
-char* intercom::getReply()
-{
-  return reply;  
-}
-
+  
+  if(!erep)
+  {
+    reply[0] = 0;
+    queuePacket(inBuffer[1], RS485_ERROR, reply);
+  }
+  
+  resetInput();
+  
 #endif
+  packetReceived = true;
+}
+
+
+// *********************************************************************************
+
+// Error functions
+
+// The output buffer has overflowed
+
+void intercom::outputBufferOverflow()
+{
+  outPointer = 0;
+#if RS485_MASTER == 1
+  strcpy(debugstring, "o/p overflow!");
+#endif  
+}
+
+
+// The input buffer has overflowed
+
+void intercom::inputBufferOverflow()
+{
+  resetInput();
+#if RS485_MASTER == 1
+  strcpy(debugstring, "i/p overflow!");
+#endif   
+}
+
+// An attempt has been made to start sending a new message before
+// the old one has been fully sent.
+
+void intercom::talkCollision()
+{
+#if RS485_MASTER == 1
+  strcpy(debugstring, "Talk collision!");
+#endif
+}
+
+// An attempt has been made to get a new message before the old one has been
+// fully received or before the last transmit is finished.
+
+void intercom::listenCollision()
+{
+#if RS485_MASTER == 1
+  strcpy(debugstring, "Listen collision!");
+#endif  
+}
+
+// (Part of) the data structure has become corrupted
+
+void intercom::corrupt()
+{
+#if RS485_MASTER == 1
+  strcpy(debugstring, "Data corrupt!");
+#endif   
+}
+
+
+// We have been trying to send a message, but something is taking too long
+
+void intercom::talkTimeout()
+{
+  state = RS485_TALK_TIMEOUT;  
+}
+
+// We have been trying to receive a message, but something has been taking too long
+
+void intercom::listenTimeout()
+{
+  state = RS485_LISTEN_TIMEOUT;  
+}
+
+// We have been waiting too long for an incomming packet
+
+void intercom::waitTimeout()
+{
+#if RS485_MASTER == 1
+  strcpy(debugstring, "Wait timeout!");
+#endif     
+}
+
+
 #endif
