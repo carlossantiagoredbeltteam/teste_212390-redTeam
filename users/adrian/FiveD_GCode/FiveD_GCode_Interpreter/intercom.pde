@@ -153,7 +153,7 @@ void intercom::resetWait()
 
 bool intercom::tooLong()
 {
-  return (millis() - wait_zero > TIMEOUT)
+  return (millis() - wait_zero > TIMEOUT);
 }
 
 
@@ -305,7 +305,7 @@ bool intercom::waitForPacket()
   {
      if(millis() - timeNow > TIMEOUT)
      {
-       waitTimeOut();
+       waitTimeout();
        packetReceived = false;
        return false;
      }
@@ -324,7 +324,7 @@ bool intercom::sendPacketAndCheckAcknowledgement(char to, char* string)
   {
     if(queuePacket(to, RS485_ACK, string))
       ok = waitForPacket();
-    ok &&= checkChecksum(inBuffer);
+    ok = ok && checkChecksum(inBuffer);
     if(!ok)
      delay(2*TIMEOUT);  // Wait twice timeout, and everything should have reset itself
     retries++;   
@@ -374,7 +374,10 @@ void intercom::processPacket()
 
 void intercom::outputBufferOverflow()
 {
-  outPointer = 0;  
+  outPointer = 0;
+#if RS485_MASTER == 1
+  strcpy(debugstring, "o/p overflow!");
+#endif  
 }
 
 
@@ -382,7 +385,10 @@ void intercom::outputBufferOverflow()
 
 void intercom::inputBufferOverflow()
 {
-  resetInput();  
+  resetInput();
+#if RS485_MASTER == 1
+  strcpy(debugstring, "i/p overflow!");
+#endif   
 }
 
 // An attempt has been made to start sending a new message before
@@ -390,7 +396,9 @@ void intercom::inputBufferOverflow()
 
 void intercom::talkCollision()
 {
-  
+#if RS485_MASTER == 1
+  strcpy(debugstring, "Talk collision!");
+#endif
 }
 
 // An attempt has been made to get a new message before the old one has been
@@ -398,14 +406,18 @@ void intercom::talkCollision()
 
 void intercom::listenCollision()
 {
-  
+#if RS485_MASTER == 1
+  strcpy(debugstring, "Listen collision!");
+#endif  
 }
 
 // (Part of) the data structure has become corrupted
 
 void intercom::corrupt()
 {
-  
+#if RS485_MASTER == 1
+  strcpy(debugstring, "Data corrupt!");
+#endif   
 }
 
 
@@ -413,21 +425,23 @@ void intercom::corrupt()
 
 void intercom::talkTimeout()
 {
-  state = RS485_TALK_TIMEOUT  
+  state = RS485_TALK_TIMEOUT;  
 }
 
 // We have been trying to receive a message, but something has been taking too long
 
 void intercom::listenTimeout()
 {
-  state = RS485_LISTEN_TIMEOUT   
+  state = RS485_LISTEN_TIMEOUT;  
 }
 
 // We have been waiting too long for an incomming packet
 
 void intercom::waitTimeout()
 {
-    
+#if RS485_MASTER == 1
+  strcpy(debugstring, "Wait timeout!");
+#endif     
 }
 
 
