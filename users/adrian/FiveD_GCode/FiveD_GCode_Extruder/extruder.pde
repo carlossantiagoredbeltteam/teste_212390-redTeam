@@ -23,11 +23,17 @@ extruder::extruder()
   coilPosition = 0;  
   forward = true;
   
-  // How much is the pot turned up?
+  // How much is the pot turned up?  Take the average of 16 readings.
   // Divide it by 4 to spread the valid readings out a bit.
   // This is about right for a 1A 3-ohm/coil stepper.
+  // Note: the pot is only read at reboot.
   
-  potValue = analogRead(POT)>>2;
+//  int pv = 0;
+//  for(int i = 0; i < 16; i++)
+//    pv += analogRead(POT);
+//  pv = pv/16;
+  
+  potValue =  80; // pv>>2;
 }
 
 void extruder::wait_for_temperature()
@@ -71,7 +77,7 @@ void extruder::manage()
   
 }
 
-void extruder::step()
+void extruder::sStep()
 {
 // This increments or decrements coilPosition then writes the appropriate pattern to the output pins.
 
@@ -222,7 +228,7 @@ char* extruder::processCommand(char command[])
        break;
         
      case STEP:
-       step();
+       sStep();
        break;
         
      case ENABLE:

@@ -44,7 +44,7 @@ public:
    void set_temperature(int temp);
    int get_temperature();
    void manage();
-   void step();
+   void sStep();
    void enableStep();
    void disableStep();
    char* processCommand(char command[]);

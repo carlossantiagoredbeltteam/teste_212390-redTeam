@@ -36,22 +36,21 @@ void setup()
   pinMode(DEBUG_PIN, OUTPUT);
   loopBlink = 0;
   rs485Interface.begin(RS485_BAUD);
-  rs485Interface.println("start");
 } 
 
 void loop() 
 { 
   //if(rs485Interface.available())
-  //    rs485Interface.print(rs485Interface.read(), BYTE);
-  //What should I do?  
+  //    rs485Interface.print(rs485Interface.read(), BYTE); 
   
   talker.tick();
   
-  // Keep me at the right temp etc. 
+  // Keep me at the right temp etc.
+  
   ex.manage();
   
   loopBlink++;
-  if(loopBlink & 0x4000)
+  if(loopBlink & 0x2000)
    digitalWrite(DEBUG_PIN, 1);
   else
    digitalWrite(DEBUG_PIN, 0); 
