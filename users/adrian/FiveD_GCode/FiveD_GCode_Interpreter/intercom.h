@@ -67,7 +67,7 @@
 
 // Size of the transmit and receive buffers
 
-#define RS485_BUF_LEN 30
+#define RS485_BUF_LEN 20
 
 enum rs485_state
 {
@@ -112,7 +112,7 @@ class intercom
     volatile bool inPacket;
     volatile bool packetReceived;
     volatile rs485_state state;
-    char reply[RS485_BUF_LEN];
+    //char reply[RS485_BUF_LEN];
     long wait_zero;
 #if !(RS485_MASTER == 1)
     extruder* ex;

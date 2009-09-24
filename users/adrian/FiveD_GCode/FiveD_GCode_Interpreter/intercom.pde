@@ -372,8 +372,8 @@ char* intercom::sendPacketAndGetReply(char to, char* string)
 {
   if(!sendPacketAndCheckAcknowledgement(to, string))
     inBuffer[P_DATA] = 0;
-  strcpy(reply, &inBuffer[P_DATA]);
-  return reply;
+  return &inBuffer[P_DATA]; //strcpy(reply, &inBuffer[P_DATA]);
+  //return reply;
 }
 
 // This function is called when a packet has been received
@@ -381,6 +381,7 @@ char* intercom::sendPacketAndGetReply(char to, char* string)
 void intercom::processPacket()
 {
   char* erep = 0;
+  char err;
   if(inBuffer[P_TO] != MY_NAME)
   {
     resetInput();
@@ -397,8 +398,8 @@ void intercom::processPacket()
   
   if(!erep)
   {
-    reply[0] = 0;
-    queuePacket(inBuffer[1], RS485_ERROR, reply);
+    err = 0;
+    queuePacket(inBuffer[1], RS485_ERROR, &err);
   }
   
   resetInput();
@@ -418,7 +419,7 @@ void intercom::outputBufferOverflow()
 {
   outPointer = 0;
 #if RS485_MASTER == 1
-  strcpy(debugstring, "o/p overflow!");
+  strcpy(debugstring, "E1");
 #endif  
 }
 
@@ -429,7 +430,7 @@ void intercom::inputBufferOverflow()
 {
   resetInput();
 #if RS485_MASTER == 1
-  strcpy(debugstring, "i/p overflow!");
+  strcpy(debugstring, "E2");
 #endif   
 }
 
@@ -439,7 +440,7 @@ void intercom::inputBufferOverflow()
 void intercom::talkCollision()
 {
 #if RS485_MASTER == 1
-  strcpy(debugstring, "Talk collision!");
+  strcpy(debugstring, "E3");
 #endif
 }
 
@@ -449,7 +450,7 @@ void intercom::talkCollision()
 void intercom::listenCollision()
 {
 #if RS485_MASTER == 1
-  strcpy(debugstring, "Listen collision!");
+  strcpy(debugstring, "E4");
 #endif  
 }
 
@@ -458,7 +459,7 @@ void intercom::listenCollision()
 void intercom::queueCollision()
 {
 #if RS485_MASTER == 1
-  strcpy(debugstring, "Queue collision!");
+  strcpy(debugstring, "E5");
 #endif  
 }
 
@@ -467,7 +468,7 @@ void intercom::queueCollision()
 void intercom::corrupt()
 {
 #if RS485_MASTER == 1
-  strcpy(debugstring, "Data corrupt!");
+  strcpy(debugstring, "E6");
 #endif   
 }
 
@@ -478,7 +479,7 @@ void intercom::talkTimeout()
 {
   state = RS485_TALK_TIMEOUT;
 #if RS485_MASTER == 1
-  strcpy(debugstring, "Talk timeout!");
+  strcpy(debugstring, "E7");
 #endif    
 }
 
@@ -488,7 +489,7 @@ void intercom::listenTimeout()
 {
   state = RS485_LISTEN_TIMEOUT;
 #if RS485_MASTER == 1
-  strcpy(debugstring, "Listen timeout!");
+  strcpy(debugstring, "E8");
 #endif    
 }
 
@@ -497,14 +498,14 @@ void intercom::listenTimeout()
 void intercom::waitTimeout()
 {
 #if RS485_MASTER == 1
-  strcpy(debugstring, "Wait timeout!");
+  strcpy(debugstring, "E9");
 #endif     
 }
 
 void intercom::queueError()
 {
 #if RS485_MASTER == 1
-  strcpy(debugstring, "Queue error!");
+  strcpy(debugstring, "EA");
 #endif     
 }
 
@@ -512,7 +513,7 @@ void intercom::queueError()
 void intercom::waitError()
 {
 #if RS485_MASTER == 1
-  strcpy(debugstring, "Wait error!");
+  strcpy(debugstring, "EB");
 #endif     
 }
 
@@ -520,7 +521,7 @@ void intercom::waitError()
 void intercom::checksumError()
 {
 #if RS485_MASTER == 1
-  strcpy(debugstring, "Checksum! ");
+  strcpy(debugstring, "EC ");
   strcat(debugstring, inBuffer);
 #endif     
 }
@@ -529,7 +530,7 @@ void intercom::checksumError()
 void intercom::ackError()
 {
 #if RS485_MASTER == 1
-  strcpy(debugstring, "Ack! ");
+  strcpy(debugstring, "ED ");
   strcat(debugstring, inBuffer);  
 #endif     
 }
