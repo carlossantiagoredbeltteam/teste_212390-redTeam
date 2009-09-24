@@ -30,6 +30,14 @@
 
 #if MOTHERBOARD > 1
 
+// Locations in a packet
+
+#define P_TO 0
+#define P_FROM 1
+#define P_SUM 2
+#define P_ACK 3
+#define P_DATA 4
+
 // Our RS485 driver and timeout
 
 #if RS485_MASTER == 1
@@ -46,6 +54,7 @@
 #define RS485_BAUD 1000000
 
 // The acknowledge, start, end, error and checksum characters
+
 #define RS485_ACK 'A'
 #define RS485_START '*'
 #define RS485_END '$'
@@ -57,6 +66,7 @@
 #define RS485_RETRIES 3      // Number of times to retry on error
 
 // Size of the transmit and receive buffers
+
 #define RS485_BUF_LEN 30
 
 enum rs485_state
@@ -107,6 +117,10 @@ class intercom
 #if !(RS485_MASTER == 1)
     extruder* ex;
 #endif
+
+// Reset everything to the initial state
+
+void reset();
   
 // Reset the output buffer and its associated variables
 
@@ -116,13 +130,14 @@ void resetOutput();
 
 void resetInput();
 
-// The checksum for a string is the least-significant nibble of the sum
+// The checksum for a string is the least-significant six bits of the sum
 // of the string's bytes added to the character RS485_CHECK.  It can thus take
-// one of sixteen values, all printable.
+// one of sixty-four values, all printable.  This function sets the checsum byte
+// in a string, assumed to be a packet.
 
-char checksum(char* string);
+void checksum(char* string);
 
-// Check the checksum of a string, presumed to be in the third (x[2]) byte
+// Check the checksum of a string
 
 bool checkChecksum(char* string);
 
@@ -182,6 +197,10 @@ void talkCollision();
 
 void listenCollision();
 
+// An attempt has been made to queue a new message while the system is busy.
+
+void queueCollision();
+
 // (Part of) the data structure has become corrupted
 
 void corrupt();
@@ -197,6 +216,22 @@ void listenTimeout();
 // We have been waiting too long for an incomming packet
 
 void waitTimeout();
+
+// Some queuing error has occurred
+
+void queueError();
+
+// Waiting for a packet error
+
+void waitError();
+
+// Dud checksum
+
+void checksumError();
+
+// Dud acknowledgement
+
+void ackError();
 
 };
 

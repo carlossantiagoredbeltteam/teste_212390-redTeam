@@ -142,7 +142,8 @@ void setup()
   enableTimerInterrupt();
 }
 
-long count = 0;
+//long count = 0;
+//int ct1 = 0;
 
 void loop()
 {
@@ -150,14 +151,22 @@ void loop()
    get_and_do_command(); 
 #if MOTHERBOARD > 1
    talker.tick();
-#endif 
+#endif
 /*
-  while(talker.busy()) talker.tick();
-  ex[0]->ping();
   count++;
-  if(!count%100)
-    Serial.print(count);
-    */
+  if(count > 1000)
+  {
+    ct1++;
+    ex[0]->step();
+    if(!ex[0]->ping())
+    {
+      Serial.print(ct1);
+      Serial.println(debugstring);
+      debugstring[0] = 0;
+    }
+    count = 0;
+  }
+*/
 }
 
 //******************************************************************************************
