@@ -15,6 +15,7 @@
 
 #include <ctype.h>
 #include <HardwareSerial.h>
+#include <avr/pgmspace.h>
 #include "WProgram.h"
 #include "vectors.h"
 #include "parameters.h"
@@ -30,7 +31,7 @@ byte extruder_in_use = 0;
 
 // Text placed in this (terminated with 0) will be transmitted back to the host
 // along with the next G Code acknowledgement.
-char debugstring[40];
+char debugstring[20];
 
 #if MOTHERBOARD < 2
 
