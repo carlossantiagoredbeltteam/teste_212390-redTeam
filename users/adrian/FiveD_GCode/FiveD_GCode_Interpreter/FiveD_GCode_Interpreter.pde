@@ -15,7 +15,7 @@
 
 #include <ctype.h>
 #include <HardwareSerial.h>
-#include <avr/pgmspace.h>
+//#include <avr/pgmspace.h>
 #include "WProgram.h"
 #include "vectors.h"
 #include "parameters.h"
