@@ -9,7 +9,7 @@
 // Keep all extruders up to temperature etc.
 
 
-void manage_all_extruders()
+void manageAllExtruders()
 {
     for(byte i = 0; i < EXTRUDER_COUNT; i++)
        ex[i]->manage();
@@ -17,7 +17,7 @@ void manage_all_extruders()
 
 // Select a new extruder
 
-void new_extruder(byte e)
+void newExtruder(byte e)
 {
   if(e < 0)
     e = 0;
@@ -99,30 +99,32 @@ extruder::extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin,
         e_direction = EXTRUDER_FORWARD;
         
         //default to cool
-        set_temperature(target_celsius);
+        setTemperature(target_celsius);
 }
 
 
-byte extruder::wait_till_hot()
+void extruder::waitForTemperature()
 {  
   count = 0;
-  oldT = get_temperature();
-  while (get_temperature() < target_celsius - HALF_DEAD_ZONE)
+  oldT = getTemperature();
+  while (getTemperature() < target_celsius - HALF_DEAD_ZONE)
   {
-	manage_all_extruders();
+	manageAllExtruders();
         count++;
         if(count > 20)
         {
-            newT = get_temperature();
+            newT = getTemperature();
             if(newT > oldT)
                oldT = newT;
             else
-                return 1;
+            {
+                temperatureError();
+                return;
+            }
             count = 0;
         }
 	delay(1000);
   }
-  return 0;
 }
 
 /*
@@ -151,9 +153,9 @@ byte extruder::wait_till_cool()
 
 
 
-void extruder::valve_set(bool open, int dTime)
+void extruder::valveSet(bool open, int dTime)
 {
-        wait_for_temperature();
+        waitForTemperature();
 	valve_open = open;
 	digitalWrite(valve_dir_pin, open);
         digitalWrite(valve_en_pin, 1);
@@ -162,7 +164,7 @@ void extruder::valve_set(bool open, int dTime)
 }
 
 
-void extruder::set_temperature(int temp)
+void extruder::setTemperature(int temp)
 {
 	target_celsius = temp;
 	max_celsius = (temp*11)/10;
@@ -176,7 +178,7 @@ void extruder::set_temperature(int temp)
 *  Samples the temperature and converts it to degrees celsius.
 *  Returns degrees celsius.
 */
-int extruder::get_temperature()
+int extruder::getTemperature()
 {
 #ifdef USE_THERMISTOR
 	int raw = sample_temperature(temp_pin);
@@ -205,7 +207,7 @@ int extruder::get_temperature()
 
 	return celsius;
 #else
-  return ( 5.0 * sample_temperature() * 100.0) / 1024.0;
+  return ( 5.0 * sampleTemperature() * 100.0) / 1024.0;
 #endif
 }
 
@@ -214,7 +216,7 @@ int extruder::get_temperature()
 /*
 * This function gives us an averaged sample of the analog temperature pin.
 */
-int extruder::sample_temperature()
+int extruder::sampleTemperature()
 {
 	int raw = 0;
 	
@@ -239,7 +241,7 @@ int extruder::sample_temperature()
 void extruder::manage()
 {
 	//make sure we know what our temp is.
-	int current_celsius = get_temperature();
+	int current_celsius = getTemperature();
         byte newheat = 0;
   
         //put the heater into high mode if we're not at our target.
@@ -258,14 +260,14 @@ void extruder::manage()
 
 
 #if 0
-void extruder::set_speed(float sp)
+void extruder::setSpeed(float sp)
 {
   // DC motor?
     if(step_en_pin < 0)
     {
       e_speed = (byte)sp;
       if(e_speed > 0)
-          wait_for_temperature();
+          waitForTemperature();
       analogWrite(motor_speed_pin, e_speed);
       return;
     }
@@ -280,7 +282,7 @@ void extruder::set_speed(float sp)
     return;
   } else
   {
-    wait_for_temperature();
+    waitForTemperature();
     enableStep();
     e_speed = 1;
   }

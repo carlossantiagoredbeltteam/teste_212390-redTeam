@@ -335,10 +335,10 @@ void cartesian_dda::dda_start()
 #else
 	digitalWrite(Z_DIR_PIN, z_direction);
 #endif
-        if(e_direction)
-          ex[extruder_in_use]->set_direction(1);
-        else
-          ex[extruder_in_use]->set_direction(0);
+       // if(e_direction)
+       //   ex[extruder_in_use]->setDirection(1);
+       // else
+       //   ex[extruder_in_use]->setDirection(0);
   
     //turn on steppers to start moving =)
     
