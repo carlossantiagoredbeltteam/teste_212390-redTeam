@@ -146,7 +146,7 @@ inline void cartesian_dda::do_z_step()
 
 inline void cartesian_dda::do_e_step()
 {
-        ex[extruder_in_use]->step();
+        ex[extruder_in_use]->sStep();
 }
 
 inline long cartesian_dda::calculate_feedrate_delay(const float& feedrate)

@@ -63,6 +63,7 @@
 #define Z_MAX_PIN (byte)2
 #define Z_ENABLE_PIN (byte)31
 
+
 //extruder pins
 #define EXTRUDER_0_MOTOR_SPEED_PIN   (byte)12
 #define EXTRUDER_0_MOTOR_DIR_PIN     (byte)16
@@ -110,6 +111,9 @@
 #define Z_ENABLE_PIN    29
 #define Z_MIN_PIN       30
 #define Z_MAX_PIN       31
+
+#define E_STEP_PIN       1
+#define E_STEP_DIR
 
 //our pin for debugging.
 #define DEBUG_PIN        0

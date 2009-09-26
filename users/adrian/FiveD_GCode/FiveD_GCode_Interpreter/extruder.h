@@ -8,9 +8,9 @@
 
 #define EXTRUDER_COUNT 1
 
-void manage_all_extruders();
+void manageAllExtruders();
 
-void new_extruder(byte e);
+void newExtruder(byte e);
 
 /**********************************************************************************************
 
@@ -25,6 +25,27 @@ void new_extruder(byte e);
 
 class extruder
 {
+
+     
+public:
+
+   extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin, byte vd_pin, byte ve_pin, byte se_pin);
+   void waitForTemperature();
+   void valveSet(bool open, int dTime);
+   void setDirection(bool direction);
+//   void set_speed(float es);
+   void setCooler(byte e_speed);
+   void setTemperature(int temp);
+   int getTemperature();
+   void manage();
+// Interrupt setup and handling functions for stepper-driven extruders
+   
+//   void interrupt();
+   void sStep();
+
+   void enableStep();
+   void disableStep();
+   
 private:
 
 //these our the default values for the extruder.
@@ -54,27 +75,8 @@ private:
     
      byte wait_till_hot();
      //byte wait_till_cool();
-     void temperature_error(); 
-     int sample_temperature();
-     
-public:
-
-   extruder(byte md_pin, byte ms_pin, byte h_pin, byte f_pin, byte t_pin, byte vd_pin, byte ve_pin, byte se_pin);
-   void wait_for_temperature();
-   void valve_set(bool open, int dTime);
-   void set_direction(bool direction);
-//   void set_speed(float es);
-   void set_cooler(byte e_speed);
-   void set_temperature(int temp);
-   int get_temperature();
-   void manage();
-// Interrupt setup and handling functions for stepper-driven extruders
-   
-//   void interrupt();
-   void step();
-
-   void enableStep();
-   void disableStep();
+     void temperatureError(); 
+     int sampleTemperature();
    
 };
 
@@ -92,40 +94,27 @@ inline void extruder::disableStep()
   digitalWrite(step_en_pin, !ENABLE_ON);
 }
 
-inline void extruder::step()
+inline void extruder::sStep()
 {
    digitalWrite(motor_speed_pin, HIGH);
    delayMicrosecondsInterruptible(5); 
    digitalWrite(motor_speed_pin, LOW);
 }
 
-inline void extruder::temperature_error()
+inline void extruder::temperatureError()
 {
       Serial.print("E: ");
-      Serial.println(get_temperature());  
+      Serial.println(getTemperature());  
 }
 
-//warmup if we're too cold; cool down if we're too hot
-inline void extruder::wait_for_temperature()
-{
-/*
-  if(wait_till_cool())
-   {
-      temperature_error();
-      return;
-   }
-*/
-   if(wait_till_hot())
-     temperature_error();
-}
 
-inline void extruder::set_direction(bool dir)
+inline void extruder::setDirection(bool dir)
 {
 	e_direction = dir;
 	digitalWrite(motor_dir_pin, e_direction);
 }
 
-inline void extruder::set_cooler(byte sp)
+inline void extruder::setCooler(byte sp)
 {
   if(step_en_pin >= 0) // Step enable conflicts with the fan
     return;
@@ -141,38 +130,46 @@ inline void extruder::set_cooler(byte sp)
 
 #else
 
+
 #define WAIT_T 'W'        // wait_for_temperature();
-#define VALVE 'V'          // valve_set(bool open, int dTime);
-#define DIRECTION 'D'   // set_direction(bool direction);
-#define COOL 'C'           // set_cooler(byte e_speed);
-#define SET_T 'T'           // set_temperature(int temp);
-#define GET_T 't'           // get_temperature();
-#define STEP 'S'             // step();
-#define ENABLE 'E'       // enableStep();
+#define VALVE 'V'         // valve_set(bool open, int dTime);
+#define DIRECTION 'D'     // set_direction(bool direction);
+#define COOL 'C'          // set_cooler(byte e_speed);
+#define SET_T 'T'         // set_temperature(int temp);
+#define GET_T 't'         // get_temperature();
+#define STEP 'S'          // step();
+#define ENABLE 'E'        // enableStep();
 #define DISABLE 'e'       // disableStep();
-#define PING 'P'            // Just acknowledge
+#define PREAD 'R'         // read the pot voltage
+#define SPWM 'M'          // Set the motor PWM
+#define PING 'P'          // Just acknowledge
 
 class extruder
 {
-private:
-
-  char my_name;
-  char commandBuffer[RS485_BUF_LEN];
-  char* reply;
   
 public:
    extruder(char name);
-   void wait_for_temperature();
-   void valve_set(bool open, int dTime);
-   void set_direction(bool direction);
-   void set_cooler(byte e_speed);
-   void set_temperature(int temp);
-   int get_temperature();
+   void waitForTemperature();
+   void valveSet(bool open, int dTime);
+   void setDirection(bool direction);
+   void setCooler(byte e_speed);
+   void setTemperature(int temp);
+   int getTemperature();
    void manage();
-   void step();
+   void sStep();
    void enableStep();
    void disableStep();
-   
+   int potVoltage();
+   void setPWM(int p);
+   bool ping();
+ 
+private:
+
+   char my_name;
+   char commandBuffer[RS485_BUF_LEN];
+   char* reply;
+   byte stp;
+
    void buildCommand(char c);   
    void buildCommand(char c, char v);
    void buildNumberCommand(char c, int v);  
@@ -181,6 +178,11 @@ public:
 inline extruder::extruder(char name)
 {
   my_name = name;
+  int v = potVoltage();
+  strcpy(debugstring, reply);
+  setPWM(v);
+  pinMode(E_STEP_PIN, OUTPUT);
+  stp = 0;
 }
 
 inline void extruder::buildCommand(char c)
@@ -203,12 +205,12 @@ inline void extruder::buildNumberCommand(char c, int v)
 }
 
 
-inline  void extruder::wait_for_temperature()
+inline  void extruder::waitForTemperature()
 {
   
 }
 
-inline  void extruder::valve_set(bool open, int dTime)
+inline  void extruder::valveSet(bool open, int dTime)
 {
    if(open)
      buildCommand(VALVE, '1');
@@ -219,7 +221,7 @@ inline  void extruder::valve_set(bool open, int dTime)
    delay(dTime);
 }
 
-inline void extruder::set_direction(bool direction)
+inline void extruder::setDirection(bool direction)
 {
    if(direction)
      buildCommand(DIRECTION, '1');
@@ -228,19 +230,19 @@ inline void extruder::set_direction(bool direction)
    talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer);
 }
 
-inline  void extruder::set_cooler(byte e_speed)
+inline  void extruder::setCooler(byte e_speed)
 {   
    buildNumberCommand(COOL, e_speed);
    talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer);
 }
 
-inline  void extruder::set_temperature(int temp)
+inline  void extruder::setTemperature(int temp)
 {
    buildNumberCommand(SET_T, temp);
    talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer);  
 }
 
-inline  int extruder::get_temperature()
+inline  int extruder::getTemperature()
 {
    buildCommand(GET_T);
    char* reply = talker.sendPacketAndGetReply(my_name, commandBuffer);
@@ -253,10 +255,12 @@ inline  void extruder::manage()
 
 }
 
-inline  void extruder::step()
+inline  void extruder::sStep()
 {
-   buildCommand(STEP);
-   talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer);
+   //buildCommand(STEP);
+   //talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer);
+   stp = 1 - stp;
+   digitalWrite(E_STEP_PIN, stp);
 }
 
 inline  void extruder::enableStep()
@@ -272,6 +276,25 @@ inline  void extruder::disableStep()
 {
   buildCommand(DISABLE);
   talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer);
+}
+
+inline int extruder::potVoltage()
+{
+   buildCommand(PREAD);
+   char* reply = talker.sendPacketAndGetReply(my_name, commandBuffer);
+   return(atoi(reply));  
+}
+
+inline void extruder::setPWM(int p)
+{
+   buildNumberCommand(SPWM, p);
+   talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer);   
+}
+
+inline bool extruder::ping()
+{
+  buildCommand(PING);
+  return talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer);  
 }
 
 #endif

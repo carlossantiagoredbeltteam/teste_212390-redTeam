@@ -148,7 +148,7 @@ void setup()
 
 void loop()
 {
-   manage_all_extruders();
+   manageAllExtruders();
    get_and_do_command(); 
 #if MOTHERBOARD > 1
    talker.tick();

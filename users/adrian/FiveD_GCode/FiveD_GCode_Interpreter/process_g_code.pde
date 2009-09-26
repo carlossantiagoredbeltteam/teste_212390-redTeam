@@ -402,43 +402,43 @@ void process_string(char instruction[], int size)
 /*
 			//turn extruder on, forward
 			case 101:
-				ex[extruder_in_use]->set_direction(1);
-				ex[extruder_in_use]->set_speed(extruder_speed);
+				ex[extruder_in_use]->setDirection(1);
+				ex[extruder_in_use]->setSpeed(extruder_speed);
 				break;
 
 			//turn extruder on, reverse
 			case 102:
-				ex[extruder_in_use]->set_direction(0);
-				ex[extruder_in_use]->set_speed(extruder_speed);
+				ex[extruder_in_use]->setDirection(0);
+				ex[extruder_in_use]->setSpeed(extruder_speed);
 				break;
 
 			//turn extruder off
 			case 103:
-				ex[extruder_in_use]->set_speed(0);
+				ex[extruder_in_use]->setSpeed(0);
 				break;
 */
 			//custom code for temperature control
 			case 104:
 				if (gc.seen & GCODE_S)
 				{
-					ex[extruder_in_use]->set_temperature((int)gc.S);
+					ex[extruder_in_use]->setTemperature((int)gc.S);
 				}
 				break;
 
 			//custom code for temperature reading
 			case 105:
 				Serial.print("T:");
-				Serial.println(ex[extruder_in_use]->get_temperature());
+				Serial.println(ex[extruder_in_use]->getTemperature());
 				break;
 
 			//turn fan on
 			case 106:
-				ex[extruder_in_use]->set_cooler(255);
+				ex[extruder_in_use]->setCooler(255);
 				break;
 
 			//turn fan off
 			case 107:
-				ex[extruder_in_use]->set_cooler(0);
+				ex[extruder_in_use]->setCooler(0);
 				break;
 /*
 // Extruder speed is now entirely controlled by E codes
@@ -454,12 +454,12 @@ void process_string(char instruction[], int size)
 
                         // Open the valve
                         case 126:
-                                ex[extruder_in_use]->valve_set(true, (int)(gc.P + 0.5));
+                                ex[extruder_in_use]->valveSet(true, (int)(gc.P + 0.5));
                                 break;
                                 
                         // Close the valve
                         case 127:
-                                ex[extruder_in_use]->valve_set(false, (int)(gc.P + 0.5));
+                                ex[extruder_in_use]->valveSet(false, (int)(gc.P + 0.5));
                                 break;
                                                                 
 
@@ -478,7 +478,7 @@ void process_string(char instruction[], int size)
         {
             while(!qEmpty()) delay(WAITING_DELAY);
             //delay(2*WAITING_DELAY);
-            new_extruder(gc.T);
+            newExtruder(gc.T);
         }
 }
 

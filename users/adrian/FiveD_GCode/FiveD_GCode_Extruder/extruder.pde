@@ -8,7 +8,8 @@ extruder::extruder()
   pinMode(H2E, OUTPUT);
   pinMode(OUTPUT_A, OUTPUT);
   pinMode(OUTPUT_B, OUTPUT);
-  pinMode(OUTPUT_C, OUTPUT);  
+  pinMode(OUTPUT_C, OUTPUT);
+  pinMode(E_STEP_PIN, OUTPUT);   
   pinMode(POT, INPUT);
   
   disableStep();
@@ -19,39 +20,32 @@ extruder::extruder()
   
   TCCR0B &= ~(0x07); 
   TCCR0B |= 1; 
-  
+
+// Defaults
+
   coilPosition = 0;  
   forward = true;
-  
-  // How much is the pot turned up?  Take the average of 16 readings.
-  // Divide it by 4 to spread the valid readings out a bit.
-  // This is about right for a 1A 3-ohm/coil stepper.
-  // Note: the pot is only read at reboot.
-  
-//  int pv = 0;
-//  for(int i = 0; i < 16; i++)
-//    pv += analogRead(POT);
-//  pv = pv/16;
-  
-  potValue =  80; // pv>>2;
+  pwmValue =  80;
+  temp = 20;
+  stp = 0;
 }
 
-void extruder::wait_for_temperature()
+void extruder::waitForTemperature()
 {
   
 }
 
-void extruder::valve_set(bool open)
+void extruder::valveSet(bool open)
 {
 
 }
 
-void extruder::set_direction(bool direction)
+void extruder::setDirection(bool direction)
 {
   forward = direction;  
 }
 
-void extruder::set_cooler(byte e_speed)
+void extruder::setCooler(byte e_speed)
 {
   if(e_speed > 20)
     digitalWrite(OUTPUT_B, 1);
@@ -59,22 +53,29 @@ void extruder::set_cooler(byte e_speed)
     digitalWrite(OUTPUT_B, 0);    
 }
 
-void extruder::set_temperature(int temp)
+void extruder::setTemperature(int t)
 {
-  if(temp > 20)
-    digitalWrite(OUTPUT_A, 1);
-  else
-    digitalWrite(OUTPUT_A, 0);  
+  temp = t;
 }
 
-int extruder::get_temperature()
+int extruder::getTemperature()
 {
   return 99;  
 }
 
 void extruder::manage()
 {
+  byte s = digitalRead(E_STEP_PIN);
+  if(s != stp)
+  {
+    stp = s;
+    sStep();
+  }  
   
+  if(temp > getTemperature())
+    digitalWrite(OUTPUT_A, 1);
+  else
+    digitalWrite(OUTPUT_A, 0);
 }
 
 void extruder::sStep()
@@ -176,12 +177,12 @@ void extruder::sStep()
   // Send the appropriate PWM values
   
   if(h1Enable)
-    analogWrite(H1E, potValue);
+    analogWrite(H1E, pwmValue);
   else
     analogWrite(H1E, 0);
     
   if(h2Enable)
-    analogWrite(H2E, potValue);
+    analogWrite(H2E, pwmValue);
   else
     analogWrite(H2E, 0);
 }
@@ -198,33 +199,43 @@ void extruder::disableStep()
     analogWrite(H2E, 0);  
 }
 
+int extruder::potVoltage()
+{
+    return (int)analogRead(POT);  
+}
+
+void extruder::setPWM(int p)
+{
+    pwmValue = p;
+}
+
 char* extruder::processCommand(char command[])
 {
   reply[0] = 0;
   switch(command[0])
   {
     case WAIT_T:
-      wait_for_temperature();
+      waitForTemperature();
       break;
       
     case VALVE:
-      valve_set(command[1] == '1');
+      valveSet(command[1] == '1');
       break;
       
     case DIRECTION:
-      set_direction(command[1] == '1');
+      setDirection(command[1] == '1');
       break;
       
      case COOL:
-       set_cooler(atoi(&command[1]));
+       setCooler(atoi(&command[1]));
        break;
        
      case SET_T:
-       set_temperature(atoi(&command[1]));
+       setTemperature(atoi(&command[1]));
        break;
        
      case GET_T:
-       itoa(get_temperature(), reply, 10);
+       itoa(getTemperature(), reply, 10);
        break;
         
      case STEP:
@@ -238,6 +249,14 @@ char* extruder::processCommand(char command[])
      case DISABLE:
        disableStep();
        break;
+       
+     case PREAD:
+       itoa(potVoltage(), reply, 10);
+       break;
+  
+     case SPWM:
+       setPWM(atoi(&command[1]));
+       break;      
         
      case PING:
        break;
