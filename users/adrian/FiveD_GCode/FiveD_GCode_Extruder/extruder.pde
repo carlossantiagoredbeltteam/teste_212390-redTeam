@@ -9,7 +9,8 @@ extruder::extruder()
   pinMode(OUTPUT_A, OUTPUT);
   pinMode(OUTPUT_B, OUTPUT);
   pinMode(OUTPUT_C, OUTPUT);
-  pinMode(E_STEP_PIN, OUTPUT);   
+  pinMode(E_STEP_PIN, INPUT);
+  pinMode(E_DIR_PIN, INPUT);  
   pinMode(POT, INPUT);
   
   disableStep();
@@ -25,7 +26,7 @@ extruder::extruder()
 
   coilPosition = 0;  
   forward = true;
-  pwmValue =  80;
+  pwmValue =  40;
   temp = 20;
   stp = 0;
 }
@@ -80,9 +81,11 @@ void extruder::manage()
 
 void extruder::sStep()
 {
+  byte pwm = pwmValue;
+  
 // This increments or decrements coilPosition then writes the appropriate pattern to the output pins.
 
-  if(forward)
+  if(digitalRead(E_DIR_PIN))
     coilPosition++;
   else
     coilPosition--;
@@ -90,8 +93,8 @@ void extruder::sStep()
   
   // Disable the coils
   
-  digitalWrite(H1E, 0);
-  digitalWrite(H2E, 0);
+  //analogueWrite(H1E, 0);
+  //analogueWrite(H2E, 0);
   
   // Which of the 8 possible patterns do we want?
   // The commented out setPower(...) lines could
@@ -103,67 +106,80 @@ void extruder::sStep()
   switch(coilPosition) 
   {
   case 7:
-    //setPower((stepPower >> 1) + (stepPower >> 3));
+    pwm = (pwm >> 1) + (pwm >> 3);
     digitalWrite(H1D, 1);    
     digitalWrite(H2D, 1);
-    h1Enable = true;
-    h2Enable = true;    
+    //h1Enable = true;
+    analogWrite(H1E, pwm);
+    //h2Enable = true;
+    analogWrite(H2E, pwm);    
     break;
     
   case 6:
-    //setPower(stepPower);
     digitalWrite(H1D, 1);    
     digitalWrite(H2D, 1);
-    h1Enable = true;
-    h2Enable = false;   
+    //h1Enable = true;
+    analogWrite(H1E, pwm);
+    //h2Enable = false;
+    analogWrite(H2E, 0);   
     break; 
     
   case 5:
-    //setPower((stepPower >> 1) + (stepPower >> 3));
+    pwm = (pwm >> 1) + (pwm >> 3);
     digitalWrite(H1D, 1);
     digitalWrite(H2D, 0);
-    h1Enable = true;
-    h2Enable = true; 
+    //h1Enable = true;
+    analogWrite(H1E, pwm);
+    //h2Enable = true;
+    analogWrite(H2E, pwm); 
     break;
     
   case 4:
-    //setPower(stepPower);
     digitalWrite(H1D, 1);
     digitalWrite(H2D, 0);
-    h1Enable = false;
-    h2Enable = true; 
+    //h1Enable = false;
+    analogWrite(H1E, 0);
+    //h2Enable = true;
+    analogWrite(H2E, pwm); 
     break;
     
   case 3:
-    //setPower((stepPower >> 1) + (stepPower >> 3));
+    pwm = (pwm >> 1) + (pwm >> 3);
     digitalWrite(H1D, 0);
     digitalWrite(H2D, 0);
-    h1Enable = true;
-    h2Enable = true; 
+    //h1Enable = true;
+    analogWrite(H1E, pwm);
+    //h2Enable = true;
+    analogWrite(H2E, pwm); 
     break; 
     
   case 2:
-    //setPower(stepPower);
     digitalWrite(H1D, 0);
     digitalWrite(H2D, 0);
-    h1Enable = true;
-    h2Enable = false; 
+    //h1Enable = true;
+    analogWrite(H1E, pwm);
+    //h2Enable = false;
+    analogWrite(H2E, 0); 
     break;
     
   case 1:
-    //setPower((stepPower >> 1) + (stepPower >> 3));
+    pwm = (pwm >> 1) + (pwm >> 3);
     digitalWrite(H1D, 0);
     digitalWrite(H2D, 1);
-    h1Enable = true;
-    h2Enable = true; 
+    //h1Enable = true;
+    analogWrite(H1E, pwm);
+    //h2Enable = true;
+    analogWrite(H2E, pwm); 
     break;
     
   case 0:
     //setPower(stepPower);
     digitalWrite(H1D, 0);
     digitalWrite(H2D, 1);
-    h1Enable = false;
-    h2Enable = true; 
+    //h1Enable = false;
+    analogWrite(H1E, 0);
+    //h2Enable = true;
+    analogWrite(H2E, pwm); 
     break; 
     
   }
@@ -175,7 +191,7 @@ void extruder::sStep()
   //potValue = analogRead(POT)>>2;
   
   // Send the appropriate PWM values
-  
+/*  
   if(h1Enable)
     analogWrite(H1E, pwmValue);
   else
@@ -185,6 +201,7 @@ void extruder::sStep()
     analogWrite(H2E, pwmValue);
   else
     analogWrite(H2E, 0);
+*/
 }
  
 
@@ -223,7 +240,7 @@ char* extruder::processCommand(char command[])
       break;
       
     case DIRECTION:
-      setDirection(command[1] == '1');
+      // setDirection(command[1] == '1'); // Now handled by hardware.
       break;
       
      case COOL:
@@ -239,7 +256,7 @@ char* extruder::processCommand(char command[])
        break;
         
      case STEP:
-       sStep();
+       //sStep(); // Now handled by hardware.
        break;
         
      case ENABLE:

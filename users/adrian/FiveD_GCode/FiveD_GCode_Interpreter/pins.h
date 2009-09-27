@@ -112,10 +112,11 @@
 #define Z_MIN_PIN       30
 #define Z_MAX_PIN       31
 
-#define E_STEP_PIN       1
-#define E_STEP_DIR
+#define E_STEP_PIN      17
+#define E_DIR_PIN       16
 
 //our pin for debugging.
+
 #define DEBUG_PIN        0
 
 //our SD card pins

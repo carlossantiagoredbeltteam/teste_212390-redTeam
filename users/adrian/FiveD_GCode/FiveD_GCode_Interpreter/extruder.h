@@ -168,7 +168,7 @@ private:
    char my_name;
    char commandBuffer[RS485_BUF_LEN];
    char* reply;
-   byte stp;
+   bool stp;
 
    void buildCommand(char c);   
    void buildCommand(char c, char v);
@@ -178,11 +178,14 @@ private:
 inline extruder::extruder(char name)
 {
   my_name = name;
-  int v = potVoltage();
-  strcpy(debugstring, reply);
-  setPWM(v);
+//  int v = potVoltage();
+//  strcpy(debugstring, reply);
+//  setPWM(v);
   pinMode(E_STEP_PIN, OUTPUT);
-  stp = 0;
+  pinMode(E_DIR_PIN, OUTPUT);
+  digitalWrite(E_STEP_PIN, 0);
+  digitalWrite(E_DIR_PIN, 0);
+  stp = false;
 }
 
 inline void extruder::buildCommand(char c)
@@ -221,15 +224,6 @@ inline  void extruder::valveSet(bool open, int dTime)
    delay(dTime);
 }
 
-inline void extruder::setDirection(bool direction)
-{
-   if(direction)
-     buildCommand(DIRECTION, '1');
-   else
-     buildCommand(DIRECTION, '0');
-   talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer);
-}
-
 inline  void extruder::setCooler(byte e_speed)
 {   
    buildNumberCommand(COOL, e_speed);
@@ -255,12 +249,29 @@ inline  void extruder::manage()
 
 }
 
+inline void extruder::setDirection(bool direction)
+{
+//   if(direction)
+//     buildCommand(DIRECTION, '1');
+//   else
+//     buildCommand(DIRECTION, '0');
+//   talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer);
+   if(direction)
+     digitalWrite(E_DIR_PIN, 1);
+   else
+     digitalWrite(E_DIR_PIN, 0);
+}
+
+
 inline  void extruder::sStep()
 {
    //buildCommand(STEP);
    //talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer);
-   stp = 1 - stp;
-   digitalWrite(E_STEP_PIN, stp);
+   stp = !stp;
+   if(stp)
+     digitalWrite(E_STEP_PIN, 1);
+   else
+     digitalWrite(E_STEP_PIN, 0);
 }
 
 inline  void extruder::enableStep()
