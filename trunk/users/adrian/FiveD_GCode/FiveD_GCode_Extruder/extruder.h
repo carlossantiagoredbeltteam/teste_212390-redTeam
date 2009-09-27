@@ -39,8 +39,8 @@ private:
    byte pwmValue;
    byte stp;
    int  temp;     // Target temperature in C
-   bool h1Enable;
-   bool h2Enable;
+   //bool h1Enable;
+   //bool h2Enable;
    bool forward;
    char reply[REPLY_LENGTH];
 
