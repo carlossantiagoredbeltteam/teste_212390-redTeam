@@ -391,9 +391,9 @@ void cartesian_dda::enable_steppers()
 {
 #if MOTHERBOARD > 0
  if(delta_steps.x)
-    digitalWrite(X_ENABLE_PIN, 1); //ENABLE_ON);
+    digitalWrite(X_ENABLE_PIN, ENABLE_ON);
   if(delta_steps.y)    
-    digitalWrite(Y_ENABLE_PIN, 1); //ENABLE_ON);
+    digitalWrite(Y_ENABLE_PIN, ENABLE_ON);
   if(delta_steps.z)
     digitalWrite(Z_ENABLE_PIN, ENABLE_ON);
   if(delta_steps.e)
@@ -409,12 +409,8 @@ void cartesian_dda::disable_steppers()
 	//disable our steppers
 	digitalWrite(X_ENABLE_PIN, !ENABLE_ON);
 	digitalWrite(Y_ENABLE_PIN, !ENABLE_ON);
-	//digitalWrite(Z_ENABLE_PIN, !ENABLE_ON);
-
-        // Disabling the extrude stepper causes the backpressure to
-        // turn the motor the wrong way.  Leave it on.
-        
-        //ex[extruder_in_use]->->disableStep();       
+        digitalWrite(Z_ENABLE_PIN, !ENABLE_ON);
+        ex[extruder_in_use]->disableStep();       
 #endif
 }
 

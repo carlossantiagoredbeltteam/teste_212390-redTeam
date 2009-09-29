@@ -26,42 +26,26 @@ extruder::extruder()
 
   coilPosition = 0;  
   forward = true;
-  pwmValue =  40;
+  pwmValue =  60;
   temp = 20;
+  t = 2;
+  manageCount = 0;
+  blink = 0;
   stp = 0;
 }
 
-void extruder::waitForTemperature()
+void extruder::slowManage()
 {
+  manageCount = 0;
   
-}
+  blink = 1 - blink;
+  digitalWrite(DEBUG_PIN, blink);   
 
-void extruder::valveSet(bool open)
-{
-
-}
-
-void extruder::setDirection(bool direction)
-{
-  forward = direction;  
-}
-
-void extruder::setCooler(byte e_speed)
-{
-  if(e_speed > 20)
-    digitalWrite(OUTPUT_B, 1);
+  t = internalTemperature();  
+  if(temp > t)
+    digitalWrite(OUTPUT_A, 1);
   else
-    digitalWrite(OUTPUT_B, 0);    
-}
-
-void extruder::setTemperature(int t)
-{
-  temp = t;
-}
-
-int extruder::getTemperature()
-{
-  return 99;  
+    digitalWrite(OUTPUT_A, 0);
 }
 
 void extruder::manage()
@@ -71,12 +55,49 @@ void extruder::manage()
   {
     stp = s;
     sStep();
-  }  
+  }
+
+  manageCount++;
+  if(manageCount > 16000)
+   slowManage();   
+}
+
+int extruder::internalTemperature()
+{
+  return 99;
+}
+
+void extruder::waitForTemperature()
+{
   
-  if(temp > getTemperature())
-    digitalWrite(OUTPUT_A, 1);
+}
+
+void extruder::valveSet(bool open)
+{
+  if(open)
+    digitalWrite(OUTPUT_C, 1);
   else
-    digitalWrite(OUTPUT_A, 0);
+    digitalWrite(OUTPUT_C, 0); 
+}
+
+void extruder::setDirection(bool direction)
+{
+  forward = direction;  
+}
+
+void extruder::setCooler(byte e_speed)
+{
+    analogWrite(OUTPUT_B, e_speed);   
+}
+
+void extruder::setTemperature(int tp)
+{
+  temp = tp;
+}
+
+int extruder::getTemperature()
+{
+  return t;  
 }
 
 void extruder::sStep()
