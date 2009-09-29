@@ -285,8 +285,11 @@ inline  void extruder::enableStep()
 
 inline  void extruder::disableStep()
 {
-  buildCommand(DISABLE);
-  talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer);
+  // Disabling the extrude stepper causes the backpressure to
+  // turn the motor the wrong way.  Leave it on.
+  
+  //buildCommand(DISABLE);
+  //talker.sendPacketAndCheckAcknowledgement(my_name, commandBuffer);
 }
 
 inline int extruder::potVoltage()

@@ -28,23 +28,19 @@ public:
   
 private:
 
-// We will half-step;  coilPosition will take values between 0 and 7 inclusive
-
-   byte coilPosition;
-
-// This variable stores the value (0..255) of the on-board potentiometer.  This is used 
-// to vary the PWM mark-space values in analogWrites() to the enable pins, hence 
-// controlling the effective motor current.
-
-   byte pwmValue;
-   byte stp;
-   int  temp;     // Target temperature in C
-   //bool h1Enable;
-   //bool h2Enable;
-   bool forward;
-   char reply[REPLY_LENGTH];
+   byte coilPosition;// Stepper position between 0 and 7 inclusive
+   byte pwmValue;    // PWM to the motor
+   byte stp;         // Tracks the step signal
+   int  temp;        // Target temperature in C
+   int  t;           // Current temperature in C
+   int  manageCount; // Timing in the manage function
+   bool forward;     // Extrude direction
+   byte blink;       // For the LED
+   char reply[REPLY_LENGTH];  // For sending messages back
 
    void waitForTemperature();
+   void slowManage();
+   int internalTemperature();
    void valveSet(bool open);
    void setDirection(bool direction);
    void setCooler(byte e_speed);

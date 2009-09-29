@@ -29,12 +29,10 @@ This will mess up timings in the delay() and similar functions; they will no lon
 
 extruder ex;
 intercom talker(&ex);
-int loopBlink;
 
 void setup() 
 {
   pinMode(DEBUG_PIN, OUTPUT);
-  loopBlink = 0;
   rs485Interface.begin(RS485_BAUD);
 } 
 
@@ -48,12 +46,6 @@ void loop()
   // Keep me at the right temp etc.
   
   ex.manage();
-  
-  loopBlink++;
-  if(loopBlink & 0x2000)
-   digitalWrite(DEBUG_PIN, 1);
-  else
-   digitalWrite(DEBUG_PIN, 0); 
 } 
 
 void delayMicrosecondsInterruptible(unsigned int us)
