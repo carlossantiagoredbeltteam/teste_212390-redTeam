@@ -91,7 +91,9 @@ inline void extruder::disableStep()
 {
   if(step_en_pin < 0)
     return;
+#if DISABLE_E
   digitalWrite(step_en_pin, !ENABLE_ON);
+#endif
 }
 
 inline void extruder::sStep()

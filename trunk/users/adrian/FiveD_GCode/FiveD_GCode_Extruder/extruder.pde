@@ -12,6 +12,12 @@ extruder::extruder()
   pinMode(E_STEP_PIN, INPUT);
   pinMode(E_DIR_PIN, INPUT);  
   pinMode(POT, INPUT);
+  pinMode(SO, INPUT);
+  pinMode(SCK, OUTPUT);
+  pinMode(TC_0, OUTPUT);
+ 
+  digitalWrite(TC_0,HIGH);  // Disable MAX6675
+
   
   disableStep();
   
@@ -62,9 +68,53 @@ void extruder::manage()
    slowManage();   
 }
 
+
+/* A function read_temp that returns an unsigned int
+   with the temp from the specified pin (if multiple MAX6675).  The
+   function will return 9999 if the TC is open.
+  
+   Usage: read_temp(int pin, int type, int error)
+     pin: the CS pin of the MAX6675
+     type: 0 for ˚F, 1 for ˚C
+     error: error compensation in digital counts
+     samples: number of measurement samples (max:10)
+     
+     With thanks to: Ryan Mclaughlin - http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1230859336
+*/
+
 int extruder::internalTemperature()
 {
-  return 99;
+    int value = 0;
+    byte error_tc;
+    
+    
+    digitalWrite(TC_0, 0); // Enable device
+
+    /* Cycle the clock for dummy bit 15 */
+    digitalWrite(SCK,HIGH);
+    digitalWrite(SCK,LOW);
+
+    /* Read bits 14-3 from MAX6675 for the Temp
+	 Loop for each bit reading the value 
+    */
+    for (int i=11; i>=0; i--)
+    {
+	digitalWrite(SCK,HIGH);  // Set Clock to HIGH
+	value += digitalRead(SO) << i;  // Read data and add it to our variable
+	digitalWrite(SCK,LOW);  // Set Clock to LOW
+    }
+  
+    /* Read the TC Input inp to check for TC Errors */
+    digitalWrite(SCK,HIGH); // Set Clock to HIGH
+    error_tc = digitalRead(SO); // Read data
+    digitalWrite(SCK,LOW);  // Set Clock to LOW
+  
+    digitalWrite(TC_0, HIGH); //Disable Device
+
+//    if(error_tc)
+//      return 2000;
+//    else
+      return value/4;
 }
 
 void extruder::waitForTemperature()
