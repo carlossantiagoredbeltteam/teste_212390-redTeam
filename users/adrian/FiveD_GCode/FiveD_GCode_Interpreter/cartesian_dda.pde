@@ -409,7 +409,9 @@ void cartesian_dda::disable_steppers()
 	//disable our steppers
 	digitalWrite(X_ENABLE_PIN, !ENABLE_ON);
 	digitalWrite(Y_ENABLE_PIN, !ENABLE_ON);
+#if DISABLE_Z
         digitalWrite(Z_ENABLE_PIN, !ENABLE_ON);
+#endif
         ex[extruder_in_use]->disableStep();       
 #endif
 }

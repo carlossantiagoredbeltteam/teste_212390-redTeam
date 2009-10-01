@@ -59,8 +59,8 @@
 
 #define Z_STEP_PIN (byte)29
 #define Z_DIR_PIN (byte)30
-#define Z_MIN_PIN (byte)1
-#define Z_MAX_PIN (byte)2
+#define Z_MIN_PIN (byte)2
+#define Z_MAX_PIN (byte)1
 #define Z_ENABLE_PIN (byte)31
 
 
