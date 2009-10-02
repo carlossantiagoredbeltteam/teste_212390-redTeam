@@ -32,7 +32,7 @@ extruder::extruder()
 
   coilPosition = 0;  
   forward = true;
-  pwmValue =  60;
+  pwmValue =  130;
   temp = 20;
   t = 2;
   manageCount = 0;
@@ -111,9 +111,9 @@ int extruder::internalTemperature()
   
     digitalWrite(TC_0, HIGH); //Disable Device
 
-//    if(error_tc)
-//      return 2000;
-//    else
+    if(error_tc)
+      return 2000;
+    else
       return value/4;
 }
 
