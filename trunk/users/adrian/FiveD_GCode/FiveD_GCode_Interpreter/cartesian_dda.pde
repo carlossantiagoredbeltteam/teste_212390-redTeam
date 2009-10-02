@@ -407,8 +407,12 @@ void cartesian_dda::disable_steppers()
 {
 #if MOTHERBOARD > 0
 	//disable our steppers
+#if DISABLE_X
 	digitalWrite(X_ENABLE_PIN, !ENABLE_ON);
+#endif
+#if DISABLE_Y
 	digitalWrite(Y_ENABLE_PIN, !ENABLE_ON);
+#endif
 #if DISABLE_Z
         digitalWrite(Z_ENABLE_PIN, !ENABLE_ON);
 #endif
