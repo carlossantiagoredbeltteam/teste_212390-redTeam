@@ -1,4 +1,7 @@
+
+#include "configuration.h"
 #include "extruder.h"
+#include "temperature.h"
 
 extruder::extruder()
 {
@@ -69,21 +72,49 @@ void extruder::manage()
 }
 
 
-/* A function read_temp that returns an unsigned int
-   with the temp from the specified pin (if multiple MAX6675).  The
-   function will return 9999 if the TC is open.
-  
-   Usage: read_temp(int pin, int type, int error)
-     pin: the CS pin of the MAX6675
-     type: 0 for ˚F, 1 for ˚C
-     error: error compensation in digital counts
-     samples: number of measurement samples (max:10)
-     
+/* 
+     Temperature reading function  
      With thanks to: Ryan Mclaughlin - http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1230859336
+     for the MAX6675 code
 */
 
 int extruder::internalTemperature()
 {
+#ifdef USE_THERMISTOR
+	int raw = analogRead(TEMP_PIN); //sample_temperature(TEMP_PIN);
+
+	int celsius = raw;
+/*	byte i;
+
+// TODO: This should do a binary chop
+
+	for (i=1; i<NUMTEMPS; i++)
+	{
+		if (temptable[i][0] > raw)
+		{
+			celsius  = temptable[i-1][1] + 
+				(raw - temptable[i-1][0]) * 
+				(temptable[i][1] - temptable[i-1][1]) /
+				(temptable[i][0] - temptable[i-1][0]);
+
+			break;
+		}
+	}
+
+        // Overflow: Set to last value in the table
+        if (i == NUMTEMPS) celsius = temptable[i-1][1];
+        // Clamp to byte
+        if (celsius > 255) celsius = 255; 
+        else if (celsius < 0) celsius = 0; 
+*/
+	return celsius;
+#endif
+
+#ifdef AD595_THERMOCOUPLE
+  return (500*(int)analogRead(TEMP_PIN))/1024; //( 5.0 * analogRead(TEMP_PIN) * 100.0) / 1024.0;
+#endif  
+
+#ifdef MAX6675_THERMOCOUPLE
     int value = 0;
     byte error_tc;
     
@@ -115,6 +146,8 @@ int extruder::internalTemperature()
       return 2000;
     else
       return value/4;
+      
+#endif
 }
 
 void extruder::waitForTemperature()
