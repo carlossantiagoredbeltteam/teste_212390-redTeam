@@ -5,6 +5,12 @@
 
 #define MY_NAME '0'          // Two byte string representing the name of this device
 
+// Temperature sensing.  One of the next three #defines needs to be uncommented
+ 
+#define USE_THERMISTOR       // Uncomment this if you are using a thermistor;
+//#define AD595_THERMOCOUPLE   // Uncomment this if you are using a thermocouple through an AD595 chip.
+//#define MAX6675_THERMOCOUPLE // Uncomment this if you are using a thermocouple through a MAX6675 chip.
+
 #define RS485_MASTER 0       // We are a slave
 
 #define MOTHERBOARD 2
@@ -27,7 +33,7 @@
 
 #define SO 18    // MISO
 #define SCK 19   // Serial Clock
-#define TC_0 17  // CS Pin of MAX6607
+#define TC_0 17  // CS Pin of MAX6607 (= A3)
 
 // Control pins for the A3949 chips
 
@@ -39,6 +45,11 @@
 // Analogue read of this pin gets the potentiometer setting
 
 #define POT 0
+
+// Analogue read of this pin gets the temperature if we're using
+// a thermistor or a thermocouple with an AD595 chip
+
+#define TEMP_PIN 3
 
 // MOSFET drivers
 
