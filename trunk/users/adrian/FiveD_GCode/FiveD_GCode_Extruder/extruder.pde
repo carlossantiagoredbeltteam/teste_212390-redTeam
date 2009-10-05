@@ -84,7 +84,7 @@ int extruder::internalTemperature()
 	int raw = analogRead(TEMP_PIN); //sample_temperature(TEMP_PIN);
 
 	int celsius = raw;
-/*	byte i;
+	byte i;
 
 // TODO: This should do a binary chop
 
@@ -106,7 +106,7 @@ int extruder::internalTemperature()
         // Clamp to byte
         if (celsius > 255) celsius = 255; 
         else if (celsius < 0) celsius = 0; 
-*/
+
 	return celsius;
 #endif
 
