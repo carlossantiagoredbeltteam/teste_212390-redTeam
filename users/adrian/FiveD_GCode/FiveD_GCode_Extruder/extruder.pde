@@ -15,11 +15,14 @@ extruder::extruder()
   pinMode(E_STEP_PIN, INPUT);
   pinMode(E_DIR_PIN, INPUT);  
   pinMode(POT, INPUT);
+#ifdef MAX6675_THERMOCOUPLE
   pinMode(SO, INPUT);
   pinMode(SCK, OUTPUT);
-  pinMode(TC_0, OUTPUT);
- 
+  pinMode(TC_0, OUTPUT); 
   digitalWrite(TC_0,HIGH);  // Disable MAX6675
+#else
+  pinmode(TEMP_PIN, INPUT);
+#endif
 
   
   disableStep();
