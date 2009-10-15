@@ -456,7 +456,7 @@ public class STLSlice
 	/**
 	 * The lists of parts sorted by material
 	 */
-	private MaterialLists mls = null;
+	private MaterialLists materialList = null;
 	/**
 	 * For debugging
 	 */
@@ -527,9 +527,9 @@ public class STLSlice
 		
 		// We need the material lists next time
 		
-		//if(mls != null)
-		//	mls.destroy();
-		//mls = null;
+		//if(materialList != null)
+		//	materialList.destroy();
+		//materialList = null;
 		
 		qp = null;		
 		
@@ -557,7 +557,7 @@ public class STLSlice
 		yCoords = null;
 		triangles = null;
 		below = null;
-		mls = null;
+		materialList = null;
 		qp = null;				
 		super.finalize();
 	}	
@@ -586,7 +586,7 @@ public class STLSlice
 	{
 		setUp();
 		shapeList = s;
-		mls = new MaterialLists();
+		materialList = new MaterialLists();
 		try
 		{
 			generateLowerTriangles = false; //Preferences.loadGlobalBool("DisplaySimulation");
@@ -612,7 +612,7 @@ public class STLSlice
 					{
 						BranchGroup bg1 = (BranchGroup)ob;
 						Attributes att = (Attributes)(bg1.getUserData());
-						mls.add(att, trans);
+						materialList.add(att, trans);
 					}
 				}
 			//}
@@ -729,9 +729,9 @@ public class STLSlice
 		RrRectangle r = null;
 		RrRectangle s;
 		
-		for(int mat = 0; mat < mls.getExtruderCount(); mat++)
+		for(int mat = 0; mat < materialList.getExtruderCount(); mat++)
 		{
-			ArrayList<AandT> aats = mls.getAandTs(mat);
+			ArrayList<AandT> aats = materialList.getAandTs(mat);
 
 			if(aats.size() > 0)
 			{
@@ -756,9 +756,9 @@ public class STLSlice
 	}
 //		//BoundingBox r = null;
 //		
-//		for(int mat = 0; mat < mls.getExtruderCount(); mat++)
+//		for(int mat = 0; mat < materialList.getExtruderCount(); mat++)
 //		{
-//			ArrayList<AandT> aats = mls.getAandTs(mat);
+//			ArrayList<AandT> aats = materialList.getAandTs(mat);
 //
 //			if(aats.size() > 0)
 //			{
@@ -1480,11 +1480,11 @@ public class STLSlice
 			below = new BranchGroup();
 		else
 			below = null;
-		
-		for(int mat = 0; mat < mls.getExtruderCount(); mat++)
+
+		for(int mat = 0; mat < materialList.getExtruderCount(); mat++)
 		{
-			destroyLayer();
-			ArrayList<AandT> aats = mls.getAandTs(mat);
+			//destroyLayer();
+			ArrayList<AandT> aats = materialList.getAandTs(mat);
 
 			if(aats.size() > 0)
 			{
@@ -1492,74 +1492,54 @@ public class STLSlice
 
 				for(int obj = 0; obj < aats.size(); obj++)
 				{
+					destroyLayer();
 					AandT aat = aats.get(obj);
 					Transform3D trans = aat.trans;
 					Attributes attr = aat.att;
 					recursiveSetEdges(attr.getPart(), trans, z, attr);
-				}
 
-				if(generateLowerTriangles)
-				{
-					if(triangles.size() > 0)
+
+					// Make sure nothing falls down the cracks.
+
+					sFactor = Preferences.swell();
+					box = box.scale(sFactor);
+					resolution_2 = box.dSquared()*Preferences.tiny();
+
+					// Recursively generate the quad tree.  The aim is to have each
+					// leaf quad containing either 0 or 2 ends of different line
+					// segments.  Then we just run round joining up all the pairs of
+					// ends.
+
+					divide();
+
+					// Run round joining up all the pairs of ends...
+
+					RrPolygonList pgl = conquer(this); //, fg, fs);
+
+					// Remove wrinkles
+
+					pgl = pgl.simplify(Preferences.gridRes()*1.5);
+
+					// Fix small radii
+
+					pgl = pgl.arcCompensate();
+
+
+					// Check for a silly result.
+
+					if(pgl.size() > 0)
 					{
-						GeometryInfo gi = new GeometryInfo(GeometryInfo.TRIANGLE_ARRAY);
-						Point3d t_array[] = new Point3d[triangles.size()];
-
-						for(int i = 0; i < triangles.size(); i++)
-							t_array[i] = triangles.get(i);
-
-						gi.setCoordinates(t_array);
-
-						NormalGenerator normalGenerator = new NormalGenerator();
-						normalGenerator.generateNormals(gi);
-
-						below.addChild(new Shape3D(gi.getGeometryArray(), ap));
-
-						triangles = new ArrayList<Point3d>();
+						rl.add(pgl.toCSG(Preferences.tiny()));
 					}
-				}
-
-
-				// Make sure nothing falls down the cracks.
-
-				sFactor = Preferences.swell();
-				box = box.scale(sFactor);
-				resolution_2 = box.dSquared()*Preferences.tiny();
-
-				// Recursively generate the quad tree.  The aim is to have each
-				// leaf quad containing either 0 or 2 ends of different line
-				// segments.  Then we just run round joining up all the pairs of
-				// ends.
-
-				divide();
-				
-				// Run round joining up all the pairs of ends...
-
-				RrPolygonList pgl = conquer(this); //, fg, fs);
-
-				// Remove wrinkles
-
-				pgl = pgl.simplify(Preferences.gridRes()*1.5);
-				
-				// Fix small radii
-				
-				pgl = pgl.arcCompensate();
-				
-
-				// Check for a silly result.
-				
-				if(pgl.size() > 0)
-				{
-					rl.add(pgl.toCSG(Preferences.tiny()));
 				}
 			}
 		}
 //		if(picture == null)
 //		{
-//			picture = new RrGraphics("STL Slice");
-//			picture.init(ObjectPlanRectangle(), false);
+//		picture = new RrGraphics("STL Slice");
+//		picture.init(ObjectPlanRectangle(), false);
 //		}
-//		
+
 //		picture.cleanPolygons();
 //		picture.add(rl.get(0));
 		return rl;
