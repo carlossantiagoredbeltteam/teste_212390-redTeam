@@ -23,6 +23,16 @@ module extruder()
 		translate([-filament_dist, 100, base_h+inner_h/2]) rotate([90, 0,0]) cylinder(h=200, r=2);
 	}
 	
+	module peek()
+	{
+		translate([-filament_dist, -peek_dist, base_h+inner_h/2]) rotate([90,0,0]) 
+		{
+			translate([-peek_inner_r,0*peek_inner_r,peek_h/2]) cube([peek_inner_r*2,peek_inner_r*2,100]);
+			#cylinder(h=peek_h, r=peek_r);
+			#cylinder(h=30, r=peek_inner_r);
+		}
+	}
+	
 	difference() {
 		dxf_linear_extrude(file =dxf_file, layer = "frame", height = base_h+inner_h, convexity = convexity);
 		
@@ -35,14 +45,15 @@ module extruder()
 		filament();
 
 		
-		translate([-filament_dist, -peek_dist, base_h+inner_h/2]) rotate([90,0,0]) 
-		{
-			translate([-peek_inner_r,0*peek_inner_r,peek_h/2]) cube([peek_inner_r*2,peek_inner_r*2,100]);
-			#cylinder(h=peek_h, r=peek_r);
-			#cylinder(h=30, r=peek_inner_r);
-		}
-	% translate([0,0,base_h+inner_h]) 
-			dxf_linear_extrude(file =dxf_file, layer = "top", height = 5, convexity = convexity);
+		peek();
+//translate([-filament_dist, -peek_dist, base_h+inner_h/2]) rotate([90,0,0]) 
+//		{
+//			translate([-peek_inner_r,0*peek_inner_r,peek_h/2]) cube([peek_inner_r*2,peek_inner_r*2,100]);
+//			%cylinder(h=peek_h, r=peek_r);
+//			%cylinder(h=30, r=peek_inner_r);
+//		}
+	%  translate([0,0,base_h+inner_h]) 
+			dxf_linear_extrude(file =dxf_file, layer = "top", height = 3, convexity = convexity);
 		}
 
 }

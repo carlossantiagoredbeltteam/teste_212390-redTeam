@@ -47,7 +47,7 @@ Standard
   9
 $CLAYER
   8
-0
+frame
   9
 $DIMEXO
  40
@@ -59,7 +59,7 @@ $DIMTXT
   9
 $CLAYER
   8
-frame
+top
   0
 ENDSEC
   0
@@ -1011,9 +1011,9 @@ AcDbLayerTableRecord
   2
 inner
  70
-1
+0
  62
--253
+253
 420
 12171705
   6
@@ -1831,7 +1831,7 @@ AcDbDimension
  71
 5
  72
-1
+0
  41
 1.0
  42
@@ -2839,7 +2839,7 @@ AcDbDimension
  71
 5
  72
-1
+0
  41
 1.0
  42
@@ -2899,7 +2899,7 @@ AcDbDimension
  71
 5
  72
-1
+0
  41
 1.0
  42
@@ -2959,7 +2959,7 @@ AcDbDimension
  71
 5
  72
-1
+0
  41
 1.0
  42
@@ -3019,7 +3019,7 @@ AcDbDimension
  71
 5
  72
-1
+0
  41
 1.0
  42
@@ -3107,7 +3107,7 @@ AcDbDimension
  71
 5
  72
-1
+0
  41
 1.0
  42
@@ -3851,6 +3851,30 @@ AcDbArc
  51
 0.0
   0
+CIRCLE
+  5
+A1
+100
+AcDbEntity
+100
+AcDbCircle
+  8
+top
+ 62
+256
+370
+-1
+  6
+ByLayer
+ 10
+-15.0
+ 20
+20.0
+ 30
+0.0
+ 40
+2.2360679774997898
+  0
 ENDSEC
   0
 SECTION
@@ -3889,7 +3913,7 @@ E
   3
 AcDbVariableDictionary
 350
-A1
+A2
   0
 DICTIONARY
   5
@@ -4353,7 +4377,7 @@ Layout2
   0
 DICTIONARY
   5
-A1
+A2
 100
 AcDbDictionary
 281
@@ -4361,15 +4385,15 @@ AcDbDictionary
   3
 DIMASSOC
 350
-A3
+A4
   3
 HIDETEXT
 350
-A2
+A3
   0
 DICTIONARYVAR
   5
-A2
+A3
 100
 DictionaryVariables
 280
@@ -4379,7 +4403,7 @@ DictionaryVariables
   0
 DICTIONARYVAR
   5
-A3
+A4
 100
 DictionaryVariables
 280
