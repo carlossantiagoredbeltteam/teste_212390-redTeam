@@ -3,29 +3,23 @@
 
 
 # init
+
+MACHINE="mendel"
+
 RELEASE=${1:-`date -u +%Y%m%d`}
 
+RELEASENAME="reprap-$MACHINE-$RELEASE"
 
-LINUXFILENAME="reprap-host-linux-$RELEASE"
-LINUXFILELIST="jar/reprap.jar lib/*.jar lib/reprap-wv.stl lib/rr-logo-green-url.png\
-    lib/reprap-icon.png lib/reprap.properties.dist lib/system-dependent/linux-i386/* LICENSE"
+FILELIST="jar/reprap.jar lib/*.jar lib/reprap-wv.stl lib/rr-logo-green-url.png\
+    lib/reprap-icon.png lib/reprap.properties.dist lib/system-dependent/linux-i386/*\
+    lib/system-dependent/windows-i586/* LICENSE"
 
-MACFILENAME="reprap-host-mac-$RELEASE"
-MACFILELIST="jar/reprap.jar lib/*.jar lib/reprap-wv.stl lib/rr-logo-green-url.png\
-    lib/reprap-icon.png lib/reprap.properties.dist lib/system-dependent/macosx/* LICENSE"
-
-WINDOWSFILENAME="reprap-host-windows-$RELEASE"
-WINDOWSFILELIST="jar/reprap.jar lib/*.jar lib/reprap-wv.stl lib/rr-logo-green-url.png\
-    lib/reprap-icon.png lib/reprap.properties.dist lib/system-dependent/windows-i586/* LICENSE"
-
-SRCFILENAME="reprap-host-src-$RELEASE"
-SRCFILELIST="src/* LICENSE build.xml build-user.xml .classpath .project \
+SRCFILELIST="src/* build.xml build-user.xml .classpath .project \
 	host-package-release README"
+
 LIBFILES="lib/*"
 
-DEBFILENAME="reprap-host-deb-$RELEASE"
-DEBFILELIST="release/"$LINUXFILENAME"/* debian/ src/ lib/ build.xml build-user.xml reprap-host.1"
-
+DESIGNFILES="../$MACHINE"
 
 CLASSPATH=$CLASSPATH:./lib/j3dcore.jar
 CLASSPATH=$CLASSPATH:./lib/j3d-org-java3d-all.jar
@@ -45,49 +39,33 @@ ant clean jar || exit 1
 # Delete and then create temporary package directories
 rm -rf "release"
 mkdir "release"
-mkdir "release/$LINUXFILENAME" "release/$MACFILENAME" "release/$WINDOWSFILENAME" "release/$SRCFILENAME" "release/$DEBFILENAME"
+BASENAME="release/$RELEASENAME"
+mkdir "$BASENAME"
+SRCFILENAME="$BASENAME/src"
+mkdir "$SRCFILENAME"
 
-# Copy linux files into binary package directory
-for F in $LINUXFILELIST
+# Copy files into binary package directory
+for F in $FILELIST
 do
-  cp -p $F "release/$LINUXFILENAME"
+  cp -p $F "$BASENAME"
 done
 
-# Copy windows files into binary package directory
-for F in $WINDOWSFILELIST
-do
-  cp -p $F "release/$WINDOWSFILENAME"
-done
-
-# Copy mac files into binary package directory
-for F in $MACFILELIST
-do
-  cp -p $F "release/$MACFILENAME"
-done
+echo "Executable created."
 
 # Copy README into package dir, substituting release string for RELEASE
 #   and the current UTC date for DATE
 NOW=`date -u +'%d %B %Y'`
-sed -e "s/RELEASE/$RELEASE/g" -e "s/DATE/$NOW/g" README > "release/$LINUXFILENAME/README"
-sed -e "s/RELEASE/$RELEASE/g" -e "s/DATE/$NOW/g" README > "release/$MACFILENAME/README"
+sed -e "s/RELEASE/$RELEASE/g" -e "s/DATE/$NOW/g" README > "$BASENAME/README"
 
 # Create README.txt for Windows people
-sed -e 's/$/\r/' README > "release/$WINDOWSFILENAME/README.txt"
+sed -e 's/$/\r/' README > "$BASENAME/README.txt"
 
-# Copy Main class file, so we can use java -cp to run software
-#mkdir -p "release/$MACFILENAME/org/reprap"
-#cp -p bin/org/reprap/Main.class "release/$MACFILENAME/org/reprap/"
-
-#mkdir -p "release/$LINUXFILENAME/org/reprap"
-#cp -p bin/org/reprap/Main.class "release/$LINUXFILENAME/org/reprap/"
-
-#mkdir -p "release/$WINDOWSFILENAME/org/reprap"
-#cp -p bin/org/reprap/Main.class "release/$WINDOWSFILENAME/org/reprap/"
+echo "READMEs created."
 
 # Now create the src archive
 for F in $SRCFILELIST
 do
-  cp -rp $F "release/$SRCFILENAME"
+  cp -rp $F "$SRCFILENAME"
 done
 
 mkdir -p "$SRCFILENAME"/lib
@@ -96,36 +74,29 @@ do
   cp -pr $F "$SRCFILENAME"/lib
 done
 
+echo "Sources copied."
+
+for F in $DESIGNFILES
+do
+  cp -pr $F "$BASENAME"
+done
+
+echo "Design files copied."
+
 # Omit all .svn subdirs
-find $SRCFILENAME -type d -name .svn |xargs rm -rf
+cd "$BASENAME"
+find . -type d -name .svn |xargs rm -rf
+cd ..
+
+echo "Subversion references removed."
 
 # Create zip archive
-cd release
-[ -f "$MACFILENAME".zip ] && rm "$MACFILENAME".zip
-zip -qr "$MACFILENAME.zip" "$MACFILENAME"
-[ -f "$LINUXFILENAME".zip ] && rm "$LINUXFILENAME".zip
-zip -qr "$LINUXFILENAME.zip" "$LINUXFILENAME"
-[ -f "$WINDOWSFILENAME".zip ] && rm "$WINDOWSFILENAME".zip
-zip -qr "$WINDOWSFILENAME.zip" "$WINDOWSFILENAME"
-# Create src zip archive
-[ -f "$SRCFILENAME".zip ] && rm "$SRCFILENAME".zip
-zip -qr "$SRCFILENAME.zip" "$SRCFILENAME"
+
+[ -f "$RELEASENAME".zip ] && rm "$RELEASENAME".zip
+zip -qr "$RELEASENAME.zip" "$RELEASENAME"
 cd ..
 
 
-echo "Zip files created. Now creating .deb package"
-# copy files and folders into temporary deb package directory
-for F in $DEBFILELIST
-do
-  cp -rp $F "release/$DEBFILENAME"
-done
-cd release/$DEBFILENAME
-
-debuild
-#Note that I (Reece) took out dependencies from control file for packages currently included as part of the package:
-# From Build-Depends: libsun-vecmath-java, librxtx-java, libswing-layout-java, libjava3d-java  | java3d
-# From reprap-host Depends: librxtx-java, libjava3d-java | java3d
-# In the future these should be included back in.
-
-echo "RepRap Host Software Release $RELEASE created."
+echo "Zip file created."
+echo "RepRap Release $RELEASE created."
 
