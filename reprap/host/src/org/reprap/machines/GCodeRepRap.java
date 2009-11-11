@@ -33,6 +33,11 @@ public class GCodeRepRap extends GenericRepRap {
 	GCodeReaderAndWriter gcode;
 	
 	/**
+	 * Force an extruder to be selected on startup
+	 */
+	Boolean forceSelection;
+	
+	/**
 	 * @param prefs
 	 * @throws Exception
 	 */
@@ -43,6 +48,8 @@ public class GCodeRepRap extends GenericRepRap {
 		gcode = new GCodeReaderAndWriter();
 		
 		loadExtruders();
+		
+		forceSelection = true;
 	}
 	
 	public void loadMotors()
@@ -375,6 +382,14 @@ public class GCodeRepRap extends GenericRepRap {
 
 		super.dispose();
 	}
+	
+	/**
+	 * Go to the purge point
+	 */
+	public void moveToPurge()
+	{
+		singleMove(dumpX, dumpY, currentZ, getExtruder().getFastXYFeedrate());
+	}
 
 
 	/* (non-Javadoc)
@@ -404,6 +419,8 @@ public class GCodeRepRap extends GenericRepRap {
 		currentY = 0;
 		currentZ = 0;
 		currentFeedrate = -100; // Force it to set the feedrate at the start
+		
+		forceSelection = true;  // Force it to set the extruder to use at the start
 				
 		try	{
 			super.startRun();
@@ -437,9 +454,7 @@ public class GCodeRepRap extends GenericRepRap {
 //			
 //		}
 
-		if(extruders[extruder].get5D())
-			gcode.queue("G92 E0; set extruder home");
-
+		extruders[extruder].zeroExtrudedLength();
 		super.home();
 	}
 	
@@ -649,8 +664,16 @@ public class GCodeRepRap extends GenericRepRap {
 	
 	public void selectExtruder(int materialIndex)
 	{
+		int oldPhysicalExtruder = getExtruder().getPhysicalExtruderNumber();
 		super.selectExtruder(materialIndex);
 		int newPhysicalExtruder = getExtruder().getPhysicalExtruderNumber();
-		gcode.queue("T" + newPhysicalExtruder + "; select new extruder");
+		if(newPhysicalExtruder != oldPhysicalExtruder || forceSelection)
+		{
+			gcode.queue("T" + newPhysicalExtruder + "; select new extruder");
+			double pwm = getExtruder().getPWM();
+			if(pwm >= 0)
+				gcode.queue("M108 " + pwm + "; set extruder PWM");
+			forceSelection = false;
+		}
 	}
 }

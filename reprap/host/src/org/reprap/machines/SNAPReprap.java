@@ -127,6 +127,14 @@ public class SNAPReprap extends GenericRepRap
 	public void calibrate()
 	{
 	}
+	
+	/**
+	 * Go to the purge point
+	 */
+	public void moveToPurge()
+	{
+		singleMove(dumpX, dumpY, currentZ, getExtruder().getFastXYFeedrate());
+	}
 
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#moveTo(double, double, double, boolean, boolean)

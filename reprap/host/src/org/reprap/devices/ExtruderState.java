@@ -22,7 +22,7 @@ public class ExtruderState
 	
 	ExtruderState(int physEx)
 	{
-		l = 0;
+		l = 1;
 		tt = 0;
 		ct = 0;
 		s = 0;

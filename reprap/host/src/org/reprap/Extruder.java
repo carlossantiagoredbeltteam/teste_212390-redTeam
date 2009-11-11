@@ -30,6 +30,12 @@ public interface Extruder
 	//public void setExtrusion(double speed) throws IOException;
 	
 	/**
+	 * For stepper extruders, return the PWM to use to drive them in [0, 1]
+	 * Negative values returned mean this feature is disabled.
+	 */
+	public double getPWM();
+	
+	/**
 	 * Start the extruder motor at a given speed.  For old extruders this ranges from 0
 	 * to 255 but is scaled by maxSpeed and t0, so that 255 corresponds to the
 	 * highest permitted speed.  It is also scaled so that 0 would correspond
@@ -187,6 +193,19 @@ public interface Extruder
      * @return the extruder speeds
      */
     public double getExtruderSpeed(); 
+    
+    /**
+     * Time to purge the extruder
+     * -ve values supress
+     * @return
+     */
+    public double getPurgeTime();
+    
+    /**
+     * Purge the extruder
+     *
+     */
+    public void purge();
     
     /**
      * Set the flag to show we're creating a separation
