@@ -26,6 +26,10 @@ public class NullExtruder extends GenericExtruder
 	public void heatOn() throws Exception {}
 	public void setHeater(int heat, double maxTemp) throws IOException {}
 	public void setTemperature(double temperature) throws Exception {}
+	/**
+	 * Purge the extruder
+	 */
+	public void purge() {}
 
 	public boolean isEmpty()
 	{

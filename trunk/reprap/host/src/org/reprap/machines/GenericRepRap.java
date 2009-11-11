@@ -54,6 +54,11 @@ public abstract class GenericRepRap implements CartesianPrinter
 	protected double totalDistanceExtruded = 0.0;
 	
 	/**
+	 * The location of the place to purge extruders
+	 */
+	protected double dumpX, dumpY;
+	
+	/**
 	 * Rezero X and y every...
 	 */
 	double xYReZeroInterval = -1;
@@ -263,6 +268,8 @@ public abstract class GenericRepRap implements CartesianPrinter
 			idleZ = Preferences.loadGlobalBool("IdleZAxis");
 			
 			foundationLayers = Preferences.loadGlobalInt("FoundationLayers");
+			dumpX = Preferences.loadGlobalDouble("DumpX(mm)");
+			dumpY = Preferences.loadGlobalDouble("DumpY(mm)");
 		}
 		catch (Exception ex)
 		{
@@ -285,12 +292,15 @@ public abstract class GenericRepRap implements CartesianPrinter
 				
 		Debug.d("Selecting material 0");
 		selectExtruder(0);
+		getExtruder().zeroExtrudedLength();
 		
 		Debug.d("Homing machine");
 		home();
 
 		Debug.d("Setting temperature");
 		getExtruder().heatOn();
+		
+		getExtruder().purge();
 	}
 	
 	/* (non-Javadoc)
@@ -335,8 +345,10 @@ public abstract class GenericRepRap implements CartesianPrinter
 			return;
 
 		if(materialIndex < 0 || materialIndex >= extruderCount)
+		{
 			System.err.println("Selected material (" + materialIndex + ") is out of range.");
-		else
+			extruder = 0;
+		} else
 			extruder = materialIndex;
 
 
@@ -1235,5 +1247,19 @@ public abstract class GenericRepRap implements CartesianPrinter
 	public void setZ(double z)
 	{
 		currentZ = z;
+	}
+	
+	/**
+	 * The location of the dump for purging extruders
+	 * @return
+	 */
+	public double getDumpX()
+	{
+		return dumpX;
+	}
+	
+	public double getDumpY()
+	{
+		return dumpY;
 	}
 }

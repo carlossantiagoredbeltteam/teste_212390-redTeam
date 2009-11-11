@@ -226,6 +226,24 @@ public class SNAPExtruder extends GenericExtruder
 	}
 	
 	/**
+	 * Purge the extruder
+	 */
+	public void purge()
+	{
+		if(purgeTime <= 0)
+			return;
+		getPrinter().moveToPurge();
+		try
+		{
+			setExtrusion(getFastXYFeedrate(), false);
+			getPrinter().machineWait(purgeTime);
+			setExtrusion(0, false);
+		} catch (Exception e)
+		{}
+		zeroExtrudedLength();
+	}
+	
+	/**
 	 * Result of last call to isAvailable(), which we don't want to
 	 * call repeatedly as each call polls the device.
 	 * @return

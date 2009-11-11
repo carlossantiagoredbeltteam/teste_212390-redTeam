@@ -186,6 +186,19 @@ public interface Printer {
 	public double getFastFeedrateZ();
 	
 	/**
+	 * The location of the dump for purging extruders
+	 * @return
+	 */
+	public double getDumpX();
+	public double getDumpY();
+	
+	/**
+	 * Move to the purge point
+	 *
+	 */
+	public void moveToPurge();
+	
+	/**
 	 * @param previewer
 	 */
 	//public void setPreviewer(Previewer previewer);

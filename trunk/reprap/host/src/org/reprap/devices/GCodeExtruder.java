@@ -34,6 +34,24 @@ public class GCodeExtruder extends GenericExtruder
 		}
 	}
 	
+	/**
+	 * Purge the extruder
+	 */
+	public void purge()
+	{
+		if(purgeTime <= 0)
+			return;
+		getPrinter().moveToPurge();
+		try
+		{
+			setExtrusion(getFastXYFeedrate(), false);
+			getPrinter().machineWait(purgeTime);
+			setExtrusion(0, false);
+		} catch (Exception e)
+		{}
+		zeroExtrudedLength();
+	}
+	
 	public void setTemperature(double temperature) throws Exception
 	{
 		gcode.queue("M104 S" + temperature + " ;set temperature");

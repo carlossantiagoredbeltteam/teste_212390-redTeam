@@ -61,7 +61,18 @@ public abstract class GenericExtruder implements Extruder
 	/**
 	 * The actual extrusion speed
 	 */
-	protected double extrusionSpeed;
+	//protected double extrusionSpeed;
+	
+	/**
+	 * The time to run the extruder at the start
+	 * -ve values supress
+	 */
+	protected double purgeTime;
+	
+	/**
+	 * The PWM into stepper extruders
+	 */
+	protected double extrusionPWM;
 	
 	/**
 	 * The extrusion temperature
@@ -381,7 +392,9 @@ public abstract class GenericExtruder implements Extruder
 		{
 			result = Preferences.loadGlobalInt(prefName + "Address");
 			maxExtruderSpeed = Preferences.loadGlobalInt(prefName + "MaxSpeed(0..255)");
-			extrusionSpeed = Preferences.loadGlobalDouble(prefName + "ExtrusionSpeed(mm/minute)");
+//			extrusionSpeed = Preferences.loadGlobalDouble(prefName + "ExtrusionSpeed(mm/minute)");
+			purgeTime = Preferences.loadGlobalDouble(prefName + "Purge(ms)");
+			extrusionPWM = Preferences.loadGlobalDouble(prefName + "ExtrusionPWM(0..1)");
 			extrusionTemp = Preferences.loadGlobalDouble(prefName + "ExtrusionTemp(C)");
 			extrusionSize = Preferences.loadGlobalDouble(prefName + "ExtrusionSize(mm)");
 			extrusionHeight = Preferences.loadGlobalDouble(prefName + "ExtrusionHeight(mm)");
@@ -461,6 +474,7 @@ public abstract class GenericExtruder implements Extruder
 		
 		return result;
 	}
+	
 	
 	/* (non-Javadoc)
 	 * @see org.reprap.Extruder#dispose()
@@ -617,6 +631,8 @@ public abstract class GenericExtruder implements Extruder
 	{
 		return getOutlineSpeedFactor() * getFastXYFeedrate();
 	}
+	
+
 	
 	/**
 	 * The length in mm to speed up when going round corners
@@ -1244,6 +1260,25 @@ public abstract class GenericExtruder implements Extruder
     public int getPhysicalExtruderNumber()
     {
     	return es.physicalExtruder();
+    }
+    
+	/**
+	 * Return the PWM for the motor.  -ve values mean
+	 * this feature is unavailable
+	 */
+	public double getPWM()
+	{
+		return extrusionPWM;
+	}
+	
+    /**
+     * Time to purge the extruder
+     * -ve values supress
+     * @return
+     */
+    public double getPurgeTime()
+    {
+    	return purgeTime;
     }
     
 }
