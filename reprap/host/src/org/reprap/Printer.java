@@ -26,6 +26,7 @@ public interface Printer {
 //	public void printSegment(double startX, double startY,
 //			double startZ, double endX, double endY, double endZ) throws ReprapException, IOException;
 	
+	
 	/**
 	 * Move the printer carriage to the give x, y and z position <b>while extruding material<b>
 	 * 

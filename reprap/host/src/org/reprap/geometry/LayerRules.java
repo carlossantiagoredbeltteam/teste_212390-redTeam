@@ -363,6 +363,7 @@ public class LayerRules
 	public void moveZAtStartOfLayer()
 	{
 		double z = getMachineZ();
+
 		if(topDown)
 		{
 			printer.setZ(z - (zStep + addToStep));

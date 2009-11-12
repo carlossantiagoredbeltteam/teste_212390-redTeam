@@ -33,6 +33,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 */
 	protected StatusMessage statusWindow;
 	
+	
 	/**
 	 * 
 	 */
