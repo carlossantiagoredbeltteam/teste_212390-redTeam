@@ -95,6 +95,7 @@ public class GCodeRepRap extends GenericRepRap {
 		if(getExtruder().getMaxAcceleration() <= 0)
 			qFeedrate(feedrate);
 		
+		
 		if(dx == 0.0 && dy == 0.0)
 		{
 			if(currentFeedrate != feedrate)
@@ -641,6 +642,7 @@ public class GCodeRepRap extends GenericRepRap {
 	
 	public void startingLayer(LayerRules lc) throws Exception
 	{
+		currentFeedrate = -1;  // Force it to set the feedrate
 		gcode.startingLayer(lc);
 		gcode.queue(";#!LAYER: " + (lc.getMachineLayer() + 1) + "/" + lc.getMachineLayerMax());		
 		super.startingLayer(lc);

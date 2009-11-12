@@ -9,6 +9,9 @@ import org.reprap.utilities.Debug;
  * The result is either a single maximum velocity, v, inbetween the ends (in which case flat will be 1), or
  * an acceleration to maxSpeed at s1 from the start, movement at that velocity to s2, then deceleration to 
  * the end (in which case flat will be 2).
+ * 
+ * If flat is 0 on return, the starting and ending speeds are greater than the maximum allowed...
+ * 
  * @author Adrian
  *
  */
