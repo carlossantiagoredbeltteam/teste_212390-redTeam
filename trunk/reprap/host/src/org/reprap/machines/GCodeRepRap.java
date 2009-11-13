@@ -674,7 +674,7 @@ public class GCodeRepRap extends GenericRepRap {
 			gcode.queue("T" + newPhysicalExtruder + "; select new extruder");
 			double pwm = getExtruder().getPWM();
 			if(pwm >= 0)
-				gcode.queue("M108 " + pwm + "; set extruder PWM");
+				gcode.queue("M108 S" + pwm + "; set extruder PWM");
 			forceSelection = false;
 		}
 	}
