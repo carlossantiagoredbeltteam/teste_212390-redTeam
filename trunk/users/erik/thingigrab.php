@@ -63,16 +63,21 @@ if($xml->ErrorResponse)
 
 foreach ($xml->channel->item as $item)
 {
-  @mkdir($setting['stl_path'].'/'.$item->title);
-  //echo($setting['stl_path'].'/'.$item->title);
+  $dir = $setting['stl_path'].'/'.$item->title;
+  @mkdir($dir);
 
   echo "Thing: ".$item->title."\n";
   print_r($item);
 if(isset($item->enclosure))
   foreach($item->enclosure as $file)
   {
-    #echo "  File: ".print_r($file,true)."\n";
-    
+    echo "  File: ".print_r($file,true)."\n";
+    $fname = basename($file['url']);
+    if(!file_exists($dir.'/'.$fname))
+      passthru('wget --continue -O '.escapeshellarg($dir.'/'.$fname).' '.escapeshellarg($file['url'])."\n");
+    file_put_contents("$dir/".$fname.".skein.sh","runskeinforge.sh \$PWD/$fname");  
+    echo("chmod +x -- ".escapeshellarg($dir.'/'.$fname.'.skein.sh'));
+    shell_exec("chmod +x -- ".escapeshellarg($dir.'/'.$fname.'.skein.sh'));
   }
 }
 ?>

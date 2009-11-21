@@ -21,17 +21,21 @@
  */
 ini_set('memory_limit','128M');
 
-$version = 0.13;
+$version = 0.15;
 out("\n( Modified by 3D-to-5D-Gcode v$version on ".date("c").')');
+$uTime=microtime(true);
 // Settings:
 
-$setting['prepend_gcode'] = "G1 Z0.3 F80\n";  // begin with this Gcode
-//$setting['append_gcode'] = "G91\nG1 Z4F40\nG90\nM104S200";  // add this Gcode at the end
-$setting['append_gcode'] = "G91\nG1 Z4F40\nG90\nM104S150";  // add this Gcode at the end
-$setting['extrusion_adjust'] = 1.5;  // factor to adjust extruded distances with
-#$setting['extruder_backlash_fwd']=200.0;
-#$setting['extruder_backlash_rev']=200.0;
-$setting['extrude_incremental'] = 1;  // E values are incremental. Better for making small adjustments
+$setting['prepend_gcode'] = "G1 E50 F2000\nG1 Z0.3 F80\n";  	// begin with this Gcode
+//$setting['append_gcode'] = "G91\nG1 Z4 F40\nG90\nM104 S200";  // add this Gcode at the end
+$setting['append_gcode'] = "G91\nG1 Z4 F40\nG90\nM104 S150";  // add this Gcode at the end
+$setting['extrusion_adjust'] = 1.5;  		// factor to adjust extruded distances with
+$setting['extruder_backlash_fwd']=402.0;	// manages tension in the Bowden extruder or for other more flexible material feedstock. Extrusion adjust NOT factored in.
+$setting['extruder_backlash_rev']=400.0;	// The amount to pull it back (see prev, comment)
+$setting['reversing_minimum_distance'] = 5; // minimum amount of travel milimeters to reverse extruder for (smaller is slower builds)
+$setting['reversing_minimum_extrusion'] = $setting['extruder_backlash_fwd']*.75; // if litle material is extruded, many reverses (pumping action) without much extrusion will transfer heat higher up the heater barrel. The extruder should reverse only when about 75% of the 'backlash' is extruded again.
+
+$setting['extrude_incremental'] = 1;  		// E values are incremental. Better for making small adjustments
 //$setting['replace_ereg'] = array('F330.0[^0-9]'=>'F1320.0');  // 
 $setting['replace_strings'] = array(
 	'Z1.2 F960.0 '=>'Z1.2 F500.0 ', // hugely speed up the raft-making
@@ -39,12 +43,19 @@ $setting['replace_strings'] = array(
 	//'F330.0'=>'F1320.0', // hugely speed up the raft-making
 	//'F330.0'=>'F430.0', // moderately speed up the raft-making
 );  // 
+$setting['accelerated_travel'] = false; 		//false = off, 1.0 is base speed, 2.0 is two times faster.
+$setting['accelerated_travel_mindist'] = 7; 	// the minimum distance in milimeters
+$setting['accelerated_travel_segments'] = 7;    // should always be an ODD number! 
+
+$setting['remove_redundant_Gcodes'] = true; // save bandwidth and processing power on sanguino/arduino. Set to false to disable.
 $setting['actions'] = array(
 	//array('while'=>array('match','F330.0'),'actions'=>array('E_mul'=>6,'F_mul'=>0.7)), // raft making: slow down XY-moves, speed up extrusion.
 //Z0.39 F330.0
 	array('while'=>array('match','Z0.61'),'actions'=>array('E_mul'=>6,'F_mul'=>0.7)), // raft making: slow down XY-moves, speed up extrusion.
 	array('while'=>array('match','Z1.05'),'actions'=>array('E_mul'=>1.7,'F_mul'=>1/2.1)), // raft making: slow down XY-moves, speed up extrusion.
 	array('while'=>array('match','Z1.16 F1320.0 '),'actions'=>array('E_mul'=>1.7,'F_mul'=>1/2.1)), // raft making: slow down XY-moves, speed up extrusion.
+// .22 layer height
+	array('while'=>array('match','Z0.44 '),'actions'=>array('E_mul'=>6,'F_mul'=>0.7)), // raft making: slow down XY-moves, speed up extrusion.
 	//array('while'=>array('match','F1320.0'),'actions'=>array('E_mul'=>2.2,'F_mul'=>0.8)), // raft making: slow down XY-moves, speed up extrusion.
 /*
 	array( // raft making: slow down XY-moves, speed up extrusion. Does the same as the above if the raft is set for feedrate 330.0 in skeinforge. This might be more reliable though...
@@ -61,10 +72,11 @@ $setting['actions'] = array(
 
 );
 $setting['remove_comments'] = true;  // Set true/false to remove comments from input file or not.
-$setting['soften_z_move_factor'] = .4;  // this slows down the move in the Z direction to this speed
+//$setting['soften_z_move_factor'] = .5;  // this slows down the move in the Z direction to this speed
 $setting['anti-backlash'] = array(
-	'X'=>array('fwd_dynamic'=>0.20/*mm*/, 'rev_dynamic'=>0.20/*mm*/,'fwd_static'=>0.1/*mm*/, 'rev_static'=>0.1/*mm*/ ), // Backlash on X-axis
-	'Y'=>array('fwd_dynamic'=>0.30/*mm*/, 'rev_dynamic'=>0.30/*mm*/,'fwd_static'=>0.1/*mm*/, 'rev_static'=>0.1/*mm*/ ), // Backlash on Y-axis
+//	'X'=>array('fwd_dynamic'=>0.0/*mm*/, 'rev_dynamic'=>0.0/*mm*/,'fwd_static'=>0.20/*mm*/, 'rev_static'=>0.20/*mm*/ ), // Backlash on X-axis
+	'Y'=>array('fwd_dynamic'=>0.00/*mm*/, 'rev_dynamic'=>0.00/*mm*/,'fwd_static'=>0.25/*mm*/, 'rev_static'=>0.25/*mm*/ ), // Backlash on Y-axis
+// Y backlash was .30
 	//'Y'=>array('fwd_dynamic'=>0.45/*mm*/, 'rev_dynamic'=>0.45/*mm*/,'fwd_static'=>0.1/*mm*/, 'rev_static'=>0.1/*mm*/ ), // Backlash on Y-axis
 );
 $setting['output_file'] = 'out-5D.gcode'; // null = output directly.
@@ -88,13 +100,20 @@ foreach($setting as $sName => $sVal)
 
 }
 
-if(!strpos($setting['output_file'],'/'))
+if(!strstr($setting['output_file'],'/'))
   $setting['output_file'] = $setting['default_output_path'].$setting['output_file'];
 
 $conditionOk = false;
 
+// Accell configuration check:
+    if(isset($setting['accelerated_travel_segments']))
+      $segs = $setting['accelerated_travel_segments'];
+    else $segs = 3;
+
+    if($segs < 3) echo "Error: travel feedrate accelleration is misconfigured, accelerated_travel_segments should be at minimum 3.";
+
 // The *OLD*, 3D (lame!) way:
-// M108S200 ; extruder motor speed at 200 PWM
+// M108 S200 ; extruder motor speed at 200 PWM
 // M101 ; extruder motor forward
 // G1 ... ; make your moves...
 
@@ -117,6 +136,8 @@ $X = $Y = $Z = "0.0";
 $lastX = $lastY = $lastZ = "0.0";
 $dist = 0;
 $extruder_starting = false;
+
+$hist = -1; // a counter used to keep history of movements
 
 out($setting['prepend_gcode']);
 out("\nG92 E0 \n");
@@ -168,9 +189,26 @@ foreach($lines as $line)
 	{
           if(isset($setting['extruder_backlash_fwd']))
           {
-	    out("G1 E".(0.6*$setting['extruder_backlash_fwd']).".0 F16000.0\n");
-	    out("G1 E".(0.4*$setting['extruder_backlash_fwd']).".0 F7000.0\n");
-	    out("G1 F".($F*1.0)."\n"); // restore previous F
+	    //out("(dist_trav=$distance_traveled)\n");
+	    if(($distance_traveled >= $setting['reversing_minimum_distance']) && ($amount_extruded > ($setting['extrusion_adjust']*$setting['reversing_minimum_extrusion'])))
+            {
+              //////////////////////////////////////////////////
+              // Go forward (usually as much as was pulled back)
+              //////////////////////////////////////////////////
+              out("G1 E".(0.8*$setting['extruder_backlash_fwd']).".0 F19000.0\n");
+	      out("G1 E".(0.2*$setting['extruder_backlash_fwd']).".0 F14000.0\n");
+	      out("G1 F".($F*1.0)."\n"); // restore previous F
+              out('','flush');
+            }else
+            {
+              $buffer = out('','get');
+//echo $buffer;
+              $buffer_new = ereg_replace('buffstart_reverse(.*)reverse_end','skipped_reversing',$buffer);
+//if($buffer != $buffer_new) echo "\nBefore: ======== $buffer ===== \nAfter: ========== $buffer_new\n";
+//else echo "\n========".$buffer;
+              out($buffer_new,'put');
+              out('','flush');
+            }
           }
 	}
 	$extrusion_has_started = true;
@@ -183,12 +221,22 @@ foreach($lines as $line)
         $dir = 0;
         if(isset($setting['extruder_backlash_rev']))
         {
-	  if($last_dir != $dir)
+	// start buffered output, reversing is conditional, based on distance we will travel before turning it on again!
+	if($last_dir != $dir)
+        {
+          ////////////////////////////////////////////////////////////////////////
+          // Pull back! First start buffering to be able to revert these added codes, then add them.
+          //////////////////////////////////////////////////
+	  out("(buffstart_reverse)\n",'on');// buffering on
 	    #$dist -= $setting['extruder_backlash_rev'];// Needs testing
 	    #$line .= "E-".(1.0*$setting['extruder_backlash_rev']);
-	    out("G1 E-".(1.0*$setting['extruder_backlash_rev']).".0 F70000.0\n");
+	    out("G1 E-".(1.0*$setting['extruder_backlash_rev']).".0 F19000.0\n");
             #out("(Turning extruder off. $E)\n");
 	    out("G1 F".($F*1.0)."\n"); // restore previous F
+	  out("(reverse_end)\n");
+	  $distance_traveled = 0; // Reset this var
+          $amount_extruded = 0;   //Reset this var
+        }
         }
       break;
     }
@@ -203,6 +251,9 @@ foreach($lines as $line)
   // G20 - inches, G21 - mm
   unset($E);
   $comment .= sprintf("dXY=%.2f,%.2f ",$dX,$dY)." lastXY= ".sprintf("%.2f,%.2f",$lastX,$lastY);
+  $prev_delta['X']=$dX;
+  $prev_delta['Y']=$dY;
+  $prev_delta['Z']=$dZ;
   if($abs)
   {
 /*    $dX=bcsub($X,$lastX);
@@ -219,7 +270,14 @@ foreach($lines as $line)
     $dY=$Y;
     $dZ=$Z;
   }
+  $hist++;
+  if($hist>9) $hist=0; // keep 9 segments in history
+  $moveHist['X'][$hist]=$dX;
+  $moveHist['Y'][$hist]=$dY;
+
+
     $dist2 = bcsqrt(bcadd(bcpow($dX,2),bcpow($dY,2)));
+    $distance_traveled += $dist2;
     if($setting['extrude_incremental'] != 1)
       $dist = bcadd($dist,$dist2);
     else
@@ -227,13 +285,14 @@ foreach($lines as $line)
     $comment .= "( dist=sqrt($dX^2+$dY^2)=".bcpow($dX,2).'+'.bcpow($dY,2).'= '.sprintf("%.2f",$dist).')';
   if($dir!=0) 
     $E = bcmul($setting['extrusion_adjust'],$dist);
+  $amount_extruded += $E;
 
   // Only when cartesian coordinates are used???
   //if(ereg("[^;(].*[XYZ])",$line,$regs))
   //{}
 
   $line = trim($line);
-  if(($extruder_starting) && ($setting['extrude_incremental'] == 1)) // FIXME: Needs testing. Does the non-incremental work now?
+  if(false && ($extruder_starting) && ($setting['extrude_incremental'] == 1)) // FIXME: Needs testing. Does the non-incremental work now?
   {
     //$line .= " E0";// Causes multiple E's!
 //out ("(starting extruder \$E=$E)\n");
@@ -244,7 +303,8 @@ foreach($lines as $line)
     $extruder_starting = false;
   }
 // LET OP, moet misschien IF zijn!??!
-  elseif($E)
+  //elseif($E)
+if($E)
   {
     $line .= " E".sprintf("%.2f",bcmul($E,$dir)); // number w/ four decimals
   }
@@ -253,6 +313,14 @@ foreach($lines as $line)
   {
     foreach($setting['anti-backlash'] as $thisAxis => $backlash)
     { //'Y'=>array('fwd_dynamic'=>0.1/*mm*/, 'rev_dynamic'=>0.1/*mm*/,'fwd_static'=>0.1/*mm*/, 'rev_static'=>0.1/*mm*/ ), // Backlash on Y-axis
+      // Dynamic or static?
+      //$vibration = 0;
+      //$vibration += ($moveHist['X'][$hist])/$dist;
+      //$vibration += -($moveHist['X'][($hist-1)%10])/$dist;
+      //$vibration += (1/$moveHist['X'][($hist-2)%10])/$dist*.8;
+      //$vibration += -(1/$moveHist['X'][($hist-3)%10])/$dist*.6;
+      //$vibration += (1/$moveHist['X'][($hist-4)%10])/$dist*.4;
+      
       extract($backlash);
       if($thisAxis == 'X')
       {
@@ -267,17 +335,32 @@ foreach($lines as $line)
       }
       $newAxisPos = $axisPos;
       if($axisDelta > 0)
-        $newAxisPos = bcadd($axisPos,$fwd_dynamic);
+      {
+        if($lastDelta[$thisAxis]<0) // if previous move was in the other direction, dynamic friction applies?
+          $newAxisPos = bcadd($axisPos,$fwd_dynamic);
+	else
+          $newAxisPos = bcadd($axisPos,$fwd_static);//otherwise, static friction
+      }
       elseif($axisDelta < 0)
-        $newAxisPos = bcsub($axisPos,$rev_dynamic);
+      {
+        if($lastDelta[$thisAxis]>0)
+          $newAxisPos = bcsub($axisPos,$rev_dynamic);
+        else
+          $newAxisPos = bcsub($axisPos,$rev_static);
+      }
       // maintain once previous backlash compensation if axis didn't move. After that compensation will be removed (!?)
-      elseif($lastDelta[$thisAxis] > 0)
-        $newAxisPos = bcadd($axisPos,$fwd_dynamic);
-      elseif($lastDelta[$thisAxis] < 0)
-        $newAxisPos = bcsub($axisPos,$rev_dynamic);
-
-      //$lastDelta[$thisAxis] = $axisDelta; //not used???
+      //elseif($lastDelta[$thisAxis] > 0)
+      //  $newAxisPos = bcadd($axisPos,$fwd_static);
+      //elseif($lastDelta[$thisAxis] < 0)
+      //  $newAxisPos = bcsub($axisPos,$rev_static);
+//if(($axisDelta < 0) && ($lastDelta[$thisAxis]>0)) $line .= " Dyn";
+//if(($axisDelta > 0) && ($lastDelta[$thisAxis]<0)) $line .= " Dyn";
+ //$line .= "\td$axisDelta";
+      $lastDelta[$thisAxis] = $axisDelta; //not used???
       $line = str_replace("$thisAxis$axisPos","$thisAxis$newAxisPos",$line);
+      //$line.="\tAcc$thisAxis=".($accelleration[$thisAxis]/$axisDelta);
+      //if($thisAxis=='X') $line.="\td$thisAxis=".$dX." Vib=".($vibration);
+      //if($thisAxis=='X') $line.="\td$thisAxis=".$dX." Vib=".($vibration);
       //out("(AntiBacklash d$thisAxis=$axisDelta: $thisAxis$axisPos now $newAxisPos)\n");
     }
   }
@@ -288,6 +371,48 @@ foreach($lines as $line)
     $line = str_replace("$oldRate","$newRate",$line);
   }
 
+  // Accelleration when traveling (not extruding)
+  if(isset($setting['accelerated_travel']) && ($setting['accelerated_travel']!=false))
+  {
+    if(
+	($E==0) // extruder should be OFF
+        && ($dist > $setting['accelerated_travel_mindist']) // not for very small distances
+    )
+    {
+       //out("\n(Dist: $dist F=$F. Line:\t".$line.")");
+       // Segments are spread evenly, but could be improved. e.g. 111222333222111, could be 123333333333321
+       //out("\n (dX=$dX, dY=$dY, dZ=$dZ)");
+       $segX = $lastX;
+       $segY = $lastY;
+       $segZ = $lastZ;
+       $segspeedfactor=0;
+       $segs = 7;
+       if($dist > 10) $segs = 15;
+       for($segnr=1;$segnr<($segs);$segnr++) // normal line will be added below
+       {
+         if($segnr<=(($segs+1)/2))
+           $segspeedfactor+=$setting['accelerated_travel'];
+         else
+           $segspeedfactor-=$setting['accelerated_travel'];
+         $newF = bcmul($F,$segspeedfactor);
+         if($newF > 4500) { $newF = 4500; continue; } // do not output the line 
+         out("G1");
+         $segX = bcadd($segX,bcdiv($dX,$segs));
+         $segY = bcadd($segY,bcdiv($dY,$segs));
+         $segZ = bcadd($segZ,bcdiv($dZ,$segs));
+	 if($dX)
+           out(" X".$segX);
+	 if($dY)
+           out(" Y".$segY);
+	 if($dZ)
+           out(" Z".$segZ);
+         
+         out(" F".intval($newF).".0\n");
+	 //out(" ($segspeedfactor speed @ seg$segnr/$segs)\n");
+       }
+
+    }
+  }
   // Actions:
   $orrigLine = $line;
   foreach($setting['actions'] as $action)
@@ -331,7 +456,12 @@ foreach($lines as $line)
 
   if(abs($dZ)>0.1)
   {
-    // Smooth-Z:
+    // Smooth-Z: WARNING, is buggy!
+/*G1 X23.1300 Y-18.8500 Z22.4 F1080.0 E1.63
+G1 X23.0900 Y-18.9200 Z22.51 F73.2727 (smthd) E0.12
+G1 X23.5000 Y-18.2900 Z22.64 F24.3076 (smthd) <--- WAY too low! .25 + .25 + .10
+G1 X23.5700 Y-18.1700 Z22.75 F126.2727 (smthd)
+*/
     if($setting['soften_z_move_factor'])
     { // F  =mm/s
       // (mm/s)/mm = /s
@@ -350,7 +480,7 @@ foreach($lines as $line)
         $Znewspeed = (abs($dZ)/($dist/$newF));
         //if($setting['debug'])
 	$oldlline= $line;
-        $line = ereg_replace("F[0-9\.]+","F$newF",$line);
+        $line = ereg_replace("F[0-9\.]+","F$newF (smthd)",$line);
         //out("(f was SLOWeD DOWN, dist=$dist f/dist=".($regs[1]/$dist)." oldLine: $oldlline, new $line)\n");
 
         } //else out("(f was slow enough, not softened, dist=$dist f/dist=".($regs[1]/$dist).")\n");
@@ -374,6 +504,8 @@ foreach($lines as $line)
 } // end foreach line
 
 out($setting['append_gcode']);
+
+echo "\n(Gcode processing took: ".number_format((microtime(true)-$uTime),2,'.','')." seconds)";
 /*
 
 $fp = fopen($fName,'r');
@@ -393,9 +525,64 @@ else
 }  
 }
 */
-function out($str) // TODO: writer class
+function out($str,$buffered = 'nochange') // TODO: writer class
 {
-  global $setting;
+  global $setting,$out_buffer,$buffer_status;
+  if($buffered == 'flush')
+  {
+    $tmpvar = out($out_buffer.$str,'off');
+    $out_buffer = '';
+    $buffer_status = false;
+    return $tmpvar;
+  }
+  if($buffered == 'get')
+  {
+    return $out_buffer;
+  }
+  if($buffered == 'put')
+  {
+    $out_buffer = $str;
+    return true;
+  }
+  if($buffered == 'on')
+  {
+    $buffer_status = true;
+  }
+  if($buffered == 'off')// turn off buffering
+  {
+   #echo $str.'turning off buffering\n';
+    $buffer_status = false;
+  }
+  if($buffer_status == true)
+  {
+    $out_buffer .= $str;
+    return;
+  }
+  if(isset($setting['remove_redundant_Gcodes']) && $setting['remove_redundant_Gcodes'])
+  {
+    if(ereg("G([0-9]+)[^0-9]",$str,$regs))
+    {
+      if($setting['last_gcode']==$regs[1]) 
+        $str = str_replace("G".$regs[1].' ','',$str);
+      $setting['last_gcode'] = $regs[1];
+    }
+    if(ereg("Z([0-9\.]+)[^0-9]",$str,$regs))
+    {
+      if($setting['last_Z']==$regs[1]) 
+        $str = str_replace("Z".$regs[1],'',$str);
+      $setting['last_Z'] = $regs[1];
+    }
+    if(ereg("F([0-9\.]+)[^0-9]",$str,$regs))
+    {
+      if($setting['last_F']==$regs[1]) 
+        $str = str_replace("F".$regs[1],'',$str);
+      $setting['last_F'] = $regs[1];
+    }
+    //$str = ereg_replace("[XYZFE]([0-9]+\.[1-9]*)0+ ","\\1 ",$str); // remove unneeded spaces
+    //$str = ereg_replace("([XYZFE]^ *)[0]+ ","\\1 ",$str); // remove unneeded spaces
+    //$str = ereg_replace(" +","\t",$str); // remove unneeded spaces
+  }
+  
   if($setting['output_file'] == null)
   {
     echo($str);
