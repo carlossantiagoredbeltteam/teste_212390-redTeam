@@ -18,10 +18,12 @@
  *					(negative Z) but it tends to skip steps when movement speed is not capped to a sensible max.
  * 0.14Erik		17/09/09	Bugfix: minor problem in anti-backlash. Would sometimes match and replace too many values.
  * 0.15Erik		17/09/09	Feature: added anti-ooze system for Bowden extruder. Still experimental, stops pullback after a while, WHY?!
+ * 0.16Erik             21/11/09        Feature: status line with progress indication.
+
  */
 ini_set('memory_limit','128M');
 
-$version = 0.15;
+$version = 0.16;
 out("\n( Modified by 3D-to-5D-Gcode v$version on ".date("c").')');
 $uTime=microtime(true);
 // Settings:
@@ -139,12 +141,23 @@ $extruder_starting = false;
 
 $hist = -1; // a counter used to keep history of movements
 
+$line_count = count($lines);
+$line_nr=0;
+
 out($setting['prepend_gcode']);
 out("\nG92 E0 \n");
 //out("\nG92 E0 ( reset extruder home pos)\n");
 
 foreach($lines as $line)
 {
+
+  $line_nr++; // keep track of the line_nr
+  // Remove original comments
+  if(!($line_nr % 1000)) // every 1000 lines
+  {
+    echo statusLine();
+  }
+
   // Remove original comments
   if($setting['remove_comments']==true)
   { 
@@ -598,4 +611,54 @@ function out($str,$buffered = 'nochange') // TODO: writer class
       file_put_contents($setting['output_file'],$str,FILE_APPEND);
   }
 }
+
+function statusLine()
+{
+  global $line_nr,$line_count,$uTime;
+
+  $lines_left = $line_count - $line_nr;
+  $lines_per_second = $line_nr / (microtime(true)-$uTime);
+  $seconds_left = $lines_left / $lines_per_second;
+
+  $percent = intval($line_nr/$line_count*100);
+  $str = "".chr(0x1B)."\r   ".intval($percent)."% done. $lines_left lines or ".Sec2Time($seconds_left)." remaining.                    ";
+  return $str;
+}
+
+
+function Sec2Time($time){
+  if(is_numeric($time)){
+    $value = array(
+      "years" => 0, "days" => 0, "hours" => 0,
+      "minutes" => 0, "seconds" => 0,
+    );
+    if($time >= 31556926){
+      $str .= $value["years"] = floor($time/31556926);
+      $time = ($time%31556926);
+      $str .= " years, ";
+    }
+    if($time >= 86400){
+      $str .= $value["days"] = floor($time/86400);
+      $time = ($time%86400);
+      $str .= " days, ";
+    }
+    if($time >= 3600){
+      $str .= $value["hours"] = floor($time/3600);
+      $time = ($time%3600);
+      $str .= " hours, ";
+    }
+    if($time >= 60){
+      $str .= $value["minutes"] = floor($time/60);
+      $time = ($time%60);
+      $str .= " minutes, ";
+    }
+    $str .= $value["seconds"] = floor($time);
+    $str .= " seconds";
+    return $str;
+    #return (array) $value;
+  }else{
+    return (bool) FALSE;
+  }
+}
+
 ?>
