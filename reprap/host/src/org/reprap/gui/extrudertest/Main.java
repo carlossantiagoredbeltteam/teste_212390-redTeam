@@ -346,9 +346,9 @@ public class Main extends javax.swing.JDialog {
 	private void setTemperature() {
 		try {
 			if (heaterActive.isSelected())
-				extruders[extruder].setTemperature(Integer.parseInt(desiredTemperature.getText()));
+				extruders[extruder].setTemperature(Integer.parseInt(desiredTemperature.getText()), false);
 			else
-				extruders[extruder].setTemperature(0);
+				extruders[extruder].setTemperature(0, false);
 		}
 		catch (Exception ex) {
 			JOptionPane.showMessageDialog(null, "Exception setting temperature: " + ex);

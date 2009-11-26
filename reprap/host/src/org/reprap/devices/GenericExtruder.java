@@ -526,7 +526,7 @@ public abstract class GenericExtruder implements Extruder
 		es.setReverse(rev);
 	}
 	
-	public void setTemperature(double temperature) throws Exception
+	public void setTemperature(double temperature, boolean wait) throws Exception
 	{
 		es.setTargetTemperature(temperature);
 	}
@@ -576,14 +576,14 @@ public abstract class GenericExtruder implements Extruder
 		es.setReverse(false);
 	}
 
-	public void heatOn() throws Exception 
+	public void heatOn(boolean wait) throws Exception 
 	{
-		setTemperature(extrusionTemp);
+		setTemperature(extrusionTemp, wait);
 	}
 	
 	public void heatOff() throws Exception 
 	{
-		setTemperature(0);
+		setTemperature(0, false);
 	}
 	
 	/* (non-Javadoc)

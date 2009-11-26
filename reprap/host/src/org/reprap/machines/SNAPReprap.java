@@ -438,7 +438,7 @@ public class SNAPReprap extends GenericRepRap
 			return;
 		Debug.d("Reminding it of the temperature");
 		try {
-			extruders[extruder].setTemperature(extruders[extruder].getTemperatureTarget());
+			extruders[extruder].setTemperature(extruders[extruder].getTemperatureTarget(), false);
 			//setTemperature(Preferences.loadGlobalInt("ExtrusionTemp"));
 		} catch (Exception e) {
 			System.err.println("Error resetting temperature.");

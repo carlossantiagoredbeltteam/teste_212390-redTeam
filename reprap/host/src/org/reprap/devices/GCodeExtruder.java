@@ -52,10 +52,13 @@ public class GCodeExtruder extends GenericExtruder
 		zeroExtrudedLength();
 	}
 	
-	public void setTemperature(double temperature) throws Exception
+	public void setTemperature(double temperature, boolean wait) throws Exception
 	{
-		gcode.queue("M104 S" + temperature + " ;set temperature");
-		super.setTemperature(temperature);
+		if(wait)
+			gcode.queue("M109 S" + temperature + " ;set temperature and wait");
+		else
+			gcode.queue("M104 S" + temperature + " ;set temperature and return");
+		super.setTemperature(temperature, wait);
 	}
 	
 	public void setHeater(int heat, double maxTemp) {}

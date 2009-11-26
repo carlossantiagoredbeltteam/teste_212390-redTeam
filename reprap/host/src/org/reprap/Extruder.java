@@ -74,7 +74,7 @@ public interface Extruder
 	 * Turn the heater of the extruder on. Inital temperatur is defined by ???
 	 * @throws Exception
 	 */
-	public void heatOn() throws Exception; 
+	public void heatOn(boolean wait) throws Exception; 
 
 	/**
 	* Turns the heater for the extruder off.
@@ -84,10 +84,11 @@ public interface Extruder
 	/**
 	 * Set the temperature of the extruder at a given height. This height is given
 	 * in centigrades, i.e. 100 equals 100 centigrades. 
-	 * @param temperature The temperature of the extruder in centigrades
+	 * @param temperature The temperature of the extruder in centigrade
+	 * @param wait - wait till it gets there (or not).
 	 * @throws Exception
 	 */
-	public void setTemperature(double temperature) throws Exception; 
+	public void setTemperature(double temperature, boolean wait) throws Exception; 
 	
 	/**
 	 * Set a heat output power.  For normal production use you would

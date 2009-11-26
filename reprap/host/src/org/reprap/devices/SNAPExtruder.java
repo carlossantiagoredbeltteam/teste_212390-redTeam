@@ -404,13 +404,13 @@ public class SNAPExtruder extends GenericExtruder
 	/* (non-Javadoc)
 	 * @see org.reprap.Extruder#setTemperature(double)
 	 */
-	public void setTemperature(double temperature) throws Exception {
+	public void setTemperature(double temperature, boolean wait) throws Exception {
 		if(!wasAvailable())
 		{
 			Debug.d("Attempting to control or interrogate non-existent extruder for " + material);
 			return;
 		}
-		setTemperature(temperature, true);
+		setTemperatureX(temperature, true);
 	}
 	
 	/**
@@ -418,7 +418,7 @@ public class SNAPExtruder extends GenericExtruder
 	 * @param lock
 	 * @throws Exception
 	 */
-	private void setTemperature(double temperature, boolean lock) throws Exception {
+	private void setTemperatureX(double temperature, boolean lock) throws Exception {
 		es.setTargetTemperature(temperature);
 		if(Math.abs(es.targetTemperature() - extrusionTemp) > 5)
 		{
@@ -601,7 +601,7 @@ public class SNAPExtruder extends GenericExtruder
 	    setVref(vRefFactor);
 		setTempScaler(tempScaler);
 		if (es.targetTemperature() != 0)
-			setTemperature(es.targetTemperature(), false);
+			setTemperatureX(es.targetTemperature(), false);
 	}
 	
 	/**
