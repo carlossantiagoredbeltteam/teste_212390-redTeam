@@ -15,7 +15,7 @@ FILELIST="jar/reprap.jar lib/*.jar lib/reprap-wv.stl lib/rr-logo-green-url.png\
     lib/system-dependent/windows-i586/* LICENSE"
 
 SRCFILELIST="src/* build.xml build-user.xml .classpath .project \
-	host-package-release README"
+	host-package-release readme"
 
 LIBFILES="lib/*"
 
@@ -55,10 +55,10 @@ echo "Executable created."
 # Copy README into package dir, substituting release string for RELEASE
 #   and the current UTC date for DATE
 NOW=`date -u +'%d %B %Y'`
-sed -e "s/RELEASE/$RELEASE/g" -e "s/DATE/$NOW/g" README > "$BASENAME/README"
+sed -e "s/RELEASE/$RELEASE/g" -e "s/DATE/$NOW/g" readme > "$BASENAME/readme"
 
 # Create README.txt for Windows people
-sed -e 's/$/\r/' README > "$BASENAME/README.txt"
+sed -e 's/$/\r/' readme > "$BASENAME/readme.txt"
 
 echo "READMEs created."
 
