@@ -299,7 +299,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		home();
 
 		Debug.d("Setting temperature");
-		getExtruder().heatOn();
+		getExtruder().heatOn(true);
 		
 		getExtruder().purge();
 	}
@@ -327,7 +327,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		moveTo(0.5, 0.5, getZ(), getExtruder().getFastXYFeedrate(), true, true);
 		getExtruder().setMotor(false);
 		getExtruder().setValve(false);
-		getExtruder().setTemperature(0);
+		getExtruder().setTemperature(0, false);
 	}
 	
 

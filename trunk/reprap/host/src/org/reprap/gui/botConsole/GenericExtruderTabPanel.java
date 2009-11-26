@@ -464,7 +464,7 @@ private void heatButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     	if (heatPushed) {
     		rampOff();
     		try {
-    			extruder.setTemperature(0);
+    			extruder.setTemperature(0, false);
     		}
     		catch (Exception ex) {
     			JOptionPane.showMessageDialog(null, "Exception setting temperature: " + ex);
@@ -475,7 +475,7 @@ private void heatButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     	}
     	else {
     		try {
-    			extruder.setTemperature(Integer.parseInt(targetTempField.getText()));
+    			extruder.setTemperature(Integer.parseInt(targetTempField.getText()), false);
     		}
     		catch (Exception ex) {
     			JOptionPane.showMessageDialog(null, "Exception setting temperature: " + ex);
@@ -645,7 +645,7 @@ private void setExtruderSpeed() {
         try
         {
         	//System.out.println("elapsed: " + elapsed*0.001 + " target: " + newTarget);
-        	extruder.setTemperature(newTarget);
+        	extruder.setTemperature(newTarget, false);
         } catch (Exception ex)
         {}
     }
