@@ -44,11 +44,13 @@ public class GCodeExtruder extends GenericExtruder
 		getPrinter().moveToPurge();
 		try
 		{
+			heatOn(true);
 			setExtrusion(getFastXYFeedrate(), false);
 			getPrinter().machineWait(purgeTime);
 			setExtrusion(0, false);
 		} catch (Exception e)
 		{}
+		getPrinter().home();
 		zeroExtrudedLength();
 	}
 	

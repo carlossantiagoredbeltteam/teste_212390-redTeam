@@ -298,8 +298,8 @@ public abstract class GenericRepRap implements CartesianPrinter
 		Debug.d("Homing machine");
 		home();
 
-		Debug.d("Setting temperature");
-		getExtruder().heatOn(true);
+		//Debug.d("Setting temperature");
+		//getExtruder().heatOn(true);
 		
 		getExtruder().purge();
 	}
