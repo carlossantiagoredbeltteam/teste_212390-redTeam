@@ -1,0 +1,63 @@
+Partlist
+
+Exported from motherboard.brd at 07/12/2009 22:53
+
+EAGLE Version 5.6.0 Copyright (c) 1988-2009 CadSoft
+
+Part, Value, Package, Library, Position, (mil), Orientation
+
+C1, 22pf, C1206, rcl, (2595, 1890), R270
+C2, 22pf, C1206, rcl, (2595, 2210), R90
+C3, 100nF, C1206, rcl, (140, 1620), R90
+C4, 100uF, SANYO-OSCON_SMD_B6, rcl, (1842.5, 892.5), R0
+C5, 100nF, C1206, rcl, (3280, 1865), R0
+C6, 100uF, SANYO-OSCON_SMD_B6, rcl, (3280, 1610), R180
+C7, 100nF, C1206, rcl, (2865, 705), R90
+C8, 100nF, C1206, rcl, (310, 2450), R270
+DEBUG, -, CHIPLED_1206, led, (535, 1540), R270
+IC1, SN75176ASOIC, SO08, reprap, (2165, 1152.5), R90
+IC2, ATMEGA644A, TQFP44, atmel, (1672.5, 2130), R90
+IC3, LD117AS33TR, SOT223, v-reg, (1460, 695), R0
+IC4, FT232RL, SSOP28, ftdichip, (2565, 640), R270
+JP1,, 1X09, pinhead, (1100, 2550), R0
+JP2,, 1X08, pinhead, (1050, 1550), R0
+JP3,, 1X09, pinhead, (2200, 2550), R180
+JP4,, 1X07, pinhead, (2300, 1550), R180
+JP5,, 1X06, pinhead, (3780, 770), R90
+JP6,, 1X04, pinhead, (3375, 902.5), R0
+JP7,, 1X02, pinhead, (3297.5, 1280), R90
+JP8,, 1X06, pinhead, (1970, 635), R0
+JP9,, 1X02, pinhead, (3102.5, 1272.5), R90
+JP10,, 1X01, pinhead, (1500, 1550), R0
+JP11,, 1X02, pinhead, (1850, 1550), R180
+JP12,, 1X01, pinhead, (1600, 2550), R0
+JP13,, 1X02, pinhead, (2905, 1272.5), R90
+JP14,, 1X06, pinhead, (1970, 485), R0
+JP15,, 1X06, pinhead, (1970, 327.5), R0
+JP16,, 1X06, pinhead, (1970, 175), R0
+POWER,, CHIPLED_1206, led, (315, 1540), R90
+Q2, 16Mhz, HC49U-V, SparkFun, (2360.606, 1968.535), R135
+R1, 10k, R1206, rcl, (3275, 2030), R0
+R2, 1K, R1206, rcl, (315, 1660), R180
+R3, 1K, R1206, resistor, (530, 1660), R0
+R4, 1.8K, R1206, resistor, (1640, 1310), R90
+R5, 1.8K, R1206, resistor, (1510, 1310), R90
+R6, 1.8K, R1206, resistor, (1380, 1310), R90
+R7, 3.3K, R1206, resistor, (1640, 1065), R90
+R8, 3.3K, R1206, resistor, (1510, 1065), R90
+R9, 3.3K, R1206, resistor, (1385, 1065), R90
+R10, 4.7K, R1206, rcl, (2445, 1240), R270
+R11, 1.8K, R1206, rcl, (3445, 2997.5), R270
+R12, 1.8K, R1206, rcl, (3280, 2990), R90
+R13, 10K, R1206, rcl, (1065, 1365), R180
+R14, 10K, R1206, rcl, (810, 1365), R0
+R15, 4.7K, R1206, rcl, (2575, 1155), R270
+R16, 180, R1206, rcl, (1897.5, 1145), R270
+S1,, B3F-10XX, switch-omron, (3090, 2460), R180
+SV1,, ML6, con-harting-ml, (400, 2020), R90
+SV2,, ML10, con-harting-ml, (2890, 1895), R270
+SV3,, ML10, con-harting-ml, (2765, 3050), R180
+SV4,, ML10, con-ml, (1790, 3050), R180
+SV5,, ML10, con-ml, (815, 3050), R180
+U$8, SDCARD, 3M-SDCARD, reprap, (605, 755), R270
+X1,, PN61729, con-berg, (3295, 395), R0

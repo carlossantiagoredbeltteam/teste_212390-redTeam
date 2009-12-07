@@ -2,12 +2,12 @@ EAGLE AutoRouter Statistics:
 
 Job           : /home/ensab/workspace/adrian/Experimental-electronics/motherboard/motherboard.brd
 
-Start at      : 11:30:42 (07/12/2009)
-End at        : 11:30:42 (07/12/2009)
+Start at      : 22:38:44 (07/12/2009)
+End at        : 22:38:45 (07/12/2009)
 Elapsed time  : 00:00:00
 
 Signals       :    55   RoutingGrid: 50 mil  Layers: 2
-Connections   :   205   predefined:  205 ( 73 Vias )
+Connections   :   205   predefined:  205 ( 77 Vias )
 
 Router memory :   27412
 

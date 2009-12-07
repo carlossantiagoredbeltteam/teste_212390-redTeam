@@ -1,0 +1,20 @@
+Source files:
+
+motherboard.sch Eagle schematic
+motherboard.brd Eagle board layout
+
+Gerber files:
+
+motherboard.drl Drill rack data
+motherboard.drd Excellon drill description
+motherboard.dri Excellon drill tool description
+motherboard.cmp Component side data
+motherboard.sol Solder side data
+motherboard.plc Component side silk screen data
+motherboard.stc Component side solder stop mask data
+motherboard.sts Solder side solder stop mask data
+motherboard.gpi Gerber photoplotter information data
+
+Ancilliary file:
+
+motherboard.xls Parts list
