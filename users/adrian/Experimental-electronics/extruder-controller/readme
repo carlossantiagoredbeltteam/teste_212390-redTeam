@@ -1,0 +1,25 @@
+Source files:
+
+extruder-controller.sch Eagle schematic
+extruder-controller.brd Eagle board layout
+
+
+Gerber files:
+
+extruder-controller.drl Drill rack data
+extruder-controller.drd Excellon drill description
+extruder-controller.dri Excellon drill tool description
+extruder-controller.cmp Component side data
+extruder-controller.sol Solder side data
+extruder-controller.plc Component side silk screen data
+extruder-controller.stc Component side solder stop mask data
+extruder-controller.sts Solder side solder stop mask data
+extruder-controller.gpi Gerber photoplotter information data
+
+Ancilliary files:
+
+extruder-controller.xls Parts list
+extruder-controller.csv Parts list as comma-separated variables
+extruder-controller.pov 3D POVray rendering file
+extruder-controller.pro Eagle autorouter output
+readme                  This file

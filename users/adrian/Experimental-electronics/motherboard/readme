@@ -3,6 +3,7 @@ Source files:
 motherboard.sch Eagle schematic
 motherboard.brd Eagle board layout
 
+
 Gerber files:
 
 motherboard.drl Drill rack data
@@ -15,6 +16,10 @@ motherboard.stc Component side solder stop mask data
 motherboard.sts Solder side solder stop mask data
 motherboard.gpi Gerber photoplotter information data
 
-Ancilliary file:
+Ancilliary files:
 
 motherboard.xls Parts list
+motherboard.csv Parts list as comma-separated variables
+motherboard.pov 3D POVray rendering file
+motherboard.pro Eagle autorouter output
+readme          This file
