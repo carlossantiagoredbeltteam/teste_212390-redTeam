@@ -2,7 +2,7 @@ package org.reprap.geometry.polygons;
 
 import org.reprap.Attributes;
 /**
- * this class stores a grid of booleans at the same grid resolution
+ * This class stores a rectangular grid at the same grid resolution
  * as the RepRap machine's finest resolution using a quad tree.
  * Non-leaf quads always have their attributes set to the material that
  * this tree represents.  Leaf quads have attributes set if they are solid,
@@ -18,7 +18,7 @@ public class BooleanGrid
 	private static int ySize = 2000;
 	
 	private BooleanGrid ne, nw, sw, se;
-	private Boolean nVisited, sVisited, eVisited, wVisited; 
+	private boolean visited[]; 
 	private BooleanGrid parent;
 	private int x0, y0, x1, y1;
 	private boolean pix;
@@ -30,6 +30,23 @@ public class BooleanGrid
 	public void destroy() 
 	{
 		
+	}
+	
+	/**
+	 * Build the grid from a CSG polygon
+	 * @param csgP
+	 */
+	public BooleanGrid(RrCSGPolygon csgP)
+	{
+		attributes = csgP.getAttributes();
+		parent = null;
+		pix = false;
+		x0 = 0;
+		y0 = 0;
+		x1 = xSize;
+		y1 = ySize;
+		visited = null;
+		generateQuadTree(csgP.csg());
 	}
 	
 	/**
@@ -49,6 +66,7 @@ public class BooleanGrid
 		y1 = yb;
 		attributes = a;
 		parent = p;
+		visited = null;
 	}
 	
 	/**
@@ -65,6 +83,12 @@ public class BooleanGrid
 		attributes = bg.attributes;
 		parent = p;
 		pix = bg.pix;
+		if(pix)
+		{
+			visited = new boolean[1];
+			visited[0] = false;
+		} else
+			visited = null;
 		if(bg.leaf())
 		{
 			ne = null;
@@ -114,6 +138,8 @@ public class BooleanGrid
 		if(x0 == x1 && y0 == y1)
 		{
 			pix = true;
+			visited = new boolean[1];
+			visited[0] = false;
 			double v = csg.value(p0);
 			homogeneous(v <= 0);
 			return;
@@ -141,21 +167,6 @@ public class BooleanGrid
 		se.generateQuadTree(csg);
 	}
 	
-	/**
-	 * Build the grid from a CSG polygon
-	 * @param csgP
-	 */
-	public BooleanGrid(RrCSGPolygon csgP)
-	{
-		attributes = csgP.getAttributes();
-		parent = null;
-		pix = false;
-		x0 = 0;
-		y0 = 0;
-		x1 = xSize;
-		y1 = ySize;
-		generateQuadTree(csgP.csg());
-	}
 	
 	public static double gridX()
 	{
@@ -239,6 +250,103 @@ public class BooleanGrid
 			if(l == null)
 				return null;
 			return l.attributes();
+	}
+	
+	/**
+	 * Compute the index of a pixel on the periphery of a quad in the
+	 * visited array.  visited[0] corresponds to the most north-easterly
+	 * pixel in the quad, and the numbers increment anti-clockwise round 
+	 * the edge.
+	 * @param xa
+	 * @param ya
+	 * @return
+	 */
+	private int vIndex(int xa, int ya)
+	{
+		if(pix)
+		{
+			if(xa == x0 && ya == y0)
+				return 0;
+			System.err.println("BooleanGrid vIndex(): not the single-pixel point!");
+			return -1;
+		}
+		
+		int result = -1;
+		
+		if(ya == y1)
+		{
+			result = x1 - xa;
+			if(result >= x0)
+				return result;
+		}
+		
+		if(xa == x0)
+		{
+			result = y1 - ya;
+			if(result >= y0)
+				return result + x1 - x0;			
+		}
+		
+		if(ya == y0)
+		{
+			result = xa - x0;
+			if(result <= x1)
+				return result + x1 - x0 + y1 - y0;			
+		}
+		
+		if(xa == x1)
+		{
+			result = ya - y0;
+			if(result <= y1)
+				return result + 2*(x1 - x0) + y1 - y0;			
+		}
+
+		System.err.println("BooleanGrid vIndex(): non-perimiter point!");
+		return result;
+	}
+	
+	/**
+	 * Has a pixel been visited?
+	 * @param xa
+	 * @param ya
+	 * @return
+	 */
+	public boolean visited(int xa, int ya)
+	{
+		BooleanGrid l = leaf(xa, ya);
+		if(l == null)
+			return false;
+		if(l.visited == null)
+			return false;
+		int index = l.vIndex(xa, ya);
+		if(index >= 0)
+			return l.visited[index];
+		else
+			return false;
+	}
+	
+	/**
+	 * Set a pixel visited, or not
+	 * @param xa
+	 * @param ya
+	 * @param v
+	 */
+	public void setVisited(int xa, int ya, boolean v)
+	{
+		BooleanGrid l = leaf(xa, ya);
+		if(l == null)
+			return;
+		int i;
+		if(l.visited == null)
+		{
+			int leng = 2*(l.x1 - l.x0 + l.y1 - l.y0);
+			l.visited = new boolean[leng];
+			for(i = 0; i < leng; i++)
+				l.visited[i] = false;
+		}
+		i = l.vIndex(xa, ya);
+		if(i >= 0)
+			l.visited[i] = v;
 	}
 	
 	/**
