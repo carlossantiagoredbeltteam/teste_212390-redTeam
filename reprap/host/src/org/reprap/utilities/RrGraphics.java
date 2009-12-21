@@ -591,21 +591,22 @@ public class RrGraphics
 			}
 		} else
 		{
-			int x = g.firstX();
-			while(x <= g.lastX())
-			{
-				int y = g.firstY();
-				while(y <= g.lastY())
-				{
-					if(g.value(x,y))
-					{
-						Rr2Point p = transform(new Rr2Point(x*BooleanGrid.gridX(), y*BooleanGrid.gridY()));
-						g2d.fillRect((int)Math.round(p.x()), (int)Math.round(p.y()), 1, 1);
-					}
-					y++;
-				}
-				x++;
-			}
+			// TODO FIXME!!!
+//			int x = g.firstX();
+//			while(x <= g.lastX())
+//			{
+//				int y = g.firstY();
+//				while(y <= g.lastY())
+//				{
+//					if(g.value(x,y))
+//					{
+//						Rr2Point p = transform(new Rr2Point(x*BooleanGrid.gridX(), y*BooleanGrid.gridY()));
+//						g2d.fillRect((int)Math.round(p.x()), (int)Math.round(p.y()), 1, 1);
+//					}
+//					y++;
+//				}
+//				x++;
+//			}
 		}
 	}
 	
