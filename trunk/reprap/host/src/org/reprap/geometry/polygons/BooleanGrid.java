@@ -1,12 +1,25 @@
 package org.reprap.geometry.polygons;
 
-import org.reprap.Attributes;
+/**
+ * Integer 2D point
+ * @author ensab
+ *
+ */
+class iPoint
+{
+	public int x, y;
+	
+	iPoint(int xa, int ya)
+	{
+		x = xa;
+		y = ya;
+	}
+}
+
 /**
  * This class stores a rectangular grid at the same grid resolution
  * as the RepRap machine's finest resolution using a quad tree.
- * Non-leaf quads always have their attributes set to the material that
- * this tree represents.  Leaf quads have attributes set if they are solid,
- * and null attributes if they are air.
+ * 
  * @author ensab
  *
  */
@@ -19,10 +32,14 @@ public class BooleanGrid
 	
 	private BooleanGrid ne, nw, sw, se;
 	private boolean visited[]; 
-	private BooleanGrid parent;
+	private BooleanGrid root;
 	private int x0, y0, x1, y1;
 	private boolean pix;
-	private Attributes attributes;
+	private boolean value;
+	
+	//**************************************************************************************************
+	
+	// Constructors and administration
 	
 	/**
 	 * Destroy me and all that I point to
@@ -38,8 +55,8 @@ public class BooleanGrid
 	 */
 	public BooleanGrid(RrCSGPolygon csgP)
 	{
-		attributes = csgP.getAttributes();
-		parent = null;
+		value = false;
+		root = this;
 		pix = false;
 		x0 = 0;
 		y0 = 0;
@@ -58,30 +75,36 @@ public class BooleanGrid
 	 * @param a
 	 * @param p
 	 */
-	private BooleanGrid(int xa, int ya, int xb, int yb, Attributes a, BooleanGrid p)
+	private BooleanGrid(int xa, int ya, int xb, int yb, BooleanGrid r)
 	{
 		x0 = xa;
 		y0 = ya;
 		x1 = xb;
 		y1 = yb;
-		attributes = a;
-		parent = p;
+		value = false;
+		if(r == null)
+			root = this;
+		else
+			root = r;
 		visited = null;
 	}
 	
 	/**
-	 * Deep copy constructor
+	 * Deep copy constructor; r should be null for an external call.
 	 * NB - Attributes are not deep copied.
 	 * @param bg
 	 */
-	private BooleanGrid(BooleanGrid bg, BooleanGrid p)
+	private BooleanGrid(BooleanGrid bg, BooleanGrid r)
 	{
 		x0 = bg.x0;
 		y0 = bg.y0;
 		x1 = bg.x1;
 		y1 = bg.y1;
-		attributes = bg.attributes;
-		parent = p;
+		value = bg.value;
+		if(r == null)
+			root = this;
+		else
+			root = r;
 		pix = bg.pix;
 		if(pix)
 		{
@@ -97,30 +120,21 @@ public class BooleanGrid
 			se = null;
 		} else
 		{
-			ne = new BooleanGrid(bg.ne, this);
-			nw = new BooleanGrid(bg.nw, this);
-			sw = new BooleanGrid(bg.sw, this);
-			se = new BooleanGrid(bg.se, this);	
+			ne = new BooleanGrid(bg.ne, root);
+			nw = new BooleanGrid(bg.nw, root);
+			sw = new BooleanGrid(bg.sw, root);
+			se = new BooleanGrid(bg.se, root);	
 		}
 	}
 	
-	/**
-	 * Are we a leaf (i.e. have we no child quads)?
-	 * @return
-	 */
-	public boolean leaf()
-	{
-		return ne == null;
-	}
-	
+
 	/**
 	 * When a quad is homogeneous, set the appropriate variables to make it a leaf.
 	 * @param solid
 	 */
 	private void homogeneous(boolean solid)
 	{
-		if(!solid)
-			attributes = null;
+		value = solid;
 		ne = null;
 		nw = null;
 		sw = null;
@@ -157,16 +171,30 @@ public class BooleanGrid
 		
 		int xm = (x0 + x1)/2;
 		int ym = (y0 + y1)/2;
-		ne = new BooleanGrid(xm+1, ym+1, x1, y1, attributes, this);
-		nw = new BooleanGrid(x0, ym+1, xm, y1, attributes, this);
-		sw = new BooleanGrid(x0, y0, xm, ym, attributes, this);
-		se = new BooleanGrid(xm+1, y0, x1, ym, attributes, this);
-		ne.generateQuadTree(csg);
+		ne = new BooleanGrid(xm+1, ym+1, x1, y1, root);
+		nw = new BooleanGrid(x0, ym+1, xm, y1, root);
+		sw = new BooleanGrid(x0, y0, xm, ym, root);
+		se = new BooleanGrid(xm+1, y0, x1, ym, root);
+		Rr2Point inc = new Rr2Point(xInc*0.5, yInc*0.5);
+		Rr2Point m = new Rr2Point((xm + 0.5)*xInc, (ym + 0.5)*yInc);
+		ne.generateQuadTree(csg.prune(new RrRectangle(m, Rr2Point.add(p1, inc))));
 		nw.generateQuadTree(csg);
 		sw.generateQuadTree(csg);
 		se.generateQuadTree(csg);
 	}
 	
+	//*************************************************************************************
+	
+	// Interrogate and set data
+	
+	/**
+	 * Are we a leaf (i.e. have we no child quads)?
+	 * @return
+	 */
+	public boolean leaf()
+	{
+		return ne == null;
+	}
 	
 	public static double gridX()
 	{
@@ -178,9 +206,9 @@ public class BooleanGrid
 		return yInc;
 	}
 	
-	public Attributes attributes()
+	public boolean value()
 	{
-		return attributes;
+		return value;
 	}
 	
 	public int lowX()
@@ -244,12 +272,12 @@ public class BooleanGrid
 	 * @param ya
 	 * @return
 	 */
-	public Attributes value(int xa, int ya)
+	public boolean value(int xa, int ya)
 	{
 			BooleanGrid l = leaf(xa, ya);
 			if(l == null)
-				return null;
-			return l.attributes();
+				return false;
+			return l.value;
 	}
 	
 	/**
@@ -349,27 +377,129 @@ public class BooleanGrid
 			l.visited[i] = v;
 	}
 	
+	
+	/**
+	 * Is a pixel on an edge?
+	 * If it is solid and there is air at at least one
+	 * of north, south, east, or west, then yes; otherwise
+	 * no.
+	 * @param xa
+	 * @param ya
+	 * @return
+	 */
+	public boolean isEdgePixel(int xa, int ya)
+	{
+		if(!value(xa, ya))
+			return false;
+		
+		if(root.value(xa + 1, ya))
+			return true;
+		if(root.value(xa - 1, ya))
+			return true;
+		if(root.value(xa, ya + 1))
+			return true;
+		if(root.value(xa, ya - 1))
+			return true;
+		return false;
+	}
+	
+
+	/**
+	 * Find an unvisited pixel on an edge
+	 * @return
+	 */
+	public iPoint findUnvisitedEdgePixel()
+	{
+		// Are we a single pixel?
+		
+		if(pix)
+		{
+			if(!visited[0])
+			{
+				if(isEdgePixel(x0, y0))
+					return new iPoint(x0, y0);
+			}	
+		}
+		
+		// Are we a solid rectangle?
+		
+		if(leaf())
+		{
+			if(!value)
+				return null;
+			
+			// Search the rectangle edges (middle pixels cannot be on an edge)
+			
+			for(int x = x0; x <= x1; x++)
+			{
+				if(!visited(x, y0))
+				{
+					if(isEdgePixel(x, y0))
+						return new iPoint(x, y0);
+				}
+				if(!visited(x, y1))
+				{
+					if(isEdgePixel(x, y1))
+						return new iPoint(x, y1);
+				}
+			}
+			
+			for(int y = y0 + 1; y < y1; y++)
+			{
+				if(!visited(x0, y))
+				{
+					if(isEdgePixel(x0, y))
+						return new iPoint(x0, y);
+				}
+				if(!visited(x1, y))
+				{
+					if(isEdgePixel(x1, y))
+						return new iPoint(x1, y);
+				}
+			}
+		}
+		
+		// Search the child quads recursively
+		
+		iPoint ip = ne.findUnvisitedEdgePixel();
+		if(ip != null)
+			return ip;
+		
+		ip = nw.findUnvisitedEdgePixel();
+		if(ip != null)
+			return ip;
+		
+		ip = sw.findUnvisitedEdgePixel();
+		if(ip != null)
+			return ip;
+		
+		ip = se.findUnvisitedEdgePixel();
+		return ip;
+	}
+
+	
+	//*********************************************************************************************************
+	
+	// Boolean operators
+	
 	/**
 	 * Internal recusive complement function actually to do the
 	 * work.  The tree has already been created by a deep copy.
 	 *
 	 */
-	private void comp(Attributes a)
+	private void comp()
 	{
 		if(leaf())
 		{
-			if(attributes == null)
-				attributes = a;
-			else
-				attributes = null;
+			value = !value;
 			return;
 		} else
-			attributes = a;
+			value = false;
 		
-		ne.comp(a);
-		nw.comp(a);
-		sw.comp(a);
-		se.comp(a);
+		ne.comp();
+		nw.comp();
+		sw.comp();
+		se.comp();
 	}
 	
 	/**
@@ -379,38 +509,7 @@ public class BooleanGrid
 	public BooleanGrid complement()
 	{
 		BooleanGrid result = new BooleanGrid(this, null);
-		result.comp(attributes);
-		return result;
-	}
-	
-	/**
-	 * Internal new-attributes function actually to do the
-	 * work.  The tree has already been created by a deep copy.
-	 *
-	 */
-	private void newA(Attributes a)
-	{
-		if(attributes != null)
-			attributes = a;
-		
-		if(leaf())
-
-			return;
-		
-		ne.comp(a);
-		nw.comp(a);
-		sw.comp(a);
-		se.comp(a);
-	}
-	
-	/**
-	 * Grid with new attributes
-	 * @return
-	 */
-	public BooleanGrid newAttributes(Attributes a)
-	{
-		BooleanGrid result = new BooleanGrid(this, null);
-		result.newA(a);
+		result.comp();
 		return result;
 	}
 	
@@ -422,13 +521,8 @@ public class BooleanGrid
 	 * @param p
 	 * @return
 	 */
-	private static BooleanGrid recursiveUnion(BooleanGrid d, BooleanGrid e, Attributes a, BooleanGrid p)
+	private static BooleanGrid recursiveUnion(BooleanGrid d, BooleanGrid e, BooleanGrid r)
 	{
-		if(d.attributes != null && e.attributes != null)
-		{
-			if(d.attributes != e.attributes)
-			System.err.println("BooleanGrid recursiveUnion(): different attributes!");
-		}
 		if(d.x0 != e.x0 || d.x1 != e.x1)
 			System.err.println("BooleanGrid recursiveUnion(): different quads!");
 		
@@ -436,27 +530,27 @@ public class BooleanGrid
 		
 		if(d.leaf())
 		{
-			if(d.attributes == null)
-				result = new BooleanGrid(e, p);
+			if(d.value)
+				result = new BooleanGrid(d, r);
 			else
-				result = new BooleanGrid(d, p);
+				result = new BooleanGrid(e, r);
 			return result;
 		}
 		
 		if(e.leaf())
 		{
-			if(e.attributes == null)
-				result = new BooleanGrid(d, p);
+			if(e.value)
+				result = new BooleanGrid(e, r);
 			else
-				result = new BooleanGrid(e, p);
+				result = new BooleanGrid(d, r);
 			return result;
 		}
 		
-		result = new BooleanGrid(d.x0, d.y0, d.x1, d.y1, a, p);
-		result.ne = recursiveUnion(d.ne, e.ne, a, result);
-		result.nw = recursiveUnion(d.nw, e.nw, a, result);
-		result.sw = recursiveUnion(d.sw, e.sw, a, result);
-		result.se = recursiveUnion(d.se, e.se, a, result);
+		result = new BooleanGrid(d.x0, d.y0, d.x1, d.y1, r);
+		result.ne = recursiveUnion(d.ne, e.ne, result.root);
+		result.nw = recursiveUnion(d.nw, e.nw, result.root);
+		result.sw = recursiveUnion(d.sw, e.sw, result.root);
+		result.se = recursiveUnion(d.se, e.se, result.root);
 		
 		return result;
 	}
@@ -469,7 +563,7 @@ public class BooleanGrid
 	 */
 	public static BooleanGrid union(BooleanGrid d, BooleanGrid e)
 	{
-		return recursiveUnion(d, e, d.attributes, null);
+		return recursiveUnion(d, e, null);
 	}
 	
 	/**
@@ -480,13 +574,8 @@ public class BooleanGrid
 	 * @param p
 	 * @return
 	 */
-	private static BooleanGrid recursiveIntersection(BooleanGrid d, BooleanGrid e, Attributes a, BooleanGrid p)
+	private static BooleanGrid recursiveIntersection(BooleanGrid d, BooleanGrid e, BooleanGrid r)
 	{
-		if(d.attributes != null && e.attributes != null)
-		{
-			if(d.attributes != e.attributes)
-			System.err.println("BooleanGrid recursiveIntersection(): different attributes!");
-		}
 		if(d.x0 != e.x0 || d.x1 != e.x1)
 			System.err.println("BooleanGrid recursiveIntersection(): different quads!");
 		
@@ -494,27 +583,27 @@ public class BooleanGrid
 		
 		if(d.leaf())
 		{
-			if(d.attributes == null)
-				result = new BooleanGrid(d, p);
+			if(d.value)
+				result = new BooleanGrid(e, r);
 			else
-				result = new BooleanGrid(e, p);
+				result = new BooleanGrid(d, r);
 			return result;
 		}
 		
 		if(e.leaf())
 		{
-			if(e.attributes == null)
-				result = new BooleanGrid(e, p);
+			if(e.value)
+				result = new BooleanGrid(d, r);
 			else
-				result = new BooleanGrid(d, p);
+				result = new BooleanGrid(e, r);
 			return result;
 		}
 		
-		result = new BooleanGrid(d.x0, d.y0, d.x1, d.y1, a, p);
-		result.ne = recursiveIntersection(d.ne, e.ne, a, result);
-		result.nw = recursiveIntersection(d.nw, e.nw, a, result);
-		result.sw = recursiveIntersection(d.sw, e.sw, a, result);
-		result.se = recursiveIntersection(d.se, e.se, a, result);
+		result = new BooleanGrid(d.x0, d.y0, d.x1, d.y1, r);
+		result.ne = recursiveIntersection(d.ne, e.ne, result.root);
+		result.nw = recursiveIntersection(d.nw, e.nw, result.root);
+		result.sw = recursiveIntersection(d.sw, e.sw, result.root);
+		result.se = recursiveIntersection(d.se, e.se, result.root);
 		
 		return result;
 	}
@@ -527,7 +616,7 @@ public class BooleanGrid
 	 */
 	public static BooleanGrid intersection(BooleanGrid d, BooleanGrid e)
 	{
-		return recursiveIntersection(d, e, d.attributes, null);
+		return recursiveIntersection(d, e, null);
 	}
 	
 	/**
