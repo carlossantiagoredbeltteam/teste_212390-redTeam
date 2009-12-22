@@ -1,3 +1,23 @@
+
+/**
+ * This class stores a rectangular grid at the same grid resolution
+ * as the RepRap machine's finest resolution using a quad tree.
+ * 
+ * It is thus effectively a pixel bitmap, but with much more
+ * efficient storage.  There are two types of pixel: solid (or true),
+ * and air (or false).
+ * 
+ * There are Boolean operators implemented to allow unions, intersections,
+ * and differences of two bitmaps, and complements of one.
+ * 
+ * There are also functions to do ray-trace intersections, to find the parts
+ * of lines that are solid, and outline following, to find the perimiters of
+ * solid shapes as polygons.
+ * 
+ * @author Adrian Bowyer
+ *
+ */
+
 package org.reprap.geometry.polygons;
 
 /**
@@ -16,13 +36,7 @@ class iPoint
 	}
 }
 
-/**
- * This class stores a rectangular grid at the same grid resolution
- * as the RepRap machine's finest resolution using a quad tree.
- * 
- * @author ensab
- *
- */
+
 public class BooleanGrid 
 {
 	private static double xInc = 0.1;
@@ -46,14 +60,26 @@ public class BooleanGrid
 	 */
 	public void destroy() 
 	{
-		
+		visited = null;
+		root = null;
+		if(!leaf())
+		{
+			ne.destroy();
+			nw.destroy();
+			sw.destroy();
+			se.destroy();
+		}
+		ne = null;
+		nw = null;
+		sw = null;
+		se = null;
 	}
 	
 	/**
-	 * Build the grid from a CSG polygon
+	 * Build the grid from a CSG expression
 	 * @param csgP
 	 */
-	public BooleanGrid(RrCSGPolygon csgP)
+	public BooleanGrid(RrCSG csg)
 	{
 		value = false;
 		root = this;
@@ -63,7 +89,7 @@ public class BooleanGrid
 		x1 = xSize;
 		y1 = ySize;
 		visited = null;
-		generateQuadTree(csgP.csg());
+		generateQuadTree(csg);
 	}
 	
 	/**
@@ -175,12 +201,16 @@ public class BooleanGrid
 		nw = new BooleanGrid(x0, ym+1, xm, y1, root);
 		sw = new BooleanGrid(x0, y0, xm, ym, root);
 		se = new BooleanGrid(xm+1, y0, x1, ym, root);
+		
 		Rr2Point inc = new Rr2Point(xInc*0.5, yInc*0.5);
 		Rr2Point m = new Rr2Point((xm + 0.5)*xInc, (ym + 0.5)*yInc);
-		ne.generateQuadTree(csg.prune(new RrRectangle(m, Rr2Point.add(p1, inc))));
-		nw.generateQuadTree(csg);
-		sw.generateQuadTree(csg);
-		se.generateQuadTree(csg);
+		p0 = Rr2Point.sub(p0, inc);
+		p1 = Rr2Point.add(p1, inc);
+		
+		ne.generateQuadTree(csg.prune(new RrRectangle(m, p1)));
+		nw.generateQuadTree(csg.prune(new RrRectangle(new Rr2Point(p0.x(), m.y()), new Rr2Point(m.x(), p1.y()))));
+		sw.generateQuadTree(csg.prune(new RrRectangle(p0, m)));
+		se.generateQuadTree(csg.prune(new RrRectangle(new Rr2Point(m.x(), p0.y()), new Rr2Point(p1.x(), m.y()))));
 	}
 	
 	//*************************************************************************************
@@ -377,6 +407,28 @@ public class BooleanGrid
 			l.visited[i] = v;
 	}
 	
+	/**
+	 * Reset all the visited flags
+	 *
+	 */
+	public void resetVisited()
+	{
+		if(leaf())
+		{
+			if(visited != null)
+			{
+				for(int i = 0; i < visited.length; i++)
+					visited[i] = false;
+			}
+		} else
+		{
+			ne.resetVisited();
+			nw.resetVisited();
+			sw.resetVisited();
+			se.resetVisited();
+		}
+	}
+	
 	
 	/**
 	 * Is a pixel on an edge?
@@ -475,6 +527,23 @@ public class BooleanGrid
 		
 		ip = se.findUnvisitedEdgePixel();
 		return ip;
+	}
+	
+	/**
+	 * Find a neighbour of a pixel that has not yet been visited and is on an edge.
+	 * @param xa
+	 * @param ya
+	 * @return
+	 */
+	public iPoint findUnvisitedNeighbourOnEdge(int xa, int ya)
+	{
+		for(int x = -1; x <= 1; x++)
+			for(int y = -1; y <= 1; y++)
+				if(x != 0 && y != 0)
+					if(isEdgePixel(xa+x, ya+y))
+						if(!visited(xa+x, ya+y))
+							return new iPoint(xa+x, ya+y);
+		return null;
 	}
 
 	
