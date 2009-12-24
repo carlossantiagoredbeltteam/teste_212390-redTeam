@@ -296,7 +296,7 @@ public class LayerProducer {
 		hatchedPolygons = new RrPolygonList();
 		hatchedPolygons.add(offHatch.hatch(layerConditions));
 		
-		if(borderPolygons != null)
+		if(borderPolygons != null && borderPolygons.size() > 0)
 		{
 			borderPolygons.middleStarts(hatchedPolygons, layerConditions);
 			if(Preferences.loadGlobalBool("Shield"))
