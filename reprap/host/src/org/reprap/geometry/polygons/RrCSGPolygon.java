@@ -196,8 +196,6 @@ public class RrCSGPolygon
 	 */
 	private Attributes att = null;
 	
-	private BooleanGrid grid = null;
-	
 	/**
 	 * Flag to prevent cyclic graphs going round forever
 	 */
@@ -247,9 +245,6 @@ public class RrCSGPolygon
 		//if(att != null)
 		//	att.destroy();
 		att = null;
-		if(grid != null)
-			grid.destroy();
-		grid = null;
 		beingDestroyed = false;
 	}
 	
@@ -269,7 +264,6 @@ public class RrCSGPolygon
 		i2 = null;
 		vertex = null;
 		att = null;
-		grid = null;
 		super.finalize();
 	}
 	
@@ -295,7 +289,6 @@ public class RrCSGPolygon
 		vertex = null;
 		i1 = new RrInterval();
 		i2 = new RrInterval();
-		grid = null;
 	}
 	
 	/**
@@ -323,7 +316,6 @@ public class RrCSGPolygon
 		vertex = null;
 		i1 = new RrInterval();
 		i2 = new RrInterval();
-		grid = null;
 	}
 	
 	/**
@@ -752,15 +744,6 @@ public class RrCSGPolygon
 		if(!leaf())
 			result.divide(resolution_2, sFactor);
 		return result;
-	}
-	
-	/**
-	 * get the grid (if any).
-	 * @return
-	 */
-	public BooleanGrid grid()
-	{
-		return grid;
 	}
 	  
 	/**
