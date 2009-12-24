@@ -19,6 +19,7 @@ import org.reprap.geometry.polygons.RrCSGPolygonList;
 import org.reprap.geometry.polygons.RrPolygon;
 import org.reprap.geometry.polygons.RrPolygonList;
 import org.reprap.geometry.polygons.RrRectangle;
+import org.reprap.geometry.polygons.BooleanGrid;
 import org.reprap.utilities.Debug;
 import org.reprap.utilities.RrGraphics;
 
@@ -126,7 +127,7 @@ public class LayerProducer {
 	 * CSG representation of the polygons offset by the width of
 	 * the extruders
 	 */
-	RrCSGPolygonList offBorder = null;
+	//RrCSGPolygonList offBorder = null;
 	
 	/**
 	 * CSG representation of the polygons offset by the factor of the
@@ -186,10 +187,6 @@ public class LayerProducer {
 			csgP.destroy();
 		csgP = null;
 		
-		if(offBorder != null)
-			offBorder.destroy();
-		offBorder = null;
-		
 		if(offHatch != null)
 			offHatch.destroy();
 		offHatch = null;
@@ -216,7 +213,6 @@ public class LayerProducer {
 		hatchedPolygons = null;
 		borderPolygons = null;
 		csgP = null;
-		offBorder = null;
 		offHatch = null;
 		startNearHere = null;
 		super.finalize();
@@ -287,9 +283,16 @@ public class LayerProducer {
 			offHatch = offHatch.union(lc.getPrinter().getExtruders());
 		} else
 		{
-			offBorder = csgP.offset(layerConditions, true);
+			RrCSGPolygonList offBorder = csgP.offset(layerConditions, true);
 			offBorder.divide(Preferences.tiny(), 1.01);
 			borderPolygons = offBorder.megList();
+			//BooleanGrid bg;
+			//borderPolygons = new RrPolygonList();
+			//for(int i = 0; i < offBorder.size(); i++)
+			//{
+			//	bg = new BooleanGrid(offBorder.get(i).csg());
+			//	borderPolygons.add(bg.allPerimiters(offBorder.get(i).getAttributes())); 
+			//}
 		}
 		
 		offHatch.divide(Preferences.tiny(), 1.01);		
