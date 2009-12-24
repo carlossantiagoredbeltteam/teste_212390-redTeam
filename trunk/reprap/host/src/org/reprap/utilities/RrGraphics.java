@@ -565,49 +565,29 @@ public class RrGraphics
 		g2d.setColor(infill);
 		Rr2Point sw = transform(q.box().sw());
 		Rr2Point ne = transform(q.box().ne());
-		BooleanGrid g = q.grid();
-		if(g == null)
-		{
-			int x0 = (int)Math.round(sw.x());
-			int y0 = (int)Math.round(sw.y());
-			int x1 = (int)Math.round(ne.x());
-			int y1 = (int)Math.round(ne.y());
 
-			if(q.csg().operator() == RrCSGOp.UNIVERSE)
-			{
-				g2d.fillRect(x0, y1, x1 - x0 + 1, y0 - y1 + 1);
-				return;
-			}
+		int x0 = (int)Math.round(sw.x());
+		int y0 = (int)Math.round(sw.y());
+		int x1 = (int)Math.round(ne.x());
+		int y1 = (int)Math.round(ne.y());
 
-			for(int x = x0; x <= x1; x++)
-			{
-				for(int y = y1; y <= y0; y++)  // Bloody backwards coordinates...
-				{
-					Rr2Point p = iTransform(x, y);
-					double v = q.csg().value(p);
-					if(v <= 0)
-						g2d.fillRect(x, y, 1, 1);
-				}
-			}
-		} else
+		if(q.csg().operator() == RrCSGOp.UNIVERSE)
 		{
-			// TODO FIXME!!!
-//			int x = g.firstX();
-//			while(x <= g.lastX())
-//			{
-//				int y = g.firstY();
-//				while(y <= g.lastY())
-//				{
-//					if(g.value(x,y))
-//					{
-//						Rr2Point p = transform(new Rr2Point(x*BooleanGrid.gridX(), y*BooleanGrid.gridY()));
-//						g2d.fillRect((int)Math.round(p.x()), (int)Math.round(p.y()), 1, 1);
-//					}
-//					y++;
-//				}
-//				x++;
-//			}
+			g2d.fillRect(x0, y1, x1 - x0 + 1, y0 - y1 + 1);
+			return;
 		}
+
+		for(int x = x0; x <= x1; x++)
+		{
+			for(int y = y1; y <= y0; y++)  // Bloody backwards coordinates...
+			{
+				Rr2Point p = iTransform(x, y);
+				double v = q.csg().value(p);
+				if(v <= 0)
+					g2d.fillRect(x, y, 1, 1);
+			}
+		}
+
 	}
 	
 	private void boxCSG(RrCSGPolygon q)

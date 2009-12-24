@@ -20,6 +20,9 @@
 
 package org.reprap.geometry.polygons;
 
+
+import org.reprap.Attributes;
+
 /**
  * Integer 2D point
  * @author ensab
@@ -689,27 +692,34 @@ public class BooleanGrid
 	 * Return all the outlines of all the solid areas as polygons
 	 * @return
 	 */
-//	public RrPolygonList allPerimiters()
-//	{
-//		RrPolygonList result = new RrPolygonList();
-//		RrPolygon p;
-//		
-//		iPoint pixel = findUnvisitedEdgePixel();
-//		while(pixel != null)
-//		{
-//			setVisited(pixel, true);
-//			p = new RrPolygon();
-//			p.add(pixel.realPoint());
-//			iPoint neighbour = findUnvisitedNeighbourOnEdge
-//			
-//			
-//			pixel = findUnvisitedEdgePixel();
-//		}
-//		
-//		resetVisited();
-//		
-//		return result;
-//	}
+	public RrPolygonList allPerimiters(Attributes a)
+	{
+		RrPolygonList result = new RrPolygonList();
+		RrPolygon p;
+		
+		iPoint pixel = findUnvisitedEdgePixel();
+		
+		while(pixel != null)
+		{
+			p = new RrPolygon(a, true);
+			
+			while(pixel != null)
+			{
+				p.add(pixel.realPoint());
+				setVisited(pixel, true);
+				pixel = findUnvisitedNeighbourOnEdge(pixel);
+			}
+			
+			if(p.size() >= 3)
+				result.add(p.simplify(1.3*Math.sqrt(xInc*xInc + yInc*yInc)));
+			
+			pixel = findUnvisitedEdgePixel();
+		}
+		
+		resetVisited();
+		
+		return result;
+	}
 
 	
 	//*********************************************************************************************************
@@ -852,7 +862,9 @@ public class BooleanGrid
 	 */
 	public static BooleanGrid intersection(BooleanGrid d, BooleanGrid e)
 	{
-		return recursiveIntersection(d, e, null);
+		BooleanGrid result = recursiveIntersection(d, e, null);
+		result.compress();
+		return result;
 	}
 	
 	/**
@@ -863,7 +875,7 @@ public class BooleanGrid
 	 */
 	public static BooleanGrid difference(BooleanGrid d, BooleanGrid e)
 	{
-		BooleanGrid result = recursiveIntersection(d, e, null);
+		BooleanGrid result = recursiveIntersection(d, e.complement(), null);
 		result.compress();
 		return result;
 	}
