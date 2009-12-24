@@ -25,31 +25,60 @@ package org.reprap.geometry.polygons;
  * @author ensab
  *
  */
-class iPoint
-{
-	public int x, y;
-	
-	iPoint(int xa, int ya)
-	{
-		x = xa;
-		y = ya;
-	}
-}
-
 
 public class BooleanGrid 
 {
-	private static double xInc = 0.1;
-	private static double yInc = 0.1;
-	private static int xSize = 2000;
-	private static int ySize = 2000;
+	static final double xInc = 0.1;
+	static final double yInc = 0.1;
+	static final int xSize = 2000;
+	static final int ySize = 2000;
 	
 	private BooleanGrid ne, nw, sw, se;
 	private boolean visited[]; 
 	private BooleanGrid root;
-	private int x0, y0, x1, y1;
+	private iPoint ipsw, ipne;
 	private boolean pix;
 	private boolean value;
+	
+	//**************************************************************************************************
+	
+	// Integer 2D point coordinates
+	
+	class iPoint
+	{
+		public int x, y;
+		
+		iPoint(int xa, int ya)
+		{
+			x = xa;
+			y = ya;
+		}
+		
+		Rr2Point realPoint()
+		{
+			return new Rr2Point(x*xInc, y*yInc);
+		}
+		
+		boolean coincidesWith(iPoint b)
+		{
+			return x == b.x && y == b.y;
+		}
+		
+		iPoint add(iPoint b)
+		{
+			return new iPoint(x + b.x, y + b.y);
+		}
+		
+		iPoint divide(int i)
+		{
+			return new iPoint(x/i, y/i);
+		}
+		
+		iPoint mean(iPoint b)
+		{
+			return add(b).divide(2);
+		}
+	}
 	
 	//**************************************************************************************************
 	
@@ -84,10 +113,8 @@ public class BooleanGrid
 		value = false;
 		root = this;
 		pix = false;
-		x0 = 0;
-		y0 = 0;
-		x1 = xSize;
-		y1 = ySize;
+		ipsw = new iPoint(0, 0);
+		ipne = new iPoint(xSize, ySize);
 		visited = null;
 		generateQuadTree(csg);
 	}
@@ -101,31 +128,30 @@ public class BooleanGrid
 	 * @param a
 	 * @param p
 	 */
-	private BooleanGrid(int xa, int ya, int xb, int yb, BooleanGrid r)
+	private BooleanGrid(iPoint a, iPoint b, BooleanGrid r)
 	{
-		x0 = xa;
-		y0 = ya;
-		x1 = xb;
-		y1 = yb;
+		ipsw = a;
+		ipne = b;
 		value = false;
 		if(r == null)
 			root = this;
 		else
 			root = r;
 		visited = null;
+		ne = null;
+		nw = null;
+		sw = null;
+		se = null;
 	}
 	
 	/**
-	 * Deep copy constructor; r should be null for an external call.
-	 * NB - Attributes are not deep copied.
+	 * Deep copy constructor; r should be set null.
 	 * @param bg
 	 */
-	private BooleanGrid(BooleanGrid bg, BooleanGrid r)
+	public BooleanGrid(BooleanGrid bg, BooleanGrid r)
 	{
-		x0 = bg.x0;
-		y0 = bg.y0;
-		x1 = bg.x1;
-		y1 = bg.y1;
+		ipsw = bg.ipsw;
+		ipne = bg.ipne;
 		value = bg.value;
 		if(r == null)
 			root = this;
@@ -158,13 +184,27 @@ public class BooleanGrid
 	 * When a quad is homogeneous, set the appropriate variables to make it a leaf.
 	 * @param solid
 	 */
-	private void homogeneous(boolean solid)
+	private void homogeneous(boolean v)
 	{
-		value = solid;
+		value = v;
 		ne = null;
 		nw = null;
 		sw = null;
 		se = null;		
+	}
+	
+	/**
+	 * Set up the four quads to meet at the rectangle's mid point
+	 *
+	 */
+	private void setQuadsToMiddle()
+	{
+		iPoint im = ipsw.mean(ipne);
+		iPoint im1 = im.add(new iPoint(1,1));
+		ne = new BooleanGrid(im1, ipne, root);
+		nw = new BooleanGrid(new iPoint(ipsw.x, im1.y), new iPoint(im.x, ipne.y), root);
+		sw = new BooleanGrid(ipsw, im, root);
+		se = new BooleanGrid(new iPoint(im1.x, ipsw.y), new iPoint(ipne.x, im.y), root);		
 	}
 	
 	/**
@@ -173,20 +213,19 @@ public class BooleanGrid
 	 */
 	private void generateQuadTree(RrCSG csg)
 	{
-		Rr2Point p0 = new Rr2Point(x0*xInc, y0*yInc);
+		Rr2Point p0 = ipsw.realPoint();
 		
-		if(x0 == x1 && y0 == y1)
+		if(ipsw.coincidesWith(ipne))
 		{
 			pix = true;
 			visited = new boolean[1];
 			visited[0] = false;
-			double v = csg.value(p0);
-			homogeneous(v <= 0);
+			homogeneous(csg.value(p0) <= 0);
 			return;
 		}
 		
 		pix = false;
-		Rr2Point p1 = new Rr2Point(x1*xInc, y1*yInc);
+		Rr2Point p1 = ipne.realPoint();
 		RrRectangle r = new RrRectangle(p0, p1);
 		RrInterval i = csg.value(r);
 		if(!i.zero())
@@ -195,15 +234,11 @@ public class BooleanGrid
 			return;
 		}
 		
-		int xm = (x0 + x1)/2;
-		int ym = (y0 + y1)/2;
-		ne = new BooleanGrid(xm+1, ym+1, x1, y1, root);
-		nw = new BooleanGrid(x0, ym+1, xm, y1, root);
-		sw = new BooleanGrid(x0, y0, xm, ym, root);
-		se = new BooleanGrid(xm+1, y0, x1, ym, root);
+		setQuadsToMiddle();
 		
 		Rr2Point inc = new Rr2Point(xInc*0.5, yInc*0.5);
-		Rr2Point m = new Rr2Point((xm + 0.5)*xInc, (ym + 0.5)*yInc);
+		Rr2Point m = sw.ipne.realPoint();
+		m = Rr2Point.add(m, inc);
 		p0 = Rr2Point.sub(p0, inc);
 		p1 = Rr2Point.add(p1, inc);
 		
@@ -211,6 +246,36 @@ public class BooleanGrid
 		nw.generateQuadTree(csg.prune(new RrRectangle(new Rr2Point(p0.x(), m.y()), new Rr2Point(m.x(), p1.y()))));
 		sw.generateQuadTree(csg.prune(new RrRectangle(p0, m)));
 		se.generateQuadTree(csg.prune(new RrRectangle(new Rr2Point(m.x(), p0.y()), new Rr2Point(p1.x(), m.y()))));
+	}
+	
+	/**
+	 * Make a minimal quad tree after quads have been changed.
+	 *
+	 */
+	private void compress()
+	{
+		if(!leaf())
+		{
+			ne.compress();
+			nw.compress();
+			sw.compress();
+			se.compress();
+			
+			if(ne.leaf() && nw.leaf() && sw.leaf() && se.leaf())
+			{
+				if(ne.value == nw.value)
+					if(ne.value == sw.value)
+						if(ne.value == se.value)
+						{
+							this.value = ne.value;
+							visited = null;
+							ne = null;
+							nw = null;
+							sw = null;
+							se = null;
+						}
+			}
+		}
 	}
 	
 	//*************************************************************************************
@@ -240,55 +305,58 @@ public class BooleanGrid
 	{
 		return value;
 	}
-	
-	public int lowX()
-	{
-		return x0;
-	}
-	
-	public int lowY()
-	{
-		return y0;
-	}
-	
-	public int highX()
-	{
-		return x1;
-	}
-	
-	public int highY()
-	{
-		return y1;
-	}
+
 	
 	/**
-	 * Recursively find the leaf containing a point
+	 * Is a point in the box?
 	 * @param xa
 	 * @param ya
 	 * @return
 	 */
-	public BooleanGrid leaf(int xa, int ya)
+	private boolean inside(iPoint a)
 	{
-		if(xa < x0)
+		if(a.x < ipsw.x)
+			return false;
+		if(a.x > ipne.x)
+			return false;
+		if(a.y < ipsw.y)
+			return false;
+		if(a.y > ipne.y)
+			return false;
+		return true;
+	}
+	
+	/**
+	 * Recursively find the leaf containing a point
+	 * If the point is outsede the grid, null is returned.
+	 * @param xa
+	 * @param ya
+	 * @return
+	 */
+	public BooleanGrid leaf(iPoint a)
+	{
+		// Outside?
+		
+		if(!inside(a))
 			return null;
-		if(xa > x1)
-			return null;
-		if(ya < y0)
-			return null;
-		if(ya > y1)
-			return null;
+		
+		// Inside and this is the leaf quad?
+		
 		if(leaf())
 			return this;
-		BooleanGrid result = ne.leaf(xa, ya);
+		
+		// Recurse down the tree
+		
+		BooleanGrid result = ne.leaf(a);
 		if(result != null)
 			return result;
-		result = nw.leaf(xa, ya);
+		result = nw.leaf(a);
 		if(result != null)
 			return result;
-		result = sw.leaf(xa, ya);
+		result = sw.leaf(a);
 		if(result != null)
 			return result;
-		result = se.leaf(xa, ya);
+		result = se.leaf(a);
 		if(result != null)
 			return result;
 		System.err.println("BooleanGrid leaf(): null result for contained point!");
@@ -296,18 +364,79 @@ public class BooleanGrid
 	}
 	
 	/**
-	 * Find the value at a point.  This is the attributes if the point
-	 * is solid, or null if the point is in air.
+	 * Find the value at a point.  This is true if the point
+	 * is solid, or false if the point is in air.
 	 * @param xa
 	 * @param ya
 	 * @return
 	 */
-	public boolean value(int xa, int ya)
+	public boolean value(iPoint a)
 	{
-			BooleanGrid l = leaf(xa, ya);
+			BooleanGrid l = leaf(a);
 			if(l == null)
 				return false;
 			return l.value;
+	}
+	
+	/**
+	 * Recursively divide down to a single pixel, setting it to v and all the other
+	 * quads to theRest.
+	 * @param xa
+	 * @param ya
+	 * @param v
+	 * @param rest
+	 */
+	private void setValueRecursive(iPoint a, boolean v, boolean theRest)
+	{		
+		if(ipsw.coincidesWith(ipne))
+		{
+			pix = true;
+			visited = new boolean[1];
+			visited[0] = false;
+			if(ipsw.coincidesWith(a))
+				homogeneous(v);
+			else
+				homogeneous(theRest);
+			return;
+		}
+		
+		pix = false;
+
+		if(!inside(a))
+		{
+			homogeneous(theRest);
+			return;
+		}
+		
+		setQuadsToMiddle();
+				
+		ne.setValueRecursive(a, v, theRest);
+		nw.setValueRecursive(a, v, theRest);
+		sw.setValueRecursive(a, v, theRest);
+		se.setValueRecursive(a, v, theRest);
+	}
+	
+	/**
+	 * Set a single pixel, building the quad tree around it if need be
+	 * @param xa
+	 * @param ya
+	 * @param v
+	 */
+	public void setValue(iPoint a, boolean v)
+	{
+		BooleanGrid l = leaf(a);
+		if(l == null)
+			return;
+		if(l.value == v)
+			return;
+		if(l.pix)
+		{
+			l.value = v;
+			return;
+		}
+		l.visited = null;
+		l.value = false;
+		l.setValueRecursive(a, v, l.value);
 	}
 	
 	/**
@@ -319,11 +448,11 @@ public class BooleanGrid
 	 * @param ya
 	 * @return
 	 */
-	private int vIndex(int xa, int ya)
+	private int vIndex(iPoint a)
 	{
 		if(pix)
 		{
-			if(xa == x0 && ya == y0)
+			if(ipsw.coincidesWith(a))
 				return 0;
 			System.err.println("BooleanGrid vIndex(): not the single-pixel point!");
 			return -1;
@@ -331,32 +460,32 @@ public class BooleanGrid
 		
 		int result = -1;
 		
-		if(ya == y1)
+		if(a.y == ipne.y)
 		{
-			result = x1 - xa;
-			if(result >= x0)
+			result = ipne.x - a.x;
+			if(result >= ipsw.x)
 				return result;
 		}
 		
-		if(xa == x0)
+		if(a.x == ipsw.x)
 		{
-			result = y1 - ya;
-			if(result >= y0)
-				return result + x1 - x0;			
+			result = ipne.y - a.y;
+			if(result >= ipsw.y)
+				return result + ipne.x - ipsw.x;			
 		}
 		
-		if(ya == y0)
+		if(a.y == ipsw.y)
 		{
-			result = xa - x0;
-			if(result <= x1)
-				return result + x1 - x0 + y1 - y0;			
+			result = a.x - ipsw.x;
+			if(result <= ipne.x)
+				return result + ipne.x - ipsw.x + ipne.y - ipsw.y;			
 		}
 		
-		if(xa == x1)
+		if(a.x == ipne.x)
 		{
-			result = ya - y0;
-			if(result <= y1)
-				return result + 2*(x1 - x0) + y1 - y0;			
+			result = a.y - ipsw.y;
+			if(result <= ipne.y)
+				return result + 2*(ipne.x - ipsw.x) + ipne.y - ipsw.y;			
 		}
 
 		System.err.println("BooleanGrid vIndex(): non-perimiter point!");
@@ -369,14 +498,14 @@ public class BooleanGrid
 	 * @param ya
 	 * @return
 	 */
-	public boolean visited(int xa, int ya)
+	public boolean visited(iPoint a)
 	{
-		BooleanGrid l = leaf(xa, ya);
+		BooleanGrid l = leaf(a);
 		if(l == null)
 			return false;
 		if(l.visited == null)
 			return false;
-		int index = l.vIndex(xa, ya);
+		int index = l.vIndex(a);
 		if(index >= 0)
 			return l.visited[index];
 		else
@@ -389,20 +518,20 @@ public class BooleanGrid
 	 * @param ya
 	 * @param v
 	 */
-	public void setVisited(int xa, int ya, boolean v)
+	public void setVisited(iPoint a, boolean v)
 	{
-		BooleanGrid l = leaf(xa, ya);
+		BooleanGrid l = leaf(a);
 		if(l == null)
 			return;
 		int i;
 		if(l.visited == null)
 		{
-			int leng = 2*(l.x1 - l.x0 + l.y1 - l.y0);
+			int leng = 2*(l.ipne.x - l.ipsw.x + l.ipne.y - l.ipsw.y);
 			l.visited = new boolean[leng];
 			for(i = 0; i < leng; i++)
 				l.visited[i] = false;
 		}
-		i = l.vIndex(xa, ya);
+		i = l.vIndex(a);
 		if(i >= 0)
 			l.visited[i] = v;
 	}
@@ -439,18 +568,18 @@ public class BooleanGrid
 	 * @param ya
 	 * @return
 	 */
-	public boolean isEdgePixel(int xa, int ya)
+	public boolean isEdgePixel(iPoint a)
 	{
-		if(!value(xa, ya))
+		if(!value(a))
 			return false;
 		
-		if(root.value(xa + 1, ya))
+		if(root.value(new iPoint(a.x + 1, a.y)))
 			return true;
-		if(root.value(xa - 1, ya))
+		if(root.value(new iPoint(a.x - 1, a.y)))
 			return true;
-		if(root.value(xa, ya + 1))
+		if(root.value(new iPoint(a.x, a.y + 1)))
 			return true;
-		if(root.value(xa, ya - 1))
+		if(root.value(new iPoint(a.x, a.y - 1)))
 			return true;
 		return false;
 	}
@@ -468,8 +597,8 @@ public class BooleanGrid
 		{
 			if(!visited[0])
 			{
-				if(isEdgePixel(x0, y0))
-					return new iPoint(x0, y0);
+				if(isEdgePixel(ipsw))
+					return ipsw;
 			}	
 		}
 		
@@ -482,31 +611,37 @@ public class BooleanGrid
 			
 			// Search the rectangle edges (middle pixels cannot be on an edge)
 			
-			for(int x = x0; x <= x1; x++)
+			iPoint p;
+			
+			for(int x = ipsw.x; x <= ipne.x; x++)
 			{
-				if(!visited(x, y0))
+				p = new iPoint(x, ipsw.y);
+				if(!visited(p))
 				{
-					if(isEdgePixel(x, y0))
-						return new iPoint(x, y0);
+					if(isEdgePixel(p))
+						return p;
 				}
-				if(!visited(x, y1))
+				p = new iPoint(x, ipne.y);
+				if(!visited(p))
 				{
-					if(isEdgePixel(x, y1))
-						return new iPoint(x, y1);
+					if(isEdgePixel(p))
+						return p;
 				}
 			}
 			
-			for(int y = y0 + 1; y < y1; y++)
+			for(int y = ipsw.y + 1; y < ipne.y; y++)
 			{
-				if(!visited(x0, y))
+				p = new iPoint(ipsw.x, y);
+				if(!visited(p))
 				{
-					if(isEdgePixel(x0, y))
-						return new iPoint(x0, y);
+					if(isEdgePixel(p))
+						return p;
 				}
-				if(!visited(x1, y))
+				p = new iPoint(ipne.x, y);
+				if(!visited(p))
 				{
-					if(isEdgePixel(x1, y))
-						return new iPoint(x1, y);
+					if(isEdgePixel(p))
+						return p;
 				}
 			}
 		}
@@ -535,16 +670,46 @@ public class BooleanGrid
 	 * @param ya
 	 * @return
 	 */
-	public iPoint findUnvisitedNeighbourOnEdge(int xa, int ya)
+	public iPoint findUnvisitedNeighbourOnEdge(iPoint a)
 	{
 		for(int x = -1; x <= 1; x++)
 			for(int y = -1; y <= 1; y++)
 				if(x != 0 && y != 0)
-					if(isEdgePixel(xa+x, ya+y))
-						if(!visited(xa+x, ya+y))
-							return new iPoint(xa+x, ya+y);
+				{
+					iPoint b = new iPoint(x, y);
+					b = b.add(a);
+					if(isEdgePixel(b))
+						if(!visited(b))
+							return b;
+				}
 		return null;
 	}
+	
+	/**
+	 * Return all the outlines of all the solid areas as polygons
+	 * @return
+	 */
+//	public RrPolygonList allPerimiters()
+//	{
+//		RrPolygonList result = new RrPolygonList();
+//		RrPolygon p;
+//		
+//		iPoint pixel = findUnvisitedEdgePixel();
+//		while(pixel != null)
+//		{
+//			setVisited(pixel, true);
+//			p = new RrPolygon();
+//			p.add(pixel.realPoint());
+//			iPoint neighbour = findUnvisitedNeighbourOnEdge
+//			
+//			
+//			pixel = findUnvisitedEdgePixel();
+//		}
+//		
+//		resetVisited();
+//		
+//		return result;
+//	}
 
 	
 	//*********************************************************************************************************
@@ -592,7 +757,7 @@ public class BooleanGrid
 	 */
 	private static BooleanGrid recursiveUnion(BooleanGrid d, BooleanGrid e, BooleanGrid r)
 	{
-		if(d.x0 != e.x0 || d.x1 != e.x1)
+		if(!d.ipsw.coincidesWith(e.ipsw) || !d.ipne.coincidesWith(e.ipne))
 			System.err.println("BooleanGrid recursiveUnion(): different quads!");
 		
 		BooleanGrid result;
@@ -615,7 +780,7 @@ public class BooleanGrid
 			return result;
 		}
 		
-		result = new BooleanGrid(d.x0, d.y0, d.x1, d.y1, r);
+		result = new BooleanGrid(d.ipsw, d.ipne, r);
 		result.ne = recursiveUnion(d.ne, e.ne, result.root);
 		result.nw = recursiveUnion(d.nw, e.nw, result.root);
 		result.sw = recursiveUnion(d.sw, e.sw, result.root);
@@ -632,7 +797,9 @@ public class BooleanGrid
 	 */
 	public static BooleanGrid union(BooleanGrid d, BooleanGrid e)
 	{
-		return recursiveUnion(d, e, null);
+		BooleanGrid result = recursiveUnion(d, e, null);
+		result.compress();
+		return result;
 	}
 	
 	/**
@@ -645,7 +812,7 @@ public class BooleanGrid
 	 */
 	private static BooleanGrid recursiveIntersection(BooleanGrid d, BooleanGrid e, BooleanGrid r)
 	{
-		if(d.x0 != e.x0 || d.x1 != e.x1)
+		if(!d.ipsw.coincidesWith(e.ipsw) || !d.ipne.coincidesWith(e.ipne))
 			System.err.println("BooleanGrid recursiveIntersection(): different quads!");
 		
 		BooleanGrid result;
@@ -668,7 +835,7 @@ public class BooleanGrid
 			return result;
 		}
 		
-		result = new BooleanGrid(d.x0, d.y0, d.x1, d.y1, r);
+		result = new BooleanGrid(d.ipsw, d.ipne, r);
 		result.ne = recursiveIntersection(d.ne, e.ne, result.root);
 		result.nw = recursiveIntersection(d.nw, e.nw, result.root);
 		result.sw = recursiveIntersection(d.sw, e.sw, result.root);
@@ -696,6 +863,8 @@ public class BooleanGrid
 	 */
 	public static BooleanGrid difference(BooleanGrid d, BooleanGrid e)
 	{
-		return intersection(d, e.complement());
+		BooleanGrid result = recursiveIntersection(d, e, null);
+		result.compress();
+		return result;
 	}
 }
