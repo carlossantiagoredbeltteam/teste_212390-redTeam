@@ -19,11 +19,15 @@
  * 0.14Erik		17/09/09	Bugfix: minor problem in anti-backlash. Would sometimes match and replace too many values.
  * 0.15Erik		17/09/09	Feature: added anti-ooze system for Bowden extruder. Still experimental, stops pullback after a while, WHY?!
  * 0.16Erik             21/11/09        Feature: status line with progress indication.
+ * 0.17Erik             28/12/09        Feature: can perform a search for the input file in varous directories
+
+Upcoming:
+ * 0.18Erik             28/12/09        Feature: can remove the raft if --noraft is set
 
  */
 ini_set('memory_limit','128M');
 
-$version = 0.16;
+$version = 0.17;
 out("\n( Modified by 3D-to-5D-Gcode v$version on ".date("c").')');
 $uTime=microtime(true);
 // Settings:
@@ -32,8 +36,8 @@ $setting['prepend_gcode'] = "G1 E50 F2000\nG1 Z0.3 F80\n";  	// begin with this 
 //$setting['append_gcode'] = "G91\nG1 Z4 F40\nG90\nM104 S200";  // add this Gcode at the end
 $setting['append_gcode'] = "G91\nG1 Z4 F40\nG90\nM104 S150";  // add this Gcode at the end
 $setting['extrusion_adjust'] = 1.5;  		// factor to adjust extruded distances with
-$setting['extruder_backlash_fwd']=402.0;	// manages tension in the Bowden extruder or for other more flexible material feedstock. Extrusion adjust NOT factored in.
-$setting['extruder_backlash_rev']=400.0;	// The amount to pull it back (see prev, comment)
+//$setting['extruder_backlash_fwd']=402.0;	// manages tension in the Bowden extruder or for other more flexible material feedstock. Extrusion adjust NOT factored in.
+//$setting['extruder_backlash_rev']=400.0;	// The amount to pull it back (see prev, comment)
 $setting['reversing_minimum_distance'] = 5; // minimum amount of travel milimeters to reverse extruder for (smaller is slower builds)
 $setting['reversing_minimum_extrusion'] = $setting['extruder_backlash_fwd']*.75; // if litle material is extruded, many reverses (pumping action) without much extrusion will transfer heat higher up the heater barrel. The extruder should reverse only when about 75% of the 'backlash' is extruded again.
 
@@ -77,11 +81,18 @@ $setting['remove_comments'] = true;  // Set true/false to remove comments from i
 //$setting['soften_z_move_factor'] = .5;  // this slows down the move in the Z direction to this speed
 $setting['anti-backlash'] = array(
 //	'X'=>array('fwd_dynamic'=>0.0/*mm*/, 'rev_dynamic'=>0.0/*mm*/,'fwd_static'=>0.20/*mm*/, 'rev_static'=>0.20/*mm*/ ), // Backlash on X-axis
-	'Y'=>array('fwd_dynamic'=>0.00/*mm*/, 'rev_dynamic'=>0.00/*mm*/,'fwd_static'=>0.25/*mm*/, 'rev_static'=>0.25/*mm*/ ), // Backlash on Y-axis
+	//'Y'=>array('fwd_dynamic'=>0.00/*mm*/, 'rev_dynamic'=>0.00/*mm*/,'fwd_static'=>0.25/*mm*/, 'rev_static'=>0.25/*mm*/ ), // Backlash on Y-axis
 // Y backlash was .30
 	//'Y'=>array('fwd_dynamic'=>0.45/*mm*/, 'rev_dynamic'=>0.45/*mm*/,'fwd_static'=>0.1/*mm*/, 'rev_static'=>0.1/*mm*/ ), // Backlash on Y-axis
 );
-$setting['output_file'] = 'out-5D.gcode'; // null = output directly.
+if(ereg("^(.+)_export\.gcode$",basename($argv[1]),$regs))
+  $setting['output_file'] = $regs[1].'.gcode';
+elseif(ereg("^(.+)\.gcode$",basename($argv[1]),$regs))
+  $setting['output_file'] = $regs[1].'.gcode';
+elseif(ereg("^([^\.]+)$",basename($argv[1]),$regs))
+  $setting['output_file'] = $regs[1].'.gcode';
+else
+  $setting['output_file'] = 'out-5D.gcode'; // null = output directly.
 $setting['default_output_path'] = '/home/erik/RepRap/gcode/';
 
 $settings_file = $_SERVER['HOME']."/.reprap/3D-to-5D.settings";
@@ -114,6 +125,9 @@ $conditionOk = false;
 
     if($segs < 3) echo "Error: travel feedrate accelleration is misconfigured, accelerated_travel_segments should be at minimum 3.";
 
+echo "\nOutput file is: ".$setting['output_file']."\n";
+  @unlink($setting['output_file']);
+
 // The *OLD*, 3D (lame!) way:
 // M108 S200 ; extruder motor speed at 200 PWM
 // M101 ; extruder motor forward
@@ -123,10 +137,7 @@ $conditionOk = false;
 // G1 X0.0 Y0.0 Z0.0
 // G1 X1.0 Y1.0 E1.4142 ; Extrude the pythagorian distance (X^2+Y^2)^.5. Assuming just XY plain (2D) moves...
 //
-if($argv[1])
-  $fName = $argv[1];
-else 
-  die("\nUsage: ".basename($argv[0])." foo.gcode [--setting-name setting-value] [--output_file filename.gcode]\n");
+$fName = determine_input_file($argv[1]);
 
 bcscale(4);
 $lines = file($fName); // ugly mem-sucker... I know. When I have files that are too big I'll improve this ;) 
@@ -661,4 +672,35 @@ function Sec2Time($time){
   }
 }
 
+function determine_input_file($fName='')
+{
+  if(!$fName)
+    die("\nUsage: ".basename($argv[0])." foo.gcode [--setting-name setting-value] [--output_file filename.gcode]\n");
+
+  if(!file_exists($fName))
+  {
+    echo "\nWarning, $fName not found. Looking in search paths...\n";
+
+    $tryFile = array(
+      "/home/erik/RepRap/obj/$fName",
+      "/home/erik/RepRap/obj/${fName}_export.gcode",
+      "/home/erik/RepRap/obj/$fName*.gcode",
+      "/home/erik/RepRap/obj/${fName}*_export.gcode",
+
+    );
+    $fName = '';
+    foreach($tryFile as $try)
+    {
+      $results = glob($try);
+      if(count($results)==1)
+      {
+        $fName = $try;
+        echo "\nNotice: found unambiguous matching filename.";
+        break;
+      }
+    }
+    if($fName=='') die("\nNo input file found in search paths:\n".print_r($tryFile,true));
+  }
+  return $fName;
+}
 ?>
