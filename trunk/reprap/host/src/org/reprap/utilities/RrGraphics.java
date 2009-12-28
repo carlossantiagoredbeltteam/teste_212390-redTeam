@@ -131,6 +131,11 @@ public class RrGraphics
 	/**
 	 * 
 	 */
+	private BooleanGrid bg = null;
+	
+	/**
+	 * 
+	 */
 	private boolean csgSolid = true;
 	
 	/**
@@ -372,6 +377,12 @@ public class RrGraphics
 			p_list = new RrPolygonList(pl);
 		else
 			p_list.add(pl);
+		jframe.repaint();
+	}
+	
+	public void add(BooleanGrid b)
+	{
+		bg = b;
 		jframe.repaint();
 	}
 	
@@ -635,6 +646,40 @@ public class RrGraphics
 	}
 	
 	/**
+	 * Recursively fill a Boolean Grid where it's solid.
+	 * @param q
+	 */
+	private void fillBG(BooleanGrid b)
+	{
+		if(RrRectangle.intersection(b.box(), scaledBox).empty())
+			return;
+		
+		if(!b.leaf())
+		{
+			fillBG(b.northEast());
+			fillBG(b.northWest());
+			fillBG(b.southEast());
+			fillBG(b.southWest());
+			return;
+		}
+		
+		if(!b.value())
+			return;
+			
+		g2d.setColor(infill);
+		Rr2Point sw = transform(b.box().sw());
+		Rr2Point ne = transform(b.box().ne());
+
+		int x0 = (int)Math.round(sw.x());
+		int y0 = (int)Math.round(sw.y());
+		int x1 = (int)Math.round(ne.x());
+		int y1 = (int)Math.round(ne.y());
+
+
+		g2d.fillRect(x0, y1, x1 - x0 + 1, y0 - y1 + 1);
+	}
+	
+	/**
 	 * Recursively plot the boxes for an STL object
 	 * @param s
 	 */
@@ -726,6 +771,11 @@ public class RrGraphics
 		if(hp != null)
 		{
 			plot(hp);
+		}
+		
+		if(bg != null)
+		{
+			fillBG(bg);
 		}
 	}
 	

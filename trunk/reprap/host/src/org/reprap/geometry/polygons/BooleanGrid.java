@@ -33,8 +33,8 @@ public class BooleanGrid
 {
 	static final double xInc = 0.1;
 	static final double yInc = 0.1;
-	static final int xSize = 2000;
-	static final int ySize = 2000;
+	static final int xSize = 2048; // N.B. Must be a power of 2
+	static final int ySize = 2048;
 	
 	private BooleanGrid ne, nw, sw, se;
 	private boolean visited[]; 
@@ -80,6 +80,11 @@ public class BooleanGrid
 		iPoint mean(iPoint b)
 		{
 			return add(b).divide(2);
+		}
+		
+		public String toString()
+		{
+			return ": " + x + ", " + y + " :";
 		}
 	}
 	
@@ -229,8 +234,7 @@ public class BooleanGrid
 		
 		pix = false;
 		Rr2Point p1 = ipne.realPoint();
-		RrRectangle r = new RrRectangle(p0, p1);
-		RrInterval i = csg.value(r);
+		RrInterval i = csg.value(new RrRectangle(p0, p1));
 		if(!i.zero())
 		{
 			homogeneous(i.high() <= 0);
@@ -308,6 +312,16 @@ public class BooleanGrid
 	{
 		return value;
 	}
+	
+	public RrRectangle box()
+	{
+		return new RrRectangle(ipsw.realPoint(), ipne.realPoint());
+	}
+	
+	public BooleanGrid northEast() { return ne; }
+	public BooleanGrid northWest() { return nw; }
+	public BooleanGrid southWest() { return sw; }
+	public BooleanGrid southEast() { return se; }
 
 	
 	/**
@@ -444,7 +458,7 @@ public class BooleanGrid
 	
 	/**
 	 * Compute the index of a pixel on the periphery of a quad in the
-	 * visited array.  visited[0] corresponds to the most north-easterly
+	 * visited array.  visited[0] corresponds to the most south-westerly
 	 * pixel in the quad, and the numbers increment anti-clockwise round 
 	 * the edge.
 	 * @param xa
@@ -453,6 +467,12 @@ public class BooleanGrid
 	 */
 	private int vIndex(iPoint a)
 	{
+		if(!inside(a))
+		{
+			System.err.println("BooleanGrid vIndex(): not in the box!");
+			return -1;
+		}
+		
 		if(pix)
 		{
 			if(ipsw.coincidesWith(a))
@@ -461,38 +481,22 @@ public class BooleanGrid
 			return -1;
 		}
 		
-		int result = -1;
-		
-		if(a.y == ipne.y)
-		{
-			result = ipne.x - a.x;
-			if(result >= ipsw.x)
-				return result;
-		}
-		
-		if(a.x == ipsw.x)
-		{
-			result = ipne.y - a.y;
-			if(result >= ipsw.y)
-				return result + ipne.x - ipsw.x;			
-		}
-		
 		if(a.y == ipsw.y)
-		{
-			result = a.x - ipsw.x;
-			if(result <= ipne.x)
-				return result + ipne.x - ipsw.x + ipne.y - ipsw.y;			
-		}
+			return a.x - ipsw.x;
 		
 		if(a.x == ipne.x)
-		{
-			result = a.y - ipsw.y;
-			if(result <= ipne.y)
-				return result + 2*(ipne.x - ipsw.x) + ipne.y - ipsw.y;			
-		}
+			return a.y - ipsw.y + ipne.x - ipsw.x;			
+		
+		if(a.y == ipne.y)
+			return 2*ipne.x - a.x - ipsw.x + ipne.y - ipsw.y;		
 
-		System.err.println("BooleanGrid vIndex(): non-perimiter point!");
-		return result;
+		
+		if(a.x == ipsw.x)
+			return ipne.y - a.y + 2*(ipne.x - ipsw.x) + ipne.y - ipsw.y;
+
+
+		System.err.println("BooleanGrid vIndex(): non-perimiter point:" + a.toString() + "(" + ipsw.toString() + ipne.toString() + ")");
+		return -1;
 	}
 	
 	/**
@@ -576,13 +580,13 @@ public class BooleanGrid
 		if(!value(a))
 			return false;
 		
-		if(root.value(new iPoint(a.x + 1, a.y)))
+		if(!root.value(new iPoint(a.x + 1, a.y)))
 			return true;
-		if(root.value(new iPoint(a.x - 1, a.y)))
+		if(!root.value(new iPoint(a.x - 1, a.y)))
 			return true;
-		if(root.value(new iPoint(a.x, a.y + 1)))
+		if(!root.value(new iPoint(a.x, a.y + 1)))
 			return true;
-		if(root.value(new iPoint(a.x, a.y - 1)))
+		if(!root.value(new iPoint(a.x, a.y - 1)))
 			return true;
 		return false;
 	}
@@ -598,9 +602,9 @@ public class BooleanGrid
 		
 		if(pix)
 		{
-			if(!visited[0])
+			if(isEdgePixel(ipsw))
 			{
-				if(isEdgePixel(ipsw))
+				if(!visited[0])
 					return ipsw;
 			}	
 		}
@@ -619,15 +623,15 @@ public class BooleanGrid
 			for(int x = ipsw.x; x <= ipne.x; x++)
 			{
 				p = new iPoint(x, ipsw.y);
-				if(!visited(p))
+				if(isEdgePixel(p))
 				{
-					if(isEdgePixel(p))
+					if(!visited(p))
 						return p;
 				}
 				p = new iPoint(x, ipne.y);
-				if(!visited(p))
+				if(isEdgePixel(p))
 				{
-					if(isEdgePixel(p))
+					if(!visited(p))
 						return p;
 				}
 			}
@@ -635,18 +639,20 @@ public class BooleanGrid
 			for(int y = ipsw.y + 1; y < ipne.y; y++)
 			{
 				p = new iPoint(ipsw.x, y);
-				if(!visited(p))
+				if(isEdgePixel(p))
 				{
-					if(isEdgePixel(p))
+					if(!visited(p))
 						return p;
 				}
 				p = new iPoint(ipne.x, y);
-				if(!visited(p))
+				if(isEdgePixel(p))
 				{
-					if(isEdgePixel(p))
+					if(!visited(p))
 						return p;
 				}
 			}
+			
+			return null;
 		}
 		
 		// Search the child quads recursively
@@ -677,7 +683,7 @@ public class BooleanGrid
 	{
 		for(int x = -1; x <= 1; x++)
 			for(int y = -1; y <= 1; y++)
-				if(x != 0 && y != 0)
+				if(!(x == 0 && y == 0))
 				{
 					iPoint b = new iPoint(x, y);
 					b = b.add(a);
@@ -710,6 +716,7 @@ public class BooleanGrid
 				pixel = findUnvisitedNeighbourOnEdge(pixel);
 			}
 			
+			System.err.println("Polygon size: " + p.size());
 			if(p.size() >= 3)
 				result.add(p.simplify(1.3*Math.sqrt(xInc*xInc + yInc*yInc)));
 			
