@@ -59,6 +59,12 @@ public class BooleanGrid
 			y = ya;
 		}
 		
+		iPoint(iPoint a)
+		{
+			x = a.x;
+			y = a.y;
+		}
+		
 		Rr2Point realPoint()
 		{
 			return new Rr2Point(x*xInc, y*yInc);
@@ -72,6 +78,16 @@ public class BooleanGrid
 		iPoint add(iPoint b)
 		{
 			return new iPoint(x + b.x, y + b.y);
+		}
+		
+		iPoint sub(iPoint b)
+		{
+			return new iPoint(x - b.x, y - b.y);
+		}
+		
+		iPoint abs()
+		{
+			return new iPoint(Math.abs(x), Math.abs(y));
 		}
 		
 		iPoint divide(int i)
@@ -90,13 +106,20 @@ public class BooleanGrid
 		}
 	}
 	
+	/**
+	 * Integer-point polygon
+	 * @author ensab
+	 *
+	 */
 	class iPolygon
 	{
 		private List<iPoint> points = null;
+		private boolean closed;
 		
-		public iPolygon()
+		public iPolygon(boolean c)
 		{
 			points = new ArrayList<iPoint>();
+			closed = c;
 		}
 		
 		public iPolygon(iPolygon a)
@@ -104,6 +127,7 @@ public class BooleanGrid
 			points = new ArrayList<iPoint>();
 			for(int i = 0; i < a.size(); i++)
 				add(a.point(i));
+			closed = a.closed;
 		}
 		
 		public iPoint point(int i)
@@ -121,52 +145,86 @@ public class BooleanGrid
 			points.add(p);
 		}
 		
-		private int nextX(int i, int x)
+		private int findAngleStart(int v1)
 		{
-			i++;
-			while(i < size())
+			int leng = size();
+			iPoint p1 = point(v1%leng);
+			int v2 = v1;
+			for(int i = 0; i <= leng; i++)
 			{
-				if(x != point(i).x)
-					return i;
-				i++;
+				v2++;
+				DDA line = new DDA(p1, point(v2%leng));
+				iPoint n = line.next();
+				boolean off = false;
+				int j = v1;
+				while(n != null)
+				{		
+					if(point(j%leng).coincidesWith(n))
+					{
+						off = false;
+					} else
+					{
+						if(off)
+						{
+							if(v2 - 2 >= 0)
+								return v2 - 2;
+							return leng - 1;
+						}
+						off = true;
+					}
+					n = line.next();
+					j++;
+				}	
 			}
-			return size();
+			System.err.println("iPolygon.findAngleStart(): polygon is all one straight line!");
+			return -1;
 		}
 		
-		private int nextY(int i, int y)
+		public iPolygon simplify()
 		{
-			i++;
-			while(i < size())
-			{
-				if(y != point(i).y)
-					return i;
-				i++;
-			}
-			return size();
-		}
-		
-		public iPolygon rightFilter()
-		{
-			if(size() < 3)
+			int leng = size();
+			if(leng <= 3)
 				return new iPolygon(this);
-			
-			iPolygon result = new iPolygon();
-			
-			int last = 0;
-			int nextx, nexty;
-			while(last < size())
+			iPolygon r = new iPolygon(closed);
+
+			int v1 = findAngleStart(0);
+			// We get back -1 if the points are in a straight line.
+			if (v1<0)
 			{
-				result.add(point(last));
-				nextx = nextX(last, point(last).x);
-				nexty = nextY(last, point(last).y);
-				if(nexty > nextx)
-					last = nexty - 1;
-				else
-					last = nextx - 1;
+				r.add(point(0));
+				r.add(point(leng-1));
+				return r;
 			}
 			
-			
-			return result;
+			if(!closed)
+				r.add(point(0));
+
+			r.add(point(v1%leng));
+			int v2 = v1;
+			while(true)
+			{
+				// We get back -1 if the points are in a straight line. 
+				v2 = findAngleStart(v2);
+				if(v2<0)
+				{
+					System.err.println("iPolygon.simplify(): points were not in a straight line; now they are!");
+					return(r);
+				}
+				
+				if(v2 > leng || (!closed && v2 == leng))
+				{
+					return(r);
+				}
+				
+				if(v2 == leng && closed)
+				{
+					r.points.add(0, point(0));
+					return r;
+				}
+				r.add(point(v2%leng));
+			}
+			// The compiler is very clever to spot that no return
+			// is needed here...
 		}
 		
 		public RrPolygon realPolygon(Attributes a, boolean closed)
@@ -174,6 +232,81 @@ public class BooleanGrid
 			RrPolygon result = new RrPolygon(a, closed);
 			for(int i = 0; i < size(); i++)
 				result.add(point(i).realPoint());
+			return result;
+		}
+	}
+	
+	/**
+	 * Straight-line DDA
+	 * @author ensab
+	 *
+	 */
+	class DDA
+	{
+		private iPoint delta, count, p;
+		private int steps, taken;
+		private boolean xPlus, yPlus, finished;
+		
+		/**
+		 * Set up the DDA between a start and an end point
+		 * @param s
+		 * @param e
+		 */
+		DDA(iPoint s, iPoint e)
+		{
+			delta = e.sub(s).abs();
+
+			steps = Math.max(delta.x, delta.y);
+			taken = 0;
+			
+			xPlus = e.x >= s.x;
+			yPlus = e.y >= s.y;
+
+			count = new iPoint(-steps/2, -steps/2);
+			
+			p = new iPoint(s);
+			
+			finished = false;
+		}
+		
+		/**
+		 * Return the next point along the line, or null
+		 * if the last point returned was the final one.
+		 * @return
+		 */
+		iPoint next()
+		{
+			if(finished)
+				return null;
+
+			iPoint result = new iPoint(p);
+
+			finished = taken >= steps;
+
+			if(!finished)
+			{
+				taken++;
+				count = count.add(delta);
+				
+				if (count.x > 0)
+				{
+					count.x -= steps;
+					if (xPlus)
+						p.x++;
+					else
+						p.x--;
+				}
+
+				if (count.y > 0)
+				{
+					count.y -= steps;
+					if (yPlus)
+						p.y++;
+					else
+						p.y--;
+				}
+			}
+			
 			return result;
 		}
 	}
@@ -791,26 +924,26 @@ public class BooleanGrid
 	public RrPolygonList allPerimiters(Attributes a)
 	{
 		RrPolygonList result = new RrPolygonList();
-		RrPolygon p;
+		iPolygon ip;
 		
 		iPoint pixel = findUnvisitedEdgePixel();
 		
 		while(pixel != null)
 		{
-			p = new RrPolygon(a, true);
+			ip = new iPolygon(true);
 			
 			while(pixel != null)
 			{
-				p.add(pixel.realPoint());
+				ip.add(pixel);
 				setVisited(pixel, true);
 				pixel = findUnvisitedNeighbourOnEdge(pixel);
 			}
 			
-			System.err.print("Polygon before size: " + p.size());
-			p = p.simplify(0.5*(xInc + yInc));
-			System.err.println(", polygon after size: " + p.size());
-			if(p.size() >= 3)
-				result.add(p);
+			//System.err.print("Polygon before size: " + ip.size());
+			ip = ip.simplify();
+			//System.err.println(", polygon after size: " + ip.size());
+			if(ip.size() >= 3)
+				result.add(ip.realPolygon(a, true));
 			
 			pixel = findUnvisitedEdgePixel();
 		}
