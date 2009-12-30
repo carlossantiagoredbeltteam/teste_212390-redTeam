@@ -22,6 +22,8 @@ package org.reprap.geometry.polygons;
 
 
 import org.reprap.Attributes;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Integer 2D point
@@ -85,6 +87,94 @@ public class BooleanGrid
 		public String toString()
 		{
 			return ": " + x + ", " + y + " :";
+		}
+	}
+	
+	class iPolygon
+	{
+		private List<iPoint> points = null;
+		
+		public iPolygon()
+		{
+			points = new ArrayList<iPoint>();
+		}
+		
+		public iPolygon(iPolygon a)
+		{
+			points = new ArrayList<iPoint>();
+			for(int i = 0; i < a.size(); i++)
+				add(a.point(i));
+		}
+		
+		public iPoint point(int i)
+		{
+			return points.get(i);
+		}
+		
+		public int size()
+		{
+			return points.size();
+		}
+		
+		public void add(iPoint p)
+		{
+			points.add(p);
+		}
+		
+		private int nextX(int i, int x)
+		{
+			i++;
+			while(i < size())
+			{
+				if(x != point(i).x)
+					return i;
+				i++;
+			}
+			return size();
+		}
+		
+		private int nextY(int i, int y)
+		{
+			i++;
+			while(i < size())
+			{
+				if(y != point(i).y)
+					return i;
+				i++;
+			}
+			return size();
+		}
+		
+		public iPolygon rightFilter()
+		{
+			if(size() < 3)
+				return new iPolygon(this);
+			
+			iPolygon result = new iPolygon();
+			
+			int last = 0;
+			int nextx, nexty;
+			while(last < size())
+			{
+				result.add(point(last));
+				nextx = nextX(last, point(last).x);
+				nexty = nextY(last, point(last).y);
+				if(nexty > nextx)
+					last = nexty - 1;
+				else
+					last = nextx - 1;
+			}
+			
+			
+			return result;
+		}
+		
+		public RrPolygon realPolygon(Attributes a, boolean closed)
+		{
+			RrPolygon result = new RrPolygon(a, closed);
+			for(int i = 0; i < size(); i++)
+				result.add(point(i).realPoint());
+			return result;
 		}
 	}
 	
@@ -716,9 +806,11 @@ public class BooleanGrid
 				pixel = findUnvisitedNeighbourOnEdge(pixel);
 			}
 			
-			System.err.println("Polygon size: " + p.size());
+			System.err.print("Polygon before size: " + p.size());
+			p = p.simplify(0.5*(xInc + yInc));
+			System.err.println(", polygon after size: " + p.size());
 			if(p.size() >= 3)
-				result.add(p.simplify(1.3*Math.sqrt(xInc*xInc + yInc*yInc)));
+				result.add(p);
 			
 			pixel = findUnvisitedEdgePixel();
 		}
