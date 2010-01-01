@@ -55,6 +55,16 @@ public class Debug {
 	}
 	
 	/**
+	 * A real hard error...
+	 * @param s
+	 */
+	static public void e(String s)
+	{
+		initialiseIfNeedBe();
+		System.err.println("ERROR: " + s + Timer.stamp());
+	}
+	
+	/**
 	 * Just print a message anytime
 	 * @param s
 	 */
