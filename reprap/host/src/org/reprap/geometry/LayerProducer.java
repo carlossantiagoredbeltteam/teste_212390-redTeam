@@ -13,6 +13,7 @@ import org.reprap.Printer;
 import org.reprap.Attributes;
 import org.reprap.Preferences;
 import org.reprap.ReprapException;
+import org.reprap.Extruder;
 import org.reprap.devices.pseudo.LinePrinter;
 import org.reprap.geometry.polygons.Rr2Point;
 import org.reprap.geometry.polygons.RrCSGPolygonList;
@@ -277,6 +278,8 @@ public class LayerProducer {
 		
 		offHatch = csgP.offset(layerConditions, false);
 		
+		BooleanGrid bg;
+		
 		if(layerConditions.getLayingSupport())
 		{
 			borderPolygons = null;
@@ -286,19 +289,16 @@ public class LayerProducer {
 			RrCSGPolygonList offBorder = csgP.offset(layerConditions, true);
 //			offBorder.divide(Preferences.tiny(), 1.01);
 //			borderPolygons = offBorder.megList();
-			BooleanGrid bg;
-			borderPolygons = new RrPolygonList();
-			for(int i = 0; i < offBorder.size(); i++)
-			{
-				bg = new BooleanGrid(offBorder.get(i).csg());
-				borderPolygons.add(bg.allPerimiters(offBorder.get(i).getAttributes())); 
-			}
+			borderPolygons = BooleanGrid.borders(offBorder);
 		}
 		
-		offHatch.divide(Preferences.tiny(), 1.01);		
-		hatchedPolygons = new RrPolygonList();
-		hatchedPolygons.add(offHatch.hatch(layerConditions));
-		
+//		offHatch.divide(Preferences.tiny(), 1.01);		
+//		hatchedPolygons = new RrPolygonList();
+//		hatchedPolygons.add(offHatch.hatch(layerConditions));
+			
+		hatchedPolygons = BooleanGrid.hatch(layerConditions, offHatch);
+
+
 		if(borderPolygons != null && borderPolygons.size() > 0)
 		{
 			borderPolygons.middleStarts(hatchedPolygons, layerConditions);
