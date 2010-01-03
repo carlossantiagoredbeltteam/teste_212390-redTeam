@@ -25,20 +25,22 @@ import org.reprap.Attributes;
 import java.util.ArrayList;
 import java.util.List;
 import org.reprap.utilities.Debug;
-
-/**
- * Integer 2D point
- * @author ensab
- *
- */
+import org.reprap.Extruder;
+import org.reprap.geometry.LayerRules;
 
 public class BooleanGrid 
 {
-	// Integer 2D point coordinates
+	// Various internal classes to make things work...
 	
+	/**
+	 * Integer 2D point
+	 * @author ensab
+	 *
+	 */
+
 	class iPoint
 	{
-		public int x, y;
+		private int x, y;
 		
 		iPoint(int xa, int ya)
 		{
@@ -46,58 +48,106 @@ public class BooleanGrid
 			y = ya;
 		}
 		
+		/**
+		 * Copy constructor
+		 * @param a
+		 */
 		iPoint(iPoint a)
 		{
 			x = a.x;
 			y = a.y;
 		}
 		
+		/**
+		 * Convert real-world point to integer
+		 * @param a
+		 */
 		iPoint(Rr2Point a)
 		{
 			x = (int)(0.5 + a.x()/xInc);
 			y = (int)(0.5 + a.y()/yInc);
 		}		
 		
+		/**
+		 * Generate the equivalent real-world point
+		 * @return
+		 */
 		Rr2Point realPoint()
 		{
 			return new Rr2Point(x*xInc, y*yInc);
 		}
 		
+		/**
+		 * Are two points the same?
+		 * @param b
+		 * @return
+		 */
 		boolean coincidesWith(iPoint b)
 		{
 			return x == b.x && y == b.y;
 		}
 		
+		/**
+		 * Vector addition
+		 * @param b
+		 * @return
+		 */
 		iPoint add(iPoint b)
 		{
 			return new iPoint(x + b.x, y + b.y);
 		}
 		
+		/**
+		 * Vector subtraction
+		 * @param b
+		 * @return
+		 */
 		iPoint sub(iPoint b)
 		{
 			return new iPoint(x - b.x, y - b.y);
 		}
 		
+		/**
+		 * Absolute value
+		 * @return
+		 */
 		iPoint abs()
 		{
 			return new iPoint(Math.abs(x), Math.abs(y));
 		}
 		
+		/**
+		 * Divide by an integer
+		 * @param i
+		 * @return
+		 */
 		iPoint divide(int i)
 		{
 			return new iPoint(x/i, y/i);
 		}
 		
+		/**
+		 * Squared length
+		 * @return
+		 */
 		long magnitude2()
 		{
 			return x*x + y*y;
 		}
 		
+		/**
+		 * Point half-way between two others
+		 * @param b
+		 * @return
+		 */
 		iPoint mean(iPoint b)
 		{
 			return add(b).divide(2);
 		}
 		
+		/**
+		 * For printing
+		 */
 		public String toString()
 		{
 			return ": " + x + ", " + y + " :";
@@ -111,8 +161,21 @@ public class BooleanGrid
 	 */
 	class iPolygon
 	{
+		/**
+		 * Auto-extending list of points
+		 */
 		private List<iPoint> points = null;
+		
+		/**
+		 * Does the polygon loop back on itself?
+		 */
 		private boolean closed;
+		
+		protected void finalize() throws Throwable
+		{
+			points = null;
+			super.finalize();
+		}
 		
 		public iPolygon(boolean c)
 		{
@@ -120,6 +183,10 @@ public class BooleanGrid
 			closed = c;
 		}
 		
+		/**
+		 * Deep copy
+		 * @param a
+		 */
 		public iPolygon(iPolygon a)
 		{
 			points = new ArrayList<iPoint>();
@@ -128,32 +195,58 @@ public class BooleanGrid
 			closed = a.closed;
 		}
 		
+		/**
+		 * Return the point at a given index
+		 * @param i
+		 * @return
+		 */
 		public iPoint point(int i)
 		{
 			return points.get(i);
 		}
 		
+		/**
+		 * How many points?
+		 * @return
+		 */
 		public int size()
 		{
 			return points.size();
 		}
 		
+		/**
+		 * Add a new point on the end
+		 * @param p
+		 */
 		public void add(iPoint p)
 		{
 			points.add(p);
 		}
 		
+		/**
+		 * Add a whole polygon on the end
+		 * @param a
+		 */
 		public void add(iPolygon a)
 		{
 			for(int i = 0; i < a.size(); i++)
 				add(a.point(i));
 		}
 		
+		/**
+		 * Delete a point and close the resulting gap
+		 * @param i
+		 */
 		public void remove(int i)
 		{
 			points.remove(i);
 		}
 		
+		/**
+		 * Find the index of the point in the polygon nearest to another point
+		 * @param a
+		 * @return
+		 */
 		public int nearest(iPoint a)
 		{
 			int i = 0;
@@ -161,17 +254,23 @@ public class BooleanGrid
 			long d0 = Long.MAX_VALUE;
 			while(i < size())
 			{
-				long d1 = point(i).magnitude2();
+				long d1 = point(i).sub(a).magnitude2();
 				if(d1 < d0)
 				{
 					j = i;
 					d0 = d1;
 				}
+				i++;
 			}
 			return j;
 		}
 		
-		
+		/**
+		 * Find the furthest point from point v1 on the polygon such that the polygon between
+		 * the two can be approximated by a DDA straight line from v1.
+		 * @param v1
+		 * @return
+		 */
 		private int findAngleStart(int v1)
 		{
 			int leng = size();
@@ -208,6 +307,11 @@ public class BooleanGrid
 				return v2 - 1;
 		}
 		
+		/**
+		 * Generate an equivalent polygon with fewer vertices by removing chains of points
+		 * that lie in straight lines.
+		 * @return
+		 */
 		public iPolygon simplify()
 		{
 			int leng = size();
@@ -216,13 +320,6 @@ public class BooleanGrid
 			iPolygon r = new iPolygon(closed);
 
 			int v1 = findAngleStart(0);
-			// We get back -1 if the points are in a straight line.
-			if (v1<0)
-			{
-				r.add(point(0));
-				r.add(point(leng-1));
-				return r;
-			}
 			
 			if(!closed)
 				r.add(point(0));
@@ -255,6 +352,11 @@ public class BooleanGrid
 			// is needed here...
 		}
 		
+		/**
+		 * Convert the polygon into a polygon in the real world.
+		 * @param a
+		 * @return
+		 */
 		public RrPolygon realPolygon(Attributes a)
 		{
 			RrPolygon result = new RrPolygon(a, closed);
@@ -264,30 +366,69 @@ public class BooleanGrid
 		}
 	}
 	
+	/**
+	 * A list of polygons
+	 * @author ensab
+	 *
+	 */
 	class iPolygonList
 	{
 		private List<iPolygon> polygons = null;
+		
+		protected void finalize() throws Throwable
+		{
+			polygons = null;
+			super.finalize();
+		}
 		
 		public iPolygonList()
 		{
 			polygons = new ArrayList<iPolygon>();
 		}
 		
+		/**
+		 * Return the ith polygon
+		 * @param i
+		 * @return
+		 */
 		public iPolygon polygon(int i)
 		{
 			return polygons.get(i);
 		}
 		
+		/**
+		 * How many polygons are there in the list?
+		 * @return
+		 */
 		public int size()
 		{
 			return polygons.size();
 		}
 		
+		/**
+		 * Add a polygon on the end
+		 * @param p
+		 */
 		public void add(iPolygon p)
 		{
 			polygons.add(p);
 		}
 		
+		/**
+		 * Add another list of polygons on the end
+		 * @param a
+		 */
+		public void add(iPolygonList a)
+		{
+			for(int i = 0; i < a.size(); i++)
+				add(a.polygon(i));
+		}
+		
+		/**
+		 * Turn all the polygons into real-world polygons
+		 * @param a
+		 * @return
+		 */
 		public RrPolygonList realPolygons(Attributes a)
 		{
 			RrPolygonList result = new RrPolygonList();
@@ -307,6 +448,14 @@ public class BooleanGrid
 		private iPoint delta, count, p;
 		private int steps, taken;
 		private boolean xPlus, yPlus, finished;
+		
+		protected void finalize() throws Throwable
+		{
+			delta = null;
+			count = null;
+			p = null;
+			super.finalize();
+		}
 		
 		/**
 		 * Set up the DDA between a start and an end point
@@ -372,20 +521,74 @@ public class BooleanGrid
 		}
 	}
 	
+	/**
+	 * Little class to hold the ends of hatching patterns
+	 * @author ensab
+	 *
+	 */
+	class SnakeEnd
+	{
+		public iPolygon track;
+		public int hitPlaneIndex;
+		
+		protected void finalize() throws Throwable
+		{
+			track = null;
+			super.finalize();
+		}
+		
+		public SnakeEnd(iPolygon t, int h)
+		{
+			track = t;
+			hitPlaneIndex = h;
+		}
+	}
+	
 	//**************************************************************************************************
 	
 	// Start of BooleanGrid propper
 	
+	/**
+	 * Roughly the resolution of the RepRap machine
+	 */
 	static final double xInc = 0.1;
 	static final double yInc = 0.1;
-	static final int xSize = 2048; // N.B. Must be a power of 2
-	static final int ySize = 2048;
 	
+	/**
+	 * The size of the pixel map
+	 * N.B. Must be a power of 2
+	 */
+	static final int xSize = 4098;
+	static final int ySize = 4098;
+	
+	/**
+	 * The quads that this quad is divided into.
+	 */
 	private BooleanGrid ne, nw, sw, se;
-	private boolean visited[]; 
+	
+	/**
+	 * Flags to tell if pixels have been visited during searches
+	 */
+	private boolean visited[];
+	
+	/**
+	 * The root quad of the tree
+	 */
 	private BooleanGrid root;
+	
+	/**
+	 * The coordinates of the corners of this quad
+	 */
 	private iPoint ipsw, ipne;
+	
+	/**
+	 * True if this quad is a single pixel
+	 */
 	private boolean pix;
+	
+	/**
+	 * False if this quad is air; true if it's solid.
+	 */
 	private boolean value;
 	
 	//**************************************************************************************************
@@ -394,21 +597,22 @@ public class BooleanGrid
 	/**
 	 * Destroy all my pretty chickens and their dam 
 	 */
-	public void destroy() 
+	protected void finalize() throws Throwable
 	{
 		visited = null;
 		root = null;
 		if(!leaf())
 		{
-			ne.destroy();
-			nw.destroy();
-			sw.destroy();
-			se.destroy();
+			ne.finalize();
+			nw.finalize();
+			sw.finalize();
+			se.finalize();
 		}
 		ne = null;
 		nw = null;
 		sw = null;
 		se = null;
+		super.finalize();
 	}
 	
 	/**
@@ -452,7 +656,8 @@ public class BooleanGrid
 	}
 	
 	/**
-	 * Deep copy constructor; r should be set null.
+	 * Deep copy constructor; r should be set null when
+	 * you call this.
 	 * @param bg
 	 */
 	public BooleanGrid(BooleanGrid bg, BooleanGrid r)
@@ -501,7 +706,7 @@ public class BooleanGrid
 	}
 	
 	/**
-	 * Set up the four quads to meet at the rectangle's mid point
+	 * Set up the four child quads to meet at this quad's mid point
 	 *
 	 */
 	private void setQuadsToMiddle()
@@ -548,6 +753,10 @@ public class BooleanGrid
 		p0 = Rr2Point.sub(p0, inc);
 		p1 = Rr2Point.add(p1, inc);
 		
+		/*
+		 * Note that we prune the CSG expression to each quad's rectangle, thus
+		 * making it simpler as we go down.
+		 */
 		ne.generateQuadTree(csg.prune(new RrRectangle(m, p1)));
 		nw.generateQuadTree(csg.prune(new RrRectangle(new Rr2Point(p0.x(), m.y()), new Rr2Point(m.x(), p1.y()))));
 		sw.generateQuadTree(csg.prune(new RrRectangle(p0, m)));
@@ -555,7 +764,9 @@ public class BooleanGrid
 	}
 	
 	/**
-	 * Make a minimal quad tree after quads have been changed.
+	 * Make a minimal quad tree after quads have been changed by
+	 * turning quad whose children are identical into leaves.  Note that
+	 * this has to recurse first, then unify.
 	 *
 	 */
 	private void compress()
@@ -597,36 +808,36 @@ public class BooleanGrid
 		return ne == null;
 	}
 	
-	public static double gridX()
-	{
-		return xInc;
-	}
-	
-	public static double gridY()
-	{
-		return yInc;
-	}
-	
+	/**
+	 * Are we solid (true) or air (false)?
+	 * @return
+	 */
 	public boolean value()
 	{
 		return value;
 	}
 	
+	/**
+	 * This quad's rectangle in real-world coordinaes.
+	 * @return
+	 */
 	public RrRectangle box()
 	{
 		return new RrRectangle(ipsw.realPoint(), ipne.realPoint());
 	}
 	
+	/**
+	 * Return the child quads
+	 * @return
+	 */
 	public BooleanGrid northEast() { return ne; }
 	public BooleanGrid northWest() { return nw; }
 	public BooleanGrid southWest() { return sw; }
 	public BooleanGrid southEast() { return se; }
-
-	
+		
 	/**
-	 * Is a point in the box?
-	 * @param xa
-	 * @param ya
+	 * Is a point in the quad?
+	 * @param a
 	 * @return
 	 */
 	private boolean inside(iPoint a)
@@ -645,8 +856,7 @@ public class BooleanGrid
 	/**
 	 * Recursively find the leaf containing a point
 	 * If the point is outsede the grid, null is returned.
-	 * @param xa
-	 * @param ya
+	 * @param a
 	 * @return
 	 */
 	public BooleanGrid leaf(iPoint a)
@@ -682,8 +892,7 @@ public class BooleanGrid
 	/**
 	 * Find the value at a point.  This is true if the point
 	 * is solid, or false if the point is in air.
-	 * @param xa
-	 * @param ya
+	 * @param a
 	 * @return
 	 */
 	public boolean value(iPoint a)
@@ -697,10 +906,9 @@ public class BooleanGrid
 	/**
 	 * Recursively divide down to a single pixel, setting it to v and all the other
 	 * quads to theRest.
-	 * @param xa
-	 * @param ya
+	 * @param a
 	 * @param v
-	 * @param rest
+	 * @param theRest
 	 */
 	private void setValueRecursive(iPoint a, boolean v, boolean theRest)
 	{		
@@ -734,8 +942,7 @@ public class BooleanGrid
 	
 	/**
 	 * Set a single pixel, building the quad tree around it if need be
-	 * @param xa
-	 * @param ya
+	 * @param a
 	 * @param v
 	 */
 	public void setValue(iPoint a, boolean v)
@@ -760,8 +967,7 @@ public class BooleanGrid
 	 * visited array.  visited[0] corresponds to the most south-westerly
 	 * pixel in the quad, and the numbers increment anti-clockwise round 
 	 * the edge.
-	 * @param xa
-	 * @param ya
+	 * @param a
 	 * @return
 	 */
 	private int vIndex(iPoint a)
@@ -800,8 +1006,7 @@ public class BooleanGrid
 	
 	/**
 	 * Has a pixel been visited?
-	 * @param xa
-	 * @param ya
+	 * @param a
 	 * @return
 	 */
 	public boolean visited(iPoint a)
@@ -820,8 +1025,8 @@ public class BooleanGrid
 	
 	/**
 	 * Set a pixel visited, or not
-	 * @param xa
-	 * @param ya
+	 * The visited array is lazily created here, if need be.
+	 * @param a
 	 * @param v
 	 */
 	public void setVisited(iPoint a, boolean v)
@@ -843,7 +1048,7 @@ public class BooleanGrid
 	}
 	
 	/**
-	 * Reset all the visited flags
+	 * Reset all the visited flags for the entire tree
 	 *
 	 */
 	public void resetVisited()
@@ -870,8 +1075,7 @@ public class BooleanGrid
 	 * If it is solid and there is air at at least one
 	 * of north, south, east, or west, then yes; otherwise
 	 * no.
-	 * @param xa
-	 * @param ya
+	 * @param a
 	 * @return
 	 */
 	public boolean isEdgePixel(iPoint a)
@@ -974,8 +1178,7 @@ public class BooleanGrid
 	
 	/**
 	 * Find a neighbour of a pixel that has not yet been visited and is on an edge.
-	 * @param xa
-	 * @param ya
+	 * @param a
 	 * @return
 	 */
 	public iPoint findUnvisitedNeighbourOnEdge(iPoint a)
@@ -994,13 +1197,13 @@ public class BooleanGrid
 	}
 	
 	/**
-	 * Find a neighbour of a pixel that has not yet been visited and is on an edge, and
-	 * is in a given direction.
-	 * @param xa
-	 * @param ya
+	 * Find a neighbour of a pixel that has not yet been visited, that is on an edge, and
+	 * that is in a given direction.
+	 * @param a
+	 * @param direction
 	 * @return
 	 */
-	public iPoint findNeighbourOnEdgeInDirection(iPoint a, Rr2Point direction)
+	public iPoint findUnvisitedNeighbourOnEdgeInDirection(iPoint a, Rr2Point direction)
 	{
 		Rr2Point start = a.realPoint();
 		Rr2Point myDir;
@@ -1011,8 +1214,9 @@ public class BooleanGrid
 					iPoint b = new iPoint(x, y);
 					b = b.add(a);
 					myDir = Rr2Point.sub(b.realPoint(), start);
-					if(Rr2Point.mul(direction, myDir) >= 0)
+					if(Rr2Point.mul(direction, myDir) > 0)
 						if(isEdgePixel(b))
+							if(!visited(b))
 								return b;
 				}
 		return null;
@@ -1022,7 +1226,7 @@ public class BooleanGrid
 	 * Return all the outlines of all the solid areas as polygons
 	 * @return
 	 */
-	public RrPolygonList allPerimiters(Attributes a)
+	private iPolygonList iAllPerimiters()
 	{
 		iPolygonList result = new iPolygonList();
 		iPolygon ip;
@@ -1039,9 +1243,9 @@ public class BooleanGrid
 				setVisited(pixel, true);
 				pixel = findUnvisitedNeighbourOnEdge(pixel);
 			}
-			System.out.print("ibefore: " + ip.size());
+			//System.out.print("ibefore: " + ip.size());
 			ip = ip.simplify();
-			System.out.print("  iafter: " + ip.size());
+			//System.out.print("  iafter: " + ip.size());
 			if(ip.size() >= 3)
 				result.add(ip);
 			
@@ -1049,13 +1253,48 @@ public class BooleanGrid
 		}
 		
 		resetVisited();
-		RrPolygonList r = result.realPolygons(a);
-		System.out.print("   rbefore: " + r.polygon(0).size());
-		r = r.simplify(xInc);
-		System.out.println("  rafter: " + r.polygon(0).size());		
+	
+		return result;
+	}
+	
+	/**
+	 * Return all the outlines of all the solid areas as 
+	 * real-world polygons with attributes a
+	 * @param a
+	 * @return
+	 */
+	public RrPolygonList allPerimiters(Attributes a)
+	{
+		RrPolygonList r = iAllPerimiters().realPolygons(a);
+		r = r.simplify(0.5*(xInc + yInc));	
 		return r;
 	}
 	
+	/**
+	 * Work out all the polygons forming a set of borders
+	 * @param offBorder
+	 * @return
+	 */
+	public static RrPolygonList borders(RrCSGPolygonList offBorder)
+	{
+		RrPolygonList result = new RrPolygonList();
+		BooleanGrid bg;
+		for(int i = 0; i < offBorder.size(); i++)
+		{
+			bg = new BooleanGrid(offBorder.get(i).csg());
+			result.add(bg.allPerimiters(offBorder.get(i).getAttributes())); 
+		}
+		return result;
+	}
+	
+	/**
+	 * Generate a sequence of point-pairs where the line h enters
+	 * and leaves solid areas.  The point pairs are stored in a 
+	 * polygon, which should consequently have an even number of points
+	 * in it on return.
+	 * @param h
+	 * @return
+	 */
 	private iPolygon hatch(RrHalfPlane h)
 	{
 		iPolygon result = new iPolygon(false);
@@ -1104,13 +1343,12 @@ public class BooleanGrid
     /**
      * Find the bit of polygon edge between start/originPlane and targetPlane
      * @param start
-     * @param modelEdge
-     * @param originPlane
-     * @param targetPlane
-     * @param flag
+     * @param hatches
+     * @param originP
+     * @param targetP
      * @return polygon edge between start/originaPlane and targetPlane
      */
-    private iPolygon goToPlane(iPoint start, List<RrHalfPlane> hatches, int originP, int targetP) 
+    private SnakeEnd goToPlane(iPoint start, List<RrHalfPlane> hatches, int originP, int targetP) 
     {
     	iPolygon track = new iPolygon(false);
     	
@@ -1127,21 +1365,49 @@ public class BooleanGrid
     		return null;
     	}
     	
-    	double vStart = targetPlane.value(start.realPoint());
+    	double vTarget = targetPlane.value(start.realPoint());
     	
-    	iPoint p = start;
-    	while(p != null && targetPlane.value(p.realPoint())*vStart >= 0)
-    	{
-    		track.add(p);
-    		p = findNeighbourOnEdgeInDirection(p, dir);
-    	}
+    	setVisited(start, true);
     	
+    	iPoint p = findUnvisitedNeighbourOnEdgeInDirection(start, dir);
     	if(p == null)
     		return null;
     	
-    	return track.simplify();
+    	double vOrigin = originPlane.value(p.realPoint());
+    	boolean notCrossedOriginPlane = originPlane.value(p.realPoint())*vOrigin >= 0;
+    	boolean notCrossedTargetPlane = targetPlane.value(p.realPoint())*vTarget >= 0;
+    	while(p != null && notCrossedOriginPlane && notCrossedTargetPlane)
+    	{
+    		track.add(p);
+    		setVisited(p, true);
+    		p = findUnvisitedNeighbourOnEdge(p);
+    		if(p == null)
+    			return null;
+    		notCrossedOriginPlane = originPlane.value(p.realPoint())*vOrigin >= 0;
+        	notCrossedTargetPlane = targetPlane.value(p.realPoint())*vTarget >= 0;
+    	}
+    	
+    	if(notCrossedOriginPlane)
+    		return(new SnakeEnd(track, targetP));
+    	
+       	if(notCrossedTargetPlane)
+    		return(new SnakeEnd(track, originP));
+       	
+       	Debug.e("BooleanGrid.goToPlane(): invalid ending!");
+       	
+    	return null;
     }
 
+    /**
+     * Take a list of hatch point pairs from hatch (above) and the corresponding lines
+     * that created them, and stitch them together to make a weaving snake-like hatching
+     * pattern for infill.
+     * @param ipl
+     * @param hatches
+     * @param thisHatch
+     * @param thisPt
+     * @return
+     */
 	private iPolygon snakeGrow(iPolygonList ipl, List<RrHalfPlane> hatches, int thisHatch, int thisPt) 
 	{
 		iPolygon result = new iPolygon(false);
@@ -1149,8 +1415,7 @@ public class BooleanGrid
 		iPolygon thisPolygon = ipl.polygon(thisHatch);
 		iPoint pt = thisPolygon.point(thisPt);
 		result.add(pt);
-		iPolygon jump;
-		
+		SnakeEnd jump;
 		do
 		{
 			thisPolygon.remove(thisPt);
@@ -1166,25 +1431,24 @@ public class BooleanGrid
 			thisPolygon.remove(thisPt);
 			if(jump != null)
 			{
-				result.add(jump);
+				result.add(jump.track);
+				thisHatch = jump.hitPlaneIndex;
 				thisPolygon = ipl.polygon(thisHatch);
-				thisPt = thisPolygon.nearest(jump.point(jump.size() - 1));
+				thisPt = thisPolygon.nearest(jump.track.point(jump.track.size() - 1));
 			}
-		} while(jump != null && thisPt >= 0);
-				
+		} while(jump != null && thisPt >= 0);		
 		return result;
 	}
 	
 	/**
-	 * Hatch a csg polygon parallel to line hp with index gap
+	 * Hatch all the polygons parallel to line hp with increment gap
 	 * @param hp
 	 * @param gap
-	 * @param fg
-	 * @param fs
-	 * @return a polygon list of hatch lines as the result
+	 * @param a
+	 * @return a polygon list of hatch lines as the result with attributes a
 	 */
-	public RrPolygonList hatch(RrHalfPlane hp, double gap, Attributes a)
-	{
+	private RrPolygonList hatch(RrHalfPlane hp, double gap, Attributes a)
+	{		
 		RrRectangle big = box().scale(1.1);
 		double d = Math.sqrt(big.dSquared());
 		
@@ -1234,6 +1498,8 @@ public class BooleanGrid
 			hatcher = hatcher.offset(gap);
 			g += gap;
 		}
+
+		//return iHatches.realPolygons(a);
 		
 		iPolygonList snakes = new iPolygonList();
 		int segment;
@@ -1254,12 +1520,39 @@ public class BooleanGrid
 			}
 		} while(segment >= 0);
 		
-		return snakes.realPolygons(a);
+		resetVisited();
+		
+		return snakes.realPolygons(a).simplify(0.5*(xInc + yInc));
+	}
+	
+	/**
+	 * Work out all the open polygond forming a set of infill hatches
+	 * @param layerConditions
+	 * @param offHatch
+	 * @return
+	 */
+	public static RrPolygonList hatch(LayerRules layerConditions, RrCSGPolygonList offHatch)
+	{
+		RrPolygonList result = new RrPolygonList();
+		BooleanGrid bg;
+		boolean foundation = layerConditions.getLayingSupport();
+		Extruder [] es = layerConditions.getPrinter().getExtruders();
+		for(int i = 0; i < offHatch.size(); i++)
+		{
+			Extruder e;
+			if(foundation)
+				e = es[0]; // Extruder 0 is used for foundations
+			else
+				e = offHatch.get(i).getAttributes().getExtruder();
+			bg = new BooleanGrid(offHatch.get(i).csg());
+			result.add(bg.hatch(layerConditions.getHatchDirection(e), layerConditions.getHatchWidth(e), offHatch.get(i).getAttributes()));
+		}
+		return result;
 	}
 	
 	//*********************************************************************************************************
 	
-	// Boolean operators
+	// Boolean operators on the quad tree
 	
 	/**
 	 * Internal recusive complement function actually to do the
@@ -1293,11 +1586,11 @@ public class BooleanGrid
 	}
 	
 	/**
-	 * Recursive function to walk two trees forming their union
+	 * Recursive function to walk two trees forming their union.  r
+	 * is the root quad.
 	 * @param d
 	 * @param e
-	 * @param a
-	 * @param p
+	 * @param r
 	 * @return
 	 */
 	private static BooleanGrid recursiveUnion(BooleanGrid d, BooleanGrid e, BooleanGrid r)
@@ -1335,7 +1628,7 @@ public class BooleanGrid
 	}
 	
 	/**
-	 * Wrapper function to compute the union of two grids
+	 * Wrapper function to compute the union of two quad trees
 	 * @param d
 	 * @param e
 	 * @return
@@ -1348,11 +1641,11 @@ public class BooleanGrid
 	}
 	
 	/**
-	 * Recursive function to walk two trees forming their intersection
+	 * Recursive function to walk two trees forming their intersection.  r
+	 * is the root quad.
 	 * @param d
 	 * @param e
-	 * @param a
-	 * @param p
+	 * @param r
 	 * @return
 	 */
 	private static BooleanGrid recursiveIntersection(BooleanGrid d, BooleanGrid e, BooleanGrid r)
@@ -1390,7 +1683,7 @@ public class BooleanGrid
 	}
 	
 	/**
-	 * Wrapper function to compute the intersection of two grids
+	 * Wrapper function to compute the intersection of two quad trees
 	 * @param d
 	 * @param e
 	 * @return
