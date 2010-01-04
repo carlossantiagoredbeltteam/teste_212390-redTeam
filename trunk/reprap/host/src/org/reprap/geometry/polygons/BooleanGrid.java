@@ -963,6 +963,29 @@ public class BooleanGrid
 	}
 	
 	/**
+	 * Set a circular blob centred at a of radius r to v
+	 * @param a
+	 * @param r
+	 * @param v
+	 */
+	public void setBlob(iPoint a, int r, boolean v)
+	{
+		int r2 = r*r;
+		for(int x = -r; x <= r; x++)
+			for(int y = -r; y <= r; y++)
+			{
+				int ri = x*x + y*y;
+				if(ri <= r2)
+				{
+					iPoint b = new iPoint(x, y);
+					b = b.add(a);
+					setValue(b, v);
+				}
+			}
+	}
+	
+	
+	/**
 	 * Compute the index of a pixel on the periphery of a quad in the
 	 * visited array.  visited[0] corresponds to the most south-westerly
 	 * pixel in the quad, and the numbers increment anti-clockwise round 
@@ -1221,6 +1244,10 @@ public class BooleanGrid
 				}
 		return null;
 	}
+	
+	//********************************************************************************
+	
+	// Return geometrical constructions based on the pattern
 	
 	/**
 	 * Return all the outlines of all the solid areas as polygons
@@ -1547,6 +1574,41 @@ public class BooleanGrid
 			bg = new BooleanGrid(offHatch.get(i).csg());
 			result.add(bg.hatch(layerConditions.getHatchDirection(e), layerConditions.getHatchWidth(e), offHatch.get(i).getAttributes()));
 		}
+		return result;
+	}
+	
+	
+	/**
+	 * Offset the pattern by a given real-world distance.  If the distance is
+	 * negative the pattern is shrunk; if it is positive it is grown;
+	 * @param dist
+	 * @return
+	 */
+	public BooleanGrid offset(double dist)
+	{
+		BooleanGrid result = new BooleanGrid(this, null);
+		
+		int r = (int)(0.5 + 2*Math.abs(dist)/(xInc + yInc));
+		
+		if(r == 0)
+			return result;
+		
+		boolean v = dist > 0;
+		
+		iPolygonList borders = result.iAllPerimiters();
+		
+		for(int i = 0; i < borders.size(); i++)
+		{
+			iPolygon boundary = borders.polygon(i);
+			for(int j = 0; j < boundary.size(); j++)
+			{
+				iPoint edgePixel = boundary.point(j);
+				result.setBlob(edgePixel, r, v);
+			}
+		}
+		
+		result.compress();
+		
 		return result;
 	}
 	
