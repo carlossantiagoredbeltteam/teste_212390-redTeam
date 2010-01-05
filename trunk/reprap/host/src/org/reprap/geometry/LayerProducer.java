@@ -287,16 +287,16 @@ public class LayerProducer {
 		} else
 		{
 			RrCSGPolygonList offBorder = csgP.offset(layerConditions, true);
-//			offBorder.divide(Preferences.tiny(), 1.01);
-//			borderPolygons = offBorder.megList();
-			borderPolygons = BooleanGrid.borders(offBorder);
+			offBorder.divide(Preferences.tiny(), 1.01);
+			borderPolygons = offBorder.megList();
+//			borderPolygons = BooleanGrid.borders(offBorder);
 		}
 		
-//		offHatch.divide(Preferences.tiny(), 1.01);		
-//		hatchedPolygons = new RrPolygonList();
-//		hatchedPolygons.add(offHatch.hatch(layerConditions));
+		offHatch.divide(Preferences.tiny(), 1.01);		
+		hatchedPolygons = new RrPolygonList();
+		hatchedPolygons.add(offHatch.hatch(layerConditions));
 			
-		hatchedPolygons = BooleanGrid.hatch(layerConditions, offHatch);
+//		hatchedPolygons = BooleanGrid.hatch(layerConditions, offHatch);
 
 
 		if(borderPolygons != null && borderPolygons.size() > 0)
