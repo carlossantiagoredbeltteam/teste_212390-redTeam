@@ -22,9 +22,11 @@ package org.reprap.geometry.polygons;
 
 
 import org.reprap.Attributes;
+import org.reprap.Preferences;
 import java.util.ArrayList;
 import java.util.List;
 import org.reprap.utilities.Debug;
+import org.reprap.utilities.RrGraphics;
 import org.reprap.Extruder;
 import org.reprap.geometry.LayerRules;
 
@@ -64,8 +66,8 @@ public class BooleanGrid
 		 */
 		iPoint(Rr2Point a)
 		{
-			x = (int)(0.5 + a.x()/xInc);
-			y = (int)(0.5 + a.y()/yInc);
+			x = (int)(0.5 + a.x()/pixSize);
+			y = (int)(0.5 + a.y()/pixSize);
 		}		
 		
 		/**
@@ -74,7 +76,7 @@ public class BooleanGrid
 		 */
 		Rr2Point realPoint()
 		{
-			return new Rr2Point(x*xInc, y*yInc);
+			return new Rr2Point(x*pixSize, y*pixSize);
 		}
 		
 		/**
@@ -436,6 +438,18 @@ public class BooleanGrid
 				result.add(polygon(i).realPolygon(a));
 			return result;
 		}
+		
+		/**
+		 * Simplify all the polygons
+		 * @return
+		 */
+		public iPolygonList simplify()
+		{
+			iPolygonList result = new iPolygonList();
+			for(int i = 0; i < size(); i++)
+				result.add(polygon(i).simplify());
+			return result;
+		}
 	}
 	
 	/**
@@ -549,11 +563,10 @@ public class BooleanGrid
 	// Start of BooleanGrid propper
 	
 	/**
-	 * Roughly the resolution of the RepRap machine
+	 * The resolution of the RepRap machine
 	 */
-	static final double xInc = 0.1;
-	static final double yInc = 0.1;
-	
+	static final double pixSize = Preferences.gridRes();
+
 	/**
 	 * The size of the pixel map
 	 * N.B. Must be a power of 2
@@ -582,11 +595,6 @@ public class BooleanGrid
 	private iPoint ipsw, ipne;
 	
 	/**
-	 * True if this quad is a single pixel
-	 */
-	private boolean pix;
-	
-	/**
 	 * False if this quad is air; true if it's solid.
 	 */
 	private boolean value;
@@ -601,6 +609,8 @@ public class BooleanGrid
 	{
 		visited = null;
 		root = null;
+		ipsw = null;
+		ipne = null;
 		if(!leaf())
 		{
 			ne.finalize();
@@ -623,7 +633,6 @@ public class BooleanGrid
 	{
 		value = false;
 		root = this;
-		pix = false;
 		ipsw = new iPoint(0, 0);
 		ipne = new iPoint(xSize, ySize);
 		visited = null;
@@ -669,8 +678,7 @@ public class BooleanGrid
 			root = this;
 		else
 			root = r;
-		pix = bg.pix;
-		if(pix)
+		if(bg.pixel())
 		{
 			visited = new boolean[1];
 			visited[0] = false;
@@ -729,14 +737,12 @@ public class BooleanGrid
 		
 		if(ipsw.coincidesWith(ipne))
 		{
-			pix = true;
 			visited = new boolean[1];
 			visited[0] = false;
 			homogeneous(csg.value(p0) <= 0);
 			return;
 		}
 		
-		pix = false;
 		Rr2Point p1 = ipne.realPoint();
 		RrInterval i = csg.value(new RrRectangle(p0, p1));
 		if(!i.zero())
@@ -747,7 +753,7 @@ public class BooleanGrid
 		
 		setQuadsToMiddle();
 		
-		Rr2Point inc = new Rr2Point(xInc*0.5, yInc*0.5);
+		Rr2Point inc = new Rr2Point(pixSize*0.5, pixSize*0.5);
 		Rr2Point m = sw.ipne.realPoint();
 		m = Rr2Point.add(m, inc);
 		p0 = Rr2Point.sub(p0, inc);
@@ -806,6 +812,15 @@ public class BooleanGrid
 	public boolean leaf()
 	{
 		return ne == null;
+	}
+	
+	/**
+	 * Is this quad a single pixel?
+	 * @return
+	 */
+	public boolean pixel()
+	{
+		return ipsw.coincidesWith(ipne);
 	}
 	
 	/**
@@ -911,10 +926,9 @@ public class BooleanGrid
 	 * @param theRest
 	 */
 	private void setValueRecursive(iPoint a, boolean v, boolean theRest)
-	{		
-		if(ipsw.coincidesWith(ipne))
+	{			
+		if(pixel())
 		{
-			pix = true;
 			visited = new boolean[1];
 			visited[0] = false;
 			if(ipsw.coincidesWith(a))
@@ -923,14 +937,14 @@ public class BooleanGrid
 				homogeneous(theRest);
 			return;
 		}
-		
-		pix = false;
 
 		if(!inside(a))
 		{
 			homogeneous(theRest);
 			return;
 		}
+		
+		value = false;
 		
 		setQuadsToMiddle();
 				
@@ -952,13 +966,12 @@ public class BooleanGrid
 			return;
 		if(l.value == v)
 			return;
-		if(l.pix)
+		if(l.pixel())
 		{
 			l.value = v;
 			return;
 		}
 		l.visited = null;
-		l.value = false;
 		l.setValueRecursive(a, v, l.value);
 	}
 	
@@ -1001,7 +1014,7 @@ public class BooleanGrid
 			return -1;
 		}
 		
-		if(pix)
+		if(pixel())
 		{
 			if(ipsw.coincidesWith(a))
 				return 0;
@@ -1126,7 +1139,7 @@ public class BooleanGrid
 	{
 		// Are we a single pixel?
 		
-		if(pix)
+		if(pixel())
 		{
 			if(isEdgePixel(ipsw))
 			{
@@ -1250,10 +1263,11 @@ public class BooleanGrid
 	// Return geometrical constructions based on the pattern
 	
 	/**
-	 * Return all the outlines of all the solid areas as polygons
+	 * Return all the outlines of all the solid areas as polygons consisting of
+	 * all the pixels that make up the outlines.
 	 * @return
 	 */
-	private iPolygonList iAllPerimiters()
+	private iPolygonList iAllPerimitersRaw()
 	{
 		iPolygonList result = new iPolygonList();
 		iPolygon ip;
@@ -1270,9 +1284,7 @@ public class BooleanGrid
 				setVisited(pixel, true);
 				pixel = findUnvisitedNeighbourOnEdge(pixel);
 			}
-			//System.out.print("ibefore: " + ip.size());
-			ip = ip.simplify();
-			//System.out.print("  iafter: " + ip.size());
+
 			if(ip.size() >= 3)
 				result.add(ip);
 			
@@ -1285,6 +1297,16 @@ public class BooleanGrid
 	}
 	
 	/**
+	 * Return all the outlines of all the solid areas as polygons in
+	 * their simplest form.
+	 * @return
+	 */
+	private iPolygonList iAllPerimiters()
+	{
+		return iAllPerimitersRaw().simplify();
+	}
+	
+	/**
 	 * Return all the outlines of all the solid areas as 
 	 * real-world polygons with attributes a
 	 * @param a
@@ -1293,25 +1315,8 @@ public class BooleanGrid
 	public RrPolygonList allPerimiters(Attributes a)
 	{
 		RrPolygonList r = iAllPerimiters().realPolygons(a);
-		r = r.simplify(0.5*(xInc + yInc));	
+		r = r.simplify(pixSize);	
 		return r;
-	}
-	
-	/**
-	 * Work out all the polygons forming a set of borders
-	 * @param offBorder
-	 * @return
-	 */
-	public static RrPolygonList borders(RrCSGPolygonList offBorder)
-	{
-		RrPolygonList result = new RrPolygonList();
-		BooleanGrid bg;
-		for(int i = 0; i < offBorder.size(); i++)
-		{
-			bg = new BooleanGrid(offBorder.get(i).csg());
-			result.add(bg.allPerimiters(offBorder.get(i).getAttributes())); 
-		}
-		return result;
 	}
 	
 	/**
@@ -1474,7 +1479,7 @@ public class BooleanGrid
 	 * @param a
 	 * @return a polygon list of hatch lines as the result with attributes a
 	 */
-	private RrPolygonList hatch(RrHalfPlane hp, double gap, Attributes a)
+	public RrPolygonList hatch(RrHalfPlane hp, double gap, Attributes a)
 	{		
 		RrRectangle big = box().scale(1.1);
 		double d = Math.sqrt(big.dSquared());
@@ -1549,32 +1554,7 @@ public class BooleanGrid
 		
 		resetVisited();
 		
-		return snakes.realPolygons(a).simplify(0.5*(xInc + yInc));
-	}
-	
-	/**
-	 * Work out all the open polygond forming a set of infill hatches
-	 * @param layerConditions
-	 * @param offHatch
-	 * @return
-	 */
-	public static RrPolygonList hatch(LayerRules layerConditions, RrCSGPolygonList offHatch)
-	{
-		RrPolygonList result = new RrPolygonList();
-		BooleanGrid bg;
-		boolean foundation = layerConditions.getLayingSupport();
-		Extruder [] es = layerConditions.getPrinter().getExtruders();
-		for(int i = 0; i < offHatch.size(); i++)
-		{
-			Extruder e;
-			if(foundation)
-				e = es[0]; // Extruder 0 is used for foundations
-			else
-				e = offHatch.get(i).getAttributes().getExtruder();
-			bg = new BooleanGrid(offHatch.get(i).csg());
-			result.add(bg.hatch(layerConditions.getHatchDirection(e), layerConditions.getHatchWidth(e), offHatch.get(i).getAttributes()));
-		}
-		return result;
+		return snakes.realPolygons(a).simplify(pixSize);
 	}
 	
 	
@@ -1584,30 +1564,38 @@ public class BooleanGrid
 	 * @param dist
 	 * @return
 	 */
-	public BooleanGrid offset(double dist)
+	public BooleanGrid offset(double dist, Attributes a)
 	{
 		BooleanGrid result = new BooleanGrid(this, null);
 		
-		int r = (int)(0.5 + 2*Math.abs(dist)/(xInc + yInc));
+		int r = (int)(0.5 + Math.abs(dist)/pixSize);
 		
 		if(r == 0)
 			return result;
 		
 		boolean v = dist > 0;
+		//RrGraphics g = new RrGraphics(result.box(), "bg");
+		//g.add(result);
+		iPolygonList borders = result.iAllPerimitersRaw();
+		//g.add(borders.realPolygons(a));
 		
-		iPolygonList borders = result.iAllPerimiters();
-		
+		int count = 2*r;
 		for(int i = 0; i < borders.size(); i++)
 		{
 			iPolygon boundary = borders.polygon(i);
 			for(int j = 0; j < boundary.size(); j++)
 			{
-				iPoint edgePixel = boundary.point(j);
-				result.setBlob(edgePixel, r, v);
+				result.setBlob(boundary.point(j), r, v);
+				count--;
+				if(count <= 0)
+				{
+					count = 2*r;
+					result.compress();
+				}
 			}
 		}
 		
-		result.compress();
+		//result.compress();
 		
 		return result;
 	}

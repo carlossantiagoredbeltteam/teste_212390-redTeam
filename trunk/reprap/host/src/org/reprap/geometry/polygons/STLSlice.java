@@ -1472,9 +1472,9 @@ public class STLSlice
 	 * @param z
 	 * @return a CSG representation of all the polygons in the slice
 	 */
-	public RrCSGPolygonList slice(double z, Extruder es[])
+	public BooleanGridList slice(double z, Extruder es[])
 	{
-		RrCSGPolygonList rl = new RrCSGPolygonList();
+		BooleanGridList rl = new BooleanGridList();
 
 		if(generateLowerTriangles)
 			below = new BranchGroup();
@@ -1514,7 +1514,7 @@ public class STLSlice
 
 					// Run round joining up all the pairs of ends...
 
-					RrPolygonList pgl = conquer(this); //, fg, fs);
+					RrPolygonList pgl = conquer(this);
 
 					// Remove wrinkles
 
@@ -1524,12 +1524,12 @@ public class STLSlice
 
 					pgl = pgl.arcCompensate();
 
-
 					// Check for a silly result.
 
 					if(pgl.size() > 0)
 					{
-						rl.add(pgl.toCSG(Preferences.tiny()));
+						RrCSGPolygon csgp = pgl.toCSG(Preferences.tiny());
+						rl.add(new BooleanGrid(csgp.csg()), attr);
 					}
 				}
 			}
