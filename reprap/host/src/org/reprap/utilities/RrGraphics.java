@@ -732,6 +732,12 @@ public class RrGraphics
 	 */
 	private void plot()
 	{
+		
+		if(bg != null)
+		{
+			fillBG(bg);
+		}
+		
 		if(csg_p != null)
 		{
 			if(csgSolid)
@@ -773,10 +779,7 @@ public class RrGraphics
 			plot(hp);
 		}
 		
-		if(bg != null)
-		{
-			fillBG(bg);
-		}
+
 	}
 	
 	class myKB implements KeyListener

@@ -12,6 +12,7 @@ import org.reprap.geometry.polygons.STLSlice;
 import org.reprap.geometry.polygons.RrCSG;
 import org.reprap.geometry.polygons.RrCSGPolygon;
 import org.reprap.geometry.polygons.RrPolygonList;
+import org.reprap.geometry.polygons.BooleanGridList;
 import org.reprap.gui.RepRapBuild;
 import org.reprap.utilities.Debug;
 import org.reprap.utilities.RrGraphics;
@@ -258,7 +259,7 @@ public class Producer {
 			reprap.waitWhileBufferNotEmpty();
 			reprap.slowBuffer();
 			
-			RrCSGPolygonList slice = stlc.slice(layerRules.getModelZ() + layerRules.getZStep()*0.5,
+			BooleanGridList slice = stlc.slice(layerRules.getModelZ() + layerRules.getZStep()*0.5,
 					reprap.getExtruders()); 
 			
 			layer = null;
@@ -285,7 +286,7 @@ public class Producer {
 			reprap.betweenLayers(layerRules);
 			layer = null;
 			
-			slice.destroy();
+			//slice.destroy();
 			stlc.destroyLayer();
 
 			layerRules.step(reprap.getExtruder());
@@ -329,7 +330,7 @@ public class Producer {
 			reprap.waitWhileBufferNotEmpty();
 			reprap.slowBuffer();
 			
-			RrCSGPolygonList slice = stlc.slice(layerRules.getModelZ() + layerRules.getZStep()*0.5,
+			BooleanGridList slice = stlc.slice(layerRules.getModelZ() + layerRules.getZStep()*0.5,
 					reprap.getExtruders()); 
 			
 			layer = null;
@@ -356,7 +357,7 @@ public class Producer {
 			reprap.betweenLayers(layerRules);
 			layer = null;
 			
-			slice.destroy();
+			//slice.finalize();
 			stlc.destroyLayer();
 
 			layerRules.step(reprap.getExtruder());
