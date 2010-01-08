@@ -1475,7 +1475,8 @@ public class STLSlice
 	public BooleanGridList slice(double z, Extruder es[])
 	{
 		BooleanGridList rl = new BooleanGridList();
-
+		RrCSGPolygon csgp = null;
+		
 		if(generateLowerTriangles)
 			below = new BranchGroup();
 		else
@@ -1528,20 +1529,35 @@ public class STLSlice
 
 					if(pgl.size() > 0)
 					{
-						RrCSGPolygon csgp = pgl.toCSG(Preferences.tiny());
+						csgp = pgl.toCSG(Preferences.tiny());
 						rl.add(new BooleanGrid(csgp.csg()), attr);
+//						if(picture == null)
+//						{
+//						  picture = new RrGraphics("STL Slice");
+//						  picture.init(ObjectPlanRectangle(), false);
+//						}
+//
+//						picture.cleanPolygons();
+//						csgp.divide(0.0001, 1.0);
+//						//picture.add(pgl);
+//						picture.add(csgp);
 					}
 				}
 			}
 		}
 //		if(picture == null)
 //		{
-//		picture = new RrGraphics("STL Slice");
-//		picture.init(ObjectPlanRectangle(), false);
+//		  picture = new RrGraphics("STL Slice");
+//		  picture.init(ObjectPlanRectangle(), false);
 //		}
-
+//
 //		picture.cleanPolygons();
-//		picture.add(rl.get(0));
+//		if(rl.size() > 0)
+//		{
+//			csgp.divide(0.01, 1.0);
+//			picture.add(csgp);
+//			//picture.add(rl.get(0));
+//		}
 		return rl;
 	}
 }
