@@ -212,6 +212,9 @@ public class RrGraphics
 	public void cleanPolygons()
 	{
 		p_list = null;
+		csg_p = null;
+		stlc = null;
+		hp = null;
 	}
 //	/**
 //	 * Constructor for point-list polygon
@@ -386,14 +389,14 @@ public class RrGraphics
 		jframe.repaint();
 	}
 	
-//	/**
-//	 * @param cp
-//	 */
-//	public void add(RrCSGPolygon cp)
-//	{
-//		csg_p = cp;
-//		jframe.repaint();
-//	}
+	/**
+	 * @param cp
+	 */
+	public void add(RrCSGPolygon cp)
+	{
+		csg_p = cp;
+		jframe.repaint();
+	}
 //	
 //	/**
 //	 * @param s

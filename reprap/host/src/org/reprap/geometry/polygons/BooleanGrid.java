@@ -268,6 +268,18 @@ public class BooleanGrid
 		}
 		
 		/**
+		 * Negate (i.e. reverse cyclic order)
+		 * @return reversed polygon object
+		 */
+		public iPolygon negate()
+		{
+			iPolygon result = new iPolygon(closed);
+			for(int i = size() - 1; i >= 0; i--)
+				result.add(point(i)); 
+			return result;
+		}
+		
+		/**
 		 * Find the furthest point from point v1 on the polygon such that the polygon between
 		 * the two can be approximated by a DDA straight line from v1.
 		 * @param v1
@@ -565,7 +577,8 @@ public class BooleanGrid
 	/**
 	 * The resolution of the RepRap machine
 	 */
-	static final double pixSize = Preferences.gridRes();
+	static final double pixSize = Preferences.machineResolution()*0.6;
+	static final double realResolution = pixSize*0.1;
 
 	/**
 	 * The size of the pixel map
@@ -918,6 +931,7 @@ public class BooleanGrid
 			return l.value;
 	}
 	
+	
 	/**
 	 * Recursively divide down to a single pixel, setting it to v and all the other
 	 * quads to theRest.
@@ -973,28 +987,6 @@ public class BooleanGrid
 		}
 		l.visited = null;
 		l.setValueRecursive(a, v, l.value);
-	}
-	
-	/**
-	 * Set a circular blob centred at a of radius r to v
-	 * @param a
-	 * @param r
-	 * @param v
-	 */
-	public void setBlob(iPoint a, int r, boolean v)
-	{
-		int r2 = r*r;
-		for(int x = -r; x <= r; x++)
-			for(int y = -r; y <= r; y++)
-			{
-				int ri = x*x + y*y;
-				if(ri <= r2)
-				{
-					iPoint b = new iPoint(x, y);
-					b = b.add(a);
-					setValue(b, v);
-				}
-			}
 	}
 	
 	
@@ -1315,7 +1307,7 @@ public class BooleanGrid
 	public RrPolygonList allPerimiters(Attributes a)
 	{
 		RrPolygonList r = iAllPerimiters().realPolygons(a);
-		r = r.simplify(pixSize);	
+		r = r.simplify(realResolution);	
 		return r;
 	}
 	
@@ -1554,7 +1546,7 @@ public class BooleanGrid
 		
 		resetVisited();
 		
-		return snakes.realPolygons(a).simplify(pixSize);
+		return snakes.realPolygons(a).simplify(realResolution);
 	}
 	
 	
@@ -1564,40 +1556,12 @@ public class BooleanGrid
 	 * @param dist
 	 * @return
 	 */
-	public BooleanGrid offset(double dist, Attributes a)
-	{
-		BooleanGrid result = new BooleanGrid(this, null);
-		
-		int r = (int)(0.5 + Math.abs(dist)/pixSize);
-		
-		if(r == 0)
-			return result;
-		
-		boolean v = dist > 0;
-		//RrGraphics g = new RrGraphics(result.box(), "bg");
-		//g.add(result);
-		iPolygonList borders = result.iAllPerimitersRaw();
-		//g.add(borders.realPolygons(a));
-		
-		int count = 2*r;
-		for(int i = 0; i < borders.size(); i++)
-		{
-			iPolygon boundary = borders.polygon(i);
-			for(int j = 0; j < boundary.size(); j++)
-			{
-				result.setBlob(boundary.point(j), r, v);
-				count--;
-				if(count <= 0)
-				{
-					count = 2*r;
-					result.compress();
-				}
-			}
-		}
-		
-		//result.compress();
-		
-		return result;
+	public BooleanGrid offset(double dist)
+	{	
+		RrPolygonList rpl = allPerimiters(new Attributes(null, null, null, null));
+		RrCSGPolygon csgp = rpl.toCSG(realResolution);
+		RrCSG csg = csgp.csg().offset(dist);
+		return new BooleanGrid(csg);
 	}
 	
 	//*********************************************************************************************************
