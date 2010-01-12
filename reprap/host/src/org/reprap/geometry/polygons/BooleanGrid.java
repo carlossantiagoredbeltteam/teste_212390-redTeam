@@ -118,16 +118,16 @@ public class BooleanGrid
 			return new iPoint(Math.abs(x), Math.abs(y));
 		}
 		
-		/**
-		 * Divide by an integer
-		 * @param i
-		 * @return
-		 */
-		iPoint divide(int i)
-		{
-			return new iPoint(x/i, y/i);
-		}
-		
+//		/**
+//		 * Divide by an integer
+//		 * @param i
+//		 * @return
+//		 */
+//		iPoint divide(int i)
+//		{
+//			return new iPoint(x/i, y/i);
+//		}
+//		
 		/**
 		 * Squared length
 		 * @return
@@ -137,15 +137,15 @@ public class BooleanGrid
 			return x*x + y*y;
 		}
 		
-		/**
-		 * Point half-way between two others
-		 * @param b
-		 * @return
-		 */
-		iPoint mean(iPoint b)
-		{
-			return add(b).divide(2);
-		}
+//		/**
+//		 * Point half-way between two others
+//		 * @param b
+//		 * @return
+//		 */
+//		iPoint mean(iPoint b)
+//		{
+//			return add(b).divide(2);
+//		}
 		
 		/**
 		 * For printing
@@ -582,10 +582,9 @@ public class BooleanGrid
 
 	/**
 	 * The size of the pixel map
-	 * N.B. Must be a power of 2
+	 * N.B. Must be a power of 2 - 1
 	 */
-	static final int xSize = 4098;
-	static final int ySize = 4098;
+	static final int gridSize = 4097;
 	
 	/**
 	 * The quads that this quad is divided into.
@@ -647,7 +646,7 @@ public class BooleanGrid
 		value = false;
 		root = this;
 		ipsw = new iPoint(0, 0);
-		ipne = new iPoint(xSize, ySize);
+		ipne = new iPoint(gridSize, gridSize);
 		visited = null;
 		generateQuadTree(csg);
 	}
@@ -732,7 +731,12 @@ public class BooleanGrid
 	 */
 	private void setQuadsToMiddle()
 	{
-		iPoint im = ipsw.mean(ipne);
+		if(pixel())
+			Debug.e("Attempt to divide pixel quad!");
+		
+		int diff2 = (ipne.x - ipsw.x + 1)/2 - 1;
+
+		iPoint im = new iPoint(ipsw.x + diff2, ipsw.y + diff2);
 		iPoint im1 = im.add(new iPoint(1,1));
 		ne = new BooleanGrid(im1, ipne, root);
 		nw = new BooleanGrid(new iPoint(ipsw.x, im1.y), new iPoint(im.x, ipne.y), root);
