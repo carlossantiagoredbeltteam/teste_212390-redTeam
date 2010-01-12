@@ -2,14 +2,14 @@ EAGLE AutoRouter Statistics:
 
 Job           : /home/ensab/workspace/adrian/Experimental-electronics/pololu-steppers-power-side.brd
 
-Start at      : 13:30:07 (12/01/2010)
-End at        : 13:30:07 (12/01/2010)
+Start at      : 16:23:10 (12/01/2010)
+End at        : 16:23:10 (12/01/2010)
 Elapsed time  : 00:00:00
 
 Signals       :    23   RoutingGrid: 50 mil  Layers: 2
 Connections   :    60   predefined:  60 ( 0 Vias )
 
-Router memory :   11880
+Router memory :   13104
 
 Passname          :     Route Optimize1 Optimize2 Optimize3 Optimize4
 
