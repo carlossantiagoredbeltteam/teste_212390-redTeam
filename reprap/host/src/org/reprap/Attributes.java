@@ -9,7 +9,7 @@ import org.reprap.gui.STLObject;
 /**
  * Small class to hold RepRap attributes that are attached to
  * Java3D shapes as user data, primarily to record the material
- * that things are made from.
+ * that things  are made from.
  * 
  * @author adrian
  *
