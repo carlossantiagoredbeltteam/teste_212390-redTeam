@@ -13,6 +13,8 @@
  * of lines that are solid, and outline following, to find the perimiters of
  * solid shapes as polygons.
  * 
+ * The class makes extensive use of lazy evaluation.
+ * 
  * @author Adrian Bowyer
  *
  */
@@ -66,8 +68,8 @@ public class BooleanGrid
 		 */
 		iPoint(Rr2Point a)
 		{
-			x = (int)(0.5 + a.x()/pixSize) - swCorner.x;
-			y = (int)(0.5 + a.y()/pixSize) - swCorner.y;
+			x = (int)(0.5 + a.x()/pixSize) - rec.swCorner.x;
+			y = (int)(0.5 + a.y()/pixSize) - rec.swCorner.y;
 		}		
 		
 		/**
@@ -76,7 +78,7 @@ public class BooleanGrid
 		 */
 		Rr2Point realPoint()
 		{
-			return new Rr2Point((swCorner.x + x)*pixSize, (swCorner.y + y)*pixSize);
+			return new Rr2Point((rec.swCorner.x + x)*pixSize, (rec.swCorner.y + y)*pixSize);
 		}
 		
 		/**
@@ -154,6 +156,45 @@ public class BooleanGrid
 		{
 			return ": " + x + ", " + y + " :";
 		}
+	}
+	
+	/**
+	 * Small class to hold rectangles represented by the sw point and
+	 * the size.
+	 * @author ensab
+	 *
+	 */
+	class iRectangle
+	{
+		public iPoint swCorner;
+		public iPoint size;
+		
+		public iRectangle(iPoint min, iPoint max)
+		{
+			swCorner = new iPoint(min);
+			size = max.sub(min);
+			size.x++;
+			size.y++;
+		}
+		
+		public iRectangle(iRectangle r)
+		{
+			swCorner = new iPoint(r.swCorner);
+			size = new iPoint(size);
+		}
+		
+		public iRectangle union(iRectangle b)
+		{
+			iRectangle result = new iRectangle(this);
+			result.swCorner.x = Math.min(result.swCorner.x, b.swCorner.x);
+			result.swCorner.y = Math.min(result.swCorner.y, b.swCorner.y);
+			int sx = result.swCorner.x + result.size.x - 1;
+			sx = Math.max(sx, b.swCorner.x + b.size.x - 1) - result.swCorner.x + 1;
+			int sy = result.swCorner.y + result.size.y - 1;
+			sy = Math.max(sy, b.swCorner.y + b.size.y - 1) - result.swCorner.y + 1;
+			result.size = new iPoint(sx, sy);			
+			return result;
+		}	
 	}
 	
 	/**
@@ -556,12 +597,7 @@ public class BooleanGrid
 	 */
 	static final double pixSize = Preferences.machineResolution()*0.6;
 	static final double realResolution = pixSize*0.1;
-
-	/**
-	 * The size of the pixel map
-	 */
-	//static final int xSize = 3400;
-	//static final int ySize = 3900;
+	static final double rSwell = 0.5; // mm by which to swell rectangles to give margins round stuff
 	
 	/**
 	 * The pixel map
@@ -576,12 +612,17 @@ public class BooleanGrid
 	/**
 	 * The bottom left corner in pixels
 	 */
-	private iPoint swCorner;
+	private iRectangle rec;
 	
 	/**
-	 * The size of the pixelmap.
+	 * The csg expression
 	 */
-	private iPoint size;
+	private RrCSG csg;
+	
+	/**
+	 * The attributes
+	 */
+	private Attributes att;
 	
 	/**
 	 * Run round the neighbours of a pixel anticlockwise from bottom left
@@ -610,39 +651,53 @@ public class BooleanGrid
 		super.finalize();
 	}
 	
+	private void evaluateIfNeedBe()
+	{
+		if(bits != null)
+			return;
+		bits = new BitSet(rec.size.x*rec.size.y);
+		visited = null;
+		//System.out.print("Starting quad tree... ");
+		generateQuadTree(new iPoint(0, 0), new iPoint(rec.size.x - 1, rec.size.y - 1), csg);
+		//System.out.println("Done quad tree");
+		deWhisker();		
+	}
+	
 	/**
 	 * Build the grid from a CSG expression
 	 * @param csgP
 	 */
-	public BooleanGrid(RrCSG csg, RrRectangle rec)
+	public BooleanGrid(RrCSG csgExp, RrRectangle rectangle, Attributes a)
 	{
-		Rr2Point margin = new Rr2Point(0.5, 0.5);
-		swCorner = new iPoint(0, 0);                           // These two lines...
-		swCorner = new iPoint(Rr2Point.sub(rec.sw(), margin)); // ...are a bit subtle.
-		size = new iPoint(Rr2Point.add(rec.ne(), margin));
-		bits = new BitSet(size.x*size.y);
+		csg = csgExp;  // N.B. No deep copy
+		att = a;
+		RrRectangle ri = rectangle.offset(rSwell);
+		rec = new iRectangle(new iPoint(0, 0), new iPoint(1, 1));  // Set the origin to (0, 0)...
+		rec.swCorner = new iPoint(ri.sw());                        // That then gets subtracted by the iPoint constructor to give the true origin
+		rec.size = new iPoint(ri.ne());                            // The true origin is now automatically subtracted.
+		bits = null;
 		visited = null;
-		//System.out.print("Starting quad tree... ");
-		generateQuadTree(new iPoint(0, 0), new iPoint(size.x - 1, size.y - 1), csg);
-		//System.out.println("Done quad tree");
-		deWhisker();
 	}
 	
 	
 	/**
 	 * Deep copy constructor
+	 * N.B. attributes are _not_ deep copied
 	 * @param bg
 	 */
 	public BooleanGrid(BooleanGrid bg)
 	{
-		bits = (BitSet)bg.bits.clone();
+		csg = new RrCSG(bg.csg);
+		att = bg.att;
+		if(bg.bits != null)
+			bits = (BitSet)bg.bits.clone();
+		else
+			bits = null;
 		if(bg.visited != null)
-		{
 			visited = (BitSet)bg.visited.clone();
-		} else
+		else
 			visited = null;
-		swCorner = new iPoint(bg.swCorner);
-		size = new iPoint(bg.size);
+		rec= new iRectangle(bg.rec);
 	}
 	
 	/**
@@ -653,7 +708,7 @@ public class BooleanGrid
 	 */
 	private int pixI(int x, int y)
 	{
-		return x*size.y + y;
+		return x*rec.size.y + y;
 	}
 	
 	/**
@@ -673,9 +728,17 @@ public class BooleanGrid
 	 */
 	private iPoint pixel(int i)
 	{
-		return new iPoint(i/size.y, i%size.y);
+		return new iPoint(i/rec.size.y, i%rec.size.y);
 	}
 	
+	/**
+	 * Return the attributes
+	 * @return
+	 */
+	public Attributes attributes()
+	{
+		return att;
+	}
 	
 	/**
 	 * Any pixels set?
@@ -683,6 +746,7 @@ public class BooleanGrid
 	 */
 	public boolean isEmpty()
 	{
+		evaluateIfNeedBe();
 		return bits.isEmpty();
 	}
 	
@@ -697,9 +761,9 @@ public class BooleanGrid
 			return false;
 		if(p.y < 0)
 			return false;
-		if(p.x >= size.x)
+		if(p.x >= rec.size.x)
 			return false;
-		if(p.y >= size.y)
+		if(p.y >= rec.size.y)
 			return false;
 		return true;
 	}
@@ -712,6 +776,8 @@ public class BooleanGrid
 	 */
 	public void set(iPoint p, boolean v)
 	{
+		if(bits == null)
+			bits = new BitSet(rec.size.x*rec.size.y);
 		if(!inside(p))
 		{
 			Debug.e("BoolenGrid.set(): attempt to set pixel beyond boundary!");
@@ -728,6 +794,8 @@ public class BooleanGrid
 	 */
 	private void homogeneous(iPoint ipsw, iPoint ipne, boolean v)
 	{
+		if(bits == null)
+			bits = new BitSet(rec.size.x*rec.size.y);
 		// TODO: if v is false we may just return?
 		for(int y = ipsw.y; y <= ipne.y; y++)
 			for(int x = ipsw.x; x <= ipne.x; x++)
@@ -740,7 +808,7 @@ public class BooleanGrid
 	 */
 	public RrRectangle box()
 	{
-		return new RrRectangle(new iPoint(0, 0).realPoint(), new iPoint(size.x - 1, size.y - 1).realPoint());
+		return new RrRectangle(new iPoint(0, 0).realPoint(), new iPoint(rec.size.x - 1, rec.size.y - 1).realPoint());
 	}
 	
 	/**
@@ -752,6 +820,7 @@ public class BooleanGrid
 	{
 		if(!inside(p))
 			return false;
+		evaluateIfNeedBe();
 		return bits.get(pixI(p));
 	}
 	
@@ -768,7 +837,7 @@ public class BooleanGrid
 			return;
 		}
 		if(visited == null)
-			visited = new BitSet(size.x*size.y);
+			visited = new BitSet(rec.size.x*rec.size.y);
 		visited.set(pixI(p), v);
 	}
 	
@@ -919,6 +988,7 @@ public class BooleanGrid
 	 */
 	private int findUnvisitedEdgeIndex(int start)
 	{
+		evaluateIfNeedBe();
 		if(visited == null)
 		{
 			int i = bits.nextSetBit(start);
@@ -1332,11 +1402,11 @@ public class BooleanGrid
 	 */
 	public BooleanGrid offset(double dist)
 	{	
-		RrPolygonList rpl = allPerimiters(new Attributes(null, null, null, null));
-		RrCSG csgp = rpl.toCSG(realResolution);
-		RrCSG csg = csgp.offset(dist);
+		//RrPolygonList rpl = allPerimiters(new Attributes(null, null, null, null));
+		//RrCSG csgp = rpl.toCSG(realResolution);
+		RrCSG csgp = csg.offset(dist);
 		RrRectangle rec = box().offset(dist);
-		return new BooleanGrid(csg, rec);
+		return new BooleanGrid(csgp, rec, att);
 	}
 	
 	//*********************************************************************************************************
@@ -1346,16 +1416,19 @@ public class BooleanGrid
 	// TODO: make them deal with different box sizes!
 	
 	
-//	/**
-//	 * Complement a grid
-//	 * @return
-//	 */
-//	public BooleanGrid complement()
-//	{
-//		BooleanGrid result = new BooleanGrid(this);
-//		result.bits.flip(0, size.x*size.y - 1);
-//		return result;
-//	}
+	/**
+	 * Complement a grid
+	 * @return
+	 */
+	public BooleanGrid complement()
+	{
+		BooleanGrid result = new BooleanGrid(this);
+		result.evaluateIfNeedBe();
+		result.bits.flip(0, result.rec.size.x*result.rec.size.y - 1);
+		return result;
+	}
+	
+	
 //	
 //	
 //	/**

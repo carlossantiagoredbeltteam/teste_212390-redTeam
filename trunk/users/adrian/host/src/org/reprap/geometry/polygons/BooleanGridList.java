@@ -17,18 +17,15 @@ public class BooleanGridList
 {
 
 		private List<BooleanGrid> shapes = null;
-		private List<Attributes> a = null;
 		
 		protected void finalize() throws Throwable
 		{
 			shapes = null;
-			a = null;
 			super.finalize();
 		}
 		
 		public BooleanGridList()
 		{
-			a = new ArrayList<Attributes>();
 			shapes = new ArrayList<BooleanGrid>();
 		}
 		
@@ -49,7 +46,7 @@ public class BooleanGridList
 		 */
 		public Attributes attribute(int i)
 		{
-			return a.get(i);
+			return shapes.get(i).attributes();
 		}
 		
 		/**
@@ -67,7 +64,6 @@ public class BooleanGridList
 		 */
 		public void remove(int i)
 		{
-			a.remove(i);
 			shapes.remove(i);
 		}
 
@@ -76,9 +72,8 @@ public class BooleanGridList
 		 * Add a shape on the end
 		 * @param p
 		 */
-		public void add(BooleanGrid b, Attributes aa)
+		public void add(BooleanGrid b)
 		{
-			a.add(aa);
 			shapes.add(b);
 		}
 		
@@ -88,8 +83,8 @@ public class BooleanGridList
 		 */
 		public void add(BooleanGridList aa)
 		{
-			for(int i = 0; i < a.size(); i++)
-				add(aa.get(i), aa.attribute(i));
+			for(int i = 0; i < aa.size(); i++)
+				add(aa.get(i));
 		}
 		
 		public BooleanGridList offset(LayerRules lc, boolean outline)
@@ -121,7 +116,7 @@ public class BooleanGridList
 					if(outline)
 					{
 						for(int shell = 0; shell < shells; shell++)
-							result.add(get(i).offset(-((double)shell + 0.5)*e.getExtrusionSize()), att);
+							result.add(get(i).offset(-((double)shell + 0.5)*e.getExtrusionSize()));
 					} else
 					{
 						// Must be a hatch.  Only do it if the gap is +ve or we're building the foundation
@@ -131,7 +126,7 @@ public class BooleanGridList
 						else
 							offSize = -((double)shells + 0.5)*e.getExtrusionSize() + e.getInfillOverlap();
 						if (e.getExtrusionInfillWidth() > 0 || foundation)  // Z valuesn't mattere here
-							result.add(get(i).offset(offSize), att);
+							result.add(get(i).offset(offSize));
 					}
 				}
 			}
