@@ -1606,7 +1606,7 @@ public class STLSlice
 					if(pgl.size() > 0)
 					{
 						csgp = pgl.toCSG(Preferences.tiny());
-						rl.add(new BooleanGrid(csgp, box), attr);
+						rl.add(new BooleanGrid(csgp, box, attr));
 //						if(picture == null)
 //						{
 //						  picture = new RrGraphics("STL Slice");
