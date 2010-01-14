@@ -654,32 +654,32 @@ public class RrGraphics
 	 */
 	private void fillBG(BooleanGrid b)
 	{
-		if(RrRectangle.intersection(b.box(), scaledBox).empty())
-			return;
-		
-		if(!b.leaf())
-		{
-			fillBG(b.northEast());
-			fillBG(b.northWest());
-			fillBG(b.southEast());
-			fillBG(b.southWest());
-			return;
-		}
-		
-		if(!b.value())
-			return;
-			
-		g2d.setColor(infill);
-		Rr2Point sw = transform(b.box().sw());
-		Rr2Point ne = transform(b.box().ne());
-
-		int x0 = (int)Math.round(sw.x());
-		int y0 = (int)Math.round(sw.y());
-		int x1 = (int)Math.round(ne.x());
-		int y1 = (int)Math.round(ne.y());
-
-
-		g2d.fillRect(x0, y1, x1 - x0 + 1, y0 - y1 + 1);
+//		if(RrRectangle.intersection(b.box(), scaledBox).empty())
+//			return;
+//		
+//		if(!b.leaf())
+//		{
+//			fillBG(b.northEast());
+//			fillBG(b.northWest());
+//			fillBG(b.southEast());
+//			fillBG(b.southWest());
+//			return;
+//		}
+//		
+//		if(!b.value())
+//			return;
+//			
+//		g2d.setColor(infill);
+//		Rr2Point sw = transform(b.box().sw());
+//		Rr2Point ne = transform(b.box().ne());
+//
+//		int x0 = (int)Math.round(sw.x());
+//		int y0 = (int)Math.round(sw.y());
+//		int x1 = (int)Math.round(ne.x());
+//		int y1 = (int)Math.round(ne.y());
+//
+//
+//		g2d.fillRect(x0, y1, x1 - x0 + 1, y0 - y1 + 1);
 	}
 	
 	/**

@@ -209,6 +209,17 @@ public class RrRectangle
 	}
 	
 	/**
+	 * Shrink or grow by a given distance
+	 * @param dist
+	 * @return
+	 */
+	public RrRectangle offset(double dist)
+	{
+		return new RrRectangle(new RrInterval(x.low() - dist, x.high() + dist), 
+				new RrInterval(y.low() - dist, y.high() + dist));
+	}
+	
+	/**
 	 * @param a
 	 */
 	public void expand(Rr2Point a)
