@@ -282,7 +282,7 @@ public class LayerProducer {
 		if(layerConditions.getLayingSupport())
 		{
 			borderPolygons = null;
-			offHatch = offHatch.union(lc.getPrinter().getExtruders());
+			//offHatch = offHatch.union(lc.getPrinter().getExtruders()); //TODO: uncomment me!
 		} else
 		{
 			BooleanGridList offBorder = boolGrdSlice.offset(layerConditions, true);
