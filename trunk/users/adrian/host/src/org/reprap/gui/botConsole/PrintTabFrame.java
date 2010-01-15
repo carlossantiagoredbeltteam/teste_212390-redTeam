@@ -37,25 +37,25 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
         initComponents();
     	String machine = "simulator";
     	
-    	toSNAPRepRapRadioButton.setSelected(false);
+    	//toSNAPRepRapRadioButton.setSelected(false);
     	toGCodeRepRapRadioButton.setSelected(false);
     	gCodeToFileRadioButton.setSelected(false);
     	try
     	{
     		machine = org.reprap.Preferences.loadGlobalString("RepRap_Machine");
 
-    		if(machine.equalsIgnoreCase("SNAPRepRap"))
-    		{
-    			toSNAPRepRapRadioButton.setSelected(true);
-    			seenSNAP = true;
-    		} else if(machine.equalsIgnoreCase("GCodeRepRap"))
-    		{
+    		//if(machine.equalsIgnoreCase("SNAPRepRap"))
+    		//{
+    		//	toSNAPRepRapRadioButton.setSelected(true);
+    		//	seenSNAP = true;
+    		//} else if(machine.equalsIgnoreCase("GCodeRepRap"))
+    		//{
     			if(org.reprap.Preferences.loadGlobalBool("GCodeUseSerial"))
     				toGCodeRepRapRadioButton.setSelected(true);
     			else
     				gCodeToFileRadioButton.setSelected(true);
     			seenGCode = true;
-    		} 
+    		//} 
     	} catch (Exception e)
     	{
             System.err.println("Failure trying to load 'RepRap_Machine' preference: " + e);
@@ -64,6 +64,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
         
 
         printer = org.reprap.Main.gui.getPrinter();
+        enableSLoad();
     }
     
     /**
@@ -154,7 +155,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
         stopButton = new java.awt.Button();
         exitButton = new java.awt.Button();
         layerPauseCheck = new javax.swing.JCheckBox();
-        toSNAPRepRapRadioButton = new javax.swing.JRadioButton();
+        //toSNAPRepRapRadioButton = new javax.swing.JRadioButton();
         getWebPage = new javax.swing.JButton();
         expectedBuildTimeLabel = new javax.swing.JLabel();
         hoursMinutesLabel1 = new javax.swing.JLabel();
@@ -214,13 +215,13 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
             }
         });
 
-        buttonGroup1.add(toSNAPRepRapRadioButton);
-        toSNAPRepRapRadioButton.setText("Print on SNAP RepRap");
-        toSNAPRepRapRadioButton.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                selectorRadioButtonMousePressed(evt);
-            }
-        });
+//        buttonGroup1.add(toSNAPRepRapRadioButton);
+//        toSNAPRepRapRadioButton.setText("Print on SNAP RepRap");
+//        toSNAPRepRapRadioButton.addMouseListener(new java.awt.event.MouseAdapter() {
+//            public void mousePressed(java.awt.event.MouseEvent evt) {
+//                selectorRadioButtonMousePressed(evt);
+//            }
+//        });
 
         getWebPage.setIcon(new javax.swing.ImageIcon(
         		ClassLoader.getSystemResource("rr-logo-green-url.png"))); // NOI18N
@@ -339,7 +340,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
                                 .add(loadSTL, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 100, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(toSNAPRepRapRadioButton)
+                            //.add(toSNAPRepRapRadioButton)
                             .add(toGCodeRepRapRadioButton)
                             .add(gCodeToFileRadioButton)
                             .add(layerPauseCheck)
@@ -392,11 +393,12 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(layout.createSequentialGroup()
-                                .add(loadSTL, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(loadGCode, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(loadGCode, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                .add(loadSTL, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                )
                             .add(layout.createSequentialGroup()
-                                .add(toSNAPRepRapRadioButton)
+                                //.add(toSNAPRepRapRadioButton)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(toGCodeRepRapRadioButton)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -517,16 +519,18 @@ private void selectorRadioButtonMousePressed(java.awt.event.MouseEvent evt) {//G
 		machine = org.reprap.Preferences.loadGlobalString("RepRap_Machine");
 
 
-		if(evt.getSource() == toSNAPRepRapRadioButton)
-		{
-			org.reprap.Preferences.setGlobalString("RepRap_Machine", "SNAPRepRap");
-			if(seenGCode)
-				closeMessage = true;
-			seenSNAP = true;
-		} else if(evt.getSource() == toGCodeRepRapRadioButton)
+//		if(evt.getSource() == toSNAPRepRapRadioButton)
+//		{
+//			org.reprap.Preferences.setGlobalString("RepRap_Machine", "SNAPRepRap");
+//			if(seenGCode)
+//				closeMessage = true;
+//			seenSNAP = true;
+//		} else 
+		if(evt.getSource() == toGCodeRepRapRadioButton)
 		{
 			org.reprap.Preferences.setGlobalString("RepRap_Machine", "GCodeRepRap");
 			org.reprap.Preferences.setGlobalString("GCodeUseSerial", "true");
+			enableGLoad();
 			if(seenSNAP)
 				closeMessage = true;
 			seenGCode = true;
@@ -534,6 +538,7 @@ private void selectorRadioButtonMousePressed(java.awt.event.MouseEvent evt) {//G
 		{
 			org.reprap.Preferences.setGlobalString("RepRap_Machine", "GCodeRepRap");
 			org.reprap.Preferences.setGlobalString("GCodeUseSerial", "false");
+			enableSLoad();
 			if(seenSNAP)
 				closeMessage = true;
 			seenGCode = true;
@@ -559,13 +564,15 @@ try {
 }//GEN-LAST:event_getWebPageActionPerformed
 
 private void loadSTL(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadSTL
+	if(!SLoadOK)
+		return;
 	if(gcodeLoaded)
 	{
 		JOptionPane.showMessageDialog(null, "This will cancel the G Code file you loaded.");
 		loadedFiles = "";
 	}
 	String fn = printer.addSTLFileForMaking();
-	if(fn == null)
+	if(fn.length() <= 0)
 	{
 		JOptionPane.showMessageDialog(null, "No STL was loaded.");
 		return;
@@ -586,6 +593,8 @@ private void loadSTL(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadSTL
 }//GEN-LAST:event_loadSTL
 
 private void LoadGCode(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoadGCode
+	if(!GLoadOK)
+		return;
 	if(seenSNAP)
 	{
 		JOptionPane.showMessageDialog(null, "Sorry.  Sending G Codes to SNAP RepRap machines is not yet implemented.");
@@ -650,6 +659,22 @@ private void displayPathsCheckMouseClicked(java.awt.event.MouseEvent evt) {//GEN
 }//GEN-LAST:event_displayPathsCheckMouseClicked
 
 
+private void enableSLoad()
+{
+	SLoadOK = true;
+	GLoadOK = false;
+	loadGCode.setBackground(new java.awt.Color(153, 153, 153));
+	loadSTL.setBackground(new java.awt.Color(0, 204, 255));
+}
+private void enableGLoad()
+{
+	SLoadOK = false;
+	GLoadOK = true;
+	loadGCode.setBackground(new java.awt.Color(0, 204, 255));
+	loadSTL.setBackground(new java.awt.Color(153, 153, 153));
+}
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel currentLayerOutOfN;
@@ -675,7 +700,9 @@ private void displayPathsCheckMouseClicked(java.awt.event.MouseEvent evt) {//GEN
     private java.awt.Button saveRFO;
     private java.awt.Button stopButton;
     private javax.swing.JRadioButton toGCodeRepRapRadioButton;
-    private javax.swing.JRadioButton toSNAPRepRapRadioButton;
+    //private javax.swing.JRadioButton toSNAPRepRapRadioButton;
     // End of variables declaration//GEN-END:variables
+    private boolean SLoadOK = false;
+    private boolean GLoadOK = false;
 
 }

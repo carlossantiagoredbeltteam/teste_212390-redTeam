@@ -169,6 +169,11 @@ public class BooleanGrid
 		public iPoint swCorner;
 		public iPoint size;
 		
+		/**
+		 * Construct from the corner points
+		 * @param min
+		 * @param max
+		 */
 		public iRectangle(iPoint min, iPoint max)
 		{
 			swCorner = new iPoint(min);
@@ -177,12 +182,21 @@ public class BooleanGrid
 			size.y++;
 		}
 		
+		/**
+		 * Copy constructor
+		 * @param r
+		 */
 		public iRectangle(iRectangle r)
 		{
 			swCorner = new iPoint(r.swCorner);
 			size = new iPoint(size);
 		}
 		
+		/**
+		 * Big rectangle containing the union of two.
+		 * @param b
+		 * @return
+		 */
 		public iRectangle union(iRectangle b)
 		{
 			iRectangle result = new iRectangle(this);
@@ -194,7 +208,34 @@ public class BooleanGrid
 			sy = Math.max(sy, b.swCorner.y + b.size.y - 1) - result.swCorner.y + 1;
 			result.size = new iPoint(sx, sy);			
 			return result;
-		}	
+		}
+		
+		/**
+		 * Rectangle containing the intersection of two.
+		 * @param b
+		 * @return
+		 */
+		public iRectangle intersection(iRectangle b)
+		{
+			iRectangle result = new iRectangle(this);
+			result.swCorner.x = Math.max(result.swCorner.x, b.swCorner.x);
+			result.swCorner.y = Math.max(result.swCorner.y, b.swCorner.y);
+			int sx = result.swCorner.x + result.size.x - 1;
+			sx = Math.min(sx, b.swCorner.x + b.size.x - 1) - result.swCorner.x + 1;
+			int sy = result.swCorner.y + result.size.y - 1;
+			sy = Math.min(sy, b.swCorner.y + b.size.y - 1) - result.swCorner.y + 1;
+			result.size = new iPoint(sx, sy);			
+			return result;
+		}
+		
+		/**
+		 * Anything there?
+		 * @return
+		 */
+		public boolean isEmpty()
+		{
+			return size.x < 0 | size.y < 0;
+		}
 	}
 	
 	/**
@@ -651,6 +692,11 @@ public class BooleanGrid
 		super.finalize();
 	}
 	
+	/**
+	 * This function is called by anything that queries the bitmap.
+	 * It does nothing if the bitmap exists.  If it doesn't, it creates it.
+	 *
+	 */
 	private void evaluateIfNeedBe()
 	{
 		if(bits != null)
@@ -681,7 +727,7 @@ public class BooleanGrid
 	
 	
 	/**
-	 * Deep copy constructor
+	 * Copy constructor
 	 * N.B. attributes are _not_ deep copied
 	 * @param bg
 	 */
@@ -689,14 +735,8 @@ public class BooleanGrid
 	{
 		csg = new RrCSG(bg.csg);
 		att = bg.att;
-		if(bg.bits != null)
-			bits = (BitSet)bg.bits.clone();
-		else
-			bits = null;
-		if(bg.visited != null)
-			visited = (BitSet)bg.visited.clone();
-		else
-			visited = null;
+		bits = null;
+		visited = null;
 		rec= new iRectangle(bg.rec);
 	}
 	
@@ -776,8 +816,7 @@ public class BooleanGrid
 	 */
 	public void set(iPoint p, boolean v)
 	{
-		if(bits == null)
-			bits = new BitSet(rec.size.x*rec.size.y);
+		evaluateIfNeedBe();
 		if(!inside(p))
 		{
 			Debug.e("BoolenGrid.set(): attempt to set pixel beyond boundary!");
@@ -794,8 +833,7 @@ public class BooleanGrid
 	 */
 	private void homogeneous(iPoint ipsw, iPoint ipne, boolean v)
 	{
-		if(bits == null)
-			bits = new BitSet(rec.size.x*rec.size.y);
+		evaluateIfNeedBe();
 		// TODO: if v is false we may just return?
 		for(int y = ipsw.y; y <= ipne.y; y++)
 			for(int x = ipsw.x; x <= ipne.x; x++)
@@ -867,11 +905,15 @@ public class BooleanGrid
 		Rr2Point inc = new Rr2Point(pixSize*0.5, pixSize*0.5);
 		Rr2Point p0 = ipsw.realPoint();
 		
+		// Single pixel?
+		
 		if(ipsw.coincidesWith(ipne))
 		{
 			set(ipsw, csg.value(p0) <= 0);
 			return;
 		}
+		
+		// Uniform rectangle?
 		
 		Rr2Point p1 = ipne.realPoint();
 		RrInterval i = csg.value(new RrRectangle(Rr2Point.sub(p0, inc), Rr2Point.add(p1, inc)));
@@ -881,6 +923,10 @@ public class BooleanGrid
 			return;
 		}
 	
+		// Divide this rectangle into four (roughly) congruent quads.
+		
+		// Work out the corner coordinates.
+		
 		int x0 = ipsw.x;
 		int y0 = ipsw.y;
 		int x1 = ipne.x;
@@ -894,6 +940,8 @@ public class BooleanGrid
 		if(yd == 2)
 			ym--;
 		iPoint sw, ne;
+		
+		// Special case - a single vertical line of pixels
 		
 		if(xd <= 1)
 		{
@@ -910,6 +958,8 @@ public class BooleanGrid
 			return;
 		}
 		
+		// Special case - a single horizontal line of pixels
+		
 		if(yd <= 1)
 		{
 			sw = new iPoint(x0, y0);
@@ -922,6 +972,8 @@ public class BooleanGrid
 			
 			return;
 		}
+		
+		// General case - 4 quads.
 		
 		sw = new iPoint(x0, y0);
 		ne = new iPoint(xm, ym);
@@ -996,7 +1048,7 @@ public class BooleanGrid
 				return -1;
 			return i;
 		}
-		
+
 		for(int i=bits.nextSetBit(start); i>=0; i=bits.nextSetBit(i+1)) 
 		{
 			if(!visited.get(i))
@@ -1009,6 +1061,7 @@ public class BooleanGrid
 
 	/**
 	 * Remove whiskers (single threads of pixels).
+	 * TODO: also need to do the same for cracks?
 	 *
 	 */
 	private void deWhisker()
@@ -1066,18 +1119,15 @@ public class BooleanGrid
 	{
 		Rr2Point start = a.realPoint();
 		Rr2Point myDir;
-		for(int x = -1; x <= 1; x++)
-			for(int y = -1; y <= 1; y++)
-				if(!(x == 0 && y == 0))
-				{
-					iPoint b = new iPoint(x, y);
-					b = b.add(a);
-					myDir = Rr2Point.sub(b.realPoint(), start);
-					if(Rr2Point.mul(direction, myDir) > 0)
-						if(isEdgePixel(b))
-							if(!vGet(b))
-								return b;
-				}
+		for(int i = 0; i < 8; i++)
+		{
+			iPoint b = a.add(neighbour[i]);
+			myDir = Rr2Point.sub(b.realPoint(), start);
+			if(Rr2Point.mul(direction, myDir) > 0)
+				if(isEdgePixel(b))
+					if(!vGet(b))
+						return b;
+		}
 		return null;
 	}
 	
@@ -1114,7 +1164,7 @@ public class BooleanGrid
 			
 			long d2 = ip.point(0).sub(ip.point(ip.size() - 1)).magnitude2();
 			if(d2 > 2)
-				Debug.e("BooleanGris.iAllPerimitersRaw(): unjoined ends:" + d2);
+				Debug.e("BooleanGrid.iAllPerimitersRaw(): unjoined ends:" + d2);
 
 			if(ip.size() >= 3)
 				result.add(ip);
@@ -1402,8 +1452,6 @@ public class BooleanGrid
 	 */
 	public BooleanGrid offset(double dist)
 	{	
-		//RrPolygonList rpl = allPerimiters(new Attributes(null, null, null, null));
-		//RrCSG csgp = rpl.toCSG(realResolution);
 		RrCSG csgp = csg.offset(dist);
 		RrRectangle rec = box().offset(dist);
 		return new BooleanGrid(csgp, rec, att);
@@ -1413,60 +1461,71 @@ public class BooleanGrid
 	
 	// Boolean operators on the quad tree
 	
-	// TODO: make them deal with different box sizes!
-	
 	
 	/**
 	 * Complement a grid
+	 * N.B. the grid doesn't get bigger, even though the expression
+	 * it contains may now fill the whole of space.
 	 * @return
 	 */
 	public BooleanGrid complement()
 	{
 		BooleanGrid result = new BooleanGrid(this);
-		result.evaluateIfNeedBe();
-		result.bits.flip(0, result.rec.size.x*result.rec.size.y - 1);
+		result.csg = result.csg.complement();
+		//result.bits.flip(0, result.rec.size.x*result.rec.size.y - 1);
 		return result;
 	}
 	
 	
-//	
-//	
-//	/**
-//	 * Compute the union of two images
-//	 * @param d
-//	 * @param e
-//	 * @return
-//	 */
-//	public static BooleanGrid union(BooleanGrid d, BooleanGrid e)
-//	{
-//		BooleanGrid result = new BooleanGrid(d);
-//		result.bits.or(e.bits);
-//		return result;
-//	}
-//	
-//	
-//	/**
-//	 * Compute the intersection of two quad trees
-//	 * @param d
-//	 * @param e
-//	 * @return
-//	 */
-//	public static BooleanGrid intersection(BooleanGrid d, BooleanGrid e)
-//	{
-//		BooleanGrid result = new BooleanGrid(d);
-//		result.bits.and(e.bits);
-//		return result;
-//	}
-//	/**
-//	 * Grid d - grid e
-//	 * @param d
-//	 * @param e
-//	 * @return
-//	 */
-//	public static BooleanGrid difference(BooleanGrid d, BooleanGrid e)
-//	{
-//		BooleanGrid result = new BooleanGrid(d);
-//		result.bits.andNot(e.bits);
-//		return result;
-//	}
+	
+	
+	/**
+	 * Compute the union of two images
+	 * @param d
+	 * @param e
+	 * @return
+	 */
+	public static BooleanGrid union(BooleanGrid d, BooleanGrid e)
+	{
+		BooleanGrid result = new BooleanGrid(d);
+		result.rec = d.rec.union(e.rec);
+		result.csg = RrCSG.union(result.csg, e.csg);
+		//result.bits.or(e.bits);
+		return result;
+	}
+	
+	
+	/**
+	 * Compute the intersection of two quad trees
+	 * @param d
+	 * @param e
+	 * @return
+	 */
+	public static BooleanGrid intersection(BooleanGrid d, BooleanGrid e)
+	{
+		BooleanGrid result = new BooleanGrid(d);
+		result.rec = d.rec.intersection(e.rec);
+		if(result.rec.isEmpty())
+		{
+			result.csg = RrCSG.nothing();
+			result.rec.size = result.new iPoint(1,1); // For safety
+		}else
+			result.csg = RrCSG.intersection(result.csg, e.csg);		
+		//result.bits.and(e.bits);
+		return result;
+	}
+	/**
+	 * Grid d - grid e
+	 * d's rectangle is presumed to contain the result.
+	 * @param d
+	 * @param e
+	 * @return
+	 */
+	public static BooleanGrid difference(BooleanGrid d, BooleanGrid e)
+	{
+		BooleanGrid result = new BooleanGrid(d);
+		result.csg = RrCSG.difference(d.csg, e.csg);
+		//result.bits.andNot(e.bits);
+		return result;
+	}
 }
