@@ -28,9 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.BitSet;
 import org.reprap.utilities.Debug;
-import org.reprap.utilities.RrGraphics;
-import org.reprap.Extruder;
-import org.reprap.geometry.LayerRules;
+
 
 public class BooleanGrid 
 {
@@ -112,22 +110,21 @@ public class BooleanGrid
 		}
 		
 		/**
+		 * Opposite direction
+		 * @return
+		 */
+		iPoint neg()
+		{
+			return new iPoint(-x, -y);
+		}
+		
+		/**
 		 * Absolute value
 		 * @return
 		 */
 		iPoint abs()
 		{
 			return new iPoint(Math.abs(x), Math.abs(y));
-		}
-		
-		/**
-		 * Divide by an integer
-		 * @param i
-		 * @return
-		 */
-		iPoint divide(int i)
-		{
-			return new iPoint(x/i, y/i);
 		}
 		
 		/**
@@ -140,13 +137,13 @@ public class BooleanGrid
 		}
 		
 		/**
-		 * Point half-way between two others
-		 * @param b
+		 * Scalar product
+		 * @param a
 		 * @return
 		 */
-		iPoint mean(iPoint b)
+		long scalarProduct(iPoint a)
 		{
-			return add(b).divide(2);
+			return x*a.x + y*a.y;
 		}
 		
 		/**
@@ -679,6 +676,11 @@ public class BooleanGrid
 		new iPoint(-1, 0)
 		};
 	
+	/**
+	 * Lookup table behaves like scalar product for two neighbours i and j; get it by neighbourProduct[Math.abs(j - i)]
+	 */
+	private final int[] neighbourProduct = {2, 1, 0, -1, -2, -1, 0, 1};
+	
 	//**************************************************************************************************
 	// Constructors and administration
 	
@@ -900,7 +902,7 @@ public class BooleanGrid
 	 * @param ipne
 	 * @param csg
 	 */
-	private void generateQuadTree(iPoint ipsw, iPoint ipne, RrCSG csg)
+	private void generateQuadTree(iPoint ipsw, iPoint ipne, RrCSG csgExpression)
 	{
 		Rr2Point inc = new Rr2Point(pixSize*0.5, pixSize*0.5);
 		Rr2Point p0 = ipsw.realPoint();
@@ -909,14 +911,14 @@ public class BooleanGrid
 		
 		if(ipsw.coincidesWith(ipne))
 		{
-			set(ipsw, csg.value(p0) <= 0);
+			set(ipsw, csgExpression.value(p0) <= 0);
 			return;
 		}
 		
 		// Uniform rectangle?
 		
 		Rr2Point p1 = ipne.realPoint();
-		RrInterval i = csg.value(new RrRectangle(Rr2Point.sub(p0, inc), Rr2Point.add(p1, inc)));
+		RrInterval i = csgExpression.value(new RrRectangle(Rr2Point.sub(p0, inc), Rr2Point.add(p1, inc)));
 		if(!i.zero())
 		{
 			homogeneous(ipsw, ipne, i.high() <= 0);
@@ -949,11 +951,11 @@ public class BooleanGrid
 				Debug.e("BooleanGrid.generateQuadTree: attempt to divide single pixel!");
 			sw = new iPoint(x0, y0);
 			ne = new iPoint(x0, ym);
-			generateQuadTree(sw, ne, csg.prune(new RrRectangle(Rr2Point.sub(sw.realPoint(), inc), Rr2Point.add(ne.realPoint(), inc))));
+			generateQuadTree(sw, ne, csgExpression.prune(new RrRectangle(Rr2Point.sub(sw.realPoint(), inc), Rr2Point.add(ne.realPoint(), inc))));
 			
 			sw = new iPoint(x0, ym+1);
 			ne = new iPoint(x0, y1);
-			generateQuadTree(sw, ne, csg.prune(new RrRectangle(Rr2Point.sub(sw.realPoint(), inc), Rr2Point.add(ne.realPoint(), inc))));
+			generateQuadTree(sw, ne, csgExpression.prune(new RrRectangle(Rr2Point.sub(sw.realPoint(), inc), Rr2Point.add(ne.realPoint(), inc))));
 			
 			return;
 		}
@@ -964,11 +966,11 @@ public class BooleanGrid
 		{
 			sw = new iPoint(x0, y0);
 			ne = new iPoint(xm, y0);
-			generateQuadTree(sw, ne, csg.prune(new RrRectangle(Rr2Point.sub(sw.realPoint(), inc), Rr2Point.add(ne.realPoint(), inc))));
+			generateQuadTree(sw, ne, csgExpression.prune(new RrRectangle(Rr2Point.sub(sw.realPoint(), inc), Rr2Point.add(ne.realPoint(), inc))));
 			
 			sw = new iPoint(xm+1, y0);
 			ne = new iPoint(x1, y0);
-			generateQuadTree(sw, ne, csg.prune(new RrRectangle(Rr2Point.sub(sw.realPoint(), inc), Rr2Point.add(ne.realPoint(), inc))));
+			generateQuadTree(sw, ne, csgExpression.prune(new RrRectangle(Rr2Point.sub(sw.realPoint(), inc), Rr2Point.add(ne.realPoint(), inc))));
 			
 			return;
 		}
@@ -977,19 +979,19 @@ public class BooleanGrid
 		
 		sw = new iPoint(x0, y0);
 		ne = new iPoint(xm, ym);
-		generateQuadTree(sw, ne, csg.prune(new RrRectangle(Rr2Point.sub(sw.realPoint(), inc), Rr2Point.add(ne.realPoint(), inc))));
+		generateQuadTree(sw, ne, csgExpression.prune(new RrRectangle(Rr2Point.sub(sw.realPoint(), inc), Rr2Point.add(ne.realPoint(), inc))));
 		
 		sw = new iPoint(x0, ym + 1);
 		ne = new iPoint(xm, y1);
-		generateQuadTree(sw, ne, csg.prune(new RrRectangle(Rr2Point.sub(sw.realPoint(), inc), Rr2Point.add(ne.realPoint(), inc))));
+		generateQuadTree(sw, ne, csgExpression.prune(new RrRectangle(Rr2Point.sub(sw.realPoint(), inc), Rr2Point.add(ne.realPoint(), inc))));
 		
 		sw = new iPoint(xm+1, ym + 1);
 		ne = new iPoint(x1, y1);
-		generateQuadTree(sw, ne, csg.prune(new RrRectangle(Rr2Point.sub(sw.realPoint(), inc), Rr2Point.add(ne.realPoint(), inc))));
+		generateQuadTree(sw, ne, csgExpression.prune(new RrRectangle(Rr2Point.sub(sw.realPoint(), inc), Rr2Point.add(ne.realPoint(), inc))));
 		
 		sw = new iPoint(xm+1, y0);
 		ne = new iPoint(x1, ym);
-		generateQuadTree(sw, ne, csg.prune(new RrRectangle(Rr2Point.sub(sw.realPoint(), inc), Rr2Point.add(ne.realPoint(), inc))));		
+		generateQuadTree(sw, ne, csgExpression.prune(new RrRectangle(Rr2Point.sub(sw.realPoint(), inc), Rr2Point.add(ne.realPoint(), inc))));		
 
 	}
 
@@ -1092,43 +1094,100 @@ public class BooleanGrid
 	}
 	
 	/**
-	 * Find a neighbour of a pixel that has not yet been visited and is on an edge.
-	 * @param a
+	 * Look-up table to find the index of a neighbour point, n, from the point.
+	 * @param n
 	 * @return
 	 */
-	public iPoint findUnvisitedNeighbourOnEdge(iPoint a)
+	private int neighbourIndex(iPoint n)
 	{
+		switch((n.y + 1)*3 + n.x + 1)
+		{
+		case 0: return 0;
+		case 1: return 1;
+		case 2: return 2;
+		case 3: return 7;
+		case 5: return 3;
+		case 6: return 6;
+		case 7: return 5;
+		case 8: return 4;
+		default:
+			Debug.e("BooleanGrid.neighbourIndex(): not a neighbour point!" + n.toString());	
+		}
+		return 0;
+	}
+
+	
+	/**
+	 * Find the index of the neighbouring point that's closest to a given real direction.
+	 * @param p
+	 * @return
+	 */
+	private int directionToNeighbour(Rr2Point p)
+	{
+		double score = Double.MIN_VALUE;
+		int result = -1;
+		for(int i = 0; i < 8; i++)
+		{
+			// Can't use neighbour.realPoint as that adds swCorner...
+			// We have to normailze neighbour, to get answers proportional to cosines
+			double s = Rr2Point.mul(p, new Rr2Point(neighbour[i].x, neighbour[i].y).norm()); 
+			if(s > score)
+			{
+				result = i;
+				score = s;
+			}
+		}
+		if(result < 0)
+			Debug.e("BooleanGrid.directionToNeighbour(): scalar product error!");
+		return result;
+	}
+	
+//	/**
+//	 * Find a neighbour of a pixel that has not yet been visited and is on an edge.
+//	 * @param a
+//	 * @return
+//	 */
+//	public iPoint findUnvisitedNeighbourOnEdge(iPoint a, iPoint lastOne)
+//	{
+//		for(int i = 0; i < 8; i++)
+//		{
+//			iPoint b = a.add(neighbour[i]);
+//			if(isEdgePixel(b))
+//				if(!vGet(b))
+//					return b;
+//		}
+//		return null;
+//	}
+	
+	/**
+	 * Find a neighbour of a pixel that has not yet been visited, that is on an edge, and
+	 * that is nearest to a given neighbour direction, nd.  If nd < 0 the first unvisited
+	 * neighbour is returned.  If no valid neighbour exists, null is returned.
+	 * @param a
+	 * @param direction
+	 * @return
+	 */
+	public iPoint findUnvisitedNeighbourOnEdgeInDirection(iPoint a, int nd)
+	{
+		iPoint result = null;
+		int score = -5;
 		for(int i = 0; i < 8; i++)
 		{
 			iPoint b = a.add(neighbour[i]);
 			if(isEdgePixel(b))
 				if(!vGet(b))
-					return b;
-		}
-		return null;
-	}
-	
-	/**
-	 * Find a neighbour of a pixel that has not yet been visited, that is on an edge, and
-	 * that is in a given direction.
-	 * @param a
-	 * @param direction
-	 * @return
-	 */
-	public iPoint findUnvisitedNeighbourOnEdgeInDirection(iPoint a, Rr2Point direction)
-	{
-		Rr2Point start = a.realPoint();
-		Rr2Point myDir;
-		for(int i = 0; i < 8; i++)
-		{
-			iPoint b = a.add(neighbour[i]);
-			myDir = Rr2Point.sub(b.realPoint(), start);
-			if(Rr2Point.mul(direction, myDir) > 0)
-				if(isEdgePixel(b))
-					if(!vGet(b))
+				{
+					if(nd < 0)
 						return b;
+					int s = neighbourProduct[Math.abs(nd - i)];
+					if(s > score)
+					{
+						score = s;
+						result = b;
+					}
+				}
 		}
-		return null;
+		return result;
 	}
 	
 	//********************************************************************************
@@ -1147,19 +1206,24 @@ public class BooleanGrid
 		
 		//System.out.print("Starting edges... ");
 		
-		iPoint pixel;
+		iPoint thisPoint;
 		
 		int i = findUnvisitedEdgeIndex(0);
 		
 		while(i >= 0)
 		{
 			ip = new iPolygon(true);
-			pixel = pixel(i);
-			while(pixel != null)
+			thisPoint = pixel(i);
+			int direction = -1;
+			iPoint newPoint;
+			while(thisPoint != null)
 			{
-				ip.add(pixel);
-				vSet(pixel, true);
-				pixel = findUnvisitedNeighbourOnEdge(pixel);
+				ip.add(thisPoint);
+				vSet(thisPoint, true);
+				newPoint = findUnvisitedNeighbourOnEdgeInDirection(thisPoint, direction);
+				if(newPoint != null)
+					direction = neighbourIndex(newPoint.sub(thisPoint)); // Try to go in the same direction
+				thisPoint = newPoint;
 			}
 			
 			long d2 = ip.point(0).sub(ip.point(ip.size() - 1)).magnitude2();
@@ -1268,9 +1332,10 @@ public class BooleanGrid
     	RrHalfPlane originPlane = hatches.get(originP);
     	RrHalfPlane targetPlane= hatches.get(targetP);
     	
-    	Rr2Point dir = originPlane.normal();
+    	int dir = directionToNeighbour(originPlane.normal());
+    	
     	if(originPlane.value(targetPlane.pLine().origin()) < 0)
-    		dir = dir.neg();
+    		dir = neighbourIndex(neighbour[dir].neg());
 
     	if(!get(start))
     	{
@@ -1293,7 +1358,7 @@ public class BooleanGrid
     	{
     		track.add(p);
     		vSet(p, true);
-    		p = findUnvisitedNeighbourOnEdge(p);
+    		p = findUnvisitedNeighbourOnEdgeInDirection(p, dir);
     		if(p == null)
     			return null;
     		notCrossedOriginPlane = originPlane.value(p.realPoint())*vOrigin >= 0;
@@ -1452,9 +1517,9 @@ public class BooleanGrid
 	 */
 	public BooleanGrid offset(double dist)
 	{	
-		RrCSG csgp = csg.offset(dist);
+		RrCSG csgExpression = csg.offset(dist);
 		RrRectangle rec = box().offset(dist);
-		return new BooleanGrid(csgp, rec, att);
+		return new BooleanGrid(csgExpression, rec, att);
 	}
 	
 	//*********************************************************************************************************
@@ -1517,6 +1582,7 @@ public class BooleanGrid
 	/**
 	 * Grid d - grid e
 	 * d's rectangle is presumed to contain the result.
+	 * TODO: write a function to compute the rectangle from the bitmap
 	 * @param d
 	 * @param e
 	 * @return
