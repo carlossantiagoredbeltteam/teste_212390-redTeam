@@ -376,6 +376,10 @@ public class RrGraphics
 	 */
 	public void add(RrPolygonList pl)
 	{
+		if(pl == null)
+			return;
+		if(pl.size() <= 0)
+			return;
 		if(p_list == null)
 			p_list = new RrPolygonList(pl);
 		else
@@ -478,7 +482,7 @@ public class RrGraphics
 	}
 	
 	/**
-	 * Plot the half-plane lust
+	 * Plot the half-plane list
 	 * @param b
 	 */
 	private void plot(List<RrHalfPlane> hl)
@@ -540,7 +544,10 @@ public class RrGraphics
 		for(int i = 1; i < p.size(); i++)	
 				plot(p.point(i));
 		if(p.isClosed())
+		{
+			g2d.setColor(Color.RED);
 			plot(p.point(0));
+		}
 	}
 	
 	/**
@@ -682,53 +689,53 @@ public class RrGraphics
 //		g2d.fillRect(x0, y1, x1 - x0 + 1, y0 - y1 + 1);
 	}
 	
-	/**
-	 * Recursively plot the boxes for an STL object
-	 * @param s
-	 */
-	private void boxSTL(STLSlice s)
-	{
-		if(RrRectangle.intersection(s.box(), scaledBox).empty())
-			return;
-		
-		if(s.leaf())
-		{
-			g2d.setColor(boxes);
-			plot(s.box());
-		} else
-		{
-			boxSTL(s.c_1());
-			boxSTL(s.c_2());
-			boxSTL(s.c_3());
-			boxSTL(s.c_4());
-		}
-	}
+//	/**
+//	 * Recursively plot the boxes for an STL object
+//	 * @param s
+//	 */
+//	private void boxSTL(STLSlice s)
+//	{
+//		if(RrRectangle.intersection(s.box(), scaledBox).empty())
+//			return;
+//		
+//		if(s.leaf())
+//		{
+//			g2d.setColor(boxes);
+//			plot(s.box());
+//		} else
+//		{
+//			boxSTL(s.c_1());
+//			boxSTL(s.c_2());
+//			boxSTL(s.c_3());
+//			boxSTL(s.c_4());
+//		}
+//	}
 	
-	/**
-	 * Plot a divided STL recursively
-	 * @param s
-	 */
-	private void plot(STLSlice s)
-	{
-		if(RrRectangle.intersection(s.box(), scaledBox).empty())
-			return;
-		
-		if(s.leaf())
-		{
-			g2d.setColor(polygon1);
-			for(int i = 0; i < s.edges().size(); i++)
-			{
-				move(s.segmentA(i));
-				plot(s.segmentB(i));
-			}
-		} else
-		{
-			plot(s.c_1());
-			plot(s.c_2());
-			plot(s.c_3());
-			plot(s.c_4());
-		}
-	}
+//	/**
+//	 * Plot a divided STL recursively
+//	 * @param s
+//	 */
+//	private void plot(STLSlice s)
+//	{
+//		if(RrRectangle.intersection(s.box(), scaledBox).empty())
+//			return;
+//		
+//		if(s.leaf())
+//		{
+//			g2d.setColor(polygon1);
+//			for(int i = 0; i < s.edges().size(); i++)
+//			{
+//				move(s.segmentA(i));
+//				plot(s.segmentB(i));
+//			}
+//		} else
+//		{
+//			plot(s.c_1());
+//			plot(s.c_2());
+//			plot(s.c_3());
+//			plot(s.c_4());
+//		}
+//	}
 	
 	/**
 	 * Master plot function - draw everything
@@ -767,15 +774,15 @@ public class RrGraphics
 				//plot(p_list.getBox());
 		}
 		
-		if(stlc != null)
-		{
-			if(plot_box)
-				boxSTL(stlc);
-			//else
-				//plot(stlc.box());
-			
-			plot(stlc);
-		}
+//		if(stlc != null)
+//		{
+//			if(plot_box)
+//				boxSTL(stlc);
+//			//else
+//				//plot(stlc.box());
+//			
+//			plot(stlc);
+//		}
 
 		if(hp != null)
 		{

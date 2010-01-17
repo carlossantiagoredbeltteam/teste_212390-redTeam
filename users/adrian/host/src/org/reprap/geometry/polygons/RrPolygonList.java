@@ -953,11 +953,19 @@ public class RrPolygonList
 				if(en >= st)
 				{
 					for(int j = st; j <= en; j++)
-						outline.add(0, pg.point(j));
+					{
+						outline.add(0, pg.point(j));  // Put it on the beginning...
+						//if(j < en)
+						//	outline.add(pg.point(j));     // ...and the end.
+					}
 				} else
 				{
 					for(int j = st; j >= en; j--)
+					{
 						outline.add(0, pg.point(j));
+						//if(j > en)
+						//	outline.add(pg.point(j));
+					}
 				}
 
 				set(i, outline);
