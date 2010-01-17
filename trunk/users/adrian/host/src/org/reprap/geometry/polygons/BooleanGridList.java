@@ -173,34 +173,34 @@ public class BooleanGridList
 		 * @param a
 		 * @return
 		 */
-//		public BooleanGridList union(Extruder[] es)
-//		{	
-//			BooleanGridList result = new BooleanGridList();
-//			if(size() <= 0)
-//				return result;
-//			
-//			BooleanGrid contents = get(0);
-//			
-//			Attributes att = attribute(0);
-//			Boolean foundAttribute0 = false;
-//			if(att.getExtruder() == es[0])
-//				foundAttribute0 = true;
-//			for(int i = 1; i < size(); i++)
-//			{
-//				if(!foundAttribute0)
-//				{
-//					if(attribute(i).getExtruder() == es[0])
-//					{
-//						att = attribute(i);
-//						foundAttribute0 = true;
-//					}
-//				}
-//				contents = BooleanGrid.union(contents, get(i));
-//			}
-//			if(!foundAttribute0)
-//				Debug.e("RrCSGPolygonList.union(): Attribute of extruder 0 not found.");
-//			result.add(contents, att);
-//			return result;
-//		}
+		public BooleanGridList union(Extruder[] es)
+		{	
+			BooleanGridList result = new BooleanGridList();
+			if(size() <= 0)
+				return result;
+			
+			BooleanGrid contents = get(0);
+			
+			Attributes att = attribute(0);
+			Boolean foundAttribute0 = false;
+			if(att.getExtruder() == es[0])
+				foundAttribute0 = true;
+			for(int i = 1; i < size(); i++)
+			{
+				if(!foundAttribute0)
+				{
+					if(attribute(i).getExtruder() == es[0])
+					{
+						att = attribute(i);
+						foundAttribute0 = true;
+					}
+				}
+				contents = BooleanGrid.union(contents, get(i));
+			}
+			if(!foundAttribute0)
+				Debug.e("RrCSGPolygonList.union(): Attribute of extruder 0 not found.");
+			result.add(contents);
+			return result;
+		}
 
 }

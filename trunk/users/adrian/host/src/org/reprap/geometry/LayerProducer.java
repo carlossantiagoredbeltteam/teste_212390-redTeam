@@ -282,7 +282,7 @@ public class LayerProducer {
 		if(layerConditions.getLayingSupport())
 		{
 			borderPolygons = null;
-			//offHatch = offHatch.union(lc.getPrinter().getExtruders()); //TODO: uncomment me!
+			offHatch = offHatch.union(lc.getPrinter().getExtruders());
 		} else
 		{
 			BooleanGridList offBorder = boolGrdSlice.offset(layerConditions, true);
@@ -899,7 +899,8 @@ public class LayerProducer {
 				oldexoff = extrudeOff;
 				extrudeOff = i > stopExtruding || i == p.size()-1;
 				valveOff = i > stopValve || i == p.size()-1;
-				
+//				if(oldexoff ^ extrudeOff)
+//					printer.printEndReverse();				
 				plot(p.point(i), next, extrudeOff, valveOff);
 				if(oldexoff ^ extrudeOff)
 					printer.printEndReverse();

@@ -634,7 +634,7 @@ public class BooleanGrid
 	 * The resolution of the RepRap machine
 	 */
 	static final double pixSize = Preferences.machineResolution()*0.6;
-	static final double realResolution = pixSize*0.1;
+	static final double realResolution = pixSize*1.5;
 	static final double rSwell = 0.5; // mm by which to swell rectangles to give margins round stuff
 	
 	/**
@@ -656,6 +656,11 @@ public class BooleanGrid
 	 * The csg expression
 	 */
 	private RrCSG csg;
+	
+	/**
+	 * How simple does a CSG expression have to be to not be worth pruning further?
+	 */
+	private static final int simpleEnough = 3;
 	
 	/**
 	 * The attributes
@@ -682,6 +687,35 @@ public class BooleanGrid
 	private final int[] neighbourProduct = {2, 1, 0, -1, -2, -1, 0, 1};
 	
 	//**************************************************************************************************
+	// Debugging
+	
+	private static String stack[] = new String[20];
+	private static int sp = -1;
+	private static boolean debug = false;
+	
+	private void push(String s)
+	{
+		if(!debug)
+			return;
+		sp++;
+		stack[sp] = s;
+		for(int i = 0; i < sp; i++)
+			System.out.print(" ");
+		System.out.println("{ " + s);
+		System.out.flush();
+	}
+	private void pop()
+	{
+		if(!debug)
+			return;
+		for(int i = 0; i < sp; i++)
+			System.out.print(" ");
+		System.out.println("} " + stack[sp]);
+		System.out.flush();
+		sp--;
+	}
+	
+	//**************************************************************************************************
 	// Constructors and administration
 	
 	/**
@@ -705,9 +739,11 @@ public class BooleanGrid
 			return;
 		bits = new BitSet(rec.size.x*rec.size.y);
 		visited = null;
-		//System.out.print("Starting quad tree... ");
+		push("Build quad tree... ");
+		//Debug.e("Quad start.");
 		generateQuadTree(new iPoint(0, 0), new iPoint(rec.size.x - 1, rec.size.y - 1), csg);
-		//System.out.println("Done quad tree");
+		//Debug.e("Quad end.");
+		pop();
 		deWhisker();		
 	}
 	
@@ -836,10 +872,24 @@ public class BooleanGrid
 	private void homogeneous(iPoint ipsw, iPoint ipne, boolean v)
 	{
 		evaluateIfNeedBe();
-		// TODO: if v is false we may just return?
-		for(int y = ipsw.y; y <= ipne.y; y++)
-			for(int x = ipsw.x; x <= ipne.x; x++)
-				bits.set(pixI(x, y), v);
+		// TODO: if v is false may we just return?
+		for(int x = ipsw.x; x <= ipne.x; x++)
+			bits.set(pixI(x, ipsw.y), pixI(x, ipne.y) + 1, v);
+	}
+	
+	/**
+	 * Set a whole rectangle to the right values for a CSG expression
+	 * @param ipsw
+	 * @param ipne
+	 * @param v
+	 */
+	private void heterogeneous(iPoint ipsw, iPoint ipne, RrCSG csgExpression)
+	{
+		evaluateIfNeedBe();
+		// TODO: if v is false may we just return?
+		for(int x = ipsw.x; x <= ipne.x; x++)
+			for(int y = ipsw.y; y <= ipne.y; y++)
+				bits.set(pixI(x, y), csgExpression.value(new iPoint(x, y).realPoint()) <= 0);
 	}
 	
 	/**
@@ -922,6 +972,14 @@ public class BooleanGrid
 		if(!i.zero())
 		{
 			homogeneous(ipsw, ipne, i.high() <= 0);
+			return;
+		}
+		
+		// Non-uniform, but simple, rectangle
+		
+		if(csgExpression.complexity() <= simpleEnough)
+		{
+			heterogeneous(ipsw, ipne, csgExpression);
 			return;
 		}
 	
@@ -1068,7 +1126,7 @@ public class BooleanGrid
 	 */
 	private void deWhisker()
 	{
-		//System.out.print("deWhisker... ");
+		push("deWhisker... ");
 		int i = findUnvisitedEdgeIndex(0);
 		while(i >= 0)
 		{
@@ -1090,7 +1148,7 @@ public class BooleanGrid
 				set(p, false);
 			i = findUnvisitedEdgeIndex(i + 1);
 		}
-		//System.out.println(" done.");
+		pop();
 	}
 	
 	/**
@@ -1142,22 +1200,6 @@ public class BooleanGrid
 		return result;
 	}
 	
-//	/**
-//	 * Find a neighbour of a pixel that has not yet been visited and is on an edge.
-//	 * @param a
-//	 * @return
-//	 */
-//	public iPoint findUnvisitedNeighbourOnEdge(iPoint a, iPoint lastOne)
-//	{
-//		for(int i = 0; i < 8; i++)
-//		{
-//			iPoint b = a.add(neighbour[i]);
-//			if(isEdgePixel(b))
-//				if(!vGet(b))
-//					return b;
-//		}
-//		return null;
-//	}
 	
 	/**
 	 * Find a neighbour of a pixel that has not yet been visited, that is on an edge, and
@@ -1204,7 +1246,7 @@ public class BooleanGrid
 		iPolygonList result = new iPolygonList();
 		iPolygon ip;
 		
-		//System.out.print("Starting edges... ");
+		push("Computing edges... ");
 		
 		iPoint thisPoint;
 		
@@ -1237,7 +1279,7 @@ public class BooleanGrid
 		}
 		
 		resetVisited();
-		//System.out.println("Done edges");
+		pop();
 		return result;
 	}
 	
@@ -1427,7 +1469,7 @@ public class BooleanGrid
 	 */
 	public RrPolygonList hatch(RrHalfPlane hp, double gap, Attributes a)
 	{	
-		//System.out.print("Starting hatching... ");
+		push("Computing hatching... ");
 		
 		RrRectangle big = box().scale(1.1);
 		double d = Math.sqrt(big.dSquared());
@@ -1478,7 +1520,6 @@ public class BooleanGrid
 			hatcher = hatcher.offset(gap);
 			g += gap;
 		}
-		//System.out.print(" done raw hatching... ");
 		
 		//return iHatches.realPolygons(a);
 		
@@ -1503,7 +1544,7 @@ public class BooleanGrid
 		
 		resetVisited();
 		
-		//System.out.println(" joined up hatching... ");
+		pop();
 		
 		return snakes.realPolygons(a).simplify(realResolution);
 	}
