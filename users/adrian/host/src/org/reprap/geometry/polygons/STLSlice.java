@@ -1133,125 +1133,125 @@ public class STLSlice
 //		yCoords = new ArrayList<Double>();
 //	}
 	
-	/**
-	 * Prune the edge list to the box so that only segments
-	 * with endpoints in the box are retained.  
-	 */
-	private void prune()
-	{
-		List<LineSegment> result = new ArrayList<LineSegment>();
-		
-		for(int i = 0; i < edges.size(); i++)
-		{
-			Rr2Point aa = segment(i).a;
-			Rr2Point bb = segment(i).b;
-			
-			boolean aIn = (box.pointRelative(aa) == 0);
-			boolean bIn = (box.pointRelative(bb) == 0);
-			
-			if(aIn || bIn)
-				result.add(segment(i));
-
-			if(aIn)
-			{
-				xCoords.add(new Double(aa.x()));
-				yCoords.add(new Double(aa.y()));
-			}
-			
-			if(bIn)
-			{
-				xCoords.add(new Double(bb.x()));
-				yCoords.add(new Double(bb.y()));
-			}
-		}
-				
-		edges = result;
-	}
+//	/**
+//	 * Prune the edge list to the box so that only segments
+//	 * with endpoints in the box are retained.  
+//	 */
+//	private void prune()
+//	{
+//		List<LineSegment> result = new ArrayList<LineSegment>();
+//		
+//		for(int i = 0; i < edges.size(); i++)
+//		{
+//			Rr2Point aa = segment(i).a;
+//			Rr2Point bb = segment(i).b;
+//			
+//			boolean aIn = (box.pointRelative(aa) == 0);
+//			boolean bIn = (box.pointRelative(bb) == 0);
+//			
+//			if(aIn || bIn)
+//				result.add(segment(i));
+//
+//			if(aIn)
+//			{
+//				xCoords.add(new Double(aa.x()));
+//				yCoords.add(new Double(aa.y()));
+//			}
+//			
+//			if(bIn)
+//			{
+//				xCoords.add(new Double(bb.x()));
+//				yCoords.add(new Double(bb.y()));
+//			}
+//		}
+//				
+//		edges = result;
+//	}
+//	
+//	/**
+//	 * Start near the middle of a sorted list of coordinates, working both
+//	 * up and down and find the first decent-sized gap
+//	 * @param coords
+//	 * @param i
+//	 * @return
+//	 */
+//	private static double findGap(ArrayList<Double> coords, RrInterval i)
+//	{
+//		double g, v;
+//		
+//		Collections.sort(coords);
+//		
+//		int middle = coords.size()/2;
+//		double vpOld = coords.get(middle).doubleValue();
+//		double vmOld = vpOld;
+//		int p = middle + 1;
+//		int m = middle - 1;
+//		RrInterval biggest = new RrInterval(0, 0);
+//		
+//		while(p < coords.size() || m  >= 0)
+//		{
+//			if(p < coords.size())
+//			{
+//				v = coords.get(p).doubleValue();
+//				g = v - vpOld;
+//				if(g > Preferences.gridRes()*0.1)
+//				{
+//					return 0.5*(vpOld + v);
+//				}
+//				if(g > biggest.length())
+//					biggest = new RrInterval(vpOld, v);
+//				vpOld = v;
+//				p++;
+//			}
+//			
+//			if(m >= 0)
+//			{
+//				v = coords.get(m).doubleValue();
+//				g = vmOld - v;
+//				if(g > Preferences.gridRes()*0.1)
+//				{
+//					return 0.5*(v + vmOld);
+//				}
+//				if(g > biggest.length())
+//					biggest = new RrInterval(v, vmOld);
+//				vmOld = v;
+//				m--;
+//			}
+//		}
+//		
+//		if(biggest.length() > Preferences.gridRes()*0.1)
+//			return biggest.low() + 0.5*biggest.length();
+//		else
+//		{
+//			do
+//				v = coords.get(0) + (rangen.nextDouble() - 0.5)*i.length();
+//			while(!i.in(v));
+//			return v;
+//		}
+//	}
 	
-	/**
-	 * Start near the middle of a sorted list of coordinates, working both
-	 * up and down and find the first decent-sized gap
-	 * @param coords
-	 * @param i
-	 * @return
-	 */
-	private static double findGap(ArrayList<Double> coords, RrInterval i)
-	{
-		double g, v;
-		
-		Collections.sort(coords);
-		
-		int middle = coords.size()/2;
-		double vpOld = coords.get(middle).doubleValue();
-		double vmOld = vpOld;
-		int p = middle + 1;
-		int m = middle - 1;
-		RrInterval biggest = new RrInterval(0, 0);
-		
-		while(p < coords.size() || m  >= 0)
-		{
-			if(p < coords.size())
-			{
-				v = coords.get(p).doubleValue();
-				g = v - vpOld;
-				if(g > Preferences.gridRes()*0.1)
-				{
-					return 0.5*(vpOld + v);
-				}
-				if(g > biggest.length())
-					biggest = new RrInterval(vpOld, v);
-				vpOld = v;
-				p++;
-			}
-			
-			if(m >= 0)
-			{
-				v = coords.get(m).doubleValue();
-				g = vmOld - v;
-				if(g > Preferences.gridRes()*0.1)
-				{
-					return 0.5*(v + vmOld);
-				}
-				if(g > biggest.length())
-					biggest = new RrInterval(v, vmOld);
-				vmOld = v;
-				m--;
-			}
-		}
-		
-		if(biggest.length() > Preferences.gridRes()*0.1)
-			return biggest.low() + 0.5*biggest.length();
-		else
-		{
-			do
-				v = coords.get(0) + (rangen.nextDouble() - 0.5)*i.length();
-			while(!i.in(v));
-			return v;
-		}
-	}
-	
-	/**
-	 * Find the place to put the quad division.
-	 * @return
-	 */
-	private Rr2Point biggestGap()
-	{
-		Rr2Point result = new Rr2Point(findGap(xCoords, box.x()), findGap(yCoords, box.y()));
-		//System.out.println("Box: " + box.toString() + "   centre: " + result.toString());
-		
-		// Not needed any more
-		
-		//xCoords = new ArrayList<Double>();
-		//yCoords = new ArrayList<Double>();
-		
-		// Sanity check
-		
-		if(box.pointRelative(result) != 0)
-			Debug.d("STLSlice.biggestGap(): point outside box! point: " + 
-					result.toString() + ", box: " + box.toString());
-		
-		return result;		
-	}
+//	/**
+//	 * Find the place to put the quad division.
+//	 * @return
+//	 */
+//	private Rr2Point biggestGap()
+//	{
+//		Rr2Point result = new Rr2Point(findGap(xCoords, box.x()), findGap(yCoords, box.y()));
+//		//System.out.println("Box: " + box.toString() + "   centre: " + result.toString());
+//		
+//		// Not needed any more
+//		
+//		//xCoords = new ArrayList<Double>();
+//		//yCoords = new ArrayList<Double>();
+//		
+//		// Sanity check
+//		
+//		if(box.pointRelative(result) != 0)
+//			Debug.d("STLSlice.biggestGap(): point outside box! point: " + 
+//					result.toString() + ", box: " + box.toString());
+//		
+//		return result;		
+//	}
 	
 //	/**
 //	 * Quad tree division - make the 4 sub quads.

@@ -3,7 +3,7 @@ package org.reprap.geometry.polygons;
 import org.reprap.Preferences;
 
 /**
- * Small class to hold circles (centre and radius)
+ * Small class to hold circles (centre and squared radius)
  * 
  */
 

@@ -691,7 +691,7 @@ public class BooleanGrid
 	
 	private static String stack[] = new String[20];
 	private static int sp = -1;
-	private static boolean debug = false;
+	private static boolean debug = true;
 	
 	private void push(String s)
 	{
