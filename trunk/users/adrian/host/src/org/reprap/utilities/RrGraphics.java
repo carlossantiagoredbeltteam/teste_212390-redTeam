@@ -485,30 +485,30 @@ public class RrGraphics
 	 * Plot the half-plane list
 	 * @param b
 	 */
-	private void plot(List<RrHalfPlane> hl)
-	{
-		for(int i = 0; i < hl.size(); i++)
-		{
-			RrHalfPlane h = hl.get(i);
-			if(!scaledBox.wipe(h.pLine(), RrInterval.bigInterval()).empty())
-			{
-				if(h.size() > 0)
-				{
-					move(h.getPoint(0));
-					boolean even = false;
-					for(int j = 1; j < h.size(); j++)
-					{
-						even = !even;
-						if(even)
-							g2d.setColor(hatch1);
-						else
-							g2d.setColor(hatch0);
-						plot(h.getPoint(j));
-					}
-				}
-			}
-		}
-	}
+//	private void plot(List<RrHalfPlane> hl)
+//	{
+//		for(int i = 0; i < hl.size(); i++)
+//		{
+//			RrHalfPlane h = hl.get(i);
+//			if(!scaledBox.wipe(h.pLine(), RrInterval.bigInterval()).empty())
+//			{
+//				if(h.size() > 0)
+//				{
+//					move(h.getPoint(0));
+//					boolean even = false;
+//					for(int j = 1; j < h.size(); j++)
+//					{
+//						even = !even;
+//						if(even)
+//							g2d.setColor(hatch1);
+//						else
+//							g2d.setColor(hatch0);
+//						plot(h.getPoint(j));
+//					}
+//				}
+//			}
+//		}
+//	}
 	
 	/**
 	 * Set the colour from a RepRap attribute
@@ -784,10 +784,10 @@ public class RrGraphics
 //			plot(stlc);
 //		}
 
-		if(hp != null)
-		{
-			plot(hp);
-		}
+//		if(hp != null)
+//		{
+//			plot(hp);
+//		}
 		
 
 	}

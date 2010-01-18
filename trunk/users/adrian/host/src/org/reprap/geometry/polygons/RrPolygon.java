@@ -462,18 +462,19 @@ public class RrPolygon
 	 */
 	public RrPolygon randomStart()
 	{
-		if(!isClosed())
-			System.err.println("RrPolygon.randomStart(): random-starting an open polygon!");
-		RrPolygon result = new RrPolygon(att, closed);
-		int i = rangen.nextInt(size());
-		for(int j = 0; j < size(); j++)
-		{
-			result.add(new Rr2Point(point(i))); 
-			i++;
-			if(i >= size())
-				i = 0;
-		}
-		return result;
+		return newStart(rangen.nextInt(size()));
+//		if(!isClosed())
+//			System.err.println("RrPolygon.randomStart(): random-starting an open polygon!");
+//		RrPolygon result = new RrPolygon(att, closed);
+//		int i = rangen.nextInt(size());
+//		for(int j = 0; j < size(); j++)
+//		{
+//			result.add(new Rr2Point(point(i))); 
+//			i++;
+//			if(i >= size())
+//				i = 0;
+//		}
+//		return result;
 	}
 	
 	/**

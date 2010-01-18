@@ -1288,21 +1288,21 @@ public class RrCSG
 		return root;
 	}
 	
-	/**
-	 * For each half plane remove any existing crossing list.
-     */
-    public void clearCrossings()
-    {
-    	if(complexity() > 1)
-    	{
-    		c_1().clearCrossings();
-    		c_2().clearCrossings();
-    	} else
-    	{
-    		if(operator() == RrCSGOp.LEAF)
-    			plane().removeCrossings();
-    	}
-    }
+//	/**
+//	 * For each half plane remove any existing crossing list.
+//     */
+//    public void clearCrossings()
+//    {
+//    	if(complexity() > 1)
+//    	{
+//    		c_1().clearCrossings();
+//    		c_2().clearCrossings();
+//    	} else
+//    	{
+//    		if(operator() == RrCSGOp.LEAF)
+//    			plane().removeCrossings();
+//    	}
+//    }
     
     
 //    /**

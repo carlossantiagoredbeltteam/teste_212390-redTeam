@@ -55,73 +55,73 @@
 
 package org.reprap.geometry.polygons;
 
-import java.util.ArrayList;
-import java.util.List;
+//import java.util.ArrayList;
+//import java.util.List;
 
-/**
- * Small class to hold parameter/quad pairs
- * @author Adrian
- *
- */
-class lineIntersection
-{
-	/**
-	 * The line's parameter 
-	 */
-	private double t;
-	
-	/**
-	 * Quad containing hit plane 
-	 */
-	//private RrCSGPolygon quad = null;
-	
-	/**
-	 * Flag to prevent cyclic graphs going round forever
-	 */
-	private boolean beingDestroyed = false;
-	
-	/**
-	 * Destroy me and all that I point to
-	 */
-	public void destroy() 
-	{
-		if(beingDestroyed) // Prevent infinite loop
-			return;
-		beingDestroyed = true;
-//		if(quad != null)
-//			quad.destroy();
-//		quad = null;
-	}
-	
-	/**
-	 * Destroy just me
-	 */
-	protected void finalize() throws Throwable
-	{
-//		quad = null;
-//		super.finalize();
-	}
-	
+///**
+// * Small class to hold parameter/quad pairs
+// * @author Adrian
+// *
+// */
+//class lineIntersection
+//{
 //	/**
-//	 * @param v
-//	 * @param q
+//	 * The line's parameter 
 //	 */
-//	public lineIntersection(double v, RrCSGPolygon q)
+//	private double t;
+//	
+//	/**
+//	 * Quad containing hit plane 
+//	 */
+//	//private RrCSGPolygon quad = null;
+//	
+//	/**
+//	 * Flag to prevent cyclic graphs going round forever
+//	 */
+//	private boolean beingDestroyed = false;
+//	
+//	/**
+//	 * Destroy me and all that I point to
+//	 */
+//	public void destroy() 
 //	{
-//		t = v;
-//		quad = q;
+//		if(beingDestroyed) // Prevent infinite loop
+//			return;
+//		beingDestroyed = true;
+////		if(quad != null)
+////			quad.destroy();
+////		quad = null;
 //	}
-	
-	/**
-	 * @return
-	 */
-	public double parameter() { return t; }
-	
-	/**
-	 * @return
-	 */
-//	public RrCSGPolygon quad() { return quad; }
-}
+//	
+//	/**
+//	 * Destroy just me
+//	 */
+//	protected void finalize() throws Throwable
+//	{
+////		quad = null;
+////		super.finalize();
+//	}
+//	
+////	/**
+////	 * @param v
+////	 * @param q
+////	 */
+////	public lineIntersection(double v, RrCSGPolygon q)
+////	{
+////		t = v;
+////		quad = q;
+////	}
+//	
+//	/**
+//	 * @return
+//	 */
+//	public double parameter() { return t; }
+//	
+//	/**
+//	 * @return
+//	 */
+////	public RrCSGPolygon quad() { return quad; }
+//}
 
 
 /**
@@ -144,7 +144,7 @@ public class RrHalfPlane
 	/**
 	 * List of intersections with others
 	 */
-	private List<lineIntersection> crossings = null;
+	//private List<lineIntersection> crossings = null;
 	
 	/**
 	 * Flag to prevent cyclic graphs going round forever
@@ -165,15 +165,15 @@ public class RrHalfPlane
 		if(p != null)
 			p.destroy();
 		p = null;
-		if(crossings != null)
-		{
-			for(int i = 0; i < size(); i++)
-			{
-				crossings.get(i).destroy();
-				crossings.set(i, null);
-			}
-		}
-		crossings = null;
+//		if(crossings != null)
+//		{
+//			for(int i = 0; i < size(); i++)
+//			{
+//				crossings.get(i).destroy();
+//				crossings.set(i, null);
+//			}
+//		}
+//		crossings = null;
 		beingDestroyed = false;
 	}
 	
@@ -184,7 +184,7 @@ public class RrHalfPlane
 	{
 		normal = null;
 		p = null;
-		crossings = null;
+		//crossings = null;
 		super.finalize();
 	}
 	
@@ -198,7 +198,7 @@ public class RrHalfPlane
 		p.norm();
 		normal = new Rr2Point(-p.direction().y(), p.direction().x());
 		offset = -Rr2Point.mul(l.origin(), normal());
-		crossings = new ArrayList<lineIntersection>();
+		//crossings = new ArrayList<lineIntersection>();
 	}
 	
 	/**
@@ -220,7 +220,7 @@ public class RrHalfPlane
 		normal = new Rr2Point(a.normal);
 		offset = a.offset;
 		p = new RrLine(a.p);
-		crossings = new ArrayList<lineIntersection>(); // No point in deep copy -
+		//crossings = new ArrayList<lineIntersection>(); // No point in deep copy -
 		                             // No pointers would match
 	}
 	
@@ -233,34 +233,34 @@ public class RrHalfPlane
 		return p;
 	}
 	
-	/**
-	 * The number of crossings
-	 * @return number of crossings
-	 */
-	public int size()
-	{
-		return crossings.size();
-	}
+//	/**
+//	 * The number of crossings
+//	 * @return number of crossings
+//	 */
+//	public int size()
+//	{
+//		return crossings.size();
+//	}
 	
-	/**
-	 * Get the i-th crossing parameter
-	 * @param i
-	 * @return i-th crossing parameter
-	 */
-	public double getParameter(int i)
-	{
-		return (crossings.get(i)).parameter();
-	}
+//	/**
+//	 * Get the i-th crossing parameter
+//	 * @param i
+//	 * @return i-th crossing parameter
+//	 */
+//	public double getParameter(int i)
+//	{
+//		return (crossings.get(i)).parameter();
+//	}
 	
-	/**
-	 * i-th point from the crossing list
-	 * @param i
-	 * @return i-th point
-	 */
-	public Rr2Point getPoint(int i)
-	{
-		return pLine().point(getParameter(i));
-	}
+//	/**
+//	 * i-th point from the crossing list
+//	 * @param i
+//	 * @return i-th point
+//	 */
+//	public Rr2Point getPoint(int i)
+//	{
+//		return pLine().point(getParameter(i));
+//	}
 	
 //	/**
 //	 * Get the i-th quad
@@ -500,22 +500,22 @@ public class RrHalfPlane
 //		return -1;
 //	}
 	
-	/**
-	 * Remove all crossings
-	 */
-	public void removeCrossings()
-	{
-		crossings = new ArrayList<lineIntersection>();
-	}
-		
-	/**
-	 * Remove a crossing from the list
-	 * @param i identifier of the crossing to be removed from the list 
-	 */
-	public void remove(int i)
-	{
-		crossings.remove(i);
-	}
+//	/**
+//	 * Remove all crossings
+//	 */
+//	public void removeCrossings()
+//	{
+//		crossings = new ArrayList<lineIntersection>();
+//	}
+//		
+//	/**
+//	 * Remove a crossing from the list
+//	 * @param i identifier of the crossing to be removed from the list 
+//	 */
+//	public void remove(int i)
+//	{
+//		crossings.remove(i);
+//	}
 	
 //	/**
 //	 * Sort on ascending parameter value.
