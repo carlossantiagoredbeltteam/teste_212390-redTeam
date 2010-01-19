@@ -61,14 +61,22 @@ public class BooleanGrid
 		}
 		
 		/**
+		 * Back and forth
+		 * @param i
+		 * @return
+		 */
+		double scale(int i) { return i*pixSize; }
+		int iScale(double d) { return (int)(0.5 + d/pixSize); }
+		
+		/**
 		 * Convert real-world point to integer
 		 * @param a
 		 */
 		iPoint(Rr2Point a)
 		{
-			x = (int)(0.5 + a.x()/pixSize) - rec.swCorner.x;
-			y = (int)(0.5 + a.y()/pixSize) - rec.swCorner.y;
-		}		
+			x = iScale(a.x()) - rec.swCorner.x;
+			y = iScale(a.y()) - rec.swCorner.y;
+		}
 		
 		/**
 		 * Generate the equivalent real-world point
@@ -76,7 +84,7 @@ public class BooleanGrid
 		 */
 		Rr2Point realPoint()
 		{
-			return new Rr2Point((rec.swCorner.x + x)*pixSize, (rec.swCorner.y + y)*pixSize);
+			return new Rr2Point(scale(rec.swCorner.x + x), scale(rec.swCorner.y + y));
 		}
 		
 		/**
@@ -861,6 +869,70 @@ public class BooleanGrid
 			return;
 		}
 		bits.set(pixI(p), v);
+	}
+	
+	/**
+	 * Fill a disc centre c radius r with v
+	 * @param c
+	 * @param r
+	 * @param v
+	 */
+	public void disc(iPoint c, int r, boolean v)
+	{
+		evaluateIfNeedBe();
+		for(int x = -r; x <= r; x++)
+		{
+			int y = (int)(0.5+Math.sqrt((double)(r*r - x*x)));
+			bits.set(pixI(c.x + x, c.y -y), pixI(c.x + x, c.y + y) + 1, v);
+		}
+	}
+	
+	/**
+	 * Fill a rectangle with centreline running from p0 to p1 of width 2r with v
+	 * @param p0
+	 * @param p1
+	 * @param r
+	 * @param v
+	 */
+	public void rectangle(iPoint p0, iPoint p1, int r, boolean v)
+	{
+		evaluateIfNeedBe();
+		Rr2Point rp0 = new Rr2Point(p0.x, p0.y);
+		Rr2Point rp1 = new Rr2Point(p1.x, p1.y);
+		RrHalfPlane[] h = new RrHalfPlane[4];
+		h[0] = new RrHalfPlane(rp0, rp1);
+		h[2] = h[0].offset(r).complement();
+		h[0] = h[0].offset(-r);
+		h[1] = new RrHalfPlane(new RrLine(rp0, Rr2Point.add(rp0, h[0].normal())));
+		h[3] = new RrHalfPlane(new RrLine(rp1, Rr2Point.add(rp1, h[2].normal())));
+		double xMin = Double.MAX_VALUE;
+		double xMax = Double.MIN_VALUE;
+		Rr2Point p = null;
+		for(int i = 0; i < 4; i++)
+		{
+			try
+			{
+				p = h[i].cross_point(h[(i+1)%4]);
+			} catch (Exception e)
+			{}
+			xMin = Math.min(xMin, p.x());
+			xMax = Math.max(xMax, p.x());
+		}
+		int iXMin = (int)(0.5 + xMin);
+		int iXMax = (int)(0.5 + xMax);
+		for(int x = iXMin; x <= iXMax; x++)
+		{
+			RrLine yLine = new RrLine(new Rr2Point(x, 0), new Rr2Point(x, 1));
+			RrInterval iv = RrInterval.bigInterval();
+			for(int i = 0; i < 4; i++)
+				iv = h[i].wipe(yLine, iv);
+			if(!iv.empty())
+			{
+				int yLow = (int)(0.5 + yLine.point(iv.low()).y());
+				int yHigh = (int)(0.5 + yLine.point(iv.high()).y());
+				bits.set(pixI(x, yLow), pixI(x, yHigh) + 1, v);
+			}
+		}
 	}
 	
 	/**
