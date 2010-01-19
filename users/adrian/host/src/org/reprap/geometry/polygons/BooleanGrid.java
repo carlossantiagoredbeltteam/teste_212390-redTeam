@@ -194,7 +194,7 @@ public class BooleanGrid
 		public iRectangle(iRectangle r)
 		{
 			swCorner = new iPoint(r.swCorner);
-			size = new iPoint(size);
+			size = new iPoint(r.size);
 		}
 		
 		/**
@@ -901,10 +901,10 @@ public class BooleanGrid
 		Rr2Point rp1 = new Rr2Point(p1.x, p1.y);
 		RrHalfPlane[] h = new RrHalfPlane[4];
 		h[0] = new RrHalfPlane(rp0, rp1);
-		h[2] = h[0].offset(r).complement();
-		h[0] = h[0].offset(-r);
-		h[1] = new RrHalfPlane(new RrLine(rp0, Rr2Point.add(rp0, h[0].normal())));
-		h[3] = new RrHalfPlane(new RrLine(rp1, Rr2Point.add(rp1, h[2].normal())));
+		h[2] = h[0].offset(r);
+		h[0] = h[0].offset(-r).complement();
+		h[1] = new RrHalfPlane(new RrLine(rp0, Rr2Point.add(rp0, h[2].normal())));
+		h[3] = new RrHalfPlane(new RrLine(rp1, Rr2Point.add(rp1, h[0].normal())));
 		double xMin = Double.MAX_VALUE;
 		double xMax = Double.MIN_VALUE;
 		Rr2Point p = null;
@@ -1629,10 +1629,29 @@ public class BooleanGrid
 	 * @return
 	 */
 	public BooleanGrid offset(double dist)
-	{	
-		RrCSG csgExpression = csg.offset(dist);
-		RrRectangle rec = box().offset(dist);
-		return new BooleanGrid(csgExpression, rec, att);
+	{
+		BooleanGrid result = new BooleanGrid(this);
+		iPolygonList polygons = result.iAllPerimiters();
+		if(polygons.size() <= 0)
+			return null;
+		int r = polygons.polygon(0).point(0).iScale(dist);
+		if(r == 0)
+			return result;
+		for(int p = 0; p < polygons.size(); p++)
+		{
+			iPolygon ip = polygons.polygon(p);
+			for(int e = 0; e < ip.size(); e++)
+			{
+				iPoint p0 = ip.point(e);
+				iPoint p1 = ip.point((e+1)%ip.size());
+				result.rectangle(p0, p1, r, r > 0);
+				result.disc(p1, r, r > 0);
+			}
+		}
+		return result;
+//		RrCSG csgExpression = csg.offset(dist);
+//		RrRectangle rec = box().offset(dist);
+//		return new BooleanGrid(csgExpression, rec, att);
 	}
 	
 	//*********************************************************************************************************
