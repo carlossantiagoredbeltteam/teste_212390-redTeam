@@ -107,7 +107,7 @@ public class LayerProducer {
 	/**
 	 * The shape of the object built so far under the current layer
 	 */
-	private BranchGroup lowerShell = null;
+	//private BranchGroup lowerShell = null;
 
 	
 	/**
@@ -153,7 +153,7 @@ public class LayerProducer {
 	 */
 	private Rr2Point startNearHere = null;
 	
-	private boolean shellSet = false;
+	//private boolean shellSet = false;
 	
 	/**
 	 * Flag to prevent cyclic graphs going round forever
@@ -232,8 +232,8 @@ public class LayerProducer {
 	{
 		layerConditions = lc;
 		startNearHere = null; //new Rr2Point(0, 0);
-		lowerShell = null;
-		shellSet = false;
+		//lowerShell = null;
+		//shellSet = false;
 		simulationPlot = simPlot;
 		
 		boolGrdSlice = null;
@@ -266,8 +266,8 @@ public class LayerProducer {
 	{
 		layerConditions = lc;
 		startNearHere = null;
-		lowerShell = ls;
-		shellSet = false;
+		//lowerShell = ls;
+		//shellSet = false;
 		simulationPlot = simPlot;
 		
 		boolGrdSlice = bgPols;
@@ -1054,11 +1054,11 @@ public class LayerProducer {
 				firstOneInLayer = false;
 			}
 		}
-		if(!shellSet)
-		{
-			printer.setLowerShell(lowerShell);
-			shellSet = true;
-		}
+//		if(!shellSet)
+//		{
+//			printer.setLowerShell(lowerShell);
+//			shellSet = true;
+//		}
 	}		
 	
 }
