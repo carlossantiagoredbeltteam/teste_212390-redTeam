@@ -308,6 +308,8 @@ public class Producer {
 		
 		layerRules.setLayingSupport(false);
 		
+		BooleanGridList slice;
+		
 		
 		while(layerRules.getModelLayer() >= 0 ) 
 		{
@@ -331,7 +333,7 @@ public class Producer {
 			reprap.waitWhileBufferNotEmpty();
 			reprap.slowBuffer();
 			
-			BooleanGridList slice = stlc.slice(layerRules.getModelZ() + layerRules.getZStep()*0.5,
+			slice = stlc.slice(layerRules.getModelZ() + layerRules.getZStep()*0.5,
 					reprap.getExtruders()); 
 			
 			layer = null;
@@ -357,6 +359,7 @@ public class Producer {
 			reprap.finishedLayer(layerRules);
 			reprap.betweenLayers(layerRules);
 			layer = null;
+			slice = null;
 			
 			//slice.finalize();
 			stlc.destroyLayer();

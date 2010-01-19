@@ -712,14 +712,14 @@ public abstract class GenericRepRap implements CartesianPrinter
 		getExtruder().setCooler(enable);
 	}
 		
-	/* (non-Javadoc)
-	 * @see org.reprap.Printer#setLowerShell(javax.media.j3d.Shape3D)
-	 */
-	public void setLowerShell(BranchGroup ls)
-	{
+//	/* (non-Javadoc)
+//	 * @see org.reprap.Printer#setLowerShell(javax.media.j3d.Shape3D)
+//	 */
+//	public void setLowerShell(BranchGroup ls)
+//	{
 //		if (previewer != null)
 //			previewer.setLowerShell(ls);
-	}
+//	}
 	
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#setPreviewer(org.reprap.gui.Previewer)

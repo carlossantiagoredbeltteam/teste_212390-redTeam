@@ -306,11 +306,11 @@ public interface Printer {
 	 */
 	public double getTotalElapsedTime();
 	
-	/**
-	 * The bits of the parts made so for for the simulation
-	 * @param ls
-	 */
-	public void setLowerShell(BranchGroup ls);
+//	/**
+//	 * The bits of the parts made so for for the simulation
+//	 * @param ls
+//	 */
+//	public void setLowerShell(BranchGroup ls);
 	
 	
 	/**
