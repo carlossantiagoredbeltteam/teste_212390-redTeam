@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.reprap.Attributes;
 import org.reprap.Extruder;
+import org.reprap.Preferences;
 import org.reprap.geometry.LayerRules;
 import org.reprap.utilities.Debug;
 
@@ -201,6 +202,70 @@ public class BooleanGridList
 //				Debug.e("RrCSGPolygonList.union(): Attribute of extruder 0 not found.");
 //			result.add(contents);
 			return result;
+		}
+		
+		/**
+		 * Compute the infill hatching polygons for this set of patterns
+		 * @param layerConditions
+		 * @return
+		 */
+		public RrPolygonList computeInfill(LayerRules layerConditions)
+		{
+			BooleanGridList offHatch = offset(layerConditions, false);
+			
+			RrPolygonList hatchedPolygons;
+			
+			if(layerConditions.getLayingSupport())
+				offHatch = offHatch.union(layerConditions.getPrinter().getExtruders());
+				
+			hatchedPolygons = offHatch.hatch(layerConditions);
+			
+			return hatchedPolygons;
+		}
+		
+		/**
+		 * Compute the outline polygons for this set of patterns.
+		 * @param layerConditions
+		 * @param hatchedPolygons
+		 * @param shield
+		 * @return
+		 */
+		public RrPolygonList computeOutlines(LayerRules layerConditions, RrPolygonList hatchedPolygons, boolean shield)
+		{
+			
+			RrPolygonList borderPolygons;
+			
+			if(layerConditions.getLayingSupport())
+			{
+				borderPolygons = null;
+			} else
+			{
+				BooleanGridList offBorder = offset(layerConditions, true);
+				borderPolygons = offBorder.borders();
+			}
+
+
+			if(borderPolygons != null && borderPolygons.size() > 0)
+			{
+				borderPolygons.middleStarts(hatchedPolygons, layerConditions);
+				try
+				{
+					if(shield && Preferences.loadGlobalBool("Shield"))
+					{
+						RrRectangle rr = layerConditions.getBox();
+						Rr2Point corner = Rr2Point.add(rr.sw(), new Rr2Point(-3, -3));
+						RrPolygon ell = new RrPolygon(borderPolygons.polygon(0).getAttributes(), false);
+						ell.add(corner);
+						ell.add(Rr2Point.add(corner, new Rr2Point(-2, 10)));
+						ell.add(Rr2Point.add(corner, new Rr2Point(-2, -2)));
+						ell.add(Rr2Point.add(corner, new Rr2Point(20, -2)));
+						borderPolygons.add(0, ell);
+					}
+				} catch (Exception ex)
+				{}
+			}
+			
+			return borderPolygons;
 		}
 
 }

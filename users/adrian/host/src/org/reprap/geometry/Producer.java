@@ -3,15 +3,16 @@ package org.reprap.geometry;
 import javax.swing.JCheckBoxMenuItem;
 import org.reprap.Preferences;
 import org.reprap.Printer;
-import org.reprap.Extruder;
-import org.reprap.Attributes;
+//import org.reprap.Extruder;
+//import org.reprap.Attributes;
 import org.reprap.geometry.polygons.Rr2Point;
 import org.reprap.geometry.polygons.RrRectangle;
 //import org.reprap.geometry.polygons.RrCSGPolygonList;
-import org.reprap.geometry.polygons.STLSlice;
-import org.reprap.geometry.polygons.RrCSG;
+//import org.reprap.geometry.polygons.STLSlice;
+//import org.reprap.geometry.polygons.RrCSG;
 //import org.reprap.geometry.polygons.RrCSGPolygon;
 import org.reprap.geometry.polygons.RrPolygonList;
+import org.reprap.geometry.polygons.RrPolygon;
 import org.reprap.geometry.polygons.BooleanGridList;
 import org.reprap.gui.RepRapBuild;
 import org.reprap.gui.AllSTLsToBuild;
@@ -22,7 +23,7 @@ public class Producer {
 	
 	private boolean paused = false;
 	
-	private LayerProducer layer = null;
+	//private LayerProducer layer = null;
 	
 	protected LayerRules layerRules = null;
 	
@@ -102,15 +103,15 @@ public class Producer {
 	public void pause()
 	{
 		paused = true;
-		if(layer != null)
-			layer.pause();
+//		if(layer != null)
+//			layer.pause();
 	}
 	
 	public void resume()
 	{
 		paused = false;
-		if(layer != null)
-			layer.resume();
+//		if(layer != null)
+//			layer.resume();
 	}
 	
 	/**
@@ -156,7 +157,8 @@ public class Producer {
 			if(layerRules.getTopDown())
 				produceAdditiveTopDown(gp);
 			else
-				produceAdditiveGroundUp(gp);
+				Debug.e("Producer.produce(): bottom-up builds no longer supported.");
+				//produceAdditiveGroundUp(gp);
 		}
 	}
 
@@ -176,32 +178,32 @@ public class Producer {
 		//reprap.setFeedrate(reprap.getFastFeedrateXY());
 	}
 	
-	private void layFoundationGroundUp(RrRectangle gp) throws Exception
-	{
-		if(layerRules.getFoundationLayers() <= 0)
-			return;
-		
-		Printer reprap = layerRules.getPrinter();
-
-		while(layerRules.getMachineLayer() < layerRules.getFoundationLayers()) 
-		{
-			
-			if (reprap.isCancelled())
-				break;
-			waitWhilePaused();
-			
-			Debug.d("Commencing foundation layer at " + layerRules.getMachineZ());
-
-			reprap.startingLayer(layerRules);
-			// Change Z height
-			//reprap.singleMove(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), reprap.getFastFeedrateZ());
-			fillFoundationRectangle(reprap, gp);
-			reprap.finishedLayer(layerRules);
-			reprap.betweenLayers(layerRules);
-			layerRules.stepMachine(reprap.getExtruder());
-		}
-		layerRules.setLayingSupport(false);
-	}
+//	private void layFoundationGroundUp(RrRectangle gp) throws Exception
+//	{
+//		if(layerRules.getFoundationLayers() <= 0)
+//			return;
+//		
+//		Printer reprap = layerRules.getPrinter();
+//
+//		while(layerRules.getMachineLayer() < layerRules.getFoundationLayers()) 
+//		{
+//			
+//			if (reprap.isCancelled())
+//				break;
+//			waitWhilePaused();
+//			
+//			Debug.d("Commencing foundation layer at " + layerRules.getMachineZ());
+//
+//			reprap.startingLayer(layerRules);
+//			// Change Z height
+//			//reprap.singleMove(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), reprap.getFastFeedrateZ());
+//			fillFoundationRectangle(reprap, gp);
+//			reprap.finishedLayer(layerRules);
+//			reprap.betweenLayers(layerRules);
+//			layerRules.stepMachine(reprap.getExtruder());
+//		}
+//		layerRules.setLayingSupport(false);
+//	}
 	
 	private void layFoundationTopDown(RrRectangle gp) throws Exception
 	{
@@ -232,74 +234,76 @@ public class Producer {
 		}
 	}
 	
-
-	
-	/**
-	 * @throws Exception
-	 */
-	private void produceAdditiveGroundUp(RrRectangle gp) throws Exception 
-	{		
-		bld.mouseToWorld();
-		
-		Printer reprap = layerRules.getPrinter();
-
-		layFoundationGroundUp(gp);
-		
-		reprap.setSeparating(true);
-		
-		while(layerRules.getMachineLayer() < layerRules.getMachineLayerMax()) 
-		{
-			
-			if (reprap.isCancelled())
-				break;
-			waitWhilePaused();
-			
-			Debug.d("Commencing layer at " + layerRules.getMachineZ());
-			
-			reprap.startingLayer(layerRules);
-			
-			// Change Z height
-			//reprap.singleMove(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), reprap.getFastFeedrateZ());
-			
-			reprap.waitWhileBufferNotEmpty();
-			reprap.slowBuffer();
-			
-			BooleanGridList slice = allSTLs.slice(layerRules.getModelZ() + layerRules.getZStep()*0.5,
-					reprap.getExtruders()); 
-			
-			layer = null;
-			if(slice.size() > 0)
-				layer = new LayerProducer(slice, layerRules, simulationPlot);
-			else
-				Debug.d("Null slice at model Z = " + layerRules.getModelZ());
-
-						
-			if (reprap.isCancelled())
-				break;		
-			waitWhilePaused();
-			
-			reprap.speedBuffer();
-			
-			if(layer != null)
-			{
-				layer.plot();
-				layer.destroy();
-			} else
-				Debug.d("Null layer at model Z = " + layerRules.getModelZ());
-			
-			reprap.finishedLayer(layerRules);
-			reprap.betweenLayers(layerRules);
-			layer = null;
-			
-			//slice.destroy();
-			allSTLs.destroyLayer();
-
-			layerRules.step(reprap.getExtruder());
-			reprap.setSeparating(false);
-		}
-		
-		reprap.terminate();
-	}
+//	/**
+//	 * @throws Exception
+//	 */
+//	private void produceAdditiveGroundUp(RrRectangle gp) throws Exception 
+//	{		
+//		bld.mouseToWorld();
+//		
+//		Printer reprap = layerRules.getPrinter();
+//
+//		layFoundationGroundUp(gp);
+//		
+//		reprap.setSeparating(true);
+//		
+//		while(layerRules.getMachineLayer() < layerRules.getMachineLayerMax()) 
+//		{
+//			
+//			if (reprap.isCancelled())
+//				break;
+//			waitWhilePaused();
+//			
+//			Debug.d("Commencing layer at " + layerRules.getMachineZ());
+//			
+//			reprap.startingLayer(layerRules);
+//			
+//			// Change Z height
+//			//reprap.singleMove(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), reprap.getFastFeedrateZ());
+//			
+//			reprap.waitWhileBufferNotEmpty();
+//			reprap.slowBuffer();
+//			
+//			BooleanGridList slice;
+//			
+//			RrPolygonList allPolygons[] = new RrPolygonList[reprap.getExtruders().length];
+//			for(int extruder = 0; extruder < reprap.getExtruders().length; extruder++)
+//				allPolygons[extruder] = new RrPolygonList();
+//			
+//			for(int i = 0; i < allSTLs.size(); i++)
+//			{
+//				slice = allSTLs.slice(i, layerRules.getModelZ() + layerRules.getZStep()*0.5,
+//						reprap.getExtruders()); 
+//
+//				if(slice.size() > 0)
+//				{
+//					RrPolygonList fills = slice.computeInfill(layerRules);
+//					RrPolygonList borders = slice.computeOutlines(layerRules, fills);
+//					for(int pol = 0; pol < borders.size(); pol++)
+//					{
+//						RrPolygon p = borders.polygon(pol);
+//						allPolygons[p.getAttributes().getExtruder().getID()].add(p);
+//					}
+//					for(int pol = 0; pol < fills.size(); pol++)
+//					{
+//						RrPolygon p = fills.polygon(pol);
+//						allPolygons[p.getAttributes().getExtruder().getID()].add(p);
+//					}
+//				}
+//			}
+//			reprap.finishedLayer(layerRules);
+//			reprap.betweenLayers(layerRules);
+//			layer = null;
+//			slice = null;
+//			//slice.destroy();
+//			allSTLs.destroyLayer();
+//
+//			layerRules.step(reprap.getExtruder());
+//			reprap.setSeparating(false);
+//		}
+//		
+//		reprap.terminate();
+//	}
 	
 	/**
 	 * @throws Exception
@@ -337,32 +341,39 @@ public class Producer {
 			reprap.waitWhileBufferNotEmpty();
 			reprap.slowBuffer();
 			
-			slice = allSTLs.slice(layerRules.getModelZ() + layerRules.getZStep()*0.5,
-					reprap.getExtruders()); 
-			
-			layer = null;
-			if(slice.size() > 0)
-				layer = new LayerProducer(slice, layerRules, simulationPlot);
-			else
-				Debug.d("Null slice at model Z = " + layerRules.getModelZ());
-
-						
-			if (reprap.isCancelled())
-				break;		
-			waitWhilePaused();
-			
-			reprap.speedBuffer();
-			
-			if(layer != null)
+			RrPolygonList allPolygons[] = new RrPolygonList[reprap.getExtruders().length];
+			for(int extruder = 0; extruder < reprap.getExtruders().length; extruder++)
+				allPolygons[extruder] = new RrPolygonList();
+			boolean shield = true;
+			for(int i = 0; i < allSTLs.size(); i++)
 			{
-				layer.plot();
-				//layer.destroy();
-			} else
-				Debug.d("Null layer at model Z = " + layerRules.getModelZ());
+				slice = allSTLs.slice(i, layerRules.getModelZ() + layerRules.getZStep()*0.5,
+						reprap.getExtruders()); 
+
+				if(slice.size() > 0)
+				{
+					RrPolygonList fills = slice.computeInfill(layerRules);
+					RrPolygonList borders = slice.computeOutlines(layerRules, fills, shield);
+					shield = false;
+					for(int pol = 0; pol < borders.size(); pol++)
+					{
+						RrPolygon p = borders.polygon(pol);
+						allPolygons[p.getAttributes().getExtruder().getID()].add(p);
+					}
+					for(int pol = 0; pol < fills.size(); pol++)
+					{
+						RrPolygon p = fills.polygon(pol);
+						allPolygons[p.getAttributes().getExtruder().getID()].add(p);
+					}
+				}
+			}
 			
+			LayerProducer lp = new LayerProducer(allPolygons, layerRules, simulationPlot);
+			lp.plot();
+
 			reprap.finishedLayer(layerRules);
 			reprap.betweenLayers(layerRules);
-			layer = null;
+			//layer = null;
 			slice = null;
 			
 			//slice.finalize();
