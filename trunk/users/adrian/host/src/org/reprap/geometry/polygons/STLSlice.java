@@ -930,11 +930,11 @@ public class STLSlice
 	 * @param x
 	 * @return grid value nearest x
 	 */
-	private double toGrid(double x)
-	{
-		return x;
-		//return (double)((int)(x*Preferences.grid() + 0.5))*Preferences.gridRes();
-	}
+//	private double toGrid(double x)
+//	{
+//		return x;
+//		//return (double)((int)(x*Preferences.grid() + 0.5))*Preferences.gridRes();
+//	}
 	
 	/**
 	 * Add the edge where the plane z cuts the triangle (p, q, r) (if it does).
@@ -1015,11 +1015,13 @@ public class STLSlice
 		double t = (z - odd.z)/even1.z;	
 		Rr2Point e1 = new Rr2Point(odd.x + t*even1.x, odd.y + t*even1.y);	
 		Point3d e3_1 = new Point3d(e1.x(), e1.y(), z);
-		e1 = new Rr2Point(toGrid(e1.x()), toGrid(e1.y()));
+		//e1 = new Rr2Point(toGrid(e1.x()), toGrid(e1.y()));
+		e1 = new Rr2Point(e1.x(), e1.y());
 		t = (z - odd.z)/even2.z;
 		Rr2Point e2 = new Rr2Point(odd.x + t*even2.x, odd.y + t*even2.y);
 		Point3d e3_2 = new Point3d(e2.x(), e2.y(), z);
-		e2 = new Rr2Point(toGrid(e2.x()), toGrid(e2.y()));
+		//e2 = new Rr2Point(toGrid(e2.x()), toGrid(e2.y()));
+		e2 = new Rr2Point(e2.x(), e2.y());
 		
 		// Too short?
 		if(!Rr2Point.same(e1, e2, Preferences.lessGridSquare()))
@@ -1536,7 +1538,7 @@ public class STLSlice
 		
 		for(int i = 0; i < shapeList.size(); i++)
 		{
-			stl = (STLObject)shapeList.get(i);
+			stl = shapeList.get(i);
 			if(stl.size().z > result)
 				result = stl.size().z;
 		}

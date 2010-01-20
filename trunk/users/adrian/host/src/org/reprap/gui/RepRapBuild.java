@@ -217,15 +217,17 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 	private MouseObject mouse = null;
 	private PickCanvas pickCanvas = null; // The thing picked by a mouse click
 	private STLObject lastPicked = null; // The last thing picked
-	private java.util.List<STLObject> stls = new ArrayList<STLObject>(); // All the STLObjects to be built
+	//private java.util.List<STLObject> stls = new ArrayList<STLObject>(); // All the STLObjects to be built
+	private AllSTLsToBuild stls;
 	//private int objectIndex = 0; // Counter for STLs as they are loaded
 
 	// Constructors
 	public RepRapBuild() throws Exception {
 		initialise();
+		stls = new AllSTLsToBuild();
 	}
 	
-	public java.util.List<STLObject> getSTLs()
+	public AllSTLsToBuild getSTLs()
 	{
 		return stls;
 	}
@@ -363,7 +365,7 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 //	protected STLObject findSTL(String name) {
 //		STLObject stl;
 //		for (int i = 0; i < stls.size(); i++) {
-//			stl = (STLObject) stls.get(i);
+//			stl = stls.get(i);
 //			if (stl.name == name)
 //				return stl;
 //		}
@@ -464,7 +466,7 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 		int index = -1;
 		for(int i = 0; i < stls.size(); i++)
 		{
-			if((STLObject)stls.get(i) == lastPicked)
+			if(stls.get(i) == lastPicked)
 			{
 				index = i;
 				break;
@@ -484,7 +486,7 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 	{
 		for(int i = 0; i < stls.size(); i++)
 		{
-			STLObject s = (STLObject)stls.get(i);
+			STLObject s = stls.get(i);
 			stls.remove(i);
 			int index = wv_and_stls.indexOfChild(s.top());
 			wv_and_stls.removeChild(index);

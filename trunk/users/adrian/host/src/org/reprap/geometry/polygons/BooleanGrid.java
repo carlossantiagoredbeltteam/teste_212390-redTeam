@@ -61,14 +61,6 @@ public class BooleanGrid
 		}
 		
 		/**
-		 * Back and forth
-		 * @param i
-		 * @return
-		 */
-		double scale(int i) { return i*pixSize; }
-		int iScale(double d) { return (int)(0.5 + d/pixSize); }
-		
-		/**
 		 * Convert real-world point to integer
 		 * @param a
 		 */
@@ -234,6 +226,21 @@ public class BooleanGrid
 		}
 		
 		/**
+		 * Grow (dist +ve) or shrink (dist -ve).
+		 * @param dist
+		 * @return
+		 */
+		public iRectangle offset(int dist)
+		{
+			iRectangle result = new iRectangle(this);
+			result.swCorner.x = result.swCorner.x - dist;
+			result.swCorner.y = result.swCorner.y - dist;
+			result.size.x = result.size.x + 2*dist;
+			result.size.y = result.size.y + 2*dist;
+			return result;
+		}
+		
+		/**
 		 * Anything there?
 		 * @return
 		 */
@@ -367,6 +374,19 @@ public class BooleanGrid
 		}
 		
 		/**
+		 * Transtate by vector t
+		 * @param t
+		 * @return
+		 */
+		public iPolygon translate(iPoint t)
+		{
+			iPolygon result = new iPolygon(closed);
+			for(int i = 0; i < size(); i++)
+				result.add(point(i).add(t));
+			return result;
+		}
+		
+		/**
 		 * Find the furthest point from point v1 on the polygon such that the polygon between
 		 * the two can be approximated by a DDA straight line from v1.
 		 * @param v1
@@ -374,21 +394,21 @@ public class BooleanGrid
 		 */
 		private int findAngleStart(int v1)
 		{
-			int leng = size();
-			iPoint p1 = point(v1%leng);
-			int addOn = (leng + v1)/2 + 1;
-			int v2 = v1 + addOn;
+			int top = size() - 1;
+			int bottom = v1;
+			iPoint p1 = point(v1);
 			int offCount = 0;
-			while(addOn > 1)
+			while(top - bottom > 1)
 			{
-				DDA line = new DDA(p1, point(v2%leng));
+				int middle = (bottom + top)/2;
+				DDA line = new DDA(p1, point(middle));
 				iPoint n = line.next();
 				offCount = 0;
 				int j = v1;
 
-				while(n != null && offCount < 2)
+				while(j <= middle && n != null && offCount < 2)
 				{		
-					if(point(j%leng).coincidesWith(n))
+					if(point(j).coincidesWith(n))
 						offCount = 0;
 					else
 						offCount++;
@@ -396,19 +416,15 @@ public class BooleanGrid
 					j++;
 				}
 				
-				if(addOn%2 == 0)
-					addOn = addOn/2;
-				else
-					addOn = 1 + addOn/2;
 				if(offCount < 2)
-					v2 = v2 + addOn;
+					bottom = middle;
 				else
-					v2 = v2 - addOn;
+					top = middle;
 			}
 			if(offCount < 2)
-				return v2;
+				return top;
 			else
-				return v2 - 1;
+				return bottom;
 		}
 		
 		/**
@@ -426,7 +442,8 @@ public class BooleanGrid
 			{
 				r.add(point(v));
 				v = findAngleStart(v);
-			}while(v < size());
+			}while(v < size() - 1);
+			r.add(point(v));
 			return r;
 		}
 		
@@ -500,6 +517,19 @@ public class BooleanGrid
 		{
 			for(int i = 0; i < a.size(); i++)
 				add(a.polygon(i));
+		}
+		
+		/**
+		 * Transtate by vector t
+		 * @param t
+		 * @return
+		 */
+		public iPolygonList translate(iPoint t)
+		{
+			iPolygonList result = new iPolygonList();
+			for(int i = 0; i < size(); i++)
+				result.add(polygon(i).translate(t));
+			return result;
 		}
 		
 		/**
@@ -661,11 +691,6 @@ public class BooleanGrid
 	private iRectangle rec;
 	
 	/**
-	 * The csg expression
-	 */
-	private RrCSG csg;
-	
-	/**
 	 * How simple does a CSG expression have to be to not be worth pruning further?
 	 */
 	private static final int simpleEnough = 3;
@@ -699,7 +724,7 @@ public class BooleanGrid
 	
 	private static String stack[] = new String[20];
 	private static int sp = -1;
-	private static boolean debug = true;
+	private static boolean debug = false;
 	
 	private void push(String s)
 	{
@@ -737,23 +762,12 @@ public class BooleanGrid
 	}
 	
 	/**
-	 * This function is called by anything that queries the bitmap.
-	 * It does nothing if the bitmap exists.  If it doesn't, it creates it.
-	 *
+	 * Back and forth from real to pixel/integer coordinates
+	 * @param i
+	 * @return
 	 */
-	private void evaluateIfNeedBe()
-	{
-		if(bits != null)
-			return;
-		bits = new BitSet(rec.size.x*rec.size.y);
-		visited = null;
-		push("Build quad tree... ");
-		//Debug.e("Quad start.");
-		generateQuadTree(new iPoint(0, 0), new iPoint(rec.size.x - 1, rec.size.y - 1), csg);
-		//Debug.e("Quad end.");
-		pop();
-		deWhisker();		
-	}
+	static double scale(int i) { return i*pixSize; }
+	static int iScale(double d) { return (int)Math.round(d/pixSize); }
 	
 	/**
 	 * Build the grid from a CSG expression
@@ -761,7 +775,6 @@ public class BooleanGrid
 	 */
 	public BooleanGrid(RrCSG csgExp, RrRectangle rectangle, Attributes a)
 	{
-		csg = csgExp;  // N.B. No deep copy
 		att = a;
 		RrRectangle ri = rectangle.offset(rSwell);
 		rec = new iRectangle(new iPoint(0, 0), new iPoint(1, 1));  // Set the origin to (0, 0)...
@@ -769,6 +782,14 @@ public class BooleanGrid
 		rec.size = new iPoint(ri.ne());                            // The true origin is now automatically subtracted.
 		bits = null;
 		visited = null;
+		bits = new BitSet(rec.size.x*rec.size.y);
+		visited = null;
+		push("Build quad tree... ");
+		//Debug.e("Quad start.");
+		generateQuadTree(new iPoint(0, 0), new iPoint(rec.size.x - 1, rec.size.y - 1), csgExp);
+		//Debug.e("Quad end.");
+		pop();
+		deWhisker();
 	}
 	
 	
@@ -779,11 +800,31 @@ public class BooleanGrid
 	 */
 	public BooleanGrid(BooleanGrid bg)
 	{
-		csg = new RrCSG(bg.csg);
 		att = bg.att;
-		bits = null;
 		visited = null;
 		rec= new iRectangle(bg.rec);
+		bits = (BitSet)bg.bits.clone();
+	}
+	
+	/**
+	 * Copy constructor with new rectangle
+	 * N.B. attributes are _not_ deep copied
+	 * @param bg
+	 */
+	public BooleanGrid(BooleanGrid bg, iRectangle newRec)
+	{
+		att = bg.att;
+		visited = null;
+		rec= new iRectangle(newRec);
+		bits = new BitSet(rec.size.x*rec.size.y);
+		iRectangle recScan = rec.intersection(bg.rec);
+		int offxOut = recScan.swCorner.x - rec.swCorner.x;
+		int offyOut = recScan.swCorner.y - rec.swCorner.y;
+		int offxIn = recScan.swCorner.x - bg.rec.swCorner.x;
+		int offyIn = recScan.swCorner.y - bg.rec.swCorner.y;
+		for(int x = 0; x < recScan.size.x; x++)
+			for(int y = 0; y < recScan.size.y; y++)
+				bits.set(pixI(x + offxOut, y + offyOut), bg.bits.get(bg.pixI(x + offxIn, y + offyIn)));
 	}
 	
 	/**
@@ -832,7 +873,6 @@ public class BooleanGrid
 	 */
 	public boolean isEmpty()
 	{
-		evaluateIfNeedBe();
 		return bits.isEmpty();
 	}
 	
@@ -862,7 +902,6 @@ public class BooleanGrid
 	 */
 	public void set(iPoint p, boolean v)
 	{
-		evaluateIfNeedBe();
 		if(!inside(p))
 		{
 			Debug.e("BoolenGrid.set(): attempt to set pixel beyond boundary!");
@@ -879,11 +918,19 @@ public class BooleanGrid
 	 */
 	public void disc(iPoint c, int r, boolean v)
 	{
-		evaluateIfNeedBe();
 		for(int x = -r; x <= r; x++)
 		{
-			int y = (int)(0.5+Math.sqrt((double)(r*r - x*x)));
-			bits.set(pixI(c.x + x, c.y -y), pixI(c.x + x, c.y + y) + 1, v);
+			int xp = c.x + x;
+			if(xp > 0 && xp < rec.size.x)
+			{
+				int y = (int)Math.round(Math.sqrt((double)(r*r - x*x)));
+				int yp0 = c.y - y;
+				int yp1 = c.y + y;
+				yp0 = Math.max(yp0, 0);
+				yp1 = Math.min(yp1, rec.size.y - 1);
+				if(yp0 <= yp1)
+					bits.set(pixI(xp, yp0), pixI(xp, yp1) + 1, v);
+			}
 		}
 	}
 	
@@ -896,15 +943,15 @@ public class BooleanGrid
 	 */
 	public void rectangle(iPoint p0, iPoint p1, int r, boolean v)
 	{
-		evaluateIfNeedBe();
+		r = Math.abs(r);
 		Rr2Point rp0 = new Rr2Point(p0.x, p0.y);
 		Rr2Point rp1 = new Rr2Point(p1.x, p1.y);
 		RrHalfPlane[] h = new RrHalfPlane[4];
 		h[0] = new RrHalfPlane(rp0, rp1);
 		h[2] = h[0].offset(r);
 		h[0] = h[0].offset(-r).complement();
-		h[1] = new RrHalfPlane(new RrLine(rp0, Rr2Point.add(rp0, h[2].normal())));
-		h[3] = new RrHalfPlane(new RrLine(rp1, Rr2Point.add(rp1, h[0].normal())));
+		h[1] = new RrHalfPlane(rp0, Rr2Point.add(rp0, h[2].normal()));
+		h[3] = new RrHalfPlane(rp1, Rr2Point.add(rp1, h[0].normal()));
 		double xMin = Double.MAX_VALUE;
 		double xMax = Double.MIN_VALUE;
 		Rr2Point p = null;
@@ -918,8 +965,10 @@ public class BooleanGrid
 			xMin = Math.min(xMin, p.x());
 			xMax = Math.max(xMax, p.x());
 		}
-		int iXMin = (int)(0.5 + xMin);
-		int iXMax = (int)(0.5 + xMax);
+		int iXMin = (int)Math.round(xMin);
+		iXMin = Math.max(iXMin, 0);
+		int iXMax = (int)Math.round(xMax);
+		iXMax = Math.min(iXMax, rec.size.x - 1);
 		for(int x = iXMin; x <= iXMax; x++)
 		{
 			RrLine yLine = new RrLine(new Rr2Point(x, 0), new Rr2Point(x, 1));
@@ -928,10 +977,13 @@ public class BooleanGrid
 				iv = h[i].wipe(yLine, iv);
 			if(!iv.empty())
 			{
-				int yLow = (int)(0.5 + yLine.point(iv.low()).y());
-				int yHigh = (int)(0.5 + yLine.point(iv.high()).y());
-				bits.set(pixI(x, yLow), pixI(x, yHigh) + 1, v);
-			}
+				int yLow = (int)Math.round(yLine.point(iv.low()).y());
+				int yHigh = (int)Math.round(yLine.point(iv.high()).y());
+				yLow = Math.max(yLow, 0);
+				yHigh = Math.min(yHigh, rec.size.y - 1);
+				if(yLow <= yHigh)
+					bits.set(pixI(x, yLow), pixI(x, yHigh) + 1, v);
+			} 
 		}
 	}
 	
@@ -943,8 +995,6 @@ public class BooleanGrid
 	 */
 	private void homogeneous(iPoint ipsw, iPoint ipne, boolean v)
 	{
-		evaluateIfNeedBe();
-		// TODO: if v is false may we just return?
 		for(int x = ipsw.x; x <= ipne.x; x++)
 			bits.set(pixI(x, ipsw.y), pixI(x, ipne.y) + 1, v);
 	}
@@ -957,8 +1007,6 @@ public class BooleanGrid
 	 */
 	private void heterogeneous(iPoint ipsw, iPoint ipne, RrCSG csgExpression)
 	{
-		evaluateIfNeedBe();
-		// TODO: if v is false may we just return?
 		for(int x = ipsw.x; x <= ipne.x; x++)
 			for(int y = ipsw.y; y <= ipne.y; y++)
 				bits.set(pixI(x, y), csgExpression.value(new iPoint(x, y).realPoint()) <= 0);
@@ -982,7 +1030,6 @@ public class BooleanGrid
 	{
 		if(!inside(p))
 			return false;
-		evaluateIfNeedBe();
 		return bits.get(pixI(p));
 	}
 	
@@ -1172,7 +1219,6 @@ public class BooleanGrid
 	 */
 	private int findUnvisitedEdgeIndex(int start)
 	{
-		evaluateIfNeedBe();
 		if(visited == null)
 		{
 			int i = bits.nextSetBit(start);
@@ -1192,7 +1238,7 @@ public class BooleanGrid
 	
 
 	/**
-	 * Remove whiskers (single threads of pixels).
+	 * Remove whiskers (single threads of pixels) and similar nasties.
 	 * TODO: also need to do the same for cracks?
 	 *
 	 */
@@ -1205,18 +1251,18 @@ public class BooleanGrid
 			iPoint p = pixel(i);
 			boolean last = get(p.add(neighbour[7]));
 			boolean here;
-			boolean isWhisker = true;
+			//int joinCount = 0;
+			int breakCount = 0;
 			for(int n = 0; n < 8; n++)
 			{
 				here = get(p.add(neighbour[n]));
-				if(here && last)
-				{
-					isWhisker = false;
-					break;
-				}
+				//if(here && last)
+				//	joinCount++;
+				if(here ^ last)
+					breakCount++;
 				last = here;
 			}
-			if(isWhisker)
+			if(breakCount > 2)
 				set(p, false);
 			i = findUnvisitedEdgeIndex(i + 1);
 		}
@@ -1593,7 +1639,7 @@ public class BooleanGrid
 			g += gap;
 		}
 		
-		//return iHatches.realPolygons(a);
+		// Now we have the individual hatch lines, join them up
 		
 		iPolygonList snakes = new iPolygonList();
 		int segment;
@@ -1630,13 +1676,16 @@ public class BooleanGrid
 	 */
 	public BooleanGrid offset(double dist)
 	{
-		BooleanGrid result = new BooleanGrid(this);
-		iPolygonList polygons = result.iAllPerimiters();
-		if(polygons.size() <= 0)
-			return null;
-		int r = polygons.polygon(0).point(0).iScale(dist);
+		int r = iScale(dist);
+		
+		BooleanGrid result = new BooleanGrid(this, rec.offset(r));
 		if(r == 0)
 			return result;
+
+		iPolygonList polygons = iAllPerimiters().translate(rec.swCorner.sub(result.rec.swCorner));
+		if(polygons.size() <= 0)
+			return null;
+
 		for(int p = 0; p < polygons.size(); p++)
 		{
 			iPolygon ip = polygons.polygon(p);
@@ -1644,86 +1693,83 @@ public class BooleanGrid
 			{
 				iPoint p0 = ip.point(e);
 				iPoint p1 = ip.point((e+1)%ip.size());
-				result.rectangle(p0, p1, r, r > 0);
-				result.disc(p1, r, r > 0);
+				result.rectangle(p0, p1, Math.abs(r), r > 0);
+				result.disc(p1, Math.abs(r), r > 0);
 			}
 		}
 		return result;
-//		RrCSG csgExpression = csg.offset(dist);
-//		RrRectangle rec = box().offset(dist);
-//		return new BooleanGrid(csgExpression, rec, att);
 	}
 	
 	//*********************************************************************************************************
 	
-	// Boolean operators on the quad tree
+	// Boolean operators on the bitmap
 	
 	
-	/**
-	 * Complement a grid
-	 * N.B. the grid doesn't get bigger, even though the expression
-	 * it contains may now fill the whole of space.
-	 * @return
-	 */
-	public BooleanGrid complement()
-	{
-		BooleanGrid result = new BooleanGrid(this);
-		result.csg = result.csg.complement();
-		//result.bits.flip(0, result.rec.size.x*result.rec.size.y - 1);
-		return result;
-	}
-	
-	
-	
-	
-	/**
-	 * Compute the union of two images
-	 * @param d
-	 * @param e
-	 * @return
-	 */
-	public static BooleanGrid union(BooleanGrid d, BooleanGrid e)
-	{
-		BooleanGrid result = new BooleanGrid(d);
-		result.rec = d.rec.union(e.rec);
-		result.csg = RrCSG.union(result.csg, e.csg);
-		//result.bits.or(e.bits);
-		return result;
-	}
-	
-	
-	/**
-	 * Compute the intersection of two quad trees
-	 * @param d
-	 * @param e
-	 * @return
-	 */
-	public static BooleanGrid intersection(BooleanGrid d, BooleanGrid e)
-	{
-		BooleanGrid result = new BooleanGrid(d);
-		result.rec = d.rec.intersection(e.rec);
-		if(result.rec.isEmpty())
-		{
-			result.csg = RrCSG.nothing();
-			result.rec.size = result.new iPoint(1,1); // For safety
-		}else
-			result.csg = RrCSG.intersection(result.csg, e.csg);		
-		//result.bits.and(e.bits);
-		return result;
-	}
-	/**
-	 * Grid d - grid e
-	 * d's rectangle is presumed to contain the result.
-	 * TODO: write a function to compute the rectangle from the bitmap
-	 * @param d
-	 * @param e
-	 * @return
-	 */
-	public static BooleanGrid difference(BooleanGrid d, BooleanGrid e)
-	{
-		BooleanGrid result = new BooleanGrid(d);
-		result.csg = RrCSG.difference(d.csg, e.csg);
-		//result.bits.andNot(e.bits);
-		return result;
-	}
+//	/**
+//	 * Complement a grid
+//	 * N.B. the grid doesn't get bigger, even though the expression
+//	 * it contains may now fill the whole of space.
+//	 * @return
+//	 */
+//	public BooleanGrid complement()
+//	{
+//		BooleanGrid result = new BooleanGrid(this);
+//		result.csg = result.csg.complement();
+//		//result.bits.flip(0, result.rec.size.x*result.rec.size.y - 1);
+//		return result;
+//	}
+//	
+//	
+//	
+//	
+//	/**
+//	 * Compute the union of two images
+//	 * @param d
+//	 * @param e
+//	 * @return
+//	 */
+//	public static BooleanGrid union(BooleanGrid d, BooleanGrid e)
+//	{
+//		BooleanGrid result = new BooleanGrid(d);
+//		result.rec = d.rec.union(e.rec);
+//		result.csg = RrCSG.union(result.csg, e.csg);
+//		//result.bits.or(e.bits);
+//		return result;
+//	}
+//	
+//	
+//	/**
+//	 * Compute the intersection of two quad trees
+//	 * @param d
+//	 * @param e
+//	 * @return
+//	 */
+//	public static BooleanGrid intersection(BooleanGrid d, BooleanGrid e)
+//	{
+//		BooleanGrid result = new BooleanGrid(d);
+//		result.rec = d.rec.intersection(e.rec);
+//		if(result.rec.isEmpty())
+//		{
+//			result.csg = RrCSG.nothing();
+//			result.rec.size = result.new iPoint(1,1); // For safety
+//		}else
+//			result.csg = RrCSG.intersection(result.csg, e.csg);		
+//		//result.bits.and(e.bits);
+//		return result;
+//	}
+//	/**
+//	 * Grid d - grid e
+//	 * d's rectangle is presumed to contain the result.
+//	 * TODO: write a function to compute the rectangle from the bitmap
+//	 * @param d
+//	 * @param e
+//	 * @return
+//	 */
+//	public static BooleanGrid difference(BooleanGrid d, BooleanGrid e)
+//	{
+//		BooleanGrid result = new BooleanGrid(d);
+//		result.csg = RrCSG.difference(d.csg, e.csg);
+//		//result.bits.andNot(e.bits);
+//		return result;
+//	}
 }
