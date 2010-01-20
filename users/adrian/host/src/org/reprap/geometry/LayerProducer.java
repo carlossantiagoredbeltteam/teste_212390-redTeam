@@ -262,7 +262,7 @@ public class LayerProducer {
 	 * @param simPlot
 	 * @throws Exception
 	 */
-	public LayerProducer(BooleanGridList bgPols, BranchGroup ls, LayerRules lc, RrGraphics simPlot) throws Exception 
+	public LayerProducer(BooleanGridList bgPols, LayerRules lc, RrGraphics simPlot) throws Exception 
 	{
 		layerConditions = lc;
 		startNearHere = null;

@@ -654,106 +654,106 @@ public class STLSlice
 	}
 	
 
-	/**
-	 * Run through a Shape3D and find its enclosing XY box
-	 * @param shape
-	 * @param trans
-	 * @param z
-	 */
-	private RrRectangle BBoxPoints(Shape3D shape, Transform3D trans)
-    {
-		RrRectangle r = null;
-        GeometryArray g = (GeometryArray)shape.getGeometry();
-        Point3d p1 = new Point3d();
-        Point3d q1 = new Point3d();
-        
-        if(g != null)
-        {
-            for(int i = 0; i < g.getVertexCount(); i++) 
-            {
-                g.getCoordinate(i, p1);
-                trans.transform(p1, q1);
-                if(r == null)
-                	r = new RrRectangle(new RrInterval(q1.x, q1.x), new RrInterval(q1.y, q1.y));
-                else
-                	r.expand(new Rr2Point(q1.x, q1.y));
-            }
-        }
-        return r;
-    }
-	
-	/**
-	 * Unpack the Shape3D(s) from value and find their exclosing XY box
-	 * @param value
-	 * @param trans
-	 * @param z
-	 */
-	private RrRectangle BBox(Object value, Transform3D trans) 
-    {
-		RrRectangle r = null;
-		RrRectangle s;
-		
-        if(value instanceof SceneGraphObject) 
-        {
-            SceneGraphObject sg = (SceneGraphObject)value;
-            if(sg instanceof Group) 
-            {
-                Group g = (Group)sg;
-                java.util.Enumeration<?> enumKids = g.getAllChildren( );
-                while(enumKids.hasMoreElements())
-                {
-                	if(r == null)
-                		r = BBox(enumKids.nextElement(), trans);
-                	else
-                	{
-                		s = BBox(enumKids.nextElement(), trans);
-                		if(s != null)
-                			r = RrRectangle.union(r, s);
-                	}
-                }
-            } else if (sg instanceof Shape3D) 
-            {
-                r = BBoxPoints((Shape3D)sg, trans);
-            }
-        }
-        
-        return r;
-    }
-	
-	/**
-	 * Find the minimum XY enclosing box round the corners of the object
-	 * @return
-	 */
-	public RrRectangle ObjectPlanRectangle()
-	{
-		RrRectangle r = null;
-		RrRectangle s;
-		
-		for(int mat = 0; mat < materialList.getExtruderCount(); mat++)
-		{
-			ArrayList<AandT> aats = materialList.getAandTs(mat);
-
-			if(aats.size() > 0)
-			{
-				for(int obj = 0; obj < aats.size(); obj++)
-				{
-					AandT aat = aats.get(obj);
-					Transform3D trans = aat.trans;
-					Attributes attr = aat.att;
-					if(r == null)
-						r = BBox(attr.getPart(), trans);
-					else
-					{
-						s = BBox(attr.getPart(), trans);
-						if(s != null)
-						r = RrRectangle.union(r, s);
-					}
-				}
-			}
-		}
-		
-		return r;
-	}
+//	/**
+//	 * Run through a Shape3D and find its enclosing XY box
+//	 * @param shape
+//	 * @param trans
+//	 * @param z
+//	 */
+//	private RrRectangle BBoxPoints(Shape3D shape, Transform3D trans)
+//    {
+//		RrRectangle r = null;
+//        GeometryArray g = (GeometryArray)shape.getGeometry();
+//        Point3d p1 = new Point3d();
+//        Point3d q1 = new Point3d();
+//        
+//        if(g != null)
+//        {
+//            for(int i = 0; i < g.getVertexCount(); i++) 
+//            {
+//                g.getCoordinate(i, p1);
+//                trans.transform(p1, q1);
+//                if(r == null)
+//                	r = new RrRectangle(new RrInterval(q1.x, q1.x), new RrInterval(q1.y, q1.y));
+//                else
+//                	r.expand(new Rr2Point(q1.x, q1.y));
+//            }
+//        }
+//        return r;
+//    }
+//	
+//	/**
+//	 * Unpack the Shape3D(s) from value and find their exclosing XY box
+//	 * @param value
+//	 * @param trans
+//	 * @param z
+//	 */
+//	private RrRectangle BBox(Object value, Transform3D trans) 
+//    {
+//		RrRectangle r = null;
+//		RrRectangle s;
+//		
+//        if(value instanceof SceneGraphObject) 
+//        {
+//            SceneGraphObject sg = (SceneGraphObject)value;
+//            if(sg instanceof Group) 
+//            {
+//                Group g = (Group)sg;
+//                java.util.Enumeration<?> enumKids = g.getAllChildren( );
+//                while(enumKids.hasMoreElements())
+//                {
+//                	if(r == null)
+//                		r = BBox(enumKids.nextElement(), trans);
+//                	else
+//                	{
+//                		s = BBox(enumKids.nextElement(), trans);
+//                		if(s != null)
+//                			r = RrRectangle.union(r, s);
+//                	}
+//                }
+//            } else if (sg instanceof Shape3D) 
+//            {
+//                r = BBoxPoints((Shape3D)sg, trans);
+//            }
+//        }
+//        
+//        return r;
+//    }
+//	
+//	/**
+//	 * Find the minimum XY enclosing box round the corners of the object
+//	 * @return
+//	 */
+//	public RrRectangle ObjectPlanRectangle()
+//	{
+//		RrRectangle r = null;
+//		RrRectangle s;
+//		
+//		for(int mat = 0; mat < materialList.getExtruderCount(); mat++)
+//		{
+//			ArrayList<AandT> aats = materialList.getAandTs(mat);
+//
+//			if(aats.size() > 0)
+//			{
+//				for(int obj = 0; obj < aats.size(); obj++)
+//				{
+//					AandT aat = aats.get(obj);
+//					Transform3D trans = aat.trans;
+//					Attributes attr = aat.att;
+//					if(r == null)
+//						r = BBox(attr.getPart(), trans);
+//					else
+//					{
+//						s = BBox(attr.getPart(), trans);
+//						if(s != null)
+//						r = RrRectangle.union(r, s);
+//					}
+//				}
+//			}
+//		}
+//		
+//		return r;
+//	}
 //		//BoundingBox r = null;
 //		
 //		for(int mat = 0; mat < materialList.getExtruderCount(); mat++)
@@ -912,17 +912,17 @@ public class STLSlice
 		return edges.get(i).b;
 	}
 	
-	/**
-	 * Get the triangulation below the current slice level.
-	 * @return
-	 */
-	public BranchGroup getBelow()
-	{
-		if(generateLowerTriangles)
-			return below;
-		else
-			return null;
-	}
+//	/**
+//	 * Get the triangulation below the current slice level.
+//	 * @return
+//	 */
+//	public BranchGroup getBelow()
+//	{
+//		if(generateLowerTriangles)
+//			return below;
+//		else
+//			return null;
+//	}
 	
 	/**
 	 * FIXME: Not sure about this - at the moment it clicks all points
@@ -1527,23 +1527,23 @@ public class STLSlice
 //	}
     
 
-	/**
-	 * Find the maximum height of the object(s) to be built
-	 * @return that height
-	 */
-	public double maxZ()
-	{
-		STLObject stl;
-		double result = Double.NEGATIVE_INFINITY;
-		
-		for(int i = 0; i < shapeList.size(); i++)
-		{
-			stl = shapeList.get(i);
-			if(stl.size().z > result)
-				result = stl.size().z;
-		}
-		return result;
-	}
+//	/**
+//	 * Find the maximum height of the object(s) to be built
+//	 * @return that height
+//	 */
+//	public double maxZ()
+//	{
+//		STLObject stl;
+//		double result = Double.NEGATIVE_INFINITY;
+//		
+//		for(int i = 0; i < shapeList.size(); i++)
+//		{
+//			stl = shapeList.get(i);
+//			if(stl.size().z > result)
+//				result = stl.size().z;
+//		}
+//		return result;
+//	}
 	
 	
 	/**

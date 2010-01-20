@@ -36,7 +36,8 @@ public class Producer {
 	
 //	protected boolean interLayerCooling;
 
-	protected STLSlice stlc;
+	//protected STLSlice stlc;
+	protected AllSTLsToBuild allSTLs;
 	
 	/**
 	 * @param preview
@@ -45,11 +46,13 @@ public class Producer {
 	 */
 	public Producer(Printer pr, RepRapBuild builder) throws Exception 
 	{
-		bld = builder;	
+		bld = builder;
 		
-		stlc = new STLSlice(bld.getSTLs().things());
+		allSTLs = bld.getSTLs();
 		
-		RrRectangle gp = stlc.ObjectPlanRectangle();
+		//stlc = new STLSlice(astl.things());
+		
+		RrRectangle gp = allSTLs.ObjectPlanRectangle();
 
 		if(Preferences.loadGlobalBool("DisplaySimulation"))
 		{
@@ -57,7 +60,7 @@ public class Producer {
 		} else
 			simulationPlot = null;
 		
-		double modZMax = stlc.maxZ();
+		double modZMax = allSTLs.maxZ();
 		double stepZ = pr.getExtruders()[0].getExtrusionHeight();
 		int foundationLayers = Math.max(0, pr.getFoundationLayers());
 		
@@ -261,12 +264,12 @@ public class Producer {
 			reprap.waitWhileBufferNotEmpty();
 			reprap.slowBuffer();
 			
-			BooleanGridList slice = stlc.slice(layerRules.getModelZ() + layerRules.getZStep()*0.5,
+			BooleanGridList slice = allSTLs.slice(layerRules.getModelZ() + layerRules.getZStep()*0.5,
 					reprap.getExtruders()); 
 			
 			layer = null;
 			if(slice.size() > 0)
-				layer = new LayerProducer(slice, stlc.getBelow(), layerRules, simulationPlot);
+				layer = new LayerProducer(slice, layerRules, simulationPlot);
 			else
 				Debug.d("Null slice at model Z = " + layerRules.getModelZ());
 
@@ -289,7 +292,7 @@ public class Producer {
 			layer = null;
 			
 			//slice.destroy();
-			stlc.destroyLayer();
+			allSTLs.destroyLayer();
 
 			layerRules.step(reprap.getExtruder());
 			reprap.setSeparating(false);
@@ -334,12 +337,12 @@ public class Producer {
 			reprap.waitWhileBufferNotEmpty();
 			reprap.slowBuffer();
 			
-			slice = stlc.slice(layerRules.getModelZ() + layerRules.getZStep()*0.5,
+			slice = allSTLs.slice(layerRules.getModelZ() + layerRules.getZStep()*0.5,
 					reprap.getExtruders()); 
 			
 			layer = null;
 			if(slice.size() > 0)
-				layer = new LayerProducer(slice, stlc.getBelow(), layerRules, simulationPlot);
+				layer = new LayerProducer(slice, layerRules, simulationPlot);
 			else
 				Debug.d("Null slice at model Z = " + layerRules.getModelZ());
 
@@ -363,7 +366,7 @@ public class Producer {
 			slice = null;
 			
 			//slice.finalize();
-			stlc.destroyLayer();
+			allSTLs.destroyLayer();
 
 			layerRules.step(reprap.getExtruder());
 		}

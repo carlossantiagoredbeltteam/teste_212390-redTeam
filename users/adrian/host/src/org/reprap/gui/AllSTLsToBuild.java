@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 import org.reprap.geometry.polygons.*;
 import org.reprap.Attributes;
+import org.reprap.Extruder;
 import javax.media.j3d.Appearance;
 import javax.media.j3d.BranchGroup;
 import javax.media.j3d.GeometryArray;
@@ -20,12 +21,14 @@ import com.sun.j3d.utils.geometry.NormalGenerator;
 public class AllSTLsToBuild 
 {	
 	private List<STLObject> stls;
+	private STLSlice slice;
 	private RrRectangle XYbox;
 	private RrInterval Zrange;
 	
 	public AllSTLsToBuild()
 	{
 		stls = new ArrayList<STLObject>();
+		slice = null;
 		XYbox = null;
 		Zrange = null;
 	}
@@ -184,6 +187,13 @@ public class AllSTLsToBuild
 		return Zrange.high();
 	}	
 	
-	//destroyLayer()???
+	public BooleanGridList slice(double z, Extruder[] extruders)
+	{
+		if(slice == null)
+			slice = new STLSlice(stls);
+		return slice.slice(z, extruders);	
+	}
+	
+	public void destroyLayer() {}
 
 }
