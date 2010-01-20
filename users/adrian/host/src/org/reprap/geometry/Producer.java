@@ -14,6 +14,7 @@ import org.reprap.geometry.polygons.RrCSG;
 import org.reprap.geometry.polygons.RrPolygonList;
 import org.reprap.geometry.polygons.BooleanGridList;
 import org.reprap.gui.RepRapBuild;
+import org.reprap.gui.AllSTLsToBuild;
 import org.reprap.utilities.Debug;
 import org.reprap.utilities.RrGraphics;
 
@@ -46,7 +47,7 @@ public class Producer {
 	{
 		bld = builder;	
 		
-		stlc = new STLSlice(bld.getSTLs());
+		stlc = new STLSlice(bld.getSTLs().things());
 		
 		RrRectangle gp = stlc.ObjectPlanRectangle();
 
