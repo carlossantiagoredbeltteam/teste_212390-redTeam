@@ -77,7 +77,7 @@ import org.reprap.geometry.polygons.RrInterval;
 import org.reprap.geometry.polygons.RrLine;
 import org.reprap.geometry.polygons.RrPolygon;
 import org.reprap.geometry.polygons.RrPolygonList;
-import org.reprap.geometry.polygons.STLSlice;
+//import org.reprap.geometry.polygons.STLSlice;
 import org.reprap.gui.StatusMessage;
 import org.reprap.Attributes;
 import javax.media.j3d.Appearance;
@@ -141,7 +141,7 @@ public class RrGraphics
 	/**
 	 * 
 	 */
-	private STLSlice stlc = null;
+	//private STLSlice stlc = null;
 	
 	/**
 	 * 
@@ -188,7 +188,7 @@ public class RrGraphics
 	{
 		p_list = null;
 		//csg_p = null;
-		stlc = null;
+		//stlc = null;
 		hp = null;
 		title = t;
 		init(b, false);
@@ -203,7 +203,7 @@ public class RrGraphics
 	{
 		p_list = null;
 		//csg_p = null;
-		stlc = null;
+		//stlc = null;
 		hp = null;
 		title = t;
 		initialised = false;
@@ -213,7 +213,7 @@ public class RrGraphics
 	{
 		p_list = null;
 		//csg_p = null;
-		stlc = null;
+		//stlc = null;
 		hp = null;
 	}
 //	/**

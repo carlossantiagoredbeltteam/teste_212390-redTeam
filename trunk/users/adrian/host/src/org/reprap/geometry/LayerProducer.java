@@ -113,17 +113,19 @@ public class LayerProducer {
 	/**
 	 * The polygons to infill
 	 */
-	private RrPolygonList hatchedPolygons = null;
+	//private RrPolygonList hatchedPolygons = null;
+	
+	private RrPolygonList allPolygons[];
 	
 	/**
 	 * The polygons to outline
 	 */
-	private RrPolygonList borderPolygons = null;
+	//private RrPolygonList borderPolygons = null;
 	
 	/**
 	 * Boolean Grid representation of the polygons as input
 	 */
-	private BooleanGridList boolGrdSlice = null;
+	//private BooleanGridList boolGrdSlice = null;
 	
 	/**
 	 * CSG representation of the polygons offset by the width of
@@ -135,13 +137,13 @@ public class LayerProducer {
 	 * CSG representation of the polygons offset by the factor of the
 	 * width of the extruders needed to lay down internal cross-hatching
 	 */	
-	BooleanGridList offHatch = null;
+	//BooleanGridList offHatch = null;
 	
 	/**
 	 * Counters use so that each material is plotted completely before
 	 * moving on to the next.
 	 */
-	private int commonBorder, commonHatch;
+	//private int commonBorder, commonHatch;
 	
 	/**
 	 * The clue is in the name...
@@ -177,25 +179,26 @@ public class LayerProducer {
 
 		//printer = null;
 		
-		if(hatchedPolygons != null)
-			hatchedPolygons.destroy();
-		hatchedPolygons = null;
-		
-		if(borderPolygons != null)
-			borderPolygons.destroy();
-		borderPolygons = null;
-		
-		//if(boolGrdSlice != null)
-		//	boolGrdSlice.destroy();
-		boolGrdSlice = null;
-		
-		//if(offHatch != null)
-			//offHatch.destroy();
-		offHatch = null;
+//		if(hatchedPolygons != null)
+//			hatchedPolygons.destroy();
+//		hatchedPolygons = null;
+//		
+//		if(borderPolygons != null)
+//			borderPolygons.destroy();
+//		borderPolygons = null;
+//		
+//		//if(boolGrdSlice != null)
+//		//	boolGrdSlice.destroy();
+//		boolGrdSlice = null;
+//		
+//		//if(offHatch != null)
+//			//offHatch.destroy();
+//		offHatch = null;
 		
 		if(startNearHere != null)
 			startNearHere.destroy();
 		startNearHere = null;
+		allPolygons = null;
 		beingDestroyed = false;
 	}
 	
@@ -212,10 +215,11 @@ public class LayerProducer {
 
 		//printer = null;
 		
-		hatchedPolygons = null;
-		borderPolygons = null;
-		boolGrdSlice = null;
-		offHatch = null;
+//		hatchedPolygons = null;
+//		borderPolygons = null;
+//		boolGrdSlice = null;
+//		offHatch = null;
+		allPolygons = null;
 		startNearHere = null;
 		super.finalize();
 	}
@@ -228,31 +232,31 @@ public class LayerProducer {
 	 * @param simPlot
 	 * @throws Exception
 	 */
-	public LayerProducer(RrPolygonList pols, LayerRules lc, RrGraphics simPlot) throws Exception 
-	{
-		layerConditions = lc;
-		startNearHere = null; //new Rr2Point(0, 0);
-		//lowerShell = null;
-		//shellSet = false;
-		simulationPlot = simPlot;
-		
-		boolGrdSlice = null;
-		
-		borderPolygons = null;
-		
-		hatchedPolygons = pols;
-		
-		
-		if(simulationPlot != null)
-		{
-			if(!simulationPlot.isInitialised())
-				simulationPlot.init(lc.getBox(), false);
-			else
-				simulationPlot.cleanPolygons();
-		}
-
-	}
-	
+//	public LayerProducer(RrPolygonList pols, LayerRules lc, RrGraphics simPlot) throws Exception 
+//	{
+//		layerConditions = lc;
+//		startNearHere = null; //new Rr2Point(0, 0);
+//		//lowerShell = null;
+//		//shellSet = false;
+//		simulationPlot = simPlot;
+//		
+//		boolGrdSlice = null;
+//		
+//		borderPolygons = null;
+//		
+//		hatchedPolygons = pols;
+//		
+//		
+//		if(simulationPlot != null)
+//		{
+//			if(!simulationPlot.isInitialised())
+//				simulationPlot.init(lc.getBox(), false);
+//			else
+//				simulationPlot.cleanPolygons();
+//		}
+//
+//	}
+//	
 	
 	/**
 	 * Set up a normal layer
@@ -262,7 +266,8 @@ public class LayerProducer {
 	 * @param simPlot
 	 * @throws Exception
 	 */
-	public LayerProducer(BooleanGridList bgPols, LayerRules lc, RrGraphics simPlot) throws Exception 
+	//public LayerProducer(BooleanGridList bgPols, LayerRules lc, RrGraphics simPlot) throws Exception 
+	public LayerProducer(RrPolygonList ap[], LayerRules lc, RrGraphics simPlot) throws Exception 
 	{
 		layerConditions = lc;
 		startNearHere = null;
@@ -270,43 +275,45 @@ public class LayerProducer {
 		//shellSet = false;
 		simulationPlot = simPlot;
 		
-		boolGrdSlice = bgPols;
+		allPolygons = ap;
+		
+		//boolGrdSlice = bgPols;
 		
 		// The next two are experimental for the moment...
 		
 		//inFillCalculations();
 		//supportCalculations();
 		
-		offHatch = boolGrdSlice.offset(layerConditions, false);
+		//offHatch = boolGrdSlice.offset(layerConditions, false);
 		
-		if(layerConditions.getLayingSupport())
-		{
-			borderPolygons = null;
-			offHatch = offHatch.union(lc.getPrinter().getExtruders());
-		} else
-		{
-			BooleanGridList offBorder = boolGrdSlice.offset(layerConditions, true);
-			borderPolygons = offBorder.borders();
-		}
-			
-		hatchedPolygons = offHatch.hatch(layerConditions);
-
-
-		if(borderPolygons != null && borderPolygons.size() > 0)
-		{
-			borderPolygons.middleStarts(hatchedPolygons, layerConditions);
-			if(Preferences.loadGlobalBool("Shield"))
-			{
-				RrRectangle rr = lc.getBox();
-				Rr2Point corner = Rr2Point.add(rr.sw(), new Rr2Point(-3, -3));
-				RrPolygon ell = new RrPolygon(borderPolygons.polygon(0).getAttributes(), false);
-				ell.add(corner);
-				ell.add(Rr2Point.add(corner, new Rr2Point(-2, 10)));
-				ell.add(Rr2Point.add(corner, new Rr2Point(-2, -2)));
-				ell.add(Rr2Point.add(corner, new Rr2Point(20, -2)));
-				borderPolygons.add(0, ell);
-			}
-		}
+//		if(layerConditions.getLayingSupport())
+//		{
+//			borderPolygons = null;
+//			offHatch = offHatch.union(lc.getPrinter().getExtruders());
+//		} else
+//		{
+//			BooleanGridList offBorder = boolGrdSlice.offset(layerConditions, true);
+//			borderPolygons = offBorder.borders();
+//		}
+//			
+//		hatchedPolygons = offHatch.hatch(layerConditions);
+//
+//
+//		if(borderPolygons != null && borderPolygons.size() > 0)
+//		{
+//			borderPolygons.middleStarts(hatchedPolygons, layerConditions);
+//			if(Preferences.loadGlobalBool("Shield"))
+//			{
+//				RrRectangle rr = lc.getBox();
+//				Rr2Point corner = Rr2Point.add(rr.sw(), new Rr2Point(-3, -3));
+//				RrPolygon ell = new RrPolygon(borderPolygons.polygon(0).getAttributes(), false);
+//				ell.add(corner);
+//				ell.add(Rr2Point.add(corner, new Rr2Point(-2, 10)));
+//				ell.add(Rr2Point.add(corner, new Rr2Point(-2, -2)));
+//				ell.add(Rr2Point.add(corner, new Rr2Point(20, -2)));
+//				borderPolygons.add(0, ell);
+//			}
+//		}
 		
 		if(simulationPlot != null)
 		{
@@ -945,42 +952,42 @@ public class LayerProducer {
 		return i;
 	}
 	
-	private boolean nextCommon(int ib, int ih)
-	{
-		if(borderPolygons == null || hatchedPolygons == null)
-			return false;
-		
-		commonBorder = ib;
-		commonHatch = ih;
-		
-		if(borderPolygons.size() <= 0)
-		{
-			commonHatch = hatchedPolygons.size();
-			return false;
-		}
-
-
-		if(hatchedPolygons.size() <= 0)
-		{
-			commonBorder = borderPolygons.size();
-			return false;
-		}
-
-		for(int jb = ib; jb < borderPolygons.size(); jb++)
-		{
-			for(int jh = ih; jh < hatchedPolygons.size(); jh++)
-			{
-				if(borderPolygons.polygon(ib).getAttributes().getMaterial().equals(
-						hatchedPolygons.polygon(ih).getAttributes().getMaterial()))
-				{
-					commonBorder = jb;
-					commonHatch = jh;
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+//	private boolean nextCommon(int ib, int ih)
+//	{
+//		if(borderPolygons == null || hatchedPolygons == null)
+//			return false;
+//		
+//		commonBorder = ib;
+//		commonHatch = ih;
+//		
+//		if(borderPolygons.size() <= 0)
+//		{
+//			commonHatch = hatchedPolygons.size();
+//			return false;
+//		}
+//
+//
+//		if(hatchedPolygons.size() <= 0)
+//		{
+//			commonBorder = borderPolygons.size();
+//			return false;
+//		}
+//
+//		for(int jb = ib; jb < borderPolygons.size(); jb++)
+//		{
+//			for(int jh = ih; jh < hatchedPolygons.size(); jh++)
+//			{
+//				if(borderPolygons.polygon(ib).getAttributes().getMaterial().equals(
+//						hatchedPolygons.polygon(ih).getAttributes().getMaterial()))
+//				{
+//					commonBorder = jb;
+//					commonHatch = jh;
+//					return true;
+//				}
+//			}
+//		}
+//		return false;
+//	}
 		
 	/**
 	 * Master plot function - draw everything.  Supress border and/or hatch by
@@ -993,72 +1000,83 @@ public class LayerProducer {
 		int ib, jb, ih, jh;
 
 		boolean firstOneInLayer = true;
-
-		//borderPolygons = borderPolygons.filterShorts(Preferences.machineResolution()*2);
-		//hatchedPolygons = hatchedPolygons.filterShorts(Preferences.machineResolution()*2);
-
-		ib = 0;
-		ih = 0;
 		
-		Printer printer = layerConditions.getPrinter();	
-		
-		while(nextCommon(ib, ih)) 
-		{	
-			for(jb = ib; jb < commonBorder; jb++)
-			{
-				if (printer.isCancelled())
-					break;
-				plot(borderPolygons.polygon(jb), firstOneInLayer);
-				firstOneInLayer = false;
-			}
-			ib = commonBorder;
-
-			for(jh = ih; jh < commonHatch; jh++)
-			{
-				if (printer.isCancelled())
-					break;
-				plot(hatchedPolygons.polygon(jh), firstOneInLayer);
-				firstOneInLayer = false;
-			}
-			ih = commonHatch;
-
+		for(int i = 0; i < allPolygons.length; i++)
+		{
 			firstOneInLayer = true;
-			borderPolygons = borderPolygons.nearEnds(startNearHere);
-			
-			ib = plotOneMaterial(borderPolygons, ib, firstOneInLayer);
-			firstOneInLayer = false;
-			hatchedPolygons = hatchedPolygons.nearEnds(startNearHere);
-			ih = plotOneMaterial(hatchedPolygons, ih, firstOneInLayer);	
-		}
-
-		firstOneInLayer = true; // Not sure about this - AB
-
-		if(borderPolygons != null)
-		{
-			for(jb = ib; jb < borderPolygons.size(); jb++)
+			RrPolygonList pl = allPolygons[i];
+			for(int j = 0; j < pl.size(); j++)
 			{
-				if (printer.isCancelled())
-					break;
-				plot(borderPolygons.polygon(jb), firstOneInLayer);
+				plot(pl.polygon(j), firstOneInLayer);
 				firstOneInLayer = false;
 			}
 		}
 
-		if(hatchedPolygons != null)
-		{
-			for(jh = ih; jh < hatchedPolygons.size(); jh++)
-			{
-				if (printer.isCancelled())
-					break;
-				plot(hatchedPolygons.polygon(jh), firstOneInLayer);
-				firstOneInLayer = false;
-			}
-		}
-//		if(!shellSet)
-//		{
-//			printer.setLowerShell(lowerShell);
-//			shellSet = true;
+//		//borderPolygons = borderPolygons.filterShorts(Preferences.machineResolution()*2);
+//		//hatchedPolygons = hatchedPolygons.filterShorts(Preferences.machineResolution()*2);
+//
+//		ib = 0;
+//		ih = 0;
+//		
+//		Printer printer = layerConditions.getPrinter();	
+//		
+//		while(nextCommon(ib, ih)) 
+//		{	
+//			for(jb = ib; jb < commonBorder; jb++)
+//			{
+//				if (printer.isCancelled())
+//					break;
+//				plot(borderPolygons.polygon(jb), firstOneInLayer);
+//				firstOneInLayer = false;
+//			}
+//			ib = commonBorder;
+//
+//			for(jh = ih; jh < commonHatch; jh++)
+//			{
+//				if (printer.isCancelled())
+//					break;
+//				plot(hatchedPolygons.polygon(jh), firstOneInLayer);
+//				firstOneInLayer = false;
+//			}
+//			ih = commonHatch;
+//
+//			firstOneInLayer = true;
+//			borderPolygons = borderPolygons.nearEnds(startNearHere);
+//			
+//			ib = plotOneMaterial(borderPolygons, ib, firstOneInLayer);
+//			firstOneInLayer = false;
+//			hatchedPolygons = hatchedPolygons.nearEnds(startNearHere);
+//			ih = plotOneMaterial(hatchedPolygons, ih, firstOneInLayer);	
 //		}
+//
+//		firstOneInLayer = true; // Not sure about this - AB
+//
+//		if(borderPolygons != null)
+//		{
+//			for(jb = ib; jb < borderPolygons.size(); jb++)
+//			{
+//				if (printer.isCancelled())
+//					break;
+//				plot(borderPolygons.polygon(jb), firstOneInLayer);
+//				firstOneInLayer = false;
+//			}
+//		}
+//
+//		if(hatchedPolygons != null)
+//		{
+//			for(jh = ih; jh < hatchedPolygons.size(); jh++)
+//			{
+//				if (printer.isCancelled())
+//					break;
+//				plot(hatchedPolygons.polygon(jh), firstOneInLayer);
+//				firstOneInLayer = false;
+//			}
+//		}
+////		if(!shellSet)
+////		{
+////			printer.setLowerShell(lowerShell);
+////			shellSet = true;
+////		}
 	}		
 	
 }
