@@ -316,7 +316,7 @@ public class Producer {
 		
 		layerRules.setLayingSupport(false);
 		
-		BooleanGridList slice;
+		BooleanGridList slice, previousSlice;
 		
 		
 		while(layerRules.getModelLayer() >= 0 ) 
@@ -334,10 +334,6 @@ public class Producer {
 			
 			reprap.startingLayer(layerRules);
 			
-			// Change Z height
-			//layerRules.moveZAtStartOfLayer();
-			//reprap.singleMove(reprap.getX(), reprap.getY(), layerRules.getMachineZ(), reprap.getFastFeedrateZ());
-			
 			reprap.waitWhileBufferNotEmpty();
 			reprap.slowBuffer();
 			
@@ -347,12 +343,13 @@ public class Producer {
 			boolean shield = true;
 			for(int i = 0; i < allSTLs.size(); i++)
 			{
+				previousSlice = allSTLs.previousSlice(i);
 				slice = allSTLs.slice(i, layerRules.getModelZ() + layerRules.getZStep()*0.5,
-						reprap.getExtruders()); 
-
+						reprap.getExtruders());
+				
 				if(slice.size() > 0)
 				{
-					RrPolygonList fills = slice.computeInfill(layerRules);
+					RrPolygonList fills = slice.computeInfill(layerRules, previousSlice);
 					RrPolygonList borders = slice.computeOutlines(layerRules, fills, shield);
 					shield = false;
 					for(int pol = 0; pol < borders.size(); pol++)

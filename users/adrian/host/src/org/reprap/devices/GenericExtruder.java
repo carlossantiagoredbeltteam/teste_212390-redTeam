@@ -6,6 +6,7 @@ import org.reprap.Preferences;
 import org.reprap.Extruder;
 import org.reprap.Printer;
 import org.reprap.geometry.LayerRules;
+import org.reprap.utilities.Debug;
 import javax.media.j3d.Appearance;
 import javax.vecmath.Color3f;
 import javax.media.j3d.Material;
@@ -1053,7 +1054,7 @@ public abstract class GenericExtruder implements Extruder
 	}
 	
 	/**
-	 * What stuff are we working with?
+	 * What stuff are we holding up with?
 	 * @return
 	 */
 	public String getSupportMaterial()
@@ -1061,14 +1062,33 @@ public abstract class GenericExtruder implements Extruder
 		return supportMaterial;
 	}
 	
+	public int getSupportExtruder()
+	{
+		return getNumberFromMaterial(supportMaterial);
+	}
+	
+	/**
+	 * What stuff are we infilling with?
+	 * @return
+	 */
+	public String getInfillMaterial()
+	{
+		return inFillMaterial;
+	}
+	
+	public int getInfillExtruder()
+	{
+		return getNumberFromMaterial(inFillMaterial);
+	}
+	
 	/**
 	 * What are the dimensions for infill?
 	 * @return
 	 */
-	public String getBroadInfillMaterial()
-	{
-		return inFillMaterial;
-	}
+//	public String getBroadInfillMaterial()
+//	{
+//		return inFillMaterial;
+//	}
 	
     public static int getNumberFromMaterial(String material)
     {
@@ -1084,7 +1104,7 @@ public abstract class GenericExtruder implements Extruder
 			throw new Exception("getNumberFromMaterial - can't find " + material);
 		} catch (Exception ex)
 		{
-			System.err.println(ex.toString());
+			Debug.d(ex.toString());
 		}
 		return -1;
     }
