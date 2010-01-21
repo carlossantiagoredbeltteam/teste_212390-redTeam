@@ -190,6 +190,16 @@ public class BooleanGrid
 		}
 		
 		/**
+		 * This rectangle in the real world
+		 * @return
+		 */
+		public RrRectangle realRectangle()
+		{
+			return new RrRectangle(swCorner.realPoint(), 
+					new iPoint(swCorner.x + size.x - 1, swCorner.y + size.y - 1).realPoint());
+		}
+		
+		/**
 		 * Big rectangle containing the union of two.
 		 * @param b
 		 * @return
@@ -862,7 +872,7 @@ public class BooleanGrid
 	 * Return the attributes
 	 * @return
 	 */
-	public Attributes attributes()
+	public Attributes attribute()
 	{
 		return att;
 	}
@@ -1684,7 +1694,12 @@ public class BooleanGrid
 
 		iPolygonList polygons = iAllPerimiters().translate(rec.swCorner.sub(result.rec.swCorner));
 		if(polygons.size() <= 0)
-			return null;
+		{
+			iRectangle newRec = new iRectangle(result.rec);
+			newRec.size.x = 1;
+			newRec.size.y = 1;
+			return new BooleanGrid(RrCSG.nothing(), newRec.realRectangle(), att);
+		}
 
 		for(int p = 0; p < polygons.size(); p++)
 		{
@@ -1705,71 +1720,75 @@ public class BooleanGrid
 	// Boolean operators on the bitmap
 	
 	
-//	/**
-//	 * Complement a grid
-//	 * N.B. the grid doesn't get bigger, even though the expression
-//	 * it contains may now fill the whole of space.
-//	 * @return
-//	 */
-//	public BooleanGrid complement()
-//	{
-//		BooleanGrid result = new BooleanGrid(this);
-//		result.csg = result.csg.complement();
-//		//result.bits.flip(0, result.rec.size.x*result.rec.size.y - 1);
-//		return result;
-//	}
-//	
-//	
-//	
-//	
-//	/**
-//	 * Compute the union of two images
-//	 * @param d
-//	 * @param e
-//	 * @return
-//	 */
-//	public static BooleanGrid union(BooleanGrid d, BooleanGrid e)
-//	{
-//		BooleanGrid result = new BooleanGrid(d);
-//		result.rec = d.rec.union(e.rec);
-//		result.csg = RrCSG.union(result.csg, e.csg);
-//		//result.bits.or(e.bits);
-//		return result;
-//	}
-//	
-//	
-//	/**
-//	 * Compute the intersection of two quad trees
-//	 * @param d
-//	 * @param e
-//	 * @return
-//	 */
-//	public static BooleanGrid intersection(BooleanGrid d, BooleanGrid e)
-//	{
-//		BooleanGrid result = new BooleanGrid(d);
-//		result.rec = d.rec.intersection(e.rec);
-//		if(result.rec.isEmpty())
-//		{
-//			result.csg = RrCSG.nothing();
-//			result.rec.size = result.new iPoint(1,1); // For safety
-//		}else
-//			result.csg = RrCSG.intersection(result.csg, e.csg);		
-//		//result.bits.and(e.bits);
-//		return result;
-//	}
-//	/**
-//	 * Grid d - grid e
-//	 * d's rectangle is presumed to contain the result.
-//	 * TODO: write a function to compute the rectangle from the bitmap
-//	 * @param d
-//	 * @param e
-//	 * @return
-//	 */
-//	public static BooleanGrid difference(BooleanGrid d, BooleanGrid e)
-//	{
-//		BooleanGrid result = new BooleanGrid(d);
-//		result.csg = RrCSG.difference(d.csg, e.csg);
-//		//result.bits.andNot(e.bits);
-//		return result;
-//	}
+	/**
+	 * Complement a grid
+	 * N.B. the grid doesn't get bigger, even though the expression
+	 * it contains may now fill the whole of space.
+	 * @return
+	 */
+	public BooleanGrid complement()
+	{
+		BooleanGrid result = new BooleanGrid(this);
+		result.bits.flip(0, result.rec.size.x*result.rec.size.y - 1);
+		return result;
+	}
+	
+	
+	
+	
+	/**
+	 * Compute the union of two bit patterns
+	 * @param d
+	 * @param e
+	 * @return
+	 */
+	public static BooleanGrid union(BooleanGrid d, BooleanGrid e)
+	{
+		if(e.att != d.att)
+			Debug.e("BooleanGrid.union(): attempt to union two bitmaps with different attributes.");
+		iRectangle u = d.rec.union(e.rec);
+		BooleanGrid result = new BooleanGrid(d, u);
+		BooleanGrid temp = new BooleanGrid(e, u);
+		result.bits.or(temp.bits);
+		return result;
+	}
+	
+	
+	/**
+	 * Compute the intersection of two  bit patterns
+	 * @param d
+	 * @param e
+	 * @return
+	 */
+	public static BooleanGrid intersection(BooleanGrid d, BooleanGrid e)
+	{
+		if(e.att != d.att)
+			Debug.e("BooleanGrid.union(): attempt to union two bitmaps with different attributes.");
+		iRectangle u = d.rec.intersection(e.rec);
+		if(u.isEmpty())
+		{
+			u.size.x = 1;
+			u.size.y = 1;
+			return new BooleanGrid(RrCSG.nothing(), u.realRectangle(), d.att);
+		}
+		BooleanGrid result = new BooleanGrid(d, u);
+		BooleanGrid temp = new BooleanGrid(e, u);
+		result.bits.and(temp.bits);
+		return result;
+	}
+	/**
+	 * Grid d - grid e
+	 * d's rectangle is presumed to contain the result.
+	 * TODO: write a function to compute the rectangle from the bitmap
+	 * @param d
+	 * @param e
+	 * @return
+	 */
+	public static BooleanGrid difference(BooleanGrid d, BooleanGrid e)
+	{
+		BooleanGrid result = new BooleanGrid(d);
+		BooleanGrid temp = new BooleanGrid(e, result.rec);
+		result.bits.andNot(temp.bits);
+		return result;
+	}
 }

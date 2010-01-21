@@ -309,18 +309,18 @@ public class LayerRules
 		}
 		
 		
-		String inFillName = e.getBroadInfillMaterial();
-		
-		// If this stuff's infill is not called "null"...
-		
-		if(!inFillName.contentEquals("null"))
-		{
-			if(modelLayer+1 > e.getLowerFineLayers() && modelLayer+1 <= modelLayerMax - e.getUpperFineLayers())
-			{
-				Extruder inFillExtruder = printer.getExtruders()[GenericExtruder.getNumberFromMaterial(inFillName)];
-				return inFillExtruder.getExtrusionInfillWidth();
-			}
-		}
+//		String inFillName = e.getBroadInfillMaterial();
+//		
+//		// If this stuff's infill is not called "null"...
+//		
+//		if(!inFillName.contentEquals("null"))
+//		{
+//			if(modelLayer+1 > e.getLowerFineLayers() && modelLayer+1 <= modelLayerMax - e.getUpperFineLayers())
+//			{
+//				Extruder inFillExtruder = printer.getExtruders()[GenericExtruder.getNumberFromMaterial(inFillName)];
+//				return inFillExtruder.getExtrusionInfillWidth();
+//			}
+//		}
 		
 		return e.getExtrusionInfillWidth();
 	}

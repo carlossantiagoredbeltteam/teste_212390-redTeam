@@ -87,6 +87,11 @@ public class AllSTLsToBuild
 	private RrInterval Zrange;
 	
 	/**
+	 * The last slices calculated
+	 */
+	private BooleanGridList[] previousSlices;
+	
+	/**
 	 * Is the list editable?
 	 */
 	private boolean frozen;
@@ -101,6 +106,7 @@ public class AllSTLsToBuild
 		XYbox = null;
 		Zrange = null;
 		frozen = false;
+		previousSlices = null;
 	}
 	
 	/**
@@ -403,13 +409,20 @@ public class AllSTLsToBuild
 		
 		ArrayList<LineSegment>[] edges = new ArrayList[extruders.length];
 		
-		for(extruderID = 0; extruderID < edges.length; extruderID++)
+		for(extruderID = 0; extruderID < extruders.length; extruderID++)
 		{
 			if(extruders[extruderID].getID() != extruderID)
 				Debug.e("AllSTLsToBuild.slice(): extruder " + extruderID + "out of sequence: " + extruders[extruderID].getID());
 			edges[extruderID] = new ArrayList<LineSegment>();
 		}
-
+		
+		if(previousSlices == null)
+		{
+			previousSlices = new BooleanGridList[stls.size()];
+			for(int stl = 0; stl < stls.size(); stl++)
+				previousSlices[stl] = null;
+		}
+		
 		// Generate all the edges for STLObject i
 		
 		STLObject stl = stls.get(i);
@@ -448,7 +461,8 @@ public class AllSTLsToBuild
 				pgl = pgl.arcCompensate();
 
 				csgp = pgl.toCSG(Preferences.tiny());
-				rl.add(new BooleanGrid(csgp, pgl.getBox().scale(1.01), pgl.polygon(0).getAttributes()));
+
+				rl.add(new BooleanGrid(csgp, pgl.getBox().scale(1.01), pgl.polygon(0).getAttributes()));	
 			}
 		}
 		
@@ -457,7 +471,23 @@ public class AllSTLsToBuild
 //			edges[extruderID] = null;
 //		edges = null;
 		
+		// Remember for next time
+		
+		previousSlices[i] = rl;
+		
 		return rl;
+	}
+	
+	/**
+	 * Get the slice computed last time for STLObject i.
+	 * @param i
+	 * @return
+	 */
+	public BooleanGridList previousSlice(int i)
+	{
+		if(previousSlices == null)
+			return null;
+		return previousSlices[i];
 	}
 
 	

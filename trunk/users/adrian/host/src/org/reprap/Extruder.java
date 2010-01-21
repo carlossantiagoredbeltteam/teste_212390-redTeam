@@ -530,11 +530,21 @@ public interface Extruder
 	 */
 	public String getSupportMaterial();
 	
+	public int getSupportExtruder();
+	
+	/**
+	 * What stuff are we infilling with?
+	 * @return
+	 */
+	public String getInfillMaterial();
+	
+	public int getInfillExtruder();
+	
 	/**
 	 * What are the dimensions for infill?
 	 * @return
 	 */
-	public String getBroadInfillMaterial();
+	//public String getBroadInfillMaterial();
 	
 	/**
 	 * The direction to hatch even-numbered layers in degrees anticlockwise
