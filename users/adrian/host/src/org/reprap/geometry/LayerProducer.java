@@ -318,8 +318,12 @@ public class LayerProducer {
 		if(simulationPlot != null)
 		{
 			if(!simulationPlot.isInitialised())
-				simulationPlot.init(lc.getBox(), false);
-			else
+			{
+				RrRectangle rec = lc.getBox();
+				if(Preferences.loadGlobalBool("Shield"))
+					rec.expand(Rr2Point.add(rec.sw(), new Rr2Point(-7, -7))); // TODO: Yuk - this should be a parameter
+				simulationPlot.init(rec, false);
+			} else
 				simulationPlot.cleanPolygons();
 		}
 	}

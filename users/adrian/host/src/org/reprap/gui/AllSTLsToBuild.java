@@ -389,6 +389,84 @@ public class AllSTLsToBuild
 	}
 	
 	/**
+	 * Compute the infill hatching polygons for this set of patterns
+	 * @param layerConditions
+	 * @return
+	 */
+	public RrPolygonList computeInfill(BooleanGridList outsides, LayerRules layerConditions, BooleanGridList previousSlice)
+	{
+		//BooleanGridList outsides = this;
+		BooleanGridList insides = null;
+		
+		if(previousSlice != null && layerConditions.getModelLayer() > 1)
+		{
+			insides = BooleanGridList.intersections(outsides, previousSlice);
+			outsides = BooleanGridList.differences(outsides, previousSlice);
+		}
+			
+		outsides = outsides.offset(layerConditions, false);
+		
+		if(insides != null)
+			insides = insides.offset(layerConditions, false);
+		
+		RrPolygonList hatchedPolygons = outsides.hatch(layerConditions, true);
+		
+//		if(layerConditions.getLayingSupport())
+//			offHatch = offHatch.union(layerConditions.getPrinter().getExtruders());
+			
+		if(insides != null)
+			hatchedPolygons.add(insides.hatch(layerConditions, false));
+		
+		return hatchedPolygons;
+	}
+	
+	/**
+	 * Compute the outline polygons for this set of patterns.
+	 * @param layerConditions
+	 * @param hatchedPolygons
+	 * @param shield
+	 * @return
+	 */
+	public RrPolygonList computeOutlines(BooleanGridList shapes, LayerRules layerConditions, RrPolygonList hatchedPolygons, boolean shield)
+	{
+		
+		RrPolygonList borderPolygons;
+		
+		if(layerConditions.getLayingSupport())
+		{
+			borderPolygons = null;
+		} else
+		{
+			BooleanGridList offBorder = shapes.offset(layerConditions, true);
+			borderPolygons = offBorder.borders();
+		}
+
+
+		if(borderPolygons != null && borderPolygons.size() > 0)
+		{
+			borderPolygons.middleStarts(hatchedPolygons, layerConditions);
+			try
+			{
+				if(shield && Preferences.loadGlobalBool("Shield"))
+				{
+					RrRectangle rr = layerConditions.getBox();
+					Rr2Point corner = Rr2Point.add(rr.sw(), new Rr2Point(-3, -3));
+					RrPolygon ell = new RrPolygon(borderPolygons.polygon(0).getAttributes(), false);
+					ell.add(corner);
+					ell.add(Rr2Point.add(corner, new Rr2Point(-2, 10)));
+					ell.add(Rr2Point.add(corner, new Rr2Point(-2, -2)));
+					ell.add(Rr2Point.add(corner, new Rr2Point(20, -2)));
+					borderPolygons.add(0, ell);
+				}
+			} catch (Exception ex)
+			{}
+		}
+		
+		return borderPolygons;
+	}
+
+	
+	/**
 	 * Generate a set of pixel-map representations, one for each extruder, for
 	 * STLObject i at height z.
 	 * 
@@ -425,7 +503,7 @@ public class AllSTLsToBuild
 				previousSlices[stl] = null;
 		}
 		
-		// Generate all the edges for STLObject i
+		// Generate all the edges for STLObject i at this z
 		
 		STLObject stl = stls.get(i);
 		Transform3D trans = stl.getTransform();
