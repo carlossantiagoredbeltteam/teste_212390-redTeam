@@ -38,8 +38,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
     	String machine = "simulator";
     	
     	//toSNAPRepRapRadioButton.setSelected(false);
-    	toGCodeRepRapRadioButton.setSelected(false);
-    	gCodeToFileRadioButton.setSelected(false);
+    	
     	try
     	{
     		machine = org.reprap.Preferences.loadGlobalString("RepRap_Machine");
@@ -50,10 +49,10 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
     		//	seenSNAP = true;
     		//} else if(machine.equalsIgnoreCase("GCodeRepRap"))
     		//{
-    			if(org.reprap.Preferences.loadGlobalBool("GCodeUseSerial"))
-    				toGCodeRepRapRadioButton.setSelected(true);
-    			else
-    				gCodeToFileRadioButton.setSelected(true);
+//    			if(org.reprap.Preferences.loadGlobalBool("GCodeUseSerial"))
+//    				toGCodeRepRapRadioButton.setSelected(true);
+//    			else
+//    				gCodeToFileRadioButton.setSelected(true);
     			seenGCode = true;
     		//} 
     	} catch (Exception e)
@@ -528,16 +527,13 @@ private void selectorRadioButtonMousePressed(java.awt.event.MouseEvent evt) {//G
 //		} else 
 		if(evt.getSource() == toGCodeRepRapRadioButton)
 		{
-			org.reprap.Preferences.setGlobalString("RepRap_Machine", "GCodeRepRap");
-			org.reprap.Preferences.setGlobalString("GCodeUseSerial", "true");
 			enableGLoad();
 			if(seenSNAP)
 				closeMessage = true;
 			seenGCode = true;
 		} else if(evt.getSource() == gCodeToFileRadioButton)
 		{
-			org.reprap.Preferences.setGlobalString("RepRap_Machine", "GCodeRepRap");
-			org.reprap.Preferences.setGlobalString("GCodeUseSerial", "false");
+
 			enableSLoad();
 			if(seenSNAP)
 				closeMessage = true;
@@ -665,13 +661,34 @@ private void enableSLoad()
 	GLoadOK = false;
 	loadGCode.setBackground(new java.awt.Color(153, 153, 153));
 	loadSTL.setBackground(new java.awt.Color(0, 204, 255));
+	try
+	{	
+		org.reprap.Preferences.setGlobalString("RepRap_Machine", "GCodeRepRap");
+		org.reprap.Preferences.setGlobalString("GCodeUseSerial", "false");
+	} catch (Exception e)
+	{
+		JOptionPane.showMessageDialog(null, e.toString());
+	}	
+	toGCodeRepRapRadioButton.setSelected(false);
+	gCodeToFileRadioButton.setSelected(true);
 }
+
 private void enableGLoad()
 {
 	SLoadOK = false;
 	GLoadOK = true;
 	loadGCode.setBackground(new java.awt.Color(0, 204, 255));
 	loadSTL.setBackground(new java.awt.Color(153, 153, 153));
+	try
+	{
+		org.reprap.Preferences.setGlobalString("RepRap_Machine", "GCodeRepRap");
+		org.reprap.Preferences.setGlobalString("GCodeUseSerial", "true");
+	} catch (Exception e)
+	{
+		JOptionPane.showMessageDialog(null, e.toString());
+	}
+	toGCodeRepRapRadioButton.setSelected(true);
+	gCodeToFileRadioButton.setSelected(false);
 }
 
 
