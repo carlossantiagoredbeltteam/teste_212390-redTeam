@@ -318,6 +318,25 @@ public class Producer {
 		
 		BooleanGridList slice, previousSlice;
 		
+		int lastExtruder = -1;
+		int totalPhysicalExtruders = 0;
+		for(int extruder = 0; extruder < reprap.getExtruders().length; extruder++)
+		{
+			int thisExtruder = reprap.getExtruders()[extruder].getPhysicalExtruderNumber();
+			if(thisExtruder > lastExtruder)
+			{
+				totalPhysicalExtruders++;
+				if(thisExtruder - lastExtruder != 1)
+				{
+					Debug.d("Producer.produceAdditiveTopDown(): Physical extruders out of sequence: " + 
+							lastExtruder + " then " + thisExtruder);
+					Debug.d("(Physical extruder addresses should be sequential (or equal) starting at 0.)");
+				}
+				lastExtruder = thisExtruder;				
+			}
+		}
+		
+		RrPolygonList allPolygons[] = new RrPolygonList[totalPhysicalExtruders];
 		
 		while(layerRules.getModelLayer() >= 0 ) 
 		{
@@ -337,15 +356,15 @@ public class Producer {
 			reprap.waitWhileBufferNotEmpty();
 			reprap.slowBuffer();
 			
-			RrPolygonList allPolygons[] = new RrPolygonList[reprap.getExtruders().length];
-			for(int extruder = 0; extruder < reprap.getExtruders().length; extruder++)
-				allPolygons[extruder] = new RrPolygonList();
+
+			for(int physicalExtruder = 0; physicalExtruder < allPolygons.length; physicalExtruder++)
+				allPolygons[physicalExtruder] = new RrPolygonList();
+			
 			boolean shield = true;
 			for(int i = 0; i < allSTLs.size(); i++)
 			{
 				previousSlice = allSTLs.previousSlice(i);
-				slice = allSTLs.slice(i, layerRules.getModelZ() + layerRules.getZStep()*0.5,
-						reprap.getExtruders());
+				slice = allSTLs.slice(i, layerRules);
 				
 				if(slice.size() > 0)
 				{
@@ -355,12 +374,12 @@ public class Producer {
 					for(int pol = 0; pol < borders.size(); pol++)
 					{
 						RrPolygon p = borders.polygon(pol);
-						allPolygons[p.getAttributes().getExtruder().getID()].add(p);
+						allPolygons[p.getAttributes().getExtruder().getPhysicalExtruderNumber()].add(p);
 					}
 					for(int pol = 0; pol < fills.size(); pol++)
 					{
 						RrPolygon p = fills.polygon(pol);
-						allPolygons[p.getAttributes().getExtruder().getID()].add(p);
+						allPolygons[p.getAttributes().getExtruder().getPhysicalExtruderNumber()].add(p);
 					}
 				}
 			}
