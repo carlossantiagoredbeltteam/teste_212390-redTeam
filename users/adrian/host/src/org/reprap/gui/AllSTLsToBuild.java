@@ -73,6 +73,58 @@ public class AllSTLsToBuild
 	}
 	
 	/**
+	 * Ring buffer to hold previously computed slices for doing 
+	 * infill and support material calculations.
+	 * @author ensab
+	 *
+	 */
+	class SliceRecords
+	{
+		private BooleanGridList[][] sliceRing;
+		private int[] layerNumber;
+		private int ringPointer;
+		private final int noLayer = Integer.MIN_VALUE;
+		private final int ringSize = 5;
+		
+		public SliceRecords()
+		{
+			sliceRing = new BooleanGridList[ringSize][stls.size()];
+			layerNumber = new int[ringSize];
+			ringPointer = 0;
+			for(int layer = 0; layer < ringSize; layer++)
+				for(int stl = 0; stl < stls.size(); stl++)
+				{
+					sliceRing[layer][stl] = null;
+					layerNumber[layer] = noLayer;
+				}
+		}
+		
+		public void set(BooleanGridList slice, int layer, int stl)
+		{
+			layerNumber[ringPointer] = layer;
+			sliceRing[ringPointer][stl] = slice;
+			ringPointer++;
+			if(ringPointer >= ringSize)
+				ringPointer = 0;
+		}
+		
+		public BooleanGridList get(int layer, int stl)
+		{
+			int l = ringPointer;
+			for(int i = 0; i < ringSize; i++)
+			{
+				l--;
+				if(l < 0)
+					l = ringSize - 1;
+				if(layerNumber[l] == layer)
+					return sliceRing[l][stl];
+			}
+			Debug.d("SliceRecords.get(): layer not found.");
+			return null;
+		}
+	}
+	
+	/**
 	 * The list of things to be built
 	 */
 	private List<STLObject> stls;
@@ -88,14 +140,11 @@ public class AllSTLsToBuild
 	private RrInterval Zrange;
 	
 	/**
-	 * The last slices calculated
-	 */
-	private BooleanGridList[] previousSlices;
-	
-	/**
 	 * Is the list editable?
 	 */
 	private boolean frozen;
+	
+	private SliceRecords sliceRecords;
 	
 	/**
 	 * Simple constructor
@@ -107,7 +156,7 @@ public class AllSTLsToBuild
 		XYbox = null;
 		Zrange = null;
 		frozen = false;
-		previousSlices = null;
+		sliceRecords = null;
 	}
 	
 	/**
@@ -158,6 +207,8 @@ public class AllSTLsToBuild
 	private void freeze()
 	{
 		frozen = true;
+		if(sliceRecords == null)
+			sliceRecords = new SliceRecords();
 	}
 	
 	/**
@@ -393,23 +444,30 @@ public class AllSTLsToBuild
 	 * @param layerConditions
 	 * @return
 	 */
-	public RrPolygonList computeInfill(BooleanGridList outsides, LayerRules layerConditions, BooleanGridList previousSlice)
+	public RrPolygonList computeInfill(int stl, LayerRules layerConditions)
 	{
-		//BooleanGridList outsides = this;
+		int layer = layerConditions.getMachineLayer();
+		BooleanGridList shapes = sliceRecords.get(layer, stl);
+		if(shapes == null)
+		{
+			shapes = slice(stl, layerConditions);
+			sliceRecords.set(shapes, layer, stl);
+		}
+		BooleanGridList previousSlice = sliceRecords.get(layer+1, stl);
 		BooleanGridList insides = null;
 		
 		if(previousSlice != null && layerConditions.getModelLayer() > 1)
 		{
-			insides = BooleanGridList.intersections(outsides, previousSlice);
-			outsides = BooleanGridList.differences(outsides, previousSlice);
+			insides = BooleanGridList.intersections(shapes, previousSlice);
+			shapes = BooleanGridList.differences(shapes, previousSlice);
 		}
 			
-		outsides = outsides.offset(layerConditions, false);
+		shapes = shapes.offset(layerConditions, false);
 		
 		if(insides != null)
 			insides = insides.offset(layerConditions, false);
 		
-		RrPolygonList hatchedPolygons = outsides.hatch(layerConditions, true);
+		RrPolygonList hatchedPolygons = shapes.hatch(layerConditions, true);
 		
 //		if(layerConditions.getLayingSupport())
 //			offHatch = offHatch.union(layerConditions.getPrinter().getExtruders());
@@ -427,8 +485,16 @@ public class AllSTLsToBuild
 	 * @param shield
 	 * @return
 	 */
-	public RrPolygonList computeOutlines(BooleanGridList shapes, LayerRules layerConditions, RrPolygonList hatchedPolygons, boolean shield)
+	public RrPolygonList computeOutlines(int stl, LayerRules layerConditions, RrPolygonList hatchedPolygons, boolean shield)
 	{
+		
+		int layer = layerConditions.getMachineLayer();
+		BooleanGridList shapes = sliceRecords.get(layer, stl);
+		if(shapes == null)
+		{
+			shapes = slice(stl, layerConditions);
+			sliceRecords.set(shapes, layer, stl);
+		}
 		
 		RrPolygonList borderPolygons;
 		
@@ -475,7 +541,7 @@ public class AllSTLsToBuild
 	 * @param extruders
 	 * @return
 	 */
-	public BooleanGridList slice(int i, LayerRules layerRules)
+	private BooleanGridList slice(int stl, LayerRules layerRules)
 	{
 		freeze();
 		double z = layerRules.getModelZ() + layerRules.getZStep()*0.5;
@@ -496,19 +562,14 @@ public class AllSTLsToBuild
 			edges[extruderID] = new ArrayList<LineSegment>();
 		}
 		
-		if(previousSlices == null)
-		{
-			previousSlices = new BooleanGridList[stls.size()];
-			for(int stl = 0; stl < stls.size(); stl++)
-				previousSlices[stl] = null;
-		}
+
 		
 		// Generate all the edges for STLObject i at this z
 		
-		STLObject stl = stls.get(i);
-		Transform3D trans = stl.getTransform();
+		STLObject stlObject = stls.get(stl);
+		Transform3D trans = stlObject.getTransform();
 
-		BranchGroup bg = stl.getSTL();
+		BranchGroup bg = stlObject.getSTL();
 		java.util.Enumeration<?> enumKids = bg.getAllChildren();
 
 		while(enumKids.hasMoreElements())
@@ -546,28 +607,7 @@ public class AllSTLsToBuild
 			}
 		}
 		
-//		// No excuse for the garbage collector
-//		for(extruderID = 0; extruderID < edges.length; extruderID++)
-//			edges[extruderID] = null;
-//		edges = null;
-		
-		// Remember for next time
-		
-		previousSlices[i] = rl;
-		
 		return rl;
-	}
-	
-	/**
-	 * Get the slice computed last time for STLObject i.
-	 * @param i
-	 * @return
-	 */
-	public BooleanGridList previousSlice(int i)
-	{
-		if(previousSlices == null)
-			return null;
-		return previousSlices[i];
 	}
 
 	

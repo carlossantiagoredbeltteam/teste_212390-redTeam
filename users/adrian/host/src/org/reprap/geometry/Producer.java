@@ -316,7 +316,7 @@ public class Producer {
 		
 		layerRules.setLayingSupport(false);
 		
-		BooleanGridList slice, previousSlice;
+		//BooleanGridList slice, previousSlice;
 		
 		int lastExtruder = -1;
 		int totalPhysicalExtruders = 0;
@@ -361,15 +361,11 @@ public class Producer {
 				allPolygons[physicalExtruder] = new RrPolygonList();
 			
 			boolean shield = true;
-			for(int i = 0; i < allSTLs.size(); i++)
+			for(int stl = 0; stl < allSTLs.size(); stl++)
 			{
-				previousSlice = allSTLs.previousSlice(i);
-				slice = allSTLs.slice(i, layerRules);
-				
-				if(slice.size() > 0)
-				{
-					RrPolygonList fills = allSTLs.computeInfill(slice, layerRules, previousSlice);
-					RrPolygonList borders = allSTLs.computeOutlines(slice, layerRules, fills, shield);
+
+					RrPolygonList fills = allSTLs.computeInfill(stl, layerRules);
+					RrPolygonList borders = allSTLs.computeOutlines(stl, layerRules, fills, shield);
 					shield = false;
 					for(int pol = 0; pol < borders.size(); pol++)
 					{
@@ -381,7 +377,6 @@ public class Producer {
 						RrPolygon p = fills.polygon(pol);
 						allPolygons[p.getAttributes().getExtruder().getPhysicalExtruderNumber()].add(p);
 					}
-				}
 			}
 			
 			LayerProducer lp = new LayerProducer(allPolygons, layerRules, simulationPlot);
@@ -390,7 +385,7 @@ public class Producer {
 			reprap.finishedLayer(layerRules);
 			reprap.betweenLayers(layerRules);
 			//layer = null;
-			slice = null;
+			//slice = null;
 			
 			//slice.finalize();
 			allSTLs.destroyLayer();
