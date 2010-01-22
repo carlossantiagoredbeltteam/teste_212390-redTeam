@@ -233,7 +233,7 @@ public class BooleanGridList
 		 * @param b
 		 * @return
 		 */
-		private static BooleanGridList intersections(BooleanGridList a, BooleanGridList b)
+		public static BooleanGridList intersections(BooleanGridList a, BooleanGridList b)
 		{
 			BooleanGridList result = new BooleanGridList();
 			for(int i = 0; i < a.size(); i++)
@@ -241,7 +241,7 @@ public class BooleanGridList
 				BooleanGrid abg = a.get(i);
 				for(int j = 0; j < b.size(); j++)
 				{
-					if(abg.attribute().getExtruder() == b.attribute(j).getExtruder());
+					if(abg.attribute().getExtruder().getID() == b.attribute(j).getExtruder().getID());
 					{
 						result.add(BooleanGrid.intersection(abg, b.get(j)));	
 						break;
@@ -261,7 +261,7 @@ public class BooleanGridList
 		 * @param b
 		 * @return
 		 */
-		private static BooleanGridList differences(BooleanGridList a, BooleanGridList b)
+		public static BooleanGridList differences(BooleanGridList a, BooleanGridList b)
 		{
 			BooleanGridList result = new BooleanGridList();
 			for(int i = 0; i < a.size(); i++)
@@ -270,7 +270,7 @@ public class BooleanGridList
 				boolean untouched = true;
 				for(int j = 0; j < b.size(); j++)
 				{
-					if(abg.attribute().getExtruder() == b.attribute(j).getExtruder());
+					if(abg.attribute().getExtruder().getID() == b.attribute(j).getExtruder().getID());
 					{
 						result.add(BooleanGrid.difference(abg, b.get(j)));
 						untouched = false;
@@ -284,81 +284,5 @@ public class BooleanGridList
 			return result;
 		}
 		
-		/**
-		 * Compute the infill hatching polygons for this set of patterns
-		 * @param layerConditions
-		 * @return
-		 */
-		public RrPolygonList computeInfill(LayerRules layerConditions, BooleanGridList previousSlice)
-		{
-			BooleanGridList outsides = this;
-			BooleanGridList insides = null;
-			
-			if(previousSlice != null && layerConditions.getModelLayer() > 1)
-			{
-				outsides = differences(this, previousSlice);
-				insides = intersections(this, previousSlice);
-			}
-				
-			outsides = outsides.offset(layerConditions, false);
-			
-			if(insides != null)
-				insides = insides.offset(layerConditions, false);
-			
-			RrPolygonList hatchedPolygons = outsides.hatch(layerConditions, true);
-			
-//			if(layerConditions.getLayingSupport())
-//				offHatch = offHatch.union(layerConditions.getPrinter().getExtruders());
-				
-			if(insides != null)
-				hatchedPolygons.add(insides.hatch(layerConditions, false));
-			
-			return hatchedPolygons;
-		}
-		
-		/**
-		 * Compute the outline polygons for this set of patterns.
-		 * @param layerConditions
-		 * @param hatchedPolygons
-		 * @param shield
-		 * @return
-		 */
-		public RrPolygonList computeOutlines(LayerRules layerConditions, RrPolygonList hatchedPolygons, boolean shield)
-		{
-			
-			RrPolygonList borderPolygons;
-			
-			if(layerConditions.getLayingSupport())
-			{
-				borderPolygons = null;
-			} else
-			{
-				BooleanGridList offBorder = offset(layerConditions, true);
-				borderPolygons = offBorder.borders();
-			}
-
-
-			if(borderPolygons != null && borderPolygons.size() > 0)
-			{
-				borderPolygons.middleStarts(hatchedPolygons, layerConditions);
-				try
-				{
-					if(shield && Preferences.loadGlobalBool("Shield"))
-					{
-						RrRectangle rr = layerConditions.getBox();
-						Rr2Point corner = Rr2Point.add(rr.sw(), new Rr2Point(-3, -3));
-						RrPolygon ell = new RrPolygon(borderPolygons.polygon(0).getAttributes(), false);
-						ell.add(corner);
-						ell.add(Rr2Point.add(corner, new Rr2Point(-2, 10)));
-						ell.add(Rr2Point.add(corner, new Rr2Point(-2, -2)));
-						ell.add(Rr2Point.add(corner, new Rr2Point(20, -2)));
-						borderPolygons.add(0, ell);
-					}
-				} catch (Exception ex)
-				{}
-			}
-			
-			return borderPolygons;
-		}
 
 }

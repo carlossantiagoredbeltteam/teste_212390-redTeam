@@ -368,8 +368,8 @@ public class Producer {
 				
 				if(slice.size() > 0)
 				{
-					RrPolygonList fills = slice.computeInfill(layerRules, previousSlice);
-					RrPolygonList borders = slice.computeOutlines(layerRules, fills, shield);
+					RrPolygonList fills = allSTLs.computeInfill(slice, layerRules, previousSlice);
+					RrPolygonList borders = allSTLs.computeOutlines(slice, layerRules, fills, shield);
 					shield = false;
 					for(int pol = 0; pol < borders.size(); pol++)
 					{
