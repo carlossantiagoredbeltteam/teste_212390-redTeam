@@ -3,6 +3,7 @@ package org.reprap.gui;
 import java.util.List;
 import java.util.ArrayList;
 import org.reprap.geometry.polygons.*;
+import org.reprap.geometry.LayerRules;
 import org.reprap.Attributes;
 import org.reprap.Extruder;
 import org.reprap.Preferences;
@@ -396,10 +397,11 @@ public class AllSTLsToBuild
 	 * @param extruders
 	 * @return
 	 */
-	public BooleanGridList slice(int i, double z, Extruder[] extruders)
+	public BooleanGridList slice(int i, LayerRules layerRules)
 	{
 		freeze();
-		
+		double z = layerRules.getModelZ() + layerRules.getZStep()*0.5;
+		Extruder[] extruders = layerRules.getPrinter().getExtruders();
 		BooleanGridList rl = new BooleanGridList();
 		RrCSG csgp = null;
 		RrPolygonList pgl = new RrPolygonList();
