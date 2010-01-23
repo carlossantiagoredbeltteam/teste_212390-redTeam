@@ -163,6 +163,28 @@ public class AllSTLsToBuild
 	}
 	
 	/**
+	 * Read in an RFO file with a collection of objects in
+	 * @param rfoFile
+	 */
+	public AllSTLsToBuild(String rfoFile)
+	{
+		stls = new ArrayList<STLObject>();
+		XYbox = null;
+		Zrange = null;
+		frozen = false;
+		cache = null;		
+	}
+	
+	/**
+	 * Write this out as an RFO file.
+	 * @param rfoFile
+	 */
+	public void writeRFO(String rfoFile)
+	{
+		
+	}
+	
+	/**
 	 * Add a new STLObject
 	 * @param s
 	 */

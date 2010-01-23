@@ -111,6 +111,7 @@ public class STLObject
     private Vector3d size = null;       // X, Y and Z extent
     private BoundingBox bbox = null;    // Temporary storage for the bounding box while loading
     private Vector3d rootOffset = null; // Offset of the first-loaded STL under stl
+    private String sourceFile = null;
     
 
     public STLObject()
@@ -178,6 +179,7 @@ public class STLObject
     	BranchGroup child = loadSingleSTL(location, att, offset, lastPicked);
     	if(child == null)
     		return null;
+    	sourceFile = location;
     	return att;
     }
 
@@ -312,6 +314,11 @@ public class STLObject
     public Vector3d size()
     {
     	return size;
+    }
+    
+    public String fileItCameFrom()
+    {
+    	return sourceFile;
     }
     
     /**

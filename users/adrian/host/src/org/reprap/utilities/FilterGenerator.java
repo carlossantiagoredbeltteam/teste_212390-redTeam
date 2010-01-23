@@ -67,6 +67,18 @@ public class FilterGenerator {
 		
 	}
 	
+	private static int r90(int i)
+	{
+		int r = i;
+		r = r << 2;
+		if((r & 512) != 0)
+			r = r | 2;
+		if((r & 256) != 0)
+			r = r | 1;
+		r = r & 255;
+		return r;
+	}
+	
 	public static void main(String[] args) 
 	{
 	    BufferedReader br = new BufferedReader(
@@ -74,7 +86,7 @@ public class FilterGenerator {
 
 		boolean[] action = new boolean[256];
 		String resp = null;
-		for(int i = 0; i < 256; i++)
+		for(int i = 0; i < 64; i++)
 		{
 			printPattern(i);
 			System.out.println();
@@ -87,6 +99,16 @@ public class FilterGenerator {
 				System.out.println(e);
 			}
 			action[i] = resp.startsWith("y");
+			int j = i;
+			for(int k = 0; k < 3; k++)
+			{
+				j = r90(j);
+				printPattern(j);
+				System.out.println();
+				action[j] = action[i];
+			}
+			System.out.println("V");
+			System.out.println("V");
 		}
 		
 		System.out.println("--------");
