@@ -73,12 +73,12 @@ public class AllSTLsToBuild
 	}
 	
 	/**
-	 * Ring buffer to hold previously computed slices for doing 
+	 * Ring buffer cache to hold previously computed slices for doing 
 	 * infill and support material calculations.
 	 * @author ensab
 	 *
 	 */
-	class SliceRecords
+	class SliceCache
 	{
 		private BooleanGridList[][] sliceRing;
 		private int[] layerNumber;
@@ -86,7 +86,7 @@ public class AllSTLsToBuild
 		private final int noLayer = Integer.MIN_VALUE;
 		private final int ringSize = 5;
 		
-		public SliceRecords()
+		public SliceCache()
 		{
 			sliceRing = new BooleanGridList[ringSize][stls.size()];
 			layerNumber = new int[ringSize];
@@ -119,7 +119,7 @@ public class AllSTLsToBuild
 				if(layerNumber[l] == layer)
 					return sliceRing[l][stl];
 			}
-			Debug.d("SliceRecords.get(): layer not found.");
+			Debug.d("SliceCache.get(): layer not found.");
 			return null;
 		}
 	}
@@ -144,7 +144,10 @@ public class AllSTLsToBuild
 	 */
 	private boolean frozen;
 	
-	private SliceRecords sliceRecords;
+	/**
+	 * Recently computed slices
+	 */
+	private SliceCache cache;
 	
 	/**
 	 * Simple constructor
@@ -156,7 +159,7 @@ public class AllSTLsToBuild
 		XYbox = null;
 		Zrange = null;
 		frozen = false;
-		sliceRecords = null;
+		cache = null;
 	}
 	
 	/**
@@ -207,8 +210,8 @@ public class AllSTLsToBuild
 	private void freeze()
 	{
 		frozen = true;
-		if(sliceRecords == null)
-			sliceRecords = new SliceRecords();
+		if(cache == null)
+			cache = new SliceCache();
 	}
 	
 	/**
@@ -447,25 +450,25 @@ public class AllSTLsToBuild
 	public RrPolygonList computeInfill(int stl, LayerRules layerConditions)
 	{
 		int layer = layerConditions.getMachineLayer();
-		BooleanGridList shapes = sliceRecords.get(layer, stl);
-		if(shapes == null)
-		{
-			shapes = slice(stl, layerConditions);
-			sliceRecords.set(shapes, layer, stl);
-		}
-		BooleanGridList previousSlice = sliceRecords.get(layer+1, stl);
+		BooleanGridList shapes = slice(layer, stl, layerConditions);
+
+		BooleanGridList previousSlices = slice(layer+1, stl, layerConditions);
+		previousSlices = BooleanGridList.intersections(slice(layer+2, stl, layerConditions), previousSlices);
 		BooleanGridList insides = null;
 		
-		if(previousSlice != null && layerConditions.getModelLayer() > 1)
+		if(previousSlices != null && layerConditions.getModelLayer() > 1)
 		{
-			insides = BooleanGridList.intersections(shapes, previousSlice);
-			shapes = BooleanGridList.differences(shapes, previousSlice);
+			insides = BooleanGridList.intersections(shapes, previousSlices);
+			BooleanGridList temp = shapes;
+			shapes = BooleanGridList.differences(shapes, previousSlices);
+			shapes = shapes.offset(layerConditions, false, -1);
+			shapes = BooleanGridList.intersections(shapes, temp);
 		}
 			
-		shapes = shapes.offset(layerConditions, false);
+		shapes = shapes.offset(layerConditions, false, 1);
 		
 		if(insides != null)
-			insides = insides.offset(layerConditions, false);
+			insides = insides.offset(layerConditions, false, 1);
 		
 		RrPolygonList hatchedPolygons = shapes.hatch(layerConditions, true);
 		
@@ -489,12 +492,7 @@ public class AllSTLsToBuild
 	{
 		
 		int layer = layerConditions.getMachineLayer();
-		BooleanGridList shapes = sliceRecords.get(layer, stl);
-		if(shapes == null)
-		{
-			shapes = slice(stl, layerConditions);
-			sliceRecords.set(shapes, layer, stl);
-		}
+		BooleanGridList shapes = slice(layer, stl, layerConditions);
 		
 		RrPolygonList borderPolygons;
 		
@@ -503,7 +501,7 @@ public class AllSTLsToBuild
 			borderPolygons = null;
 		} else
 		{
-			BooleanGridList offBorder = shapes.offset(layerConditions, true);
+			BooleanGridList offBorder = shapes.offset(layerConditions, true, 1);
 			borderPolygons = offBorder.borders();
 		}
 
@@ -541,12 +539,18 @@ public class AllSTLsToBuild
 	 * @param extruders
 	 * @return
 	 */
-	private BooleanGridList slice(int stl, LayerRules layerRules)
+	private BooleanGridList slice(int layer, int stl, LayerRules layerRules)
 	{
 		freeze();
+		BooleanGridList result = cache.get(layer, stl);
+		if(result != null)
+			return result;
+		
+		// Haven't got it in the cache, so we need to compute it
+		
 		double z = layerRules.getModelZ() + layerRules.getZStep()*0.5;
 		Extruder[] extruders = layerRules.getPrinter().getExtruders();
-		BooleanGridList rl = new BooleanGridList();
+		result = new BooleanGridList();
 		RrCSG csgp = null;
 		RrPolygonList pgl = new RrPolygonList();
 		int extruderID;
@@ -603,11 +607,13 @@ public class AllSTLsToBuild
 
 				csgp = pgl.toCSG(Preferences.tiny());
 
-				rl.add(new BooleanGrid(csgp, pgl.getBox().scale(1.01), pgl.polygon(0).getAttributes()));	
+				result.add(new BooleanGrid(csgp, pgl.getBox(), pgl.polygon(0).getAttributes()));	
 			}
 		}
 		
-		return rl;
+		cache.set(result, layer, stl);
+		
+		return result;
 	}
 
 	

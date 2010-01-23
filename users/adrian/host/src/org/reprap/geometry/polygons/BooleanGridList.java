@@ -91,7 +91,7 @@ public class BooleanGridList
 
 		}
 		
-		public BooleanGridList offset(LayerRules lc, boolean outline)
+		public BooleanGridList offset(LayerRules lc, boolean outline, double multiplier)
 		{
 			boolean foundation = lc.getLayingSupport();
 			if(outline && foundation)
@@ -120,7 +120,7 @@ public class BooleanGridList
 					if(outline)
 					{
 						for(int shell = 0; shell < shells; shell++)
-								result.add(get(i).offset(-((double)shell + 0.5)*e.getExtrusionSize()));
+								result.add(get(i).offset(-multiplier*((double)shell + 0.5)*e.getExtrusionSize()));
 					} else
 					{
 						// Must be a hatch.  Only do it if the gap is +ve or we're building the foundation
@@ -132,7 +132,7 @@ public class BooleanGridList
 						if(foundation)
 							offSize = 3;
 						else
-							offSize = -((double)shells + 0.5)*e.getExtrusionSize() + ife.getInfillOverlap();
+							offSize = -multiplier*((double)shells + 0.5)*e.getExtrusionSize() + ife.getInfillOverlap();
 						if (e.getExtrusionInfillWidth() > 0 || foundation)  // Z valuesn't mattere here
 								result.add(get(i).offset(offSize));
 					}
@@ -236,6 +236,8 @@ public class BooleanGridList
 		public static BooleanGridList intersections(BooleanGridList a, BooleanGridList b)
 		{
 			BooleanGridList result = new BooleanGridList();
+			if(a == null || b == null)
+				return result;
 			for(int i = 0; i < a.size(); i++)
 			{
 				BooleanGrid abg = a.get(i);
@@ -264,10 +266,13 @@ public class BooleanGridList
 		public static BooleanGridList differences(BooleanGridList a, BooleanGridList b)
 		{
 			BooleanGridList result = new BooleanGridList();
+			if(a == null)
+				return result;
 			for(int i = 0; i < a.size(); i++)
 			{
 				BooleanGrid abg = a.get(i);
 				boolean untouched = true;
+				if(b != null)
 				for(int j = 0; j < b.size(); j++)
 				{
 					if(abg.attribute().getExtruder().getID() == b.attribute(j).getExtruder().getID());
