@@ -730,22 +730,22 @@ public class BooleanGrid
 	 * implied by the neighbour array.
 	 */
 	private static final boolean[] thinFilter = {
-			true, true, true, false, true, true, false, true, true, true, true, true, false, true, false, false, 
-			true, true, true, true, true, true, true, true, false, true, true, true, true, true, false, false, 
-			true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, 
-			false, true, true, true, true, true, true, true, false, true, false, true, false, true, false, false, 
-			true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, 
-			true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, 
-			false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, 
-			true, true, true, true, true, true, true, true, false, true, false, true, false, true, false, false, 
-			true, false, true, false, true, true, true, false, true, true, true, true, true, true, true, false, 
-			true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, 
-			true, true, true, false, true, true, true, false, true, true, true, true, true, true, true, false, 
-			true, true, true, true, true, true, true, true, false, true, true, true, false, true, false, false, 
-			false, true, true, false, true, true, true, false, true, true, true, false, true, true, true, false, 
-			true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, 
-			false, false, false, false, true, true, true, false, false, false, true, false, true, true, true, false, 
-			false, false, false, false, true, true, true, false, false, false, false, false, false, false, false, false	
+		true, true, true, false, true, true, false, true, true, true, true, true, false, true, false, false, 
+		true, true, true, true, true, true, true, true, false, true, true, true, true, true, false, false, 
+		true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, true, 
+		false, true, true, true, true, true, true, true, false, true, true, true, false, true, false, false, 
+		true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, 
+		true, true, true, true, true, false, false, false, true, false, false, false, true, false, false, false, 
+		false, true, true, true, true, false, false, false, true, false, false, false, true, false, false, false, 
+		true, true, true, true, true, false, false, false, false, false, false, false, false, false, false, false, 
+		true, false, true, false, true, true, true, false, true, true, true, false, true, true, true, false, 
+		true, true, true, true, true, false, false, false, true, false, false, false, true, false, false, false, 
+		true, true, true, true, true, false, false, false, true, false, false, false, true, false, false, false, 
+		true, true, true, true, true, false, false, false, false, false, false, false, true, false, false, false, 
+		false, true, true, false, true, true, true, false, true, true, true, true, true, true, true, false, 
+		true, true, true, true, true, false, false, false, true, false, false, false, true, false, false, false, 
+		false, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false, 
+		false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false	
 	};
 	
 	/**
@@ -1577,7 +1577,7 @@ public class BooleanGrid
 			d2 = ip.point(0).sub(ip.point(ip.size() - 1)).magnitude2();
 			if(d2 > searchDepth*searchDepth)
 			{
-				Debug.d("BooleanGrid.iAllPerimitersRaw(): unjoined ends:" + d2);
+				Debug.e("BooleanGrid.iAllPerimitersRaw(): unjoined ends:" + d2);
 				//printNearby(ip.point(0), 6);
 				//printNearby(ip.point(ip.size() - 1), 6);
 			}
