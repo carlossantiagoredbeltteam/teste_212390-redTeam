@@ -684,6 +684,7 @@ public class BooleanGrid
 	static final double pixSize = Preferences.machineResolution()*0.6;
 	static final double realResolution = pixSize*1.5;
 	static final double rSwell = 0.5; // mm by which to swell rectangles to give margins round stuff
+	static final int searchDepth = 3;
 	
 	/**
 	 * The pixel map
@@ -723,6 +724,29 @@ public class BooleanGrid
 		new iPoint(-1, 1),
 		new iPoint(-1, 0)
 		};
+	
+	/**
+	 * Lookup table for whether to cull points forming thin bridges.  The index into this is the bitpattern
+	 * implied by the neighbour array.
+	 */
+	private static final boolean[] thinFilter = {
+			true, true, true, false, true, true, false, true, true, true, true, true, false, true, false, false, 
+			true, true, true, true, true, true, true, true, false, true, true, true, true, true, false, false, 
+			true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, 
+			false, true, true, true, true, true, true, true, false, true, false, true, false, true, false, false, 
+			true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, 
+			true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, 
+			false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, 
+			true, true, true, true, true, true, true, true, false, true, false, true, false, true, false, false, 
+			true, false, true, false, true, true, true, false, true, true, true, true, true, true, true, false, 
+			true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, 
+			true, true, true, false, true, true, true, false, true, true, true, true, true, true, true, false, 
+			true, true, true, true, true, true, true, true, false, true, true, true, false, true, false, false, 
+			false, true, true, false, true, true, true, false, true, true, true, false, true, true, true, false, 
+			true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, 
+			false, false, false, false, true, true, true, false, false, false, true, false, true, true, true, false, 
+			false, false, false, false, true, true, true, false, false, false, false, false, false, false, false, false	
+	};
 	
 	/**
 	 * Lookup table behaves like scalar product for two neighbours i and j; get it by neighbourProduct[Math.abs(j - i)]
@@ -1204,21 +1228,36 @@ public class BooleanGrid
 	 * @param a
 	 * @return
 	 */
-	public boolean isEdgePixel(iPoint a)
+	private boolean isEdgePixel(iPoint a)
 	{
 		if(!get(a))
 			return false;
 		
-		if(!get(a.add(neighbour[1])))
-			return true;
-		if(!get(a.add(neighbour[3])))
-			return true;
-		if(!get(a.add(neighbour[5])))
-			return true;
-		if(!get(a.add(neighbour[7])))
-			return true;
+		for(int i = 1; i < 8; i+=2)
+			if(!get(a.add(neighbour[i])))
+				return true;
+
 		return false;
 	}
+	
+//	/**
+//	 * Sloppy edge-test for a pixel.
+//	 * If it is solid and there is air at at least one
+//	 * neighbour then yes; otherwise no.
+//	 * @param a
+//	 * @return
+//	 */
+//	private boolean isSloppyEdgePixel(iPoint a)
+//	{
+//		if(!get(a))
+//			return false;
+//		
+//		for(int i = 0; i < 8; i++)
+//			if(!get(a.add(neighbour[i])))
+//				return true;
+//
+//		return false;
+//	}
 	
 
 	/**
@@ -1229,16 +1268,21 @@ public class BooleanGrid
 	 */
 	private int findUnvisitedEdgeIndex(int start)
 	{
-		if(visited == null)
-		{
-			int i = bits.nextSetBit(start);
-			if(i < 0)
-				return -1;
-			return i;
-		}
+//		if(visited == null)
+//		{
+//			int i = bits.nextSetBit(start);
+//			if(i < 0)
+//				return -1;
+//			return i;
+//		}
 
 		for(int i=bits.nextSetBit(start); i>=0; i=bits.nextSetBit(i+1)) 
 		{
+			if(visited == null)
+			{
+				if(isEdgePixel(pixel(i)))
+					return i;
+			} else
 			if(!visited.get(i))
 				if(isEdgePixel(pixel(i)))
 					return i;
@@ -1255,26 +1299,52 @@ public class BooleanGrid
 	private void deWhisker()
 	{
 		push("deWhisker... ");
-		int i = findUnvisitedEdgeIndex(0);
-		while(i >= 0)
+		int n;
+		for(int passes = 0; passes < 2; passes++)
 		{
-			iPoint p = pixel(i);
-			boolean last = get(p.add(neighbour[7]));
-			boolean here;
-			//int joinCount = 0;
-			int breakCount = 0;
-			for(int n = 0; n < 8; n++)
+			int i = findUnvisitedEdgeIndex(0);
+			while(i >= 0)
 			{
-				here = get(p.add(neighbour[n]));
-				//if(here && last)
-				//	joinCount++;
-				if(here ^ last)
-					breakCount++;
-				last = here;
+				iPoint p = pixel(i);
+				int filterIndex = 0;
+				for(n = 0; n < 8; n++)
+					if(get(p.add(neighbour[n])))
+						filterIndex = filterIndex | (1<<n);
+				if(thinFilter[filterIndex])
+				{
+					//printNearby(p, 3);
+					set(p, false);
+					//printNearby(p, 3);
+				} else
+					i++;
+				
+//				for(n = 0; n < 8; n++)
+//					blockSize[n] = 0;
+//				boolean last = get(p.add(neighbour[7]));
+//				boolean here;
+//				int nCount = 0;
+//				int blockCount = 0;
+//				for(n = 0; n < 8; n++)
+//				{
+//					here = get(p.add(neighbour[n]));
+//					if(here)
+//						nCount++;
+//					if(here && !last)
+//						blockCount++;
+//					if(here && last)
+//						blockSize[n]++;
+//					last = here;
+//				}
+//
+//				if(blockCount > 1 || nCount < 2)
+//				{
+//					printNearby(p, 3);
+//					set(p, false);
+//					printNearby(p, 3);
+//				}
+				i = findUnvisitedEdgeIndex(i);
 			}
-			if(breakCount > 2)
-				set(p, false);
-			i = findUnvisitedEdgeIndex(i + 1);
+			//System.out.println("end pass " + passes);
 		}
 		pop();
 	}
@@ -1300,6 +1370,20 @@ public class BooleanGrid
 			Debug.e("BooleanGrid.neighbourIndex(): not a neighbour point!" + n.toString());	
 		}
 		return 0;
+	}
+	
+	/**
+	 * Count the solid neighbours of this point
+	 * @param p
+	 * @return
+	 */
+	private int neighbourCount(iPoint p)
+	{
+		int result = 0;
+		for(int i = 0; i < 8; i++)
+			if(get(p.add(neighbour[i])))
+				result++;
+		return result;
 	}
 
 	
@@ -1332,15 +1416,17 @@ public class BooleanGrid
 	/**
 	 * Find a neighbour of a pixel that has not yet been visited, that is on an edge, and
 	 * that is nearest to a given neighbour direction, nd.  If nd < 0 the first unvisited
-	 * neighbour is returned.  If no valid neighbour exists, null is returned.
+	 * neighbour is returned.  If no valid neighbour exists, null is returned.  This prefrs to
+	 * visit valid pixels with few neighbours, and only after that tries to head in direction nd.
 	 * @param a
 	 * @param direction
 	 * @return
 	 */
-	public iPoint findUnvisitedNeighbourOnEdgeInDirection(iPoint a, int nd)
+	private iPoint findUnvisitedNeighbourOnEdgeInDirection(iPoint a, int nd)
 	{
 		iPoint result = null;
-		int score = -5;
+		int directionScore = -5;
+		int neighbourScore = 9;
 		for(int i = 0; i < 8; i++)
 		{
 			iPoint b = a.add(neighbour[i]);
@@ -1349,15 +1435,91 @@ public class BooleanGrid
 				{
 					if(nd < 0)
 						return b;
-					int s = neighbourProduct[Math.abs(nd - i)];
-					if(s > score)
+					int ns = neighbourCount(b);
+					if(ns <= neighbourScore)
 					{
-						score = s;
-						result = b;
+						neighbourScore = ns;
+						int s = neighbourProduct[Math.abs(nd - i)];
+						if(s > directionScore)
+						{
+							directionScore = s;
+							result = b;
+						}
 					}
 				}
 		}
 		return result;
+	}
+	
+	/**
+	 * Useful debugging function
+	 * @param p
+	 */
+	private void printNearby(iPoint p, int b)
+	{
+		String op = new String();
+		for(int y = p.y + b; y >= p.y - b; y--)
+		{
+			for(int x = p.x - b; x <= p.x + b; x++)
+			{
+				iPoint q = new iPoint(x, y);
+				if(q.coincidesWith(p))
+				{
+					if(get(p))
+						op += " +";
+					else
+						op += " o";
+				}
+				else if(get(q))
+				{
+					if(visited != null)
+					{
+						if(vGet(q))
+							op += " v";
+						else
+							op += " 1";
+					} else
+						op += " 1";
+				} else
+					op += " .";
+			}
+			op += "\n";
+		}
+		System.out.println(op);		
+	}
+	
+	/**
+	 * Recursive flood-fill search of solid pixels p and its neighbours to find an
+	 * unvisited edge pixel.
+	 * @param p
+	 * @param depth
+	 * @return
+	 */
+	private iPoint searchNearby(iPoint p, int depth)
+	{
+		//System.out.println("point: " + p.toString() + ", depth: " + depth +
+		//		", edge:" + isSloppyEdgePixel(p) + ", vis: " + vGet(p) + ", solid: " + get(p));
+		if(depth > searchDepth)
+			return null;
+		if(!vGet(p) || depth == 0)
+		{
+			if(isEdgePixel(p) && depth > 0)
+				return p;
+
+			if(get(p))
+			{
+				vSet(p, true);
+				for(int i = 0; i < 8; i++)
+				{
+					iPoint q = p.add(neighbour[i]);
+					iPoint r = searchNearby(q, depth + 1);
+					if(r != null)
+						return r;
+				}
+			}
+		}
+
+		return null;
 	}
 	
 	//********************************************************************************
@@ -1379,6 +1541,7 @@ public class BooleanGrid
 		iPoint thisPoint;
 		
 		int i = findUnvisitedEdgeIndex(0);
+		long d2;
 		
 		while(i >= 0)
 		{
@@ -1393,12 +1556,31 @@ public class BooleanGrid
 				newPoint = findUnvisitedNeighbourOnEdgeInDirection(thisPoint, direction);
 				if(newPoint != null)
 					direction = neighbourIndex(newPoint.sub(thisPoint)); // Try to go in the same direction
+				else
+				{
+					d2 = ip.point(0).sub(ip.point(ip.size() - 1)).magnitude2();
+					if(d2 > 2)
+					{
+						//printNearby(thisPoint);
+						newPoint = searchNearby(thisPoint, 0);
+						if(newPoint != null)
+						{
+							iPoint dir = newPoint.sub(thisPoint);
+							//System.out.println("Found nearby sq dist = " + dir.magnitude2());
+							direction = directionToNeighbour(new Rr2Point(dir.x, dir.y));
+						}
+					}
+				}
 				thisPoint = newPoint;
 			}
-			
-			long d2 = ip.point(0).sub(ip.point(ip.size() - 1)).magnitude2();
-			if(d2 > 2)
-				Debug.e("BooleanGrid.iAllPerimitersRaw(): unjoined ends:" + d2);
+
+			d2 = ip.point(0).sub(ip.point(ip.size() - 1)).magnitude2();
+			if(d2 > searchDepth*searchDepth)
+			{
+				Debug.d("BooleanGrid.iAllPerimitersRaw(): unjoined ends:" + d2);
+				//printNearby(ip.point(0), 6);
+				//printNearby(ip.point(ip.size() - 1), 6);
+			}
 
 			if(ip.size() >= 3)
 				result.add(ip);
@@ -1712,6 +1894,8 @@ public class BooleanGrid
 				result.disc(p1, Math.abs(r), r > 0);
 			}
 		}
+		if(dist < 0)
+			result.deWhisker();
 		return result;
 	}
 	
@@ -1730,6 +1914,7 @@ public class BooleanGrid
 	{
 		BooleanGrid result = new BooleanGrid(this);
 		result.bits.flip(0, result.rec.size.x*result.rec.size.y - 1);
+		//result.deWhisker();
 		return result;
 	}
 	
@@ -1750,6 +1935,7 @@ public class BooleanGrid
 		BooleanGrid result = new BooleanGrid(d, u);
 		BooleanGrid temp = new BooleanGrid(e, u);
 		result.bits.or(temp.bits);
+		//result.deWhisker();
 		return result;
 	}
 	
@@ -1774,6 +1960,7 @@ public class BooleanGrid
 		BooleanGrid result = new BooleanGrid(d, u);
 		BooleanGrid temp = new BooleanGrid(e, u);
 		result.bits.and(temp.bits);
+		result.deWhisker();
 		return result;
 	}
 	/**
@@ -1789,6 +1976,7 @@ public class BooleanGrid
 		BooleanGrid result = new BooleanGrid(d);
 		BooleanGrid temp = new BooleanGrid(e, result.rec);
 		result.bits.andNot(temp.bits);
+		result.deWhisker();
 		return result;
 	}
 }

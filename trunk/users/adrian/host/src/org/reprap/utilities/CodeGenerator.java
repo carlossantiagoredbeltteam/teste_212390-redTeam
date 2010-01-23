@@ -1,4 +1,4 @@
-package org.reprap.geometry.polygons;
+package org.reprap.utilities;
 
 import java.util.ArrayList;
 import java.util.List;
