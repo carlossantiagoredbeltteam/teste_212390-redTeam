@@ -92,7 +92,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
 
 import javax.media.j3d.AmbientLight;
 import javax.media.j3d.Background;
@@ -104,16 +103,20 @@ import javax.media.j3d.Group;
 import javax.media.j3d.Node;
 import javax.media.j3d.TransformGroup;
 import javax.media.j3d.ViewPlatform;
+
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JTextField;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.SwingConstants;
+
 import javax.vecmath.Color3f;
+import javax.vecmath.Vector3d;
 
 import com.sun.j3d.utils.picking.PickCanvas;
 import com.sun.j3d.utils.picking.PickResult;
@@ -134,6 +137,9 @@ class MaterialRadioButtons extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private static Attributes att;
 	private static JFrame frame;
+	private static JTextField copies;
+	private static RepRapBuild rrb;
+	private static int stlIndex; 
 	
 	private MaterialRadioButtons()
 	{
@@ -143,9 +149,19 @@ class MaterialRadioButtons extends JPanel {
 		String[] names;
 		radioPanel = new JPanel(new GridLayout(0, 1));
 		radioPanel.setSize(300,200);
+		
+	    JLabel jLabel2 = new JLabel();
+	    radioPanel.add(jLabel2);
+	    jLabel2.setText(" Number of copies of the object just loaded to print: ");
+		jLabel2.setHorizontalAlignment(SwingConstants.CENTER);
+		copies = new JTextField("1");
+		radioPanel.add(copies);
+		copies.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		
 		JLabel jLabel1 = new JLabel();
 		radioPanel.add(jLabel1);
-		jLabel1.setText(" Select the material for the object just loaded ");
+		jLabel1.setText(" Select the material for the object(s): ");
 		jLabel1.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		try
@@ -171,7 +187,7 @@ class MaterialRadioButtons extends JPanel {
 			okButton.setText("OK");
 			okButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
-					frame.dispose();
+					OKHandler();
 				}
 			});
 			
@@ -184,9 +200,21 @@ class MaterialRadioButtons extends JPanel {
 			ex.printStackTrace();
 		}	
 	}
+	
+	public static void OKHandler()
+	{
+		//System.out.println("Copies: " + copies.getText());
+		int number = Integer.parseInt(copies.getText().trim()) - 1;
+		STLObject stl = rrb.getSTLs().get(stlIndex);
+		rrb.moreCopies(stl, att, number);
+		frame.dispose();
+	}
     
-    public static void createAndShowGUI(Attributes a) {
+    public static void createAndShowGUI(Attributes a, RepRapBuild r, int index) 
+    {
     	att = a;
+    	rrb = r;
+    	stlIndex = index;
         //Create and set up the window.
     	frame = new JFrame("Material selector");
         frame.setLocation(500, 400);
@@ -213,6 +241,10 @@ class MaterialRadioButtons extends JPanel {
  */
 
 public class RepRapBuild extends Panel3D implements MouseListener {
+	
+
+	
+	
 	private static final long serialVersionUID = 1L;
 	private MouseObject mouse = null;
 	private PickCanvas pickCanvas = null; // The thing picked by a mouse click
@@ -386,7 +418,8 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 
 	// Callback for when the user selects an STL file to load
 
-	public void anotherSTLFile(String s) {
+	public void anotherSTLFile(String s) 
+	{
 		if (s == null)
 			return;
 		//objectIndex++;
@@ -400,7 +433,35 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 				wv_and_stls.addChild(stl.top());
 				stls.add(stl);
 			}
-			MaterialRadioButtons.createAndShowGUI(att);
+			MaterialRadioButtons.createAndShowGUI(att, this, stls.size() - 1);
+		}
+	}
+	
+	public void moreCopies(STLObject original, Attributes originalAttributes, int number)
+	{
+		if (number <= 0)
+			return;
+		String fileName = original.fileItCameFrom();
+		Vector3d offset = new Vector3d(original.size());
+		offset.y = 0;
+		offset.z = 0;
+		offset.x += 5;
+		double increment = offset.x;
+		for(int i = 0; i < number; i++)
+		{
+			STLObject stl = new STLObject();
+			Attributes newAtt = stl.addSTL(fileName, offset, original.getAppearance(), null);
+			newAtt.setMaterial(originalAttributes.getMaterial());
+			if(newAtt != null)
+			{
+				// New separate object, or just appended to lastPicked?
+				if(stl.numChildren() > 0)
+				{
+					wv_and_stls.addChild(stl.top());
+					stls.add(stl);
+				}
+			}
+			offset.x += increment;
 		}
 	}
 
