@@ -349,8 +349,8 @@ public class STLObject
                 offset.x = -p0.x;  // Generally offset to put bottom left at the origin
                 offset.y = -p0.y;
                 offset.z = -p0.z;
-            } else
-            	offset.z = -p0.z;  // Tie it down whatever the user has said...
+            } //else
+            	//offset.z = -p0.z;  // Tie it down whatever the user has said...
             
             // How big?
             
