@@ -363,7 +363,6 @@ public class Producer {
 			boolean shield = true;
 			for(int stl = 0; stl < allSTLs.size(); stl++)
 			{
-
 					RrPolygonList fills = allSTLs.computeInfill(stl, layerRules);
 					RrPolygonList borders = allSTLs.computeOutlines(stl, layerRules, fills, shield);
 					shield = false;
