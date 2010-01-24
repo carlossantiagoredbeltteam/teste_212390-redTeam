@@ -327,9 +327,12 @@ public class STLObject
      * @param child
      * @param offset
      */
-    private Offsets getOffsets(BranchGroup child, Vector3d offset) 
+    private Offsets getOffsets(BranchGroup child, Vector3d userOffset) 
     {
     	Offsets result = new Offsets();
+    	Vector3d offset = null;
+    	if(userOffset != null)
+    		offset = new Vector3d(userOffset);
     	
     	if(child != null && bbox != null)
     	{
@@ -346,7 +349,8 @@ public class STLObject
                 offset.x = -p0.x;  // Generally offset to put bottom left at the origin
                 offset.y = -p0.y;
                 offset.z = -p0.z;
-            }
+            } else
+            	offset.z = -p0.z;  // Tie it down whatever the user has said...
             
             // How big?
             
