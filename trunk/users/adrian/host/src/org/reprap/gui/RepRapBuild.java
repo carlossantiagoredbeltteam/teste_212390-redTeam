@@ -103,6 +103,7 @@ import javax.media.j3d.Group;
 import javax.media.j3d.Node;
 import javax.media.j3d.TransformGroup;
 import javax.media.j3d.ViewPlatform;
+import javax.media.j3d.Transform3D;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -450,10 +451,13 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 		for(int i = 0; i < number; i++)
 		{
 			STLObject stl = new STLObject();
-			Attributes newAtt = stl.addSTL(fileName, offset, original.getAppearance(), null);
+			Attributes newAtt = stl.addSTL(fileName, null, original.getAppearance(), null);
 			newAtt.setMaterial(originalAttributes.getMaterial());
 			if(newAtt != null)
 			{
+				Transform3D t3d = new Transform3D();
+				t3d.set(new Vector3d(offset));
+				stl.setTransform(t3d);
 				// New separate object, or just appended to lastPicked?
 				if(stl.numChildren() > 0)
 				{
