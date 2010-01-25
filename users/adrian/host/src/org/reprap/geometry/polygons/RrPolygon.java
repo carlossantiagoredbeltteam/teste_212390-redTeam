@@ -723,7 +723,7 @@ public class RrPolygon
 			v2 = findAngleStart(v2, d2);
 			if(v2<0)
 			{
-				System.err.println("RrPolygon.simplify(): points were not in a straight line; now they are!");
+				Debug.e("RrPolygon.simplify(): points were not in a straight line; now they are!");
 				return(r);
 			}
 			
