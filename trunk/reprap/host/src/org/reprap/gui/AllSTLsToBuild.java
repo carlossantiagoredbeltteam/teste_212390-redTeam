@@ -101,11 +101,21 @@ public class AllSTLsToBuild
 		
 		public void set(BooleanGridList slice, int layer, int stl)
 		{
-			layerNumber[ringPointer] = layer;
-			sliceRing[ringPointer][stl] = slice;
-			ringPointer++;
-			if(ringPointer >= ringSize)
-				ringPointer = 0;
+			int rp = -1;
+			for(int i = 0; i < ringSize; i++)
+				if(layerNumber[i] == layer)
+					rp = i;
+			if(rp < 0)
+			{
+				rp = ringPointer;
+				for(int s = 0; s < stls.size(); s++)
+					sliceRing[rp][s] = null;
+				ringPointer++;
+				if(ringPointer >= ringSize)
+					ringPointer = 0;
+			}
+			layerNumber[rp] = layer;
+			sliceRing[rp][stl] = slice;
 		}
 		
 		public BooleanGridList get(int layer, int stl)
@@ -472,10 +482,10 @@ public class AllSTLsToBuild
 	public RrPolygonList computeInfill(int stl, LayerRules layerConditions)
 	{
 		int layer = layerConditions.getMachineLayer();
-		BooleanGridList shapes = slice(layer, stl, layerConditions);
+		BooleanGridList shapes = slice(stl, layerConditions);
 
-		BooleanGridList previousSlices = slice(layer+1, stl, layerConditions);
-		previousSlices = BooleanGridList.intersections(slice(layer+2, stl, layerConditions), previousSlices);
+		BooleanGridList previousSlices = cache.get(layer+1, stl);
+		previousSlices = BooleanGridList.intersections(cache.get(layer+2, stl), previousSlices);
 		BooleanGridList insides = null;
 		
 		if(previousSlices != null && layerConditions.getModelLayer() > 1)
@@ -514,7 +524,7 @@ public class AllSTLsToBuild
 	{
 		
 		int layer = layerConditions.getMachineLayer();
-		BooleanGridList shapes = slice(layer, stl, layerConditions);
+		BooleanGridList shapes = slice(stl, layerConditions);
 		
 		RrPolygonList borderPolygons;
 		
@@ -561,9 +571,10 @@ public class AllSTLsToBuild
 	 * @param extruders
 	 * @return
 	 */
-	private BooleanGridList slice(int layer, int stl, LayerRules layerRules)
+	private BooleanGridList slice(int stl, LayerRules layerRules)
 	{
 		freeze();
+		int layer = layerRules.getMachineLayer();
 		BooleanGridList result = cache.get(layer, stl);
 		if(result != null)
 			return result;

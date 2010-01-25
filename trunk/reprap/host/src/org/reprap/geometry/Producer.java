@@ -363,17 +363,17 @@ public class Producer {
 			boolean shield = true;
 			for(int stl = 0; stl < allSTLs.size(); stl++)
 			{
-
 					RrPolygonList fills = allSTLs.computeInfill(stl, layerRules);
 					RrPolygonList borders = allSTLs.computeOutlines(stl, layerRules, fills, shield);
-					shield = false;
 					for(int pol = 0; pol < borders.size(); pol++)
 					{
+						shield = false;
 						RrPolygon p = borders.polygon(pol);
 						allPolygons[p.getAttributes().getExtruder().getPhysicalExtruderNumber()].add(p);
 					}
 					for(int pol = 0; pol < fills.size(); pol++)
 					{
+						shield = false;
 						RrPolygon p = fills.polygon(pol);
 						allPolygons[p.getAttributes().getExtruder().getPhysicalExtruderNumber()].add(p);
 					}

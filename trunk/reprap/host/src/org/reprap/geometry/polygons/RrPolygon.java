@@ -77,6 +77,7 @@ import org.reprap.Preferences;
 import org.reprap.Extruder;
 import org.reprap.geometry.LayerRules;
 import org.reprap.machines.VelocityProfile;
+import org.reprap.utilities.Debug;
 
 /**
  * The main boundary-representation polygon class
@@ -683,7 +684,7 @@ public class RrPolygon
 					return v2 - 1;
 			}	
 		}
-		System.err.println("RrPolygon.findAngleStart(): polygon is all one straight line!");
+		Debug.d("RrPolygon.findAngleStart(): polygon is all one straight line!");
 		return -1;
 	}
 	
@@ -722,7 +723,7 @@ public class RrPolygon
 			v2 = findAngleStart(v2, d2);
 			if(v2<0)
 			{
-				System.err.println("RrPolygon.simplify(): points were not in a straight line; now they are!");
+				Debug.e("RrPolygon.simplify(): points were not in a straight line; now they are!");
 				return(r);
 			}
 			
