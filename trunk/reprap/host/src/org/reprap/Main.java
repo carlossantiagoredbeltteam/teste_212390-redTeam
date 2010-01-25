@@ -211,14 +211,22 @@ public class Main {
         manipMenu.add(inToMM);
         
         
-        JMenuItem deleteSTL = new JMenuItem("Delete selected object", KeyEvent.VK_W);
-        deleteSTL.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.CTRL_MASK));
-        deleteSTL.addActionListener(new ActionListener() {
+//        JMenuItem deleteSTL = new JMenuItem("Delete selected object", KeyEvent.VK_W);
+//        deleteSTL.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.CTRL_MASK));
+//        deleteSTL.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent arg0) {
+//				onDelete();
+//			}});
+//        manipMenu.add(deleteSTL);
+        
+        
+        JMenuItem deleteSTL2 = new JMenuItem("Delete selected object", KeyEvent.VK_DELETE);
+        deleteSTL2.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
+        deleteSTL2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				onDelete();
 			}});
-        manipMenu.add(deleteSTL);
-        
+        manipMenu.add(deleteSTL2);
         
 
         //JMenu produceMenu = new JMenu("Build");
