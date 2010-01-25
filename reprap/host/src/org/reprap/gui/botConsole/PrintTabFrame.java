@@ -154,7 +154,6 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
         stopButton = new java.awt.Button();
         exitButton = new java.awt.Button();
         layerPauseCheck = new javax.swing.JCheckBox();
-        layerPause(false);
         //toSNAPRepRapRadioButton = new javax.swing.JRadioButton();
         getWebPage = new javax.swing.JButton();
         expectedBuildTimeLabel = new javax.swing.JLabel();
@@ -174,7 +173,6 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
         preferencesButton = new java.awt.Button();
         saveRFO = new java.awt.Button();
         displayPathsCheck = new javax.swing.JCheckBox();
-        displayPaths(false);
 
         printButton.setBackground(new java.awt.Color(51, 204, 0));
         printButton.setFont(printButton.getFont());
@@ -506,11 +504,6 @@ private void exitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 	System.exit(0);
 }//GEN-LAST:event_exitButtonActionPerformed
 
-private void layerPause(boolean p)
-{
-	org.reprap.Main.gui.setLayerPause(p);	
-}
-
 private void layerPauseCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_layerPauseCheckActionPerformed
 org.reprap.Main.gui.setLayerPause(layerPauseCheck.isSelected());
 }//GEN-LAST:event_layerPauseCheckActionPerformed
@@ -653,17 +646,12 @@ private void saveRFO(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveRFO
 	JOptionPane.showMessageDialog(null, "RFO files not yet supported.  But see http://reprap.org/bin/view/Main/MultipleMaterialsFiles");
 }//GEN-LAST:event_saveRFO
 
-private void displayPaths(boolean disp)
-{
+private void displayPathsCheckMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_displayPathsCheckMouseClicked
 	try
 	{
-		org.reprap.Preferences.setGlobalBool("DisplaySimulation", disp);
+		org.reprap.Preferences.setGlobalBool("DisplaySimulation", displayPathsCheck.isSelected());
 	} catch (Exception e)
-	{}	
-}
-
-private void displayPathsCheckMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_displayPathsCheckMouseClicked
-	displayPaths(displayPathsCheck.isSelected());
+	{}
 }//GEN-LAST:event_displayPathsCheckMouseClicked
 
 
