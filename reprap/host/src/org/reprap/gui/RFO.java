@@ -1,10 +1,15 @@
 //package org.reprap.gui;
-
 // http://www.devx.com/tips/Tip/14049
 //
+//import java.io.*;
+//import java.nio.channels.*;
 //import java.util.zip.*;
 //
 //public class RFO {
+//http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-integration-test/src/main/java/net/orfjackal/darkstar/integration/util/TempDirectory.java
+//	
+//String dirName = System.getProperty("java.io.tmpdir");
+//
 //	try 
 //	{ 
 //	    //create a ZipOutputStream to zip the data to 
@@ -69,5 +74,31 @@
 //	    //handle exception 
 //	} 
 //
+//public class FileUtils{
+//    public static void copyFile(File in, File out) 
+//        throws IOException 
+//    {
+//        FileChannel inChannel = new
+//            FileInputStream(in).getChannel();
+//        FileChannel outChannel = new
+//            FileOutputStream(out).getChannel();
+//        try {
+//            inChannel.transferTo(0, inChannel.size(),
+//                    outChannel);
+//        } 
+//        catch (IOException e) {
+//            throw e;
+//        }
+//        finally {
+//            if (inChannel != null) inChannel.close();
+//            if (outChannel != null) outChannel.close();
+//        }
+//    }
+//
+//    public static void main(String args[]) throws IOException{
+//        FileUtils.copyFile(new File(args[0]),new File(args[1]));
+//  }
+//}
+
 //
 //}
