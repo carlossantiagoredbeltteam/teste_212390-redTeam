@@ -281,7 +281,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
         });
 
         loadRFO.setActionCommand("loadRFO");
-        loadRFO.setBackground(new java.awt.Color(153, 153, 153));
+        loadRFO.setBackground(new java.awt.Color(0, 204, 255));
         loadRFO.setLabel("Load RFO"); // NOI18N
         loadRFO.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -566,12 +566,24 @@ try {
         }
 }//GEN-LAST:event_getWebPageActionPerformed
 
+
 private void loadSTL(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadSTL
 	if(!SLoadOK)
 		return;
 	if(gcodeLoaded)
 	{
-		JOptionPane.showMessageDialog(null, "This will cancel the G Code file you loaded.");
+		int response = JOptionPane.showOptionDialog(
+                null                       // Center in window.
+                , "This will abandon the G Code file you loaded."        // Message
+                , "Load STL"               // Title in titlebar
+                , JOptionPane.YES_NO_OPTION  // Option type
+                , JOptionPane.PLAIN_MESSAGE  // messageType
+                , null                       // Icon (none)
+                , new String[] {"OK", "Cancel"}                    // Button text as above.
+                , ""    // Default button's label
+              );
+		if(response == 1)
+			return;
 		loadedFiles = "";
 	}
 	String fn = printer.addSTLFileForMaking();
@@ -617,13 +629,35 @@ private void LoadGCode(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoadGC
 	}
 	if(stlLoaded)
 	{
-		JOptionPane.showMessageDialog(null, "This will cancel the STL file(s) you loaded.");
+		int response = JOptionPane.showOptionDialog(
+                null                       // Center in window.
+                , "This will abandon the STL file(s) you loaded."        // Message
+                , "Load GCode"               // Title in titlebar
+                , JOptionPane.YES_NO_OPTION  // Option type
+                , JOptionPane.PLAIN_MESSAGE  // messageType
+                , null                       // Icon (none)
+                , new String[] {"OK", "Cancel"}                    // Button text as above.
+                , ""    // Default button's label
+              );
+		if(response == 1)
+			return;
 		org.reprap.Main.gui.deleteAllSTLs();
 		loadedFiles = "";
 	}
 	if(gcodeLoaded)
 	{
-		JOptionPane.showMessageDialog(null, "This will cancel the previous G Code file you loaded.");
+		int response = JOptionPane.showOptionDialog(
+                null                       // Center in window.
+                , "This will abandon the previous G Code file you loaded."        // Message
+                , "Load GCode"               // Title in titlebar
+                , JOptionPane.YES_NO_OPTION  // Option type
+                , JOptionPane.PLAIN_MESSAGE  // messageType
+                , null                       // Icon (none)
+                , new String[] {"OK", "Cancel"}                    // Button text as above.
+                , ""    // Default button's label
+              );
+		if(response == 1)
+			return;
 		loadedFiles = "";
 	}
 	loadedFiles = printer.loadGCodeFileForMaking();
@@ -641,6 +675,44 @@ private void LoadGCode(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoadGC
 private void loadRFO(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadRFO
 	//fileNameBox.setText("-");
 	JOptionPane.showMessageDialog(null, "RFO files not yet supported.  But see http://reprap.org/bin/view/Main/MultipleMaterialsFiles");
+//	if(!SLoadOK)
+//		return;
+//	if(gcodeLoaded || stlLoaded)
+//	{
+//		int response = JOptionPane.showOptionDialog(
+//                null                       // Center in window.
+//                , "This will abandon the previous file(s) you loaded."        // Message
+//                , "Load RFO"               // Title in titlebar
+//                , JOptionPane.YES_NO_OPTION  // Option type
+//                , JOptionPane.PLAIN_MESSAGE  // messageType
+//                , null                       // Icon (none)
+//                , new String[] {"OK", "Cancel"}                    // Button text as above.
+//                , ""    // Default button's label
+//              );
+//		if(response == 1)
+//			return;
+//		loadedFiles = "";
+//	}
+//
+//	String fn = printer.loadRFOFileForMaking();
+//	if(fn.length() <= 0)
+//	{
+//		JOptionPane.showMessageDialog(null, "No .rfo file was loaded.");
+//		return;
+//	}
+//	
+//	if(loadedFilesLong)
+//		return;
+//	if(loadedFiles.length() > 50)
+//	{
+//		loadedFiles += "...";
+//		loadedFilesLong = true;
+//	} else
+//		loadedFiles += fn + " ";
+//	
+//	fileNameBox.setText(loadedFiles);
+//	stlLoaded = true;
+//	gcodeLoaded = false;
 }//GEN-LAST:event_loadRFO
 
 private void preferences(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_preferences
@@ -651,6 +723,7 @@ private void preferences(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref
 private void saveRFO(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveRFO
     // TODO add your handling code here:
 	JOptionPane.showMessageDialog(null, "RFO files not yet supported.  But see http://reprap.org/bin/view/Main/MultipleMaterialsFiles");
+	//printer.saveRFOFile();
 }//GEN-LAST:event_saveRFO
 
 private void displayPaths(boolean disp)
@@ -673,6 +746,8 @@ private void enableSLoad()
 	GLoadOK = false;
 	loadGCode.setBackground(new java.awt.Color(153, 153, 153));
 	loadSTL.setBackground(new java.awt.Color(0, 204, 255));
+	loadRFO.setBackground(new java.awt.Color(0, 204, 255));
+	saveRFO.setBackground(new java.awt.Color(0, 204, 255));
 	try
 	{	
 		org.reprap.Preferences.setGlobalString("RepRap_Machine", "GCodeRepRap");
@@ -691,6 +766,8 @@ private void enableGLoad()
 	GLoadOK = true;
 	loadGCode.setBackground(new java.awt.Color(0, 204, 255));
 	loadSTL.setBackground(new java.awt.Color(153, 153, 153));
+    loadRFO.setBackground(new java.awt.Color(153, 153, 153));
+    saveRFO.setBackground(new java.awt.Color(153, 153, 153));
 	try
 	{
 		org.reprap.Preferences.setGlobalString("RepRap_Machine", "GCodeRepRap");

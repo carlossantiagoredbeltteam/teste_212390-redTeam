@@ -1,11 +1,165 @@
+/**
+ * A .rfo file is a compressed archive containing multiple objects that are all to
+ * be built in a RepRap machine at once.  See this web page:
+ * 
+ * 
+ * for details.
+ * 
+ * This is the class that handles .rfo files.
+ */
 package org.reprap;
 // http://www.devx.com/tips/Tip/14049
-//
-//import java.io.*;
-//import java.nio.channels.*;
-//import java.util.zip.*;
-//
-//public class RFO {
+
+import java.io.*;
+import java.nio.channels.*;
+import java.util.zip.*;
+
+import org.reprap.geometry.polygons.AllSTLsToBuild;
+
+public class RFO {
+	
+	String fileName;
+	String path;
+	String tempDir;
+	String[] names;
+	String  rfoDir;
+	AllSTLsToBuild astl;
+	
+	private RFO(String fn, AllSTLsToBuild as)
+	{
+		int sepIndex = fn.lastIndexOf(File.separator);
+		int fIndex = fn.indexOf("file:");
+		fileName = fn.substring(sepIndex + 1, fn.length());
+		if(sepIndex >= 0)
+		{
+			if(fIndex >= 0)
+				path = fn.substring(fIndex + 5, sepIndex + 1);
+			else
+				path = fn.substring(0, sepIndex + 1);
+		} else
+			path = "";
+		tempDir = System.getProperty("java.io.tmpdir") + File.separator;
+		System.out.println("Name: " + fileName);
+		System.out.println("Path: " + path);
+		System.out.println("Temp: " + tempDir);
+		
+		astl = as;
+	}
+	
+	//****************************************************************************
+	//
+	// .rfo writing
+	
+	private void createRFOdir()
+	{
+		rfoDir = tempDir + fileName;
+		File rfod = new File(rfoDir);
+		if(!rfod.mkdir())
+			throw new RuntimeException(rfoDir);
+		rfoDir += File.separator;
+	}
+	
+	private void copyFile(String from, String to) throws IOException
+	{
+		File inputFile;
+	    File outputFile;
+		int fIndex = from.indexOf("file:");
+		int tIndex = to.indexOf("file:");
+		if(fIndex < 0)
+			inputFile = new File(from);
+		else
+			inputFile = new File(from.substring(fIndex + 5, from.length()));
+		if(tIndex < 0)
+			outputFile = new File(to);
+		else
+			outputFile = new File(to.substring(tIndex + 5, to.length()));
+
+	    BufferedInputStream in = new BufferedInputStream(new FileInputStream(inputFile), 4096);
+	    BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(outputFile), 4096);
+	    int c;
+
+	    while ((c = in.read()) != -1)
+	      out.write(c);
+
+	    in.close();
+	    out.close();		
+	}
+	
+	private void copySTLs() throws IOException
+	{
+		names = new String[astl.size()];
+		String[] uniqueNames = new String[astl.size()];
+		int uniqueP = 0;
+
+		for(int i = 0; i < astl.size(); i++)
+		{
+			String s = astl.get(i).fileItCameFrom();
+			int ni = -1;
+			for(int j = 0; j < uniqueP; j++)
+			{
+				if(s.matches(uniqueNames[j]))
+				{
+					ni = j;
+					break;
+				}
+			}
+			if(ni < 0)
+			{
+				uniqueNames[uniqueP] = s;
+				names[i] = "rfo-" + uniqueP + ".stl";
+				uniqueP++;
+			} else
+			{
+				names[i] = uniqueNames[ni];
+			}
+		}
+		
+		for(int i = 0; i < uniqueP; i++)
+			copyFile(uniqueNames[i], rfoDir + "rfo-" + i + ".stl");
+	}
+	
+	private void createLegend()
+	{
+		
+	}
+	
+	private void compress()
+	{
+		
+	}
+	
+	public static void save(String fn, AllSTLsToBuild allSTL) throws IOException
+	{
+		RFO rfo = new RFO(fn, allSTL);
+		rfo.createRFOdir();
+		rfo.copySTLs();
+		rfo.createLegend();
+		rfo.compress();
+		System.out.println("Save RFO called with: " + fn);
+	}
+	
+	//******************************************************************************************
+	//
+	// .rfo reading
+	
+	private void unCompress()
+	{
+		
+	}
+	
+	private void interpretLegend()
+	{
+		
+	}
+	
+	public static AllSTLsToBuild load(String fn)
+	{
+		RFO rfo = new RFO(fn, null);
+		rfo.unCompress();
+		rfo.interpretLegend();
+		System.out.println("Load RFO called with: " + fn);
+		return rfo.astl;
+	}
 //http://code.google.com/p/darkstar-contrib/source/browse/trunk/darkstar-integration-test/src/main/java/net/orfjackal/darkstar/integration/util/TempDirectory.java
 //	
 //String dirName = System.getProperty("java.io.tmpdir");
@@ -101,4 +255,4 @@ package org.reprap;
 //}
 
 //
-//}
+}

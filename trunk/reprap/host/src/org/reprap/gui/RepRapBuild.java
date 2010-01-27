@@ -124,9 +124,10 @@ import com.sun.j3d.utils.picking.PickResult;
 import com.sun.j3d.utils.picking.PickTool;
 
 import org.reprap.Attributes;
+import org.reprap.RFO;
 import org.reprap.Preferences;
 import org.reprap.geometry.polygons.AllSTLsToBuild;
-
+import org.reprap.utilities.Debug;
 
 /**
  * Little class to put up a radiobutton menu so you can set
@@ -439,6 +440,28 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 		}
 	}
 	
+	// Callback for when the user selects an STL file to load
+
+	public void addRFOFile(String s) 
+	{
+		if (s == null)
+			return;
+		deleteAllSTLs();
+		stls = RFO.load(s);
+	}
+	
+	public void saveRFOFile(String s)
+	{
+		try
+		{
+			RFO.save(s, stls);
+		} catch (Exception e)
+		{
+			Debug.e("RepRapBuild.saveRFOFile(): Error creating " + s);
+			Debug.e(e.toString());
+		}
+	}
+	
 	public void moreCopies(STLObject original, Attributes originalAttributes, int number)
 	{
 		if (number <= 0)
@@ -558,7 +581,9 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 			stls.remove(i);
 			int index = wv_and_stls.indexOfChild(s.top());
 			wv_and_stls.removeChild(index);
-		}		
+		}
+		mouseToWorld();
+		lastPicked = null;
 	}
 
 }

@@ -524,21 +524,54 @@ public class Main {
 		t.start();
 	}
 	
-    public String onOpen() 
+    public String onOpen(boolean rfo) 
     {
         String result = null;
         File f;
+        FileFilter filter;
+        
+        if(rfo)
+        	filter = new ExtensionFileFilter("RFO", new String[] { "RFO" });
+        else
+        	filter = new ExtensionFileFilter("STL", new String[] { "STL" });
+        chooser.setFileFilter(filter);
 
         int returnVal = chooser.showOpenDialog(null);// chooser.showOpenDialog(mainFrame);
         if(returnVal == JFileChooser.APPROVE_OPTION) 
         {
             f = chooser.getSelectedFile();
             result = "file:" + f.getAbsolutePath();
-        
-            builder.anotherSTLFile(result);
+            if(rfo)
+            	builder.addRFOFile(result);
+            else
+            	builder.anotherSTLFile(result);
+
             return f.getName();
         }
         return "";
+    }
+    
+    public String saveRFO()
+    {
+        String result = null;
+        File f;
+        FileFilter filter;
+        
+
+        filter = new ExtensionFileFilter("RFO", new String[] { "RFO" });
+ 
+        chooser.setFileFilter(filter);
+
+        int returnVal = chooser.showOpenDialog(null);// chooser.showOpenDialog(mainFrame);
+        if(returnVal == JFileChooser.APPROVE_OPTION) 
+        {
+            f = chooser.getSelectedFile();
+            result = "file:" + f.getAbsolutePath();
+
+            	builder.saveRFOFile(result);
+            return f.getName();
+        }
+        return "";   	
     }
     
     public void deleteAllSTLs()
