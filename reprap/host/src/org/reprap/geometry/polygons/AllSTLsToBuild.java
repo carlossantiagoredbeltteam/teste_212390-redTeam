@@ -1,9 +1,10 @@
-package org.reprap.gui;
+package org.reprap.geometry.polygons;
 
 import java.util.List;
 import java.util.ArrayList;
 import org.reprap.geometry.polygons.*;
 import org.reprap.geometry.LayerRules;
+import org.reprap.gui.STLObject;
 import org.reprap.Attributes;
 import org.reprap.Extruder;
 import org.reprap.Preferences;

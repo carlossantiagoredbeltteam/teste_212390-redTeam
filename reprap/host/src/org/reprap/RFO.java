@@ -1,4 +1,4 @@
-//package org.reprap.gui;
+package org.reprap;
 // http://www.devx.com/tips/Tip/14049
 //
 //import java.io.*;

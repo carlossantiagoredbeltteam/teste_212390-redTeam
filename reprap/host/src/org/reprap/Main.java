@@ -32,8 +32,8 @@ import org.reprap.gui.RepRapBuild;
 import org.reprap.gui.Utility;
 import org.reprap.gui.botConsole.BotConsoleFrame;
 import org.reprap.comms.Communicator;
-import org.reprap.comms.snap.SNAPAddress;
-import org.reprap.comms.snap.SNAPCommunicator;
+//import org.reprap.comms.snap.SNAPAddress;
+//import org.reprap.comms.snap.SNAPCommunicator;
 import org.reprap.utilities.ExtensionFileFilter;
 
 /**
@@ -671,13 +671,13 @@ public class Main {
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
             
             public void run() {
-                try {
-                     initComms();
-                }
-                catch (Exception ex) {
-                        JOptionPane.showMessageDialog(null, "Error initialising comms: " + ex);
-                                ex.printStackTrace();
-                }
+//                try {
+//                     initComms();
+//                }
+//                catch (Exception ex) {
+//                        JOptionPane.showMessageDialog(null, "Error initialising comms: " + ex);
+//                                ex.printStackTrace();
+//                }
                 
 
                 
@@ -703,60 +703,60 @@ public class Main {
         
         public static Main gui;
         
-        private static void initComms() throws Exception {
-
-            SNAPAddress myAddress = new SNAPAddress(localNodeNumber);
-
-            String port = "";
-            String err = "";
-            String machine = "simulator";
-			@SuppressWarnings("unused")
-			Boolean use_serial = false;
-
-			repRapAttached = false;
-			try
-			{
-	            port = org.reprap.Preferences.loadGlobalString("Port(name)");
-	            machine = org.reprap.Preferences.loadGlobalString("RepRap_Machine");
-				use_serial = org.reprap.Preferences.loadGlobalBool("GCodeUseSerial");
-			}
-			catch (Exception e)	{}
-
-			if (machine.equals("SNAPRepRap"))
-			{
-				try
-				{
-					communicator = new SNAPCommunicator(port, myAddress);
-				}
-				catch (gnu.io.NoSuchPortException e)
-				{
-					err = "\nCould not connect at " + port + ".\n\n";
-					err += "Check to make sure that is the right path.\n";
-					err += "Check that you have your serial connector plugged in.\n\n";
-					err += "The program will continue but your geometry preference has been set to 'nullcartesian' for this session.";
-
-					org.reprap.Preferences.setGlobalString("RepRap_Machine", "simulator");
-					
-					communicator = null;
-
-					throw new Exception(err);
-				}
-				catch (gnu.io.PortInUseException e)
-				{
-					err = "\nThe " + port + " port is already in use by another program, or your bot isn't plugged in.\n";
-					err += "The program will continue but your geometry preference has been set to 'nullcartesian' for this session.";
-
-					org.reprap.Preferences.setGlobalString("RepRap_Machine", "simulator");
-
-					throw new Exception(err);
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-				}
-				repRapAttached = true;
-			}
-		}
+//        private static void initComms() throws Exception {
+//
+//            SNAPAddress myAddress = new SNAPAddress(localNodeNumber);
+//
+//            String port = "";
+//            String err = "";
+//            String machine = "simulator";
+//			@SuppressWarnings("unused")
+//			Boolean use_serial = false;
+//
+//			repRapAttached = false;
+//			try
+//			{
+//	            port = org.reprap.Preferences.loadGlobalString("Port(name)");
+//	            machine = org.reprap.Preferences.loadGlobalString("RepRap_Machine");
+//				use_serial = org.reprap.Preferences.loadGlobalBool("GCodeUseSerial");
+//			}
+//			catch (Exception e)	{}
+//
+//			if (machine.equals("SNAPRepRap"))
+//			{
+//				try
+//				{
+//					communicator = new SNAPCommunicator(port, myAddress);
+//				}
+//				catch (gnu.io.NoSuchPortException e)
+//				{
+//					err = "\nCould not connect at " + port + ".\n\n";
+//					err += "Check to make sure that is the right path.\n";
+//					err += "Check that you have your serial connector plugged in.\n\n";
+//					err += "The program will continue but your geometry preference has been set to 'nullcartesian' for this session.";
+//
+//					org.reprap.Preferences.setGlobalString("RepRap_Machine", "simulator");
+//					
+//					communicator = null;
+//
+//					throw new Exception(err);
+//				}
+//				catch (gnu.io.PortInUseException e)
+//				{
+//					err = "\nThe " + port + " port is already in use by another program, or your bot isn't plugged in.\n";
+//					err += "The program will continue but your geometry preference has been set to 'nullcartesian' for this session.";
+//
+//					org.reprap.Preferences.setGlobalString("RepRap_Machine", "simulator");
+//
+//					throw new Exception(err);
+//				}
+//				catch (Exception e)
+//				{
+//					e.printStackTrace();
+//				}
+//				repRapAttached = true;
+//			}
+//		}
         
         public static void setRepRapPresent(boolean a)
         {
