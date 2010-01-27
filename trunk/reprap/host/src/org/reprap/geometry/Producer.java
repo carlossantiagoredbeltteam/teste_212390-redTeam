@@ -11,11 +11,11 @@ import org.reprap.geometry.polygons.RrRectangle;
 //import org.reprap.geometry.polygons.STLSlice;
 //import org.reprap.geometry.polygons.RrCSG;
 //import org.reprap.geometry.polygons.RrCSGPolygon;
+import org.reprap.geometry.polygons.AllSTLsToBuild;
 import org.reprap.geometry.polygons.RrPolygonList;
 import org.reprap.geometry.polygons.RrPolygon;
 import org.reprap.geometry.polygons.BooleanGridList;
 import org.reprap.gui.RepRapBuild;
-import org.reprap.gui.AllSTLsToBuild;
 import org.reprap.utilities.Debug;
 import org.reprap.utilities.RrGraphics;
 
