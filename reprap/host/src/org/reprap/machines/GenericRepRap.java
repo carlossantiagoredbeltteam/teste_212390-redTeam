@@ -1136,7 +1136,27 @@ public abstract class GenericRepRap implements CartesianPrinter
 	{
 		gcodeLoaded = false;		
 		stlLoaded = true;
-		return org.reprap.Main.gui.onOpen();
+		return org.reprap.Main.gui.onOpen(false);
+	}
+	
+	/**
+	 * Load an RFO file to be made.
+	 * @return the name of the file
+	 */
+	public String loadRFOFileForMaking()
+	{
+		gcodeLoaded = false;		
+		stlLoaded = true;
+		return org.reprap.Main.gui.onOpen(true);
+	}
+	
+	/**
+	 * Load an RFO file to be made.
+	 * @return the name of the file
+	 */
+	public String saveRFOFile()
+	{
+		return org.reprap.Main.gui.saveRFO();
 	}
 
 	/**

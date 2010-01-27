@@ -444,11 +444,13 @@ public interface Printer {
 	/**
 	 * Load a file to be made.
 	 * Currently these can be STLs (more than one can be loaded) or
-	 * a GCode file.
+	 * a GCode file, or an .rfo file.
 	 * @return the name of the file
 	 */
 	public String addSTLFileForMaking();
 	public String loadGCodeFileForMaking();
+	public String loadRFOFileForMaking();
+	public String saveRFOFile();
 	
 	/**
 	 * Set an output file
