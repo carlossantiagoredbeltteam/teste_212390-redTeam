@@ -111,7 +111,7 @@ public class STLObject
     private Vector3d size = null;       // X, Y and Z extent
     private BoundingBox bbox = null;    // Temporary storage for the bounding box while loading
     private Vector3d rootOffset = null; // Offset of the first-loaded STL under stl
-    private String sourceFile = null;   // The STL file I was laded from
+    private String sourceFile = null;   // The STL file I was loaded from
     
 
     public STLObject()

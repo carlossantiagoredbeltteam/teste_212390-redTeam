@@ -19,6 +19,7 @@ import org.reprap.Printer;
  */
 public class PrintTabFrame extends javax.swing.JInternalFrame {
 	private static final long serialVersionUID = 1L;
+	private static final boolean rfo = false;
 	private BotConsoleFrame parentBotConsoleFrame = null;
 //	private XYZTabPanel xYZTabPanel = null;
     private Printer printer;
@@ -673,46 +674,49 @@ private void LoadGCode(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoadGC
 }//GEN-LAST:event_LoadGCode
 
 private void loadRFO(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadRFO
-	//fileNameBox.setText("-");
-	JOptionPane.showMessageDialog(null, "RFO files not yet supported.  But see http://reprap.org/bin/view/Main/MultipleMaterialsFiles");
-//	if(!SLoadOK)
-//		return;
-//	if(gcodeLoaded || stlLoaded)
-//	{
-//		int response = JOptionPane.showOptionDialog(
-//                null                       // Center in window.
-//                , "This will abandon the previous file(s) you loaded."        // Message
-//                , "Load RFO"               // Title in titlebar
-//                , JOptionPane.YES_NO_OPTION  // Option type
-//                , JOptionPane.PLAIN_MESSAGE  // messageType
-//                , null                       // Icon (none)
-//                , new String[] {"OK", "Cancel"}                    // Button text as above.
-//                , ""    // Default button's label
-//              );
-//		if(response == 1)
-//			return;
-//		loadedFiles = "";
-//	}
-//
-//	String fn = printer.loadRFOFileForMaking();
-//	if(fn.length() <= 0)
-//	{
-//		JOptionPane.showMessageDialog(null, "No .rfo file was loaded.");
-//		return;
-//	}
-//	
-//	if(loadedFilesLong)
-//		return;
-//	if(loadedFiles.length() > 50)
-//	{
-//		loadedFiles += "...";
-//		loadedFilesLong = true;
-//	} else
-//		loadedFiles += fn + " ";
-//	
-//	fileNameBox.setText(loadedFiles);
-//	stlLoaded = true;
-//	gcodeLoaded = false;
+
+	if(rfo)
+	{
+		if(!SLoadOK)
+			return;
+		if(gcodeLoaded || stlLoaded)
+		{
+			int response = JOptionPane.showOptionDialog(
+					null                       // Center in window.
+					, "This will abandon the previous file(s) you loaded."        // Message
+					, "Load RFO"               // Title in titlebar
+					, JOptionPane.YES_NO_OPTION  // Option type
+					, JOptionPane.PLAIN_MESSAGE  // messageType
+					, null                       // Icon (none)
+					, new String[] {"OK", "Cancel"}                    // Button text as above.
+					, ""    // Default button's label
+			);
+			if(response == 1)
+				return;
+			loadedFiles = "";
+		}
+
+		String fn = printer.loadRFOFileForMaking();
+		if(fn.length() <= 0)
+		{
+			JOptionPane.showMessageDialog(null, "No .rfo file was loaded.");
+			return;
+		}
+
+		if(loadedFilesLong)
+			return;
+		if(loadedFiles.length() > 50)
+		{
+			loadedFiles += "...";
+			loadedFilesLong = true;
+		} else
+			loadedFiles += fn + " ";
+
+		fileNameBox.setText(loadedFiles);
+		stlLoaded = true;
+		gcodeLoaded = false;
+	} else
+		JOptionPane.showMessageDialog(null, "RFO files not yet supported.  But see http://reprap.org/bin/view/Main/MultipleMaterialsFiles");
 }//GEN-LAST:event_loadRFO
 
 private void preferences(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_preferences
@@ -722,8 +726,10 @@ private void preferences(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref
 
 private void saveRFO(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveRFO
     // TODO add your handling code here:
-	JOptionPane.showMessageDialog(null, "RFO files not yet supported.  But see http://reprap.org/bin/view/Main/MultipleMaterialsFiles");
-	//printer.saveRFOFile();
+	if(rfo)
+		printer.saveRFOFile();
+	else
+		JOptionPane.showMessageDialog(null, "RFO files not yet supported.  But see http://reprap.org/bin/view/Main/MultipleMaterialsFiles");
 }//GEN-LAST:event_saveRFO
 
 private void displayPaths(boolean disp)

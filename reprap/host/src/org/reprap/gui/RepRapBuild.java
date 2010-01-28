@@ -452,14 +452,7 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 	
 	public void saveRFOFile(String s)
 	{
-		try
-		{
-			RFO.save(s, stls);
-		} catch (Exception e)
-		{
-			Debug.e("RepRapBuild.saveRFOFile(): Error creating " + s);
-			Debug.e(e.toString());
-		}
+		RFO.save(s, stls);
 	}
 	
 	public void moreCopies(STLObject original, Attributes originalAttributes, int number)
