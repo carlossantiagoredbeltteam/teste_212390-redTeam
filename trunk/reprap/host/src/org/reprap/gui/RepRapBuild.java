@@ -126,6 +126,7 @@ import com.sun.j3d.utils.picking.PickTool;
 import org.reprap.Attributes;
 import org.reprap.RFO;
 import org.reprap.Preferences;
+import org.reprap.geometry.LayerRules;
 import org.reprap.geometry.polygons.AllSTLsToBuild;
 import org.reprap.utilities.Debug;
 
@@ -440,14 +441,16 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 		}
 	}
 	
-	// Callback for when the user selects an STL file to load
+	// Callback for when the user selects an RFO file to load
 
 	public void addRFOFile(String s) 
 	{
 		if (s == null)
 			return;
-		deleteAllSTLs();
+		//deleteAllSTLs();
 		stls = RFO.load(s);
+		for(int i = 0; i < stls.size(); i++)
+			wv_and_stls.addChild(stls.get(i).top());
 	}
 	
 	public void saveRFOFile(String s)

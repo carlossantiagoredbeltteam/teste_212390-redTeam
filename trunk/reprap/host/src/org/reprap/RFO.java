@@ -15,7 +15,6 @@ import java.nio.channels.*;
 import java.util.zip.*;
 import java.util.Enumeration;
 
-import org.xml.sax.helpers.DefaultHandler;
 
 import org.xml.sax.XMLReader;
 import org.xml.sax.Attributes;
@@ -41,6 +40,10 @@ public class RFO
 	static final int top = 100;
 	static final String stlPrefix = "rfo-";
 	static final String stlSuffix = ".stl";
+	
+	//**************************************************************************************
+	//
+	// XML file writing
 	
 	class XMLOut
 	{
@@ -104,12 +107,33 @@ public class RFO
 		}
 	}
 	
+	//**************************************************************************************
+	//
+	// XML file reading
+	
 	class XMLIn extends DefaultHandler
 	{
-
-		XMLIn (String legendFile)
+		private RFO rfo;
+		String element;
+		String location;
+		String filetype;
+		String material;
+		double[] mElements;
+		Transform3D transform;
+		
+		int rowNumber = 0;
+		
+		XMLIn(String legendFile, RFO r)
 		{
 			super();
+			rfo = r;
+			element = "";
+			location = "";
+			filetype = "";
+			material = "";
+			mElements = new double[16];
+			setMToIdentity();			
+			
 			XMLReader xr = null;
 			try
 			{
@@ -128,9 +152,22 @@ public class RFO
 			{
 				Debug.e("XMLIn() 2: " + e);
 			}
+
 		}
 
-
+		private void setMToIdentity()
+		{
+			for(rowNumber = 0; rowNumber < 4; rowNumber++)
+				for(int column = 0; column < 4; column++)
+				{
+					if(rowNumber == column)
+						mElements[rowNumber*4 + column] = 1;
+					else
+						mElements[rowNumber*4 + column] = 0;
+				}
+			transform = new Transform3D(mElements);
+			rowNumber = 0;
+		}
 		////////////////////////////////////////////////////////////////////
 		// Event handlers.
 		////////////////////////////////////////////////////////////////////
@@ -138,64 +175,133 @@ public class RFO
 
 		public void startDocument ()
 		{
-			System.out.println("Start document");
+			//System.out.println("Start document");
 		}
 
 
 		public void endDocument ()
 		{
-			System.out.println("End document");
+			//System.out.println("End document");
 		}
 
 
 		public void startElement (String uri, String name,
-				String qName, Attributes atts)
+				String qName, org.xml.sax.Attributes atts)
 		{
-			System.out.println("Start element: " + qName);
-			System.out.println("Name: " + name);
-			System.out.println("URI: " + uri);
-			System.out.println("Attributes: " + atts);
+			if (uri.equals(""))
+				element = qName;
+			else
+				element = name;
+			//System.out.print(element);
+			if(element.equalsIgnoreCase("reprap-fab-at-home-build"))
+			{
+				
+			} else if(element.equalsIgnoreCase("object"))
+			{
+				
+			} else  if(element.equalsIgnoreCase("files"))
+			{
+				
+			} else if(element.equalsIgnoreCase("file"))
+			{
+				location = atts.getValue("location");
+				filetype = atts.getValue("filetype");
+				material = atts.getValue("material");
+				if(!filetype.equalsIgnoreCase("application/sla"))
+					Debug.e("XMLIn.startElement(): unreconised object file type (should be \"application/sla\"): " + filetype);
+				
+			} else if(element.equalsIgnoreCase("transform3D"))
+			{
+				setMToIdentity();
+			} else if(element.equalsIgnoreCase("row"))
+			{
+				for(int column = 0; column < 4; column++)
+					mElements[rowNumber*4 + column] = Double.parseDouble(atts.getValue("m" + rowNumber + column));
+			} else
+			{
+				Debug.e("XMLIn.startElement(): unreconised RFO element: " + element);
+			}
 		}
 
 
 		public void endElement (String uri, String name, String qName)
 		{
-			if ("".equals (uri))
-				System.out.println("End element: " + qName);
+			if (uri.equals(""))
+				element = qName;
 			else
-				System.out.println("End element:   {" + uri + "}" + name);
+				element = name;
+			if(element.equalsIgnoreCase("reprap-fab-at-home-build"))
+			{
+				
+			} else if(element.equalsIgnoreCase("object"))
+			{
+				
+			} else  if(element.equalsIgnoreCase("files"))
+			{
+				
+			} else if(element.equalsIgnoreCase("file"))
+			{
+				STLObject stl = new STLObject();
+				STLObject lastPicked = null;
+				org.reprap.Attributes att = stl.addSTL("file:" + rfoDir + location, null, Preferences.unselectedApp(), lastPicked);
+				att.setMaterial(material);
+				stl.setTransform(transform);
+				rfo.astl.add(stl);
+				location = "";
+				filetype = "";
+				material = "";
+
+			} else if(element.equalsIgnoreCase("transform3D"))
+			{
+				if(rowNumber != 4)
+					Debug.e("XMLIn.endElement(): incomplete Transform3D matrix - last row number is not 4: " + rowNumber);
+				transform = new Transform3D(mElements);
+			} else if(element.equalsIgnoreCase("row"))
+			{
+				rowNumber++;
+			} else
+			{
+				Debug.e("XMLIn.endElement(): unreconised RFO element: " + element);
+			}
 		}
 
 
 		public void characters (char ch[], int start, int length)
 		{
-			System.out.print("Characters:    \"");
-			for (int i = start; i < start + length; i++) {
-				switch (ch[i]) {
-				case '\\':
-					System.out.print("\\\\");
-					break;
-				case '"':
-					System.out.print("\\\"");
-					break;
-				case '\n':
-					System.out.print("\\n");
-					break;
-				case '\r':
-					System.out.print("\\r");
-					break;
-				case '\t':
-					System.out.print("\\t");
-					break;
-				default:
-					System.out.print(ch[i]);
-				break;
-				}
-			}
-			System.out.print("\"\n");
+//			System.out.print("Characters: \"");
+//			for (int i = start; i < start + length; i++) 
+//			{
+//				switch (ch[i]) 
+//				{
+//				case '\\':
+//					System.out.print("\\\\");
+//					break;
+//				case '"':
+//					System.out.print("\\\"");
+//					break;
+//				case '\n':
+//					System.out.print("\\n");
+//					break;
+//				case '\r':
+//					System.out.print("\\r");
+//					break;
+//				case '\t':
+//					System.out.print("\\t");
+//					break;
+//				default:
+//					System.out.print(ch[i]);
+//				break;
+//				}
+//			}
+//			System.out.print("\"\n");
 		}
 
 	}
+	
+	//**************************************************************************************
+	//
+	// Start of RFO handling
+	
 	
 	String fileName;
 	String path;
@@ -319,7 +425,7 @@ public class RFO
 			xml.push("object name=\"object-" + i + "\"");
 			 xml.push("files");
 			  STLObject stlo = astl.get(i);
-			  xml.push("file location=\"" + stlName(names[i]) + "\" filetype=\"application/sla\" material=\"" + "STUFF\"");
+			  xml.push("file location=\"" + stlName(names[i]) + "\" filetype=\"application/sla\" material=\"" + "PLA\"");
 			   writeTransform(stlo.trans());
 			  xml.pop();
 			 xml.pop();
@@ -400,12 +506,15 @@ public class RFO
 	
 	private void interpretLegend()
 	{
-		XMLIn xi = new XMLIn(rfoDir + "legend");
+		XMLIn xi = new XMLIn(rfoDir + "legend", this);
+		File f = new File(rfoDir + "legend");
+		f.delete();
 	}
 	
 	public static AllSTLsToBuild load(String fn)
 	{
 		RFO rfo = new RFO(fn, null);
+		rfo.astl = new AllSTLsToBuild();
 		rfo.unCompress();
 		try
 		{
@@ -414,6 +523,17 @@ public class RFO
 		{
 			Debug.e("RFO.load(): exception - " + e.toString());
 		}
+		
+		File td = new File(rfo.rfoDir);
+		String[] fileList = td.list(); 
+		for(int i=0; i<fileList.length; i++) 
+		{ 
+			File f = new File(rfo.rfoDir, fileList[i]);
+			if(!f.delete())
+				Debug.e("RFO.AllSTLsToBuild(): Can't delete file: " + fileList[i]);
+		}
+		if(!td.delete())
+			Debug.e("RFO.AllSTLsToBuild(): Can't delete file: " + rfo.rfoDir);
 		return rfo.astl;
 	}
 }

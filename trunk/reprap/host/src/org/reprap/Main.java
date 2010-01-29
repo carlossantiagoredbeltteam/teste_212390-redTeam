@@ -27,6 +27,7 @@ import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
 import org.reprap.geometry.Producer;
+import org.reprap.geometry.LayerRules;
 import org.reprap.machines.MachineFactory;
 import org.reprap.gui.RepRapBuild;
 import org.reprap.gui.Utility;
