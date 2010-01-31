@@ -161,6 +161,16 @@ public class AllSTLsToBuild
 	private SliceCache cache;
 	
 	/**
+	 * The total count of all the stls, including multi-material objects
+	 */
+	private int subSTLCount;
+	
+	/**
+	 * The number of things in the most complicated STL object
+	 */
+	private int subMaxCount;
+	
+	/**
 	 * Simple constructor
 	 *
 	 */
@@ -171,29 +181,31 @@ public class AllSTLsToBuild
 		Zrange = null;
 		frozen = false;
 		cache = null;
+		subSTLCount = 0;
+		subMaxCount = 0;
 	}
 	
-	/**
-	 * Read in an RFO file with a collection of objects in
-	 * @param rfoFile
-	 */
-	public AllSTLsToBuild(String rfoFile)
-	{
-		stls = new ArrayList<STLObject>();
-		XYbox = null;
-		Zrange = null;
-		frozen = false;
-		cache = null;		
-	}
+//	/**
+//	 * Read in an RFO file with a collection of objects in
+//	 * @param rfoFile
+//	 */
+//	public AllSTLsToBuild(String rfoFile)
+//	{
+//		stls = new ArrayList<STLObject>();
+//		XYbox = null;
+//		Zrange = null;
+//		frozen = false;
+//		cache = null;		
+//	}
 	
-	/**
-	 * Write this out as an RFO file.
-	 * @param rfoFile
-	 */
-	public void writeRFO(String rfoFile)
-	{
-		
-	}
+//	/**
+//	 * Write this out as an RFO file.
+//	 * @param rfoFile
+//	 */
+//	public void writeRFO(String rfoFile)
+//	{
+//		
+//	}
 	
 	/**
 	 * Add a new STLObject
@@ -204,7 +216,28 @@ public class AllSTLsToBuild
 		if(frozen)
 			Debug.d("AllSTLsToBuild.add(): attempt to add an item to a frozen list.");
 		stls.add(s);
+		subSTLCount += s.size();
+		if(s.size() > subMaxCount)
+			subMaxCount = s.size();
 	}
+	
+//	/**
+//	 * Return the count of all the little bits
+//	 * @return
+//	 */
+//	public int stlPartCount()
+//	{
+//		return subSTLCount;
+//	}
+//	
+//	/**
+//	 * Return the biggest count of all the little bits
+//	 * @return
+//	 */
+//	public int stlMaxCount()
+//	{
+//		return subMaxCount;
+//	}
 	
 	/**
 	 * Get the i-th STLObject
@@ -215,6 +248,26 @@ public class AllSTLsToBuild
 	{
 		return stls.get(i);
 	}
+	
+//	/**
+//	 * Get the i-th STLObject's jth name
+//	 * @param i
+//	 * @return
+//	 */
+//	public String fileName(int i, int j)
+//	{
+//		return stls.get(i).fileItCameFrom(j);
+//	}
+	
+//	/**
+//	 * Get the i-th STLObject's jth name
+//	 * @param i
+//	 * @return
+//	 */
+//	public Attributes attributes(int i, int j)
+//	{
+//		return stls.get(i).attributes(j);
+//	}
 	
 	/**
 	 * Delete an object
@@ -376,10 +429,10 @@ public class AllSTLsToBuild
 		for(int i = 0; i < stls.size(); i++)
 		{
 			stl = stls.get(i);
-			if(stl.size().z > zhi)
-				zhi = stl.size().z;
-			if(stl.size().z < zlo)
-				zlo = stl.size().z;
+			if(stl.extent().z > zhi)
+				zhi = stl.extent().z;
+			if(stl.extent().z < zlo)
+				zlo = stl.extent().z;
 		}
 		
 		Zrange = new RrInterval(zlo, zhi);	

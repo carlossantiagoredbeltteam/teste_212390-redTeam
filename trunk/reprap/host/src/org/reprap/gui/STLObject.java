@@ -58,6 +58,8 @@ package org.reprap.gui;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.media.j3d.Appearance;
 import javax.media.j3d.BoundingBox;
@@ -92,31 +94,63 @@ import org.reprap.Preferences;
  * 
  */
 
-/**
- * Little class to hold offsets of loaded STL objects
- */
-class Offsets
-{
-	public Vector3d centreToOrigin;
-	public Vector3d bottomLeftShift;
-}
-
 public class STLObject
 {
+	
+	/**
+	 * Little class to hold offsets of loaded STL objects
+	 */
+	class Offsets
+	{
+		private Vector3d centreToOrigin;
+		private Vector3d bottomLeftShift;
+	}
+	
+	/**
+	 * Little class to hold tripples of the parts of this STLObject loaded.
+	 *
+	 */
+	class Contents
+	{
+	    private String sourceFile = null;   // The STL file I was loaded from
+	    private BranchGroup stl = null;     // The actual STL geometry
+	    private Attributes att = null;		// The attributes associated with it
+	    private int unique = 0;
+	    
+	    Contents(String s, BranchGroup st, Attributes a)
+	    {
+	    	sourceFile = s;
+	    	stl = st;
+	    	att = a;
+	    }
+	    
+	    void setUnique(int i)
+	    {
+	    	unique = i;
+	    }
+	    
+	    int getUnique()
+	    {
+	    	return unique;
+	    }
+	}
+	
     private MouseObject mouse = null;   // The mouse, if it is controlling us
     private BranchGroup top = null;     // The thing that links us to the world
     private BranchGroup handle = null;  // Internal handle for the mouse to grab
     private TransformGroup trans = null;// Static transform for when the mouse is away
     private BranchGroup stl = null;     // The actual STL geometry
-    private Vector3d size = null;       // X, Y and Z extent
+    private Vector3d extent = null;       // X, Y and Z extent
     private BoundingBox bbox = null;    // Temporary storage for the bounding box while loading
     private Vector3d rootOffset = null; // Offset of the first-loaded STL under stl
-    private String sourceFile = null;   // The STL file I was loaded from
+    private List<Contents> contents = null;
     
 
     public STLObject()
     {
-    	stl = new BranchGroup(); 
+    	stl = new BranchGroup();
+    	
+    	contents = new ArrayList<Contents>();
         
         // No mouse yet
         
@@ -179,7 +213,10 @@ public class STLObject
     	BranchGroup child = loadSingleSTL(location, att, offset, lastPicked);
     	if(child == null)
     		return null;
-    	sourceFile = location;
+    	if(lastPicked == null)
+    		contents.add(new Contents(location, child, att));
+    	else
+    		lastPicked.contents.add(new Contents(location, child, att));
     	return att;
     }
 
@@ -278,7 +315,7 @@ public class STLObject
         if(pNew.z < pOld.z)
         	pOld.z = pNew.z;
         bbox.setLower(pOld);
-        size = new Vector3d(pOld.x, pOld.y, pOld.z);
+        extent = new Vector3d(pOld.x, pOld.y, pOld.z);
 
         bb.getUpper(pNew);
         bbox.getUpper(pOld);
@@ -290,9 +327,9 @@ public class STLObject
         	pOld.z = pNew.z;
         bbox.setUpper(pOld);
         
-        size.x = pOld.x - size.x;
-        size.y = pOld.y - size.y;
-        size.z = pOld.z - size.z;
+        extent.x = pOld.x - extent.x;
+        extent.y = pOld.y - extent.y;
+        extent.z = pOld.z - extent.z;
         
     }
     
@@ -311,15 +348,42 @@ public class STLObject
     	return handle;
     }
     
-    public Vector3d size()
+    public Vector3d extent()
     {
-    	return size;
+    	return extent;
     }
     
-    public String fileItCameFrom()
+    public String fileItCameFrom(int i)
     {
-    	return sourceFile;
+    	return contents.get(i).sourceFile;
     }
+    
+    public Attributes attributes(int i)
+    {
+    	return contents.get(i).att;
+    }
+    
+    public BranchGroup branchGroup(int i)
+    {
+    	return contents.get(i).stl;
+    } 
+    
+    public int size()
+    {
+    	return contents.size();
+    }
+    
+    public void setUnique(int i, int v)
+    {
+    	contents.get(i).setUnique(v);
+    }
+    
+    public int getUnique(int i)
+    {
+    	return contents.get(i).getUnique();
+    }
+    
+    
     
     /**
      * Find how to move the object by actually changing all its coordinates (i.e. don't just add a
@@ -354,11 +418,11 @@ public class STLObject
             
             // How big?
             
-            size = new Vector3d(p1.x - p0.x, p1.y - p0.y, p1.z - p0.z);
+            extent = new Vector3d(p1.x - p0.x, p1.y - p0.y, p1.z - p0.z);
             
             // Position us centre at origin:
             
-            offset = add(offset, neg(scale(size, 0.5)));
+            offset = add(offset, neg(scale(extent, 0.5)));
             
             // Recursively apply that.  N.B. we do not apply a transform to the
             // loaded object; we actually shift all its points to put it in this
@@ -374,7 +438,7 @@ public class STLObject
             
             //Transform3D temp_t = new Transform3D();
             //temp_t.set(scale(size, 0.5));
-            result.bottomLeftShift = scale(size, 0.5);
+            result.bottomLeftShift = scale(extent, 0.5);
             //System.out.println("half-size = " + result.bottomLeftShift.toString());
             //trans.setTransform(temp_t);
             
@@ -395,7 +459,7 @@ public class STLObject
     	this();
   
         stl.addChild(s);
-        size = new Vector3d(1, 1, 1);  // Should never be needed.
+        extent = new Vector3d(1, 1, 1);  // Should never be needed.
         
         Transform3D temp_t = new Transform3D();
         trans.setTransform(temp_t); 
@@ -708,13 +772,13 @@ public class STLObject
         // Subtract the part of the translation that puts the bottom left corner
         // at the origin.
         
-        Vector3d zero = scale(size, 0.5);
+        Vector3d zero = scale(extent, 0.5);
         mouseTranslation = add(mouseTranslation, neg(zero));       
         
         // Click the size record round by t
         
-        t.transform(size);
-        size = posOct(size); 
+        t.transform(extent);
+        extent = posOct(extent); 
         
         // Apply the new rotation to the existing one
         
@@ -725,7 +789,7 @@ public class STLObject
         // Add a new translation to put the bottom left corner
         // back at the origin.
         
-        zero = scale(size, 0.5);
+        zero = scale(extent, 0.5);
         mouseTranslation = add(mouseTranslation, zero);
         
         // Then slide us back where we were
@@ -758,17 +822,17 @@ public class STLObject
         // Subtract the part of the translation that puts the bottom left corner
         // at the origin.
         
-        Vector3d zero = scale(size, 0.5);
+        Vector3d zero = scale(extent, 0.5);
         mouseTranslation = add(mouseTranslation, neg(zero));       
         
         // Rescale the box
         
-       	size.scale(s);
+       	extent.scale(s);
         
         // Add a new translation to put the bottom left corner
         // back at the origin.
         
-        zero = scale(size, 0.5);
+        zero = scale(extent, 0.5);
         mouseTranslation = add(mouseTranslation, zero);
         
         // Then slide us back where we were
