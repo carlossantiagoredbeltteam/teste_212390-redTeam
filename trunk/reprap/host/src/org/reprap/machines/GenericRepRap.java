@@ -1154,9 +1154,9 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 * Load an RFO file to be made.
 	 * @return the name of the file
 	 */
-	public String saveRFOFile()
+	public String saveRFOFile(String filerRoot)
 	{
-		return org.reprap.Main.gui.saveRFO();
+		return org.reprap.Main.gui.saveRFO(filerRoot);
 	}
 
 	/**
