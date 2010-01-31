@@ -450,7 +450,7 @@ public interface Printer {
 	public String addSTLFileForMaking();
 	public String loadGCodeFileForMaking();
 	public String loadRFOFileForMaking();
-	public String saveRFOFile();
+	public String saveRFOFile(String fileRoot);
 	
 	/**
 	 * Set an output file

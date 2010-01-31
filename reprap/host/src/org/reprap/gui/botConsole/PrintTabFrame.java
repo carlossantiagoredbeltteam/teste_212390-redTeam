@@ -19,7 +19,6 @@ import org.reprap.Printer;
  */
 public class PrintTabFrame extends javax.swing.JInternalFrame {
 	private static final long serialVersionUID = 1L;
-	private static final boolean rfo = true;
 	private BotConsoleFrame parentBotConsoleFrame = null;
 //	private XYZTabPanel xYZTabPanel = null;
     private Printer printer;
@@ -454,18 +453,13 @@ private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     	int sp = loadedFiles.length();
     	if(sp <= 0)
     	{
-    		JOptionPane.showMessageDialog(null, "There are no STLs loaded to print to file.");
+    		JOptionPane.showMessageDialog(null, "There are no STLs/RFOs loaded to print to file.");
     		return;
     	}
-    	sp = loadedFiles.indexOf(".stl");
+    	sp = Math.max(loadedFiles.indexOf(".stl"), Math.max(loadedFiles.indexOf(".STL"), Math.max(loadedFiles.indexOf(".rfo"), loadedFiles.indexOf(".RFO"))));
     	if(sp <= 0)
        	{
-    		sp = loadedFiles.indexOf(".STL");
-    		if(sp <= 0)
-    		{
-    			JOptionPane.showMessageDialog(null, "The loaded file is not an STL file.");
-    			return;
-    		}
+    		JOptionPane.showMessageDialog(null, "The loaded file is not an STL or an RFO file.");
     	}   		
     	printer.setTopDown(true);	
     	if(printer.setGCodeFileForOutput(loadedFiles.substring(0, sp)) == null)
@@ -632,7 +626,7 @@ private void LoadGCode(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoadGC
 	{
 		int response = JOptionPane.showOptionDialog(
                 null                       // Center in window.
-                , "This will abandon the STL file(s) you loaded."        // Message
+                , "This will abandon the STL/RFO file(s) you loaded."        // Message
                 , "Load GCode"               // Title in titlebar
                 , JOptionPane.YES_NO_OPTION  // Option type
                 , JOptionPane.PLAIN_MESSAGE  // messageType
@@ -674,16 +668,13 @@ private void LoadGCode(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoadGC
 }//GEN-LAST:event_LoadGCode
 
 private void loadRFO(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadRFO
-
-	if(rfo)
-	{
 		if(!SLoadOK)
 			return;
-		if(gcodeLoaded || stlLoaded)
+		if(gcodeLoaded)
 		{
 			int response = JOptionPane.showOptionDialog(
 					null                       // Center in window.
-					, "This will abandon the previous file(s) you loaded."        // Message
+					, "This will abandon the previous GCode file you loaded."        // Message
 					, "Load RFO"               // Title in titlebar
 					, JOptionPane.YES_NO_OPTION  // Option type
 					, JOptionPane.PLAIN_MESSAGE  // messageType
@@ -715,8 +706,6 @@ private void loadRFO(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadRFO
 		fileNameBox.setText(loadedFiles);
 		stlLoaded = true;
 		gcodeLoaded = false;
-	} else
-		JOptionPane.showMessageDialog(null, "RFO files not yet supported.  But see http://reprap.org/bin/view/Main/MultipleMaterialsFiles");
 }//GEN-LAST:event_loadRFO
 
 private void preferences(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_preferences
@@ -726,10 +715,12 @@ private void preferences(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref
 
 private void saveRFO(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveRFO
     // TODO add your handling code here:
-	if(rfo)
-		printer.saveRFOFile();
-	else
-		JOptionPane.showMessageDialog(null, "RFO files not yet supported.  But see http://reprap.org/bin/view/Main/MultipleMaterialsFiles");
+	int sp = Math.max(loadedFiles.indexOf(".stl"), Math.max(loadedFiles.indexOf(".STL"), Math.max(loadedFiles.indexOf(".rfo"), loadedFiles.indexOf(".RFO"))));
+	if(sp <= 0)
+   	{
+		JOptionPane.showMessageDialog(null, "The loaded file is not an STL or an RFO file.");
+	}   		
+	printer.saveRFOFile(loadedFiles.substring(0, sp));
 }//GEN-LAST:event_saveRFO
 
 private void displayPaths(boolean disp)

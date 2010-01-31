@@ -160,15 +160,15 @@ public class AllSTLsToBuild
 	 */
 	private SliceCache cache;
 	
-	/**
-	 * The total count of all the stls, including multi-material objects
-	 */
-	private int subSTLCount;
-	
-	/**
-	 * The number of things in the most complicated STL object
-	 */
-	private int subMaxCount;
+//	/**
+//	 * The total count of all the stls, including multi-material objects
+//	 */
+//	private int subSTLCount;
+//	
+//	/**
+//	 * The number of things in the most complicated STL object
+//	 */
+//	private int subMaxCount;
 	
 	/**
 	 * Simple constructor
@@ -181,8 +181,8 @@ public class AllSTLsToBuild
 		Zrange = null;
 		frozen = false;
 		cache = null;
-		subSTLCount = 0;
-		subMaxCount = 0;
+//		subSTLCount = 0;
+//		subMaxCount = 0;
 	}
 	
 //	/**
@@ -216,9 +216,9 @@ public class AllSTLsToBuild
 		if(frozen)
 			Debug.d("AllSTLsToBuild.add(): attempt to add an item to a frozen list.");
 		stls.add(s);
-		subSTLCount += s.size();
-		if(s.size() > subMaxCount)
-			subMaxCount = s.size();
+//		subSTLCount += s.size();
+//		if(s.size() > subMaxCount)
+//			subMaxCount = s.size();
 	}
 	
 //	/**

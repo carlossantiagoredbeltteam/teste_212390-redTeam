@@ -552,18 +552,23 @@ public class Main {
         return "";
     }
     
-    public String saveRFO()
+    public String saveRFO(String fileRoot)
     {
         String result = null;
         File f;
         FileFilter filter;
         
-
-        filter = new ExtensionFileFilter("RFO", new String[] { "RFO" });
+        
+		File defaultFile = new File(fileRoot + ".rfo");
+		JFileChooser chooser = new JFileChooser();
+		chooser.setSelectedFile(defaultFile);
+		filter = new ExtensionFileFilter("RFO file to write to", new String[] { "rfo" });
+		chooser.setFileFilter(filter);
+		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
  
         chooser.setFileFilter(filter);
 
-        int returnVal = chooser.showOpenDialog(null);// chooser.showOpenDialog(mainFrame);
+        int returnVal = chooser.showSaveDialog(null);// chooser.showOpenDialog(mainFrame);
         if(returnVal == JFileChooser.APPROVE_OPTION) 
         {
             f = chooser.getSelectedFile();
