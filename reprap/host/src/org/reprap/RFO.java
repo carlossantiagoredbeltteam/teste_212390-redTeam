@@ -2,6 +2,7 @@
  * A .rfo file is a compressed archive containing multiple objects that are all to
  * be built in a RepRap machine at once.  See this web page:
  * 
+ * http://reprap.org/bin/view/Main/MultipleMaterialsFiles
  * 
  * for details.
  * 
@@ -37,13 +38,21 @@ import org.reprap.gui.STLObject;
 
 public class RFO 
 {
+	/**
+	 * XML stack top.  If it gets 100 deep we're in trouble...
+	 */
 	static final int top = 100;
+	
+	/**
+	 * Names of STL files in the compressed .rfo file
+	 */
 	static final String stlPrefix = "rfo-";
 	static final String stlSuffix = ".stl";
 	
 	//**************************************************************************************
 	//
-	// XML file writing
+	// XML file writing.  The legend file that ties everything together is XML.  This writes
+	// it.
 	
 	class XMLOut
 	{
@@ -51,6 +60,11 @@ public class RFO
 		String[] stack;
 		int sp;
 		
+		/**
+		 * Create an XML file called LegendFile starting with XML entry start.
+		 * @param LegendFile
+		 * @param start
+		 */
 		XMLOut(String LegendFile, String start)
 		{
 			FileOutputStream fileStream = null;
@@ -67,6 +81,10 @@ public class RFO
 			push(start);
 		}
 		
+		/**
+		 * Start item s
+		 * @param s
+		 */
 		void push(String s)
 		{
 			for(int i = 0; i < sp; i++)
@@ -82,6 +100,10 @@ public class RFO
 				Debug.e("RFO: XMLOut stack overflow on " + s);
 		}
 		
+		/**
+		 * Output a complete item s all in one go.
+		 * @param s
+		 */
 		void write(String s)
 		{
 			for(int i = 0; i < sp; i++)
@@ -89,6 +111,10 @@ public class RFO
 			XMLStream.println("<" + s + "/>");
 		}
 		
+		/**
+		 * End the current item.
+		 *
+		 */
 		void pop()
 		{
 			sp--;
@@ -99,6 +125,10 @@ public class RFO
 			XMLStream.println("</" + stack[sp] + ">");
 		}
 		
+		/**
+		 * Wind it up.
+		 *
+		 */
 		void close()
 		{
 			while(sp > 0)
@@ -109,20 +139,57 @@ public class RFO
 	
 	//**************************************************************************************
 	//
-	// XML file reading
+	// XML file reading.  This reads the legend file.
 	
 	class XMLIn extends DefaultHandler
 	{
+		/**
+		 * The rfo that we are reading in
+		 */
 		private RFO rfo;
-		String element;
-		String location;
-		String filetype;
-		String material;
-		double[] mElements;
-		Transform3D transform;
 		
-		int rowNumber = 0;
+		/**
+		 * The STL being read
+		 */
+		private STLObject stl;
 		
+		/**
+		 * The first of a list of STLs being read.
+		 */
+		private STLObject firstSTL;
+		/**
+		 * The current XML item
+		 */
+		private String element;
+		
+		/**
+		 * File location for reading (eg for an input STL file).
+		 */
+		private String location;
+		
+		/**
+		 * What type of file (Only STLs supported at the moment).
+		 */
+		private String filetype;
+		
+		/**
+		 * The name of the material (i.e. extruder) that this item is made from.
+		 */
+		private String material;
+		
+		/**
+		 * Transfom matrix to get an item in the right place.
+		 */
+		private double[] mElements;
+		private Transform3D transform;
+		
+		private int rowNumber = 0;
+		
+		/**
+		 * Open up legendFile and use it to build RFO rfo.
+		 * @param legendFile
+		 * @param r
+		 */
 		XMLIn(String legendFile, RFO r)
 		{
 			super();
@@ -155,6 +222,10 @@ public class RFO
 
 		}
 
+		/**
+		 * Initialise the matrix to the identity matrix.
+		 *
+		 */
 		private void setMToIdentity()
 		{
 			for(rowNumber = 0; rowNumber < 4; rowNumber++)
@@ -169,22 +240,31 @@ public class RFO
 			rowNumber = 0;
 		}
 		////////////////////////////////////////////////////////////////////
-		// Event handlers.
+		// Event handlers.  These are callbacks for the XML parser.
 		////////////////////////////////////////////////////////////////////
 
 
+		/**
+		 * Begin the XML document - no action needed.
+		 */
 		public void startDocument ()
 		{
 			//System.out.println("Start document");
 		}
 
 
+		/**
+		 * End the XML document - no action needed.
+		 */
 		public void endDocument ()
 		{
 			//System.out.println("End document");
 		}
 
 
+		/**
+		 * Start an element
+		 */
 		public void startElement (String uri, String name,
 				String qName, org.xml.sax.Attributes atts)
 		{
@@ -193,12 +273,16 @@ public class RFO
 			else
 				element = name;
 			//System.out.print(element);
+			
+			// What element is it?
+			
 			if(element.equalsIgnoreCase("reprap-fab-at-home-build"))
 			{
 				
 			} else if(element.equalsIgnoreCase("object"))
 			{
-				
+				stl = new STLObject();
+				firstSTL = null;
 			} else  if(element.equalsIgnoreCase("files"))
 			{
 				
@@ -209,7 +293,6 @@ public class RFO
 				material = atts.getValue("material");
 				if(!filetype.equalsIgnoreCase("application/sla"))
 					Debug.e("XMLIn.startElement(): unreconised object file type (should be \"application/sla\"): " + filetype);
-				
 			} else if(element.equalsIgnoreCase("transform3D"))
 			{
 				setMToIdentity();
@@ -223,7 +306,9 @@ public class RFO
 			}
 		}
 
-
+		/**
+		 * End an element
+		 */
 		public void endElement (String uri, String name, String qName)
 		{
 			if (uri.equals(""))
@@ -235,18 +320,17 @@ public class RFO
 				
 			} else if(element.equalsIgnoreCase("object"))
 			{
-				
+				stl.setTransform(transform);
+				rfo.astl.add(stl);
 			} else  if(element.equalsIgnoreCase("files"))
 			{
 				
 			} else if(element.equalsIgnoreCase("file"))
 			{
-				STLObject stl = new STLObject();
-				STLObject lastPicked = null;
-				org.reprap.Attributes att = stl.addSTL("file:" + rfoDir + location, null, Preferences.unselectedApp(), lastPicked);
+				org.reprap.Attributes att = stl.addSTL("file:" + rfoDir + location, null, Preferences.unselectedApp(), firstSTL);
+				if(firstSTL == null)
+					firstSTL = stl;
 				att.setMaterial(material);
-				stl.setTransform(transform);
-				rfo.astl.add(stl);
 				location = "";
 				filetype = "";
 				material = "";
@@ -265,35 +349,14 @@ public class RFO
 			}
 		}
 
-
+		/**
+		 * Nothing to do for characters in between.
+		 */
 		public void characters (char ch[], int start, int length)
 		{
-//			System.out.print("Characters: \"");
 //			for (int i = start; i < start + length; i++) 
-//			{
-//				switch (ch[i]) 
-//				{
-//				case '\\':
-//					System.out.print("\\\\");
-//					break;
-//				case '"':
-//					System.out.print("\\\"");
-//					break;
-//				case '\n':
-//					System.out.print("\\n");
-//					break;
-//				case '\r':
-//					System.out.print("\\r");
-//					break;
-//				case '\t':
-//					System.out.print("\\t");
-//					break;
-//				default:
-//					System.out.print(ch[i]);
-//				break;
-//				}
-//			}
-//			System.out.print("\"\n");
+//				System.out.print(ch[i]);
+//			System.out.println();
 		}
 
 	}
@@ -302,15 +365,42 @@ public class RFO
 	//
 	// Start of RFO handling
 	
-	
+	/**
+	 * The name of the RFO file.
+	 */
 	String fileName;
+	
+	/**
+	 * The directory in which it is.
+	 */
 	String path;
+	
+	/**
+	 * The temporary directory
+	 */
 	String tempDir;
-	int[] names;
+	
+	/**
+	 * The location of the temporary RFO directory
+	 */
 	String  rfoDir;
+	
+	/**
+	 * The collection of objects being written out or read in.
+	 */
 	AllSTLsToBuild astl;
+	
+	/**
+	 * The XML output for the legend file.
+	 */
 	XMLOut xml;
 	
+	/**
+	 * The constructor is the same whether we're reading or writing.  fn is where to put or get the
+	 * rfo file from.  as is all the things to write; set that null when reading.
+	 * @param fn
+	 * @param as
+	 */
 	private RFO(String fn, AllSTLsToBuild as)
 	{
 		int sepIndex = fn.lastIndexOf(File.separator);
@@ -338,7 +428,9 @@ public class RFO
 	//
 	// .rfo writing
 	
-	
+	/**
+	 * Copy a file from one place to another
+	 */
 	private static void copyFile(File in, File out)
 	{
 		try
@@ -355,6 +447,11 @@ public class RFO
 
 	}		
 	
+	/**
+	 * Copy a file from one place to another.
+	 * @param from
+	 * @param to
+	 */
 	private static void copyFile(String from, String to)
 	{
 		File inputFile;
@@ -368,41 +465,58 @@ public class RFO
 		if(tIndex < 0)
 			outputFile = new File(to);
 		else
-			outputFile = new File(to.substring(tIndex + 5, to.length()));
-		//outputFile.deleteOnExit(); 
+			outputFile = new File(to.substring(tIndex + 5, to.length())); 
 		copyFile(inputFile, outputFile);		
 	}
 	
+	/**
+	 * Create the name of STL file number i
+	 * @param i
+	 * @return
+	 */
 	private String stlName(int i)
 	{
 		return stlPrefix + i + stlSuffix;
 	}
 	
+	/**
+	 * Copy each unique STL file to the temporary directory.  Files used more
+	 * than once are only copied once.
+	 *
+	 */
 	private void copySTLs()
 	{
-		names = new int[astl.size()];
-
 		int u = 0;
 		for(int i = 0; i < astl.size(); i++)
 		{
-			String s = astl.get(i).fileItCameFrom();
-			names[i] = u;
-			for(int j = 0; j < i; j++)
+			for(int subMod1 = 0; subMod1 < astl.get(i).size(); subMod1++)
 			{
-				if(s.matches(astl.get(j).fileItCameFrom()))
+				String s = astl.get(i).fileItCameFrom(subMod1);
+				astl.get(i).setUnique(subMod1, u);
+				for(int j = 0; j < i; j++)
 				{
-					names[i] = j;
-					break;
+					for(int subMod2 = 0; subMod2 < astl.get(j).size(); subMod2++)
+					{
+						if(s.matches(astl.get(j).fileItCameFrom(subMod2)))
+						{
+							astl.get(i).setUnique(subMod1, astl.get(j).getUnique(subMod2));
+							break;
+						}
+					}
 				}
-			}
-			if(names[i] == u)
-			{
-				copyFile(s, rfoDir + stlName(u));
-				u++;
+				if(astl.get(i).getUnique(subMod1) == u)
+				{
+					copyFile(s, rfoDir + stlName(u));
+					u++;
+				}
 			}
 		}	
 	}
 	
+	/**
+	 * Write a 4x4 homogeneous transform in XML format.
+	 * @param trans
+	 */
 	private void writeTransform(TransformGroup trans)
 	{
 		Transform3D t = new Transform3D();
@@ -417,6 +531,10 @@ public class RFO
 		xml.pop();
 	}
 	
+	/**
+	 * Create the legend file
+	 *
+	 */
 	private void createLegend()
 	{
 		xml = new XMLOut(rfoDir + "legend", "reprap-fab-at-home-build version=\"0.1\"");
@@ -425,16 +543,25 @@ public class RFO
 			xml.push("object name=\"object-" + i + "\"");
 			 xml.push("files");
 			  STLObject stlo = astl.get(i);
-			  xml.push("file location=\"" + stlName(names[i]) + "\" filetype=\"application/sla\" material=\"" + "PLA\"");
-			   writeTransform(stlo.trans());
-			  xml.pop();
+			  for(int subObj = 0; subObj < stlo.size(); subObj++)
+			  {
+				  xml.push("file location=\"" + stlName(stlo.getUnique(subObj)) + "\" filetype=\"application/sla\" material=\"" + 
+						  stlo.attributes(subObj).getMaterial() + "\"");
+				  xml.pop();
+			  }
 			 xml.pop();
+			 writeTransform(stlo.trans());
 			xml.pop();
 		}
 		xml.close();
 	}
 	
-	
+	/**
+	 * The entire temporary directory with the legend file and ann the STLs is complete.
+	 * Compress it into the required rfo file using zip.  Note we delete the temporary files as we
+	 * go along, ending up by deleting the directory containing them.
+	 *
+	 */
 	private void compress()
 	{
 		try
@@ -468,8 +595,15 @@ public class RFO
 		}
 	}
 	
+	/**
+	 * This is what gets called to write an rfo file.  It saves all the parts of allSTL in rfo file fn.
+	 * @param fn
+	 * @param allSTL
+	 */
 	public static void save(String fn, AllSTLsToBuild allSTL)
 	{
+		if(!fn.endsWith(".rfo"))
+			fn += ".rfo";
 		RFO rfo = new RFO(fn, allSTL);
 		rfo.copySTLs();
 		rfo.createLegend();
@@ -480,6 +614,9 @@ public class RFO
 	//
 	// .rfo reading
 	
+	/**
+	 * This uncompresses the zip that is the rfo file into the temporary directory.
+	 */
 	private void unCompress()
 	{
 		try
@@ -504,6 +641,10 @@ public class RFO
 		}
 	}
 	
+	/**
+	 * This reads the legend file, does what it says, then deletes it.
+	 *
+	 */
 	private void interpretLegend()
 	{
 		XMLIn xi = new XMLIn(rfoDir + "legend", this);
@@ -511,8 +652,15 @@ public class RFO
 		f.delete();
 	}
 	
+	/**
+	 * This is what gets called to read an rfo file from filename fn.
+	 * @param fn
+	 * @return
+	 */
 	public static AllSTLsToBuild load(String fn)
 	{
+		if(!fn.endsWith(".rfo"))
+			fn += ".rfo";
 		RFO rfo = new RFO(fn, null);
 		rfo.astl = new AllSTLsToBuild();
 		rfo.unCompress();
@@ -523,6 +671,9 @@ public class RFO
 		{
 			Debug.e("RFO.load(): exception - " + e.toString());
 		}
+		
+		// Tidy up - delete the temporary files and the directory
+		// containing them.
 		
 		File td = new File(rfo.rfoDir);
 		String[] fileList = td.list(); 

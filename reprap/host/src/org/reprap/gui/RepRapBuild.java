@@ -462,11 +462,11 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 	{
 		if (number <= 0)
 			return;
-		String fileName = original.fileItCameFrom();
+		String fileName = original.fileItCameFrom(0);
 		Vector3d offset = new Vector3d();
 		offset.y = 0;
 		offset.z = 0;
-		double increment = original.size().x + 5;
+		double increment = original.extent().x + 5;
 		offset.x = increment;
 		for(int i = 0; i < number; i++)
 		{
