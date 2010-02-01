@@ -361,9 +361,15 @@ public class Producer {
 				allPolygons[physicalExtruder] = new RrPolygonList();
 			
 			boolean shield = true;
+			Rr2Point startNearHere = null;
 			for(int stl = 0; stl < allSTLs.size(); stl++)
 			{
-					RrPolygonList fills = allSTLs.computeInfill(stl, layerRules);
+					RrPolygonList fills = allSTLs.computeInfill(stl, layerRules, startNearHere);
+					if(fills.size() > 0)
+					{
+						RrPolygon last = fills.polygon(fills.size() - 1);
+						startNearHere = last.point(last.size() - 1);
+					}
 					RrPolygonList borders = allSTLs.computeOutlines(stl, layerRules, fills, shield);
 					for(int pol = 0; pol < borders.size(); pol++)
 					{

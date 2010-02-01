@@ -533,7 +533,7 @@ public class AllSTLsToBuild
 	 * @param layerConditions
 	 * @return
 	 */
-	public RrPolygonList computeInfill(int stl, LayerRules layerConditions)
+	public RrPolygonList computeInfill(int stl, LayerRules layerConditions, Rr2Point startNearHere)
 	{
 		int layer = layerConditions.getMachineLayer();
 		BooleanGridList shapes = slice(stl, layerConditions);
@@ -556,13 +556,18 @@ public class AllSTLsToBuild
 		if(insides != null)
 			insides = insides.offset(layerConditions, false, 1);
 		
-		RrPolygonList hatchedPolygons = shapes.hatch(layerConditions, true);
+		RrPolygonList hatchedPolygons = shapes.hatch(layerConditions, true, startNearHere);
+		if(hatchedPolygons.size() > 0)
+		{
+			RrPolygon last = hatchedPolygons.polygon(hatchedPolygons.size() - 1);
+			startNearHere = last.point(last.size() - 1);
+		}
 		
 //		if(layerConditions.getLayingSupport())
 //			offHatch = offHatch.union(layerConditions.getPrinter().getExtruders());
 			
 		if(insides != null)
-			hatchedPolygons.add(insides.hatch(layerConditions, false));
+			hatchedPolygons.add(insides.hatch(layerConditions, false, startNearHere));
 		
 		return hatchedPolygons;
 	}

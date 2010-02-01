@@ -1777,7 +1777,7 @@ public class BooleanGrid
 	 * @param a
 	 * @return a polygon list of hatch lines as the result with attributes a
 	 */
-	public RrPolygonList hatch(RrHalfPlane hp, double gap, Attributes a)
+	public RrPolygonList hatch(RrHalfPlane hp, double gap, Attributes a, Rr2Point startNearHere)
 	{	
 		push("Computing hatching... ");
 		
@@ -1856,7 +1856,9 @@ public class BooleanGrid
 		
 		pop();
 		
-		return snakes.realPolygons(a).simplify(realResolution);
+		RrPolygonList result = snakes.realPolygons(a).simplify(realResolution);
+		result = result.nearEnds(startNearHere);
+		return result;
 	}
 	
 	
