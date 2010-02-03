@@ -194,6 +194,13 @@ public interface Printer {
 	public double getDumpY();
 	
 	/**
+	 * The location to go to at the end
+	 * @return
+	 */
+	public double getFinishX();
+	public double getFinishY();
+	
+	/**
 	 * Move to the purge point
 	 *
 	 */

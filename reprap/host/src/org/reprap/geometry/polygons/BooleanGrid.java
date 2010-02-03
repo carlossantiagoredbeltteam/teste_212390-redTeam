@@ -349,15 +349,17 @@ public class BooleanGrid
 		}
 		
 		/**
-		 * Find the index of the point in the polygon nearest to another point
+		 * Find the index of the point in the polygon nearest to another point as long as
+		 * it's less than tooFar2.  Set that to Long.MAX_VALUE for a complete search.
 		 * @param a
+		 * @param tooFar2
 		 * @return
 		 */
-		public int nearest(iPoint a)
+		public int nearest(iPoint a, long tooFar2)
 		{
 			int i = 0;
 			int j = -1;
-			long d0 = Long.MAX_VALUE;
+			long d0 = tooFar2;
 			while(i < size())
 			{
 				long d1 = point(i).sub(a).magnitude2();
@@ -1703,6 +1705,7 @@ public class BooleanGrid
     	if(p == null)
     		return null;
     	
+    	iPoint pNew;
     	double vOrigin = originPlane.value(p.realPoint());
     	boolean notCrossedOriginPlane = originPlane.value(p.realPoint())*vOrigin >= 0;
     	boolean notCrossedTargetPlane = targetPlane.value(p.realPoint())*vTarget >= 0;
@@ -1710,9 +1713,11 @@ public class BooleanGrid
     	{
     		track.add(p);
     		vSet(p, true);
-    		p = findUnvisitedNeighbourOnEdgeInDirection(p, dir);
-    		if(p == null)
+    		pNew = findUnvisitedNeighbourOnEdgeInDirection(p, dir);
+    		if(pNew == null)
     			return null;
+    		dir = neighbourIndex(pNew.sub(p));
+    		p = pNew;
     		notCrossedOriginPlane = originPlane.value(p.realPoint())*vOrigin >= 0;
         	notCrossedTargetPlane = targetPlane.value(p.realPoint())*vTarget >= 0;
     	}
@@ -1764,7 +1769,14 @@ public class BooleanGrid
 				result.add(jump.track);
 				thisHatch = jump.hitPlaneIndex;
 				thisPolygon = ipl.polygon(thisHatch);
-				thisPt = thisPolygon.nearest(jump.track.point(jump.track.size() - 1));
+				thisPt = thisPolygon.nearest(jump.track.point(jump.track.size() - 1), 10);
+//				if(thisPt >= 0)
+//				{
+//					long d = thisPolygon.point(thisPt).sub(jump.track.point(jump.track.size() - 1)).magnitude2();
+//					if(d > 10)
+//						Debug.e("Long jump! " + d);
+//					thisPt = -1;
+//				}
 			}
 		} while(jump != null && thisPt >= 0);		
 		return result;
