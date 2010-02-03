@@ -60,6 +60,11 @@ public abstract class GenericRepRap implements CartesianPrinter
 	protected double dumpX, dumpY;
 	
 	/**
+	 * The location of the place to go at the end
+	 */
+	protected double finishX, finishY;
+	
+	/**
 	 * Rezero X and y every...
 	 */
 	double xYReZeroInterval = -1;
@@ -271,6 +276,9 @@ public abstract class GenericRepRap implements CartesianPrinter
 			foundationLayers = Preferences.loadGlobalInt("FoundationLayers");
 			dumpX = Preferences.loadGlobalDouble("DumpX(mm)");
 			dumpY = Preferences.loadGlobalDouble("DumpY(mm)");
+			
+			finishX = Preferences.loadGlobalDouble("FinishX(mm)");
+			finishY = Preferences.loadGlobalDouble("FinishY(mm)");
 		}
 		catch (Exception ex)
 		{
@@ -324,7 +332,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 */
 	public void terminate() throws Exception
 	{
-		moveTo(0.5, 0.5, getZ(), getExtruder().getFastXYFeedrate(), true, true);
+		moveTo(getFinishX(), getFinishY(), getZ(), getExtruder().getFastXYFeedrate(), true, true);
 		getExtruder().setMotor(false);
 		getExtruder().setValve(false);
 		getExtruder().setTemperature(0, false);
@@ -1282,5 +1290,19 @@ public abstract class GenericRepRap implements CartesianPrinter
 	public double getDumpY()
 	{
 		return dumpY;
+	}
+	
+	/**
+	 * The XY location to go to at the end of a build
+	 * @return
+	 */
+	public double getFinishX()
+	{
+		return finishX;
+	}
+	
+	public double getFinishY()
+	{
+		return finishY;
 	}
 }
