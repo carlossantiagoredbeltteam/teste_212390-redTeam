@@ -363,12 +363,41 @@ public class GCodeRepRap extends GenericRepRap {
 	 */
 	public void dispose() {
 		// TODO: fix this to be more flexible
+		
+//		gcode.startingEpilogue();
+//		
+//		try
+//		{
+//			// Fan off
+//			getExtruder().setCooler(false);
+//			moveToFinish();
+//			// Extruder off
+//			getExtruder().setExtrusion(0, false);
+//
+//			// heater off
+//			getExtruder().heatOff();
+//		} catch(Exception e){
+//			//oops
+//		}
+//		//write/close our file/serial port
+//		gcode.reverseLayers();
+//		gcode.finish();
+
+		super.dispose();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.reprap.Printer#terminate()
+	 */
+	public void terminate() throws Exception
+	{
 		gcode.startingEpilogue();
+		
 		try
 		{
 			// Fan off
 			getExtruder().setCooler(false);
-
+			moveToFinish();
 			// Extruder off
 			getExtruder().setExtrusion(0, false);
 
@@ -380,9 +409,13 @@ public class GCodeRepRap extends GenericRepRap {
 		//write/close our file/serial port
 		gcode.reverseLayers();
 		gcode.finish();
-
-		super.dispose();
+		//Debug.e("Generic terminate: " + getFinishX() + " " + getFinishY());
+//		moveToFinish();
+//		getExtruder().setMotor(false);
+//		getExtruder().setValve(false);
+//		getExtruder().setTemperature(0, false);
 	}
+	
 	
 	/**
 	 * Go to the purge point
@@ -390,6 +423,14 @@ public class GCodeRepRap extends GenericRepRap {
 	public void moveToPurge()
 	{
 		singleMove(dumpX, dumpY, currentZ, getExtruder().getFastXYFeedrate());
+	}
+	
+	/**
+	 * Go to the purge point
+	 */
+	public void moveToFinish()
+	{
+		singleMove(finishX, finishY, currentZ, getExtruder().getFastXYFeedrate());
 	}
 
 

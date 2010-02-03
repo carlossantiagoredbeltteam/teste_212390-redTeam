@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.reprap.Extruder;
 import org.reprap.devices.NullStepperMotor;
 import org.reprap.devices.NullExtruder;
+import org.reprap.utilities.Debug;
 
 /**
  *
@@ -34,6 +35,19 @@ public class Simulator extends GenericRepRap {
 	{
 		
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.reprap.Printer#terminate()
+	 */
+	public void terminate() throws Exception
+	{
+		//Debug.e("Generic terminate: " + getFinishX() + " " + getFinishY());
+		moveTo(getFinishX(), getFinishY(), getZ(), getExtruder().getFastXYFeedrate(), true, true);
+		getExtruder().setMotor(false);
+		getExtruder().setValve(false);
+		getExtruder().setTemperature(0, false);
+	}
+	
 	
 	/**
 	 * Go to the purge point
