@@ -327,17 +327,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 			extruders[i].dispose();
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.reprap.Printer#terminate()
-	 */
-	public void terminate() throws Exception
-	{
-		moveTo(getFinishX(), getFinishY(), getZ(), getExtruder().getFastXYFeedrate(), true, true);
-		getExtruder().setMotor(false);
-		getExtruder().setValve(false);
-		getExtruder().setTemperature(0, false);
-	}
-	
+
 
 	
 //	public Extruder extruderFactory(int count)
