@@ -448,9 +448,10 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 		if (s == null)
 			return;
 		//deleteAllSTLs();
-		stls = RFO.load(s);
-		for(int i = 0; i < stls.size(); i++)
-			wv_and_stls.addChild(stls.get(i).top());
+		AllSTLsToBuild newStls = RFO.load(s);
+		for(int i = 0; i < newStls.size(); i++)
+			wv_and_stls.addChild(newStls.get(i).top());
+		stls.add(newStls);
 	}
 	
 	public void saveRFOFile(String s)

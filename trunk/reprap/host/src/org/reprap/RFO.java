@@ -365,35 +365,37 @@ public class RFO
 	//
 	// Start of RFO handling
 	
+	private static final String legendName = "legend.xml";
+	
 	/**
 	 * The name of the RFO file.
 	 */
-	String fileName;
+	private String fileName;
 	
 	/**
 	 * The directory in which it is.
 	 */
-	String path;
+	private String path;
 	
 	/**
 	 * The temporary directory
 	 */
-	String tempDir;
+	private String tempDir;
 	
 	/**
 	 * The location of the temporary RFO directory
 	 */
-	String  rfoDir;
+	private String  rfoDir;
 	
 	/**
 	 * The collection of objects being written out or read in.
 	 */
-	AllSTLsToBuild astl;
+	private AllSTLsToBuild astl;
 	
 	/**
 	 * The XML output for the legend file.
 	 */
-	XMLOut xml;
+	private XMLOut xml;
 	
 	/**
 	 * The constructor is the same whether we're reading or writing.  fn is where to put or get the
@@ -403,6 +405,7 @@ public class RFO
 	 */
 	private RFO(String fn, AllSTLsToBuild as)
 	{
+		astl = as;
 		int sepIndex = fn.lastIndexOf(File.separator);
 		int fIndex = fn.indexOf("file:");
 		fileName = fn.substring(sepIndex + 1, fn.length());
@@ -414,16 +417,57 @@ public class RFO
 				path = fn.substring(0, sepIndex + 1);
 		} else
 			path = "";
-		tempDir = System.getProperty("java.io.tmpdir") + File.separator;
-		astl = as;
+		tempDir = System.getProperty("java.io.tmpdir") + File.separator + "rfo" + Long.toString(System.nanoTime());
 
-		rfoDir = tempDir + fileName;
-		File rfod = new File(rfoDir);
+		File rfod = new File(tempDir);
+		if(!rfod.mkdir())
+			throw new RuntimeException(tempDir);
+		tempDir += File.separator;
+		rfoDir = tempDir + "rfo";
+		rfod = new File(rfoDir);
 		if(!rfod.mkdir())
 			throw new RuntimeException(rfoDir);
 		rfoDir += File.separator;
 	}
 	
+//	public File createTempDirectory() throws IOException
+//	{
+//		final File temp;
+//
+//		temp = File.createTempFile(tempDir, Long.toString(System.nanoTime()));
+//
+//		if(!(temp.delete()))
+//		{
+//			throw new IOException("Could not delete temp file: " + temp.getAbsolutePath());
+//		}
+//
+//		if(!(temp.mkdir()))
+//		{
+//			throw new IOException("Could not create temp directory: " + temp.getAbsolutePath());
+//		}
+//
+//		return (temp);
+//	}
+//	
+	public static boolean recursiveDelete(File fileOrDir)
+	{
+	    if(fileOrDir.isDirectory())
+	    {
+	        // recursively delete contents
+	        for(File innerFile: fileOrDir.listFiles())
+	        {
+	            if(!recursiveDelete(innerFile))
+	            {
+	                return false;
+	            }
+	        }
+	    }
+
+	    return fileOrDir.delete();
+	}
+
+
+
 	//****************************************************************************
 	//
 	// .rfo writing
@@ -537,7 +581,7 @@ public class RFO
 	 */
 	private void createLegend()
 	{
-		xml = new XMLOut(rfoDir + "legend", "reprap-fab-at-home-build version=\"0.1\"");
+		xml = new XMLOut(rfoDir + legendName, "reprap-fab-at-home-build version=\"0.1\"");
 		for(int i = 0; i < astl.size(); i++)
 		{
 			xml.push("object name=\"object-" + i + "\"");
@@ -583,11 +627,7 @@ public class RFO
 				while((bytesIn = fis.read(buffer)) != -1) 
 					rfoFile.write(buffer, 0, bytesIn); 
 				fis.close();
-				if(!f.delete())
-					Debug.e("RFO.compress(): Can't delete file: " + fileList[i]);
 			}
-			if(!dirToZip.delete())
-				Debug.e("RFO.compress(): Can't delete directory: " + rfoDir);
 			rfoFile.close();
 		} catch (Exception e)
 		{
@@ -608,6 +648,8 @@ public class RFO
 		rfo.copySTLs();
 		rfo.createLegend();
 		rfo.compress();
+		File t = new File(rfo.tempDir);
+		recursiveDelete(t);
 	}
 	
 	//******************************************************************************************
@@ -647,9 +689,9 @@ public class RFO
 	 */
 	private void interpretLegend()
 	{
-		XMLIn xi = new XMLIn(rfoDir + "legend", this);
-		File f = new File(rfoDir + "legend");
-		f.delete();
+		XMLIn xi = new XMLIn(rfoDir + legendName, this);
+		File f = new File(rfoDir + legendName);
+		//f.delete();
 	}
 	
 	/**
@@ -675,16 +717,16 @@ public class RFO
 		// Tidy up - delete the temporary files and the directory
 		// containing them.
 		
-		File td = new File(rfo.rfoDir);
-		String[] fileList = td.list(); 
-		for(int i=0; i<fileList.length; i++) 
-		{ 
-			File f = new File(rfo.rfoDir, fileList[i]);
-			if(!f.delete())
-				Debug.e("RFO.AllSTLsToBuild(): Can't delete file: " + fileList[i]);
-		}
-		if(!td.delete())
-			Debug.e("RFO.AllSTLsToBuild(): Can't delete file: " + rfo.rfoDir);
+//		File td = new File(rfo.rfoDir);
+//		String[] fileList = td.list(); 
+//		for(int i=0; i<fileList.length; i++) 
+//		{ 
+//			File f = new File(rfo.rfoDir, fileList[i]);
+//			if(!f.delete())
+//				Debug.e("RFO.AllSTLsToBuild(): Can't delete file: " + fileList[i]);
+//		}
+//		if(!td.delete())
+//			Debug.e("RFO.AllSTLsToBuild(): Can't delete file: " + rfo.rfoDir);
 		return rfo.astl;
 	}
 }

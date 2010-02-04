@@ -221,6 +221,21 @@ public class AllSTLsToBuild
 //			subMaxCount = s.size();
 	}
 	
+	/**
+	 * Add a new collection
+	 * @param s
+	 */
+	public void add(AllSTLsToBuild a)
+	{
+		if(frozen)
+			Debug.d("AllSTLsToBuild.add(): attempt to add a collection to a frozen list.");
+		for(int i = 0; i < a.size(); i++)
+			stls.add(a.get(i));
+//		subSTLCount += s.size();
+//		if(s.size() > subMaxCount)
+//			subMaxCount = s.size();
+	}
+	
 //	/**
 //	 * Return the count of all the little bits
 //	 * @return
