@@ -422,33 +422,17 @@ public class RFO
 		File rfod = new File(tempDir);
 		if(!rfod.mkdir())
 			throw new RuntimeException(tempDir);
+		org.reprap.Main.ftd.add(rfod);
 		tempDir += File.separator;
 		rfoDir = tempDir + "rfo";
 		rfod = new File(rfoDir);
 		if(!rfod.mkdir())
 			throw new RuntimeException(rfoDir);
+		org.reprap.Main.ftd.add(rfod);
 		rfoDir += File.separator;
 	}
 	
-//	public File createTempDirectory() throws IOException
-//	{
-//		final File temp;
-//
-//		temp = File.createTempFile(tempDir, Long.toString(System.nanoTime()));
-//
-//		if(!(temp.delete()))
-//		{
-//			throw new IOException("Could not delete temp file: " + temp.getAbsolutePath());
-//		}
-//
-//		if(!(temp.mkdir()))
-//		{
-//			throw new IOException("Could not create temp directory: " + temp.getAbsolutePath());
-//		}
-//
-//		return (temp);
-//	}
-//	
+
 	public static boolean recursiveDelete(File fileOrDir)
 	{
 	    if(fileOrDir.isDirectory())
@@ -672,6 +656,7 @@ public class RFO
 				ZipEntry ze = (ZipEntry)allFiles.nextElement();
 				InputStream is = rfoFile.getInputStream(ze);
 				File element = new File(tempDir + ze.getName());
+				org.reprap.Main.ftd.add(element);
 				FileOutputStream os = new FileOutputStream(element);
 				while((bytesIn = is.read(buffer)) != -1) 
 					os.write(buffer, 0, bytesIn);
@@ -684,14 +669,12 @@ public class RFO
 	}
 	
 	/**
-	 * This reads the legend file, does what it says, then deletes it.
+	 * This reads the legend file and does what it says.
 	 *
 	 */
 	private void interpretLegend()
 	{
 		XMLIn xi = new XMLIn(rfoDir + legendName, this);
-		File f = new File(rfoDir + legendName);
-		//f.delete();
 	}
 	
 	/**
