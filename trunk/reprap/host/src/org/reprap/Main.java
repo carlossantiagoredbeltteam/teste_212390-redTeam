@@ -36,7 +36,7 @@ import org.reprap.comms.Communicator;
 //import org.reprap.comms.snap.SNAPAddress;
 //import org.reprap.comms.snap.SNAPCommunicator;
 import org.reprap.utilities.ExtensionFileFilter;
-
+import org.reprap.utilities.RrDeleteOnExit;
 /**
  *
  * mainpage RepRap Host Controller Software
@@ -49,6 +49,8 @@ import org.reprap.utilities.ExtensionFileFilter;
 
 
 public class Main {
+	
+	public static RrDeleteOnExit ftd = new RrDeleteOnExit();
 
     private static Communicator communicator = null;
     
@@ -690,6 +692,7 @@ public class Main {
 	}
 	
 	public void dispose() {
+		ftd.killThem();
 		/// TODO This class should be fixed so it gets the dispose on window close
 		try {
 			// Attempt to save screen position if requested
