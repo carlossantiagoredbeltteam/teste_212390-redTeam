@@ -29,12 +29,13 @@ public class RrDeleteOnExit
 		
 		for(int i = toDelete.size() - 1; i >= 0; i--)
 			if(!toDelete.get(i).delete())
-				Debug.e("Unable to delete: " + toDelete.get(i).getAbsolutePath());
+				Debug.e("RrDeleteOnExit.killThem(): Unable to delete: " + toDelete.get(i).getAbsolutePath());
 		toDelete = null;
 	}
 	
 	protected void finalize() throws Throwable
 	{
+		Debug.d("RrDel finalise()");
 		killThem();
 	}
 }

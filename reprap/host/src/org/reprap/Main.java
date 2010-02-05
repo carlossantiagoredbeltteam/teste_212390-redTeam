@@ -37,6 +37,8 @@ import org.reprap.comms.Communicator;
 //import org.reprap.comms.snap.SNAPCommunicator;
 import org.reprap.utilities.ExtensionFileFilter;
 import org.reprap.utilities.RrDeleteOnExit;
+import org.reprap.utilities.Debug;
+
 /**
  *
  * mainpage RepRap Host Controller Software
@@ -50,7 +52,7 @@ import org.reprap.utilities.RrDeleteOnExit;
 
 public class Main {
 	
-	public static RrDeleteOnExit ftd = new RrDeleteOnExit();
+	public static RrDeleteOnExit ftd = null;
 
     private static Communicator communicator = null;
     
@@ -89,6 +91,7 @@ public class Main {
     private JSplitPane panel;
 	
 	public Main() {
+		ftd = new RrDeleteOnExit();
         chooser = new JFileChooser();
  
         // Do we want just to list .stl files, or all?
@@ -380,6 +383,12 @@ public class Main {
         mainFrame.pack();
         Utility.positionWindowOnScreen(mainFrame);
         mainFrame.setVisible(true);
+	}
+	
+	protected void finalize() throws Throwable
+	{
+		Debug.d("Main finalise()");
+		ftd.killThem();
 	}
 
 //	private Box createPreviewPanel() throws Exception {
@@ -691,7 +700,9 @@ public class Main {
 			"mm^3.  Elapsed time=" + time + "s";
 	}
 	
-	public void dispose() {
+	public void dispose() 
+	{
+		Debug.d("Main dispose()");
 		ftd.killThem();
 		/// TODO This class should be fixed so it gets the dispose on window close
 		try {
