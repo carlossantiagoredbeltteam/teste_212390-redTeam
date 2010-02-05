@@ -497,6 +497,7 @@ private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 }//GEN-LAST:event_stopButtonActionPerformed
 
 private void exitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitButtonActionPerformed
+	org.reprap.Main.gui.ftd.killThem();
 	printer.dispose();
 	System.exit(0);
 }//GEN-LAST:event_exitButtonActionPerformed
