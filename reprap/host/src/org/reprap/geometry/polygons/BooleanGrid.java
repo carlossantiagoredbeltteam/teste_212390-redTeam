@@ -1715,7 +1715,11 @@ public class BooleanGrid
     		vSet(p, true);
     		pNew = findUnvisitedNeighbourOnEdgeInDirection(p, dir);
     		if(pNew == null)
+    		{
+    			for(int i = 0; i < track.size(); i++)
+    				vSet(track.point(i), false);
     			return null;
+    		}
     		dir = neighbourIndex(pNew.sub(p));
     		p = pNew;
     		notCrossedOriginPlane = originPlane.value(p.realPoint())*vOrigin >= 0;
@@ -1770,16 +1774,36 @@ public class BooleanGrid
 				thisHatch = jump.hitPlaneIndex;
 				thisPolygon = ipl.polygon(thisHatch);
 				thisPt = thisPolygon.nearest(jump.track.point(jump.track.size() - 1), 10);
-//				if(thisPt >= 0)
-//				{
-//					long d = thisPolygon.point(thisPt).sub(jump.track.point(jump.track.size() - 1)).magnitude2();
-//					if(d > 10)
-//						Debug.e("Long jump! " + d);
-//					thisPt = -1;
-//				}
 			}
 		} while(jump != null && thisPt >= 0);		
 		return result;
+	}
+	
+	void joinUpSnakes(iPolygonList snakes, List<RrHalfPlane> hatches, double gap)
+	{
+		int i = 0;
+		Rr2Point n = hatches.get(0).normal();
+		while(i < snakes.size())
+		{
+			iPoint iStart = snakes.polygon(i).point(0);
+			iPoint iEnd = snakes.polygon(i).point(snakes.polygon(i).size() - 1);
+			iPoint diff;
+			double d;
+			for(int j = i+1; j < snakes.size(); j++)
+			{
+				iPoint jStart = snakes.polygon(j).point(0);
+				iPoint jEnd = snakes.polygon(j).point(snakes.polygon(j).size() - 1);
+				diff = jStart.sub(iStart);
+				d = Rr2Point.mul(diff.realPoint(), n);
+				if(Math.abs(d) < 1.5*gap)
+				{
+					//TODO!!!!!
+				}
+			}
+			
+			
+			i++;
+		}
 	}
 	
 	/**
@@ -1865,6 +1889,8 @@ public class BooleanGrid
 		} while(segment >= 0);
 		
 		resetVisited();
+		
+		//joinUpSnakes(snakes, hatches, gap);
 		
 		pop();
 		
