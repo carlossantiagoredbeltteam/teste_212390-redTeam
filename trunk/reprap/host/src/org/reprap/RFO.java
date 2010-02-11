@@ -422,13 +422,11 @@ public class RFO
 		File rfod = new File(tempDir);
 		if(!rfod.mkdir())
 			throw new RuntimeException(tempDir);
-		org.reprap.Main.ftd.add(rfod);
 		tempDir += File.separator;
 		rfoDir = tempDir + "rfo";
 		rfod = new File(rfoDir);
 		if(!rfod.mkdir())
 			throw new RuntimeException(rfoDir);
-		org.reprap.Main.ftd.add(rfod);
 		rfoDir += File.separator;
 	}
 	
@@ -687,6 +685,11 @@ public class RFO
 		if(!fn.endsWith(".rfo"))
 			fn += ".rfo";
 		RFO rfo = new RFO(fn, null);
+		File rfod = new File(rfo.tempDir);
+		org.reprap.Main.ftd.add(rfod);
+		rfod = new File(rfo.rfoDir);
+		org.reprap.Main.ftd.add(rfod);
+		
 		rfo.astl = new AllSTLsToBuild();
 		rfo.unCompress();
 		try
