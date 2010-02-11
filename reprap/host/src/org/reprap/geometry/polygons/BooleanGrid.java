@@ -522,6 +522,25 @@ public class BooleanGrid
 		}
 		
 		/**
+		 * Replace a polygon in the list
+		 * @param i
+		 * @param p
+		 */
+		public void set(int i, iPolygon p)
+		{
+			polygons.set(i, p);
+		}
+		
+		/**
+		 * Get rid of a polygon from the list
+		 * @param i
+		 */
+		public void remove(int i)
+		{
+			polygons.remove(i);
+		}
+		
+		/**
 		 * Add another list of polygons on the end
 		 * @param a
 		 */
@@ -654,7 +673,8 @@ public class BooleanGrid
 	}
 	
 	/**
-	 * Little class to hold the ends of hatching patterns
+	 * Little class to hold the ends of hatching patterns.  Snakes are a combination of the hatching
+	 * lines that infill a shape plus the bits of boundary that join their ends to make a zig-zag pattern.
 	 * @author ensab
 	 *
 	 */
@@ -714,7 +734,7 @@ public class BooleanGrid
 	private Attributes att;
 	
 	/**
-	 * Run round the neighbours of a pixel anticlockwise from bottom left
+	 * Run round the eight neighbours of a pixel anticlockwise from bottom left
 	 */
 	private final iPoint[] neighbour = {
 		new iPoint(-1, -1),
@@ -728,8 +748,9 @@ public class BooleanGrid
 		};
 	
 	/**
-	 * Lookup table for whether to cull points forming thin bridges.  The index into this is the bitpattern
-	 * implied by the neighbour array.
+	 * Lookup table for whether to cull points forming thin bridges.  The index into this is the byte bitpattern
+	 * implied by the neighbour array.  This table is generated interactively by the program 
+	 * org.reprap.utilities.FilterGenerator.
 	 */
 	private static final boolean[] thinFilter = {
 		true, true, true, false, true, true, false, true, true, true, true, true, false, true, false, false, 
@@ -756,7 +777,7 @@ public class BooleanGrid
 	private final int[] neighbourProduct = {2, 1, 0, -1, -2, -1, 0, 1};
 	
 	//**************************************************************************************************
-	// Debugging
+	// Debugging and timing
 	
 	private static String stack[] = new String[20];
 	private static int sp = -1;
@@ -768,19 +789,19 @@ public class BooleanGrid
 			return;
 		sp++;
 		stack[sp] = s;
+		String str = "";
 		for(int i = 0; i < sp; i++)
-			System.out.print(" ");
-		System.out.println("{ " + s);
-		System.out.flush();
+			str += " ";
+		Debug.a("{ " + str + s);
 	}
 	private void pop()
 	{
 		if(!debug)
 			return;
+		String str = "";
 		for(int i = 0; i < sp; i++)
-			System.out.print(" ");
-		System.out.println("} " + stack[sp]);
-		System.out.flush();
+			str += " ";		
+		Debug.a("} " + str + stack[sp]);
 		sp--;
 	}
 	
@@ -1673,6 +1694,7 @@ public class BooleanGrid
 	
     /**
      * Find the bit of polygon edge between start/originPlane and targetPlane
+     * TODO: origin == target!!!
      * @param start
      * @param hatches
      * @param originP
@@ -1684,12 +1706,13 @@ public class BooleanGrid
     	iPolygon track = new iPolygon(false);
     	
     	RrHalfPlane originPlane = hatches.get(originP);
-    	RrHalfPlane targetPlane= hatches.get(targetP);
+    	RrHalfPlane targetPlane = hatches.get(targetP);
     	
-    	int dir = directionToNeighbour(originPlane.normal());
-    	
-    	if(originPlane.value(targetPlane.pLine().origin()) < 0)
-    		dir = neighbourIndex(neighbour[dir].neg());
+
+    		int dir = directionToNeighbour(originPlane.normal());
+
+    			if(originPlane.value(targetPlane.pLine().origin()) < 0)
+    				dir = neighbourIndex(neighbour[dir].neg());
 
     	if(!get(start))
     	{
@@ -1723,7 +1746,7 @@ public class BooleanGrid
     		dir = neighbourIndex(pNew.sub(p));
     		p = pNew;
     		notCrossedOriginPlane = originPlane.value(p.realPoint())*vOrigin >= 0;
-        	notCrossedTargetPlane = targetPlane.value(p.realPoint())*vTarget >= 0;
+    		notCrossedTargetPlane = targetPlane.value(p.realPoint())*vTarget >= 0;
     	}
     	
     	if(notCrossedOriginPlane)
@@ -1735,6 +1758,54 @@ public class BooleanGrid
        	Debug.e("BooleanGrid.goToPlane(): invalid ending!");
        	
     	return null;
+    }
+    
+    /**
+     * Find the poece of edge between start and end (if there is one).
+     * @param start
+     * @param end
+     * @return
+     */
+    private iPolygon goToPoint(iPoint start, iPoint end, RrHalfPlane hatch, double tooFar) 
+    {
+    	iPolygon track = new iPolygon(false);
+    	
+    	iPoint diff = end.sub(start);
+
+    	int dir = directionToNeighbour(new Rr2Point(diff.x, diff.y));
+
+    	if(!get(start))
+    	{
+    		Debug.e("BooleanGrid.goToPlane(): start is not solid!");
+    		return null;
+    	}
+    	
+    	vSet(start, true);
+    	
+    	iPoint p = findUnvisitedNeighbourOnEdgeInDirection(start, dir);
+    	if(p == null)
+    		return null;
+
+    	while(true)
+    	{
+    		track.add(p);
+    		vSet(p, true);
+    		p = findUnvisitedNeighbourOnEdgeInDirection(p, dir);
+    		boolean lost = p == null;
+    		if(!lost)
+    			lost = Math.abs(hatch.value(p.realPoint())) > tooFar;
+    		if(lost)
+    		{
+    			for(int i = 0; i < track.size(); i++)
+    				vSet(track.point(i), false);
+    			vSet(start, false);
+    			return null;
+    		}
+    		diff = end.sub(p);
+    		if(diff.magnitude2() < 3)
+    			return track;
+        	dir = directionToNeighbour(new Rr2Point(diff.x, diff.y));
+    	}
     }
 
     /**
@@ -1779,30 +1850,135 @@ public class BooleanGrid
 		return result;
 	}
 	
+	/**
+	 * Fine the nearest plane in the hatch to a given point
+	 * @param p
+	 * @param hatches
+	 * @return
+	 */
+	RrHalfPlane hPlane(iPoint p, List<RrHalfPlane> hatches)
+	{
+		int bot = 0;
+		int top = hatches.size() - 1;
+		Rr2Point rp = p.realPoint();
+		double dbot = Math.abs(hatches.get(bot).value(rp));
+		double dtop = Math.abs(hatches.get(top).value(rp));
+		while(top - bot > 1)
+		{
+			int mid = (top + bot)/2;
+			if(dbot < dtop)
+			{
+				top = mid;
+				dtop = Math.abs(hatches.get(top).value(rp));
+			} else
+			{
+				bot = mid;
+				dbot = Math.abs(hatches.get(bot).value(rp));				
+			}
+		}
+		if(dtop < dbot)
+			return hatches.get(top);
+		else
+			return hatches.get(bot);
+	}
+	
+	/**
+	 * Run through the snakes, trying to join them up to make longer snakes
+	 * @param snakes
+	 * @param hatches
+	 * @param gap
+	 */
 	void joinUpSnakes(iPolygonList snakes, List<RrHalfPlane> hatches, double gap)
 	{
 		int i = 0;
+		if(hatches.size() <= 0)
+			return;
 		Rr2Point n = hatches.get(0).normal();
+		iPolygon track;
 		while(i < snakes.size())
 		{
 			iPoint iStart = snakes.polygon(i).point(0);
 			iPoint iEnd = snakes.polygon(i).point(snakes.polygon(i).size() - 1);
-			iPoint diff;
 			double d;
-			for(int j = i+1; j < snakes.size(); j++)
+			int j = i+1;
+			boolean incrementI = true;
+			while(j < snakes.size())
 			{
 				iPoint jStart = snakes.polygon(j).point(0);
 				iPoint jEnd = snakes.polygon(j).point(snakes.polygon(j).size() - 1);
-				diff = jStart.sub(iStart);
-				d = Rr2Point.mul(diff.realPoint(), n);
+				incrementI = true;
+				
+				Rr2Point diff = Rr2Point.sub(jStart.realPoint(), iStart.realPoint());
+				d = Rr2Point.mul(diff, n);
 				if(Math.abs(d) < 1.5*gap)
 				{
-					//TODO!!!!!
+					track = goToPoint(iStart, jStart, hPlane(iStart, hatches), gap);
+					if(track != null)
+					{
+						iPolygon p = snakes.polygon(i).negate();
+						p.add(track);
+						p.add(snakes.polygon(j));
+						snakes.set(i, p);
+						snakes.remove(j);
+						incrementI = false;
+						break;
+					}
 				}
+				
+				diff = Rr2Point.sub(jEnd.realPoint(), iStart.realPoint());
+				d = Rr2Point.mul(diff, n);
+				if(Math.abs(d) < 1.5*gap)
+				{
+					track = goToPoint(iStart, jEnd, hPlane(iStart, hatches), gap);
+					if(track != null)
+					{
+						iPolygon p = snakes.polygon(j);
+						p.add(track.negate());
+						p.add(snakes.polygon(i));
+						snakes.set(i, p);
+						snakes.remove(j);
+						incrementI = false;
+						break;						
+					}
+				}
+				
+				diff = Rr2Point.sub(jStart.realPoint(), iEnd.realPoint());
+				d = Rr2Point.mul(diff, n);
+				if(Math.abs(d) < 1.5*gap)
+				{
+					track = goToPoint(iEnd, jStart, hPlane(iEnd, hatches), gap);
+					if(track != null)
+					{
+						iPolygon p = snakes.polygon(i);
+						p.add(track);
+						p.add(snakes.polygon(j));
+						snakes.set(i, p);
+						snakes.remove(j);
+						incrementI = false;
+						break;
+					}
+				}
+				
+				diff = Rr2Point.sub(jEnd.realPoint(), iEnd.realPoint());
+				d = Rr2Point.mul(diff, n);
+				if(Math.abs(d) < 1.5*gap)
+				{
+					track = goToPoint(iEnd, jEnd, hPlane(iEnd, hatches), gap);
+					if(track != null)
+					{
+						iPolygon p = snakes.polygon(i);
+						p.add(track);
+						p.add(snakes.polygon(j).negate());
+						snakes.set(i, p);
+						snakes.remove(j);	
+						incrementI = false;
+						break;
+					}						
+				}
+				j++;
 			}
-			
-			
-			i++;
+			if(incrementI)
+				i++;
 		}
 	}
 	
@@ -1888,14 +2064,20 @@ public class BooleanGrid
 			}
 		} while(segment >= 0);
 		
+
+		try
+		{
+			if(Preferences.loadGlobalBool("PathOptimise"))
+				joinUpSnakes(snakes, hatches, gap);
+		} catch (Exception e)
+		{}
+		
 		resetVisited();
-		
-		//joinUpSnakes(snakes, hatches, gap);
-		
-		pop();
 		
 		RrPolygonList result = snakes.realPolygons(a).simplify(realResolution);
 		result = result.nearEnds(startNearHere);
+		
+		pop();
 		return result;
 	}
 	

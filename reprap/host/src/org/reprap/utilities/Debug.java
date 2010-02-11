@@ -52,6 +52,7 @@ public class Debug {
 		initialiseIfNeedBe();
 		if(!db.debug) return;
 		System.out.println("DEBUG: " + s + Timer.stamp());
+		System.out.flush();
 	}
 	
 	/**
@@ -62,6 +63,7 @@ public class Debug {
 	{
 		initialiseIfNeedBe();
 		System.err.println("ERROR: " + s + Timer.stamp());
+		System.err.flush();
 	}
 	
 	/**
@@ -72,6 +74,7 @@ public class Debug {
 	{
 		initialiseIfNeedBe();
 		System.out.println("message: " + s + Timer.stamp());
+		System.out.flush();
 	}
 	
 	static public void c(String s)
@@ -79,6 +82,7 @@ public class Debug {
 		initialiseIfNeedBe();
 		if(!db.commsDebug) return;
 		System.out.println("comms: " + s + Timer.stamp());
+		System.out.flush();
 	}
 	
 

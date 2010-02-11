@@ -304,6 +304,7 @@ MouseTranslationFactor=50
 MouseZoomFactor=50
 MovementSpeedZ(0..255)=240
 NumberOfExtruders=3
+PathOptimise=false
 Port(name)=/dev/ttyUSB0
 RadiusFactor=0.7
 RememberWindowPosition=false
