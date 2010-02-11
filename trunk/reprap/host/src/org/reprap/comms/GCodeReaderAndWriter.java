@@ -113,12 +113,23 @@ public class GCodeReaderAndWriter
 	private PrintStream fileOutStream = null;
 	
 	/**
-	 * The ring buffer that stores the commands for direct
-	 * transmission to the RepRap machine.
+	 * The last command sent
+	 */
+	//private String lastCommand;
+	
+	/**
+	 * The current linenumber
+	 */
+	private long lineNumber;
+	
+	/**
+	 * The ring buffer that stores the commands for 
+	 * possible resend requests.
 	 */
 	private int head, tail;
 	private static final int buflen = 10; // No too long, or pause doesn't work well
 	private String[] ringBuffer;
+	private long[] ringLines;
 	
 	/**
 	 * The transmission to the RepRap machine is handled by
@@ -143,8 +154,10 @@ public class GCodeReaderAndWriter
 		paused = false;
 		alreadyReversed = false;
 		ringBuffer = new String[buflen];
+		ringLines = new long[buflen];
 		head = 0;
 		tail = 0;
+		lineNumber = 0;
 		//threadLock = false;
 		exhaustBuffer = false;
 		responsesExpected = 0;
@@ -232,7 +245,7 @@ public class GCodeReaderAndWriter
 			bufferThread = null;
 			head = 0;
 			tail = 0;
-		}	
+		}
 	}
 	
 	/**
@@ -368,7 +381,45 @@ public class GCodeReaderAndWriter
 	{
 		if(bufferThread != null)		
 			bufferThread.setPriority(myPriority);
-	}	
+	}
+	
+	/**
+	 * Compute the checksum of a GCode string.
+	 * @param cmd
+	 * @return
+	 */
+	private String checkSum(String cmd)
+	{
+		int cs = 0;
+		for(int i = 0; i < cmd.length(); i++)
+			cs = cs ^ cmd.charAt(i);
+		cs &= 0xff;
+		return "*" + cs;
+	}
+	
+	private void ringAdd(long ln, String cmd)
+	{
+		head++;
+		if(head >= ringBuffer.length)
+			head = 0;
+		ringBuffer[head] = cmd;
+		ringLines[head] = ln;
+	}
+	
+	private String ringGet(long ln)
+	{
+		int h = head;
+		do
+		{
+			if(ringLines[h] == ln)
+				return ringBuffer[h];
+			h--;
+			if(h < 0)
+				h = ringBuffer.length - 1;
+		} while(h != head);
+		Debug.e("ringGet: line " + ln + " not stored");
+		return "";
+	}
 	
 	/**
 	 * Queue a command into the ring buffer.  Note the use of prime time periods
@@ -390,119 +441,42 @@ public class GCodeReaderAndWriter
 			cmd = cmd.trim();
 			if(cmd.length() > 0)
 			{
+				ringAdd(lineNumber, cmd);
+				cmd = "N" + lineNumber + " " + cmd + " ";
+				cmd += checkSum(cmd);
 				serialOutStream.print(cmd + "\n");
+				
 				// Message has effectively gone to the machine, so we can release the queuing thread
 				//threadLock = false;				
 				serialOutStream.flush();
 				//oneSent = true;
 				Debug.c("G-code: " + cmd + " dequeued and sent");
 				// Wait for the machine to respond before we send the next command
-				waitForOK();
+				long ln;
+				while((ln = waitForOK()) >= 0)
+				{
+					lineNumber++;
+					cmd = "N" + lineNumber + " " + ringGet(ln) + " ";
+					cmd += checkSum(cmd);
+					serialOutStream.print(cmd + "\n");
+				}
+				lineNumber++;
 			}
 			return;
 		}
 	
 		Debug.c("G-code: " + cmd + " not sent");
 		
-//		// Is the output thread running?
-//		if(bufferThread == null)
-//		{
-//			Debug.d("bufferQueue: attempt to queue: " + cmd + " to a non-running output buffer.");
-//			return;
-//		}
-//		// Are we locked out by the transmit thread?
-//		//while(threadLock) sleep(5);
-//		// Lock out the transmit thread
-//		//threadLock = true;
-//		// Next location in the ring
-//		
-//		int newHead = head + 1;
-//		while(newHead == tail-1 || (tail == 0 && newHead == buflen-1))
-//		{
-//			// Release the lock so the transmit thread can get rid of stuff
-//			//threadLock = false;
-//			sleep(223);
-//		}
-//		synchronized(this)
-//		{
-//			//head++;
-//			head = newHead;
-//			if(head >= buflen) head = 0;
-//			// Have we collided with the tail (i.e. is the ring full)?
-//			//while(head == tail-1 || (tail == 0 && head == buflen-1))
-//			//{
-//			// Release the lock so the transmit thread can get rid of stuff
-//			//threadLock = false;
-//			//sleep(223);
-//			//}
-//			// Record the command in the buffer
-//			ringBuffer[head] = cmd;
-//			//threadLock = false;
-//			Debug.c("G-code: " + cmd + " queued");
-//		}
+
 	}
 	
-//	/**
-//	 * Loop getting the next thing in the buffer and transmitting it 
-//	 * (or waiting for something to send if there's nothing there).
-//	 *
-//	 */
-//	private void bufferDeQueue()
-//	{
-//		for(;;)
-//		{
-//			// Are we locked out by the queuing thread?
-//			//while(threadLock) sleep(7);
-//			// Wait for something to be there to send
-//			while(bufferEmpty())
-//			{
-//				// If nothing more is ever coming, finish
-//				if(exhaustBuffer)
-//				{
-//					exhaustBuffer = false;
-//					return;
-//				}
-//				sleep(19);
-//			}
-//			// Lock out the queuing thread
-//			//threadLock = true;
-//			boolean oneSent = false;
-//			synchronized(this)
-//			{
-//				// Pick up the next command in the buffer
-//				tail++;
-//				if(tail >= buflen) tail = 0;
-//				// Strip any comment and send the command to the machine
-//				String cmd = ringBuffer[tail];
-//				int com = cmd.indexOf(';');
-//				if(com > 0)
-//					cmd = cmd.substring(0, com);
-//				if(com != 0)
-//				{
-//					cmd = cmd.trim();
-//					serialOutStream.print(cmd + "\n");
-//					// Message has effectively gone to the machine, so we can release the queuing thread
-//					//threadLock = false;				
-//					serialOutStream.flush();
-//					oneSent = true;
-//					Debug.c("G-code: " + cmd + " dequeued and sent");
-//					// Wait for the machine to respond before we send the next command
-//					//waitForOK();
-//				} else
-//					Debug.c("G-code: " + ringBuffer[tail] + " not sent");
-//				// Just for safety
-//				//threadLock = false;
-//			}
-//			if(oneSent)
-//				waitForOK();
-//		}
-//	}
+
 
 	/**
 	 * Wait for the GCode interpreter in the RepRap machine to send back "ok\n".
 	 *
 	 */
-	private void waitForOK()
+	private long waitForOK()
 	{
 		int i, count;
 		String resp = "";
@@ -532,7 +506,7 @@ public class GCodeReaderAndWriter
 							Debug.c("GCode acknowledged with message: " + resp);
 						else
 							Debug.c("GCode acknowledged");
-						return;
+						return -1;
 					} else if (resp.startsWith("T:"))
 					{
 						Debug.c("GCodeWriter.waitForOK() - temperature reading: " + resp);
@@ -549,6 +523,13 @@ public class GCodeReaderAndWriter
 					else if (resp.startsWith("start") || resp.contentEquals(""))
 					{	
 						// That was the reset string from the machine or a null line; ignore it.
+					}else if (resp.startsWith("Serial Error:"))
+					{	
+						Debug.e("GCodeWriter.waitForOK(): " + resp);
+					}else if (resp.startsWith("Resend:"))
+					{	
+						// An error has occured.  Request a resend of the command.
+						return Long.parseLong(resp.substring(7, resp.length()));
 					}else
 					{
 						//Gone wrong.  Start again.
@@ -557,7 +538,7 @@ public class GCodeReaderAndWriter
 						if(count >= 3)
 						{
 							System.err.println("GCodeWriter.waitForOK(): try count exceeded.  Last line received was: " + resp);
-							return;
+							return -1; // No resend request
 						}
 					}
 					// If we get here we need a new string

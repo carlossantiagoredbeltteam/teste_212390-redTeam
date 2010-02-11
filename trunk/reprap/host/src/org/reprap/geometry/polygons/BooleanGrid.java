@@ -1419,10 +1419,11 @@ public class BooleanGrid
 	{
 		double score = Double.MIN_VALUE;
 		int result = -1;
+
 		for(int i = 0; i < 8; i++)
 		{
 			// Can't use neighbour.realPoint as that adds swCorner...
-			// We have to normailze neighbour, to get answers proportional to cosines
+			//  We have to normailze neighbour, to get answers proportional to cosines
 			double s = Rr2Point.mul(p, new Rr2Point(neighbour[i].x, neighbour[i].y).norm()); 
 			if(s > score)
 			{
@@ -1431,7 +1432,7 @@ public class BooleanGrid
 			}
 		}
 		if(result < 0)
-			Debug.e("BooleanGrid.directionToNeighbour(): scalar product error!");
+			Debug.e("BooleanGrid.directionToNeighbour(): scalar product error!" + p.toString());
 		return result;
 	}
 	
