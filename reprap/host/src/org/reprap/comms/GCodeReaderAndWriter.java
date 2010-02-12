@@ -456,9 +456,12 @@ public class GCodeReaderAndWriter
 				while((ln = waitForOK()) >= 0)
 				{
 					lineNumber++;
-					cmd = "N" + lineNumber + " " + ringGet(ln) + " ";
+					cmd = ringGet(ln);
+					ringAdd(lineNumber, cmd);
+					cmd = "N" + lineNumber + " " + cmd + " ";
 					cmd += checkSum(cmd);
 					serialOutStream.print(cmd + "\n");
+					Debug.e("Resent: " + cmd);
 				}
 				lineNumber++;
 			}
