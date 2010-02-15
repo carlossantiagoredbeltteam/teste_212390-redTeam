@@ -455,9 +455,10 @@ public class GCodeReaderAndWriter
 				long ln;
 				while((ln = waitForOK()) >= 0)
 				{
-					lineNumber++;
+					Debug.e("Requested to resend line " + ln);
+					lineNumber = ln;
 					cmd = ringGet(ln);
-					ringAdd(lineNumber, cmd);
+					//ringAdd(lineNumber, cmd);
 					cmd = "N" + lineNumber + " " + cmd + " ";
 					cmd += checkSum(cmd);
 					serialOutStream.print(cmd + "\n");
