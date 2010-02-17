@@ -141,6 +141,11 @@ public class AllSTLsToBuild
 	private List<STLObject> stls;
 	
 	/**
+	 * A plan box round each item
+	 */
+	private List<RrRectangle> rectangles;
+	
+	/**
 	 * The XY box around everything
 	 */
 	private RrRectangle XYbox;
@@ -160,16 +165,6 @@ public class AllSTLsToBuild
 	 */
 	private SliceCache cache;
 	
-//	/**
-//	 * The total count of all the stls, including multi-material objects
-//	 */
-//	private int subSTLCount;
-//	
-//	/**
-//	 * The number of things in the most complicated STL object
-//	 */
-//	private int subMaxCount;
-	
 	/**
 	 * Simple constructor
 	 *
@@ -177,35 +172,12 @@ public class AllSTLsToBuild
 	public AllSTLsToBuild()
 	{
 		stls = new ArrayList<STLObject>();
+		rectangles = null;
 		XYbox = null;
 		Zrange = null;
 		frozen = false;
 		cache = null;
-//		subSTLCount = 0;
-//		subMaxCount = 0;
 	}
-	
-//	/**
-//	 * Read in an RFO file with a collection of objects in
-//	 * @param rfoFile
-//	 */
-//	public AllSTLsToBuild(String rfoFile)
-//	{
-//		stls = new ArrayList<STLObject>();
-//		XYbox = null;
-//		Zrange = null;
-//		frozen = false;
-//		cache = null;		
-//	}
-	
-//	/**
-//	 * Write this out as an RFO file.
-//	 * @param rfoFile
-//	 */
-//	public void writeRFO(String rfoFile)
-//	{
-//		
-//	}
 	
 	/**
 	 * Add a new STLObject
@@ -214,11 +186,8 @@ public class AllSTLsToBuild
 	public void add(STLObject s)
 	{
 		if(frozen)
-			Debug.d("AllSTLsToBuild.add(): attempt to add an item to a frozen list.");
+			Debug.e("AllSTLsToBuild.add(): adding an item to a frozen list.");
 		stls.add(s);
-//		subSTLCount += s.size();
-//		if(s.size() > subMaxCount)
-//			subMaxCount = s.size();
 	}
 	
 	/**
@@ -228,31 +197,10 @@ public class AllSTLsToBuild
 	public void add(AllSTLsToBuild a)
 	{
 		if(frozen)
-			Debug.d("AllSTLsToBuild.add(): attempt to add a collection to a frozen list.");
+			Debug.e("AllSTLsToBuild.add(): adding a collection to a frozen list.");
 		for(int i = 0; i < a.size(); i++)
 			stls.add(a.get(i));
-//		subSTLCount += s.size();
-//		if(s.size() > subMaxCount)
-//			subMaxCount = s.size();
 	}
-	
-//	/**
-//	 * Return the count of all the little bits
-//	 * @return
-//	 */
-//	public int stlPartCount()
-//	{
-//		return subSTLCount;
-//	}
-//	
-//	/**
-//	 * Return the biggest count of all the little bits
-//	 * @return
-//	 */
-//	public int stlMaxCount()
-//	{
-//		return subMaxCount;
-//	}
 	
 	/**
 	 * Get the i-th STLObject
@@ -264,26 +212,6 @@ public class AllSTLsToBuild
 		return stls.get(i);
 	}
 	
-//	/**
-//	 * Get the i-th STLObject's jth name
-//	 * @param i
-//	 * @return
-//	 */
-//	public String fileName(int i, int j)
-//	{
-//		return stls.get(i).fileItCameFrom(j);
-//	}
-	
-//	/**
-//	 * Get the i-th STLObject's jth name
-//	 * @param i
-//	 * @return
-//	 */
-//	public Attributes attributes(int i, int j)
-//	{
-//		return stls.get(i).attributes(j);
-//	}
-	
 	/**
 	 * Delete an object
 	 * @param i
@@ -291,7 +219,7 @@ public class AllSTLsToBuild
 	public void remove(int i)
 	{
 		if(frozen)
-			Debug.d("AllSTLsToBuild.remove(): attempt to remove an item to a frozen list.");
+			Debug.e("AllSTLsToBuild.remove(): removing an item from a frozen list.");
 		stls.remove(i);
 	}
 	
@@ -306,13 +234,61 @@ public class AllSTLsToBuild
 	
 	/**
 	 * Freeze the list - no more editing.
-	 *
+	 * Also compute the XY box round everything.
+	 * Also compute the individual plan boxes round each STLObject.
 	 */
 	private void freeze()
 	{
+		if(frozen)
+			return;
 		frozen = true;
+		rectangles = new ArrayList<RrRectangle>();
+		for(int i = 0; i < stls.size(); i++)
+			rectangles.add(null);		
 		if(cache == null)
 			cache = new SliceCache();
+		RrRectangle s;
+		
+		for(int i = 0; i < stls.size(); i++)
+		{
+			STLObject stl = stls.get(i);
+			Transform3D trans = stl.getTransform();
+
+			BranchGroup bg = stl.getSTL();
+			java.util.Enumeration<?> enumKids = bg.getAllChildren();
+
+			while(enumKids.hasMoreElements())
+			{
+				Object ob = enumKids.nextElement();
+
+				if(ob instanceof BranchGroup)
+				{
+					BranchGroup bg1 = (BranchGroup)ob;
+					Attributes att = (Attributes)(bg1.getUserData());
+					if(XYbox == null)
+					{
+						XYbox = BBox(att.getPart(), trans);
+						if(rectangles.get(i) == null)
+							rectangles.set(i, new RrRectangle(XYbox));
+						else
+							rectangles.set(i, RrRectangle.union(rectangles.get(i), XYbox));
+					} else
+					{
+						s = BBox(att.getPart(), trans);
+						if(s != null)
+						{
+							XYbox = RrRectangle.union(XYbox, s);
+							if(rectangles.get(i) == null)
+								rectangles.set(i, new RrRectangle(s));
+							else
+								rectangles.set(i, RrRectangle.union(rectangles.get(i), s));
+						}
+					}
+				}
+			}
+			if(rectangles.get(i) == null)
+				Debug.e("AllSTLsToBuild:ObjectPlanRectangle(): object " + i + " is empty");
+		}		
 	}
 	
 	/**
@@ -381,48 +357,14 @@ public class AllSTLsToBuild
         return r;
     }
 	
+	
 	/**
-	 * Return the XY box round everything, computing it if need be.
-	 * Once this function has been called the list is frozen.
+	 * Return the XY box round everything
 	 * @return
 	 */
 	public RrRectangle ObjectPlanRectangle()
 	{
 		freeze();
-		if(XYbox != null)
-			return XYbox;
-		
-		RrRectangle s;
-		
-		for(int i = 0; i < stls.size(); i++)
-		{
-			STLObject stl = stls.get(i);
-			Transform3D trans = stl.getTransform();
-
-			BranchGroup bg = stl.getSTL();
-			java.util.Enumeration<?> enumKids = bg.getAllChildren();
-
-			while(enumKids.hasMoreElements())
-			{
-				Object ob = enumKids.nextElement();
-
-				if(ob instanceof BranchGroup)
-				{
-					BranchGroup bg1 = (BranchGroup)ob;
-					Attributes att = (Attributes)(bg1.getUserData());
-					if(XYbox == null)
-						XYbox = BBox(att.getPart(), trans);
-					else
-					{
-						s = BBox(att.getPart(), trans);
-						if(s != null)
-							XYbox = RrRectangle.union(XYbox, s);
-					}
-				}
-			}
-
-		}		
-				
 		return XYbox;
 	}
 	
@@ -456,12 +398,17 @@ public class AllSTLsToBuild
 	}
 	
 	/**
-	 * Stitch together the some fo the edges to form a polygon.
+	 * Stitch together the some of the edges to form a polygon.
 	 * @param edges
 	 * @return
 	 */
 	private RrPolygon getNextPolygon(ArrayList<LineSegment> edges)
 	{
+		if(!frozen)
+		{
+			Debug.e("AllSTLsToBuild:getNextPolygon() called for an unfrozen list!");
+			freeze();
+		}
 		if(edges.size() <= 0)
 			return null;
 		LineSegment next = edges.get(0);
@@ -531,6 +478,11 @@ public class AllSTLsToBuild
 	 */
 	private RrPolygonList simpleCull(ArrayList<LineSegment> edges)
 	{
+		if(!frozen)
+		{
+			Debug.e("AllSTLsToBuild:simpleCull() called for an unfrozen list!");
+			freeze();
+		}
 		RrPolygonList result = new RrPolygonList();
 		RrPolygon next = getNextPolygon(edges);
 		while(next != null)
@@ -544,14 +496,65 @@ public class AllSTLsToBuild
 	}
 	
 	/**
-	 * Compute the infill hatching polygons for this set of patterns
+	 * Compute the support hatching polygons for this set of patterns
+	 * @param stl
 	 * @param layerConditions
+	 * @return
+	 */
+	public RrPolygonList computeSupport(int stl, LayerRules layerConditions)
+	{
+		freeze();
+		int layer = layerConditions.getMachineLayer();
+		BooleanGridList slice = slice(stl, layerConditions);
+		
+		BooleanGrid un;
+		Attributes a;
+		if(slice.size() > 0)
+		{
+			un = slice.get(0);
+			a = un.attribute();
+		}else
+		{
+			a = stls.get(stl).attributes(0);
+			un = new BooleanGrid(a);
+		}
+		for(int i = 1; i < slice.size(); i++)
+			un = BooleanGrid.union(un, slice.get(i), a);
+		
+		BooleanGridList allThis = new BooleanGridList();
+		allThis.add(un);
+		allThis = allThis.offset(layerConditions, true, -1);
+		
+		un = allThis.get(0);
+
+		BooleanGridList previousSlice = cache.get(layer+1, stl);
+		
+		if(previousSlice != null)
+		{
+			BooleanGridList support = new BooleanGridList();
+			for(int i = 0; i < previousSlice.size(); i++)
+			{
+				BooleanGrid above = previousSlice.get(i);
+				a = above.attribute();
+				if(!a.getExtruder().getSupportMaterial().equalsIgnoreCase("null"))
+					support.add(BooleanGrid.difference(above, un, a));
+			}
+		}
+		return new RrPolygonList();
+	}
+	
+	/**
+	 * Compute the infill hatching polygons for this set of patterns
+	 * @param stl
+	 * @param layerConditions
+	 * @param startNearHere
 	 * @return
 	 */
 	public RrPolygonList computeInfill(int stl, LayerRules layerConditions, Rr2Point startNearHere)
 	{
+		freeze();
 		int layer = layerConditions.getMachineLayer();
-		BooleanGridList shapes = slice(stl, layerConditions);
+		BooleanGridList slice = slice(stl, layerConditions);
 
 		BooleanGridList previousSlices = cache.get(layer+1, stl);
 		previousSlices = BooleanGridList.intersections(cache.get(layer+2, stl), previousSlices);
@@ -559,19 +562,19 @@ public class AllSTLsToBuild
 		
 		if(previousSlices != null && layerConditions.getModelLayer() > 1)
 		{
-			insides = BooleanGridList.intersections(shapes, previousSlices);
-			BooleanGridList temp = shapes;
-			shapes = BooleanGridList.differences(shapes, previousSlices);
-			shapes = shapes.offset(layerConditions, false, -1);
-			shapes = BooleanGridList.intersections(shapes, temp);
+			insides = BooleanGridList.intersections(slice, previousSlices);
+			BooleanGridList temp = slice;
+			slice = BooleanGridList.differences(slice, previousSlices);
+			slice = slice.offset(layerConditions, false, -1);
+			slice = BooleanGridList.intersections(slice, temp);
 		}
 			
-		shapes = shapes.offset(layerConditions, false, 1);
+		slice = slice.offset(layerConditions, false, 1);
 		
 		if(insides != null)
 			insides = insides.offset(layerConditions, false, 1);
 		
-		RrPolygonList hatchedPolygons = shapes.hatch(layerConditions, true, startNearHere);
+		RrPolygonList hatchedPolygons = slice.hatch(layerConditions, true, startNearHere);
 		if(hatchedPolygons.size() > 0)
 		{
 			RrPolygon last = hatchedPolygons.polygon(hatchedPolygons.size() - 1);
@@ -596,9 +599,9 @@ public class AllSTLsToBuild
 	 */
 	public RrPolygonList computeOutlines(int stl, LayerRules layerConditions, RrPolygonList hatchedPolygons, boolean shield)
 	{
-		
-		int layer = layerConditions.getMachineLayer();
-		BooleanGridList shapes = slice(stl, layerConditions);
+		freeze();	
+		//int layer = layerConditions.getMachineLayer();
+		BooleanGridList slice = slice(stl, layerConditions);
 		
 		RrPolygonList borderPolygons;
 		
@@ -607,7 +610,7 @@ public class AllSTLsToBuild
 			borderPolygons = null;
 		} else
 		{
-			BooleanGridList offBorder = shapes.offset(layerConditions, true, 1);
+			BooleanGridList offBorder = slice.offset(layerConditions, true, 1);
 			borderPolygons = offBorder.borders();
 		}
 
@@ -638,22 +641,33 @@ public class AllSTLsToBuild
 	
 	/**
 	 * Generate a set of pixel-map representations, one for each extruder, for
-	 * STLObject i at height z.
+	 * STLObject stl at height z.
 	 * 
-	 * @param i
+	 * @param stl
 	 * @param z
 	 * @param extruders
 	 * @return
 	 */
 	private BooleanGridList slice(int stl, LayerRules layerRules)
 	{
-		freeze();
+		if(!frozen)
+		{
+			Debug.e("AllSTLsToBuild.slice() called when unfrozen!");
+			freeze();
+		}
 		int layer = layerRules.getMachineLayer();
 		BooleanGridList result = cache.get(layer, stl);
 		if(result != null)
 			return result;
 		
 		// Haven't got it in the cache, so we need to compute it
+		
+		// Anything there?
+		
+		if(rectangles.get(stl) == null)
+			return new BooleanGridList();
+		
+		// Probably...
 		
 		double z = layerRules.getModelZ() + layerRules.getZStep()*0.5;
 		Extruder[] extruders = layerRules.getPrinter().getExtruders();
@@ -672,8 +686,6 @@ public class AllSTLsToBuild
 				Debug.e("AllSTLsToBuild.slice(): extruder " + extruderID + "out of sequence: " + extruders[extruderID].getID());
 			edges[extruderID] = new ArrayList<LineSegment>();
 		}
-		
-
 		
 		// Generate all the edges for STLObject i at this z
 		
@@ -714,7 +726,8 @@ public class AllSTLsToBuild
 
 				csgp = pgl.toCSG(Preferences.tiny());
 
-				result.add(new BooleanGrid(csgp, pgl.getBox(), pgl.polygon(0).getAttributes()));	
+				//result.add(new BooleanGrid(csgp, pgl.getBox(), pgl.polygon(0).getAttributes()));
+				result.add(new BooleanGrid(csgp, rectangles.get(stl), pgl.polygon(0).getAttributes()));
 			}
 		}
 		

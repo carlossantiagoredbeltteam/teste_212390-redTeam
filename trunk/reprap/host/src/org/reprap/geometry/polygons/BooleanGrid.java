@@ -190,6 +190,26 @@ public class BooleanGrid
 		}
 		
 		/**
+		 * Useful to have a single-pixel at the origin
+		 *
+		 */
+		private iRectangle()
+		{
+			swCorner = new iPoint(0, 0);
+			size = new iPoint(1, 1);
+		}
+		
+		/**
+		 * Are two rectangles the same?
+		 * @param b
+		 * @return
+		 */
+		public boolean coincidesWith(iRectangle b)
+		{
+			return swCorner.coincidesWith(b.swCorner) && size.coincidesWith(b.size);
+		}
+		
+		/**
 		 * This rectangle in the real world
 		 * @return
 		 */
@@ -709,29 +729,9 @@ public class BooleanGrid
 	static final int searchDepth = 3;
 	
 	/**
-	 * The pixel map
-	 */
-	private BitSet bits;
-	
-	/**
-	 * Flags for visited poxels during searches
-	 */
-	private BitSet visited;
-	
-	/**
-	 * The bottom left corner in pixels
-	 */
-	private iRectangle rec;
-	
-	/**
 	 * How simple does a CSG expression have to be to not be worth pruning further?
 	 */
 	private static final int simpleEnough = 3;
-	
-	/**
-	 * The attributes
-	 */
-	private Attributes att;
 	
 	/**
 	 * Run round the eight neighbours of a pixel anticlockwise from bottom left
@@ -775,6 +775,28 @@ public class BooleanGrid
 	 * Lookup table behaves like scalar product for two neighbours i and j; get it by neighbourProduct[Math.abs(j - i)]
 	 */
 	private final int[] neighbourProduct = {2, 1, 0, -1, -2, -1, 0, 1};
+	
+	/**
+	 * The pixel map
+	 */
+	private BitSet bits;
+	
+	/**
+	 * Flags for visited poxels during searches
+	 */
+	private BitSet visited;
+	
+	/**
+	 * The rectangle the pixelmap covers
+	 */
+	private iRectangle rec;
+	
+	/**
+	 * The attributes
+	 */
+	private Attributes att;
+	
+
 	
 	//**************************************************************************************************
 	// Debugging and timing
@@ -837,8 +859,6 @@ public class BooleanGrid
 		rec = new iRectangle(new iPoint(0, 0), new iPoint(1, 1));  // Set the origin to (0, 0)...
 		rec.swCorner = new iPoint(ri.sw());                        // That then gets subtracted by the iPoint constructor to give the true origin
 		rec.size = new iPoint(ri.ne());                            // The true origin is now automatically subtracted.
-		bits = null;
-		visited = null;
 		bits = new BitSet(rec.size.x*rec.size.y);
 		visited = null;
 		push("Build quad tree... ");
@@ -882,6 +902,26 @@ public class BooleanGrid
 		for(int x = 0; x < recScan.size.x; x++)
 			for(int y = 0; y < recScan.size.y; y++)
 				bits.set(pixI(x + offxOut, y + offyOut), bg.bits.get(bg.pixI(x + offxIn, y + offyIn)));
+	}
+	
+	/**
+     * The empty grid
+	 */
+	public BooleanGrid(Attributes a)
+	{
+		att = a;
+		rec = new iRectangle();
+		bits = new BitSet(1);
+		visited = null;		
+	}
+	
+	/**
+	 * Overwrite the attributes
+	 * @param a
+	 */
+	private void forceAttribute(Attributes a)
+	{
+		att = a;
 	}
 	
 	/**
@@ -2141,8 +2181,33 @@ public class BooleanGrid
 		return result;
 	}
 	
-	
-	
+
+	/**
+	 * Compute the union of two bit patterns, forcing attribute a on the result.
+	 * @param d
+	 * @param e
+	 * @param a
+	 * @return
+	 */
+	public static BooleanGrid union(BooleanGrid d, BooleanGrid e, Attributes a)
+	{	
+		BooleanGrid result;
+
+		if(d.rec.coincidesWith(e.rec))
+		{
+			result = new BooleanGrid(d);
+			result.bits.or(e.bits);
+		} else
+		{
+			iRectangle u = d.rec.union(e.rec);
+			result = new BooleanGrid(d, u);
+			BooleanGrid temp = new BooleanGrid(e, u);
+			result.bits.or(temp.bits);
+		}
+		//result.deWhisker();
+		result.forceAttribute(a);
+		return result;
+	}
 	
 	/**
 	 * Compute the union of two bit patterns
@@ -2152,14 +2217,9 @@ public class BooleanGrid
 	 */
 	public static BooleanGrid union(BooleanGrid d, BooleanGrid e)
 	{
-		if(e.att != d.att)
+		if(d.att != e.att)
 			Debug.e("BooleanGrid.union(): attempt to union two bitmaps with different attributes.");
-		iRectangle u = d.rec.union(e.rec);
-		BooleanGrid result = new BooleanGrid(d, u);
-		BooleanGrid temp = new BooleanGrid(e, u);
-		result.bits.or(temp.bits);
-		//result.deWhisker();
-		return result;
+		return union(d, e, d.att);
 	}
 	
 	
@@ -2169,21 +2229,70 @@ public class BooleanGrid
 	 * @param e
 	 * @return
 	 */
+	public static BooleanGrid intersection(BooleanGrid d, BooleanGrid e, Attributes a)
+	{	
+		BooleanGrid result;
+
+		if(d.rec.coincidesWith(e.rec))
+		{
+			result = new BooleanGrid(d);
+			result.bits.and(e.bits);
+		} else
+		{
+
+			iRectangle u = d.rec.intersection(e.rec);
+			if(u.isEmpty())
+			{
+				u.size.x = 1;
+				u.size.y = 1;
+				return new BooleanGrid(a);
+			}
+			result = new BooleanGrid(d, u);
+			BooleanGrid temp = new BooleanGrid(e, u);
+			result.bits.and(temp.bits);
+		}
+		if(result.isEmpty())
+			result = new BooleanGrid(a);
+		result.deWhisker();
+		result.forceAttribute(a);
+		return result;
+	}
+
+	/**
+	 * Compute the intersection of two  bit patterns
+	 * @param d
+	 * @param e
+	 * @return
+	 */
 	public static BooleanGrid intersection(BooleanGrid d, BooleanGrid e)
 	{
-		if(e.att != d.att)
+		if(d.att != e.att)
 			Debug.e("BooleanGrid.union(): attempt to union two bitmaps with different attributes.");
-		iRectangle u = d.rec.intersection(e.rec);
-		if(u.isEmpty())
-		{
-			u.size.x = 1;
-			u.size.y = 1;
-			return new BooleanGrid(RrCSG.nothing(), u.realRectangle(), d.att);
-		}
-		BooleanGrid result = new BooleanGrid(d, u);
-		BooleanGrid temp = new BooleanGrid(e, u);
-		result.bits.and(temp.bits);
+		return intersection(d, e, d.att);
+	}
+	
+	/**
+	 * Grid d - grid e, forcing attribute a on the result
+	 * d's rectangle is presumed to contain the result.
+	 * TODO: write a function to compute the rectangle from the bitmap
+	 * @param d
+	 * @param e
+	 * @param a
+	 * @return
+	 */
+	public static BooleanGrid difference(BooleanGrid d, BooleanGrid e, Attributes a)
+	{
+		BooleanGrid result = new BooleanGrid(d);
+		BooleanGrid temp;
+		if(d.rec.coincidesWith(e.rec))
+			temp = e;
+		else
+			temp = new BooleanGrid(e, result.rec);
+		result.bits.andNot(temp.bits);
+		if(result.isEmpty())
+			result = new BooleanGrid(a);
 		result.deWhisker();
+		result.forceAttribute(a);
 		return result;
 	}
 	/**
@@ -2196,10 +2305,8 @@ public class BooleanGrid
 	 */
 	public static BooleanGrid difference(BooleanGrid d, BooleanGrid e)
 	{
-		BooleanGrid result = new BooleanGrid(d);
-		BooleanGrid temp = new BooleanGrid(e, result.rec);
-		result.bits.andNot(temp.bits);
-		result.deWhisker();
-		return result;
+		if(d.att != e.att)
+			Debug.e("BooleanGrid.union(): attempt to union two bitmaps with different attributes.");
+		return difference(d, e, d.att);
 	}
 }
