@@ -371,6 +371,7 @@ public class Producer {
 						startNearHere = last.point(last.size() - 1);
 					}
 					RrPolygonList borders = allSTLs.computeOutlines(stl, layerRules, fills, shield);
+					RrPolygonList support = allSTLs.computeSupport(stl, layerRules);
 					for(int pol = 0; pol < borders.size(); pol++)
 					{
 						shield = false;
@@ -383,7 +384,15 @@ public class Producer {
 						RrPolygon p = fills.polygon(pol);
 						allPolygons[p.getAttributes().getExtruder().getPhysicalExtruderNumber()].add(p);
 					}
+					for(int pol = 0; pol < support.size(); pol++)
+					{
+						shield = false;
+						RrPolygon p = support.polygon(pol);
+						allPolygons[p.getAttributes().getExtruder().getPhysicalExtruderNumber()].add(p);
+					}
 			}
+			
+
 			
 			LayerProducer lp = new LayerProducer(allPolygons, layerRules, simulationPlot);
 			lp.plot();
