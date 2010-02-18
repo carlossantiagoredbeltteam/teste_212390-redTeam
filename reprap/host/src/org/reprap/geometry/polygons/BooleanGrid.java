@@ -928,9 +928,10 @@ public class BooleanGrid
 	
 	/**
 	 * Overwrite the attributes
+	 * Only to be used if you know what you're doing...
 	 * @param a
 	 */
-	private void forceAttribute(Attributes a)
+	public void forceAttribute(Attributes a)
 	{
 		att = a;
 	}

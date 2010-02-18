@@ -105,7 +105,7 @@ public class Attributes {
 				System.err.println("Attributes.getExtruder(): null printer!");
 				return null;
 			}
-			e = p.getExtruder(material); //)es[GenericExtruder.getNumberFromMaterial(material)];
+			e = p.getExtruder(material); 
 			if(e == null)
 			{
 				System.err.println("Attributes.getExtruder(): null extruder for " + material);

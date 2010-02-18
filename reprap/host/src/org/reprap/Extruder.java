@@ -530,7 +530,9 @@ public interface Extruder
 	 */
 	public String getSupportMaterial();
 	
-	public int getSupportExtruder();
+	public int getSupportExtruderNumber();
+	
+	public Extruder getSupportExtruder();
 	
 	/**
 	 * What stuff are we infilling with?
@@ -538,7 +540,9 @@ public interface Extruder
 	 */
 	public String getInfillMaterial();
 	
-	public int getInfillExtruder();
+	public int getInfillExtruderNumber();
+	
+	public Extruder getInfillExtruder();
 	
 	/**
 	 * What are the dimensions for infill?
