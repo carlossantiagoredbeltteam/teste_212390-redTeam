@@ -723,15 +723,17 @@ public class BooleanGrid
 	/**
 	 * The resolution of the RepRap machine
 	 */
-	static final double pixSize = Preferences.machineResolution()*0.6;
-	static final double realResolution = pixSize*1.5;
-	static final double rSwell = 0.5; // mm by which to swell rectangles to give margins round stuff
-	static final int searchDepth = 3;
+	private static final double pixSize = Preferences.machineResolution()*0.6;
+	private static final double realResolution = pixSize*1.5;
+	private static final double rSwell = 0.5; // mm by which to swell rectangles to give margins round stuff
+	private static final int searchDepth = 3;
 	
 	/**
 	 * How simple does a CSG expression have to be to not be worth pruning further?
 	 */
 	private static final int simpleEnough = 3;
+	
+	private static final BooleanGrid nothingThere = new BooleanGrid();
 	
 	/**
 	 * Run round the eight neighbours of a pixel anticlockwise from bottom left
@@ -907,12 +909,21 @@ public class BooleanGrid
 	/**
      * The empty grid
 	 */
-	public BooleanGrid(Attributes a)
+	private BooleanGrid()
 	{
-		att = a;
+		att = new Attributes(null, null, null, null);
 		rec = new iRectangle();
 		bits = new BitSet(1);
 		visited = null;		
+	}
+	
+	/**
+	 * The empty set
+	 * @return
+	 */
+	public static BooleanGrid nullBooleanGrid()
+	{
+		return nothingThere;
 	}
 	
 	/**
@@ -2192,6 +2203,26 @@ public class BooleanGrid
 	public static BooleanGrid union(BooleanGrid d, BooleanGrid e, Attributes a)
 	{	
 		BooleanGrid result;
+		
+		if(d == nothingThere)
+		{
+			if(e == nothingThere)
+				return nothingThere;
+			if(e.att == a)
+				return e;
+			result = new BooleanGrid(e);
+			result.forceAttribute(a);
+			return result;
+		}
+		
+		if(e == nothingThere)
+		{
+			if(d.att == a)
+				return d;
+			result = new BooleanGrid(d);
+			result.forceAttribute(a);
+			return result;
+		}
 
 		if(d.rec.coincidesWith(e.rec))
 		{
@@ -2232,6 +2263,9 @@ public class BooleanGrid
 	public static BooleanGrid intersection(BooleanGrid d, BooleanGrid e, Attributes a)
 	{	
 		BooleanGrid result;
+		
+		if(d == nothingThere || e == nothingThere)
+			return nothingThere;
 
 		if(d.rec.coincidesWith(e.rec))
 		{
@@ -2242,17 +2276,13 @@ public class BooleanGrid
 
 			iRectangle u = d.rec.intersection(e.rec);
 			if(u.isEmpty())
-			{
-				u.size.x = 1;
-				u.size.y = 1;
-				return new BooleanGrid(a);
-			}
+				return nothingThere;
 			result = new BooleanGrid(d, u);
 			BooleanGrid temp = new BooleanGrid(e, u);
 			result.bits.and(temp.bits);
 		}
 		if(result.isEmpty())
-			result = new BooleanGrid(a);
+			return nothingThere;
 		result.deWhisker();
 		result.forceAttribute(a);
 		return result;
@@ -2282,7 +2312,21 @@ public class BooleanGrid
 	 */
 	public static BooleanGrid difference(BooleanGrid d, BooleanGrid e, Attributes a)
 	{
-		BooleanGrid result = new BooleanGrid(d);
+		if(d == nothingThere)
+			return nothingThere;
+		
+		BooleanGrid result;
+		
+		if(e == nothingThere)
+		{
+			if(d.att == a)
+				return d;
+			result = new BooleanGrid(d);
+			result.forceAttribute(a);
+			return result;
+		}
+		
+		result = new BooleanGrid(d);
 		BooleanGrid temp;
 		if(d.rec.coincidesWith(e.rec))
 			temp = e;
@@ -2290,7 +2334,7 @@ public class BooleanGrid
 			temp = new BooleanGrid(e, result.rec);
 		result.bits.andNot(temp.bits);
 		if(result.isEmpty())
-			result = new BooleanGrid(a);
+			return nothingThere;
 		result.deWhisker();
 		result.forceAttribute(a);
 		return result;
