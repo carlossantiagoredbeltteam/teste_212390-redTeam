@@ -534,47 +534,83 @@ public class AllSTLsToBuild
 	 */
 	public RrPolygonList computeSupport(int stl, LayerRules layerConditions)
 	{
-		freeze();
-		int layer = layerConditions.getMachineLayer();
-		BooleanGridList slice = slice(stl, layerConditions);
+		// No more additions or movements, please
 		
-		BooleanGrid un;
+		freeze();
+		
+		// We start by computing the union of everything in this layer because
+		// that is everywhere that support _isn't_ needed.
+		// We give the union the attribute of the first thing found, though
+		// clearly it will - in general - represent many different substances.
+		// But it's only going to be subtracted from other shapes, so what it's made
+		// from doesn't matter.
+		
+		int layer = layerConditions.getMachineLayer();
+		BooleanGridList thisLayer = slice(stl, layerConditions);
+		
+		BooleanGrid unionOfThisLayer;
 		Attributes a;
-		if(slice.size() > 0)
+		if(thisLayer.size() > 0)
 		{
-			un = slice.get(0);
-			a = un.attribute();
+			unionOfThisLayer = thisLayer.get(0);
+			a = unionOfThisLayer.attribute();
 		}else
 		{
 			a = stls.get(stl).attributes(0);
-			un = BooleanGrid.nullBooleanGrid();
+			unionOfThisLayer = BooleanGrid.nullBooleanGrid();
 		}
-		for(int i = 1; i < slice.size(); i++)
-			un = BooleanGrid.union(un, slice.get(i), a);
+		for(int i = 1; i < thisLayer.size(); i++)
+			unionOfThisLayer = BooleanGrid.union(unionOfThisLayer, thisLayer.get(i), a);
+		
+		// Expand the union of this layer a bit, so that any support is a little clear of 
+		// this layer's boundaries.
 		
 		BooleanGridList allThis = new BooleanGridList();
-		allThis.add(un);
+		allThis.add(unionOfThisLayer);
 		allThis = allThis.offset(layerConditions, true, -1);
 		
 		if(allThis.size() > 0)
-			un = allThis.get(0);
+			unionOfThisLayer = allThis.get(0);
 		else
-			un = BooleanGrid.nullBooleanGrid();
+			unionOfThisLayer = BooleanGrid.nullBooleanGrid();
 
-		BooleanGridList previousSlice = cache.getSlice(layer+1, stl);
+		// Now we subtract the union of this layer from all the stuff requiring support in the layer above.
 		
-		if(previousSlice != null)
+		BooleanGridList previousSupport = cache.getSupport(layer+1, stl);
+		
+		BooleanGridList support = new BooleanGridList();
+		if(previousSupport != null)
 		{
-			BooleanGridList support = new BooleanGridList();
-			for(int i = 0; i < previousSlice.size(); i++)
+			for(int i = 0; i < previousSupport.size(); i++)
 			{
-				BooleanGrid above = previousSlice.get(i);
+				BooleanGrid above = previousSupport.get(i);
 				a = above.attribute();
 				if(!a.getExtruder().getSupportMaterial().equalsIgnoreCase("null"))
-					support.add(BooleanGrid.difference(above, un, a));
+					support.add(BooleanGrid.difference(above, unionOfThisLayer, a));
 			}
 		}
-		return new RrPolygonList();
+		
+		// Copy the support material as we are about to change its attributes
+		// to that of the support for each of its components, and we want
+		// the original material in the cache.
+		
+		BooleanGridList toCache = new BooleanGridList(support);
+		toCache = BooleanGridList.unions(toCache, thisLayer);
+		cache.setSupport(toCache, layer, stl);
+		
+		for(int i = 0; i < support.size(); i++)
+		{
+			Extruder e = support.attribute(i).getExtruder().getSupportExtruder();
+			if(e == null)
+			{
+				Debug.e("AllSTLsToBuild.computeSupport(): null support extruder specified!");
+				continue;
+			}
+			support.get(i).forceAttribute(new Attributes(e.getMaterial(), null, null, e.getAppearance()));
+		}
+		
+		
+		return support.hatch(layerConditions, false, null);
 	}
 	
 	/**
@@ -586,29 +622,42 @@ public class AllSTLsToBuild
 	 */
 	public RrPolygonList computeInfill(int stl, LayerRules layerConditions, Rr2Point startNearHere)
 	{
+		// No more additions or movements, please
+		
 		freeze();
+		
+		// Where are we and what does the current slice look like?
+		
 		int layer = layerConditions.getMachineLayer();
 		BooleanGridList slice = slice(stl, layerConditions);
 
+		// If we are solid but the slices around us weren't, we need some fine infill as
+		// we are (at least partly) surface
+		
 		BooleanGridList previousSlices = cache.getSlice(layer+1, stl);
 		previousSlices = BooleanGridList.intersections(cache.getSlice(layer+2, stl), previousSlices);
 		BooleanGridList insides = null;
 		
+		// The insides are the bits that aren't surface.
+		// The outsides are the bits that are left when the insides are subtracted from the total.
+		// We grow the outsides just into the insides (nowhere else) to
+		// ensure that they go a little way into the inside infill.
+		
+		BooleanGridList outsides = slice;
 		if(previousSlices != null && layerConditions.getModelLayer() > 1)
 		{
 			insides = BooleanGridList.intersections(slice, previousSlices);
-			BooleanGridList temp = slice;
-			slice = BooleanGridList.differences(slice, previousSlices);
-			slice = slice.offset(layerConditions, false, -1);
-			slice = BooleanGridList.intersections(slice, temp);
+			outsides = BooleanGridList.differences(slice, previousSlices);
+			outsides = outsides.offset(layerConditions, false, -1);
+			outsides = BooleanGridList.intersections(outsides, slice);
 		}
 			
-		slice = slice.offset(layerConditions, false, 1);
+		outsides = outsides.offset(layerConditions, false, 1);
 		
 		if(insides != null)
 			insides = insides.offset(layerConditions, false, 1);
 		
-		RrPolygonList hatchedPolygons = slice.hatch(layerConditions, true, startNearHere);
+		RrPolygonList hatchedPolygons = outsides.hatch(layerConditions, true, startNearHere);
 		if(hatchedPolygons.size() > 0)
 		{
 			RrPolygon last = hatchedPolygons.polygon(hatchedPolygons.size() - 1);
@@ -633,11 +682,17 @@ public class AllSTLsToBuild
 	 */
 	public RrPolygonList computeOutlines(int stl, LayerRules layerConditions, RrPolygonList hatchedPolygons, boolean shield)
 	{
+		// No more additions or movements, please
+		
 		freeze();	
-		//int layer = layerConditions.getMachineLayer();
+		
+		// The shapes to outline.
+		
 		BooleanGridList slice = slice(stl, layerConditions);
 		
 		RrPolygonList borderPolygons;
+		
+		// Are we building the raft under things?  If so, there is no border.
 		
 		if(layerConditions.getLayingSupport())
 		{
@@ -649,6 +704,10 @@ public class AllSTLsToBuild
 		}
 
 
+		// If we've got polygons to plot, ammend them so they start in the middle 
+		// of a hatch (this gives cleaner boundaries).  Also add the nose-wipe shield
+		// if it's been asked for.
+		
 		if(borderPolygons != null && borderPolygons.size() > 0)
 		{
 			borderPolygons.middleStarts(hatchedPolygons, layerConditions);
@@ -689,6 +748,9 @@ public class AllSTLsToBuild
 			Debug.e("AllSTLsToBuild.slice() called when unfrozen!");
 			freeze();
 		}
+		
+		// Is the result in the cache?  If so, just use that.
+		
 		int layer = layerRules.getMachineLayer();
 		BooleanGridList result = cache.getSlice(layer, stl);
 		if(result != null)
@@ -760,10 +822,15 @@ public class AllSTLsToBuild
 
 				csgp = pgl.toCSG(Preferences.tiny());
 
-				//result.add(new BooleanGrid(csgp, pgl.getBox(), pgl.polygon(0).getAttributes()));
+				// We use the plan rectangle of the entire stl object to store the bitmap, even though this slice may be
+				// much smaller than the whole.  This allows booleans on slices to be computed much more
+				// quickly as each is in the same rectangle so the bit patterns match exactly.  But it does use more memory.
+				
 				result.add(new BooleanGrid(csgp, rectangles.get(stl), pgl.polygon(0).getAttributes()));
 			}
 		}
+		
+		// We may need this later...
 		
 		cache.setSlice(result, layer, stl);
 		

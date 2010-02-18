@@ -1062,9 +1062,14 @@ public abstract class GenericExtruder implements Extruder
 		return supportMaterial;
 	}
 	
-	public int getSupportExtruder()
+	public int getSupportExtruderNumber()
 	{
 		return getNumberFromMaterial(supportMaterial);
+	}
+	
+	public Extruder getSupportExtruder()
+	{
+		return org.reprap.Main.gui.getPrinter().getExtruder(supportMaterial);
 	}
 	
 	/**
@@ -1076,9 +1081,14 @@ public abstract class GenericExtruder implements Extruder
 		return inFillMaterial;
 	}
 	
-	public int getInfillExtruder()
+	public int getInfillExtruderNumber()
 	{
 		return getNumberFromMaterial(inFillMaterial);
+	}
+	
+	public Extruder getInfillExtruder()
+	{
+		return org.reprap.Main.gui.getPrinter().getExtruder(inFillMaterial);
 	}
 	
 	/**
@@ -1092,6 +1102,9 @@ public abstract class GenericExtruder implements Extruder
 	
     public static int getNumberFromMaterial(String material)
     {
+    	if(material.equalsIgnoreCase("null"))
+    		return -1;
+    	
     	String[] names;
 		try
 		{

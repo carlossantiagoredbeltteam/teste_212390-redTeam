@@ -31,6 +31,17 @@ public class BooleanGridList
 		}
 		
 		/**
+		 * Deep copy
+		 * @param a
+		 */
+		public BooleanGridList(BooleanGridList a)
+		{
+			shapes = new ArrayList<BooleanGrid>();
+			for(int i = 0; i < a.size(); i++)
+				shapes.add(new BooleanGrid(a.get(i)));
+		}
+		
+		/**
 		 * Return the ith shape
 		 * @param i
 		 * @return
@@ -132,7 +143,7 @@ public class BooleanGridList
 					{
 						// Must be a hatch.  Only do it if the gap is +ve or we're building the foundation
 						double offSize;
-						int ei = e.getInfillExtruder();
+						int ei = e.getInfillExtruderNumber();
 						Extruder ife = e;
 						if(ei >= 0)
 							ife = es[ei];
@@ -183,7 +194,7 @@ public class BooleanGridList
 					e = att.getExtruder();
 				if(!surface)
 				{
-					int ei = e.getInfillExtruder();
+					int ei = e.getInfillExtruderNumber();
 					if(ei >= 0)
 					{
 						e = es[ei];
@@ -195,47 +206,63 @@ public class BooleanGridList
 			return result;
 		}
 		
+		
 		/**
-		 * Make a list with a single entry: the union of all the entries.
-		 * Set its attributes to that of extruder 0 in the extruder list.
+		 * Return a list of unions between the entries in a and b.
+		 * Only pairs with the same extruder are unioned.  If an element
+		 * of a has no corresponding element in b, or vice versa, then 
+		 * those elements are returned unmodified in the result.
 		 * @param a
+		 * @param b
 		 * @return
 		 */
-		public BooleanGridList union(Extruder[] es)
-		{	
+		public static BooleanGridList unions(BooleanGridList a, BooleanGridList b)
+		{
 			BooleanGridList result = new BooleanGridList();
-//			if(size() <= 0)
-//				return result;
-//			
-//			BooleanGrid contents = get(0);
-//			
-//			Attributes att = attribute(0);
-//			Boolean foundAttribute0 = false;
-//			if(att.getExtruder() == es[0])
-//				foundAttribute0 = true;
-//			for(int i = 1; i < size(); i++)
-//			{
-//				if(!foundAttribute0)
-//				{
-//					if(attribute(i).getExtruder() == es[0])
-//					{
-//						att = attribute(i);
-//						foundAttribute0 = true;
-//					}
-//				}
-//				contents = BooleanGrid.union(contents, get(i));
-//			}
-//			if(!foundAttribute0)
-//				Debug.e("RrCSGPolygonList.union(): Attribute of extruder 0 not found.");
-//			result.add(contents);
+			
+			if(a == null)
+				return b;
+			if(a.size() <= 0)
+				return b;
+			if(b == null)
+				return a;
+			if(b.size() <= 0)
+				return a;
+			
+			boolean[] bMatched = new boolean[b.size()];
+			for(int i = 0; i < bMatched.length; i++)
+				bMatched[i] = false;
+			
+			for(int i = 0; i < a.size(); i++)
+			{
+				BooleanGrid abg = a.get(i);
+				boolean aMatched = false;
+				for(int j = 0; j < b.size(); j++)
+				{
+					if(abg.attribute().getExtruder().getID() == b.attribute(j).getExtruder().getID())
+					{
+						result.add(BooleanGrid.union(abg, b.get(j)));
+						bMatched[j] = true;
+						aMatched = true;
+						break;
+					}
+				}
+				if(!aMatched)
+					result.add(abg);
+			}
+			
+			for(int i = 0; i < bMatched.length; i++)
+				if(!bMatched[i])
+					result.add(b.get(i));
+			
 			return result;
 		}
 		
 		/**
 		 * Return a list of intersections between the entries in a and b.
 		 * Only pairs with the same extruder are intersected.  If an element
-		 * of a has no corresponding element in b, then no entry is returned
-		 * for that.
+		 * of a has no corresponding element in b, or vice versa, then no entry is returned
+		 * for them.
 		 * @param a
 		 * @param b
 		 * @return
@@ -243,14 +270,18 @@ public class BooleanGridList
 		public static BooleanGridList intersections(BooleanGridList a, BooleanGridList b)
 		{
 			BooleanGridList result = new BooleanGridList();
+			
 			if(a == null || b == null)
 				return result;
+			if(a.size() <= 0  || b.size() <= 0)
+				return result;
+			
 			for(int i = 0; i < a.size(); i++)
 			{
 				BooleanGrid abg = a.get(i);
 				for(int j = 0; j < b.size(); j++)
 				{
-					if(abg.attribute().getExtruder().getID() == b.attribute(j).getExtruder().getID());
+					if(abg.attribute().getExtruder().getID() == b.attribute(j).getExtruder().getID())
 					{
 						result.add(BooleanGrid.intersection(abg, b.get(j)));	
 						break;
@@ -273,23 +304,30 @@ public class BooleanGridList
 		public static BooleanGridList differences(BooleanGridList a, BooleanGridList b)
 		{
 			BooleanGridList result = new BooleanGridList();
+			
 			if(a == null)
 				return result;
+			if(a.size() <= 0)
+				return result;
+			if(b == null)
+				return a;
+			if(b.size() <= 0)
+				return a;
+			
 			for(int i = 0; i < a.size(); i++)
 			{
 				BooleanGrid abg = a.get(i);
-				boolean untouched = true;
-				if(b != null)
+				boolean aMatched = false;
 				for(int j = 0; j < b.size(); j++)
 				{
-					if(abg.attribute().getExtruder().getID() == b.attribute(j).getExtruder().getID());
+					if(abg.attribute().getExtruder().getID() == b.attribute(j).getExtruder().getID())
 					{
 						result.add(BooleanGrid.difference(abg, b.get(j)));
-						untouched = false;
+						aMatched = true;
 						break;
 					}
 				}
-				if(untouched)
+				if(!aMatched)
 					result.add(abg);
 					
 			}
