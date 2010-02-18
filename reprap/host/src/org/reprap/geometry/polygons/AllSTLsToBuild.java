@@ -82,6 +82,7 @@ public class AllSTLsToBuild
 	class SliceCache
 	{
 		private BooleanGridList[][] sliceRing;
+		private BooleanGridList[][] supportRing;
 		private int[] layerNumber;
 		private int ringPointer;
 		private final int noLayer = Integer.MIN_VALUE;
@@ -90,47 +91,77 @@ public class AllSTLsToBuild
 		public SliceCache()
 		{
 			sliceRing = new BooleanGridList[ringSize][stls.size()];
+			supportRing = new BooleanGridList[ringSize][stls.size()];
 			layerNumber = new int[ringSize];
 			ringPointer = 0;
 			for(int layer = 0; layer < ringSize; layer++)
 				for(int stl = 0; stl < stls.size(); stl++)
 				{
 					sliceRing[layer][stl] = null;
+					supportRing[layer][stl] = null;
 					layerNumber[layer] = noLayer;
 				}
 		}
 		
-		public void set(BooleanGridList slice, int layer, int stl)
+		private int getTheRingLocationForWrite(int layer)
 		{
-			int rp = -1;
 			for(int i = 0; i < ringSize; i++)
 				if(layerNumber[i] == layer)
-					rp = i;
-			if(rp < 0)
+					return i;
+
+			int rp = ringPointer;
+			for(int s = 0; s < stls.size(); s++)
 			{
-				rp = ringPointer;
-				for(int s = 0; s < stls.size(); s++)
-					sliceRing[rp][s] = null;
-				ringPointer++;
-				if(ringPointer >= ringSize)
-					ringPointer = 0;
+				sliceRing[rp][s] = null;
+				supportRing[rp][s] = null;
 			}
+			ringPointer++;
+			if(ringPointer >= ringSize)
+				ringPointer = 0;
+			return rp;
+		}
+		
+		public void setSlice(BooleanGridList slice, int layer, int stl)
+		{
+			int rp = getTheRingLocationForWrite(layer);
 			layerNumber[rp] = layer;
 			sliceRing[rp][stl] = slice;
 		}
 		
-		public BooleanGridList get(int layer, int stl)
+		public void setSupport(BooleanGridList support, int layer, int stl)
 		{
-			int l = ringPointer;
+			int rp = getTheRingLocationForWrite(layer);
+			layerNumber[rp] = layer;
+			supportRing[rp][stl] = support;
+		}
+		
+		private int getTheRingLocationForRead(int layer)
+		{
+			int rp = ringPointer;
 			for(int i = 0; i < ringSize; i++)
 			{
-				l--;
-				if(l < 0)
-					l = ringSize - 1;
-				if(layerNumber[l] == layer)
-					return sliceRing[l][stl];
+				rp--;
+				if(rp < 0)
+					rp = ringSize - 1;
+				if(layerNumber[rp] == layer)
+					return rp;
 			}
-			Debug.d("SliceCache.get(): layer not found.");
+			return -1;
+		}
+		
+		public BooleanGridList getSlice(int layer, int stl)
+		{
+			int rp = getTheRingLocationForRead(layer);
+			if(rp >= 0)
+				return sliceRing[rp][stl];
+			return null;
+		}
+		
+		public BooleanGridList getSupport(int layer, int stl)
+		{
+			int rp = getTheRingLocationForRead(layer);
+			if(rp >= 0)
+				return supportRing[rp][stl];
 			return null;
 		}
 	}
@@ -516,7 +547,7 @@ public class AllSTLsToBuild
 		}else
 		{
 			a = stls.get(stl).attributes(0);
-			un = new BooleanGrid(a);
+			un = BooleanGrid.nullBooleanGrid();
 		}
 		for(int i = 1; i < slice.size(); i++)
 			un = BooleanGrid.union(un, slice.get(i), a);
@@ -525,9 +556,12 @@ public class AllSTLsToBuild
 		allThis.add(un);
 		allThis = allThis.offset(layerConditions, true, -1);
 		
-		un = allThis.get(0);
+		if(allThis.size() > 0)
+			un = allThis.get(0);
+		else
+			un = BooleanGrid.nullBooleanGrid();
 
-		BooleanGridList previousSlice = cache.get(layer+1, stl);
+		BooleanGridList previousSlice = cache.getSlice(layer+1, stl);
 		
 		if(previousSlice != null)
 		{
@@ -556,8 +590,8 @@ public class AllSTLsToBuild
 		int layer = layerConditions.getMachineLayer();
 		BooleanGridList slice = slice(stl, layerConditions);
 
-		BooleanGridList previousSlices = cache.get(layer+1, stl);
-		previousSlices = BooleanGridList.intersections(cache.get(layer+2, stl), previousSlices);
+		BooleanGridList previousSlices = cache.getSlice(layer+1, stl);
+		previousSlices = BooleanGridList.intersections(cache.getSlice(layer+2, stl), previousSlices);
 		BooleanGridList insides = null;
 		
 		if(previousSlices != null && layerConditions.getModelLayer() > 1)
@@ -656,7 +690,7 @@ public class AllSTLsToBuild
 			freeze();
 		}
 		int layer = layerRules.getMachineLayer();
-		BooleanGridList result = cache.get(layer, stl);
+		BooleanGridList result = cache.getSlice(layer, stl);
 		if(result != null)
 			return result;
 		
@@ -731,7 +765,7 @@ public class AllSTLsToBuild
 			}
 		}
 		
-		cache.set(result, layer, stl);
+		cache.setSlice(result, layer, stl);
 		
 		return result;
 	}

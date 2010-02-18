@@ -77,7 +77,8 @@ public class BooleanGridList
 		{
 			if(b == null)
 				Debug.e("BooleanGridList.add(): attempt to add null BooleanGrid.");
-			shapes.add(b);
+			if(b != BooleanGrid.nullBooleanGrid())
+				shapes.add(b);
 		}
 		
 		/**
@@ -88,9 +89,15 @@ public class BooleanGridList
 		{
 			for(int i = 0; i < aa.size(); i++)
 					add(aa.get(i));
-
 		}
 		
+		/**
+		 * Offset all the shapes in the list for this layer
+		 * @param lc
+		 * @param outline
+		 * @param multiplier
+		 * @return
+		 */
 		public BooleanGridList offset(LayerRules lc, boolean outline, double multiplier)
 		{
 			boolean foundation = lc.getLayingSupport();
