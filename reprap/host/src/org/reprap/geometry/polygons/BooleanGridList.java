@@ -206,6 +206,49 @@ public class BooleanGridList
 			return result;
 		}
 		
+		/**
+		 * Run through the list, unioning entries in it that share the same material so that
+		 * the result has just one entry per material.
+		 */
+		public BooleanGridList unionDuplicates()
+		{
+			BooleanGridList result = new BooleanGridList();
+
+			if(size() <= 0)
+				return result;
+			
+			if(size() == 1)
+				return this;
+
+			boolean[] usedUp = new boolean[size()];
+			for(int i = 0; i < usedUp.length; i++)
+				usedUp[i] = false;
+
+			for(int i = 0; i < size() - 1; i++)
+			{
+				if(!usedUp[i])
+				{
+					BooleanGrid union = get(i);
+					int iExId = union.attribute().getExtruder().getID();
+					for(int j = i+1; j < size(); j++)
+					{
+						if(!usedUp[j])
+						{
+							BooleanGrid jg = get(j);
+							if(iExId == jg.attribute().getExtruder().getID())
+							{
+								union = BooleanGrid.union(union, jg);
+								usedUp[j] = true;
+							}
+						}
+					}
+					result.add(union);
+				}
+			}
+
+			return result;
+		}
+		
 		
 		/**
 		 * Return a list of unions between the entries in a and b.
@@ -220,6 +263,8 @@ public class BooleanGridList
 		{
 			BooleanGridList result = new BooleanGridList();
 			
+			if(a == b)
+				return a;
 			if(a == null)
 				return b;
 			if(a.size() <= 0)
@@ -255,7 +300,7 @@ public class BooleanGridList
 				if(!bMatched[i])
 					result.add(b.get(i));
 			
-			return result;
+			return result.unionDuplicates();
 		}
 		
 		/**
@@ -270,7 +315,8 @@ public class BooleanGridList
 		public static BooleanGridList intersections(BooleanGridList a, BooleanGridList b)
 		{
 			BooleanGridList result = new BooleanGridList();
-			
+			if(a == b)
+				return a;
 			if(a == null || b == null)
 				return result;
 			if(a.size() <= 0  || b.size() <= 0)
@@ -288,7 +334,7 @@ public class BooleanGridList
 					}
 				}
 			}
-			return result;
+			return result.unionDuplicates();
 		}
 		
 		
@@ -305,6 +351,8 @@ public class BooleanGridList
 		{
 			BooleanGridList result = new BooleanGridList();
 			
+			if(a == b)
+				return result;
 			if(a == null)
 				return result;
 			if(a.size() <= 0)
@@ -331,7 +379,7 @@ public class BooleanGridList
 					result.add(abg);
 					
 			}
-			return result;
+			return result.unionDuplicates();
 		}
 		
 

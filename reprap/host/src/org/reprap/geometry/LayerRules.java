@@ -161,14 +161,8 @@ public class LayerRules
 			}
 		}
 		
-		//layerRecord = new RrCSGPolygonList[fineLayers+1];
 		recordNumber = new int[fineLayers+1];
 		layerPointer = 0;
-//		for(int i = 0; i < layerRecord.length; i++)
-//		{
-//			layerRecord[i] = null;
-//			recordNumber[i] = -1;
-//		}
 	}
 	
 	public RrRectangle getBox()
@@ -176,42 +170,20 @@ public class LayerRules
 		return bBox;
 	}
 	
-//	public void recordThisLayer(RrCSGPolygonList pl)
-//	{
-//		//if(layerRecord[layerPointer] != null)
-//		//	layerRecord[layerPointer].destroy();
-//		layerRecord[layerPointer] = pl;
-//		recordNumber[layerPointer] = machineLayer;
-//		layerPointer++;
-//		if(layerPointer >= layerRecord.length)
-//			layerPointer = 0;
-//	}
-	
-	/**
-	 * Return the layer i above where we are 
-	 * @param i
-	 * @return
-	 */
-//	public RrCSGPolygonList getLayerAbove(int i)
-//	{
-//		int lp = layerPointer - i;
-//		if(lp < 0)
-//			return layerRecord[layerRecord.length + lp];
-//		else
-//			return layerRecord[lp];
-//	}
-	
 	public boolean getTopDown() { return topDown; }
 	
 	public void setPrinter(Printer p) { printer = p; }
 	public Printer getPrinter() { return printer; }
 	
-	//public void setModelZ(double mz) { modelZ = mz; }
 	public double getModelZ() { return modelZ; }
+	
+	public double getModelZ(int layer) 
+	{
+		return zStep*layer; 
+	}
 	
 	public double getMachineZ() { return machineZ; }
 	
-	//private void setModelLayer(int ml) { modelLayer = ml; }
 	public int getModelLayer() { return modelLayer; }
 	
 	public int getModelLayerMax() { return modelLayerMax; }
@@ -300,27 +272,7 @@ public class LayerRules
 	public double getHatchWidth(Extruder e)
 	{
 		if(getMachineLayer() < getFoundationLayers())
-		{
-			//if(getMachineLayer() == getFoundationLayers() - 2)
-				//return e.getExtrusionFoundationWidth()*0.5;
-
-			
 			return e.getExtrusionFoundationWidth();
-		}
-		
-		
-//		String inFillName = e.getBroadInfillMaterial();
-//		
-//		// If this stuff's infill is not called "null"...
-//		
-//		if(!inFillName.contentEquals("null"))
-//		{
-//			if(modelLayer+1 > e.getLowerFineLayers() && modelLayer+1 <= modelLayerMax - e.getUpperFineLayers())
-//			{
-//				Extruder inFillExtruder = printer.getExtruders()[GenericExtruder.getNumberFromMaterial(inFillName)];
-//				return inFillExtruder.getExtrusionInfillWidth();
-//			}
-//		}
 		
 		return e.getExtrusionInfillWidth();
 	}
@@ -389,21 +341,10 @@ public class LayerRules
 		}
 		addToStep = 0;
 		stepMachine(e);
-		
-//		// modelLayer < 0 when we're building foundations
-//		if(modelLayer < 0)
-//		{
-//			modelLayer = 0;
-//			modelZ = 0;
-//		}
 	}
 	
 	public void setFractionDone()
 	{
-//		double f = machineZ/machineZMax;
-//		if(topDown)
-//			f = 1 - f;
-		
 		// Set -ve to force the system to query the layer rules
 		
 		org.reprap.gui.botConsole.BotConsoleFrame.getBotConsoleFrame().setFractionDone(-1);

@@ -546,7 +546,7 @@ public class AllSTLsToBuild
 		// from doesn't matter.
 		
 		int layer = layerConditions.getMachineLayer();
-		BooleanGridList thisLayer = slice(stl, layerConditions);
+		BooleanGridList thisLayer = slice(stl, layerConditions.getModelLayer(), layerConditions);
 		
 		BooleanGrid unionOfThisLayer;
 		Attributes a;
@@ -567,36 +567,37 @@ public class AllSTLsToBuild
 		
 		BooleanGridList allThis = new BooleanGridList();
 		allThis.add(unionOfThisLayer);
-		allThis = allThis.offset(layerConditions, true, -1);
+		allThis = allThis.offset(layerConditions, true, -3);  // -3 is a bit of a hack...
 		
 		if(allThis.size() > 0)
 			unionOfThisLayer = allThis.get(0);
 		else
 			unionOfThisLayer = BooleanGrid.nullBooleanGrid();
 
-		// Now we subtract the union of this layer from all the stuff requiring support in the layer above.
+		// Get the layer above and union it with this layer.  That's what needs
+		// support on the next layer down.
 		
 		BooleanGridList previousSupport = cache.getSupport(layer+1, stl);
+		cache.setSupport(BooleanGridList.unions(previousSupport, thisLayer), layer, stl);
+		
+		// Now we subtract the union of this layer from all the stuff requiring support in the layer above.
 		
 		BooleanGridList support = new BooleanGridList();
+	
 		if(previousSupport != null)
 		{
 			for(int i = 0; i < previousSupport.size(); i++)
 			{
 				BooleanGrid above = previousSupport.get(i);
 				a = above.attribute();
-				if(!a.getExtruder().getSupportMaterial().equalsIgnoreCase("null"))
+				if(a.getExtruder().getSupportExtruder() != null)
 					support.add(BooleanGrid.difference(above, unionOfThisLayer, a));
 			}
+			support = support.unionDuplicates();
 		}
 		
-		// Copy the support material as we are about to change its attributes
-		// to that of the support for each of its components, and we want
-		// the original material in the cache.
-		
-		BooleanGridList toCache = new BooleanGridList(support);
-		toCache = BooleanGridList.unions(toCache, thisLayer);
-		cache.setSupport(toCache, layer, stl);
+		// Now force the attributes of the support pattern to be the support extruders
+		// for all the materials in it.
 		
 		for(int i = 0; i < support.size(); i++)
 		{
@@ -609,6 +610,7 @@ public class AllSTLsToBuild
 			support.get(i).forceAttribute(new Attributes(e.getMaterial(), null, null, e.getAppearance()));
 		}
 		
+		// Finally compute the support hatch.
 		
 		return support.hatch(layerConditions, false, null);
 	}
@@ -629,13 +631,15 @@ public class AllSTLsToBuild
 		// Where are we and what does the current slice look like?
 		
 		int layer = layerConditions.getMachineLayer();
-		BooleanGridList slice = slice(stl, layerConditions);
+		BooleanGridList slice = slice(stl, layerConditions.getModelLayer(), layerConditions);
 
 		// If we are solid but the slices around us weren't, we need some fine infill as
 		// we are (at least partly) surface
 		
-		BooleanGridList previousSlices = cache.getSlice(layer+1, stl);
-		previousSlices = BooleanGridList.intersections(cache.getSlice(layer+2, stl), previousSlices);
+		BooleanGridList adjacentSlices = slice(stl, layer+1, layerConditions);
+		adjacentSlices = BooleanGridList.intersections(slice(stl, layer+2, layerConditions), adjacentSlices);
+		adjacentSlices = BooleanGridList.intersections(slice(stl, layer-1, layerConditions), adjacentSlices);
+		adjacentSlices = BooleanGridList.intersections(slice(stl, layer-2, layerConditions), adjacentSlices);
 		BooleanGridList insides = null;
 		
 		// The insides are the bits that aren't surface.
@@ -644,10 +648,10 @@ public class AllSTLsToBuild
 		// ensure that they go a little way into the inside infill.
 		
 		BooleanGridList outsides = slice;
-		if(previousSlices != null && layerConditions.getModelLayer() > 1)
+		if(adjacentSlices != null && layerConditions.getModelLayer() > 1)
 		{
-			insides = BooleanGridList.intersections(slice, previousSlices);
-			outsides = BooleanGridList.differences(slice, previousSlices);
+			insides = BooleanGridList.intersections(slice, adjacentSlices);
+			outsides = BooleanGridList.differences(slice, adjacentSlices);
 			outsides = outsides.offset(layerConditions, false, -1);
 			outsides = BooleanGridList.intersections(outsides, slice);
 		}
@@ -688,7 +692,7 @@ public class AllSTLsToBuild
 		
 		// The shapes to outline.
 		
-		BooleanGridList slice = slice(stl, layerConditions);
+		BooleanGridList slice = slice(stl, layerConditions.getModelLayer(), layerConditions);
 		
 		RrPolygonList borderPolygons;
 		
@@ -741,7 +745,7 @@ public class AllSTLsToBuild
 	 * @param extruders
 	 * @return
 	 */
-	private BooleanGridList slice(int stl, LayerRules layerRules)
+	private BooleanGridList slice(int stl, int layer, LayerRules layerRules)
 	{
 		if(!frozen)
 		{
@@ -749,9 +753,11 @@ public class AllSTLsToBuild
 			freeze();
 		}
 		
+		if(layer < 0)
+			return new BooleanGridList();
+		
 		// Is the result in the cache?  If so, just use that.
 		
-		int layer = layerRules.getMachineLayer();
 		BooleanGridList result = cache.getSlice(layer, stl);
 		if(result != null)
 			return result;
@@ -765,7 +771,7 @@ public class AllSTLsToBuild
 		
 		// Probably...
 		
-		double z = layerRules.getModelZ() + layerRules.getZStep()*0.5;
+		double z = layerRules.getModelZ(layer) + layerRules.getZStep()*0.5;
 		Extruder[] extruders = layerRules.getPrinter().getExtruders();
 		result = new BooleanGridList();
 		RrCSG csgp = null;
