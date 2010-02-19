@@ -1,0 +1,203 @@
+Return-Path: <onbehalfof+gregc+jhu.edu@manuscriptcentral.com>
+Received: from murder (imaphost.bath.ac.uk [138.38.3.83])
+	 by bartali.bath.ac.uk (Cyrus v2.2.12) with LMTPA;
+	 Mon, 08 Feb 2010 14:40:12 +0000
+X-Sieve: CMU Sieve 2.2
+Received: from imaphost.bath.ac.uk ([unix socket])
+	 by imaphost.bath.ac.uk (Cyrus v2.2.13) with LMTPA;
+	 Mon, 08 Feb 2010 14:40:13 +0000
+Delivery-date: Mon, 08 Feb 2010 14:40:13 +0000
+Received: from piquet.bath.ac.uk ([138.38.0.36])
+	by imaphost.bath.ac.uk with esmtp (Exim 4.69)
+	(envelope-from <onbehalfof+gregc+jhu.edu@manuscriptcentral.com>)
+	id 1NeUmb-0005WE-Ck
+	for ensab@imaps.bath.ac.uk; Mon, 08 Feb 2010 14:40:13 +0000
+Received: from uranus.scholarone.com ([170.107.181.135])
+	by piquet.bath.ac.uk with esmtp (Exim 4)
+	(envelope-from <onbehalfof+gregc+jhu.edu@manuscriptcentral.com>)
+	id 1NeUmS-0000Kf-8E
+	for A.Bowyer@bath.ac.uk; Mon, 08 Feb 2010 14:40:13 +0000
+Received: from tss1be0008 (tss1be0008 [10.237.148.35])
+	by uranus.scholarone.com (Postfix) with ESMTP id 0A9D8B288F2
+	for <A.Bowyer@bath.ac.uk>; Mon,  8 Feb 2010 09:39:49 -0500 (EST)
+Date: Mon, 8 Feb 2010 09:39:49 -0500 (EST)
+From: gregc@jhu.edu
+Sender: onbehalfof+gregc+jhu.edu@manuscriptcentral.com
+To: A.Bowyer@bath.ac.uk
+Message-ID: <1439705179.515221265639989039.JavaMail.wladmin@tss1be0008>
+Subject: Robotica - Decision on Manuscript ID ROB-REG-09-0184
+Errors-To: gregc@jhu.edu
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Errors-To: gregc@jhu.edu
+X-Spam-Score: 0.0 (/)
+X-Spam-Report: 0.0/6.0
+	---- Start SpamAssassin results 
+	---- End SpamAssassin results
+X-Scanner: 2b52620a1ff21207d4baea3c3e7facd477e5fa38
+
+08-Feb-2010
+
+Dear Dr. Bowyer:
+
+Manuscript ID ROB-REG-09-0184 entitled "RepRap - The Replicating Rapid Prot=
+otyper" which you submitted to Robotica, has been reviewed.  The comments o=
+f the reviewer(s) are included at the bottom of this letter.
+
+The guest editors recommend that the authors revise this submission in acco=
+rdance with reviewer directions. Depending on the time required to complete=
+ this revision, as well as the outcome of the subsequent review process, th=
+e revised work may be included in the special issue on Robotic Self-X Syste=
+ms.=20
+
+To revise your manuscript, log into http://mc.manuscriptcentral.com/robotic=
+a  and enter your Author Center, where you will find your manuscript title =
+listed under "Manuscripts with Decisions."  Under "Actions," click on "Crea=
+te a Revision."  Your manuscript number has been appended to denote a revis=
+ion.
+
+You will be unable to make your revisions on the originally submitted versi=
+on of the manuscript.  Instead, revise your manuscript using a word process=
+ing program and save it on your computer.  Please also highlight the change=
+s to your manuscript within the document by using the track changes mode in=
+ MS Word or by using bold or colored text.
+
+Once the revised manuscript is prepared, you can upload it and submit it th=
+rough your Author Center.
+
+When submitting your revised manuscript, you will be able to respond to the=
+ comments made by the reviewer(s) in the space provided.  You can use this =
+space to document any changes you make to the original manuscript.  In orde=
+r to expedite the processing of the revised manuscript, please be as specif=
+ic as possible in your response to the reviewer(s).
+
+IMPORTANT:  Your original files are available to you when you upload your r=
+evised manuscript.  Please delete any redundant files before completing the=
+ submission.
+
+Because we are trying to facilitate timely publication of manuscripts submi=
+tted to Robotica, your revised manuscript should be uploaded as soon as pos=
+sible.  If it is not possible for you to submit your revision in a reasonab=
+le amount of time, we may have to consider your paper as a new submission.
+
+Once again, thank you for submitting your manuscript to Robotica and I look=
+ forward to receiving your revision.
+
+Sincerely,
+Prof. Greg Chirikjian
+Editor in Chief, Robotica
+gregc@jhu.edu
+
+
+Reviewer(s)' Comments to Author:
+
+Reviewer: 1
+Comments to the Author
+This is a very excellent review of the kinematic replication field and summ=
+ary of the history and accomplishments of the RepRap project.  There=E2=80=
+=99s the same exciting feel as in the earliest days in the PC industry back=
+ in the late 1970s, when Radio Shack and others started selling the first a=
+ssemble-it-yourself home computers.  I enthusiastically recommend this pape=
+r for publication in Robotica.
+
+I didn=E2=80=99t see a statement of the estimated lifetime of a typical mac=
+hine, e.g., how many hours you can get out of key parts, such as a head, be=
+fore it must be replaced;  nor did I see a statement of the smallest attain=
+able feature size on product objects that can be fabricated (this is differ=
+ent from the raw positioning accuracy, which is stated to be 0.1 mm).  Addi=
+ng these two bits of information to the text would improve the paper, but a=
+re not critical.
+
+I could find only one minor factual error:  on the last line of page 6, =E2=
+=80=9CReproducing Concepts Team=E2=80=9D should be corrected to =E2=80=9CRe=
+plicating Systems Concepts Team=E2=80=9D, which was the actual name of the =
+group in this study.
+
+
+Reviewer: 2
+Comments to the Author
+I found this to be a very interesting, well written narrative of the rep-ra=
+p project. However, therin lies my greatest objection - that this reads lik=
+e a narrative or a progress report more than a scientific paper. I think mu=
+ch of the content is relevant, but it would benefit readers to reorganize t=
+he paper from section 3 onwards to stress what the "result" is. Describe th=
+e working, replicating printer clearly, in all its details, and fill in his=
+tory, variations, and some future directions in separate sections to the ex=
+tent it enlightens the reader.
+=20
+Specific comments:=20
+-Since you do not give an exact definition of "raw" materials, it would be =
+useful background to present the physical systems that have been demonstrat=
+ed reproducing, albeit with varying levels of "raw" materials. IE Zykov et =
+al at Cornell in addition to Chirikjian (JHU) whom your reference elsewhere=
+.=20
+
+-Although an interesting philosophical read, much of section 2 ("the genesi=
+s of RepRap") seemed tangential to the results presented here. I would stro=
+ngly suggest (but not require) that this section be distilled to its core i=
+deas.
+
+-A functional diagram would be helpful along with Fig 4.
+
+-Awkward to references authors within the paper, ie "... one of us (VO) cam=
+e up with a..."
+
+-Replace hand-drawn sketch with a clear, computer-generated diagram. (Fig 5=
+)=20
+
+- Fig 7: functional diagram would be helpful in addition to one exterior vi=
+ew. Actual picture would be worlds better than a Solidworks screenshot.
+
+-"Unlike commercial machines, RepRap also allows interiors to be built full=
+y dense." Incorrect. All major vendors I am familiar with (Stratasys, ZCorp=
+, Objet, all laser sintering systems, etc) have this option, if not require=
+ment. You may be speaking of the fact that stratasys leaves micro-voids eve=
+n when set to print dense, but after the previous sentence comparing "dense=
+" to "honeycomb" this is very confusing/misleading.
+
+-In mentioning  the FaH project, your comment "(this project, incidentally,=
+ was inspired by RepRap)" should be referenced if you wish to assert this. =
+(quick survey of the FaH site you include as your reference doesn't verify =
+this...)
+
+-One could easily argue that the build precision of your child machines com=
+es from the positioning system, not the parts produced by the parent machin=
+e. Please address in your discussion - IE where you call it "self replicati=
+ng" by your definition.
+
+
+In summary, I believe this is valuable information that should be definitel=
+y published, but a reader should have a stronger sense of "arrival" at a re=
+sult than I get from reading this paper. Some relatively deep re-organizing=
+ is in order, but will (I believe) result in a much stronger paper.
+
+Reviewer: 3
+Comments to the Author
+This paper is very interesting and useful to the engineering practitioner i=
+nterested in producing a self-reproducing machine that is also capable of f=
+abricating other useful engineering artifacts. The establishment of a clear=
+ lexicon around self-reproduction is particularly useful for categorizing e=
+xisting attempts at self-reproducing kinematic machines. Additionally, the =
+biomimetic approach provides an excellent justification for the design of t=
+he RepRap as a kinematic assisted self-replication self-manufacturing machi=
+ne.=20
+
+To strengthen the paper it would be helpful to more clearly place the RepRa=
+p in the broader ecosystem of personal fabrication robots (both self-replic=
+ating and otherwise). For example, the MakerBot and Fab@Home projects are m=
+entioned as RepStraps, but it would be nice to have an overview of how thei=
+r capabilities compare to or complement the RepRap's.=20
+
+Secondly, while the hardware design evolution is covered in-depth, the soft=
+ware is ignored entirely. An overview of the control software, particularly=
+ slicing and filling algorithms would be illuminating. For example, the pap=
+er mentions that the internal density of the part can be adjusted over a wi=
+de range. One challenge for any solid free form machine is the production o=
+f thin-walled parts. Though arbitrary part fabrication is clearly not the p=
+rimary goal of RepRap, it would be useful to describe its limitations in th=
+at regard. Also of interest are open source design tools. Are any design to=
+ols included as part of the RepRap kit, or does the system simply except an=
+d standard part representations like STL, depending on the user to provide =
+the tools for designing parts?
+
