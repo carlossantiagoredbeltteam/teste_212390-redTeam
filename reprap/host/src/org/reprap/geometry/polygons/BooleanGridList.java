@@ -179,7 +179,7 @@ public class BooleanGridList
 		 * @param surface
 		 * @return
 		 */
-		public RrPolygonList hatch(LayerRules layerConditions, boolean surface, Rr2Point startNearHere)
+		public RrPolygonList hatch(LayerRules layerConditions, boolean surface) //, Rr2Point startNearHere)
 		{
 			RrPolygonList result = new RrPolygonList();
 			boolean foundation = layerConditions.getLayingSupport();
@@ -201,7 +201,7 @@ public class BooleanGridList
 						att = new Attributes(e.getMaterial(), null, null, e.getAppearance());
 					}
 				}
-				result.add(get(i).hatch(layerConditions.getHatchDirection(e), layerConditions.getHatchWidth(e), att, startNearHere)); 
+				result.add(get(i).hatch(layerConditions.getHatchDirection(e), layerConditions.getHatchWidth(e), att)); //, startNearHere)); 
 			}	
 			return result;
 		}

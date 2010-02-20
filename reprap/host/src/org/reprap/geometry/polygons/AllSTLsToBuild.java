@@ -612,7 +612,7 @@ public class AllSTLsToBuild
 		
 		// Finally compute the support hatch.
 		
-		return support.hatch(layerConditions, false, null);
+		return support.hatch(layerConditions, false); //, null);
 	}
 	
 	/**
@@ -622,7 +622,7 @@ public class AllSTLsToBuild
 	 * @param startNearHere
 	 * @return
 	 */
-	public RrPolygonList computeInfill(int stl, LayerRules layerConditions, Rr2Point startNearHere)
+	public RrPolygonList computeInfill(int stl, LayerRules layerConditions) //, Rr2Point startNearHere)
 	{
 		// No more additions or movements, please
 		
@@ -661,18 +661,18 @@ public class AllSTLsToBuild
 		if(insides != null)
 			insides = insides.offset(layerConditions, false, 1);
 		
-		RrPolygonList hatchedPolygons = outsides.hatch(layerConditions, true, startNearHere);
-		if(hatchedPolygons.size() > 0)
-		{
-			RrPolygon last = hatchedPolygons.polygon(hatchedPolygons.size() - 1);
-			startNearHere = last.point(last.size() - 1);
-		}
+		RrPolygonList hatchedPolygons = outsides.hatch(layerConditions, true); //, startNearHere);
+//		if(hatchedPolygons.size() > 0)
+//		{
+//			RrPolygon last = hatchedPolygons.polygon(hatchedPolygons.size() - 1);
+//			startNearHere = last.point(last.size() - 1);
+//		}
 		
 //		if(layerConditions.getLayingSupport())
 //			offHatch = offHatch.union(layerConditions.getPrinter().getExtruders());
 			
 		if(insides != null)
-			hatchedPolygons.add(insides.hatch(layerConditions, false, startNearHere));
+			hatchedPolygons.add(insides.hatch(layerConditions, false)); //, startNearHere));
 		
 		return hatchedPolygons;
 	}

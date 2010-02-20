@@ -361,17 +361,30 @@ public class Producer {
 				allPolygons[physicalExtruder] = new RrPolygonList();
 			
 			boolean shield = true;
-			Rr2Point startNearHere = null;
+			Rr2Point startNearHere = new Rr2Point(0, 0);
 			for(int stl = 0; stl < allSTLs.size(); stl++)
 			{
-					RrPolygonList fills = allSTLs.computeInfill(stl, layerRules, startNearHere);
+					RrPolygonList fills = allSTLs.computeInfill(stl, layerRules); //, startNearHere);
+					RrPolygonList borders = allSTLs.computeOutlines(stl, layerRules, fills, shield);
+					RrPolygonList support = allSTLs.computeSupport(stl, layerRules);
+					borders = borders.nearEnds(startNearHere);
+					if(borders.size() > 0)
+					{
+						RrPolygon last = borders.polygon(borders.size() - 1);
+						startNearHere = last.point(last.size() - 1);
+					}
+					fills = fills.nearEnds(startNearHere);
 					if(fills.size() > 0)
 					{
 						RrPolygon last = fills.polygon(fills.size() - 1);
 						startNearHere = last.point(last.size() - 1);
 					}
-					RrPolygonList borders = allSTLs.computeOutlines(stl, layerRules, fills, shield);
-					RrPolygonList support = allSTLs.computeSupport(stl, layerRules);
+					support = support.nearEnds(startNearHere);
+					if(support.size() > 0)
+					{
+						RrPolygon last = support.polygon(support.size() - 1);
+						startNearHere = last.point(last.size() - 1);
+					}
 					for(int pol = 0; pol < borders.size(); pol++)
 					{
 						shield = false;
