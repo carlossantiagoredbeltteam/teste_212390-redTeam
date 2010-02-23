@@ -454,7 +454,7 @@ public interface Printer {
 	 * The RS232/USB etc comms system doesn't use this - it sets its own delays.
 	 * @param milliseconds
 	 */
-	public void machineWait(double milliseconds);
+	public void machineWait(double milliseconds, boolean fastExtrude);
 	
 	/**
 	 * Load a file to be made.

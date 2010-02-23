@@ -476,13 +476,13 @@ public class GCodeRepRap extends GenericRepRap {
 
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#printStartDelay(long)
-	 */
-	public void printStartDelay(long msDelay) {
-		// This would extrude for the given interval to ensure polymer flow.
-		getExtruder().startExtruding();
-		
-		delay(msDelay);
-	}
+//	 */
+//	public void printStartDelay(long msDelay) {
+//		// This would extrude for the given interval to ensure polymer flow.
+//		getExtruder().startExtruding();
+//		
+//		delay(msDelay);
+//	}
 
 	public void home() {
 
@@ -502,14 +502,17 @@ public class GCodeRepRap extends GenericRepRap {
 		super.home();
 	}
 	
-	private void delay(long millis)
+	private void delay(long millis, boolean fastExtrude)
 	{
 		double extrudeLength = getExtruder().getDistanceFromTime(millis);
 		if(extrudeLength > 0)
 		{
 			if(extruders[extruder].get5D())
 			{
-				qFeedrate(getExtruder().getFastXYFeedrate());
+				if(fastExtrude)
+					qFeedrate(getExtruder().getFastEFeedrate());
+				else
+					qFeedrate(getExtruder().getFastXYFeedrate());
 				// Fix the value for possible feedrate change
 				extrudeLength = getExtruder().getDistanceFromTime(millis); 
 			}
@@ -630,11 +633,11 @@ public class GCodeRepRap extends GenericRepRap {
 	 * The RS232/USB etc comms system doesn't use this - it sets its own delays.
 	 * @param milliseconds
 	 */
-	public void machineWait(double milliseconds)
+	public void machineWait(double milliseconds, boolean fastExtrude)
 	{
 		if(milliseconds <= 0)
 			return;
-		delay((long)milliseconds);
+		delay((long)milliseconds, fastExtrude);
 	}
 	
 	/**

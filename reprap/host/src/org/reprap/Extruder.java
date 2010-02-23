@@ -180,11 +180,11 @@ public interface Extruder
      */
     public double getFastXYFeedrate();
     
-//    /**
-//     * The fastest we can extrude in mm/min
-//     * @return
-//     */
-//    public double getFastEFeedrate();
+    /**
+     * The fastest we can extrude in mm/min
+     * @return
+     */
+    public double getFastEFeedrate();
     
 	/**
 	 * @return slow XY movement feedrate in mm/minute

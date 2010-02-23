@@ -101,7 +101,7 @@ public class Simulator extends GenericRepRap {
 	 * Here do no delay; it makes no sense for the simulation machine
 	 * @param milliseconds
 	 */
-	public void machineWait(double milliseconds)
+	public void machineWait(double milliseconds, boolean fastExtrude)
 	{
 	}
 	

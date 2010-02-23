@@ -122,10 +122,10 @@ public abstract class GenericExtruder implements Extruder
 	 */
 	protected double fastXYFeedrate;
 	
-//	/**
-//	 * The fastest the extruder can extrude
-//	 */
-//	protected double fastEFeedrate;
+	/**
+	 * The fastest the extruder can extrude
+	 */
+	protected double fastEFeedrate;
 	
 	/**
 	 * The speed from which that machine can do a standing start with this extruder
@@ -410,7 +410,7 @@ public abstract class GenericExtruder implements Extruder
 			extrusionBroadWidth = Preferences.loadGlobalDouble(prefName + "ExtrusionBroadWidth(mm)");		
 			coolingPeriod = Preferences.loadGlobalDouble(prefName + "CoolingPeriod(s)");
 			fastXYFeedrate = Preferences.loadGlobalDouble(prefName + "FastXYFeedrate(mm/minute)");
-			//fastEFeedrate = Preferences.loadGlobalDouble(prefName + "FastEFeedrate(mm/minute)");
+			fastEFeedrate = Preferences.loadGlobalDouble(prefName + "FastEFeedrate(mm/minute)");
 			slowXYFeedrate = Preferences.loadGlobalDouble(prefName + "SlowXYFeedrate(mm/minute)");
 			maxAcceleration = Preferences.loadGlobalDouble(prefName + "MaxAcceleration(mm/minute/minute)");
 			t0 = Preferences.loadGlobalInt(prefName + "t0(0..255)");
@@ -687,13 +687,13 @@ public abstract class GenericExtruder implements Extruder
     	return fastXYFeedrate;
     }
     
-//    /* (non-Javadoc)
-//     * @see org.reprap.Extruder#getXYSpeed()
-//     */
-//    public double getFastEFeedrate()
-//    {
-//    	return fastEFeedrate;
-//    }
+    /* (non-Javadoc)
+     * @see org.reprap.Extruder#getXYSpeed()
+     */
+    public double getFastEFeedrate()
+    {
+    	return fastEFeedrate;
+    }
     
 	/**
 	 * @return slow XY movement feedrate in mm/minute
