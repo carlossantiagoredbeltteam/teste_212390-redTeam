@@ -145,7 +145,7 @@ public class GCodeRepRap extends GenericRepRap {
 	
 	private void qZMove(double z, double feedrate)
 	{	
-		// Z doesn't accelerate (yet); note we set the feedrate whether we move or not
+		// note we set the feedrate whether we move or not
 		
 		double zFeedrate = round(getMaxFeedrateZ(), 1);
 		
@@ -250,7 +250,6 @@ public class GCodeRepRap extends GenericRepRap {
 			qZMove(liftedZ - liftIncrement, zFeedrate);
 			qFeedrate(feedrate);			
 		}		
-		
 		super.moveTo(x, y, z, feedrate, startUp, endUp);
 	}
 	
@@ -408,7 +407,7 @@ public class GCodeRepRap extends GenericRepRap {
 			moveToFinish();
 			// Extruder off
 			getExtruder().setExtrusion(0, false);
-
+			gcode.queue("M113 S0.0 ;shut extruder stepper down");
 			// heater off
 			getExtruder().heatOff();
 		} catch(Exception e){
@@ -417,11 +416,6 @@ public class GCodeRepRap extends GenericRepRap {
 		//write/close our file/serial port
 		gcode.reverseLayers();
 		gcode.finish();
-		//Debug.e("Generic terminate: " + getFinishX() + " " + getFinishY());
-//		moveToFinish();
-//		getExtruder().setMotor(false);
-//		getExtruder().setValve(false);
-//		getExtruder().setTemperature(0, false);
 	}
 	
 	
@@ -438,7 +432,7 @@ public class GCodeRepRap extends GenericRepRap {
 	 */
 	public void moveToFinish()
 	{
-		singleMove(finishX, finishY, currentZ, getExtruder().getFastXYFeedrate());
+		singleMove(getFinishX(), getFinishY(), currentZ, getExtruder().getFastXYFeedrate());
 	}
 
 
@@ -571,6 +565,26 @@ public class GCodeRepRap extends GenericRepRap {
 		gcode.queue("G92 Y0 ;set y 0");
 		super.homeToZeroY();
 
+	}
+	
+	public void homeToZeroXYE() throws ReprapException, IOException
+	{
+		if(XYEAtZero)
+			return;
+		homeToZeroX();
+		homeToZeroY();
+		int extruderNow = extruder;
+		for(int i = 0; i < extruders.length; i++)
+		{
+			if(extruders[i].getExtruderState().length() > 0)
+			{
+				selectExtruder(i);
+				extruders[i].zeroExtrudedLength();
+			}
+		}
+		selectExtruder(extruderNow);
+		XYEAtZero = true;
+		super.homeToZeroXYE();
 	}
 
 	/* (non-Javadoc)

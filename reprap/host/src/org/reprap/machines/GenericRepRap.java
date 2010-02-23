@@ -28,6 +28,8 @@ public abstract class GenericRepRap implements CartesianPrinter
 	
 	//protected boolean accelerating;
 	
+	protected boolean XYEAtZero;
+	
 	/**
 	 * 
 	 */
@@ -177,6 +179,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	public GenericRepRap() throws Exception
 	{
 		topDown = false;
+		XYEAtZero = false;
 		startTime = System.currentTimeMillis();
 		startCooling = -1;
 		statusWindow = new StatusMessage(new JFrame());
@@ -614,6 +617,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		currentX = x;
 		currentY = y;
 		currentZ = z;
+		XYEAtZero = false;
 	}
 	
 	public void singleMove(double x, double y, double z, double feedrate)
@@ -788,6 +792,9 @@ public abstract class GenericRepRap implements CartesianPrinter
 		currentZ = 0.0;
 	}
 	
+	public void homeToZeroXYE() throws ReprapException, IOException
+	{}
+	
 	public void home(){
 		currentX = currentY = currentZ = 0.0;
 	}
@@ -828,18 +835,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 			//setFeedrate(getFastXYFeedrate());
 			
 			// Go home. Seek (0,0) then callibrate X first
-			homeToZeroX();
-			homeToZeroY();
-			int extruderNow = extruder;
-			for(int i = 0; i < extruders.length; i++)
-			{
-				if(extruders[i].getExtruderState().length() > 0)
-				{
-					selectExtruder(i);
-					extruders[i].zeroExtrudedLength();
-				}
-			}
-			selectExtruder(extruderNow);
+			homeToZeroXYE();
 			startCooling = Timer.elapsed();
 		}
 
@@ -865,6 +861,9 @@ public abstract class GenericRepRap implements CartesianPrinter
 	public void startingLayer(LayerRules lc) throws Exception
 	{
 		lc.setFractionDone();
+		
+		homeToZeroXYE();
+		
 		double datumX = getExtruder().getNozzleWipeDatumX();
 		double datumY = getExtruder().getNozzleWipeDatumY();
 		double strokeY = getExtruder().getNozzleWipeStrokeY();

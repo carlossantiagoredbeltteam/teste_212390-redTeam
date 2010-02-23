@@ -104,6 +104,14 @@ public interface Printer {
 	 */
 	public void homeToZeroY() throws ReprapException, IOException; 
 	
+	
+	/**
+	 * Home XY and zero all extruders
+	 * @throws ReprapException
+	 * @throws IOException
+	 */
+	public void homeToZeroXYE() throws ReprapException, IOException; 
+	
 	/**
 	 * Sync to zero Z location.
 	 * @throws ReprapException

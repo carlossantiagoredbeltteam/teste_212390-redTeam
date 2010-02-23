@@ -347,7 +347,7 @@ public class LayerRules
 	{
 		// Set -ve to force the system to query the layer rules
 		
-		org.reprap.gui.botConsole.BotConsoleFrame.getBotConsoleFrame().setFractionDone(-1);
+		org.reprap.gui.botConsole.BotConsoleFrame.getBotConsoleFrame().setFractionDone(-1, -1, -1);
 	}
 	
 }
