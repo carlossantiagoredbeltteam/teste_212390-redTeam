@@ -12,6 +12,7 @@ package org.reprap.machines;
 
 import org.reprap.ReprapException;
 import org.reprap.Extruder;
+import org.reprap.Preferences;
 import org.reprap.comms.GCodeReaderAndWriter;
 import org.reprap.utilities.Debug;
 import org.reprap.devices.GCodeExtruder;
@@ -61,7 +62,14 @@ public class GCodeRepRap extends GenericRepRap {
 	
 	public void loadExtruders()
 	{
-		extruders = new GCodeExtruder[extruderCount];
+		try
+		{
+			int extruderCount = Preferences.loadGlobalInt("NumberOfExtruders");
+			extruders = new GCodeExtruder[extruderCount];
+		} catch (Exception e)
+		{
+			Debug.e(e.toString());
+		}
 		
 		super.loadExtruders();
 	}
