@@ -46,7 +46,7 @@ public class GCodeExtruder extends GenericExtruder
 		{
 			heatOn(true);
 			setExtrusion(getFastXYFeedrate(), false);
-			getPrinter().machineWait(purgeTime);
+			getPrinter().machineWait(purgeTime, false);
 			setExtrusion(0, false);
 		} catch (Exception e)
 		{}

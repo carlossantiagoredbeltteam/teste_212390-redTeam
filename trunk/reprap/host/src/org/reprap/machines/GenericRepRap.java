@@ -523,38 +523,48 @@ public abstract class GenericRepRap implements CartesianPrinter
 	
 	/**
 	 * Extrude for the given time in milliseconds, so that polymer is flowing
-	 * before we try to move the extruder.
+	 * before we try to move the extruder.  But first take up the slack from any
+	 * previous reverse.
 	 */
 	public void printStartDelay(boolean firstOneInLayer) 
 	{
-		// Extrude motor and valve delays (ms)
-		
-		double eDelay, vDelay;
-		
-		if(firstOneInLayer)
-		{
-			eDelay = getExtruder().getExtrusionDelayForLayer();
-			vDelay = getExtruder().getValveDelayForLayer();
-		} else
-		{
-			eDelay = getExtruder().getExtrusionDelayForPolygon();
-			vDelay = getExtruder().getValveDelayForPolygon();			
-		}
-		
 		try
-		{
+		{		
+			double rDelay = getExtruder().getExtrusionReverseDelay();
+
+			if(rDelay > 0)
+			{
+				getExtruder().setMotor(true);
+				machineWait(rDelay, true);
+			}
+
+			// Extrude motor and valve delays (ms)
+
+			double eDelay, vDelay;
+
+			if(firstOneInLayer)
+			{
+				eDelay = getExtruder().getExtrusionDelayForLayer();
+				vDelay = getExtruder().getValveDelayForLayer();
+			} else
+			{
+				eDelay = getExtruder().getExtrusionDelayForPolygon();
+				vDelay = getExtruder().getValveDelayForPolygon();			
+			}
+
+
 			if(eDelay >= vDelay)
 			{
 				getExtruder().setMotor(true);
-				machineWait(eDelay - vDelay);
+				machineWait(eDelay - vDelay, false);
 				getExtruder().setValve(true);
-				machineWait(vDelay);
+				machineWait(vDelay, false);
 			} else
 			{
 				getExtruder().setValve(true);
-				machineWait(vDelay - eDelay);
+				machineWait(vDelay - eDelay, false);
 				getExtruder().setMotor(true);
-				machineWait(eDelay);
+				machineWait(eDelay, false);
 			}
 			//getExtruder().setMotor(false);  // What's this for?  - AB
 		} catch(Exception e)
@@ -579,7 +589,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		try
 		{
 			getExtruder().setExtrusion(getExtruder().getExtruderSpeed(), true);
-			machineWait(delay);
+			machineWait(delay, true);
 			getExtruder().stopExtruding();
 		} catch (Exception e)
 		{}
@@ -896,7 +906,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		{	
 			cool = coolTime - cool;
 			// NB - if cool is -ve machineWait will return immediately
-			machineWait(1000*cool);
+			machineWait(1000*cool, false);
 		}
 		// Fan off
 		
@@ -906,7 +916,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		
 		if(startCooling >= 0)
 		{
-			machineWait(200 * coolTime);			
+			machineWait(200 * coolTime, false);			
 			Debug.d("End of cooling period");			
 		}
 		
@@ -924,10 +934,10 @@ public abstract class GenericRepRap implements CartesianPrinter
 			{
 				getExtruder().setValve(true);
 				getExtruder().setMotor(true);
-				machineWait(1000*clearTime);
+				machineWait(1000*clearTime, false);
 				getExtruder().setMotor(false);
 				getExtruder().setValve(false);
-				machineWait(1000*waitTime);
+				machineWait(1000*waitTime, false);
 			}
 
 			singleMove(datumX, datumY + strokeY, currentZ, currentFeedrate);

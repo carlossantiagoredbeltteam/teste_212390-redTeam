@@ -384,7 +384,7 @@ public void goTo(double xTo, double yTo, double zTo)
 			GenericExtruderTabPanel etp = BotConsoleFrame.getGenericExtruderTabPanel(eNum);
 			printer.selectExtruder(eNum);
 			printer.getExtruder().setExtrusion(etp.getExtruderSpeed(), false);
-			printer.machineWait(printer.getExtruder().getExtrusionDelayForLayer());
+			printer.machineWait(printer.getExtruder().getExtrusionDelayForLayer(), false);
 		}
 		if(z >= zTo)
 		{

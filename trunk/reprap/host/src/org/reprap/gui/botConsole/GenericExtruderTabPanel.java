@@ -506,7 +506,7 @@ private void heatButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
         setExtruderSpeed();
         if(extruder.get5D() && extruding)
 		{
-			extruder.getPrinter().machineWait(5000);
+			extruder.getPrinter().machineWait(5000, false);
 			extruding = false;
 			setExtruderSpeed();
             extrudeButton.setText("Extrude");
