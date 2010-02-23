@@ -285,7 +285,7 @@ public class GCodeReaderAndWriter
 						bufferQueue(line);
 						bytes += line.length();
 						fractionDone = (double)bytes/(double)fileInStreamLength;
-						setFractionDone(fractionDone);
+						setFractionDone(fractionDone, -1, -1);
 						while(paused)
 						{
 							//System.err.println("Waiting for pause to end.");
@@ -305,9 +305,9 @@ public class GCodeReaderAndWriter
 	    return true;
 	}
 	
-	public void setFractionDone(double fractionDone)
+	public void setFractionDone(double fractionDone, int layer, int outOf)
 	{
-		org.reprap.gui.botConsole.BotConsoleFrame.getBotConsoleFrame().setFractionDone(fractionDone);
+		org.reprap.gui.botConsole.BotConsoleFrame.getBotConsoleFrame().setFractionDone(fractionDone, layer, outOf);
 	}
 	
 	/**
@@ -470,7 +470,13 @@ public class GCodeReaderAndWriter
 		}
 	
 		Debug.c("G-code: " + cmd + " not sent");
-		
+		if(cmd.startsWith(";#!LAYER:"))
+		{
+			int l = Integer.parseInt(cmd.substring(cmd.indexOf(" ") + 1, cmd.indexOf("/")));
+			int o = Integer.parseInt(cmd.substring(cmd.indexOf("/") + 1));
+			//System.out.println("layer marker: " + l + ", " + o);
+			setFractionDone(-1, l, o+1);
+		}
 
 	}
 	

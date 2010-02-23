@@ -72,16 +72,26 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
      * it.
      * @param fractionDone
      */
-    public void updateProgress(double fractionDone)
+    public void updateProgress(double fractionDone, int layer, int layers)
     {
+    	//System.out.println("layer marker: " + fractionDone + ", " + layer + ", " + layers);
+    	if(layer >= 0)
+    		currentLayerOutOfN.setText("" + layer + "/" + layers);
+    	
+    	if(layers < 0)
+    	{
+    		layers = org.reprap.Main.gui.getLayers();
+    	}
+    	
+    	if(layer < 0)
+    	{
+    		layer = org.reprap.Main.gui.getLayer();
+    		if(layer >= 0)
+        		currentLayerOutOfN.setText("" + layer + "/" + layers);
+    	}
+    	
     	if(fractionDone < 0)
     	{
-    		int layers = org.reprap.Main.gui.getLayers();
-    		if(layers <= 0)
-    			return;
-
-    		int layer = org.reprap.Main.gui.getLayer();
-
     		// Only bother if the layer has just changed
 
     		if(layer == oldLayer)
@@ -91,7 +101,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
 
     		oldLayer = layer;
 
-    		currentLayerOutOfN.setText("" + layer + "/" + layers);
+    		//currentLayerOutOfN.setText("" + layer + "/" + layers);
     		if(topDown)
     			fractionDone = (double)(layers - layer)/(double)layers;
     		else
@@ -446,7 +456,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
 
 private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
     parentBotConsoleFrame.suspendPolling();
-    parentBotConsoleFrame.setFractionDone(-1);
+    parentBotConsoleFrame.setFractionDone(-1, -1, -1);
     org.reprap.Main.gui.mouseToWorld();
     if(gCodeToFileRadioButton.isSelected())
     {

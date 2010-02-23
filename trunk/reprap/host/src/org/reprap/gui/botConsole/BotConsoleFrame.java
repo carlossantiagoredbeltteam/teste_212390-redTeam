@@ -32,6 +32,8 @@ public class BotConsoleFrame extends javax.swing.JFrame {
     private boolean carryOnPolling = true;
     private GenericExtruderTabPanel[] extruderPanels;
     double fractionDone = -1;
+    int layer = -1;
+    int outOf = -1;
     private static BotConsoleFrame bcf = null;
     private static int exPanelNumber;
     
@@ -105,12 +107,17 @@ public class BotConsoleFrame extends javax.swing.JFrame {
      */
     private void updateProgress()
     {
-    	printTabFrame1.updateProgress(fractionDone);
+    	printTabFrame1.updateProgress(fractionDone, layer, outOf);
     }
     
-    public void setFractionDone(double f)
+    public void setFractionDone(double f, int l, int o)
     {
-    	fractionDone = f;
+    	if(f >= 0)
+    		fractionDone = f;
+    	if(l >= 0)
+    		layer = l;
+    	if(o >= 0)
+    		outOf = o;
     }
 
     /**

@@ -27,11 +27,11 @@ public class GCodeExtruder extends GenericExtruder
 	 */
 	public void zeroExtrudedLength()
 	{
-		if(es.length() > 0)
-		{
+		//if(es.length() > 0)
+		//{
 			super.zeroExtrudedLength();
 			gcode.queue("G92 E0 ;zero the extruded length");
-		}
+		//}
 	}
 	
 	/**
