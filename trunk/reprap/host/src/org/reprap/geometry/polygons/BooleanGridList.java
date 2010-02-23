@@ -192,16 +192,16 @@ public class BooleanGridList
 					e = es[0]; // Extruder 0 is used for foundations
 				else
 					e = att.getExtruder();
+				Extruder ei;
 				if(!surface)
 				{
-					int ei = e.getInfillExtruderNumber();
-					if(ei >= 0)
-					{
-						e = es[ei];
-						att = new Attributes(e.getMaterial(), null, null, e.getAppearance());
-					}
-				}
-				result.add(get(i).hatch(layerConditions.getHatchDirection(e), layerConditions.getHatchWidth(e), att)); //, startNearHere)); 
+					ei = e.getInfillExtruder();
+					if(ei != null)
+						att = new Attributes(ei.getMaterial(), null, null, ei.getAppearance());
+				} else
+					ei = e;
+				if(ei != null)
+					result.add(get(i).hatch(layerConditions.getHatchDirection(ei), layerConditions.getHatchWidth(ei), att)); //, startNearHere)); 
 			}	
 			return result;
 		}

@@ -134,7 +134,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	/**
 	 * Number of extruders on the 3D printer
 	 */
-	protected int extruderCount;
+	//protected int extruderCount;
 	
 	/**
 	 * Array containing the extruders on the 3D printer
@@ -182,7 +182,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		statusWindow = new StatusMessage(new JFrame());
 		
 		//load extruder prefs
-		extruderCount = Preferences.loadGlobalInt("NumberOfExtruders");
+		int extruderCount = Preferences.loadGlobalInt("NumberOfExtruders");
 		if (extruderCount < 1)
 			throw new Exception("A Reprap printer must contain at least one extruder.");
 
@@ -212,7 +212,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	{
 		int pe;
 		
-		for(int i = 0; i < extruderCount; i++)
+		for(int i = 0; i < extruders.length; i++)
 		{
 			extruders[i] = extruderFactory(i);
 			
@@ -285,7 +285,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 			System.err.println("Refresh Reprap preferences: " + ex.toString());
 		}
 		
-		for(int i = 0; i < extruderCount; i++)
+		for(int i = 0; i < extruders.length; i++)
 			extruders[i].refreshPreferences();
 		
 		Debug.refreshPreferences();
@@ -323,7 +323,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 */
 	public void dispose()
 	{
-		for(int i = 0; i < extruderCount; i++)
+		for(int i = 0; i < extruders.length; i++)
 			extruders[i].dispose();
 	}
 	
@@ -343,7 +343,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		if (isCancelled())
 			return;
 
-		if(materialIndex < 0 || materialIndex >= extruderCount)
+		if(materialIndex < 0 || materialIndex >= extruders.length)
 		{
 			System.err.println("Selected material (" + materialIndex + ") is out of range.");
 			extruder = 0;
@@ -368,7 +368,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 * @see org.reprap.Printer#selectMaterial(int)
 	 */
 	public void selectExtruder(Attributes att) {
-		for(int i = 0; i < extruderCount; i++)
+		for(int i = 0; i < extruders.length; i++)
 		{
 			if(att.getMaterial().equals(extruders[i].getMaterial()))
 			{
@@ -486,7 +486,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 */
 	public Extruder getExtruder(String name)
 	{
-		for(int i = 0; i < extruderCount; i++)
+		for(int i = 0; i < extruders.length; i++)
 			if(name.equals(extruders[i].toString()))
 				return extruders[i];
 		return null;
@@ -831,7 +831,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 			homeToZeroX();
 			homeToZeroY();
 			int extruderNow = extruder;
-			for(int i = 0; i < extruderCount; i++)
+			for(int i = 0; i < extruders.length; i++)
 			{
 				if(extruders[i].getExtruderState().length() > 0)
 				{
