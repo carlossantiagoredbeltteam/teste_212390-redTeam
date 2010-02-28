@@ -1032,7 +1032,12 @@ public class RrPolygonList
 		p = polygon(i).point(polygon(i).size()/2);
 		boolean b = (exp.value(p) <= 0);
 		if (a != b)
+		{
 			System.err.println("RrPolygonList:inside() - i is both inside and outside j!");
+			// casting vote...
+			p = polygon(i).point(polygon(i).size()/3);
+			return exp.value(p) <= 0;
+		}
 		return a;
 	}
 		
