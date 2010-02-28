@@ -20,14 +20,16 @@
  * 0.15Erik		17/09/09	Feature: added anti-ooze system for Bowden extruder. Still experimental, stops pullback after a while, WHY?!
  * 0.16Erik             21/11/09        Feature: status line with progress indication.
  * 0.17Erik             28/12/09        Feature: can perform a search for the input file in varous directories
+ * 0.18Erik             09/01/10        Feature: can rescale and offset g-code
+ * 0.19Erik             28/02/10        Feature: can put the output on an SD card and safely unmounts it.
 
 Upcoming:
- * 0.18Erik             28/12/09        Feature: can remove the raft if --noraft is set
+ * ... Erik             28/12/09        Feature: can remove the raft if --noraft is set
 
  */
 ini_set('memory_limit','128M');
 
-$version = 0.17;
+$version = 0.19;
 out("\n( Modified by 3D-to-5D-Gcode v$version on ".date("c").')');
 $uTime=microtime(true);
 // Settings:
@@ -77,7 +79,15 @@ $setting['actions'] = array(
 */
 
 );
+$setting['machine'] = 'charles';
+$setting['extension'] = 'gcode';
+$setting['add_E_codes'] = true;
 $setting['remove_comments'] = true;  // Set true/false to remove comments from input file or not.
+$setting['remove_M108s'] = true;
+$setting['scale'] = 1;
+$setting['offset_x'] = 0;
+$setting['offset_y'] = 0;
+$setting['remove_M101-M103'] = true;
 //$setting['soften_z_move_factor'] = .5;  // this slows down the move in the Z direction to this speed
 $setting['anti-backlash'] = array(
 //	'X'=>array('fwd_dynamic'=>0.0/*mm*/, 'rev_dynamic'=>0.0/*mm*/,'fwd_static'=>0.20/*mm*/, 'rev_static'=>0.20/*mm*/ ), // Backlash on X-axis
@@ -85,21 +95,21 @@ $setting['anti-backlash'] = array(
 // Y backlash was .30
 	//'Y'=>array('fwd_dynamic'=>0.45/*mm*/, 'rev_dynamic'=>0.45/*mm*/,'fwd_static'=>0.1/*mm*/, 'rev_static'=>0.1/*mm*/ ), // Backlash on Y-axis
 );
-if(ereg("^(.+)_export\.gcode$",basename($argv[1]),$regs))
-  $setting['output_file'] = $regs[1].'.gcode';
-elseif(ereg("^(.+)\.gcode$",basename($argv[1]),$regs))
-  $setting['output_file'] = $regs[1].'.gcode';
+if(ereg("^(.+)_export\.".$setting['extension']."$",basename($argv[1]),$regs))
+  $setting['output_file'] = $regs[1].'.'.$setting['extension'];
+elseif(ereg("^(.+)\.".$setting['extension']."$",basename($argv[1]),$regs))
+  $setting['output_file'] = $regs[1].'.'.$setting['extension'];
 elseif(ereg("^([^\.]+)$",basename($argv[1]),$regs))
-  $setting['output_file'] = $regs[1].'.gcode';
+  $setting['output_file'] = $regs[1].'.'.$setting['extension'];
 else
-  $setting['output_file'] = 'out-5D.gcode'; // null = output directly.
+  $setting['output_file'] = 'out-5D.'.$setting['extension']; // null = output directly.
 $setting['default_output_path'] = '/home/erik/RepRap/gcode/';
 
-$settings_file = $_SERVER['HOME']."/.reprap/3D-to-5D.settings";
-if(file_exists($settings_file))
-  $setting = ini_get($settings_file);
+$setting_file = $_SERVER['HOME']."/.reprap/3D-to-5D.settings";
+if(file_exists($setting_file))
+  $setting = ini_get($setting_file);
 else 
-  out("\n( Warning: no settings file found in $settings_file using only defaults.)");
+  out("\n( Warning: no settings file found in $setting_file using only defaults.)");
 // explain defaults
 foreach($setting as $sName => $sVal)
 {
@@ -112,6 +122,53 @@ foreach($setting as $sName => $sVal)
   }
 
 }
+
+if(isset($setting['machine']) && ($setting['machine'] == 'leo'))
+{
+  $setting['remove_M101-M103'] = false;
+
+  $setting['prepend_gcode'] = "G90\nG21\nM108 S10.0\n";
+//\n";// HOME: "G28\n";
+//M227 S1000 P800 on extruder stop (M103) reverse the extruder stepper for S turns and on extruder start (M101) prepare (push) filament P steps (available from firmware 1.0.8)
+  #$setting['extrusion_adjust'] = 0.13;
+  $setting['add_E_codes'] = false;
+  $setting['scale'] = array();
+  $setting['scale']['X'] = 0.77;
+  $setting['scale']['Y'] = 0.77;
+  $setting['scale']['Z'] = 1.0;
+  $setting['scale']['F'] = 0.77;
+  $setting['offset_x'] = 40;
+  $setting['offset_y'] = -30;
+  $setting['extension']='bfb';
+  $setting['output_file'] = str_replace('.gcode','.bfb',$setting['output_file']);
+  $setting['remove_redundant_Gcodes'] = false;
+  $setting['remove_M108s'] = false;
+  $setting['M108factor'] = 0.10;
+  $sd_mounted = glob("/media/disk*/RR_SD");
+  if($nr_SDs = count($sd_mounted))
+    {
+      if($nr_SDs > 1)
+      {
+        echo "Multiple ($nr_SDs) SD cards found. Please mount only one at a time...";
+      }
+      $setting['sd_mount'] = dirname($sd_mounted[0]);
+      echo "Notice: SD mounted on ".dirname($setting['sd_mount'])."\n";
+    }
+}
+if(isset($setting['scale'])&&(!is_array($setting['scale']))) // doesn't scale Z by default
+{
+  $scale = $setting['scale'];
+  $setting['scale']=array();
+
+  $setting['scale']['X'] = $scale;
+  $setting['scale']['Y'] = $scale;
+  
+}
+if(isset($setting['scale_z'])) $setting['scale']['Z'] = $setting['scale_z'];
+
+echo "=============";
+print_r($setting['scale']);
+echo "=============";
 
 if(!strstr($setting['output_file'],'/'))
   $setting['output_file'] = $setting['default_output_path'].$setting['output_file'];
@@ -184,9 +241,14 @@ foreach($lines as $line)
   {
     $line = trim($line)." ; fw/bck/off";
     $speed = $regs[1];
-    out("(".trim($line).")\n");
+    if(isset($setting['remove_M108s']) && ($setting['remove_M108s']==false))
+    {
+      if(isset($setting['M108factor']))
+        out("M108 S".trim($regs[1]*$setting['M108factor'])."\n");
+    }
     continue;
   }
+  
   // Store previous coordinates
   $lastX = $X;
   $lastY = $Y;
@@ -200,6 +262,15 @@ foreach($lines as $line)
     $Z = $regs[1];
   if(ereg("F[ ]*(-?[0-9.]+)",$line,$regs))
     $F = $regs[1];
+
+  if(isset($setting['scale']['X']))
+    $line = str_replace("X$X","X".(($X+$setting['offset_x'])*$setting['scale']['X']),$line);
+  if(isset($setting['scale']['Y']))
+    $line = str_replace("Y$Y","Y".(($Y+$setting['offset_y'])*$setting['scale']['Y']),$line);
+  if(isset($setting['scale']['Z']))
+    $line = str_replace("Z$Z","Z".($Z*$setting['scale']['Z']),$line);
+  if(isset($setting['scale']['F']))
+    $line = str_replace("F$F","F".($F*$setting['scale']['F']),$line);
 
   if(ereg("M[ ]*10([123])",$line,$regs))
   {
@@ -266,7 +337,10 @@ foreach($lines as $line)
     }
     //$comment .= " dir $dir";
     //out("(".trim($line).")\n");
+    if($setting['remove_M101-M103']==false)
+      out("$line");
     continue; // Assuming that M codes are always on a single line... skip this
+    
   }
   if(ereg("G[ ]*90",$line))
     $abs = true;
@@ -328,7 +402,7 @@ foreach($lines as $line)
   }
 // LET OP, moet misschien IF zijn!??!
   //elseif($E)
-if($E)
+if($E && ($setting['add_E_codes']))
   {
     $line .= " E".sprintf("%.2f",bcmul($E,$dir)); // number w/ four decimals
   }
@@ -530,6 +604,19 @@ G1 X23.5700 Y-18.1700 Z22.75 F126.2727 (smthd)
 out($setting['append_gcode']);
 
 echo "\n(Gcode processing took: ".number_format((microtime(true)-$uTime),2,'.','')." seconds)";
+if($setting['sd_mount'])
+{
+  echo "Backing up SD card contents to ".$setting['sdbak_dir']."\n";
+
+  echo "Copying to SD card... ";
+  if(!copy($setting['output_file'],$setting['sd_mount']."/".basename($setting['output_file'])))
+    die("Copying ".$setting['output_file']." to ".$setting['sd_mount']." failed.");
+  echo "done\n";
+  echo "Syncing filesystem and unmounting...";
+  `sync`;
+  echo shell_exec("umount ".escapeshellarg($setting['sd_mount']));
+  echo "done\n";
+}
 /*
 
 $fp = fopen($fName,'r');
@@ -675,17 +762,17 @@ function Sec2Time($time){
 function determine_input_file($fName='')
 {
   if(!$fName)
-    die("\nUsage: ".basename($argv[0])." foo.gcode [--setting-name setting-value] [--output_file filename.gcode]\n");
+    die("\nUsage: ".basename($argv[0])." foo.".$setting['extension']." [--setting-name setting-value] [--output_file filename.".$settings['extension']."]\n");
 
   if(!file_exists($fName))
   {
-    echo "\nWarning, $fName not found. Looking in search paths...\n";
+    echo "Warning, $fName not found. Looking in search paths...\n";
 
     $tryFile = array(
       "/home/erik/RepRap/obj/$fName",
-      "/home/erik/RepRap/obj/${fName}_export.gcode",
-      "/home/erik/RepRap/obj/$fName*.gcode",
-      "/home/erik/RepRap/obj/${fName}*_export.gcode",
+      "/home/erik/RepRap/obj/${fName}_export.".$setting['extension'],
+      "/home/erik/RepRap/obj/$fName*.".$setting['extension'],
+      "/home/erik/RepRap/obj/${fName}*_export.".$setting['extension'],
 
     );
     $fName = '';
@@ -694,8 +781,8 @@ function determine_input_file($fName='')
       $results = glob($try);
       if(count($results)==1)
       {
-        $fName = $try;
-        echo "\nNotice: found unambiguous matching filename.";
+        $fName = $results[0];
+        echo "Notice: found unambiguous matching filename: $fName\n";
         break;
       }
     }
