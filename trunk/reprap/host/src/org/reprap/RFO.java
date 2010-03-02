@@ -440,6 +440,7 @@ public class RFO
 //			rfoDir += (File.separator + File.separator);
 //		else
 			rfoDir += File.separator;
+		System.out.println(tempDir + " \n  " + rfoDir);
 	}
 	
 
