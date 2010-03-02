@@ -429,7 +429,10 @@ public class RFO
 //			tempDir += (File.separator + File.separator);
 //		else
 			tempDir += File.separator;
-		rfoDir = tempDir + "rfo";
+		if(horribleWindows)
+			rfoDir = tempDir + File.separator + "rfo";
+		else
+			rfoDir = tempDir + "rfo";
 		rfod = new File(rfoDir);
 		if(!rfod.mkdir())
 			throw new RuntimeException(rfoDir);
