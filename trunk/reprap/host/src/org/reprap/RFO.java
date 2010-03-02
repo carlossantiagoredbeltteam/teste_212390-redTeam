@@ -404,6 +404,7 @@ public class RFO
 	 */
 	private RFO(String fn, AllSTLsToBuild as)
 	{
+		boolean horribleWindows = File.separator.equalsIgnoreCase("\\");
 		astl = as;
 		int sepIndex = fn.lastIndexOf(File.separator);
 		int fIndex = fn.indexOf("file:");
@@ -416,17 +417,26 @@ public class RFO
 				path = fn.substring(0, sepIndex + 1);
 		} else
 			path = "";
-		tempDir = System.getProperty("java.io.tmpdir") + File.separator + "rfo" + Long.toString(System.nanoTime());
-
+		if(horribleWindows)
+			tempDir = System.getProperty("java.io.tmpdir") + File.separator + File.separator + "rfo" + Long.toString(System.nanoTime());
+		else
+			tempDir = System.getProperty("java.io.tmpdir") + File.separator + "rfo" + Long.toString(System.nanoTime());
+		
 		File rfod = new File(tempDir);
 		if(!rfod.mkdir())
 			throw new RuntimeException(tempDir);
-		tempDir += File.separator;
+		if(horribleWindows)
+			tempDir += (File.separator + File.separator);
+		else
+			tempDir += File.separator;
 		rfoDir = tempDir + "rfo";
 		rfod = new File(rfoDir);
 		if(!rfod.mkdir())
 			throw new RuntimeException(rfoDir);
-		rfoDir += File.separator;
+		if(horribleWindows)
+			rfoDir += (File.separator + File.separator);
+		else
+			rfoDir += File.separator;
 	}
 	
 
