@@ -2,7 +2,6 @@ package org.reprap.machines;
 
 import java.io.IOException;
 
-import javax.media.j3d.BranchGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import org.reprap.Attributes;
