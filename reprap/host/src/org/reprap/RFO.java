@@ -18,7 +18,6 @@ import java.util.Enumeration;
 
 
 import org.xml.sax.XMLReader;
-import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.XMLReaderFactory;
 import org.xml.sax.helpers.DefaultHandler;
@@ -648,7 +647,7 @@ public class RFO
 			byte[] buffer = new byte[4096];
 			int bytesIn;
 			ZipFile rfoFile = new ZipFile(path + fileName);
-			Enumeration allFiles = rfoFile.entries();
+			Enumeration<? extends ZipEntry> allFiles = rfoFile.entries();
 			while(allFiles.hasMoreElements())
 			{
 				ZipEntry ze = (ZipEntry)allFiles.nextElement();
@@ -672,6 +671,7 @@ public class RFO
 	 */
 	private void interpretLegend()
 	{
+		@SuppressWarnings("unused")
 		XMLIn xi = new XMLIn(rfoDir + legendName, this);
 	}
 	

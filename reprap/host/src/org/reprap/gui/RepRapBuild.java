@@ -126,9 +126,7 @@ import com.sun.j3d.utils.picking.PickTool;
 import org.reprap.Attributes;
 import org.reprap.RFO;
 import org.reprap.Preferences;
-import org.reprap.geometry.LayerRules;
 import org.reprap.geometry.polygons.AllSTLsToBuild;
-import org.reprap.utilities.Debug;
 
 /**
  * Little class to put up a radiobutton menu so you can set

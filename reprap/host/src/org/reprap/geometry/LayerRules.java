@@ -3,11 +3,9 @@ package org.reprap.geometry;
 
 import org.reprap.Printer;
 import org.reprap.Extruder;
-import org.reprap.devices.GenericExtruder;
 import org.reprap.geometry.polygons.RrHalfPlane;
 import org.reprap.geometry.polygons.RrRectangle;
 import org.reprap.geometry.polygons.Rr2Point;
-//import org.reprap.geometry.polygons.RrCSGPolygonList;
 import org.reprap.Preferences;
 
 /**

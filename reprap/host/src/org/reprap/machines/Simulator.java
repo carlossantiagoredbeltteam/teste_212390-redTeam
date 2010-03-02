@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.reprap.Extruder;
 import org.reprap.devices.NullStepperMotor;
 import org.reprap.devices.NullExtruder;
-import org.reprap.utilities.Debug;
 
 /**
  *

@@ -27,14 +27,11 @@ import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
 import org.reprap.geometry.Producer;
-import org.reprap.geometry.LayerRules;
 import org.reprap.machines.MachineFactory;
 import org.reprap.gui.RepRapBuild;
 import org.reprap.gui.Utility;
 import org.reprap.gui.botConsole.BotConsoleFrame;
 import org.reprap.comms.Communicator;
-//import org.reprap.comms.snap.SNAPAddress;
-//import org.reprap.comms.snap.SNAPCommunicator;
 import org.reprap.utilities.ExtensionFileFilter;
 import org.reprap.utilities.RrDeleteOnExit;
 import org.reprap.utilities.Debug;

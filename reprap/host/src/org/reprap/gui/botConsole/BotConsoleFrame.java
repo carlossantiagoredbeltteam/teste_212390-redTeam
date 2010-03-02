@@ -13,10 +13,8 @@
 package org.reprap.gui.botConsole;
 
 import org.reprap.Preferences;
-import org.reprap.utilities.Debug;
 
 import javax.swing.JOptionPane;
-//import org.reprap.machines.MachineFactory;
 
 /**
  *

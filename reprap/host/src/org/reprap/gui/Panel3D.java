@@ -25,7 +25,6 @@ import javax.media.j3d.View;
 import javax.media.j3d.ViewPlatform;
 import javax.media.j3d.VirtualUniverse;
 import javax.swing.JPanel;
-import javax.vecmath.AxisAngle4d;
 import javax.vecmath.Color3f;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
@@ -33,9 +32,6 @@ import javax.vecmath.Vector3d;
 import org.reprap.Preferences;
 
 import com.sun.j3d.audioengines.javasound.JavaSoundMixer;
-import com.sun.j3d.utils.geometry.Box;
-import com.sun.j3d.utils.geometry.Cylinder;
-import com.sun.j3d.utils.geometry.Primitive;
 
 abstract public class Panel3D extends JPanel {
 	private static final long serialVersionUID = 1L;

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.reprap.Attributes;
 import org.reprap.Extruder;
-import org.reprap.Preferences;
 import org.reprap.geometry.LayerRules;
 import org.reprap.utilities.Debug;
 
