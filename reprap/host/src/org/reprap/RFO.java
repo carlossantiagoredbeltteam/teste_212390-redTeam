@@ -404,7 +404,6 @@ public class RFO
 	 */
 	private RFO(String fn, AllSTLsToBuild as)
 	{
-//		boolean horribleWindows = File.separator.equalsIgnoreCase("\\");
 		astl = as;
 		int sepIndex = fn.lastIndexOf(File.separator);
 		int fIndex = fn.indexOf("file:");
@@ -417,30 +416,18 @@ public class RFO
 				path = fn.substring(0, sepIndex + 1);
 		} else
 			path = "";
-//		if(horribleWindows)
-//			tempDir = System.getProperty("java.io.tmpdir") + File.separator + File.separator + "rfo" + Long.toString(System.nanoTime());
-//		else
-			tempDir = System.getProperty("java.io.tmpdir") + File.separator + "rfo" + Long.toString(System.nanoTime());
+
+		tempDir = System.getProperty("java.io.tmpdir") + File.separator + "rfo" + Long.toString(System.nanoTime());
 		
 		File rfod = new File(tempDir);
 		if(!rfod.mkdir())
 			throw new RuntimeException(tempDir);
-//		if(horribleWindows)
-//			tempDir += (File.separator + File.separator);
-//		else
-			tempDir += File.separator;
-//		if(horribleWindows)
-//			rfoDir = tempDir + File.separator + "rfo";
-//		else
-			rfoDir = tempDir + "rfo";
+		tempDir += File.separator;
+		rfoDir = tempDir + "rfo";
 		rfod = new File(rfoDir);
 		if(!rfod.mkdir())
 			throw new RuntimeException(rfoDir);
-//		if(horribleWindows)
-//			rfoDir += (File.separator + File.separator);
-//		else
-			rfoDir += File.separator;
-		//System.out.println(tempDir + " \n  " + rfoDir);
+		rfoDir += File.separator;
 	}
 	
 
@@ -536,7 +523,7 @@ public class RFO
 				{
 					for(int subMod2 = 0; subMod2 < astl.get(j).size(); subMod2++)
 					{
-						if(s.matches(astl.get(j).fileItCameFrom(subMod2)))
+						if(s.equals(astl.get(j).fileItCameFrom(subMod2)))
 						{
 							astl.get(i).setUnique(subMod1, astl.get(j).getUnique(subMod2));
 							break;

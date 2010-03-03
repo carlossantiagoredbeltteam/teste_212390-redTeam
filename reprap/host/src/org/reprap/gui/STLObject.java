@@ -119,15 +119,7 @@ public class STLObject
 	    
 	    Contents(String s, BranchGroup st, Attributes a)
 	    {
-	    	sourceFile = "";
-	    	for(int i = 0; i < s.length(); i++)
-	    	{
-	    		char c = s.charAt(i);
-	    		if(c == '\\')
-	    			sourceFile += "\\\\";
-	    		else
-	    			sourceFile += c;
-	    	}
+	    	sourceFile = s;
 	    	stl = st;
 	    	att = a;
 	    }
