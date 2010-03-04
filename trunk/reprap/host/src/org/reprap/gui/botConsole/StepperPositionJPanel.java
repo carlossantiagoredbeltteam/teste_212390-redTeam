@@ -246,7 +246,7 @@ public class StepperPositionJPanel extends javax.swing.JPanel {
         nudgeSize = size;
     }
     
-    public void setTargetPositionField(int coord) {
+    public void setTargetPositionField(double coord) {
     	targetPosition.setText("" + coord);
     }
 
@@ -408,27 +408,27 @@ private void homeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 
 public void store()
 {
-    double pos = 0;
-		switch(motorID)
-		{
-		case 1:
-			pos = printer.getX();
-			break;
-		case 2:
-			pos = printer.getY();
-			break;
-		case 3:
-			pos = printer.getZ();
-			break;
-		default:
-			System.err.println("store()  Dud motor id: " + motorID);
-		}
+//    double pos = 0;
+//		switch(motorID)
+//		{
+//		case 1:
+//			pos = printer.getX();
+//			break;
+//		case 2:
+//			pos = printer.getY();
+//			break;
+//		case 3:
+//			pos = printer.getZ();
+//			break;
+//		default:
+//			System.err.println("store()  Dud motor id: " + motorID);
+//		}
 //    try
 //    {   
 //        moPos = motor.getPosition();
 //    } catch (Exception ex) {}
 //    double pos = stepsToMM(moPos);
-    storedPosition.setText("" + round(pos, 2));    
+    storedPosition.setText(targetPosition.getText());    
 }
 
 private void storeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_storeButtonActionPerformed

@@ -35,6 +35,11 @@ public class Simulator extends GenericRepRap {
 		
 	}
 	
+	public boolean iAmPaused()
+	{
+		return false;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#terminate()
 	 */
@@ -77,6 +82,17 @@ public class Simulator extends GenericRepRap {
 		currentX = x;
 		currentY = y;
 		currentZ = z;
+	}
+	
+	public double[] getCoordinates()
+	{
+		double [] result = new double[4];
+		result[0] = currentX;
+		result[1] = currentY;
+		result[2] = currentZ;
+		result[3] = getExtruder().getExtruderState().length();
+		
+		return result;
 	}
 	
 	public void delay(long millis) {}

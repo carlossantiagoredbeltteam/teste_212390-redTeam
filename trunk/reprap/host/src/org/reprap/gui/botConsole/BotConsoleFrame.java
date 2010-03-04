@@ -27,6 +27,7 @@ public class BotConsoleFrame extends javax.swing.JFrame {
 	private static final long serialVersionUID = 1L;
 
     private Thread pollThread = null;
+    boolean updatePosition = false;
     private boolean carryOnPolling = true;
     private GenericExtruderTabPanel[] extruderPanels;
     double fractionDone = -1;
@@ -45,7 +46,7 @@ public class BotConsoleFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, e.getMessage());
             return;
         }
-
+        updatePosition = false;
         initComponents();
 
         this.setTitle("RepRap Console");
@@ -95,7 +96,15 @@ public class BotConsoleFrame extends javax.swing.JFrame {
     	
     	exPanelNumber++;
     	if(exPanelNumber >= extruderPanels.length)
-    		exPanelNumber = 0;   		
+    		exPanelNumber = 0;
+    	if(updatePosition)
+    		xYZTabPanel.recordCurrentPosition();
+    	updatePosition = false;
+    }
+    
+    public void getPosition()
+    {
+    	updatePosition = true;
     }
     
     /**

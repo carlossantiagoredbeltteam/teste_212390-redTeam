@@ -241,6 +241,12 @@ public interface Printer {
 	public double getZ();
 	
 	/**
+	 * Get X, Y, Z and E (if supported) coordinates in an array
+	 * @return
+	 */
+	public double[] getCoordinates();
+	
+	/**
 	 * Tell the printer class it's Z position.  Only to be used if
 	 * you know what you're doing...
 	 * @param z
@@ -481,6 +487,13 @@ public interface Printer {
 	 * This _shouldn't_ also stop it being controlled interactively.
 	 */
 	public void pause();
+	
+	
+	/**
+	 * Query the paused status
+	 * @return
+	 */
+	public boolean iAmPaused();
 	
 	/**
 	 * Resume building.
