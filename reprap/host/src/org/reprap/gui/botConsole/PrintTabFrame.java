@@ -489,13 +489,16 @@ public void pauseAction()
     {
     	pauseButton.setLabel("Pausing...");
     	org.reprap.Main.gui.pause();
-        pauseButton.setLabel("Resume");
+    	//while(!printer.iAmPaused());
         parentBotConsoleFrame.resumePolling();
+        parentBotConsoleFrame.getPosition();
+        //parentBotConsoleFrame.getXYZTabPanel().recordCurrentPosition();
+        pauseButton.setLabel("Resume");
     } else
     {
     	org.reprap.Main.gui.resume();
-        pauseButton.setLabel("Pause");
         parentBotConsoleFrame.suspendPolling();
+        pauseButton.setLabel("Pause");
     }   
 }
 

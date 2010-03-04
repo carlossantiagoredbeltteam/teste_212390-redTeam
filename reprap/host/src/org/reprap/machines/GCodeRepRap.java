@@ -536,6 +536,46 @@ public class GCodeRepRap extends GenericRepRap {
 		
 		gcode.queue("G4 P" + millis + " ;delay");
 	}
+	
+	/**
+	 * Pick out a coordinate from the returned string
+	 * @param s
+	 * @param coord
+	 * @return
+	 */
+	private double getReturnedCoordinate(String s, String coord)
+	{
+		int i = s.indexOf(coord);
+		if(i < 0)
+			return 0;
+		String ss = s.substring(i + 1);
+		int j = ss.indexOf(" ");
+		return Double.parseDouble(ss.substring(0, j - 1));
+	}
+	
+	/**
+	 * Are we paused?
+	 * @return
+	 */
+	public boolean iAmPaused()
+	{
+		return gcode.iAmPaused();
+	}
+	
+	/**
+	 * Get X, Y, Z and E (if supported) coordinates in an array
+	 * @return
+	 */
+	public double[] getCoordinates()
+	{
+		String coords = gcode.queueRespond("M114; get coordinates") + " ";
+		double [] result = new double[4];
+		result[0] = getReturnedCoordinate(coords, "X");
+		result[1] = getReturnedCoordinate(coords, "Y");
+		result[2] = getReturnedCoordinate(coords, "Z");
+		result[3] = getReturnedCoordinate(coords, "E");
+		return result;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#homeToZeroX()
@@ -645,8 +685,8 @@ public class GCodeRepRap extends GenericRepRap {
 	 */
 	public void waitWhileBufferNotEmpty()
 	{
-		while(!gcode.bufferEmpty())
-			gcode.sleep(97);
+//		while(!gcode.bufferEmpty())
+//			gcode.sleep(97);
 	}
 	
 	public void slowBuffer()

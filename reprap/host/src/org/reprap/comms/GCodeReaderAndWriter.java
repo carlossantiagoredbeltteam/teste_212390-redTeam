@@ -32,6 +32,8 @@ public class GCodeReaderAndWriter
 	 */
 	private boolean paused = false;
 	
+	private boolean iAmPaused = false;
+	
 	/**
 	 * Not quite sure why this is needed...
 	 */
@@ -140,7 +142,7 @@ public class GCodeReaderAndWriter
 	private int myPriority;
 	
 	/**
-	 * Some commands (at the moment just M105 - get temperature) generate
+	 * Some commands (at the moment just M105 - get temperature and M114 - get coords) generate
 	 * a response.  Return that as a string.
 	 */
 	private int responsesExpected = 0;
@@ -152,6 +154,7 @@ public class GCodeReaderAndWriter
 	public GCodeReaderAndWriter()
 	{
 		paused = false;
+		iAmPaused = false;
 		alreadyReversed = false;
 		ringBuffer = new String[buflen];
 		ringLines = new long[buflen];
@@ -212,11 +215,11 @@ public class GCodeReaderAndWriter
 	public void pause()
 	{
 		paused = true;
-		while(!bufferEmpty())
-		{
-			//System.err.println("Waiting for buffer to empty.");
-			sleep (131);
-		}
+//		while(!bufferEmpty())
+//		{
+//			//System.err.println("Waiting for buffer to empty.");
+//			sleep (131);
+//		}
 	}
 	
 	/**
@@ -246,6 +249,15 @@ public class GCodeReaderAndWriter
 			head = 0;
 			tail = 0;
 		}
+	}
+	
+	/**
+	 * Are we paused?
+	 * @return
+	 */
+	public boolean iAmPaused()
+	{
+		return iAmPaused;
 	}
 	
 	/**
@@ -288,9 +300,11 @@ public class GCodeReaderAndWriter
 						setFractionDone(fractionDone, -1, -1);
 						while(paused)
 						{
+							iAmPaused = true;
 							//System.err.println("Waiting for pause to end.");
 							sleep(239);
 						}
+						iAmPaused = false;
 					}
 					fileInStream.close();
 				} catch (Exception e) 
@@ -361,10 +375,10 @@ public class GCodeReaderAndWriter
 	 * using the buffer as then head == tail == 0 always).
 	 * @return
 	 */
-	public boolean bufferEmpty()
-	{
-		return head == tail;
-	}
+//	public boolean bufferEmpty()
+//	{
+//		return head == tail;
+//	}
 	
 	/**
 	 * Between layers nothing will be queued.  Use the next two
@@ -526,6 +540,15 @@ public class GCodeReaderAndWriter
 							responseAvailable = true;
 						} else
 							System.err.println("GCodeWriter.waitForOK(): temperature response returned when none expected.");
+					}else if (resp.startsWith("C:"))
+					{
+						Debug.c("GCodeWriter.waitForOK() - coordinates: " + resp);
+						if(responsesExpected > 0)
+						{
+							response = resp;
+							responseAvailable = true;
+						} else
+							System.err.println("GCodeWriter.waitForOK(): coordinate response returned when none expected.");
 					} else if (resp.startsWith("E:"))
 					{
 						System.err.println("GCodeWriter.waitForOK(): temperature error returned: " + resp);

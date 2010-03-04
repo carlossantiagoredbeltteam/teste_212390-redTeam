@@ -369,6 +369,16 @@ public Printer getPrinter()
 	return printer;
 }
 
+public void recordCurrentPosition()
+{
+	//parentBotConsoleFrame.suspendPolling();
+	double cp[] = printer.getCoordinates();
+	xStepperPositionJPanel.setTargetPositionField(cp[0]);
+	yStepperPositionJPanel.setTargetPositionField(cp[1]);
+	zStepperPositionJPanel.setTargetPositionField(cp[2]);
+	//parentBotConsoleFrame.resumePolling();
+}
+
 public void goTo(double xTo, double yTo, double zTo)
 {
 	parentBotConsoleFrame.suspendPolling();
