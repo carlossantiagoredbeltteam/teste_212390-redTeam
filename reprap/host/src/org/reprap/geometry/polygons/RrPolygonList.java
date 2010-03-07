@@ -892,6 +892,9 @@ public class RrPolygonList
 		double d = Double.POSITIVE_INFINITY;
 		PolPoint result = null;
 		
+		if(size() <= 0)
+			return result;
+		
 		for(int i = 0; i < size(); i++)
 		{
 			RrPolygon pgon = polygon(i);
