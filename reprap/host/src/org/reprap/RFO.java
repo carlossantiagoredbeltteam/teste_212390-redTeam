@@ -387,6 +387,11 @@ public class RFO
 	private String  rfoDir;
 	
 	/**
+	 * The unique temporary directory name
+	 */
+	private String uniqueName;
+	
+	/**
 	 * The collection of objects being written out or read in.
 	 */
 	private AllSTLsToBuild astl;
@@ -416,8 +421,10 @@ public class RFO
 				path = fn.substring(0, sepIndex + 1);
 		} else
 			path = "";
+		
+		uniqueName = "rfo" + Long.toString(System.nanoTime());
 
-		tempDir = System.getProperty("java.io.tmpdir") + File.separator + "rfo" + Long.toString(System.nanoTime());
+		tempDir = System.getProperty("java.io.tmpdir") + File.separator + uniqueName;
 		
 		File rfod = new File(tempDir);
 		if(!rfod.mkdir())
@@ -603,7 +610,11 @@ public class RFO
 				File f = new File(dirToZip, fileList[i]); 
 				FileInputStream fis = new FileInputStream(f); 
 				String zEntry = f.getPath();
-				zEntry = zEntry.substring(tempDir.length(), zEntry.length());
+				//System.out.println("\n" + zEntry);
+				int start = zEntry.indexOf(uniqueName);
+				zEntry = zEntry.substring(start + uniqueName.length() + 1, zEntry.length());
+				//System.out.println(tempDir);
+				//System.out.println(zEntry + "\n");
 				ZipEntry entry = new ZipEntry(zEntry); 
 				rfoFile.putNextEntry(entry); 
 				while((bytesIn = fis.read(buffer)) != -1) 
