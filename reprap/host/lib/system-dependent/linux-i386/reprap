@@ -1,7 +1,7 @@
 #!/bin/bash
 # reprap-host -- runs RepRap Java host with an appropriate classpath
 
-#RAM_SIZE=1024M                     # Amount of RAM to allow Java VM to use
+REPRAP_RAM_SIZE=1024M                # Amount of RAM to allow Java VM to use
 REPRAP_DIR=`dirname $0`       # reprap.jar, jni libs and stl file
 
 cd $REPRAP_DIR
@@ -19,4 +19,4 @@ CLASSPATH=$CLASSPATH:./swing-layout-1.0.3.jar
 CLASSPATH=$CLASSPATH:.
 
 # invoke the code
-java -cp $CLASSPATH -Djava.library.path=. org.reprap.Main
+java -cp $CLASSPATH -Xmx$REPRAP_RAM_SIZE -Djava.library.path=. org.reprap.Main
