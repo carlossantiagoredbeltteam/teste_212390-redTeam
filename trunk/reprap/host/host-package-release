@@ -12,7 +12,7 @@ RELEASENAME="reprap-$MACHINE-$RELEASE"
 
 FILELIST="jar/reprap.jar lib/*.jar lib/reprap-wv.stl lib/rr-logo-green-url.png\
     lib/reprap-icon.png lib/reprap.properties.dist lib/system-dependent/linux-i386/*\
-    lib/system-dependent/windows-i586/* LICENSE"
+    lib/system-dependent/windows-i586/* lib/system-dependent/macosx/RepRap-Drivers.mpkg.zip LICENSE"
 
 SRCFILELIST="src/* build.xml build-user.xml .classpath .project \
 	host-package-release readme"
