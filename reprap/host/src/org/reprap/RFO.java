@@ -650,6 +650,33 @@ public class RFO
 	// .rfo reading
 	
 	/**
+	 * Arrghhh!!!!
+	 */
+	private String processSeparators(String is)
+	{
+		String result = "";
+		for(int i = 0; i < is.length(); i++)
+		{
+			if(is.charAt(i) == '\\')
+			{
+				if(File.separator.charAt(0) == '/')
+					result += '/';
+				else
+					result += '\\';
+			} else if(is.charAt(i) == '/')
+			{
+				if(File.separator.charAt(0) == '\\')
+					result += '\\';
+				else
+					result += '/';
+			} else
+				result += is.charAt(i);
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * This uncompresses the zip that is the rfo file into the temporary directory.
 	 */
 	private void unCompress()
@@ -664,7 +691,8 @@ public class RFO
 			{
 				ZipEntry ze = (ZipEntry)allFiles.nextElement();
 				InputStream is = rfoFile.getInputStream(ze);
-				File element = new File(tempDir + ze.getName());
+				String fName = processSeparators(ze.getName());
+				File element = new File(tempDir + fName);
 				org.reprap.Main.ftd.add(element);
 				FileOutputStream os = new FileOutputStream(element);
 				while((bytesIn = is.read(buffer)) != -1) 
