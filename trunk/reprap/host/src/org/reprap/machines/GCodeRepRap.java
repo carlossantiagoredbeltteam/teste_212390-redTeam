@@ -583,13 +583,14 @@ public class GCodeRepRap extends GenericRepRap {
 	public void homeToZeroX() throws ReprapException, IOException {
 
 		
-		// Assume extruder is off...
-		try
-		{
-			singleMove(-250, currentY, currentZ, getExtruder().getFastXYFeedrate());
-		} catch (Exception e)
-		{}
-		gcode.queue("G92 X0 ;set x 0");
+//		// Assume extruder is off...
+//		try
+//		{
+//			singleMove(-250, currentY, currentZ, getExtruder().getFastXYFeedrate());
+//		} catch (Exception e)
+//		{}
+//		gcode.queue("G92 X0 ;set x 0");
+		gcode.queue("G28 X0 ;set x 0");
 		super.homeToZeroX();
 	}
 
@@ -600,12 +601,13 @@ public class GCodeRepRap extends GenericRepRap {
 
 		// Assume extruder is off...
 		
-		try
-		{
-			singleMove(currentX, -250, currentZ, getExtruder().getFastXYFeedrate());
-		} catch (Exception e)
-		{}
-		gcode.queue("G92 Y0 ;set y 0");
+//		try
+//		{
+//			singleMove(currentX, -250, currentZ, getExtruder().getFastXYFeedrate());
+//		} catch (Exception e)
+//		{}
+//		gcode.queue("G92 Y0 ;set y 0");
+		gcode.queue("G28 Y0 ;set x 0");
 		super.homeToZeroY();
 
 	}
@@ -636,12 +638,13 @@ public class GCodeRepRap extends GenericRepRap {
 	public void homeToZeroZ() throws ReprapException, IOException {
 
 		// Assume extruder is off...
-		try
-		{
-			singleMove(currentX, currentY, -250, getMaxFeedrateZ());
-		} catch (Exception e)
-		{}
-		gcode.queue("G92 Z0 ;set z 0");	
+//		try
+//		{
+//			singleMove(currentX, currentY, -250, getMaxFeedrateZ());
+//		} catch (Exception e)
+//		{}
+//		gcode.queue("G92 Z0 ;set z 0");
+		gcode.queue("G28 Z0 ;set x 0");
 		super.homeToZeroZ();
 	}
 	
