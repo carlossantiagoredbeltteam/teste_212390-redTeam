@@ -50,6 +50,7 @@ public class GCodeExtruder extends GenericExtruder
 			setExtrusion(0, false);
 		} catch (Exception e)
 		{}
+		getPrinter().printEndReverse();
 		getPrinter().home();
 		zeroExtrudedLength();
 	}
