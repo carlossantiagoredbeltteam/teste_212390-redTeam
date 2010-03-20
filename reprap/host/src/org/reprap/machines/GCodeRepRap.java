@@ -424,6 +424,7 @@ public class GCodeRepRap extends GenericRepRap {
 	 */
 	public void moveToPurge()
 	{
+		singleMove(currentX, currentY, currentZ + 1, getFastFeedrateZ());
 		singleMove(dumpX, dumpY, currentZ, getExtruder().getFastXYFeedrate());
 	}
 	
