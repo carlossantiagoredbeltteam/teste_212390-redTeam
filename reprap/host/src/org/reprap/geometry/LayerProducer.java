@@ -691,21 +691,21 @@ public class LayerProducer {
 	
 
 
-	private int plotOneMaterial(RrPolygonList polygons, int i, boolean firstOneInLayer)
-		throws ReprapException, IOException
-	{
-		String material = polygons.polygon(i).getAttributes().getMaterial();
-		
-		while(i < polygons.size() && polygons.polygon(i).getAttributes().getMaterial().equals(material))
-		{
-			if (layerConditions.getPrinter().isCancelled())
-				return i;
-			plot(polygons.polygon(i), firstOneInLayer);
-			firstOneInLayer = false;
-			i++;
-		}
-		return i;
-	}
+//	private int plotOneMaterial(RrPolygonList polygons, int i, boolean firstOneInLayer)
+//		throws ReprapException, IOException
+//	{
+//		String material = polygons.polygon(i).getAttributes().getMaterial();
+//		
+//		while(i < polygons.size() && polygons.polygon(i).getAttributes().getMaterial().equals(material))
+//		{
+//			if (layerConditions.getPrinter().isCancelled())
+//				return i;
+//			plot(polygons.polygon(i), firstOneInLayer);
+//			firstOneInLayer = false;
+//			i++;
+//		}
+//		return i;
+//	}
 	
 //	private boolean nextCommon(int ib, int ih)
 //	{
@@ -752,7 +752,7 @@ public class LayerProducer {
 	 */
 	public void plot() throws ReprapException, IOException
 	{
-		int ib, jb, ih, jh;
+		//int ib, jb, ih, jh;
 
 		boolean firstOneInLayer = true;
 		
