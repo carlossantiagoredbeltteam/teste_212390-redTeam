@@ -26,8 +26,45 @@ import javax.vecmath.Tuple3d;
  * @author Adrian
  *
  */
+
+
 public class AllSTLsToBuild 
 {	
+	/**
+	 * 3D bounding box
+	 * @author ensab
+	 *
+	 */
+	class BoundingBox
+	{
+		private RrRectangle XYbox;
+		private RrInterval Zint;
+		
+		public BoundingBox(Point3d p0)
+		{	
+			Zint = new RrInterval(p0.z, p0.z);
+			XYbox = new RrRectangle(new RrInterval(p0.x, p0.x), new RrInterval(p0.y, p0.y));
+		}
+		
+		public BoundingBox(BoundingBox b)
+		{
+			Zint = new RrInterval(b.Zint);
+			XYbox = new RrRectangle(b.XYbox);
+		}
+		
+		public void expand(Point3d p0)
+		{
+			Zint.expand(p0.z);
+			XYbox.expand(new Rr2Point(p0.x, p0.y));
+		}
+		
+		public void expand(BoundingBox b)
+		{
+			Zint.expand(b.Zint);
+			XYbox.expand(b.XYbox);
+		}
+	}
+	
 	/**
 	 * Line segment consisting of two points.
 	 * @author Adrian
@@ -172,9 +209,10 @@ public class AllSTLsToBuild
 	private List<RrRectangle> rectangles;
 	
 	/**
-	 * The XY box around everything
+	 * The XYZ box around everything
 	 */
-	private RrRectangle XYbox;
+	//private RrRectangle XYbox;
+	private BoundingBox XYZbox;
 	
 	/**
 	 * The lowest and highest points
@@ -199,7 +237,7 @@ public class AllSTLsToBuild
 	{
 		stls = new ArrayList<STLObject>();
 		rectangles = null;
-		XYbox = null;
+		XYZbox = null;
 		Zrange = null;
 		frozen = false;
 		cache = null;
@@ -273,7 +311,7 @@ public class AllSTLsToBuild
 			rectangles.add(null);		
 		if(cache == null)
 			cache = new SliceCache();
-		RrRectangle s;
+		BoundingBox s;
 		
 		for(int i = 0; i < stls.size(); i++)
 		{
@@ -291,23 +329,23 @@ public class AllSTLsToBuild
 				{
 					BranchGroup bg1 = (BranchGroup)ob;
 					Attributes att = (Attributes)(bg1.getUserData());
-					if(XYbox == null)
+					if(XYZbox == null)
 					{
-						XYbox = BBox(att.getPart(), trans);
+						XYZbox = BBox(att.getPart(), trans);
 						if(rectangles.get(i) == null)
-							rectangles.set(i, new RrRectangle(XYbox));
+							rectangles.set(i, new RrRectangle(XYZbox.XYbox));
 						else
-							rectangles.set(i, RrRectangle.union(rectangles.get(i), XYbox));
+							rectangles.set(i, RrRectangle.union(rectangles.get(i), XYZbox.XYbox));
 					} else
 					{
 						s = BBox(att.getPart(), trans);
 						if(s != null)
 						{
-							XYbox = RrRectangle.union(XYbox, s);
+							XYZbox.expand(s);
 							if(rectangles.get(i) == null)
-								rectangles.set(i, new RrRectangle(s));
+								rectangles.set(i, new RrRectangle(s.XYbox));
 							else
-								rectangles.set(i, RrRectangle.union(rectangles.get(i), s));
+								rectangles.set(i, RrRectangle.union(rectangles.get(i), s.XYbox));
 						}
 					}
 				}
@@ -318,14 +356,14 @@ public class AllSTLsToBuild
 	}
 	
 	/**
-	 * Run through a Shape3D and find its enclosing XY box
+	 * Run through a Shape3D and find its enclosing XYZ box
 	 * @param shape
 	 * @param trans
 	 * @param z
 	 */
-	private RrRectangle BBoxPoints(Shape3D shape, Transform3D trans)
+	private BoundingBox BBoxPoints(Shape3D shape, Transform3D trans)
     {
-		RrRectangle r = null;
+		BoundingBox b = null;
         GeometryArray g = (GeometryArray)shape.getGeometry();
         Point3d p1 = new Point3d();
         Point3d q1 = new Point3d();
@@ -336,25 +374,25 @@ public class AllSTLsToBuild
             {
                 g.getCoordinate(i, p1);
                 trans.transform(p1, q1);
-                if(r == null)
-                	r = new RrRectangle(new RrInterval(q1.x, q1.x), new RrInterval(q1.y, q1.y));
+                if(b == null)
+                	b = new BoundingBox(q1);
                 else
-                	r.expand(new Rr2Point(q1.x, q1.y));
+                	b.expand(q1);
             }
         }
-        return r;
+        return b;
     }
 	
 	/**
-	 * Unpack the Shape3D(s) from value and find their exclosing XY box
+	 * Unpack the Shape3D(s) from value and find their exclosing XYZ box
 	 * @param value
 	 * @param trans
 	 * @param z
 	 */
-	private RrRectangle BBox(Object value, Transform3D trans) 
+	private BoundingBox BBox(Object value, Transform3D trans) 
     {
-		RrRectangle r = null;
-		RrRectangle s;
+		BoundingBox b = null;
+		BoundingBox s;
 		
         if(value instanceof SceneGraphObject) 
         {
@@ -365,22 +403,22 @@ public class AllSTLsToBuild
                 java.util.Enumeration<?> enumKids = g.getAllChildren( );
                 while(enumKids.hasMoreElements())
                 {
-                	if(r == null)
-                		r = BBox(enumKids.nextElement(), trans);
+                	if(b == null)
+                		b = BBox(enumKids.nextElement(), trans);
                 	else
                 	{
                 		s = BBox(enumKids.nextElement(), trans);
                 		if(s != null)
-                			r = RrRectangle.union(r, s);
+                			b.expand(s);
                 	}
                 }
             } else if (sg instanceof Shape3D) 
             {
-                r = BBoxPoints((Shape3D)sg, trans);
+                b = BBoxPoints((Shape3D)sg, trans);
             }
         }
         
-        return r;
+        return b;
     }
 	
 	
@@ -391,7 +429,7 @@ public class AllSTLsToBuild
 	public RrRectangle ObjectPlanRectangle()
 	{
 		freeze();
-		return XYbox;
+		return XYZbox.XYbox;
 	}
 	
 	/**
@@ -402,25 +440,7 @@ public class AllSTLsToBuild
 	public double maxZ()
 	{
 		freeze();
-		if(Zrange != null)
-			return Zrange.high();
-
-		STLObject stl;
-		double zlo = Double.POSITIVE_INFINITY;
-		double zhi = Double.NEGATIVE_INFINITY;
-
-		for(int i = 0; i < stls.size(); i++)
-		{
-			stl = stls.get(i);
-			if(stl.extent().z > zhi)
-				zhi = stl.extent().z;
-			if(stl.extent().z < zlo)
-				zlo = stl.extent().z;
-		}
-		
-		Zrange = new RrInterval(zlo, zhi);	
-
-		return Zrange.high();
+		return XYZbox.Zint.high();
 	}
 	
 	/**
