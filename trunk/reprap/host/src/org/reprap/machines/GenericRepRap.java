@@ -93,6 +93,11 @@ public abstract class GenericRepRap implements CartesianPrinter
 	protected double currentX, currentY, currentZ;
 	
 	/**
+	 * X, Y and Z position of the extruder at the end of the topmost layer 
+	 */
+	protected double topX, topY, topZ;
+	
+	/**
 	 * Maximum feedrate for Z axis
 	 */
 	protected double maxFeedrateZ;
@@ -1274,6 +1279,19 @@ public abstract class GenericRepRap implements CartesianPrinter
 	public void setZ(double z)
 	{
 		currentZ = z;
+	}
+
+	/**
+	 * Set the position at the end of the topmost layer
+	 * @param x
+	 * @param y
+	 * @param z
+	 */
+	public void setTop(double x, double y, double z)
+	{
+		topX = x;
+		topY = y;
+		topZ = z;
 	}
 	
 	/**
