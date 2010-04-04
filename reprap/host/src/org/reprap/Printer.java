@@ -252,6 +252,14 @@ public interface Printer {
 	 * @param z
 	 */
 	public void setZ(double z);
+	
+	/**
+	 * Set the position at the end of the topmost layer
+	 * @param x
+	 * @param y
+	 * @param z
+	 */
+	public void setTop(double x, double y, double z);
 
 	/**
 	 * @return the extruder currently in use

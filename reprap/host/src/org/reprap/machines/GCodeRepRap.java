@@ -403,13 +403,13 @@ public class GCodeRepRap extends GenericRepRap {
 		try
 		{
 			// Fan off
-			getExtruder().setCooler(false);
+			//getExtruder().setCooler(false);
 			moveToFinish();
 			// Extruder off
-			getExtruder().setExtrusion(0, false);
-			gcode.queue("M113 S0.0 ;shut extruder stepper down");
+			//getExtruder().setExtrusion(0, false);
+			gcode.queue("M0 ;shut RepRap down");
 			// heater off
-			getExtruder().heatOff();
+			//getExtruder().heatOff();
 		} catch(Exception e){
 			//oops
 		}
@@ -429,10 +429,16 @@ public class GCodeRepRap extends GenericRepRap {
 	}
 	
 	/**
-	 * Go to the purge point
+	 * Go to the finish point
 	 */
 	public void moveToFinish()
 	{
+		//System.out.println("current: " + currentX + " " + currentY + " " + currentZ);
+		//System.out.println("top: " + topX + " " + topY + " " + topZ);
+		currentX = topX; // Nasty hack to deal with top-down computing of layers
+		currentY = topY;
+		currentZ = topZ;
+		singleMove(currentX, currentY, currentZ + 1, getFastFeedrateZ());
 		singleMove(getFinishX(), getFinishY(), currentZ, getExtruder().getFastXYFeedrate());
 	}
 

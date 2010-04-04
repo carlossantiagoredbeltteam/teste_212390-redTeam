@@ -331,6 +331,8 @@ public class Producer {
 		
 		RrPolygonList allPolygons[] = new RrPolygonList[totalPhysicalExtruders];
 		
+		boolean firstTimeRound = true;
+		
 		while(layerRules.getModelLayer() >= 0 ) 
 		{
 			if(layerRules.getModelLayer() == 0)
@@ -340,6 +342,7 @@ public class Producer {
 			
 			if (reprap.isCancelled())
 				break;
+			
 			waitWhilePaused();
 			
 			Debug.d("Commencing model layer " + layerRules.getModelLayer() + " at " + layerRules.getMachineZ());
@@ -405,6 +408,12 @@ public class Producer {
 
 			reprap.finishedLayer(layerRules);
 			reprap.betweenLayers(layerRules);
+			
+			if(firstTimeRound)
+			{
+				reprap.setTop(reprap.getX(), reprap.getY(), reprap.getZ());
+				firstTimeRound = false;
+			}
 			//layer = null;
 			//slice = null;
 			
@@ -412,6 +421,7 @@ public class Producer {
 			allSTLs.destroyLayer();
 
 			layerRules.step(reprap.getExtruder());
+			
 		}
 		
 		layFoundationTopDown(gp);
