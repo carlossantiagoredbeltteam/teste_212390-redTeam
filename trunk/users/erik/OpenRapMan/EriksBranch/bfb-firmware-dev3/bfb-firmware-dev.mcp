@@ -8,7 +8,7 @@ dir_src=
 dir_bin=
 dir_tmp=
 dir_sin=
-dir_inc=C:\Documents and Settings\erik\My Documents\bfb-firmware-dev;C:\Program Files\Microchip\MPLAB C32\pic32mx\include\peripheral;C:\Program Files\Microchip\MPLAB C32\pic32mx\include;C:\Microchip Solutions\Microchip\Include
+dir_inc=C:\Documents and Settings\erik\My Documents\bfb-firmware-dev;C:\Program Files\Microchip\MPLAB C32\pic32mx\include\peripheral;C:\Program Files\Microchip\MPLAB C32 Suite\pic32mx\include\peripheral;C:\Program Files\Microchip\MPLAB C32\pic32mx\include;C:\Program Files\Microchip\MPLAB C32 Suite\pic32mx\include;C:\Microchip Solutions\Microchip\Include
 dir_lib=
 dir_lkr=
 [CAT_FILTERS]
@@ -99,9 +99,9 @@ file_016=Enviroment.h
 suite_guid={14495C23-81F8-43F3-8A44-859C583D7760}
 suite_state=
 [TOOL_SETTINGS]
-TS{CB0AF4B8-4022-429D-8F99-8A56782B2C6D}=-gdwarf-2
+TS{CB0AF4B8-4022-429D-8F99-8A56782B2C6D}=
 TS{9C698E0A-CBC9-4EFF-AE7D-B569F93E7322}=-g
-TS{77F59DA1-3C53-4677-AC5F-A03EB0125170}=-o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)" -Map="$(BINDIR_)$(TARGETBASE).map"
+TS{77F59DA1-3C53-4677-AC5F-A03EB0125170}=-Map="$(BINDIR_)$(TARGETBASE).map" -o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)"
 TS{0396C0A1-9052-4E4F-8B84-EF0162B1B4E9}=
 [INSTRUMENTED_TRACE]
 enable=0
@@ -110,5 +110,5 @@ format=0
 [CUSTOM_BUILD]
 Pre-Build=
 Pre-BuildEnabled=1
-Post-Build=
-Post-BuildEnabled=1
+Post-Build=HIDBootLoader.exe
+Post-BuildEnabled=0
