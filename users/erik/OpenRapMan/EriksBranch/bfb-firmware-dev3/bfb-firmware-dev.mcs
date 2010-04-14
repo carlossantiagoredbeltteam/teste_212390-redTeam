@@ -2,7 +2,7 @@
 MagicCookie={0b13fe8c-dfe0-40eb-8900-6712719559a7}
 Version=1.0
 [File000]
-Location=Z:\home\erik\dev\bfb-firmware-dev3\Extruder.o
+Location=Z:\home\erik\RepRap\3D-to-5D\erik\OpenRapMan\EriksBranch\bfb-firmware-dev3\Extruder.o
 Folder=Intermediary
 DeviceName=PIC32MX440F256H
 LanguageToolSuiteID={14495C23-81F8-43F3-8A44-859C583D7760}
@@ -15,7 +15,7 @@ ToolArgsString=-g
 TraceCmdString=
 DebugOptions=-D__DEBUG
 [File001]
-Location=Z:\home\erik\dev\bfb-firmware-dev3\FSIO.o
+Location=Z:\home\erik\RepRap\3D-to-5D\erik\OpenRapMan\EriksBranch\bfb-firmware-dev3\FSIO.o
 Folder=Intermediary
 DeviceName=PIC32MX440F256H
 LanguageToolSuiteID={14495C23-81F8-43F3-8A44-859C583D7760}
@@ -28,7 +28,7 @@ ToolArgsString=-g
 TraceCmdString=
 DebugOptions=-D__DEBUG
 [File002]
-Location=Z:\home\erik\dev\bfb-firmware-dev3\SD-SPI.o
+Location=Z:\home\erik\RepRap\3D-to-5D\erik\OpenRapMan\EriksBranch\bfb-firmware-dev3\SD-SPI.o
 Folder=Intermediary
 DeviceName=PIC32MX440F256H
 LanguageToolSuiteID={14495C23-81F8-43F3-8A44-859C583D7760}
@@ -41,7 +41,7 @@ ToolArgsString=-g
 TraceCmdString=
 DebugOptions=-D__DEBUG
 [File003]
-Location=Z:\home\erik\dev\bfb-firmware-dev3\G_Code.o
+Location=Z:\home\erik\RepRap\3D-to-5D\erik\OpenRapMan\EriksBranch\bfb-firmware-dev3\G_Code.o
 Folder=Intermediary
 DeviceName=PIC32MX440F256H
 LanguageToolSuiteID={14495C23-81F8-43F3-8A44-859C583D7760}
@@ -54,7 +54,7 @@ ToolArgsString=-g
 TraceCmdString=
 DebugOptions=-D__DEBUG
 [File004]
-Location=Z:\home\erik\dev\bfb-firmware-dev3\OLED.o
+Location=Z:\home\erik\RepRap\3D-to-5D\erik\OpenRapMan\EriksBranch\bfb-firmware-dev3\OLED.o
 Folder=Intermediary
 DeviceName=PIC32MX440F256H
 LanguageToolSuiteID={14495C23-81F8-43F3-8A44-859C583D7760}
@@ -67,7 +67,7 @@ ToolArgsString=-g
 TraceCmdString=
 DebugOptions=-D__DEBUG
 [File005]
-Location=Z:\home\erik\dev\bfb-firmware-dev3\RapMan.o
+Location=Z:\home\erik\RepRap\3D-to-5D\erik\OpenRapMan\EriksBranch\bfb-firmware-dev3\RapMan.o
 Folder=Intermediary
 DeviceName=PIC32MX440F256H
 LanguageToolSuiteID={14495C23-81F8-43F3-8A44-859C583D7760}
@@ -80,7 +80,7 @@ ToolArgsString=-g
 TraceCmdString=
 DebugOptions=-D__DEBUG
 [File006]
-Location=Z:\home\erik\dev\bfb-firmware-dev3\Stepper.o
+Location=Z:\home\erik\RepRap\3D-to-5D\erik\OpenRapMan\EriksBranch\bfb-firmware-dev3\Stepper.o
 Folder=Intermediary
 DeviceName=PIC32MX440F256H
 LanguageToolSuiteID={14495C23-81F8-43F3-8A44-859C583D7760}
@@ -93,7 +93,7 @@ ToolArgsString=-g
 TraceCmdString=
 DebugOptions=-D__DEBUG
 [File007]
-Location=Z:\home\erik\dev\bfb-firmware-dev3\bfb-firmware-dev.elf
+Location=Z:\home\erik\RepRap\3D-to-5D\erik\OpenRapMan\EriksBranch\bfb-firmware-dev3\bfb-firmware-dev.elf
 Folder=Output
 DeviceName=PIC32MX440F256H
 LanguageToolSuiteID={14495C23-81F8-43F3-8A44-859C583D7760}
@@ -106,7 +106,7 @@ ToolArgsString=-o"$(BINDIR_)$(TARGETBASE).$(TARGETSUFFIX)" -Map="$(BINDIR_)$(TAR
 TraceCmdString=
 DebugOptions=--defsym=__MPLAB_DEBUG=1
 [File008]
-Location=Z:\home\erik\dev\bfb-firmware-dev3\bfb-firmware-dev.hex
+Location=Z:\home\erik\RepRap\3D-to-5D\erik\OpenRapMan\EriksBranch\bfb-firmware-dev3\bfb-firmware-dev.hex
 Folder=Output
 DeviceName=PIC32MX440F256H
 LanguageToolSuiteID={14495C23-81F8-43F3-8A44-859C583D7760}
