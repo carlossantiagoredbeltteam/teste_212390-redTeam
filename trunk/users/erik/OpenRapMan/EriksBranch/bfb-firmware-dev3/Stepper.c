@@ -196,7 +196,75 @@ void Axis_Stepper_Motors(int on_off)
 	}	
 }		
 /******************************************************************/
-int RapMan_Home(void)
+/******************************************************************/
+int RapMan_Home(char x,char y,char z)
+{
+int i;
+
+while(!XPlusRight_Btn); // loop until button is released
+
+OLED_FastText57(3, 0, "PRESS > FOR MANUAL",0);
+int init_manual_home;
+init_manual_home = 0;
+for(i=0;i<2000000;i++)
+{
+if(!XPlusRight_Btn)
+  { 
+    init_manual_home = 1;
+    OLED_FastText57(3, 0, "HOMING MANUALLY   ",0);
+    for(i=0;i<2000000;i++);
+  }
+}
+if(init_manual_home == 1)
+{
+  Manual_Mode('1');
+  OLED_FastText57(3, 0, "HOME COMPLETE",0);
+  while(!Manual_Select); // loop until button is released
+  return TRUE;
+}
+
+	ClearWDT();	
+	OLED_Home_Screen();
+	moveX = !TRUE; moveY = !TRUE; moveZ = !TRUE;	//Turn off all steppers
+	Stepper_InitIO();
+	Axis_Stepper_Motors(On);
+	Manual_Mode_Set = 1;
+	
+	
+	Feed_Rate = HOME_SPEED_Z;		//Move tool down to prevent crash
+#ifdef MACHINE_TYPE_V3_V31
+	ZDown_YForward();//used for machine home
+#endif
+#ifdef MACHINE_TYPE_PRO_TWIN
+	ZDown_YForward();//used for machine home
+#endif
+
+
+if(init_manual_home == 0)
+{
+	if (x)Home_X_Axis();	
+	if (y)Home_Y_Axis();			
+	if (z)Home_Z_Axis();
+
+	Manual_Mode_Set = 0;
+	mT4IntEnable(!TRUE);
+	if(!Manual_Select)
+	{
+		OLED_FastText57(3, 0, "HOME ABORTED",0);
+		for(i=0;i<2000000;i++);
+		return !TRUE;
+	}
+	else
+	{
+		OLED_FastText57(3, 0, "HOME COMPLETE",0);
+		for(i=0;i<2000000;i++);
+		return TRUE;
+	}	
+}	
+
+}//Rap_Man_Home
+
+/*int RapMan_Home(void)
 {
 int i;
 	OLED_Home_Screen();
@@ -302,7 +370,7 @@ int i;
 		return TRUE;
 	}	
 }//Home
-
+*/
 //******************************************************************
 void GoToRest(void)
 {
