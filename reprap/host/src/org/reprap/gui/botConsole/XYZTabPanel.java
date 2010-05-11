@@ -98,7 +98,7 @@ public class XYZTabPanel extends javax.swing.JPanel {
         jLabel7 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         bedTempPanel = new javax.swing.JPanel();
-        
+        heatPushed = false;
         targetTempField.setColumns(3);
         targetTempField.setFont(targetTempField.getFont().deriveFont(targetTempField.getFont().getSize()+1f));
         targetTempField.setText("000");
@@ -120,7 +120,7 @@ public class XYZTabPanel extends javax.swing.JPanel {
             }
         });
         
-        bedTempPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Bed temperature (degrees Celcius)"));
+        bedTempPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Bed temp. (Celcius)"));
         
         
         
@@ -245,7 +245,8 @@ public class XYZTabPanel extends javax.swing.JPanel {
                     .add(xStepperPositionJPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(yStepperPositionJPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(zStepperPositionJPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(24, Short.MAX_VALUE))
+                //.addContainerGap(24, Short.MAX_VALUE)
+                )
         );
         motorsPanelLayout.setVerticalGroup(
             motorsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -319,7 +320,7 @@ public class XYZTabPanel extends javax.swing.JPanel {
         bedTempPanel.setLayout(bedTempPanelLayout);
         bedTempPanelLayout.setHorizontalGroup(
             bedTempPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, bedTempPanelLayout.createSequentialGroup()
+            .add(org.jdesktop.layout.GroupLayout.LEADING, bedTempPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(bedTempPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, bedTempPanelLayout.createSequentialGroup()
@@ -330,7 +331,8 @@ public class XYZTabPanel extends javax.swing.JPanel {
                         .add(6, 6, 6)
                         .add(jLabel7)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(targetTempField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                        .add(targetTempField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 
+                        		org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 //.add(bedTempPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                 //    .add(heatButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE))
                 //.addContainerGap()
@@ -359,25 +361,6 @@ public class XYZTabPanel extends javax.swing.JPanel {
         
         
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -385,7 +368,7 @@ public class XYZTabPanel extends javax.swing.JPanel {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                         .addContainerGap()
                         .add(nudgePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .add(2, 2, 2)
@@ -396,14 +379,15 @@ public class XYZTabPanel extends javax.swing.JPanel {
                         .add(extruderToPlotWith, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         //.add(235, 235, 235)
                         )
-                    //.add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup() 
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup() 
              
-                    .add(motorsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(motorsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 
+                    		org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(bedTempPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    //)
-                    .addContainerGap()
+                    )
+                    //.addContainerGap()
                 )
-        );
+        ));
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
@@ -432,30 +416,15 @@ public class XYZTabPanel extends javax.swing.JPanel {
     
     private void heatButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_heatButtonActionPerformed
     	parentBotConsoleFrame.suspendPolling();
-//    	selectExtruder();
-//    	if (heatPushed) {
-//    		rampOff();
-//    		try {
-//    			extruder.setTemperature(0, false);
-//    		}
-//    		catch (Exception ex) {
-//    			JOptionPane.showMessageDialog(null, "Exception setting temperature: " + ex);
-//    			ex.printStackTrace();
-//    		}
-//    		heatButton.setText("Switch heater on");
-//    		heatPushed = false;
-//    	}
-//    	else {
-//    		try {
-//    			extruder.setTemperature(Integer.parseInt(targetTempField.getText()), false);
-//    		}
-//    		catch (Exception ex) {
-//    			JOptionPane.showMessageDialog(null, "Exception setting temperature: " + ex);
-//    			ex.printStackTrace();
-//    		}
-//    		heatButton.setText("Switch heater off");
-//    		heatPushed = true;
-//    	}
+    	if (heatPushed) 
+    	{
+    		heatButton.setText("Switch bed heat on");
+    		heatPushed = false;
+    	} else 
+    	{
+    		heatButton.setText("Switch bed heat off");
+    		heatPushed = true;
+    	}
     	parentBotConsoleFrame.resumePolling();
     	
     }//GEN-LAST:event_heatButtonActionPerformed
@@ -616,5 +585,6 @@ private void goButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel bedTempPanel;
     private javax.swing.JToggleButton heatButton;
+    private boolean heatPushed;
 
 }
