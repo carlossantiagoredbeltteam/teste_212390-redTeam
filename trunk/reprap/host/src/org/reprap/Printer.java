@@ -525,4 +525,32 @@ public interface Printer {
 	 * @param s
 	 */
 	public void setSeparating(boolean s);
+	
+	
+	/**
+	 * Set the bed temperature. This value is given
+	 * in centigrade, i.e. 100 equals 100 centigrade. 
+	 * @param temperature The temperature of the extruder in centigrade
+	 * @param wait - wait till it gets there (or not).
+	 * @throws Exception
+	 */
+	public void setBedTemperature(double temperature);
+	
+	/**
+	 * Return the current temperature of the bed
+	 * @return
+	 */
+	public double getBedTemperature();
+	
+	/**
+	 * The temperature we want the bed to be at
+	 * @return
+	 */
+	public double getBedTemperatureTarget();
+	
+	/**
+	 * Wait till the entire machine is ready to print.  That is that such things as
+	 * extruder and bed temperatures are at the values set and stable.
+	 */
+	public void stabilise();
 }

@@ -2,6 +2,7 @@
 #RepRap machine parameters. See http://objects.reprap.org/wiki/Java_Software_Preferences_File
 #Wed Feb 24 10:32:10 GMT 2010
 #Wed Feb 24 10:32:10 GMT 2010
+BedTemperature(C)=48
 AxisCount=3
 AxisCount=3
 BackColourB(0..1)=0.9

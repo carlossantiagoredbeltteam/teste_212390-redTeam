@@ -68,7 +68,9 @@ public class GCodeExtruder extends GenericExtruder
 	
 	public double getTemperature()
 	{
-		es.setCurrentTemperature(Double.parseDouble(gcode.queueRespond("M105; get temperature").substring(2))); // Throw away "T:"
+		String temps = gcode.queueRespond("M105; get temperature");
+		temps = temps.substring(temps.indexOf("T:") + 2, temps.indexOf(" "));
+		es.setCurrentTemperature(Double.parseDouble(temps));
 		return es.currentTemperature();
 	}
 	
