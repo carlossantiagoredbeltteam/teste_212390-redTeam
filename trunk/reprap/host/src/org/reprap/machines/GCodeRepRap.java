@@ -472,6 +472,10 @@ public class GCodeRepRap extends GenericRepRap {
 		currentFeedrate = -100; // Force it to set the feedrate at the start
 		
 		forceSelection = true;  // Force it to set the extruder to use at the start
+		
+		// Set the bed temperature
+		
+		setBedTemperature(bedTemperatureTarget);
 				
 		try	{
 			super.startRun();
