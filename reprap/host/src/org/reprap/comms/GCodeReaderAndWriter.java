@@ -610,7 +610,7 @@ public class GCodeReaderAndWriter
 		if(serialOutStream == null)
 		{
 			Debug.d("queueRespond: attempt to queue: " + cmd + " to a non-running output buffer.");
-			return "0000";
+			return "T:0 B:0";
 		}
 		//trim it and cleanup.
 		cmd = cmd.trim();
@@ -619,7 +619,7 @@ public class GCodeReaderAndWriter
 		if (fileOutStream != null)
 		{
 			System.err.println("GCodeWriter.queueRespond() called when file being created.");
-			return "0000"; // Safest compromise
+			return "T:0 B:0"; // Safest compromise
 		}
 		responsesExpected++;
 		bufferQueue(cmd);
@@ -628,7 +628,7 @@ public class GCodeReaderAndWriter
 			System.err.println("GCodeWriter.getResponse() called when no response expected.");
 			responsesExpected = 0;
 			responseAvailable = false;
-			return "0000";
+			return "T:0 B:0";
 		}
 		while(!responseAvailable) sleep(31);
 		responseAvailable = false;

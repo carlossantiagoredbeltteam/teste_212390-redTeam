@@ -796,4 +796,38 @@ public class GCodeRepRap extends GenericRepRap {
 			forceSelection = false;
 		}
 	}
+	
+	
+	/**
+	 * Set the bed temperature. This value is given
+	 * in centigrade, i.e. 100 equals 100 centigrade. 
+	 * @param temperature The temperature of the extruder in centigrade
+	 * @param wait - wait till it gets there (or not).
+	 * @throws Exception
+	 */
+	public void setBedTemperature(double temperature)
+	{
+		super.setBedTemperature(temperature);
+		gcode.queue("M115 S" + temperature + " ;set bed temperature and return");
+	}
+	
+	/**
+	 * Return the current temperature of the bed
+	 * @return
+	 */
+	public double getBedTemperature()
+	{ 
+		String temps = gcode.queueRespond("M105; get temperature");
+		temps = temps.substring(temps.indexOf("B:") + 2);
+		return Double.parseDouble(temps);
+	}
+	
+	/**
+	 * Wait till the entire machine is ready to print.  That is that such things as
+	 * extruder and bed temperatures are at the values set and stable.
+	 */
+	public void stabilise()
+	{
+		gcode.queue("M116 ;wait for stability then return");
+	}
 }

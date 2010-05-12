@@ -101,7 +101,7 @@ public class XYZTabPanel extends javax.swing.JPanel {
         heatPushed = false;
         targetTempField.setColumns(3);
         targetTempField.setFont(targetTempField.getFont().deriveFont(targetTempField.getFont().getSize()+1f));
-        targetTempField.setText("000");
+        targetTempField.setText(String.valueOf(printer.getBedTemperatureTarget()));
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 0, 12));
         jLabel7.setText("Target:");
@@ -413,21 +413,29 @@ public class XYZTabPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    
-    private void heatButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_heatButtonActionPerformed
+
+public void refreshTemperature()
+{
+	double t = printer.getBedTemperature();
+	currentTempLabel.setText("" + t);
+}
+
+private void heatButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_heatButtonActionPerformed
     	parentBotConsoleFrame.suspendPolling();
     	if (heatPushed) 
     	{
+    		printer.setBedTemperature(0);
     		heatButton.setText("Switch bed heat on");
     		heatPushed = false;
     	} else 
     	{
+    		printer.setBedTemperature(Double.parseDouble(targetTempField.getText()));
     		heatButton.setText("Switch bed heat off");
     		heatPushed = true;
     	}
     	parentBotConsoleFrame.resumePolling();
     	
-    }//GEN-LAST:event_heatButtonActionPerformed
+}//GEN-LAST:event_heatButtonActionPerformed
     
     
 private void nudgeSizeRB1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nudgeSizeRB1ActionPerformed

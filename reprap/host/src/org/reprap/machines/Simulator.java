@@ -157,4 +157,12 @@ public class Simulator extends GenericRepRap {
 	{
 		return false;
 	}
+	
+	public void stabilise()
+	{}
+	
+	public double getBedTemperature()
+	{
+		return bedTemperatureTarget;
+	}
 }

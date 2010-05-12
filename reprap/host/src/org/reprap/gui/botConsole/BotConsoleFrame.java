@@ -96,7 +96,10 @@ public class BotConsoleFrame extends javax.swing.JFrame {
     	
     	exPanelNumber++;
     	if(exPanelNumber >= extruderPanels.length)
+    	{
+    		xYZTabPanel.refreshTemperature();
     		exPanelNumber = 0;
+    	}
     	if(updatePosition)
     		xYZTabPanel.recordCurrentPosition();
     	updatePosition = false;

@@ -172,7 +172,12 @@ public abstract class GenericRepRap implements CartesianPrinter
 	private int foundationLayers = 0;
 	
 	private boolean topDown;
-
+	
+	/**
+	 * The temperature to set the bed to
+	 */
+	protected double bedTemperatureTarget;
+	
 	/**
 	 * Stepper motors for the 3 axis 
 	 */
@@ -286,6 +291,8 @@ public abstract class GenericRepRap implements CartesianPrinter
 			
 			finishX = Preferences.loadGlobalDouble("FinishX(mm)");
 			finishY = Preferences.loadGlobalDouble("FinishY(mm)");
+			
+			bedTemperatureTarget = Preferences.loadGlobalDouble("BedTemperature(C)");
 		}
 		catch (Exception ex)
 		{
@@ -1320,5 +1327,27 @@ public abstract class GenericRepRap implements CartesianPrinter
 	public double getFinishY()
 	{
 		return finishY;
+	}
+	
+	
+	/**
+	 * Set the bed temperature. This value is given
+	 * in centigrade, i.e. 100 equals 100 centigrade. 
+	 * @param temperature The temperature of the extruder in centigrade
+	 * @param wait - wait till it gets there (or not).
+	 * @throws Exception
+	 */
+	public void setBedTemperature(double temperature)
+	{
+		bedTemperatureTarget = temperature;
+	}
+		
+	/**
+	 * The temperature we want the bed to be at
+	 * @return
+	 */
+	public double getBedTemperatureTarget()
+	{
+		return bedTemperatureTarget;
 	}
 }
