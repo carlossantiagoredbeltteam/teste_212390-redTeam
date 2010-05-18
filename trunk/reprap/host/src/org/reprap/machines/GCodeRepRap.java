@@ -822,7 +822,10 @@ public class GCodeRepRap extends GenericRepRap {
 	public double getBedTemperature()
 	{ 
 		String temps = gcode.queueRespond("M105; get temperature");
-		temps = temps.substring(temps.indexOf("B:") + 2);
+		int st = temps.indexOf("B:");
+		if(st < 0)
+			return 0;
+		temps = temps.substring(st + 2);
 		return Double.parseDouble(temps);
 	}
 	
