@@ -718,7 +718,7 @@ public class BooleanGrid
 	
 	//**************************************************************************************************
 	
-	// Start of BooleanGrid propper
+	// Start of BooleanGrid proper
 	
 	/**
 	 * The resolution of the RepRap machine
@@ -738,16 +738,43 @@ public class BooleanGrid
 	/**
 	 * Run round the eight neighbours of a pixel anticlockwise from bottom left
 	 */
-	private final iPoint[] neighbour = {
-		new iPoint(-1, -1),
-		new iPoint(0, -1),
-		new iPoint(1, -1),
-		new iPoint(1, 0),
-		new iPoint(1, 1),
-		new iPoint(0, 1),
-		new iPoint(-1, 1),
-		new iPoint(-1, 0)
-		};
+	private final iPoint[] neighbour = 
+	{
+		new iPoint(-1, -1),  //0 /
+		new iPoint(0, -1),   //1 V
+		new iPoint(1, -1),   //2 \
+		new iPoint(1, 0),    //3 ->
+		new iPoint(1, 1),    //4 /
+		new iPoint(0, 1),    //5 ^
+		new iPoint(-1, 1),   //6 \
+		new iPoint(-1, 0)    //7 <
+	};
+	
+	// Marching squares directions.  2x2 grid bits:
+	//
+	//    0  1
+	//
+	//    2  3
+	
+	private final int[] march =
+	{
+			3,
+			5,
+			3,
+			3,
+			7,
+			5,
+			7,
+			3,
+			1,
+			5,
+			1,
+			1,
+			7,
+			5,
+			7,
+			-1
+	};
 	
 	/**
 	 * Lookup table for whether to cull points forming thin bridges.  The index into this is the byte bitpattern
@@ -1596,6 +1623,22 @@ public class BooleanGrid
 		}
 
 		return null;
+	}
+	
+	/**
+	 * Calculate the 4-bit marching squares value for a point
+	 * @param ip
+	 * @return
+	 */
+	private int marchPattern(iPoint ip)
+	{
+		int result = 0;
+		
+		if(get(ip)) result |= 1;
+		if(get(ip.add(neighbour[3]))) result |= 2;
+		if(get(ip.add(neighbour[1]))) result |= 4;
+		if(get(ip.add(neighbour[2]))) result |= 8;
+		return result;
 	}
 	
 	//********************************************************************************
