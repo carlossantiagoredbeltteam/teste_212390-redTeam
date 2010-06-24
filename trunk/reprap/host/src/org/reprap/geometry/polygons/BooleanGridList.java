@@ -18,11 +18,11 @@ public class BooleanGridList
 
 		private List<BooleanGrid> shapes = null;
 		
-		protected void finalize() throws Throwable
-		{
-			shapes = null;
-			super.finalize();
-		}
+//		protected void finalize() throws Throwable
+//		{
+//			shapes = null;
+//			super.finalize();
+//		}
 		
 		public BooleanGridList()
 		{

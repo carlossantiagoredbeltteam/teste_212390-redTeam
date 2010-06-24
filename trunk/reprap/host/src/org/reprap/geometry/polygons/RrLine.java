@@ -96,12 +96,12 @@ public class RrLine
 	/**
 	 * Destroy just me
 	 */
-	protected void finalize() throws Throwable
-	{
-		direction = null;
-		origin = null;
-		super.finalize();
-	}
+//	protected void finalize() throws Throwable
+//	{
+//		direction = null;
+//		origin = null;
+//		super.finalize();
+//	}
 	
 	/**
 	 * Line between two points

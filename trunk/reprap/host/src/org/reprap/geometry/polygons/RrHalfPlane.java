@@ -180,13 +180,13 @@ public class RrHalfPlane
 	/**
 	 * Destroy just me
 	 */
-	protected void finalize() throws Throwable
-	{
-		normal = null;
-		p = null;
-		//crossings = null;
-		super.finalize();
-	}
+//	protected void finalize() throws Throwable
+//	{
+//		normal = null;
+//		p = null;
+//		//crossings = null;
+//		super.finalize();
+//	}
 	
 	/**
 	 * Convert a parametric line

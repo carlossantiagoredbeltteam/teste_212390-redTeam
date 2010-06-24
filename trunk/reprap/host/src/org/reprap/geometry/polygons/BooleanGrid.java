@@ -862,12 +862,12 @@ public class BooleanGrid
 	/**
 	 * Bye!
 	 */
-	protected void finalize() throws Throwable
-	{
-		bits = null;
-		visited = null;
-		super.finalize();
-	}
+//	protected void finalize() throws Throwable
+//	{
+//		bits = null;
+//		visited = null;
+//		super.finalize();
+//	}
 	
 	/**
 	 * Back and forth from real to pixel/integer coordinates

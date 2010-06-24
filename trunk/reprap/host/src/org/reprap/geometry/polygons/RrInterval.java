@@ -75,10 +75,10 @@ public class RrInterval
 	/**
 	 * Destroy just me
 	 */
-	protected void finalize() throws Throwable
-	{
-		super.finalize();
-	}
+//	protected void finalize() throws Throwable
+//	{
+//		super.finalize();
+//	}
 	
 	public RrInterval()
 	{
