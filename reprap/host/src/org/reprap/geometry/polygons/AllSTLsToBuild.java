@@ -82,13 +82,13 @@ public class AllSTLsToBuild
 		 */
 		public Attributes att = null;
 
-		protected void finalize() throws Throwable
-		{
-			a = null;
-			b = null;
-			att = null;
-			super.finalize();
-		}
+//		protected void finalize() throws Throwable
+//		{
+//			a = null;
+//			b = null;
+//			att = null;
+//			super.finalize();
+//		}
 		
 		/**
 		 * Constructor takes two intersection points with an STL triangle edge.

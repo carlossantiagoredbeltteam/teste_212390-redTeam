@@ -128,14 +128,14 @@ public class RrCSG
 	/**
 	 * Destroy just me
 	 */
-	protected void finalize() throws Throwable
-	{
-		c1 = null;
-		c2 = null;
-		comp = null;
-		hp = null;
-		super.finalize();
-	}
+//	protected void finalize() throws Throwable
+//	{
+//		c1 = null;
+//		c2 = null;
+//		comp = null;
+//		hp = null;
+//		super.finalize();
+//	}
 	
 	/**
 	 * Make a leaf from a single half-plane

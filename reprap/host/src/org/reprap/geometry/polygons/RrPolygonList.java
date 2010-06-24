@@ -176,10 +176,10 @@ class chPair
 	/**
 	 * Destroy just me
 	 */
-	protected void finalize() throws Throwable
-	{
-		super.finalize();
-	}
+//	protected void finalize() throws Throwable
+//	{
+//		super.finalize();
+//	}
 	
 	/**
 	 * @param p

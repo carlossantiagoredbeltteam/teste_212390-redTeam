@@ -160,14 +160,14 @@ public class RrPolygon
 	/**
 	 * Destroy just me
 	 */
-	protected void finalize() throws Throwable
-	{
-		points = null;
-		speeds = null;
-		att = null;
-		box = null;
-		super.finalize();
-	}
+//	protected void finalize() throws Throwable
+//	{
+//		points = null;
+//		speeds = null;
+//		att = null;
+//		box = null;
+//		super.finalize();
+//	}
 	
 	
 	/**

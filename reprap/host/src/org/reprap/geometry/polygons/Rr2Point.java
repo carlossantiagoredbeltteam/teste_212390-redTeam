@@ -78,10 +78,10 @@ public class Rr2Point
 	/**
 	 * Destroy just me
 	 */
-	protected void finalize() throws Throwable
-	{
-		super.finalize();
-	}
+//	protected void finalize() throws Throwable
+//	{
+//		super.finalize();
+//	}
 	
 	
 	/**

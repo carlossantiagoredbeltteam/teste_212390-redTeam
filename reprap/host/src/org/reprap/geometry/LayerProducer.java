@@ -200,24 +200,24 @@ public class LayerProducer {
 	/**
 	 * Destroy just me
 	 */
-	protected void finalize() throws Throwable
-	{
-		// Keep the lower shell - the graphics system is using it
-		
-		//lowerShell = null;
-
-		// Keep the printer; that's needed for the next layer
-
-		//printer = null;
-		
-//		hatchedPolygons = null;
-//		borderPolygons = null;
-//		boolGrdSlice = null;
-//		offHatch = null;
-		allPolygons = null;
-		startNearHere = null;
-		super.finalize();
-	}
+//	protected void finalize() throws Throwable
+//	{
+//		// Keep the lower shell - the graphics system is using it
+//		
+//		//lowerShell = null;
+//
+//		// Keep the printer; that's needed for the next layer
+//
+//		//printer = null;
+//		
+////		hatchedPolygons = null;
+////		borderPolygons = null;
+////		boolGrdSlice = null;
+////		offHatch = null;
+//		allPolygons = null;
+//		startNearHere = null;
+//		super.finalize();
+//	}
 	
 	/**
 	 * Set up a layer consisting of a single material in a single pre-computed list.

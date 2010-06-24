@@ -108,12 +108,12 @@ public class RrRectangle
 	/**
 	 * Destroy just me
 	 */
-	protected void finalize() throws Throwable
-	{
-		x = null;
-		y = null;
-		super.finalize();
-	}
+//	protected void finalize() throws Throwable
+//	{
+//		x = null;
+//		y = null;
+//		super.finalize();
+//	}
 	
 	/**
 	 * Default is empty
