@@ -115,9 +115,9 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
     	progressBar.setValue((int)(100*fractionDone));
     	
     	GregorianCalendar cal = new GregorianCalendar();
-    	SimpleDateFormat dateFormat = new SimpleDateFormat("EE HH:mm");
+    	SimpleDateFormat dateFormat = new SimpleDateFormat("EE HH:mm:ss Z");
     	Date d = cal.getTime();
-		long e = d.getTime() + cal.getTimeZone().getOffset(d.getTime());
+	long e = d.getTime();
     	if(startTime < 0)
     	{
     		startTime = e;
@@ -131,12 +131,6 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
     	int h = (int)(f/60000)/60;
     	int m = (int)(f/60000)%60;
     	
-    	// No idea why this next bit doesn't work...
-    	//if(cal.getTimeZone().inDaylightTime(d))
-    	//{
-    		//f = f + 3600000;
-    		//System.out.println("DST");
-    	//}
     	if(m > 9)
     		expectedBuildTime.setText("" + h + ":" + m);
     	else
@@ -254,7 +248,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
         expectedBuildTime.setText("00:00"); // NOI18N
 
         expectedFinishTimeLabel.setFont(new java.awt.Font("Tahoma", 0, 12));
-        expectedFinishTimeLabel.setText("Expected to finsh at:"); // NOI18N
+        expectedFinishTimeLabel.setText("Expected to finish at:"); // NOI18N
 
         expectedFinishTime.setFont(new java.awt.Font("Tahoma", 0, 12));
         expectedFinishTime.setText("    -"); // NOI18N
