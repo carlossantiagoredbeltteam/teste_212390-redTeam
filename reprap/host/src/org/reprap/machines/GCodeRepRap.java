@@ -618,7 +618,7 @@ public class GCodeRepRap extends GenericRepRap {
 //		} catch (Exception e)
 //		{}
 //		gcode.queue("G92 Y0 ;set y 0");
-		gcode.queue("G28 Y0 ;set x 0");
+		gcode.queue("G28 Y0 ;set y 0");
 		super.homeToZeroY();
 
 	}
@@ -655,7 +655,7 @@ public class GCodeRepRap extends GenericRepRap {
 //		} catch (Exception e)
 //		{}
 //		gcode.queue("G92 Z0 ;set z 0");
-		gcode.queue("G28 Z0 ;set x 0");
+		gcode.queue("G28 Z0 ;set z 0");
 		super.homeToZeroZ();
 	}
 	

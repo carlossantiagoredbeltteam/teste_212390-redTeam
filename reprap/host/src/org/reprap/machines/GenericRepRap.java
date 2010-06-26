@@ -323,7 +323,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		//Debug.d("Setting temperature");
 		//getExtruder().heatOn(true);
 		
-		getExtruder().purge();
+		getExtruder().purge(true);
 	}
 	
 	/* (non-Javadoc)
@@ -883,7 +883,11 @@ public abstract class GenericRepRap implements CartesianPrinter
 	{
 		lc.setFractionDone();
 		
-		homeToZeroXYE();
+		// Don't home the first layer
+		// The startup procedure has already done that
+		
+		if(lc.getMachineLayer() > 0)
+			homeToZeroXYE();
 		
 		double datumX = getExtruder().getNozzleWipeDatumX();
 		double datumY = getExtruder().getNozzleWipeDatumY();

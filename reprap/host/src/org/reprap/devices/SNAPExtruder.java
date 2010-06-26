@@ -228,13 +228,15 @@ public class SNAPExtruder extends GenericExtruder
 	/**
 	 * Purge the extruder
 	 */
-	public void purge()
+	public void purge(boolean homeZ)
 	{
 		if(purgeTime <= 0)
 			return;
 		getPrinter().moveToPurge();
 		try
 		{
+			if(homeZ)
+				getPrinter().homeToZeroZ();
 			setExtrusion(getFastXYFeedrate(), false);
 			getPrinter().machineWait(purgeTime, false);
 			setExtrusion(0, false);
