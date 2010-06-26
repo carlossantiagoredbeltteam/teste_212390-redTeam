@@ -29,7 +29,7 @@ public class NullExtruder extends GenericExtruder
 	/**
 	 * Purge the extruder
 	 */
-	public void purge() {}
+	public void purge(boolean homeZ) {}
 
 	public boolean isEmpty()
 	{

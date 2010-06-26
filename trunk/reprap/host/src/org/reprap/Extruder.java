@@ -212,7 +212,7 @@ public interface Extruder
      * Purge the extruder
      *
      */
-    public void purge();
+    public void purge(boolean homeZ);
     
     /**
      * Set the flag to show we're creating a separation
