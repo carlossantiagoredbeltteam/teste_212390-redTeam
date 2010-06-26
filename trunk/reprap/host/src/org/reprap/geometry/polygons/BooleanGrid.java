@@ -758,22 +758,22 @@ public class BooleanGrid
 	
 	private final int[] march =
 	{
-			3,
-			5,
-			3,
-			3,
-			7,
-			5,
-			7,
-			3,
-			1,
-			5,
-			1,
-			1,
-			7,
-			5,
-			7,
-			-1
+			-1, // 0
+			5,  // 1
+			3,  // 2
+			3,  // 3
+			7,  // 4
+			5,  // 5
+			7,  // 6
+			3,  // 7
+			1,  // 8
+			5,  // 9
+			1,  // 10
+			1,  // 11
+			7,  // 12
+			5,  // 13
+			7,  // 14
+			-1  // 15
 	};
 	
 	/**
@@ -1557,8 +1557,9 @@ public class BooleanGrid
 	/**
 	 * Useful debugging function
 	 * @param p
+	 * @param b
 	 */
-	private void printNearby(iPoint p, int b)
+	private String printNearby(iPoint p, int b)
 	{
 		String op = new String();
 		for(int y = p.y + b; y >= p.y - b; y--)
@@ -1588,7 +1589,7 @@ public class BooleanGrid
 			}
 			op += "\n";
 		}
-		System.out.println(op);		
+		return op;		
 	}
 	
 	/**
@@ -1652,64 +1653,65 @@ public class BooleanGrid
 	 */
 	private iPolygonList iAllPerimitersRaw()
 	{
-		iPolygonList result = new iPolygonList();
-		iPolygon ip;
-		
-		push("Computing edges... ");
-		
-		iPoint thisPoint;
-		
-		int i = findUnvisitedEdgeIndex(0);
-		long d2;
-		
-		while(i >= 0)
-		{
-			ip = new iPolygon(true);
-			thisPoint = pixel(i);
-			int direction = -1;
-			iPoint newPoint;
-			while(thisPoint != null)
-			{
-				ip.add(thisPoint);
-				vSet(thisPoint, true);
-				newPoint = findUnvisitedNeighbourOnEdgeInDirection(thisPoint, direction);
-				if(newPoint != null)
-					direction = neighbourIndex(newPoint.sub(thisPoint)); // Try to go in the same direction
-				else
-				{
-					d2 = ip.point(0).sub(ip.point(ip.size() - 1)).magnitude2();
-					if(d2 > 2)
-					{
-						//printNearby(thisPoint);
-						newPoint = searchNearby(thisPoint, 0);
-						if(newPoint != null)
-						{
-							iPoint dir = newPoint.sub(thisPoint);
-							//System.out.println("Found nearby sq dist = " + dir.magnitude2());
-							direction = directionToNeighbour(new Rr2Point(dir.x, dir.y));
-						}
-					}
-				}
-				thisPoint = newPoint;
-			}
-
-			d2 = ip.point(0).sub(ip.point(ip.size() - 1)).magnitude2();
-			if(d2 > searchDepth*searchDepth)
-			{
-				Debug.e("BooleanGrid.iAllPerimitersRaw(): unjoined ends:" + d2);
-				//printNearby(ip.point(0), 6);
-				//printNearby(ip.point(ip.size() - 1), 6);
-			}
-
-			if(ip.size() >= 3)
-				result.add(ip);
-			
-			i = findUnvisitedEdgeIndex(i + 1);
-		}
-		
-		resetVisited();
-		pop();
-		return result;
+		return marchAll();
+//		iPolygonList result = new iPolygonList();
+//		iPolygon ip;
+//		
+//		push("Computing edges... ");
+//		
+//		iPoint thisPoint;
+//		
+//		int i = findUnvisitedEdgeIndex(0);
+//		long d2;
+//		
+//		while(i >= 0)
+//		{
+//			ip = new iPolygon(true);
+//			thisPoint = pixel(i);
+//			int direction = -1;
+//			iPoint newPoint;
+//			while(thisPoint != null)
+//			{
+//				ip.add(thisPoint);
+//				vSet(thisPoint, true);
+//				newPoint = findUnvisitedNeighbourOnEdgeInDirection(thisPoint, direction);
+//				if(newPoint != null)
+//					direction = neighbourIndex(newPoint.sub(thisPoint)); // Try to go in the same direction
+//				else
+//				{
+//					d2 = ip.point(0).sub(ip.point(ip.size() - 1)).magnitude2();
+//					if(d2 > 2)
+//					{
+//						//printNearby(thisPoint);
+//						newPoint = searchNearby(thisPoint, 0);
+//						if(newPoint != null)
+//						{
+//							iPoint dir = newPoint.sub(thisPoint);
+//							//System.out.println("Found nearby sq dist = " + dir.magnitude2());
+//							direction = directionToNeighbour(new Rr2Point(dir.x, dir.y));
+//						}
+//					}
+//				}
+//				thisPoint = newPoint;
+//			}
+//
+//			d2 = ip.point(0).sub(ip.point(ip.size() - 1)).magnitude2();
+//			if(d2 > searchDepth*searchDepth)
+//			{
+//				Debug.e("BooleanGrid.iAllPerimitersRaw(): unjoined ends:" + d2);
+//				//printNearby(ip.point(0), 6);
+//				//printNearby(ip.point(ip.size() - 1), 6);
+//			}
+//
+//			if(ip.size() >= 3)
+//				result.add(ip);
+//			
+//			i = findUnvisitedEdgeIndex(i + 1);
+//		}
+//		
+//		resetVisited();
+//		pop();
+//		return result;
 	}
 	
 	/**
@@ -1733,6 +1735,279 @@ public class BooleanGrid
 		RrPolygonList r = iAllPerimiters().realPolygons(a);
 		r = r.simplify(realResolution);	
 		return r;
+	}
+	
+	private double poll(iPoint p, int b)
+	{
+		int result = 0;
+		iPoint q;
+		for(int y = p.y + b; y >= p.y - b; y--)
+			for(int x = p.x - b; x <= p.x + b; x++)
+			{
+				q = new iPoint(x, y);
+				if(get(q)) result++;
+			}
+		b++;
+		return (double)result/(double)(b*b);
+	}
+	
+	/**
+	 * Run marching squares round the polygon starting with the 2x2 march pattern at start
+	 * @param start
+	 * @return
+	 */
+	private iPolygon marchRound(iPoint start)
+	{
+		iPolygon result = new iPolygon(true);
+		
+		iPoint here = new iPoint(start);
+		iPoint pix;
+		int m;
+		boolean step = true;
+		
+		do
+		{
+			m = marchPattern(here);
+			pix = new iPoint(here);
+			switch(m)
+			{
+			case 1:
+				if(!vGet(pix))
+				{
+					result.add(pix);
+					vSet(pix,true);
+				}
+				break;
+			case 2:
+				pix = pix.add(neighbour[3]);
+				if(!vGet(pix))
+				{
+					result.add(pix);
+					vSet(pix,true);
+				}
+				break;
+			case 3:
+				if(!vGet(pix))
+				{
+					result.add(pix);
+					vSet(pix,true);
+				}
+				pix = pix.add(neighbour[3]);
+				if(!vGet(pix))
+				{
+					result.add(pix);
+					vSet(pix,true);
+				}					
+				break;
+			case 4:
+				pix = pix.add(neighbour[1]);
+				if(!vGet(pix))
+				{
+					result.add(pix);
+					vSet(pix,true);
+				}				
+				break;
+			case 5:
+				pix = pix.add(neighbour[1]);
+				if(!vGet(pix))
+				{
+					result.add(pix);
+					vSet(pix,true);
+				}
+				pix = pix.add(neighbour[5]);
+				if(!vGet(pix))
+				{
+					result.add(pix);
+					vSet(pix,true);
+				}					
+				break;
+			case 6:
+				Debug.e("BooleanGrid.marchRound() - dud 2x2 grid: " + m + " at " + 
+						here.toString() + "\n" + printNearby(here,4) + "\n\n");
+				if(poll(pix, 3) > 0.5)
+				{
+					pix = pix.add(neighbour[2]);
+					set(pix, true);
+					vSet(pix, false);
+				} else
+				{
+					pix = pix.add(neighbour[1]);
+					set(pix, false);
+					vSet(pix, false);					
+				}
+				step = false;
+//				if(!vGet(pix))
+//				{
+//					result.add(pix);
+//					vSet(pix,true);
+//				}
+//				pix = pix.add(neighbour[0]);
+//				if(!vGet(pix))
+//				{
+//					result.add(pix);
+//					vSet(pix,true);
+//				}		
+				break;
+			case 7:
+				pix = pix.add(neighbour[1]);
+				if(!vGet(pix))
+				{
+					result.add(pix);
+					vSet(pix,true);
+				}
+				pix = pix.add(neighbour[4]);
+				if(!vGet(pix))
+				{
+					result.add(pix);
+					vSet(pix,true);
+				}						
+				break;
+			case 8:
+				pix = pix.add(neighbour[2]);
+				if(!vGet(pix))
+				{
+					result.add(pix);
+					vSet(pix,true);
+				}						
+				break;
+			case 9:
+				Debug.e("BooleanGrid.marchRound() - dud 2x2 grid: " + m + " at " + 
+						here.toString() + "\n" + printNearby(here,4) + "\n\n");
+				if(poll(pix, 3) > 0.5)
+				{
+					pix = pix.add(neighbour[1]);
+					set(pix, true);
+					vSet(pix, false);
+				} else
+				{
+					set(pix, false);
+					vSet(pix, false);					
+				}
+				step = false;
+//				pix = pix.add(neighbour[2]);
+//				if(!vGet(pix))
+//				{
+//					result.add(pix);
+//					vSet(pix,true);
+//				}
+//				pix = pix.add(neighbour[6]);
+//				if(!vGet(pix))
+//				{
+//					result.add(pix);
+//					vSet(pix,true);
+//				}						
+				break;
+			case 10:
+				pix = pix.add(neighbour[3]);
+				if(!vGet(pix))
+				{
+					result.add(pix);
+					vSet(pix,true);
+				}
+				pix = pix.add(neighbour[1]);
+				if(!vGet(pix))
+				{
+					result.add(pix);
+					vSet(pix,true);
+				}						
+				break;
+			case 11:
+				if(!vGet(pix))
+				{
+					result.add(pix);
+					vSet(pix,true);
+				}
+				pix = pix.add(neighbour[2]);
+				if(!vGet(pix))
+				{
+					result.add(pix);
+					vSet(pix,true);
+				}						
+				break;
+			case 12:
+				pix = pix.add(neighbour[2]);
+				if(!vGet(pix))
+				{
+					result.add(pix);
+					vSet(pix,true);
+				}
+				pix = pix.add(neighbour[7]);
+				if(!vGet(pix))
+				{
+					result.add(pix);
+					vSet(pix,true);
+				}							
+				break;
+			case 13:
+				pix = pix.add(neighbour[2]);
+				if(!vGet(pix))
+				{
+					result.add(pix);
+					vSet(pix,true);
+				}
+				pix = pix.add(neighbour[6]);
+				if(!vGet(pix))
+				{
+					result.add(pix);
+					vSet(pix,true);
+				}					
+				break;
+			case 14:
+				pix = pix.add(neighbour[3]);
+				if(!vGet(pix))
+				{
+					result.add(pix);
+					vSet(pix,true);
+				}
+				pix = pix.add(neighbour[0]);
+				if(!vGet(pix))
+				{
+					result.add(pix);
+					vSet(pix,true);
+				}						
+				break;
+			
+			default:
+				Debug.e("BooleanGrid.marchRound() - dud 2x2 grid: " + m + " at " + 
+						here.toString() + "\n" + printNearby(here,4) + "\n\n");
+				return result;
+			}
+			if(step)
+				here = here.add(neighbour[march[m]]);
+			step = true;
+		} while(!here.coincidesWith(start));
+		
+		return result;
+	}
+	
+	/**
+	 * Run marching squares round all polygons in the pattern, returning a list of them all
+	 * @return
+	 */
+	private iPolygonList marchAll()
+	{
+		iPolygonList result = new iPolygonList();
+		iPoint start;
+		iPolygon p;
+		int m;
+		
+		for(int x = 0; x < rec.size.x - 1; x++)
+			for(int y = 0; y < rec.size.y - 1; y++)
+			{
+				start = new iPoint(x, y);
+				m = marchPattern(start);
+				if(m != 0 && m != 15)
+				{
+					if( !( vGet(start) || vGet(start.add(neighbour[1])) || vGet(start.add(neighbour[2])) || vGet(start.add(neighbour[3])) ) )
+					{
+						p = marchRound(start);
+						if(p.size() > 2)
+							result.add(p);
+					}
+				}
+			}
+		resetVisited();	
+		return result;
 	}
 	
 	/**
@@ -1857,7 +2132,7 @@ public class BooleanGrid
     }
     
     /**
-     * Find the poece of edge between start and end (if there is one).
+     * Find the piece of edge between start and end (if there is one).
      * @param start
      * @param end
      * @return
