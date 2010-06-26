@@ -1401,53 +1401,76 @@ public class BooleanGrid
 	private void deWhisker()
 	{
 		push("deWhisker... ");
-		int n;
-		for(int passes = 0; passes < 2; passes++)
-		{
-			int i = findUnvisitedEdgeIndex(0);
-			while(i >= 0)
+		
+		for(int x = 0; x < rec.size.x - 1; x++)
+			for(int y = 0; y < rec.size.y - 1; y++)
 			{
-				iPoint p = pixel(i);
-				int filterIndex = 0;
-				for(n = 0; n < 8; n++)
-					if(get(p.add(neighbour[n])))
-						filterIndex = filterIndex | (1<<n);
-				if(thinFilter[filterIndex])
+				iPoint start = new iPoint(x, y);
+				int m = marchPattern(start);
+				if(m == 6 || m == 9)
 				{
-					//printNearby(p, 3);
-					set(p, false);
-					//printNearby(p, 3);
-				} else
-					i++;
-				
+					if(poll(start, 3) > 0.5)
+					{
+						set(start, true);
+						set(start.add(neighbour[1]), true);
+						set(start.add(neighbour[2]), true);
+						set(start.add(neighbour[2]), true);
+					} else
+					{
+						set(start, false);
+						set(start.add(neighbour[1]), false);
+						set(start.add(neighbour[2]), false);
+						set(start.add(neighbour[2]), false);						
+					}
+				}
+			}		
+//		int n;
+//		for(int passes = 0; passes < 2; passes++)
+//		{
+//			int i = findUnvisitedEdgeIndex(0);
+//			while(i >= 0)
+//			{
+//				iPoint p = pixel(i);
+//				int filterIndex = 0;
 //				for(n = 0; n < 8; n++)
-//					blockSize[n] = 0;
-//				boolean last = get(p.add(neighbour[7]));
-//				boolean here;
-//				int nCount = 0;
-//				int blockCount = 0;
-//				for(n = 0; n < 8; n++)
+//					if(get(p.add(neighbour[n])))
+//						filterIndex = filterIndex | (1<<n);
+//				if(thinFilter[filterIndex])
 //				{
-//					here = get(p.add(neighbour[n]));
-//					if(here)
-//						nCount++;
-//					if(here && !last)
-//						blockCount++;
-//					if(here && last)
-//						blockSize[n]++;
-//					last = here;
-//				}
-//
-//				if(blockCount > 1 || nCount < 2)
-//				{
-//					printNearby(p, 3);
+//					//printNearby(p, 3);
 //					set(p, false);
-//					printNearby(p, 3);
-//				}
-				i = findUnvisitedEdgeIndex(i);
-			}
-			//System.out.println("end pass " + passes);
-		}
+//					//printNearby(p, 3);
+//				} else
+//					i++;
+//				
+////				for(n = 0; n < 8; n++)
+////					blockSize[n] = 0;
+////				boolean last = get(p.add(neighbour[7]));
+////				boolean here;
+////				int nCount = 0;
+////				int blockCount = 0;
+////				for(n = 0; n < 8; n++)
+////				{
+////					here = get(p.add(neighbour[n]));
+////					if(here)
+////						nCount++;
+////					if(here && !last)
+////						blockCount++;
+////					if(here && last)
+////						blockSize[n]++;
+////					last = here;
+////				}
+////
+////				if(blockCount > 1 || nCount < 2)
+////				{
+////					printNearby(p, 3);
+////					set(p, false);
+////					printNearby(p, 3);
+////				}
+//				i = findUnvisitedEdgeIndex(i);
+//			}
+//			//System.out.println("end pass " + passes);
+//		}
 		pop();
 	}
 	
