@@ -812,7 +812,7 @@ public class GCodeRepRap extends GenericRepRap {
 	public void setBedTemperature(double temperature)
 	{
 		super.setBedTemperature(temperature);
-		gcode.queue("M115 S" + temperature + " ;set bed temperature and return");
+		gcode.queue("M140 S" + temperature + " ;set bed temperature and return");
 	}
 	
 	/**
