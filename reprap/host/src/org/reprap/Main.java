@@ -213,6 +213,14 @@ public class Main {
 			}});
         manipMenu.add(inToMM);
         
+        JMenuItem nextP = new JMenuItem("Select next object that will be built", KeyEvent.VK_N);
+        nextP.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+        nextP.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				onNextPicked();
+			}});
+        manipMenu.add(nextP);
+        
         
         JMenuItem deleteSTLW = new JMenuItem("Delete selected object", KeyEvent.VK_W);
         deleteSTLW.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.CTRL_MASK));
@@ -607,6 +615,11 @@ public class Main {
     private void oninToMM() {
     	  builder.inToMM();
       } 
+    
+    private void onNextPicked()
+    {
+    	builder.nextPicked();
+    }
     
 //    private void onMaterial() {
 //  	  builder.materialSTL();

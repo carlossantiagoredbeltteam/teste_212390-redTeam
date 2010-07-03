@@ -288,6 +288,36 @@ public class AllSTLsToBuild
 	}
 	
 	/**
+	 * Find an object in the list and return the next one.
+	 * @param st
+	 * @return
+	 */
+	public STLObject getNextOne(STLObject st)
+	{
+		if(size() <= 0)
+		{
+			Debug.e("AllSTLsToBuild.getNextOne(): no objects to pick from!");
+			return null;			
+		}
+		int index = -1;
+		for(int i = 0; i < size(); i++)
+			if(get(i) == st)
+			{
+				index = i;
+				break;
+			}
+		if(index < 0)
+		{
+			Debug.e("AllSTLsToBuild.getNextOne(): dud object submitted.");
+			return get(0);
+		}
+		index++;
+		if(index >= size())
+			index = 0;
+		return get(index);
+	}
+	
+	/**
 	 * Return the number of objects.
 	 * @return
 	 */
