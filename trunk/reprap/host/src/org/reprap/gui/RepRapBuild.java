@@ -535,6 +535,19 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 			lastPicked.inToMM();
 	}
 	
+	// Move to the next one in the list
+	
+	public void nextPicked()
+	{
+		if (lastPicked == null)
+			return; // Or should it pick the first object?
+		lastPicked.restoreAppearance();
+		lastPicked = stls.getNextOne(lastPicked);
+		lastPicked.setAppearance(picked_app);
+		mouse.move(lastPicked, true);
+		
+	}
+	
 //	public void materialSTL()
 //	{
 //		if (lastPicked == null)
