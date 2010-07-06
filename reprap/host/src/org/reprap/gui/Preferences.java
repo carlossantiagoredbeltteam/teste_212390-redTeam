@@ -14,6 +14,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.JScrollPane;
+import javax.swing.JRadioButton;
+import javax.swing.ButtonGroup;
+
 
 /**
  * This reads in the preferences file and constructs a set of menus from it to allow entries
@@ -50,10 +54,10 @@ public class Preferences extends JFrame {
 	
 	private int extruderCount;
 	private JLabel[] globals;              // Array of JLabels for the general key names
-	private JTextField[] globalValues;     // Array of JTextFields for the general variables
+	private PreferencesValue[] globalValues;     // Array of JTextFields for the general variables
 	private Category[] globalCats;         // What are they?
 	private JLabel[][] extruders;          // Array of Arrays of JLabels for the extruders' key names
-	private JTextField[][] extruderValues; // Array of Arrays of JTextFields for the extruders' variables
+	private PreferencesValue[][] extruderValues; // Array of Arrays of JTextFields for the extruders' variables
 	private Category[][] extruderCats;     // What are they?
 
 	// Get the show on the road...
@@ -100,7 +104,7 @@ public class Preferences extends JFrame {
 			for(int j = 0; j < extruderCount; j++)
 			{
 				JLabel[] enames = extruders[j];
-				JTextField[] evals = extruderValues[j];
+				PreferencesValue[] evals = extruderValues[j];
 				Category[] cats = extruderCats[j];
 				for(int i = 0; i < enames.length; i++)
 				{
@@ -156,7 +160,7 @@ public class Preferences extends JFrame {
 		// Now build a set of arrays for each extruder in turn.
 		
 		extruders= new JLabel[extruderCount][];
-		extruderValues= new JTextField[extruderCount][];
+		extruderValues= new PreferencesValue[extruderCount][];
 		extruderCats = new Category[extruderCount][];
 		try {
 			for(int i = 0; i < extruderCount; i++)
@@ -207,10 +211,30 @@ public class Preferences extends JFrame {
 		return jButtonCancel;
 	}	
 	
+	
+	
+	
+	private void addValueToPanel(PreferencesValue value, JPanel panel)
+	{
+		
+		if(isBoolean(value.getText()))
+		{
+			
+			
+			value.makeBoolean();
+			
+			panel.add(value.getObject());
+		}
+		else
+			panel.add(value.getObject());
+	
+	}
 	/**
 	 * Set up the panels with all the right boxes in
 	 *
 	 */
+	
+	
 	private void initGUI() 
 	{
 		setSize(600, 700);
@@ -227,10 +251,15 @@ public class Preferences extends JFrame {
 			JTabbedPane jTabbedPane1 = new JTabbedPane();
 			add(jTabbedPane1);
 
+			
 
 			// Do the global panel
 
 			JPanel jPanelGeneral = new JPanel();
+			JScrollPane jScrollPaneGeneral = new JScrollPane(jPanelGeneral);
+
+			
+			
 			boolean odd = globals.length%2 != 0;
 			int rows;
 			if(odd)
@@ -239,7 +268,7 @@ public class Preferences extends JFrame {
 				rows = globals.length/2 + 1;
 			jPanelGeneral.setLayout(new GridLayout(rows, 4, 5, 5));
 
-			jTabbedPane1.addTab("Globals", null, jPanelGeneral, null);
+			jTabbedPane1.addTab("Globals", null, jScrollPaneGeneral, null);
 
 			// Do it in two chunks, so they're vertically ordered, not horizontally
 			
@@ -249,19 +278,20 @@ public class Preferences extends JFrame {
 			for(i = 0; i < half; i++)
 			{
 				jPanelGeneral.add(globals[i]);
-				jPanelGeneral.add(globalValues[i]);
+				addValueToPanel(globalValues[i], jPanelGeneral);
+				
 				next = i + half;
 				if(next < globals.length)
 				{
 					jPanelGeneral.add(globals[next]);
-					jPanelGeneral.add(globalValues[next]);
+					addValueToPanel(globalValues[next], jPanelGeneral);
 				}
 			}
 			
 			if(odd)
 			{
 				jPanelGeneral.add(globals[globals.length - 1]);
-				jPanelGeneral.add(globalValues[globals.length - 1]);
+				jPanelGeneral.add(globalValues[globals.length - 1].getObject());
 				jPanelGeneral.add(new JLabel());
 				jPanelGeneral.add(new JLabel());
 			}
@@ -276,16 +306,18 @@ public class Preferences extends JFrame {
 			for(int j = 0; j < extruderCount; j++)
 			{
 				JLabel[] keys = extruders[j];
-				JTextField[] values = extruderValues[j];
+				PreferencesValue[] values = extruderValues[j];
 
 				JPanel jPanelExtruder = new JPanel();
+				JScrollPane jScrollPaneExtruder = new JScrollPane(jPanelExtruder);
+				
 				odd = keys.length%2 != 0;
 				if(odd)
 					rows = keys.length/2 + 2;
 				else
 					rows = keys.length/2 + 1;
 				jPanelExtruder.setLayout(new GridLayout(rows, 4, 5, 5));
-				jTabbedPane1.addTab("Extruder " + j, null, jPanelExtruder, null);
+				jTabbedPane1.addTab("Extruder " + j, null, jScrollPaneExtruder, null);
 				
 				// Do it in two chunks, so they're vertically ordered, not horizontally
 				
@@ -293,19 +325,22 @@ public class Preferences extends JFrame {
 				for(i = 0; i < keys.length/2; i++)
 				{
 					jPanelExtruder.add(keys[i]);
-					jPanelExtruder.add(values[i]);
+					addValueToPanel(values[i], jPanelExtruder);
+
+					
 					next = i + half;
 					if(next < keys.length)
 					{
 						jPanelExtruder.add(keys[next]);
-						jPanelExtruder.add(values[next]);
+						addValueToPanel(values[next], jPanelExtruder);
+
 					}
 				}		
 				
 				if(odd)
 				{
 					jPanelExtruder.add(keys[keys.length - 1]);
-					jPanelExtruder.add(values[keys.length - 1]);
+					jPanelExtruder.add(values[keys.length - 1].getObject());
 					jPanelExtruder.add(new JLabel());
 					jPanelExtruder.add(new JLabel());
 				}
@@ -368,14 +403,19 @@ public class Preferences extends JFrame {
 	 * @param a
 	 * @return
 	 */
-	private JTextField[] makeValues(JLabel[] a)
+	private PreferencesValue[] makeValues(JLabel[] a)
 	{
-		JTextField[] result = new JTextField[a.length];
+		PreferencesValue[] result = new PreferencesValue[a.length];
+		String value;
 		for(int i = 0; i < a.length; i++)
 		{
 			try{
-				result[i] = new JTextField();
-				result[i].setText(loadString(a[i].getText()));
+				value = loadString(a[i].getText());
+				
+				result[i] = new PreferencesValue(new JTextField());
+				result[i].setText(value);
+				
+				
 			} catch (Exception ex)
 			{
 				ex.printStackTrace();
@@ -462,7 +502,7 @@ public class Preferences extends JFrame {
 	 * @param a
 	 * @return
 	 */
-	private Category[] categorise(JTextField[] a)
+	private Category[] categorise(PreferencesValue[] a)
 	{
 		Category[] result = new Category[a.length];
 		for(int i = 0; i < a.length; i++)
@@ -471,3 +511,7 @@ public class Preferences extends JFrame {
 		return result;
 	}
 }
+
+
+
+
