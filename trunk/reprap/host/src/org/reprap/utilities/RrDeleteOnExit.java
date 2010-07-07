@@ -35,7 +35,7 @@ public class RrDeleteOnExit
 	
 	protected void finalize() throws Throwable
 	{
-		Debug.d("RrDel finalise()");
+		Debug.d("RrDeleteOnExit.finalise()");
 		killThem();
 	}
 }

@@ -1200,6 +1200,11 @@ public class BooleanGrid
 		return visited.get(pixI(p));
 	}
 	
+	public long pixelCount()
+	{
+		return bits.cardinality();
+	}
+	
 	/**
 	 * Generate the entire image from a CSG experession recursively
 	 * using a quad tree.
