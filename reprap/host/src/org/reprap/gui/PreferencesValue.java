@@ -61,6 +61,19 @@ public class PreferencesValue {
 			else
 				return "false";
 		}
+		
+		public void setValue(boolean boolvalue)
+		{
+			if(boolvalue == true)
+				trueButton.setSelected(true); 
+			else
+				trueButton.setSelected(false); 
+			
+			if(boolvalue == false)
+				falseButton.setSelected(true);
+			else
+				falseButton.setSelected(false);
+		}
 	}
 
 	
@@ -89,6 +102,8 @@ public class PreferencesValue {
 	{
 		if(textfieldValue != null)
 			textfieldValue.setText(str);
+		if(boolchoiceValue != null)
+			boolchoiceValue.setValue(getBoolFromString(str));
 	}
 	
 	public Component getObject()
