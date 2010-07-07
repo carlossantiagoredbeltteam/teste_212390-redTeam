@@ -22,7 +22,7 @@ import org.reprap.utilities.Debug;
  */
 public class Preferences {
 	
-	private static final String propsFile = "reprap.properties";
+	private static String propsFile = "reprap.properties";
 	private static final String propsFolder = ".reprap";
 	private static final String propsFileDist = "reprap.properties.dist";
 	
@@ -218,6 +218,21 @@ public class Preferences {
 		return false;
 	}
 
+	public static boolean loadConfig(String configName)
+	{
+		propsFile = configName;
+	
+		try
+		{
+			globalPrefs = new Preferences();
+			return true;
+		}
+		catch(IOException e)
+		{
+			return false;
+		}
+		
+	}
 	synchronized private static void initIfNeeded() throws IOException {
 		if (globalPrefs == null)
 			globalPrefs = new Preferences();
@@ -252,7 +267,18 @@ public class Preferences {
 		initIfNeeded();
 		return globalPrefs;
 	}
-
+	
+	public static String getProbsFolderPath()
+	{
+		String path;
+		path = System.getProperty("user.home") + File.separatorChar + 	propsFolder + File.separatorChar;
+		return path;
+	}
+	
+	public static String getPropsFile()
+	{
+		return propsFile;
+	}
 	/**
 	 * Set a new value
 	 * @param name

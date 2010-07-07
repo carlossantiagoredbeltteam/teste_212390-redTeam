@@ -3,6 +3,7 @@ package org.reprap.gui;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.GridLayout;
+import java.io.File;
 import java.io.IOException;
 import java.lang.System;
 import java.util.Arrays;
@@ -17,7 +18,11 @@ import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
-
+import javax.swing.JComboBox;
+import javax.swing.Box;
+import java.awt.Button;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * This reads in the preferences file and constructs a set of menus from it to allow entries
@@ -84,6 +89,31 @@ public class Preferences extends JFrame {
 	 */	
 	private void saveString(String name, String value) throws IOException {
 		org.reprap.Preferences.setGlobalString(name, value);
+	}
+	
+
+	public void updatePreferencesValues() {
+		try {
+			
+					
+			for(int i = 0; i < globals.length; i++)
+			{
+				globalValues[i].setText(loadString(globals[i].getText()));
+			}
+			
+			for(int j = 0; j < extruderCount; j++)
+			{
+	
+				JLabel[] enames = extruders[j];
+				for(int i = 0; i < enames.length; i++)
+					extruderValues[j][i].setText(loadString(enames[i].getText()));
+			}
+				
+				
+			} catch (Exception ex) {
+			JOptionPane.showMessageDialog(null, "Updating preferences: " + ex);
+			ex.printStackTrace();
+		}
 	}
 	
 	/**
@@ -244,15 +274,124 @@ public class Preferences extends JFrame {
 		// Put it all together
 
 		try {
+			
+			// combobox with buttons for selecting config files
+			
+			JPanel panel  = new JPanel();
+			String[] configfiles =  { "reprap.properties" };
+			
+			File dir = new File( org.reprap.Preferences.getProbsFolderPath()); 
+			
+			if (dir.list() != null)
+			{
+				configfiles = dir.list();
+				for (int i=0; i<configfiles.length; i++) 
+				{
+					if(configfiles[i].indexOf(".properties") != -1)
+						configfiles[i] = configfiles[i].substring(0, configfiles[i].indexOf(".properties"));
+				}	
+			} 
+			
+					
+		
+			final JComboBox configfileList = new JComboBox(configfiles);
+			configfileList.setEditable(true);
+			
+			String configName = org.reprap.Preferences.getPropsFile();
+			configName = configName.substring(0, configName.indexOf(".properties"));
+    		configfileList.setSelectedItem(configName);
+    		
+    		configfileList.addActionListener(new ActionListener() 
+			 {
+	               
+	            public void actionPerformed(ActionEvent e)
+	            {
+	            	
+	            	if ("comboBoxChanged".equals(e.getActionCommand())) 
+	            	{
+		            	String configName = (String)configfileList.getSelectedItem() + ".properties";
+		            	String configPath = org.reprap.Preferences.getProbsFolderPath() + configName;
+		            	if((new File(configPath)).exists())
+		            	{
+		            		System.out.println("loading config " + configName);
+		            		org.reprap.Preferences.loadConfig(configName);		
+		            		updatePreferencesValues();
+		            		
+		            	}
+		           
+	            	}
+	            }
+	     }); 
+			
+			
+			panel.add(new JLabel("config file:"));
+			
+			
+			Button prefCreateButton = new Button("create");
+			prefCreateButton.addActionListener(new ActionListener() 
+			 {
+				 public void actionPerformed(ActionEvent e)
+		         {
+					
+					String configName = (String)configfileList.getSelectedItem() + ".properties";
+					String configPath = org.reprap.Preferences.getProbsFolderPath() + configName;
+					File configFileObj = new File(configPath);
+					
+					if(!configFileObj.exists())
+	            	{
+						configfileList.addItem(configfileList.getSelectedItem());
+						System.out.println("loading config " + configName);
+						org.reprap.Preferences.loadConfig(configName);	
+						updatePreferencesValues();
+		         
+	            	}
+		         }
+			 });
+			
+			Button prefDeleteButton = new Button("delete");
+			prefDeleteButton.addActionListener(new ActionListener() 
+			 {
+	               
+		            public void actionPerformed(ActionEvent e)
+		            {
+		            	
+		            	String configName = (String)configfileList.getSelectedItem() + ".properties";
+		            	if(!configName.equals("reprap.properties"))
+		            	{
+			            	String configPath = org.reprap.Preferences.getProbsFolderPath() + configName;
+			            	File configFileObj = new File(configPath);
+			            	if(configFileObj.exists())
+			            	{
+			            		configFileObj.delete();
+			            		configfileList.removeItem(configfileList.getSelectedItem());
+			            		updatePreferencesValues();
+			            	}
+			            	else
+			            	{
+			            		
+			            		configName = org.reprap.Preferences.getPropsFile();
+			            		configName = configName.substring(0, configName.indexOf(".properties"));
+			            		
+			            		configfileList.setSelectedItem(configName);
+			            	}
+		            
+		            	}
+		            }
+		     }); 
+			
+			panel.add(configfileList);
+			panel.add(prefCreateButton);
+			panel.add(prefDeleteButton);
 
 			// We'll have a tab for the globals, then one 
 			// for each extruder
 
+			Box prefDiffBox = new Box(1);
 			JTabbedPane jTabbedPane1 = new JTabbedPane();
-			add(jTabbedPane1);
-
+			prefDiffBox.add(panel);
+			prefDiffBox.add(jTabbedPane1);
+			add(prefDiffBox);
 			
-
 			// Do the global panel
 
 			JPanel jPanelGeneral = new JPanel();
