@@ -25,6 +25,11 @@ public abstract class GenericRepRap implements CartesianPrinter
 	protected boolean stlLoaded = false;
 	protected boolean gcodeLoaded = false;
 	
+	/**
+	 * Force an extruder to be selected on startup
+	 */
+	Boolean forceSelection;
+	
 	//protected boolean accelerating;
 	
 	protected boolean XYEAtZero;
@@ -192,6 +197,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		startTime = System.currentTimeMillis();
 		startCooling = -1;
 		statusWindow = new StatusMessage(new JFrame());
+		forceSelection = true;
 		
 		//load extruder prefs
 		int extruderCount = Preferences.loadGlobalInt("NumberOfExtruders");
@@ -1353,5 +1359,10 @@ public abstract class GenericRepRap implements CartesianPrinter
 	public double getBedTemperatureTarget()
 	{
 		return bedTemperatureTarget;
+	}
+	
+	public void forceNextExtruder()
+	{
+		forceSelection = true;
 	}
 }

@@ -34,11 +34,6 @@ public class GCodeRepRap extends GenericRepRap {
 	GCodeReaderAndWriter gcode;
 	
 	/**
-	 * Force an extruder to be selected on startup
-	 */
-	Boolean forceSelection;
-	
-	/**
 	 * @param prefs
 	 * @throws Exception
 	 */
