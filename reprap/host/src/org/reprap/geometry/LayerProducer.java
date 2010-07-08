@@ -542,6 +542,8 @@ public class LayerProducer {
 			return;
 		}	
 		
+		if(firstOneInLayer)
+			printer.forceNextExtruder();
 		printer.selectExtruder(att);
 		
 // Don't do these with mid-point starting

@@ -260,6 +260,12 @@ public interface Printer {
 	 * @param z
 	 */
 	public void setTop(double x, double y, double z);
+	
+	/**
+	 * The next time an extruder is changed, force the change to be
+	 * sent to the RepRap, even if it's changed to the same as it just was.
+	 */
+	public void forceNextExtruder();
 
 	/**
 	 * @return the extruder currently in use
