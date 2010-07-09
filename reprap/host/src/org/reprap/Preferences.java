@@ -112,7 +112,7 @@ public class Preferences {
 	}
 	
 	/**
-	 * Compare the users preferences with the distribution one and report any
+	 * Compare the user's preferences with the distribution one and report any
 	 * different names.
 	 */
 	private void comparePreferences()
