@@ -43,7 +43,6 @@ import java.awt.event.ActionListener;
  * Extensively adapted from Simon's old version by Adrian to construct itself from
  * the preferences file.
  * 
- * TODO: make booleans use check boxes or radio buttons, not "true" or "false".
  */
 
 //Boxes must contain one of three types:
