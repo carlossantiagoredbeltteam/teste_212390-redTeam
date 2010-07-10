@@ -323,7 +323,7 @@ public class Preferences extends JFrame {
 	     }); 
 			
 			
-			panel.add(new JLabel("config file:"));
+			panel.add(new JLabel("preferences file:"));
 			
 			
 			Button prefCreateButton = new Button("create");
