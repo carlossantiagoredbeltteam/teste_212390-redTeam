@@ -254,11 +254,13 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 	//private java.util.List<STLObject> stls = new ArrayList<STLObject>(); // All the STLObjects to be built
 	private AllSTLsToBuild stls;
 	//private int objectIndex = 0; // Counter for STLs as they are loaded
+	private boolean reordering;
 
 	// Constructors
 	public RepRapBuild() throws Exception {
 		initialise();
 		stls = new AllSTLsToBuild();
+		reordering = false;
 	}
 	
 	public AllSTLsToBuild getSTLs()
@@ -372,15 +374,18 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 					//picked = findSTL(name);
 					if (picked != null) {
 						picked.setAppearance(picked_app); // Highlight it
-						if (lastPicked != null)
+						if (lastPicked != null  && !reordering)
 							lastPicked.restoreAppearance(); // lowlight
 						// the last
 						// one
-						mouse.move(picked, true); // Set the mouse to move it
+						if(!reordering)
+							mouse.move(picked, true); // Set the mouse to move it
 						lastPicked = picked; // Remember it
+						reorder();
 					}
 				} else { // Picked the working volume - deselect all and...
-					mouseToWorld();
+					if(!reordering)
+						mouseToWorld();
 				}
 			}
 		}
@@ -535,6 +540,33 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 			lastPicked.inToMM();
 	}
 	
+	public void doReorder()
+	{
+		if (lastPicked != null)
+		{
+			lastPicked.restoreAppearance();
+			mouseToWorld();
+			lastPicked = null;
+		}
+		reordering = true;
+	}
+	
+	/**
+	 * User is reordering the list
+	 */
+	private void reorder()
+	{
+		if(!reordering)
+			return;
+		if(stls.reorderAdd(lastPicked))
+			return;
+		for(int i = 0; i < stls.size(); i++)
+			stls.get(i).restoreAppearance();
+		//mouseToWorld();		
+		lastPicked = null;
+		reordering = false;
+	}
+	
 	// Move to the next one in the list
 	
 	public void nextPicked()
@@ -545,7 +577,6 @@ public class RepRapBuild extends Panel3D implements MouseListener {
 		lastPicked = stls.getNextOne(lastPicked);
 		lastPicked.setAppearance(picked_app);
 		mouse.move(lastPicked, true);
-		
 	}
 	
 //	public void materialSTL()
