@@ -209,6 +209,11 @@ public class AllSTLsToBuild
 	private List<RrRectangle> rectangles;
 	
 	/**
+	 * New list of things to be built for reordering
+	 */
+	private List<STLObject> newstls;
+	
+	/**
 	 * The XYZ box around everything
 	 */
 	//private RrRectangle XYbox;
@@ -237,6 +242,7 @@ public class AllSTLsToBuild
 	{
 		stls = new ArrayList<STLObject>();
 		rectangles = null;
+		newstls = null;
 		XYZbox = null;
 		Zrange = null;
 		frozen = false;
@@ -288,16 +294,16 @@ public class AllSTLsToBuild
 	}
 	
 	/**
-	 * Find an object in the list and return the next one.
+	 * Find an object in the list
 	 * @param st
 	 * @return
 	 */
-	public STLObject getNextOne(STLObject st)
+	private int findSTL(STLObject st)
 	{
 		if(size() <= 0)
 		{
 			Debug.e("AllSTLsToBuild.getNextOne(): no objects to pick from!");
-			return null;			
+			return -1;			
 		}
 		int index = -1;
 		for(int i = 0; i < size(); i++)
@@ -309,8 +315,19 @@ public class AllSTLsToBuild
 		if(index < 0)
 		{
 			Debug.e("AllSTLsToBuild.getNextOne(): dud object submitted.");
-			return get(0);
+			return -1;
 		}
+		return index;
+	}
+	
+	/**
+	 * Find an object in the list and return the next one.
+	 * @param st
+	 * @return
+	 */
+	public STLObject getNextOne(STLObject st)
+	{
+		int index = findSTL(st);
 		index++;
 		if(index >= size())
 			index = 0;
@@ -324,6 +341,41 @@ public class AllSTLsToBuild
 	public int size()
 	{
 		return stls.size();
+	}
+	
+	/**
+	 * Reorder the list under user control.  The user sends items from the
+	 * old list one by one.  These are added to a new list in that order.  
+	 * When there's only one left that is added last automatically.
+	 * 
+	 * Needless to say, this process must be carried through to completion.
+	 * The function returns true while the process is ongoing, false when
+	 * it's complete.
+	 * 
+	 * @param st
+	 * @return
+	 */
+	public boolean reorderAdd(STLObject st)
+	{
+		if(frozen)
+			Debug.d("AllSTLsToBuild.remove(): attempting to reorder a frozen list.");
+		
+		if(newstls == null)
+			newstls = new ArrayList<STLObject>();
+		
+		int index = findSTL(st);
+		newstls.add(get(index));
+		stls.remove(index);
+		
+		if(stls.size() > 1)
+			return true;
+		
+		newstls.add(get(0));
+		stls = newstls;
+		newstls = null;
+		cache = null;  // Just in case...
+		
+		return false;
 	}
 	
 	/**

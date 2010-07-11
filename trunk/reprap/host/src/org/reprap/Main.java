@@ -221,6 +221,14 @@ public class Main {
 			}});
         manipMenu.add(nextP);
         
+        JMenuItem reorder = new JMenuItem("Reorder the building sequence", KeyEvent.VK_R);
+        reorder.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.CTRL_MASK));
+        reorder.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				onReorder();
+			}});
+        manipMenu.add(reorder);
+        
         
         JMenuItem deleteSTLW = new JMenuItem("Delete selected object", KeyEvent.VK_W);
         deleteSTLW.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.CTRL_MASK));
@@ -619,6 +627,11 @@ public class Main {
     private void onNextPicked()
     {
     	builder.nextPicked();
+    }
+    
+    private void onReorder()
+    {
+    	builder.doReorder();
     }
     
 //    private void onMaterial() {
