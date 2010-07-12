@@ -1620,39 +1620,39 @@ public class BooleanGrid
 		return op;		
 	}
 	
-	/**
-	 * Recursive flood-fill search of solid pixels p and its neighbours to find an
-	 * unvisited edge pixel.
-	 * @param p
-	 * @param depth
-	 * @return
-	 */
-	private iPoint searchNearby(iPoint p, int depth)
-	{
-		//System.out.println("point: " + p.toString() + ", depth: " + depth +
-		//		", edge:" + isSloppyEdgePixel(p) + ", vis: " + vGet(p) + ", solid: " + get(p));
-		if(depth > searchDepth)
-			return null;
-		if(!vGet(p) || depth == 0)
-		{
-			if(isEdgePixel(p) && depth > 0)
-				return p;
-
-			if(get(p))
-			{
-				vSet(p, true);
-				for(int i = 0; i < 8; i++)
-				{
-					iPoint q = p.add(neighbour[i]);
-					iPoint r = searchNearby(q, depth + 1);
-					if(r != null)
-						return r;
-				}
-			}
-		}
-
-		return null;
-	}
+//	/**
+//	 * Recursive flood-fill search of solid pixels p and its neighbours to find an
+//	 * unvisited edge pixel.
+//	 * @param p
+//	 * @param depth
+//	 * @return
+//	 */
+//	private iPoint searchNearby(iPoint p, int depth)
+//	{
+//		//System.out.println("point: " + p.toString() + ", depth: " + depth +
+//		//		", edge:" + isSloppyEdgePixel(p) + ", vis: " + vGet(p) + ", solid: " + get(p));
+//		if(depth > searchDepth)
+//			return null;
+//		if(!vGet(p) || depth == 0)
+//		{
+//			if(isEdgePixel(p) && depth > 0)
+//				return p;
+//
+//			if(get(p))
+//			{
+//				vSet(p, true);
+//				for(int i = 0; i < 8; i++)
+//				{
+//					iPoint q = p.add(neighbour[i]);
+//					iPoint r = searchNearby(q, depth + 1);
+//					if(r != null)
+//						return r;
+//				}
+//			}
+//		}
+//
+//		return null;
+//	}
 	
 	/**
 	 * Calculate the 4-bit marching squares value for a point
@@ -2515,7 +2515,7 @@ public class BooleanGrid
 				result.disc(p1, Math.abs(r), r > 0);
 			}
 		}
-		if(dist < 0)
+		//if(dist < 0)
 			result.deWhisker();
 		return result;
 	}
@@ -2582,7 +2582,7 @@ public class BooleanGrid
 			BooleanGrid temp = new BooleanGrid(e, u);
 			result.bits.or(temp.bits);
 		}
-		//result.deWhisker();
+		result.deWhisker();  //Was commented out
 		result.forceAttribute(a);
 		return result;
 	}
