@@ -1373,29 +1373,29 @@ public class BooleanGrid
 	 * @param start
 	 * @return
 	 */
-	private int findUnvisitedEdgeIndex(int start)
-	{
-//		if(visited == null)
+//	private int findUnvisitedEdgeIndex(int start)
+//	{
+////		if(visited == null)
+////		{
+////			int i = bits.nextSetBit(start);
+////			if(i < 0)
+////				return -1;
+////			return i;
+////		}
+//
+//		for(int i=bits.nextSetBit(start); i>=0; i=bits.nextSetBit(i+1)) 
 //		{
-//			int i = bits.nextSetBit(start);
-//			if(i < 0)
-//				return -1;
-//			return i;
+//			if(visited == null)
+//			{
+//				if(isEdgePixel(pixel(i)))
+//					return i;
+//			} else
+//			if(!visited.get(i))
+//				if(isEdgePixel(pixel(i)))
+//					return i;
 //		}
-
-		for(int i=bits.nextSetBit(start); i>=0; i=bits.nextSetBit(i+1)) 
-		{
-			if(visited == null)
-			{
-				if(isEdgePixel(pixel(i)))
-					return i;
-			} else
-			if(!visited.get(i))
-				if(isEdgePixel(pixel(i)))
-					return i;
-		}
-		return -1;		
-	}
+//		return -1;		
+//	}
 	
 
 	/**
@@ -1406,6 +1406,13 @@ public class BooleanGrid
 	private void deWhisker()
 	{
 		push("deWhisker... ");
+		
+		for(int i=bits.nextSetBit(0); i>=0; i=bits.nextSetBit(i+1)) 
+		{
+			iPoint here = pixel(i);
+			if(neighbourCount(here) < 3)
+				set(here, false);
+		}
 		
 		for(int x = 0; x < rec.size.x - 1; x++)
 			for(int y = 0; y < rec.size.y - 1; y++)
@@ -1524,7 +1531,7 @@ public class BooleanGrid
 	 */
 	private int directionToNeighbour(Rr2Point p)
 	{
-		double score = Double.MIN_VALUE;
+		double score = Double.NEGATIVE_INFINITY;
 		int result = -1;
 
 		for(int i = 0; i < 8; i++)
@@ -2170,6 +2177,11 @@ public class BooleanGrid
     	iPolygon track = new iPolygon(false);
     	
     	iPoint diff = end.sub(start);
+    	if(diff.x == 0 && diff.y == 0)
+    	{
+    		track.add(start);
+    		return track;
+    	}
 
     	int dir = directionToNeighbour(new Rr2Point(diff.x, diff.y));
 
@@ -2582,7 +2594,7 @@ public class BooleanGrid
 			BooleanGrid temp = new BooleanGrid(e, u);
 			result.bits.or(temp.bits);
 		}
-		result.deWhisker();  //Was commented out
+		//result.deWhisker();
 		result.forceAttribute(a);
 		return result;
 	}
