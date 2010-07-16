@@ -935,45 +935,48 @@ public class RrPolygonList
 		{
 			RrPolygon outline = polygon(i);
 			Extruder ex = outline.getAttributes().getExtruder();
-			RrLine l = lc.getHatchDirection(ex).pLine();
-			if(i%2 != 0 ^ lc.getMachineLayer()%4 > 1)
-				l = l.neg();
-			outline = outline.newStart(outline.maximalVertex(l));
-
-			Rr2Point start = outline.point(0);
-			PolPoint pp = hatching.ppSearch(start);
-			if(pp != null)
+			if(ex.getMiddleStart())
 			{
-				pp.findLongEnough(10, 30);
+				RrLine l = lc.getHatchDirection(ex).pLine();
+				if(i%2 != 0 ^ lc.getMachineLayer()%4 > 1)
+					l = l.neg();
+				outline = outline.newStart(outline.maximalVertex(l));
 
-				int st = pp.near();
-				int en = pp.end();
-
-				RrPolygon pg = pp.polygon();
-
-				outline.add(start);
-
-				if(en >= st)
+				Rr2Point start = outline.point(0);
+				PolPoint pp = hatching.ppSearch(start);
+				if(pp != null)
 				{
-					for(int j = st; j <= en; j++)
+					pp.findLongEnough(10, 30);
+
+					int st = pp.near();
+					int en = pp.end();
+
+					RrPolygon pg = pp.polygon();
+
+					outline.add(start);
+
+					if(en >= st)
 					{
-						outline.add(0, pg.point(j));  // Put it on the beginning...
-						//if(j < en)
-						//	outline.add(pg.point(j));     // ...and the end.
-					}
-				} else
-				{
-					for(int j = st; j >= en; j--)
+						for(int j = st; j <= en; j++)
+						{
+							outline.add(0, pg.point(j));  // Put it on the beginning...
+							//if(j < en)
+							//	outline.add(pg.point(j));     // ...and the end.
+						}
+					} else
 					{
-						outline.add(0, pg.point(j));
-						//if(j > en)
-						//	outline.add(pg.point(j));
+						for(int j = st; j >= en; j--)
+						{
+							outline.add(0, pg.point(j));
+							//if(j > en)
+							//	outline.add(pg.point(j));
+						}
 					}
+
+					set(i, outline);
+
+					hatching.cutPolygon(pp.pIndex(), st, en);
 				}
-
-				set(i, outline);
-
-				hatching.cutPolygon(pp.pIndex(), st, en);
 			}
 		}
 	}

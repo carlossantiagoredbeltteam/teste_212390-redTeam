@@ -372,6 +372,13 @@ public interface Extruder
     public boolean incrementedStart();
     
     /**
+     * If this is true, plot outlines from the middle of their infilling hatch to reduce dribble at
+     * their starts and ends.  If false, plot the outline as the outline.
+     * @return
+     */
+    public boolean getMiddleStart();
+    
+    /**
      * get short lengths which need to be plotted faster
      * set -ve to turn this off.
      * @return

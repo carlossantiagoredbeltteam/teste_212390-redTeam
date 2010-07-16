@@ -347,6 +347,8 @@ public abstract class GenericExtruder implements Extruder
 	
 	protected double extrudeRatio = 1;
 	
+	protected boolean middleStart;
+	
 	/**
 	* Our printer object.
 	*/
@@ -413,6 +415,7 @@ public abstract class GenericExtruder implements Extruder
 			fastEFeedrate = Preferences.loadGlobalDouble(prefName + "FastEFeedrate(mm/minute)");
 			slowXYFeedrate = Preferences.loadGlobalDouble(prefName + "SlowXYFeedrate(mm/minute)");
 			maxAcceleration = Preferences.loadGlobalDouble(prefName + "MaxAcceleration(mm/minute/minute)");
+			middleStart = Preferences.loadGlobalBool(prefName + "MiddleStart");
 			t0 = Preferences.loadGlobalInt(prefName + "t0(0..255)");
 			iSpeed = Preferences.loadGlobalDouble(prefName + "InfillSpeed(0..1)");
 			oSpeed = Preferences.loadGlobalDouble(prefName + "OutlineSpeed(0..1)");
@@ -1326,6 +1329,16 @@ public abstract class GenericExtruder implements Extruder
     public double getPurgeTime()
     {
     	return purgeTime;
+    }
+    
+    /**
+     * If this is true, plot outlines from the middle of their infilling hatch to reduce dribble at
+     * their starts and ends.  If false, plot the outline as the outline.
+     * @return
+     */
+    public boolean getMiddleStart()
+    {
+    	return middleStart;
     }
     
 }
