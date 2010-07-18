@@ -729,7 +729,6 @@ public class AllSTLsToBuild
 		
 		int layer = layerConditions.getMachineLayer();
 		BooleanGridList slice = slice(stl, layerConditions.getModelLayer(), layerConditions);
-
 		// If we are solid but the slices around us weren't, we need some fine infill as
 		// we are (at least partly) surface
 		
@@ -750,14 +749,13 @@ public class AllSTLsToBuild
 			insides = BooleanGridList.intersections(slice, adjacentSlices);
 			outsides = BooleanGridList.differences(slice, adjacentSlices);
 			outsides = outsides.offset(layerConditions, false, -1);
-			outsides = BooleanGridList.intersections(outsides, slice);
+			outsides = BooleanGridList.intersections(outsides, slice);				
 		}
 			
 		outsides = outsides.offset(layerConditions, false, 1);
 		
 		if(insides != null)
 			insides = insides.offset(layerConditions, false, 1);
-		
 		RrPolygonList hatchedPolygons = outsides.hatch(layerConditions, true); //, startNearHere);
 //		if(hatchedPolygons.size() > 0)
 //		{

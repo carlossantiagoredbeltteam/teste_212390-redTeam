@@ -244,6 +244,9 @@ public class BooleanGridList
 					result.add(union);
 				}
 			}
+			
+			if(!usedUp[size() - 1])
+				result.add(get(size() - 1));
 
 			return result;
 		}
