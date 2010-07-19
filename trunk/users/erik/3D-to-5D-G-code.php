@@ -22,6 +22,7 @@
  * 0.17Erik             28/12/09        Feature: can perform a search for the input file in varous directories
  * 0.18Erik             09/01/10        Feature: can rescale and offset g-code
  * 0.19Erik             28/02/10        Feature: can put the output on an SD card and safely unmounts it.
+ * 0.20Erik             19/07/10        Feature: preliminary functionality for multiple extruders and device profiles.
 
 Upcoming:
  * ... Erik             28/12/09        Feature: can remove the raft if --noraft is set
@@ -29,14 +30,14 @@ Upcoming:
  */
 ini_set('memory_limit','128M');
 
-$version = 0.19;
+$version = 0.20;
 out("\n( Modified by 3D-to-5D-Gcode v$version on ".date("c").')');
 $uTime=microtime(true);
 // Settings:
 
-$setting['prepend_gcode'] = "G1 E50 F2000\nG1 Z0.3 F80\n";  	// begin with this Gcode
+$setting['prepend_gcode'] = "G1 E250 F6000\nG1 Z0.3 F140\n";  	// begin with this Gcode
 //$setting['append_gcode'] = "G91\nG1 Z4 F40\nG90\nM104 S200";  // add this Gcode at the end
-$setting['append_gcode'] = "G91\nG1 Z4 F40\nG90\nM104 S150";  // add this Gcode at the end
+$setting['append_gcode'] = "G91\nG1 Z4 F140\nG90\nM104 S150";  // add this Gcode at the end
 $setting['extrusion_adjust'] = 1.5;  		// factor to adjust extruded distances with
 //$setting['extruder_backlash_fwd']=402.0;	// manages tension in the Bowden extruder or for other more flexible material feedstock. Extrusion adjust NOT factored in.
 //$setting['extruder_backlash_rev']=400.0;	// The amount to pull it back (see prev, comment)
@@ -52,6 +53,8 @@ $setting['replace_strings'] = array(
 	//'F330.0'=>'F430.0', // moderately speed up the raft-making
 );  // 
 $setting['accelerated_travel'] = false; 		//false = off, 1.0 is base speed, 2.0 is two times faster.
+$setting['repeat_M103-M101'] = false; 		// a workaround for BfB v3.1 beta firmware
+$setting['switch_extruders'] = false; 		// replace M101 with M201 and vice versa
 $setting['accelerated_travel_mindist'] = 7; 	// the minimum distance in milimeters
 $setting['accelerated_travel_segments'] = 7;    // should always be an ODD number! 
 
@@ -82,6 +85,7 @@ $setting['actions'] = array(
 $setting['machine'] = 'charles';
 $setting['extension'] = 'gcode';
 $setting['add_E_codes'] = true;
+$setting['F_max'] = 6000;
 $setting['remove_comments'] = true;  // Set true/false to remove comments from input file or not.
 $setting['remove_M108s'] = true;
 $setting['scale'] = 1;
@@ -127,33 +131,46 @@ if(isset($setting['machine']) && ($setting['machine'] == 'leo'))
 {
   $setting['remove_M101-M103'] = false;
 
-  $setting['prepend_gcode'] = "G90\nG21\nM108 S10.0\n";
+  $setting['prepend_gcode'] = "G90\nG21\nM108 S10.0\nM227 S1000 P800\n";
 //\n";// HOME: "G28\n";
 //M227 S1000 P800 on extruder stop (M103) reverse the extruder stepper for S turns and on extruder start (M101) prepare (push) filament P steps (available from firmware 1.0.8)
   #$setting['extrusion_adjust'] = 0.13;
   $setting['add_E_codes'] = false;
   $setting['scale'] = array();
-  $setting['scale']['X'] = 0.77;
-  $setting['scale']['Y'] = 0.77;
-  $setting['scale']['Z'] = 1.0;
-  $setting['scale']['F'] = 0.77;
-  $setting['offset_x'] = 40;
-  $setting['offset_y'] = -30;
+  #$setting['scale']['X'] = 0.77;
+  #$setting['scale']['Y'] = 0.77;
+  #$setting['scale']['Z'] = 1.0;
+  #$setting['scale']['F'] = 0.77;
+  #$setting['offset_x'] = 120;
+  #$setting['offset_y'] = -60;
+  $setting['F_max'] = 1900; //maximum feedrate
   $setting['extension']='bfb';
   $setting['output_file'] = str_replace('.gcode','.bfb',$setting['output_file']);
   $setting['remove_redundant_Gcodes'] = false;
   $setting['remove_M108s'] = false;
-  $setting['M108factor'] = 0.10;
-  $sd_mounted = glob("/media/disk*/RR_SD");
-  if($nr_SDs = count($sd_mounted))
-    {
-      if($nr_SDs > 1)
-      {
-        echo "Multiple ($nr_SDs) SD cards found. Please mount only one at a time...";
-      }
-      $setting['sd_mount'] = dirname($sd_mounted[0]);
-      echo "Notice: SD mounted on ".dirname($setting['sd_mount'])."\n";
-    }
+  $setting['M108factor'] = 0.14;
+  init_sd(&$setting);
+}
+if(isset($setting['machine']) && ($setting['machine'] == 'mini'))
+{
+  $setting['scale']=array();
+  $setting['scale']['X'] = 0.9;
+  $setting['scale']['Y'] = 0.9;
+  $setting['scale']['Z'] = 2.5; // 8 teeth / 20 teeth = 0.4
+  $setting['scale']['F'] = 1.30;
+  $setting['offset_x'] = -180;
+  $setting['offset_y'] = 150;
+
+  $setting['remove_M101-M103'] = false;
+  $setting['prepend_gcode'] = "G90\nG21\nG28\nM221\nM225\nM108 S11.0\n";//\nM227 S1000 P800
+  $setting['extension']='bfb';
+  $setting['output_file'] = str_replace('.gcode','.bfb',$setting['output_file']);
+  $setting['remove_redundant_Gcodes'] = false;
+  $setting['remove_M108s'] = false;
+  $setting['M108factor'] = 0.15;
+  $setting['repeat_M103-M101'] = true;  // a workaround for BfB v3.1 beta firmware
+  $setting['switch_extruders'] = true; // replace M101 with M201 and vice versa
+  init_sd(&$setting);
 }
 if(isset($setting['scale'])&&(!is_array($setting['scale']))) // doesn't scale Z by default
 {
@@ -213,8 +230,6 @@ $line_count = count($lines);
 $line_nr=0;
 
 out($setting['prepend_gcode']);
-out("\nG92 E0 \n");
-//out("\nG92 E0 ( reset extruder home pos)\n");
 
 foreach($lines as $line)
 {
@@ -270,7 +285,11 @@ foreach($lines as $line)
   if(isset($setting['scale']['Z']))
     $line = str_replace("Z$Z","Z".($Z*$setting['scale']['Z']),$line);
   if(isset($setting['scale']['F']))
-    $line = str_replace("F$F","F".($F*$setting['scale']['F']),$line);
+  {
+    $F_replace = $F*$setting['scale']['F'];
+    if($F_replace > $setting['F_max']) $F_replace = $setting['F_max'];
+    $line = str_replace("F$F","F".$F_replace,$line);
+  }
 
   if(ereg("M[ ]*10([123])",$line,$regs))
   {
@@ -337,11 +356,22 @@ foreach($lines as $line)
     }
     //$comment .= " dir $dir";
     //out("(".trim($line).")\n");
-    if($setting['remove_M101-M103']==false)
+    if(($setting['remove_M101-M103']==false) && ($setting['repeat_M103-M101']!=true))
       out("$line");
     continue; // Assuming that M codes are always on a single line... skip this
     
   }
+  if($setting['repeat_M103-M101']==true) // BfB bug workaround
+  {
+    if($dir == 1)
+      #out("M103\nM101\n");
+      {
+        $line = str_replace("\n","\nM103\nM101\n",$line);
+        #$line = str_replace("\n","\nM103\nM101\n",$line);
+      }
+  }
+
+
   if(ereg("G[ ]*90",$line))
     $abs = true;
   if(ereg("G[ ]*91",$line))
@@ -586,7 +616,6 @@ G1 X23.5700 Y-18.1700 Z22.75 F126.2727 (smthd)
       } 
     }//end if smooth
   }
-
  
   out($line);
   if($E > 999)
@@ -693,6 +722,12 @@ function out($str,$buffered = 'nochange') // TODO: writer class
     //$str = ereg_replace("([XYZFE]^ *)[0]+ ","\\1 ",$str); // remove unneeded spaces
     //$str = ereg_replace(" +","\t",$str); // remove unneeded spaces
   }
+  if($setting['switch_extruders'])
+  {
+    $str = ereg_replace("M10([12348])","m20\\1",$str);
+    $str = ereg_replace("M20([12348])","M10\\1",$str);
+    $str = ereg_replace("m20([12348])","M20\\1",$str);
+  }
   
   if($setting['output_file'] == null)
   {
@@ -789,5 +824,19 @@ function determine_input_file($fName='')
     if($fName=='') die("\nNo input file found in search paths:\n".print_r($tryFile,true));
   }
   return $fName;
+}
+
+function init_sd($setting)
+{
+  $sd_mounted = glob("/media/disk*/RR_SD");
+  if($nr_SDs = count($sd_mounted))
+    {
+      if($nr_SDs > 1)
+      {
+        echo "Multiple ($nr_SDs) SD cards found. Please mount only one at a time...";
+      }
+      $setting['sd_mount'] = dirname($sd_mounted[0]);
+      echo "Notice: SD mounted on ".dirname($setting['sd_mount'])."\n";
+    }
 }
 ?>
