@@ -3,34 +3,37 @@
 // By Erik de Bruijn <reprap@erikdebruijn.nl>
 // Description: this script will parse a G-Code file and reformat it to work with the newer RepRap G-Code interpreter firmware.
 // Licence: GPLv3 or later
+// Documentation can be found at:
+// http://objects.reprap.org/wiki/3D-to-5D-Gcode.php
+//
 /* Changelog:
- * 0.5 Erik		14/07/09	Software anti-backlash (TODO: differentiate between dynamic and static friction)
- * 0.6 Erik		15/07/09	Output to file --output_file filename.gcode Default: out-5D.gcode
- * 0.7 Erik		19/07/09	Condition based actions (change lines based on a list of criteria).
- * 0.8 Erik		20/07/09	Added start and stop conditions in addition to 'while'.
- * 0.9 Erik		11/08/09	Possibly fixed non-incremental extrusion mode. Needs testing though. Siert, tnx for bug report.
- * 0.10Erik		11/08/09	Several bugfixes. Of course I shouldn't use str_replace this much...
- * 0.11Erik		17/09/09	Bugfix: order of processing improved. Anti-backlash is applied first, then better distances will be measured
- * 0.12Erik		17/09/09	Softener of Z-moves was relative and for EVERY Z move, also those that were already slow. This is not based
+ * 0.5  Erik		14/07/09	Software anti-backlash (TODO: differentiate between dynamic and static friction)
+ * 0.6  Erik		15/07/09	Output to file --output_file filename.gcode Default: out-5D.gcode
+ * 0.7  Erik		19/07/09	Condition based actions (change lines based on a list of criteria).
+ * 0.8  Erik		20/07/09	Added start and stop conditions in addition to 'while'.
+ * 0.9  Erik		11/08/09	Possibly fixed non-incremental extrusion mode. Needs testing though. Siert, tnx for bug report.
+ * 0.10 Erik		11/08/09	Several bugfixes. Of course I shouldn't use str_replace this much...
+ * 0.11 Erik		17/09/09	Bugfix: order of processing improved. Anti-backlash is applied first, then better distances will be measured
+ * 0.12 Erik		17/09/09	Softener of Z-moves was relative and for EVERY Z move, also those that were already slow. This is not based
  *					on the maximum speed the Z-axis should move and if it's high the feedrate is adjusted so that it effectively moves
  *					at this maximum speed along the Z-axis.
- * 0.13Erik		17/09/09	Bugfix: dZ is used absolute for softening. This is what caused towering to go bad, the printhead has to move down 
+ * 0.13 Erik		17/09/09	Bugfix: dZ is used absolute for softening. This is what caused towering to go bad, the printhead has to move down 
  *					(negative Z) but it tends to skip steps when movement speed is not capped to a sensible max.
- * 0.14Erik		17/09/09	Bugfix: minor problem in anti-backlash. Would sometimes match and replace too many values.
- * 0.15Erik		17/09/09	Feature: added anti-ooze system for Bowden extruder. Still experimental, stops pullback after a while, WHY?!
- * 0.16Erik             21/11/09        Feature: status line with progress indication.
- * 0.17Erik             28/12/09        Feature: can perform a search for the input file in varous directories
- * 0.18Erik             09/01/10        Feature: can rescale and offset g-code
- * 0.19Erik             28/02/10        Feature: can put the output on an SD card and safely unmounts it.
- * 0.20Erik             19/07/10        Feature: preliminary functionality for multiple extruders and device profiles.
+ * 0.14 Erik		17/09/09	Bugfix: minor problem in anti-backlash. Would sometimes match and replace too many values.
+ * 0.15 Erik		17/09/09	Feature: added anti-ooze system for Bowden extruder. Still experimental, stops pullback after a while, WHY?!
+ * 0.16 Erik             21/11/09        Feature: status line with progress indication.
+ * 0.17 Erik             28/12/09        Feature: can perform a search for the input file in varous directories
+ * 0.18 Erik             09/01/10        Feature: can rescale and offset g-code
+ * 0.19 Erik             28/02/10        Feature: can put the output on an SD card and safely unmounts it.
+ * 0.20 Erik             19/07/10        Feature: preliminary functionality for multiple extruders and device profiles.
 
 Upcoming:
- * ... Erik             28/12/09        Feature: can remove the raft if --noraft is set
+ * ... Erik             ../../..        Feature: can remove the raft if --noraft is set
 
  */
 ini_set('memory_limit','128M');
 
-$version = 0.20;
+$version = 0.21;
 out("\n( Modified by 3D-to-5D-Gcode v$version on ".date("c").')');
 $uTime=microtime(true);
 // Settings:
