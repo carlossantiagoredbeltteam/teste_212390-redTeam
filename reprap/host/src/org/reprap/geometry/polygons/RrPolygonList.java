@@ -244,12 +244,12 @@ class treeList
 	/**
 	 * Destroy just me
 	 */
-	protected void finalize() throws Throwable
-	{
-		children = null;
-		parent = null;	
-		super.finalize();
-	}
+//	protected void finalize() throws Throwable
+//	{
+//		children = null;
+//		parent = null;	
+//		super.finalize();
+//	}
 	
 	/**
 	 * Constructor builds from a polygon index
@@ -476,12 +476,12 @@ public class RrPolygonList
 	/**
 	 * Destroy just me
 	 */
-	protected void finalize() throws Throwable
-	{
-		polygons = null;
-		box = null;
-		super.finalize();
-	}
+//	protected void finalize() throws Throwable
+//	{
+//		polygons = null;
+//		box = null;
+//		super.finalize();
+//	}
 	
 	/**
 	 * Empty constructor
