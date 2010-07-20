@@ -297,11 +297,11 @@ public class BooleanGrid
 		 */
 		private boolean closed;
 		
-		protected void finalize() throws Throwable
-		{
-			points = null;
-			super.finalize();
-		}
+//		protected void finalize() throws Throwable
+//		{
+//			points = null;
+//			super.finalize();
+//		}
 		
 		public iPolygon(boolean c)
 		{
@@ -502,11 +502,11 @@ public class BooleanGrid
 	{
 		private List<iPolygon> polygons = null;
 		
-		protected void finalize() throws Throwable
-		{
-			polygons = null;
-			super.finalize();
-		}
+//		protected void finalize() throws Throwable
+//		{
+//			polygons = null;
+//			super.finalize();
+//		}
 		
 		public iPolygonList()
 		{
@@ -620,13 +620,13 @@ public class BooleanGrid
 		private int steps, taken;
 		private boolean xPlus, yPlus, finished;
 		
-		protected void finalize() throws Throwable
-		{
-			delta = null;
-			count = null;
-			p = null;
-			super.finalize();
-		}
+//		protected void finalize() throws Throwable
+//		{
+//			delta = null;
+//			count = null;
+//			p = null;
+//			super.finalize();
+//		}
 		
 		/**
 		 * Set up the DDA between a start and an end point
@@ -703,11 +703,11 @@ public class BooleanGrid
 		public iPolygon track;
 		public int hitPlaneIndex;
 		
-		protected void finalize() throws Throwable
-		{
-			track = null;
-			super.finalize();
-		}
+//		protected void finalize() throws Throwable
+//		{
+//			track = null;
+//			super.finalize();
+//		}
 		
 		public SnakeEnd(iPolygon t, int h)
 		{
