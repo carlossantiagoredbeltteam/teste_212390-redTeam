@@ -1803,18 +1803,18 @@ public class BooleanGrid
 		do
 		{
 			m = marchPattern(here);
-			pix = new iPoint(here);
+			//pix = new iPoint(here);
 			switch(m)
 			{
 			case 1:
-				if(!vGet(pix))
+				if(!vGet(here))
 				{
-					result.add(pix);
-					vSet(pix,true);
+					result.add(here);
+					vSet(here,true);
 				}
 				break;
 			case 2:
-				pix = pix.add(neighbour[3]);
+				pix = here.add(neighbour[3]);
 				if(!vGet(pix))
 				{
 					result.add(pix);
@@ -1822,12 +1822,12 @@ public class BooleanGrid
 				}
 				break;
 			case 3:
-				if(!vGet(pix))
+				if(!vGet(here))
 				{
-					result.add(pix);
-					vSet(pix,true);
+					result.add(here);
+					vSet(here,true);
 				}
-				pix = pix.add(neighbour[3]);
+				pix = here.add(neighbour[3]);
 				if(!vGet(pix))
 				{
 					result.add(pix);
@@ -1835,7 +1835,7 @@ public class BooleanGrid
 				}					
 				break;
 			case 4:
-				pix = pix.add(neighbour[1]);
+				pix = here.add(neighbour[1]);
 				if(!vGet(pix))
 				{
 					result.add(pix);
@@ -1843,34 +1843,55 @@ public class BooleanGrid
 				}				
 				break;
 			case 5:
-				pix = pix.add(neighbour[1]);
+				if(!vGet(here))
+				{
+					result.add(here);
+					vSet(here,true);
+				}				
+				pix = here.add(neighbour[1]);
 				if(!vGet(pix))
 				{
 					result.add(pix);
 					vSet(pix,true);
-				}
-				pix = pix.add(neighbour[5]);
-				if(!vGet(pix))
-				{
-					result.add(pix);
-					vSet(pix,true);
-				}					
+				}				
 				break;
 			case 6:
 				Debug.e("BooleanGrid.marchRound() - dud 2x2 grid: " + m + " at " + 
 						here.toString() + "\n" + printNearby(here,4) + "\n\n");
-				if(poll(pix, 3) > 0.5)
-				{
-					pix = pix.add(neighbour[2]);
-					set(pix, true);
-					vSet(pix, false);
-				} else
-				{
-					pix = pix.add(neighbour[1]);
-					set(pix, false);
-					vSet(pix, false);					
-				}
+//				pix = here.add(neighbour[3]);
+//				if(!vGet(pix))
+//				{
+//					result.add(pix);
+//					vSet(pix,true);
+//				}
+//				pix = here.add(neighbour[1]);
+//				if(!vGet(pix))
+//				{
+//					result.add(pix);
+//					vSet(pix,true);
+//				}						
+//				break;
 				step = false;
+				pix = here.add(neighbour[3]);
+				set(pix, false);
+				vSet(pix, false);
+				pix = here.add(neighbour[1]);
+				set(pix, false);
+				vSet(pix, false);				
+				here = result.point(result.size() - 1);
+				break;
+//				if(poll(pix, 3) > 0.5)
+//				{
+//					pix = pix.add(neighbour[2]);
+//					set(pix, true);
+//					vSet(pix, false);
+//				} else
+//				{
+//					pix = pix.add(neighbour[1]);
+//					set(pix, false);
+//					vSet(pix, false);					
+//				}
+//				step = false;
 //				if(!vGet(pix))
 //				{
 //					result.add(pix);
@@ -1882,15 +1903,15 @@ public class BooleanGrid
 //					result.add(pix);
 //					vSet(pix,true);
 //				}		
-				break;
+//				break;
 			case 7:
-				pix = pix.add(neighbour[1]);
+				pix = here.add(neighbour[1]);
 				if(!vGet(pix))
 				{
 					result.add(pix);
 					vSet(pix,true);
 				}
-				pix = pix.add(neighbour[4]);
+				pix = here.add(neighbour[3]);
 				if(!vGet(pix))
 				{
 					result.add(pix);
@@ -1898,7 +1919,7 @@ public class BooleanGrid
 				}						
 				break;
 			case 8:
-				pix = pix.add(neighbour[2]);
+				pix = here.add(neighbour[2]);
 				if(!vGet(pix))
 				{
 					result.add(pix);
@@ -1908,17 +1929,36 @@ public class BooleanGrid
 			case 9:
 				Debug.e("BooleanGrid.marchRound() - dud 2x2 grid: " + m + " at " + 
 						here.toString() + "\n" + printNearby(here,4) + "\n\n");
-				if(poll(pix, 3) > 0.5)
-				{
-					pix = pix.add(neighbour[1]);
-					set(pix, true);
-					vSet(pix, false);
-				} else
-				{
-					set(pix, false);
-					vSet(pix, false);					
-				}
+//				if(!vGet(here))
+//				{
+//					result.add(here);
+//					vSet(here,true);
+//				}
+//				pix = here.add(neighbour[2]);
+//				if(!vGet(pix))
+//				{
+//					result.add(pix);
+//					vSet(pix,true);
+//				}						
+//				break;				
 				step = false;
+				set(here, false);
+				vSet(here, false);
+				pix = here.add(neighbour[2]);
+				set(pix, false);
+				vSet(pix, false);				
+				here = result.point(result.size() - 1);
+				break;
+//				if(poll(pix, 3) > 0.5)
+//				{
+//					pix = pix.add(neighbour[1]);
+//					set(pix, true);
+//					vSet(pix, false);
+//				} else
+//				{
+//					set(pix, false);
+//					vSet(pix, false);					
+//				}
 //				pix = pix.add(neighbour[2]);
 //				if(!vGet(pix))
 //				{
@@ -1931,15 +1971,15 @@ public class BooleanGrid
 //					result.add(pix);
 //					vSet(pix,true);
 //				}						
-				break;
+//				break;
 			case 10:
-				pix = pix.add(neighbour[3]);
+				pix = here.add(neighbour[3]);
 				if(!vGet(pix))
 				{
 					result.add(pix);
 					vSet(pix,true);
 				}
-				pix = pix.add(neighbour[1]);
+				pix = here.add(neighbour[2]);
 				if(!vGet(pix))
 				{
 					result.add(pix);
@@ -1947,12 +1987,12 @@ public class BooleanGrid
 				}						
 				break;
 			case 11:
-				if(!vGet(pix))
+				if(!vGet(here))
 				{
-					result.add(pix);
-					vSet(pix,true);
+					result.add(here);
+					vSet(here,true);
 				}
-				pix = pix.add(neighbour[2]);
+				pix = here.add(neighbour[2]);
 				if(!vGet(pix))
 				{
 					result.add(pix);
@@ -1960,13 +2000,13 @@ public class BooleanGrid
 				}						
 				break;
 			case 12:
-				pix = pix.add(neighbour[2]);
+				pix = here.add(neighbour[2]);
 				if(!vGet(pix))
 				{
 					result.add(pix);
 					vSet(pix,true);
 				}
-				pix = pix.add(neighbour[7]);
+				pix = here.add(neighbour[1]);
 				if(!vGet(pix))
 				{
 					result.add(pix);
@@ -1974,27 +2014,26 @@ public class BooleanGrid
 				}							
 				break;
 			case 13:
-				pix = pix.add(neighbour[2]);
+				pix = here.add(neighbour[2]);
 				if(!vGet(pix))
 				{
 					result.add(pix);
 					vSet(pix,true);
 				}
-				pix = pix.add(neighbour[6]);
-				if(!vGet(pix))
+				if(!vGet(here))
 				{
-					result.add(pix);
-					vSet(pix,true);
+					result.add(here);
+					vSet(here,true);
 				}					
 				break;
 			case 14:
-				pix = pix.add(neighbour[3]);
+				pix = here.add(neighbour[3]);
 				if(!vGet(pix))
 				{
 					result.add(pix);
 					vSet(pix,true);
 				}
-				pix = pix.add(neighbour[0]);
+				pix = here.add(neighbour[1]);
 				if(!vGet(pix))
 				{
 					result.add(pix);
