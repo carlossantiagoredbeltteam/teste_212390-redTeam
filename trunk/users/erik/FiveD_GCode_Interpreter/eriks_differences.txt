@@ -1,0 +1,587 @@
+Index: process_g_code.pde
+===================================================================
+--- process_g_code.pde	(revision 3145)
++++ process_g_code.pde	(working copy)
+@@ -214,6 +214,19 @@
+ 	{
+ 		last_gcode_g = gc.G;	/* remember this for future instructions */
+ 		fp = where_i_am;
++#ifdef MODIFIER_PIN
++                modifier = analogRead(MODIFIER_PIN); // Erik
++if(((modifier - modifier_old) > 3) || ((modifier - modifier_old) < -3))  
++{
++  Serial.print("Modifier: ");
++  Serial.println(modifier);
++  modifier_old = modifier;
++}
++#endif
++                // Debug Erik:
++                //Serial.print("Modifier: ");
++                //Serial.println(modifier/512);
++                
+ 		if (abs_mode)
+ 		{
+ 			if (gc.seen & GCODE_X)
+@@ -223,7 +236,28 @@
+ 			if (gc.seen & GCODE_Z)
+ 				fp.z = gc.Z;
+ 			if (gc.seen & GCODE_E)
+-				fp.e = gc.E;
++#ifdef MODIFIER_PIN
++if(gc.E<0) 
++{
++  Serial.print("Reversing: ");
++  Serial.print(gc.E);
++  Serial.print(", extr pos bef: ");
++  Serial.print(fp.e);
++  fp.e += gc.E*(modifier/512); // Erik
++  Serial.print(", extr pos after: ");
++  Serial.println(fp.e);
++} else
++{
++  fp.e += gc.E*(modifier/512); // Erik
++  Serial.print("fp.e is: ");
++  Serial.println(fp.e);
++}
++                                // Erik: Make forced incremental
++#else
++				fp.e += gc.E; // Erik
++//                                fp.e += gc.E; //ERIK: normaal niet aditive!
++
++#endif
+ 		}
+ 		else
+ 		{
+@@ -234,13 +268,20 @@
+ 			if (gc.seen & GCODE_Z)
+ 				fp.z += gc.Z;
+ 			if (gc.seen & GCODE_E)
+-				fp.e += gc.E;
++#ifndef MODIFIER_PIN
++                                fp.e += gc.E;
++#else
++  fp.e += gc.E*(modifier/512); // Erik
++#endif
+ 		}
+ 
+ 		// Get feedrate if supplied - feedrates are always absolute???
+ 		if ( gc.seen & GCODE_F )
+-			fp.f = gc.F;
+-               
++//#ifdef MODIFIER_PIN
++			fp.f = gc.F*(modifier_speed/512); // ERIK
++////#else
++//			fp.f = gc.F;
++//#endif               
+                 // Process the buffered move commands first
+                 // If we get one, return immediately
+ 
+Index: FiveD_GCode_Interpreter.pde
+===================================================================
+--- FiveD_GCode_Interpreter.pde	(revision 3145)
++++ FiveD_GCode_Interpreter.pde	(working copy)
+@@ -18,7 +18,6 @@
+ #include "cartesian_dda.h"
+ 
+ // Inline interrupt control functions
+-
+ inline void enableTimerInterrupt() 
+ {
+    TIMSK1 |= (1<<OCIE1A);
+@@ -38,7 +37,6 @@
+ {
+   TCNT2 = 0;
+ }
+-
+ char debugstring[COMMAND_SIZE];
+ 
+ // Maintain a list of extruders...
+@@ -68,7 +66,6 @@
+ 
+ 
+ // Our interrupt function
+-
+ SIGNAL(SIG_OUTPUT_COMPARE1A)
+ {
+   disableTimerInterrupt();
+@@ -81,9 +78,18 @@
+   enableTimerInterrupt();
+ }
+ 
++//ERIK
++#ifdef MODIFIER_PIN
++double modifier = 500.0;
++double modifier_old = 1.0;
++#endif
++double modifier_speed = 512.0; //ERIK
++
+ void setup()
+ {
++  
+   disableTimerInterrupt();
++  // This screws with PWM :(
+   setupTimerInterrupt();
+   debugstring[0] = 0;
+   extruder_in_use = 0;
+@@ -105,12 +111,39 @@
+   where_i_am.e = 0.0;
+   where_i_am.f = SLOW_XY_FEEDRATE;
+   
+-  Serial.begin(19200);
++  Serial.begin(57600);
+   Serial.println("start");
+   setTimer(DEFAULT_TICK);
+   enableTimerInterrupt();
++  
++  // ERIK:
++#ifdef MODIFIER_PIN
++  pinMode(MODIFIER_PIN,INPUT);
++#endif
++
+ }
+ 
++byte softPWMduty = 0;
++byte softPWMcount = 0;
++int PWMstate = HIGH;
++static void softPWM()
++{
++    if(softPWMduty == softPWMcount)
++    {
++      PWMstate = LOW;
++    }
++    digitalWrite(12,PWMstate);
++    
++    if(softPWMcount<254)
++      softPWMcount++;
++    else
++    { 
++      PWMstate = HIGH;
++      softPWMcount=0;
++    }
++}
++
++
+ void loop()
+ {
+ 	manage_all_extruders();
+@@ -177,7 +210,6 @@
+ //******************************************************************************************
+ 
+ // Interrupt functions
+-
+ void setupTimerInterrupt()
+ {
+ 	//clear the registers
+@@ -199,7 +231,7 @@
+ 	TCCR1A &= ~(1<<COM1B0);
+ 
+ 	//start off with a slow frequency.
+-	setTimerResolution(4);
++	setTimerResolution(5);
+ 	setTimerCeiling(65535);
+ }
+ 
+Index: cartesian_dda.pde
+===================================================================
+--- cartesian_dda.pde	(revision 3145)
++++ cartesian_dda.pde	(working copy)
+@@ -188,6 +188,10 @@
+    
+   do
+   {
++    // ERIK NEW:
++    softPWM();
++    
++
+ 		x_can_step = can_step(X_MIN_PIN, X_MAX_PIN, current_steps.x, target_steps.x, x_direction);
+ 		y_can_step = can_step(Y_MIN_PIN, Y_MAX_PIN, current_steps.y, target_steps.y, y_direction);
+ 		z_can_step = can_step(Z_MIN_PIN, Z_MAX_PIN, current_steps.z, target_steps.z, z_direction);
+@@ -335,6 +339,7 @@
+ #else
+ 	digitalWrite(Z_DIR_PIN, z_direction);
+ #endif
++delayMicroseconds(110);//ERIK: FIXME Dit kost misschien te veel tijd maar nu voldoen we wel aan de specs van de driver IC.        
+         if(e_direction)
+           ext->set_direction(1);
+         else
+@@ -343,7 +348,6 @@
+     //turn on steppers to start moving =)
+     
+ 	enable_steppers();
+-        
+        // extcount = 0;
+ 
+         setTimer(DEFAULT_TICK);
+@@ -391,11 +395,15 @@
+ {
+ #ifdef SANGUINO
+   if(delta_steps.x)
+-    digitalWrite(X_ENABLE_PIN, ENABLE_ON);
++    digitalWrite(X_ENABLE_PIN, LOW);// ERIK: dit is een inverted boardje.
+   if(delta_steps.y)    
+-    digitalWrite(Y_ENABLE_PIN, ENABLE_ON);
++    digitalWrite(Y_ENABLE_PIN, LOW);// ERIK dit zelfbouw board luistert niet, maar toch...
+   if(delta_steps.z)
++//#ifdef MOTHERBOARD_ERIK2
++//    digitalWrite(Z_ENABLE_PIN, ENABLE_ON);
++//#else
+     digitalWrite(Z_ENABLE_PIN, ENABLE_ON);
++//#endif
+   if(delta_steps.e)
+     ext->enableStep();   
+ #endif  
+@@ -407,8 +415,9 @@
+ {
+ #ifdef SANGUINO 
+ 	//disable our steppers
+-	digitalWrite(X_ENABLE_PIN, !ENABLE_ON);
+-	digitalWrite(Y_ENABLE_PIN, !ENABLE_ON);
++        // ERIK: let op: X_ENABLE_PIN == Y_ENABLE_PIN
++	//digitalWrite(X_ENABLE_PIN, ENABLE_ON);// ERIK: dit is een inverted board
++	//digitalWrite(Y_ENABLE_PIN, ENABLE_ON);// ERIK: dit is een inverted board, luistert alleen niet naar enable..
+ 	digitalWrite(Z_ENABLE_PIN, !ENABLE_ON);
+ 
+         // Disabling the extrude stepper causes the backpressure to
+Index: extruder.pde
+===================================================================
+--- extruder.pde	(revision 3145)
++++ extruder.pde	(working copy)
+@@ -1,4 +1,3 @@
+-
+ #include "parameters.h"
+ #include "pins.h"
+ #include "ThermistorTable.h"
+@@ -24,20 +23,21 @@
+ 	//setup our pins
+ 	pinMode(motor_dir_pin, OUTPUT);
+ 	pinMode(motor_speed_pin, OUTPUT);
+-	pinMode(heater_pin, OUTPUT);
++	//NOT NEEDED: pinMode(heater_pin, OUTPUT);
+ 
+ 	pinMode(temp_pin, INPUT);
+-	pinMode(valve_dir_pin, OUTPUT); 
+-        pinMode(valve_en_pin, OUTPUT);
++	//pinMode(valve_dir_pin, OUTPUT); 
++        //pinMode(valve_en_pin, OUTPUT);
+ 
+ 	//initialize values
+ 	digitalWrite(motor_dir_pin, EXTRUDER_FORWARD);
+-	
+-	analogWrite(heater_pin, 0);
+-	analogWrite(motor_speed_pin, 0);
+-	digitalWrite(valve_dir_pin, false);
+-	digitalWrite(valve_en_pin, 0);
++	analogWrite(heater_pin, 64);
++	//digitalWrite(heater_pin, LOW);//ERIK: changed to digital, LOW
++	digitalWrite(motor_speed_pin, 0);// ERIK: changed to digital
++	//digitalWrite(valve_dir_pin, false);
++	///digitalWrite(valve_en_pin, 0);
+ 
++
+ // The step enable pin and the fan pin are the same...
+ // We can have one, or the other, but not both
+ 
+@@ -51,12 +51,26 @@
+           analogWrite(fan_pin, 0);
+         }
+ 
+-        //these our the default values for the extruder.
++// From makerbot branch:
++#if TEMP_PID
++  temp_iState = 0;
++  temp_dState = 0;
++  temp_pGain = TEMP_PID_PGAIN;
++  temp_iGain = TEMP_PID_IGAIN;
++  temp_dGain = TEMP_PID_DGAIN;
++  
++  temp_pid_update_windup();
++#endif
++
++  temp_control_enabled = true;
++  current_temperature = 0;
++  target_temperature = 100; // target_celcius
++  max_temperature = 0; // max_celcius
++
++  //these our the default values for the extruder.
+         e_speed = 0;
+-        target_celsius = 0;
+-        max_celsius = 0;
+-        heater_low = 64;
+-        heater_high = 255;
++        byte heater_low = 64;
++        byte heater_high = 255;
+         heater_current = 0;
+         valve_open = false;
+         
+@@ -69,7 +83,7 @@
+         e_direction = EXTRUDER_FORWARD;
+         
+         //default to cool
+-        set_temperature(target_celsius);
++        set_temperature(target_temperature);
+ }
+ 
+ 
+@@ -77,7 +91,7 @@
+ {  
+   count = 0;
+   oldT = get_temperature();
+-  while (get_temperature() < target_celsius - HALF_DEAD_ZONE)
++  while (get_temperature() < target_temperature - HALF_DEAD_ZONE)
+   {
+ 	manage_all_extruders();
+         count++;
+@@ -95,32 +109,8 @@
+   return 0;
+ }
+ 
+-/*
+-byte extruder::wait_till_cool()
+-{  
+-  count = 0;
+-  oldT = get_temperature();
+-  while (get_temperature() > target_celsius + HALF_DEAD_ZONE)
+-  {
+-	manage_all_extruders();
+-        count++;
+-        if(count > 20)
+-        {
+-            newT = get_temperature();
+-            if(newT < oldT)
+-               oldT = newT;
+-            else
+-                return 1;
+-            count = 0;
+-        }
+-	delay(1000);
+-  }
+-  return 0;
+-}
+-*/
+ 
+ 
+-
+ void extruder::valve_set(bool open, int millis)
+ {
+         wait_for_temperature();
+@@ -134,11 +124,11 @@
+ 
+ void extruder::set_temperature(int temp)
+ {
+-	target_celsius = temp;
+-	max_celsius = (temp*11)/10;
++	target_temperature = temp;
++	max_temperature = (temp*11)/10;
+ 
+         // If we've turned the heat off, we might as well disable the extrude stepper
+-        if(target_celsius < 1)
++        if(target_temperature < 0)
+           ex[extruder_in_use]->disableStep(); 
+ }
+ 
+@@ -199,82 +189,140 @@
+ 	return raw;
+ }
+ 
++
++#if TEMP_PID
++int extruder::temp_update(int dt)
++{
++  int output;
++  int error;
++  float pTerm, iTerm, dTerm;
++  
++  if (temp_control_enabled) {
++    error = target_temperature - current_temperature;
++    
++    pTerm = temp_pGain * error;
++    
++    temp_iState += error;
++    temp_iState = constrain(temp_iState, temp_iState_min, temp_iState_max);
++    iTerm = temp_iGain * temp_iState;
++    
++    dTerm = temp_dGain * (current_temperature - temp_dState);
++    temp_dState = current_temperature;
++    
++    output = pTerm + iTerm - dTerm;
++    output = constrain(output, 0, 255);
++  } else {
++    output = 0;
++  }
++  return output;
++}
++ 
++void extruder::temp_pid_update_windup()
++{
++  temp_iState_min = -TEMP_PID_INTEGRAL_DRIVE_MAX/temp_iGain;
++  temp_iState_max = TEMP_PID_INTEGRAL_DRIVE_MAX/temp_iGain;
++}
++
++#else
++
++int extruder::temp_update(int dt)
++{
++  int output;
++  
++  if (temp_control_enabled) {
++    //put the heater into high mode if we're not at our target.
++    if (current_temperature < target_temperature)
++      output = heater_high;
++    //put the heater on low if we're at our target.
++    else if (current_temperature < max_temperature)
++      output = heater_low;
++    //turn the heater off if we're above our max.
++    else
++      output = 0;
++  } else {
++    output = 0;
++  }
++  return output;
++}
++#endif /* TEMP_PID */
++
++
++/*void extruder::manage()
++{
++ //int output = random(255);
++// analogWrite(12,128);
++ // 
++ //digitalWrite(12,(output > 64)?HIGH:LOW);
++ //Serial.print("!");
++ //delay(200);
++}
++*/
+ /*!
++Manages motor and heater based on measured temperature:
++o If temp is too low, don't start the motor
++o Adjust the heater power to keep the temperature at the target
++*/
++// NEW
++void extruder::manage()
++{
++  int output, dt;
++  unsigned long time;
++
++  //make sure we know what our temp is.
++  current_temperature = get_temperature();
++    
++  // ignoring millis rollover for now
++  time = millis();
++  dt = time - temp_prev_time;
++
++  if (dt > TEMP_UPDATE_INTERVAL)
++  {
++    temp_prev_time = time;
++    output = temp_update(dt);
++    //digitalWrite(DEBUG_PIN, (output > 0)?HIGH:LOW);
++//    analogWrite(12, output);
++//    delay(200);
++    digitalWrite(heater_pin, (output > 128)?HIGH:LOW);
++    softPWMduty = output;
++//    softPWM(); // deze moet gewoon aan of uit...
++  }
++}
++
++
++/*!
+   Manages extruder functions to keep temps, speeds etc
+   at the set levels.  Should be called only by manage_all_extruders(),
+   which should be called in all non-trivial loops.
+   o If temp is too low, don't start the motor
+   o Adjust the heater power to keep the temperature at the target
+  */
++// OLD
++/*
+ void extruder::manage()
+ {
+ 	//make sure we know what our temp is.
+ 	int current_celsius = get_temperature();
+-        byte newheat = 0;
++        int newheat = 0;
+   
+         //put the heater into high mode if we're not at our target.
+         if (current_celsius < target_celsius)
+-                newheat = heater_high;
++                newheat = 255;
+         //put the heater on low if we're at our target.
+         else if (current_celsius < max_celsius)
+-                newheat = heater_low;
++                newheat = 64;
+         
+         // Only update heat if it changed
+         if (heater_current != newheat) {
+                 heater_current = newheat;
+-                analogWrite(heater_pin, heater_current);
++//                analogWrite(heater_pin, newheat); // STandard 
++                analogWrite(12, newheat); // STandard 
++//                digitalWrite(heater_pin, heater_current);//ERIK
+         }
+ }
+ 
++*/
+ 
+-#if 0
+-void extruder::set_speed(float sp)
+-{
+-  // DC motor?
+-    if(step_en_pin < 0)
+-    {
+-      e_speed = (byte)sp;
+-      if(e_speed > 0)
+-          wait_for_temperature();
+-      analogWrite(motor_speed_pin, e_speed);
+-      return;
+-    }
+-      
+-    // No - stepper
+-  disableTimerInterrupt();
+-  
+-  if(sp <= 1.0e-4)
+-  {
+-    disableStep();
+-    e_speed = 0; // Just use this as a flag
+-    return;
+-  } else
+-  {
+-    wait_for_temperature();
+-    enableStep();
+-    e_speed = 1;
+-  }
+-    
+-  extrude_step_count = 0;
+-  
+-  float milliseconds_per_step = 60000.0/(E_STEPS_PER_MM*sp);
+-  long thousand_ticks_per_step = 4*(long)(milliseconds_per_step);
+-  setupTimerInterrupt();
+-  setTimer(thousand_ticks_per_step);
+-  enableTimerInterrupt();
+-}
+ 
+-void extruder::interrupt()
+-{
+-    if(!e_speed)
+-      return;
+-    extrude_step_count++;
+-    if(extrude_step_count > 1000)
+-    {
+-      step();
+-      extrude_step_count = 0;
+-    }
+-}
++// NOT USED
+ 
+-#endif
+ 
+Index: ThermistorTable.h
+===================================================================
+--- ThermistorTable.h	(revision 3145)
++++ ThermistorTable.h	(working copy)
+@@ -4,8 +4,6 @@
+ // Uncomment the next line if you are using a thermistor; leave it if you have a thermocouple
+ //#define USE_THERMISTOR
+ 
+-// How many temperature samples to take for an average.  each sample takes about 100 usecs.
+-#define TEMPERATURE_SAMPLES 3
+ 
+ // How accurately do we maintain the temperature?
+ #define HALF_DEAD_ZONE 5
