@@ -559,6 +559,7 @@ public class GCodeReaderAndWriter
 					}else if (resp.startsWith("Serial Error:"))
 					{	
 						Debug.e("GCodeWriter.waitForOK(): " + resp);
+						return waitForOK();
 					}else if (resp.startsWith("Resend:"))
 					{	
 						// An error has occured.  Request a resend of the command.
