@@ -27,6 +27,17 @@ import org.reprap.geometry.LayerRules;
 
 public class GCodeReaderAndWriter
 {
+	// Codes for responses from the machine
+	// A positive number returned is a request for that line number
+	// to be resent.
+	
+	private static final long shutDown = -3;
+	private static final long startOrNullResponse = -2;
+	private static final long allSentOK = -1;
+	private double eTemp;
+	private double bTemp;
+	private double x, y, z, e;
+	
 	/**
 	 * Stop sending a file (if we are).
 	 */
@@ -146,13 +157,14 @@ public class GCodeReaderAndWriter
 	 * a response.  Return that as a string.
 	 */
 	private int responsesExpected = 0;
-	private boolean responseAvailable = false;
-	private String response;
+//	private boolean responseAvailable = false;
+//	private String response;
 	
 	//private boolean sendFileToMachine = false;
 		
 	public GCodeReaderAndWriter()
 	{
+		resetReceived();
 		paused = false;
 		iAmPaused = false;
 		alreadyReversed = false;
@@ -164,8 +176,8 @@ public class GCodeReaderAndWriter
 		//threadLock = false;
 		exhaustBuffer = false;
 		responsesExpected = 0;
-		responseAvailable = false;
-		response = "0000";
+//		responseAvailable = false;
+//		response = "0000";
 		opFileIndex = -1;
 		try
 		{
@@ -294,7 +306,7 @@ public class GCodeReaderAndWriter
 				{
 					while ((line = fileInStream.readLine()) != null) 
 					{
-						bufferQueue(line);
+						bufferQueue(line, 0);
 						bytes += line.length();
 						fractionDone = (double)bytes/(double)fileInStreamLength;
 						setFractionDone(fractionDone, -1, -1);
@@ -436,17 +448,13 @@ public class GCodeReaderAndWriter
 	}
 	
 	/**
-	 * Queue a command into the ring buffer.  Note the use of prime time periods
-	 * in the following code.  That's probably just superstition, but it feels more robust...
+	 * Send a command to the machine.  Return true if a response is expected; 
+	 * false if not.
 	 * @param cmd
+	 * @return
 	 */
-	private void bufferQueue(String cmd)
+	private boolean sendLine(String cmd)
 	{
-		if(serialOutStream == null)
-		{
-			Debug.d("bufferQueue: attempt to queue: " + cmd + " to a non-running output buffer.");
-			return;
-		}
 		int com = cmd.indexOf(';');
 		if(com > 0)
 			cmd = cmd.substring(0, com);
@@ -458,29 +466,12 @@ public class GCodeReaderAndWriter
 				ringAdd(lineNumber, cmd);
 				cmd = "N" + lineNumber + " " + cmd + " ";
 				cmd += checkSum(cmd);
-				serialOutStream.print(cmd + "\n");
-				
-				// Message has effectively gone to the machine, so we can release the queuing thread
-				//threadLock = false;				
+				serialOutStream.print(cmd + "\n");				
 				serialOutStream.flush();
-				//oneSent = true;
 				Debug.c("G-code: " + cmd + " dequeued and sent");
-				// Wait for the machine to respond before we send the next command
-				long ln;
-				while((ln = waitForOK()) >= 0)
-				{
-					Debug.e("Requested to resend line " + ln);
-					lineNumber = ln;
-					cmd = ringGet(ln);
-					//ringAdd(lineNumber, cmd);
-					cmd = "N" + lineNumber + " " + cmd + " ";
-					cmd += checkSum(cmd);
-					serialOutStream.print(cmd + "\n");
-					Debug.e("Resent: " + cmd);
-				}
-				lineNumber++;
+				return true;
 			}
-			return;
+			return false;
 		}
 	
 		Debug.c("G-code: " + cmd + " not sent");
@@ -488,23 +479,177 @@ public class GCodeReaderAndWriter
 		{
 			int l = Integer.parseInt(cmd.substring(cmd.indexOf(" ") + 1, cmd.indexOf("/")));
 			int o = Integer.parseInt(cmd.substring(cmd.indexOf("/") + 1));
-			//System.out.println("layer marker: " + l + ", " + o);
 			setFractionDone(-1, l, o+1);
 		}
-
+		return false;
 	}
 	
+	/**
+	 * Queue a command.  
+	 */
+	private void bufferQueue(String cmd, int retries) throws Exception
+	{
+		if(serialOutStream == null)
+		{
+			Debug.d("bufferQueue: attempt to queue: " + cmd + " to a non-running output buffer.");
+			return;
+		}
+		if(retries > 3)
+		{
+			Debug.e("bufferQueue(): too many retries (" + retries + ") sending " + cmd);
+			return;			
+		}
+		if(sendLine(cmd))
+		{
+			long resp = waitForResponse();
+			if(resp == startOrNullResponse)
+			{
+				return;
+			} else if(resp == shutDown)
+			{
+				throw new Exception("The RepRap machine has flagged a hard error!");
+			} else if (resp == allSentOK)
+			{
+				lineNumber++;
+			} else // Must be a re-send line number
+			{
+				long gotTo = lineNumber;
+				lineNumber = resp;
+				while(lineNumber <= gotTo)
+				{
+					String rCmd = ringGet(lineNumber);
+					bufferQueue(rCmd, retries+1);  // Is recursion clever; or stupid?
+				}
+			}
+		} 
+	}
+	
+	private void resetReceived()
+	{
+		eTemp = Double.NEGATIVE_INFINITY;
+		bTemp = Double.NEGATIVE_INFINITY;
+		x = Double.NEGATIVE_INFINITY;
+		y = Double.NEGATIVE_INFINITY;
+		z = Double.NEGATIVE_INFINITY;
+		e = Double.NEGATIVE_INFINITY;
+	}
+	
+	/**
+	 * Pick out a value from the returned string
+	 * @param s
+	 * @param coord
+	 * @return
+	 */
+	private double parseReturnedValue(String s, String cue)
+	{
+		int i = s.indexOf(cue);
+		if(i < 0)
+			return Double.NEGATIVE_INFINITY;
+		i += cue.length();
+		String ss = s.substring(i);
+		int j = ss.indexOf(" ");
+		if(j < 0)
+			return Double.parseDouble(ss);
+		else
+			return Double.parseDouble(ss.substring(0, j));
+	}
+	
+	/**
+	 * If the machine has just returned an extruder temperature, return its value
+	 * @return
+	 */
+	public double getETemp()
+	{
+		if(eTemp == Double.NEGATIVE_INFINITY)
+		{
+			Debug.e("GCodeReaderAndWriter.getETemp() - no value stored!");
+			return 0;
+		}
+		return eTemp;
+	}
+	
+	/**
+	 * If the machine has just returned a bed temperature, return its value
+	 * @return
+	 */
+	public double getBTemp()
+	{
+		if(bTemp == Double.NEGATIVE_INFINITY)
+		{
+			Debug.e("GCodeReaderAndWriter.getBTemp() - no value stored!");
+			return 0;
+		}
+		return bTemp;
+	}
+	
+	/**
+	 * If the machine has just returned an x coordinate, return its value
+	 * @return
+	 */
+	public double getX()
+	{
+		if(x == Double.NEGATIVE_INFINITY)
+		{
+			Debug.e("GCodeReaderAndWriter.getX() - no value stored!");
+			return 0;
+		}
+		return x;
+	}
+
+	/**
+	 * If the machine has just returned a y coordinate, return its value
+	 * @return
+	 */
+	public double getY()
+	{
+		if(y == Double.NEGATIVE_INFINITY)
+		{
+			Debug.e("GCodeReaderAndWriter.getY() - no value stored!");
+			return 0;
+		}
+		return y;
+	}
+
+	/**
+	 * If the machine has just returned a z coordinate, return its value
+	 * @return
+	 */
+	public double getZ()
+	{
+		if(z == Double.NEGATIVE_INFINITY)
+		{
+			Debug.e("GCodeReaderAndWriter.getZ() - no value stored!");
+			return 0;
+		}
+		return z;
+	}
+
+	/**
+	 * If the machine has just returned an e coordinate, return its value
+	 * @return
+	 */
+	public double getE()
+	{
+		if(e == Double.NEGATIVE_INFINITY)
+		{
+			Debug.e("GCodeReaderAndWriter.getE() - no value stored!");
+			return 0;
+		}
+		return e;
+	}
 
 
 	/**
-	 * Wait for the GCode interpreter in the RepRap machine to send back "ok\n".
+	 * Parse the string sent back from the RepRap machine.
 	 *
 	 */
-	private long waitForOK()
+	private long waitForResponse()
 	{
-		int i, count;
+		int i;
 		String resp = "";
-		count = 0;
+		long result = allSentOK;
+		String lns;
+		resetReceived();
 		
 		for(;;)
 		{
@@ -524,59 +669,38 @@ public class GCodeReaderAndWriter
 				//is it at the end of the line?
 				if (c == '\n' || c == '\r')
 				{
-					if (resp.startsWith("ok"))
+					if (resp.startsWith("start") || resp.contentEquals("")) // Startup or null string...
+						return startOrNullResponse;                                   // ... ignore it.
+					else if (resp.startsWith("!!")) // Horrible hard fault?
+						result = shutDown;
+					else if (resp.startsWith("rs")) // Re-send request?
 					{
-						if(resp.length() > 2)
-							Debug.c("GCode acknowledged with message: " + resp);
-						else
-							Debug.c("GCode acknowledged");
-						return -1;
-					} else if (resp.startsWith("T:"))
+						lns = resp.substring(3);
+						lns = lns.substring(0, lns.indexOf(" "));
+						result = Long.parseLong(lns);
+						Debug.e("GCodeWriter.waitForOK() - request to resend from line " + result);
+					} else if (!resp.startsWith("ok")) // Must be "ok" if not those - check
 					{
-						Debug.c("GCodeWriter.waitForOK() - temperature reading: " + resp);
-						if(responsesExpected > 0)
-						{
-							response = resp;
-							responseAvailable = true;
-						} else
-							System.err.println("GCodeWriter.waitForOK(): temperature response returned when none expected.");
-					}else if (resp.startsWith("C:"))
-					{
-						Debug.c("GCodeWriter.waitForOK() - coordinates: " + resp);
-						if(responsesExpected > 0)
-						{
-							response = resp;
-							responseAvailable = true;
-						} else
-							System.err.println("GCodeWriter.waitForOK(): coordinate response returned when none expected.");
-					} else if (resp.startsWith("E:"))
-					{
-						System.err.println("GCodeWriter.waitForOK(): temperature error returned: " + resp);
-					} 
-					else if (resp.startsWith("start") || resp.contentEquals(""))
-					{	
-						// That was the reset string from the machine or a null line; ignore it.
-					}else if (resp.startsWith("Serial Error:"))
-					{	
-						Debug.e("GCodeWriter.waitForOK(): " + resp);
-						return waitForOK();
-					}else if (resp.startsWith("Resend:"))
-					{	
-						// An error has occured.  Request a resend of the command.
-						return Long.parseLong(resp.substring(7, resp.length()));
-					}else
-					{
-						//Gone wrong.  Start again.
-						Debug.c("GCodeWriter.waitForOK() dud response: " + resp);
-						count++;
-						if(count >= 3)
-						{
-							System.err.println("GCodeWriter.waitForOK(): try count exceeded.  Last line received was: " + resp);
-							return -1; // No resend request
-						}
+						Debug.e("GCodeWriter.waitForOK() - dud response:" + resp);
+						result = lineNumber; // Try to send the last line again
 					}
-					// If we get here we need a new string
-					resp = "";
+					
+					// Have we got temperatures and/or coordinates?
+					
+					eTemp = parseReturnedValue(resp, " T:");
+					bTemp = parseReturnedValue(resp, " B:");
+					if(resp.indexOf(" C:") >= 0)
+					{
+						x = parseReturnedValue(resp, " X:");
+						y = parseReturnedValue(resp, " Y:");
+						z = parseReturnedValue(resp, " Z:");
+						e = parseReturnedValue(resp, " E:");
+					}
+					
+					Debug.c("Response: " + resp);
+					
+					return result;
+
 				} else
 					resp += c;
 			}
@@ -587,7 +711,7 @@ public class GCodeReaderAndWriter
 	 * Send a G-code command to the machine or into a file.
 	 * @param cmd
 	 */
-	public void queue(String cmd)
+	public void queue(String cmd) throws Exception
 	{
 		//trim it and cleanup.
 		cmd = cmd.trim();
@@ -598,43 +722,7 @@ public class GCodeReaderAndWriter
 			fileOutStream.println(cmd);
 			Debug.c("G-code: " + cmd + " written to file");
 		} else
-			bufferQueue(cmd);
-	}
-	
-	/**
-	 * Send a G-code command to the machine and return
-	 * a response.
-	 * @param cmd
-	 */
-	public String queueRespond(String cmd)
-	{
-		if(serialOutStream == null)
-		{
-			Debug.d("queueRespond: attempt to queue: " + cmd + " to a non-running output buffer.");
-			return "T:0 B:0";
-		}
-		//trim it and cleanup.
-		cmd = cmd.trim();
-		cmd = cmd.replaceAll("  ", " ");
-		
-		if (fileOutStream != null)
-		{
-			System.err.println("GCodeWriter.queueRespond() called when file being created.");
-			return "T:0 B:0"; // Safest compromise
-		}
-		responsesExpected++;
-		bufferQueue(cmd);
-		if(responsesExpected <= 0)
-		{
-			System.err.println("GCodeWriter.getResponse() called when no response expected.");
-			responsesExpected = 0;
-			responseAvailable = false;
-			return "T:0 B:0";
-		}
-		while(!responseAvailable) sleep(31);
-		responseAvailable = false;
-		responsesExpected--;
-		return response;		
+			bufferQueue(cmd, 0);
 	}
 	
 
@@ -677,7 +765,7 @@ public class GCodeReaderAndWriter
 					SerialPort.PARITY_NONE);
 		}
 		catch (UnsupportedCommOperationException e) {
-			Debug.d("An unsupported comms operation was encountered.");
+			Debug.d("An unsupported comms operation was encountered.\n" + e.toString());
 			return;		
 		}
 
