@@ -32,7 +32,7 @@ public class GCodeReaderAndWriter
 	// to be resent.
 	
 	private static final long shutDown = -3;
-	private static final long startOrNullResponse = -2;
+	//private static final long startOrNullResponse = -2;
 	private static final long allSentOK = -1;
 	private double eTemp;
 	private double bTemp;
@@ -321,7 +321,8 @@ public class GCodeReaderAndWriter
 					fileInStream.close();
 				} catch (Exception e) 
 				{  
-					System.err.println("Error printing file: " + e.toString());
+					Debug.e("Error printing file: " + e.toString());
+					e.printStackTrace();
 				}
 			}
 		};
@@ -502,10 +503,7 @@ public class GCodeReaderAndWriter
 		if(sendLine(cmd))
 		{
 			long resp = waitForResponse();
-			if(resp == startOrNullResponse)
-			{
-				return;
-			} else if(resp == shutDown)
+			if(resp == shutDown)
 			{
 				throw new Exception("The RepRap machine has flagged a hard error!");
 			} else if (resp == allSentOK)
@@ -676,16 +674,21 @@ public class GCodeReaderAndWriter
 						resp = "";
 						goAgain = true;
 					} else if (resp.startsWith("!!")) // Horrible hard fault?
+					{
 						result = shutDown;
-					else if (resp.startsWith("rs")) // Re-send request?
+						Debug.e("GCodeWriter.waitForResponse(): RepRap hard fault!  RepRap said: " + resp);
+					} else if (resp.startsWith("rs")) // Re-send request?
 					{
 						lns = resp.substring(3);
-						lns = lns.substring(0, lns.indexOf(" "));
+						int sp = lns.indexOf(" ");
+						if(sp > 0)
+							lns = lns.substring(0, sp);
 						result = Long.parseLong(lns);
-						Debug.e("GCodeWriter.waitForOK() - request to resend from line " + result);
+						Debug.e("GCodeWriter.waitForResponse() - request to resend from line " + result +
+								".  RepRap said: " + resp);
 					} else if (!resp.startsWith("ok")) // Must be "ok" if not those - check
 					{
-						Debug.e("GCodeWriter.waitForOK() - dud response:" + resp);
+						Debug.e("GCodeWriter.waitForResponse() - dud response from RepRap:" + resp);
 						result = lineNumber; // Try to send the last line again
 					}
 					
