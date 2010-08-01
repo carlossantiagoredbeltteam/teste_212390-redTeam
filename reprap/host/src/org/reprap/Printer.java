@@ -36,8 +36,9 @@ public interface Printer {
 	 * @param endUp ?
 	 * @throws ReprapException
 	 * @throws IOException 
+	 * @throws Exception 
 	 */
-	public void moveTo(double x, double y, double z, double feedrate, boolean startUp, boolean endUp) throws ReprapException, IOException;
+	public void moveTo(double x, double y, double z, double feedrate, boolean startUp, boolean endUp) throws ReprapException, IOException, Exception;
 	
 	/**
 	 * Single move for when we're moving about giong places rather than making
@@ -60,8 +61,9 @@ public interface Printer {
 	 * @param lastOne True if extruder should be turned off at end of this segment.
 	 * @throws ReprapException
 	 * @throws IOException 
+	 * @throws Exception 
 	 */
-	public void printTo(double x, double y, double z, double feedrate, boolean stopExtruder, boolean closeValve) throws ReprapException, IOException;
+	public void printTo(double x, double y, double z, double feedrate, boolean stopExtruder, boolean closeValve) throws ReprapException, IOException, Exception;
 	
 	/**
 	 * Get the feedrate currently being used
@@ -82,50 +84,57 @@ public interface Printer {
 	
 	/**
 	 * Home all axes
+	 * @throws Exception 
 	 *
 	 */
-	public void home();
+	public void home() throws Exception;
 	
 	/**
 	 * Sync to zero X location.
 	 * @throws ReprapException
 	 * @throws IOException
+	 * @throws Exception 
 	 */
-	public void homeToZeroX() throws ReprapException, IOException;
+	public void homeToZeroX() throws ReprapException, IOException, Exception;
 	
 	/**
 	 * Sync to zero Y location.
 	 * @throws ReprapException
 	 * @throws IOException
+	 * @throws Exception 
 	 */
-	public void homeToZeroY() throws ReprapException, IOException; 
+	public void homeToZeroY() throws ReprapException, IOException, Exception; 
 	
 	
 	/**
 	 * Home XY and zero all extruders
 	 * @throws ReprapException
 	 * @throws IOException
+	 * @throws Exception 
 	 */
-	public void homeToZeroXYE() throws ReprapException, IOException; 
+	public void homeToZeroXYE() throws ReprapException, IOException, Exception; 
 	
 	/**
 	 * Sync to zero Z location.
 	 * @throws ReprapException
 	 * @throws IOException
+	 * @throws Exception 
 	 */
-	public void homeToZeroZ() throws ReprapException, IOException; 
+	public void homeToZeroZ() throws ReprapException, IOException, Exception; 
 	
 	/**
 	 * Select a specific material to print with
 	 * @param attributes with name of the material
+	 * @throws Exception 
 	 */
-	public void selectExtruder(Attributes att);
+	public void selectExtruder(Attributes att) throws Exception;
 	
 	/**
 	 * Select a specific material to print with
 	 * @param extr identifier of the material
+	 * @throws Exception 
 	 */
-	public void selectExtruder(int extr);
+	public void selectExtruder(int extr) throws Exception;
 	
 	/**
 	 * Start a production run (as opposed to moving the machine about
@@ -243,8 +252,9 @@ public interface Printer {
 	/**
 	 * Get X, Y, Z and E (if supported) coordinates in an array
 	 * @return
+	 * @throws Exception 
 	 */
-	public double[] getCoordinates();
+	public double[] getCoordinates() throws Exception;
 	
 	/**
 	 * Tell the printer class it's Z position.  Only to be used if
@@ -292,14 +302,16 @@ public interface Printer {
 	/**
 	 * Stop the extrude motor (if any)
 	 * @throws IOException
+	 * @throws Exception 
 	 */
-	public void stopMotor() throws IOException;
+	public void stopMotor() throws IOException, Exception;
 	
 	/**
 	 * Close the extrude valve (if any)
 	 * @throws IOException
+	 * @throws Exception 
 	 */
-	public void stopValve() throws IOException;
+	public void stopValve() throws IOException, Exception;
 
 	/**
 	 * Allow the user to manually calibrate the Z axis position to deal
@@ -469,8 +481,9 @@ public interface Printer {
 	 * 
 	 * The RS232/USB etc comms system doesn't use this - it sets its own delays.
 	 * @param milliseconds
+	 * @throws Exception 
 	 */
-	public void machineWait(double milliseconds, boolean fastExtrude);
+	public void machineWait(double milliseconds, boolean fastExtrude) throws Exception;
 	
 	/**
 	 * Load a file to be made.
@@ -538,15 +551,17 @@ public interface Printer {
 	 * in centigrade, i.e. 100 equals 100 centigrade. 
 	 * @param temperature The temperature of the extruder in centigrade
 	 * @param wait - wait till it gets there (or not).
+	 * @throws Exception 
 	 * @throws Exception
 	 */
-	public void setBedTemperature(double temperature);
+	public void setBedTemperature(double temperature) throws Exception;
 	
 	/**
 	 * Return the current temperature of the bed
 	 * @return
+	 * @throws Exception 
 	 */
-	public double getBedTemperature();
+	public double getBedTemperature() throws Exception;
 	
 	/**
 	 * The temperature we want the bed to be at
@@ -557,6 +572,7 @@ public interface Printer {
 	/**
 	 * Wait till the entire machine is ready to print.  That is that such things as
 	 * extruder and bed temperatures are at the values set and stable.
+	 * @throws Exception 
 	 */
-	public void stabilise();
+	public void stabilise() throws Exception;
 }

@@ -416,7 +416,12 @@ public class XYZTabPanel extends javax.swing.JPanel {
 
 public void refreshTemperature()
 {
-	double t = printer.getBedTemperature();
+	double t = 0;
+	try {
+		t = printer.getBedTemperature();
+	} catch (Exception e) {
+		parentBotConsoleFrame.handleException(e);
+	}
 	currentTempLabel.setText("" + t);
 }
 
@@ -424,12 +429,23 @@ private void heatButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     	parentBotConsoleFrame.suspendPolling();
     	if (heatPushed) 
     	{
-    		printer.setBedTemperature(0);
+    		try {
+				printer.setBedTemperature(0);
+			} catch (Exception e) {
+				parentBotConsoleFrame.handleException(e);
+			}
     		heatButton.setText("Switch bed heat on");
     		heatPushed = false;
     	} else 
     	{
-    		printer.setBedTemperature(Double.parseDouble(targetTempField.getText()));
+    		try {
+				printer.setBedTemperature(Double.parseDouble(targetTempField.getText()));
+			} catch (NumberFormatException e) {
+				parentBotConsoleFrame.handleException(e);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
     		heatButton.setText("Switch bed heat off");
     		heatPushed = true;
     	}
@@ -453,7 +469,11 @@ private void nudgeSizeRB3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 public void homeAll()
 {
 	parentBotConsoleFrame.suspendPolling();
-	printer.home();
+	try {
+		printer.home();
+	} catch (Exception e) {
+		parentBotConsoleFrame.handleException(e);
+	}
 	xStepperPositionJPanel.zeroBox();
 	yStepperPositionJPanel.zeroBox();
 	zStepperPositionJPanel.zeroBox();
@@ -511,10 +531,15 @@ public Printer getPrinter()
 public void recordCurrentPosition()
 {
 	//parentBotConsoleFrame.suspendPolling();
-	double cp[] = printer.getCoordinates();
-	xStepperPositionJPanel.setTargetPositionField(cp[0]);
-	yStepperPositionJPanel.setTargetPositionField(cp[1]);
-	zStepperPositionJPanel.setTargetPositionField(cp[2]);
+	double cp[];
+	try {
+		cp = printer.getCoordinates();
+		xStepperPositionJPanel.setTargetPositionField(cp[0]);
+		yStepperPositionJPanel.setTargetPositionField(cp[1]);
+		zStepperPositionJPanel.setTargetPositionField(cp[2]);
+	} catch (Exception e) {
+		parentBotConsoleFrame.handleException(e);
+	}
 	//parentBotConsoleFrame.resumePolling();
 }
 

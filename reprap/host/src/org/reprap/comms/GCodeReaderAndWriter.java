@@ -650,6 +650,7 @@ public class GCodeReaderAndWriter
 		long result = allSentOK;
 		String lns;
 		resetReceived();
+		boolean goAgain;
 		
 		for(;;)
 		{
@@ -669,9 +670,12 @@ public class GCodeReaderAndWriter
 				//is it at the end of the line?
 				if (c == '\n' || c == '\r')
 				{
+					goAgain = false;
 					if (resp.startsWith("start") || resp.contentEquals("")) // Startup or null string...
-						return startOrNullResponse;                                   // ... ignore it.
-					else if (resp.startsWith("!!")) // Horrible hard fault?
+					{
+						resp = "";
+						goAgain = true;
+					} else if (resp.startsWith("!!")) // Horrible hard fault?
 						result = shutDown;
 					else if (resp.startsWith("rs")) // Re-send request?
 					{
@@ -697,16 +701,17 @@ public class GCodeReaderAndWriter
 						e = parseReturnedValue(resp, " E:");
 					}
 					
-					Debug.c("Response: " + resp);
-					
-					return result;
-
+					if(!goAgain)
+					{
+						Debug.c("Response: " + resp);
+						return result;
+					}
 				} else
 					resp += c;
 			}
 		}
 	}
-	
+		
 	/**
 	 * Send a G-code command to the machine or into a file.
 	 * @param cmd

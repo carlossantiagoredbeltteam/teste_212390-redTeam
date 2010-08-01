@@ -387,7 +387,7 @@ public abstract class GenericExtruder implements Extruder
 	 * Zero the extruded length
 	 *
 	 */
-	public void zeroExtrudedLength()
+	public void zeroExtrudedLength() throws Exception
 	{
 		es.zero();
 	}
@@ -524,8 +524,9 @@ public abstract class GenericExtruder implements Extruder
 	 * 
 	 * @param speed The speed to drive the motor at (0-255)
 	 * @throws IOException
+	 * @throws Exception 
 	 */
-	public void setExtrusion(double speed, boolean rev) throws IOException
+	public void setExtrusion(double speed, boolean rev) throws IOException, Exception
 	{
 		if (speed > 0)
 			es.setExtruding(true);
@@ -569,7 +570,7 @@ public abstract class GenericExtruder implements Extruder
 		}
 	}
 	
-	public void setMotor(boolean motorOn) throws IOException
+	public void setMotor(boolean motorOn) throws Exception
 	{
 		if(getExtruderSpeed() < 0)
 			return;

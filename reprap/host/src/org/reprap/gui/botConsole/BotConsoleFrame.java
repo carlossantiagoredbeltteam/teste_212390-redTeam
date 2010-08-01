@@ -80,7 +80,10 @@ public class BotConsoleFrame extends javax.swing.JFrame {
         pollThread.start(); 
     }
     
-
+    public void handleException(Exception e)
+    {
+    	
+    }
     
     /**
      * The update thread calls this to update everything
@@ -90,9 +93,17 @@ public class BotConsoleFrame extends javax.swing.JFrame {
     {
     	int currentExtruder = org.reprap.Main.gui.getPrinter().getExtruder().getID();
     	
-    	org.reprap.Main.gui.getPrinter().selectExtruder(exPanelNumber);
+    	try {
+			org.reprap.Main.gui.getPrinter().selectExtruder(exPanelNumber);
+		} catch (Exception e) {
+			handleException(e);
+		}
     	extruderPanels[exPanelNumber].refreshTemperature();
-    	org.reprap.Main.gui.getPrinter().selectExtruder(currentExtruder);
+    	try {
+			org.reprap.Main.gui.getPrinter().selectExtruder(currentExtruder);
+		} catch (Exception e) {
+			handleException(e);
+		}
     	
     	exPanelNumber++;
     	if(exPanelNumber >= extruderPanels.length)

@@ -106,7 +106,11 @@ public class GenericExtruderTabPanel extends javax.swing.JPanel {
     
     public void selectExtruder()
     {
-    	org.reprap.Main.gui.getPrinter().selectExtruder(extruderID);
+    	try {
+			org.reprap.Main.gui.getPrinter().selectExtruder(extruderID);
+		} catch (Exception e) {
+			parentBotConsoleFrame.handleException(e);
+		}
     }
     
     /** This method is called from within the constructor to
@@ -509,7 +513,11 @@ private void heatButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
         setExtruderSpeed();
         if(extruder.get5D() && extruding)
 		{
-			extruder.getPrinter().machineWait(5000, false);
+			try {
+				extruder.getPrinter().machineWait(5000, false);
+			} catch (Exception e) {
+				parentBotConsoleFrame.handleException(e);
+			}
 			extruding = false;
 			setExtruderSpeed();
             extrudeButton.setText("Extrude");
@@ -559,7 +567,11 @@ private void RampButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     	//GregorianCalendar cal = new GregorianCalendar();
     	//Date d = cal.getTime();
 		startTime = Timer.elapsed();//d.getTime() + cal.getTimeZone().getOffset(d.getTime());
-		startTemp = extruder.getTemperature() - 1; // Start a bit below where we are for safety
+		try {
+			startTemp = extruder.getTemperature() - 1;
+		} catch (Exception e) {
+			parentBotConsoleFrame.handleException(e);
+		} // Start a bit below where we are for safety
     	RampButton.setText("Ramping");
         ramping = true;
     }
@@ -620,7 +632,11 @@ private void setExtruderSpeed() {
     private Color c;
     
     public void refreshTemperature() {
-        currentTemp = (int)Math.round(extruder.getTemperature());
+        try {
+			currentTemp = (int)Math.round(extruder.getTemperature());
+		} catch (Exception e) {
+			parentBotConsoleFrame.handleException(e);
+		}
         currentTempLabel.setText("" + currentTemp);
         tempProgress.setMinimum(0);
         tempProgress.setMaximum(Integer.parseInt(targetTempField.getText()));

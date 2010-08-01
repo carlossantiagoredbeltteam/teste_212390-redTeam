@@ -25,7 +25,7 @@ public class GCodeExtruder extends GenericExtruder
 	 * Zero the extruded length
 	 *
 	 */
-	public void zeroExtrudedLength()
+	public void zeroExtrudedLength() throws Exception
 	{
 		//if(es.length() > 0)
 		//{
@@ -37,7 +37,7 @@ public class GCodeExtruder extends GenericExtruder
 	/**
 	 * Purge the extruder
 	 */
-	public void purge(boolean homeZ)
+	public void purge(boolean homeZ) throws Exception
 	{
 		if(purgeTime <= 0)
 			return;
@@ -68,18 +68,14 @@ public class GCodeExtruder extends GenericExtruder
 	
 	public void setHeater(int heat, double maxTemp) {}
 	
-	public double getTemperature()
+	public double getTemperature() throws Exception
 	{
-		String temps = gcode.queueRespond("M105; get temperature");
-		if(temps.indexOf("B:") < 0)
-			temps = temps.substring(temps.indexOf("T:") + 2);
-		else
-			temps = temps.substring(temps.indexOf("T:") + 2, temps.indexOf(" "));
-		es.setCurrentTemperature(Double.parseDouble(temps));
+		gcode.queue("M105; get temperature");
+		es.setCurrentTemperature(gcode.getETemp());
 		return es.currentTemperature();
 	}
 	
-	public void setExtrusion(double speed, boolean reverse) throws IOException
+	public void setExtrusion(double speed, boolean reverse) throws Exception
 	{
 		if(getExtruderSpeed() < 0)
 			return;
@@ -105,7 +101,7 @@ public class GCodeExtruder extends GenericExtruder
 	}
 	
 	//TODO: make these real G codes.
-	public void setCooler(boolean coolerOn) throws IOException
+	public void setCooler(boolean coolerOn) throws Exception
 	{
 		if (coolerOn)
 			gcode.queue("M106 ;cooler on");
@@ -114,7 +110,7 @@ public class GCodeExtruder extends GenericExtruder
 	}
 	
 
-	public void setValve(boolean valveOpen) throws IOException
+	public void setValve(boolean valveOpen) throws Exception
 	{
 		if(valvePulseTime <= 0)
 			return;

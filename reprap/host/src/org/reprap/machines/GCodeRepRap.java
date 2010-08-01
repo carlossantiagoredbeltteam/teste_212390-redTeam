@@ -55,7 +55,7 @@ public class GCodeRepRap extends GenericRepRap {
 		motorZ = new GCodeStepperMotor(this, 3);
 	}
 	
-	public void loadExtruders()
+	public void loadExtruders() throws Exception
 	{
 		try
 		{
@@ -74,7 +74,7 @@ public class GCodeRepRap extends GenericRepRap {
 		return new GCodeExtruder(gcode, count, this);
 	}
 	
-	private void qFeedrate(double feedrate)
+	private void qFeedrate(double feedrate) throws Exception
 	{		
 		if(currentFeedrate == feedrate)
 			return;
@@ -82,7 +82,7 @@ public class GCodeRepRap extends GenericRepRap {
 		currentFeedrate = feedrate;		
 	}
 	
-	private void qXYMove(double x, double y, double feedrate)
+	private void qXYMove(double x, double y, double feedrate) throws Exception
 	{	
 		double dx = x - currentX;
 		double dy = y - currentY;
@@ -138,7 +138,7 @@ public class GCodeRepRap extends GenericRepRap {
 		currentY = y;
 	}
 	
-	private void qZMove(double z, double feedrate)
+	private void qZMove(double z, double feedrate) throws Exception
 	{	
 		// note we set the feedrate whether we move or not
 		
@@ -191,7 +191,7 @@ public class GCodeRepRap extends GenericRepRap {
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#moveTo(double, double, double, boolean, boolean)
 	 */
-	public void moveTo(double x, double y, double z, double feedrate, boolean startUp, boolean endUp) throws ReprapException, IOException
+	public void moveTo(double x, double y, double z, double feedrate, boolean startUp, boolean endUp) throws Exception
 	{
 		if (isCancelled())
 			return;
@@ -350,7 +350,7 @@ public class GCodeRepRap extends GenericRepRap {
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#printTo(double, double, double)
 	 */
-	public void printTo(double x, double y, double z, double feedrate, boolean stopExtruder, boolean closeValve) throws ReprapException, IOException
+	public void printTo(double x, double y, double z, double feedrate, boolean stopExtruder, boolean closeValve) throws Exception
 	{
 		moveTo(x, y, z, feedrate, false, false);
 		
@@ -441,7 +441,7 @@ public class GCodeRepRap extends GenericRepRap {
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#initialise()
 	 */
-	public void startRun()
+	public void startRun() throws Exception
 	{	
 		// If we are printing from a file, that should contain all the headers we need.
 		if(gcode.buildingFromFile())
@@ -490,7 +490,7 @@ public class GCodeRepRap extends GenericRepRap {
 //		delay(msDelay);
 //	}
 
-	public void home() {
+	public void home() throws Exception {
 
 		gcode.queue("G28; go home");
 //		// Assume the extruder is off...
@@ -508,7 +508,7 @@ public class GCodeRepRap extends GenericRepRap {
 		super.home();
 	}
 	
-	private void delay(long millis, boolean fastExtrude)
+	private void delay(long millis, boolean fastExtrude) throws Exception
 	{
 		double extrudeLength = getExtruder().getDistanceFromTime(millis);
 		if(extrudeLength > 0)
@@ -571,22 +571,23 @@ public class GCodeRepRap extends GenericRepRap {
 	/**
 	 * Get X, Y, Z and E (if supported) coordinates in an array
 	 * @return
+	 * @throws Exception 
 	 */
-	public double[] getCoordinates()
+	public double[] getCoordinates() throws Exception
 	{
-		String coords = gcode.queueRespond("M114; get coordinates") + " ";
+		gcode.queue("M114; get coordinates");
 		double [] result = new double[4];
-		result[0] = getReturnedCoordinate(coords, "X");
-		result[1] = getReturnedCoordinate(coords, "Y");
-		result[2] = getReturnedCoordinate(coords, "Z");
-		result[3] = getReturnedCoordinate(coords, "E");
+		result[0] = gcode.getX();
+		result[1] = gcode.getY();
+		result[2] = gcode.getZ();
+		result[3] = gcode.getE();
 		return result;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#homeToZeroX()
 	 */
-	public void homeToZeroX() throws ReprapException, IOException {
+	public void homeToZeroX() throws Exception {
 
 		
 //		// Assume extruder is off...
@@ -603,7 +604,7 @@ public class GCodeRepRap extends GenericRepRap {
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#homeToZeroY()
 	 */
-	public void homeToZeroY() throws ReprapException, IOException {
+	public void homeToZeroY() throws Exception {
 
 		// Assume extruder is off...
 		
@@ -618,7 +619,7 @@ public class GCodeRepRap extends GenericRepRap {
 
 	}
 	
-	public void homeToZeroXYE() throws ReprapException, IOException
+	public void homeToZeroXYE() throws Exception
 	{
 		if(XYEAtZero)
 			return;
@@ -641,7 +642,7 @@ public class GCodeRepRap extends GenericRepRap {
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#homeToZeroY()
 	 */
-	public void homeToZeroZ() throws ReprapException, IOException {
+	public void homeToZeroZ() throws Exception {
 
 		// Assume extruder is off...
 //		try
@@ -664,13 +665,13 @@ public class GCodeRepRap extends GenericRepRap {
 	public void waitTillNotBusy() throws IOException {}
 
 	//TODO: make this work normally.
-	public void stopMotor() throws IOException
+	public void stopMotor() throws Exception
 	{
 		getExtruder().stopExtruding();
 	}
 	
 	//TODO: make this work normally.
-	public void stopValve() throws IOException
+	public void stopValve() throws Exception
 	{
 		getExtruder().setValve(false);
 	}
@@ -681,8 +682,9 @@ public class GCodeRepRap extends GenericRepRap {
 	 * 
 	 * The RS232/USB etc comms system doesn't use this - it sets its own delays.
 	 * @param milliseconds
+	 * @throws Exception 
 	 */
-	public void machineWait(double milliseconds, boolean fastExtrude)
+	public void machineWait(double milliseconds, boolean fastExtrude) throws Exception
 	{
 		if(milliseconds <= 0)
 			return;
@@ -779,7 +781,7 @@ public class GCodeRepRap extends GenericRepRap {
 		gcode.finishedLayer();
 	}
 	
-	public void selectExtruder(int materialIndex)
+	public void selectExtruder(int materialIndex) throws Exception
 	{
 		int oldPhysicalExtruder = getExtruder().getPhysicalExtruderNumber();
 		super.selectExtruder(materialIndex);
@@ -802,9 +804,10 @@ public class GCodeRepRap extends GenericRepRap {
 	 * in centigrade, i.e. 100 equals 100 centigrade. 
 	 * @param temperature The temperature of the extruder in centigrade
 	 * @param wait - wait till it gets there (or not).
+	 * @throws Exception 
 	 * @throws Exception
 	 */
-	public void setBedTemperature(double temperature)
+	public void setBedTemperature(double temperature) throws Exception
 	{
 		super.setBedTemperature(temperature);
 		gcode.queue("M140 S" + temperature + " ;set bed temperature and return");
@@ -813,22 +816,20 @@ public class GCodeRepRap extends GenericRepRap {
 	/**
 	 * Return the current temperature of the bed
 	 * @return
+	 * @throws Exception 
 	 */
-	public double getBedTemperature()
+	public double getBedTemperature() throws Exception
 	{ 
-		String temps = gcode.queueRespond("M105; get temperature");
-		int st = temps.indexOf("B:");
-		if(st < 0)
-			return 0;
-		temps = temps.substring(st + 2);
-		return Double.parseDouble(temps);
+		gcode.queue("M105; get temperature");
+		return gcode.getBTemp();
 	}
 	
 	/**
 	 * Wait till the entire machine is ready to print.  That is that such things as
 	 * extruder and bed temperatures are at the values set and stable.
+	 * @throws Exception 
 	 */
-	public void stabilise()
+	public void stabilise() throws Exception
 	{
 		gcode.queue("M116 ;wait for stability then return");
 	}
