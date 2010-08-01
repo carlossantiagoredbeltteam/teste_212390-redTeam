@@ -84,7 +84,7 @@ public class Simulator extends GenericRepRap {
 		currentZ = z;
 	}
 	
-	public double[] getCoordinates()
+	public double[] getCoordinates() throws Exception
 	{
 		double [] result = new double[4];
 		result[0] = currentX;

@@ -44,31 +44,34 @@ public interface Extruder
 	 * @param speed The speed to drive the motor at (0-255)
 	 * @param reverse If set, run extruder in reverse
 	 * @throws IOException
+	 * @throws Exception 
 	 */
-	public void setExtrusion(double speed, boolean reverse) throws IOException;
+	public void setExtrusion(double speed, boolean reverse) throws IOException, Exception;
 	
 	/**
 	* start extruding at the normal rate.
 	*/
-	public void startExtruding();
+	public void startExtruding() throws Exception;
 	
 	/**
 	* stop extruding
 	*/
-	public void stopExtruding();
+	public void stopExtruding() throws Exception;
 	
 	/**
 	* Start/stop the extruder motor
+	 * @throws Exception 
 	*/
-	public void setMotor(boolean motorOn) throws IOException;
+	public void setMotor(boolean motorOn) throws IOException, Exception;
 		
 	/**
 	 * Open and close the valve (if any).
 	 * @param pulseTime
 	 * @param valveOpen
 	 * @throws IOException
+	 * @throws Exception 
 	 */
-	public void setValve(boolean valveOpen) throws IOException;
+	public void setValve(boolean valveOpen) throws IOException, Exception;
 	
 	/**
 	 * Turn the heater of the extruder on. Inital temperatur is defined by ???
@@ -119,7 +122,7 @@ public interface Extruder
 	/**
 	 * @return the current temperature of the extruder 
 	 */
-	public double getTemperature(); 
+	public double getTemperature() throws Exception; 
 
 	/**
 	 * @return the infill speed as a value between [0,1]
@@ -165,8 +168,9 @@ public interface Extruder
 	 * Turn the cooler (fan?) on or off
 	 * @param f true if the cooler is to be turned on, false to turn off
 	 * @throws IOException
+	 * @throws Exception 
 	 */
-	public void setCooler(boolean f) throws IOException ;
+	public void setCooler(boolean f) throws IOException, Exception ;
 	
 	/**
 	 * Check if the extruder is available, which is determined by ???
@@ -212,7 +216,7 @@ public interface Extruder
      * Purge the extruder
      *
      */
-    public void purge(boolean homeZ);
+    public void purge(boolean homeZ) throws Exception;
     
     /**
      * Set the flag to show we're creating a separation
@@ -271,7 +275,7 @@ public interface Extruder
      * Find out how far we have extruded so far
      * @return
      */
-    public ExtruderState getExtruderState();
+    public ExtruderState getExtruderState() throws Exception;
     
 	/**
 	 * Allow otthers to set our extrude length so that all logical extruders
@@ -282,9 +286,10 @@ public interface Extruder
 	
 	/**
 	 * Zero the extruded length
+	 * @throws Exception 
 	 *
 	 */
-	public void zeroExtrudedLength();
+	public void zeroExtrudedLength() throws Exception;
     
     /**
      * @return the X offset in millimeters

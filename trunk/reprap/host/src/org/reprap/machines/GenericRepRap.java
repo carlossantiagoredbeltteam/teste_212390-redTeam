@@ -226,7 +226,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 		motorZ = new NullStepperMotor(3);
 	}
 	
-	public void loadExtruders()
+	public void loadExtruders() throws Exception
 	{
 		int pe;
 		
@@ -358,7 +358,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#selectMaterial(int)
 	 */
-	public void selectExtruder(int materialIndex)
+	public void selectExtruder(int materialIndex) throws Exception
 	{
 		if (isCancelled())
 			return;
@@ -387,7 +387,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#selectMaterial(int)
 	 */
-	public void selectExtruder(Attributes att) {
+	public void selectExtruder(Attributes att) throws Exception {
 		for(int i = 0; i < extruders.length; i++)
 		{
 			if(att.getMaterial().equals(extruders[i].getMaterial()))
@@ -621,6 +621,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 * @param endZ
 	 * @throws ReprapException
 	 * @throws IOException
+	 * @throws Exception 
 	 */
 //	public void printSegment(double startX, double startY, double startZ, 
 //			double endX, double endY, double endZ, boolean turnOff) throws ReprapException, IOException {
@@ -631,7 +632,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#moveTo(double, double, double, boolean, boolean)
 	 */
-	public void moveTo(double x, double y, double z, double feedRate, boolean startUp, boolean endUp) throws ReprapException, IOException
+	public void moveTo(double x, double y, double z, double feedRate, boolean startUp, boolean endUp) throws ReprapException, IOException, Exception
 	{
 		if (isCancelled()) return;
 
@@ -687,10 +688,9 @@ public abstract class GenericRepRap implements CartesianPrinter
 	
 	/**
 	 * Occasionally re-zero X and Y if that option is selected (i.e. xYReZeroInterval > 0)
-	 * @throws ReprapException
-	 * @throws IOException
+	 * @throws Exception 
 	 */
-	protected void maybeReZero() throws ReprapException, IOException
+	protected void maybeReZero() throws Exception
 	{
 		if(xYReZeroInterval <= 0)
 			return;
@@ -735,9 +735,9 @@ public abstract class GenericRepRap implements CartesianPrinter
 	
 	/**
 	 * @param enable
-	 * @throws IOException
+	 * @throws Exception 
 	 */
-	public void setCooling(boolean enable) throws IOException {
+	public void setCooling(boolean enable) throws Exception {
 		getExtruder().setCooler(enable);
 	}
 		
@@ -804,25 +804,25 @@ public abstract class GenericRepRap implements CartesianPrinter
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#homeToZeroX()
 	 */
-	public void homeToZeroX() throws ReprapException, IOException{
+	public void homeToZeroX() throws ReprapException, IOException, Exception{
 		currentX = 0.0;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#homeToZeroY()
 	 */
-	public void homeToZeroY() throws ReprapException, IOException {
+	public void homeToZeroY() throws ReprapException, IOException, Exception {
 		currentY = 0.0;
 	}
 	
-	public void homeToZeroZ() throws ReprapException, IOException {
+	public void homeToZeroZ() throws ReprapException, IOException, Exception {
 		currentZ = 0.0;
 	}
 	
-	public void homeToZeroXYE() throws ReprapException, IOException
+	public void homeToZeroXYE() throws ReprapException, IOException, Exception
 	{}
 	
-	public void home(){
+	public void home() throws Exception{
 		currentX = currentY = currentZ = 0.0;
 	}
 	
@@ -1345,9 +1345,10 @@ public abstract class GenericRepRap implements CartesianPrinter
 	 * in centigrade, i.e. 100 equals 100 centigrade. 
 	 * @param temperature The temperature of the extruder in centigrade
 	 * @param wait - wait till it gets there (or not).
+	 * @throws Exception 
 	 * @throws Exception
 	 */
-	public void setBedTemperature(double temperature)
+	public void setBedTemperature(double temperature) throws Exception
 	{
 		bedTemperatureTarget = temperature;
 	}

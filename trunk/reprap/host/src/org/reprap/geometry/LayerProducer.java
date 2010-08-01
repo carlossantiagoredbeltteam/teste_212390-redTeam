@@ -355,10 +355,9 @@ public class LayerProducer {
 	 * speed up for short lines
 	 * @param p
 	 * @return
-	 * @throws ReprapException
-	 * @throws IOException
+	 * @throws Exception 
 	 */
-	private boolean shortLine(Rr2Point p, boolean stopExtruder, boolean closeValve) throws ReprapException, IOException
+	private boolean shortLine(Rr2Point p, boolean stopExtruder, boolean closeValve) throws Exception
 	{
 		Printer printer = layerConditions.getPrinter();
 		double shortLen = printer.getExtruder().getShortLength();
@@ -384,10 +383,9 @@ public class LayerProducer {
 	 * @param first First point, the end of the line segment to be plotted to from the current position.
 	 * @param second Second point, the end of the next line segment; used for angle calculations
 	 * @param turnOff True if the extruder should be turned off at the end of this segment.
-	 * @throws ReprapException
-	 * @throws IOException
+	 * @throws Exception 
 	 */
-	private void plot(Rr2Point first, Rr2Point second, boolean stopExtruder, boolean closeValve) throws ReprapException, IOException
+	private void plot(Rr2Point first, Rr2Point second, boolean stopExtruder, boolean closeValve) throws Exception
 	{
 		Printer printer = layerConditions.getPrinter();
 		if (printer.isCancelled()) return;
@@ -446,11 +444,10 @@ public class LayerProducer {
 	 * @param second
 	 * @param startUp
 	 * @param endUp
-	 * @throws ReprapException
-	 * @throws IOException
+	 * @throws Exception 
 	 */
 	private void move(Rr2Point first, Rr2Point second, boolean startUp, boolean endUp, boolean fast) 
-		throws ReprapException, IOException
+		throws Exception
 	{
 		Printer printer = layerConditions.getPrinter();
 		
@@ -505,11 +502,10 @@ public class LayerProducer {
 
 	/**
 	 * Plot a polygon
-	 * @throws IOException
-	 * @throws ReprapException
 	 * @return
+	 * @throws Exception 
 	 */
-	private void plot(RrPolygon p, boolean firstOneInLayer) throws ReprapException, IOException
+	private void plot(RrPolygon p, boolean firstOneInLayer) throws Exception
 	{
 		Attributes att = p.getAttributes();
 		Printer printer = layerConditions.getPrinter();
@@ -749,10 +745,9 @@ public class LayerProducer {
 	/**
 	 * Master plot function - draw everything.  Supress border and/or hatch by
 	 * setting borderPolygons and/or hatchedPolygons null
-	 * @throws IOException
-	 * @throws ReprapException
+	 * @throws Exception 
 	 */
-	public void plot() throws ReprapException, IOException
+	public void plot() throws Exception
 	{
 		//int ib, jb, ih, jh;
 

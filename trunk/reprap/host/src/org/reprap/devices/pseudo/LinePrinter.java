@@ -76,9 +76,9 @@ public class LinePrinter {
 	 * @param endX
 	 * @param endY
 	 * @param movementSpeed
-	 * @throws IOException
+	 * @throws Exception 
 	 */
-	public void moveTo(int endX, int endY, int movementSpeed, boolean stopExt, boolean closeV) throws IOException {
+	public void moveTo(int endX, int endY, int movementSpeed, boolean stopExt, boolean closeV) throws Exception {
 		initialiseXY();
 
 		if (currentX == endX && currentY == endY)
@@ -192,10 +192,10 @@ public class LinePrinter {
 	 * @param movementSpeed
 	 * @param extruderSpeed
 	 * @param lastOne True if extruder should be turned off after this segment is printed.
-	 * @throws IOException
+	 * @throws Exception 
 	 */
 	public void printTo(int endX, int endY, int movementSpeed, 
-			double extruderSpeed, boolean stopExt, boolean closeV) throws IOException {
+			double extruderSpeed, boolean stopExt, boolean closeV) throws Exception {
 		// Determine the extruder speed, based on the geometry of the line
 		// to be printed
 		double dx = endX - currentX;
@@ -208,12 +208,12 @@ public class LinePrinter {
 			moveTo(endX, endY, angleSpeed(movementSpeed, dx, dy), stopExt, closeV);
 	}
 	
-	public void stopMotor() throws IOException
+	public void stopMotor() throws Exception
 	{
 		extruder.setMotor(false);
 	}
 	
-	public void stopValve() throws IOException
+	public void stopValve() throws Exception
 	{
 		extruder.setValve(false);
 	}
@@ -226,10 +226,10 @@ public class LinePrinter {
 	 * @param movementSpeed
 	 * @param extruderSpeed
 	 * @param lastOne True if the extruder should be turned off at the end of this segment.
-	 * @throws IOException
+	 * @throws Exception 
 	 */
 	public void printLine(int startX, int startY, int endX, int endY, 
-			int movementSpeed, int extruderSpeed, boolean stopExt, boolean closeV) throws IOException {
+			int movementSpeed, int extruderSpeed, boolean stopExt, boolean closeV) throws Exception {
 		moveTo(startX, startY, movementSpeed, false, false);
 		printTo(endX, endY, movementSpeed, extruderSpeed, stopExt, closeV);
 	}

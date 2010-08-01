@@ -319,7 +319,12 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 		
 		while((value >> 8) != 0)
 		{
-			printer.machineWait(500, false);
+			try {
+				printer.machineWait(500, false);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			value = getStatus();
 		}
 	}
@@ -338,7 +343,12 @@ public class SNAPStepperMotor extends GenericStepperMotor {
 		while((value & 0xff) == modeQueue)
 		{
 			//System.out.println("busy: " + value);
-			printer.machineWait(500, false);
+			try {
+				printer.machineWait(500, false);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			value = getStatus();
 		}
 	}	

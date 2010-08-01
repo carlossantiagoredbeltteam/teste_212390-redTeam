@@ -242,7 +242,11 @@ public class SNAPExtruder extends GenericExtruder
 			setExtrusion(0, false);
 		} catch (Exception e)
 		{}
-		zeroExtrudedLength();
+		try {
+			zeroExtrudedLength();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
