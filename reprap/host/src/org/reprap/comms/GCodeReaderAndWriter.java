@@ -558,6 +558,11 @@ public class GCodeReaderAndWriter
 	 */
 	public double getETemp()
 	{
+		if(serialOutStream == null)
+		{
+			Debug.d("getETemp(): non-running output buffer.");
+			return 0;
+		}
 		if(eTemp == Double.NEGATIVE_INFINITY)
 		{
 			Debug.e("GCodeReaderAndWriter.getETemp() - no value stored!");
@@ -572,6 +577,11 @@ public class GCodeReaderAndWriter
 	 */
 	public double getBTemp()
 	{
+		if(serialOutStream == null)
+		{
+			Debug.d("getBTemp(): non-running output buffer.");
+			return 0;
+		}
 		if(bTemp == Double.NEGATIVE_INFINITY)
 		{
 			Debug.e("GCodeReaderAndWriter.getBTemp() - no value stored!");
@@ -586,6 +596,11 @@ public class GCodeReaderAndWriter
 	 */
 	public double getX()
 	{
+		if(serialOutStream == null)
+		{
+			Debug.d("getX(): non-running output buffer.");
+			return 0;
+		}
 		if(x == Double.NEGATIVE_INFINITY)
 		{
 			Debug.e("GCodeReaderAndWriter.getX() - no value stored!");
@@ -600,6 +615,11 @@ public class GCodeReaderAndWriter
 	 */
 	public double getY()
 	{
+		if(serialOutStream == null)
+		{
+			Debug.d("getY(): non-running output buffer.");
+			return 0;
+		}
 		if(y == Double.NEGATIVE_INFINITY)
 		{
 			Debug.e("GCodeReaderAndWriter.getY() - no value stored!");
@@ -614,6 +634,11 @@ public class GCodeReaderAndWriter
 	 */
 	public double getZ()
 	{
+		if(serialOutStream == null)
+		{
+			Debug.d("getZ(): non-running output buffer.");
+			return 0;
+		}
 		if(z == Double.NEGATIVE_INFINITY)
 		{
 			Debug.e("GCodeReaderAndWriter.getZ() - no value stored!");
@@ -628,6 +653,11 @@ public class GCodeReaderAndWriter
 	 */
 	public double getE()
 	{
+		if(serialOutStream == null)
+		{
+			Debug.d("getE(): non-running output buffer.");
+			return 0;
+		}
 		if(e == Double.NEGATIVE_INFINITY)
 		{
 			Debug.e("GCodeReaderAndWriter.getE() - no value stored!");
