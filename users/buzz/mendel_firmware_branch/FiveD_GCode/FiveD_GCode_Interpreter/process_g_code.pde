@@ -595,6 +595,11 @@ void process_string(char instruction[], int size)
                                 talkToHost.setCoords(where_i_am);
 				break;
 
+			//custom code for returning Firmware Version and Capabilities 
+			case 115:
+                                talkToHost.capabilities();
+				break;
+
 
                         // TODO: make this work properly
                         case 116:

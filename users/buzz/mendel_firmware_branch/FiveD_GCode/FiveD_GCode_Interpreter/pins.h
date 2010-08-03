@@ -1,13 +1,14 @@
 #ifndef PINS_H
 #define PINS_H
 
-#if MOTHERBOARD == 0
+#include "features.h"
 
-#error The Arduino cannot run the 5D GCode interpreter
+#if CPUTYPE == CPUTYPE_ATMEL168
+
+#error The Arduino_168 cannot likely run the 5D GCode interpreter
 
 /****************************************************************************************
-* Arduino pin assignment - left here as they might be useful
-*
+* Old Arduino168 pin assignment - left here as they might be useful
 ****************************************************************************************/
 
 #define X_STEP_PIN (byte)2
@@ -41,7 +42,7 @@
 * Sanguino/RepRap Motherboard with direct-drive extruders
 *
 ****************************************************************************************/
-#elif MOTHERBOARD == 1
+#elif (CPUTYPE == CPUTYPE_SANGUINO) && (EXTRUDER_CONTROLLER == EXTRUDER_CONTROLLER_INTERNAL)
 
 #ifndef __AVR_ATmega644P__
 #error Oops!  Make sure you have 'Sanguino' selected from the 'Tools -> Boards' menu.
@@ -94,11 +95,10 @@
 
 
 /****************************************************************************************
-* RepRap Motherboard with RS485 extruders
-*
+* RepRap "Gen 3" Motherboard with RS485 extruder/s
 ****************************************************************************************/
 
-#elif MOTHERBOARD == 2
+#elif (CPUTYPE == CPUTYPE_SANGUINO) && (EXTRUDER_CONTROLLER == EXTRUDER_CONTROLLER_RS485)
 
 #ifndef __AVR_ATmega644P__
 #error Oops!  Make sure you have 'Sanguino' selected from the 'Tools -> Boards' menu.
@@ -145,11 +145,10 @@
 #define PS_ON_PIN       14
 
 /****************************************************************************************
-* Arduino Mega pin assignment
-*
+* Typical Arduino Mega pin assignment  ( using internally controlled extruder stepper, not RS485)
 ****************************************************************************************/
 
-#elif MOTHERBOARD == 3
+#elif (CPUTYPE == CPUTYPE_MEGA) && (EXTRUDER_CONTROLLER == EXTRUDER_CONTROLLER_INTERNAL)
 
 #ifndef __AVR_ATmega1280__
 #error Oops!  Make sure you have 'Arduino Mega' selected from the 'Tools -> Boards' menu.
@@ -195,10 +194,14 @@
 #define EXTRUDER_1_HEATER_PIN (byte)13
 #define EXTRUDER_1_TEMPERATURE_PIN (byte)2 
 
+/****************************************************************************************
+*  ANY OTHER TYPICAL MACHINE PINOUTS CAN GO HERE.
+****************************************************************************************/
+//#elif (CPUTYPE == CPUTYPE_MEGA) && (EXTRUDER_CONTROLLER == EXTRUDER_CONTROLLER_INTERNAL)
 
 #else
 
-#error Unknown MOTHERBOARD value in configuration.h
+#error Unknown CPUTYPE value in pins.h  Please add your setup, and let us know, so we  can add it.  join the list: reprap-dev@lists.reprap.org
 
 #endif
 

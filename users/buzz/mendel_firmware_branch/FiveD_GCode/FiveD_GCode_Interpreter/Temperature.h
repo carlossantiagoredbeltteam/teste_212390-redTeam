@@ -5,8 +5,8 @@
 
 #define HALF_DEAD_ZONE 5
 
-
-#if MOTHERBOARD != 2
+// for heated beds OR direct PIC temperature control of the extruder without a separate CPU. 
+#if (HEATED_BED == HEATED_BED_ON) ||  (EXTRUDER_CONTROLLER == EXTRUDER_CONTROLLER_INTERNAL )
 
 #ifdef USE_THERMISTOR
 

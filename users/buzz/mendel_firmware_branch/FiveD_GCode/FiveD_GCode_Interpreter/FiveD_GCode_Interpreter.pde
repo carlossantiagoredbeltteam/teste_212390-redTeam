@@ -4,6 +4,7 @@
 #include <avr/pgmspace.h>
 #include "WProgram.h"
 #include "vectors.h"
+#include "features.h"
 #include "configuration.h"
 #include "hostcom.h"
 #include "intercom.h"
@@ -38,8 +39,6 @@ http://objects.reprap.org/wiki/Mendel_User_Manual:_RepRapGCodes
 // Arduino Mega v1.7 by Adrian Bowyer
 // Features code v1.8 by David Bussenschutt July 2010
 
-
-
 // Maintain a list of extruders...
 
 extruder* ex[EXTRUDER_COUNT];
@@ -48,7 +47,7 @@ byte extruder_in_use = 0;
 
 // Old Mothers...
 
-#if MOTHERBOARD == 1
+#if EXTRUDER_CONTROLLER == EXTRUDER_CONTROLLER_DC
 
 // TODO: For some reason, if you declare the following two in the order ex0 ex1 then
 // ex0 won't drive its stepper.  They seem fine this way round though.  But that's got
@@ -66,11 +65,12 @@ static extruder ex0(EXTRUDER_0_MOTOR_DIR_PIN, EXTRUDER_0_MOTOR_SPEED_PIN , EXTRU
    
 static bed heatedBed(BED_HEATER_PIN, BED_TEMPERATURE_PIN);
 
-#endif
+#endif // extruder controller
 
-// Standard Mendel
 
-#if MOTHERBOARD == 2
+// Standard Mendel, 
+
+#if EXTRUDER_CONTROLLER == EXTRUDER_CONTROLLER_RS485
 
 #if EXTRUDER_COUNT == 2    
 static extruder ex1(E1_NAME, E1_STEPS_PER_MM);            
@@ -80,11 +80,12 @@ static extruder ex0(E0_NAME, E0_STEPS_PER_MM);
 
 intercom talker;
 
-#endif
+#endif // extruder controller
 
-// Arduino Mega
 
-#if MOTHERBOARD == 3
+// Arduino Mega and friends
+
+#if EXTRUDER_CONTROLLER == EXTRUDER_CONTROLLER_INTERNAL
 
 #if EXTRUDER_COUNT == 2            
 static extruder ex1(EXTRUDER_1_STEP_PIN, EXTRUDER_1_DIR_PIN, EXTRUDER_1_ENABLE_PIN, EXTRUDER_1_HEATER_PIN, EXTRUDER_1_TEMPERATURE_PIN, E1_STEPS_PER_MM);            
@@ -92,9 +93,17 @@ static extruder ex1(EXTRUDER_1_STEP_PIN, EXTRUDER_1_DIR_PIN, EXTRUDER_1_ENABLE_P
 
 static extruder ex0(EXTRUDER_0_STEP_PIN, EXTRUDER_0_DIR_PIN, EXTRUDER_0_ENABLE_PIN, EXTRUDER_0_HEATER_PIN, EXTRUDER_0_TEMPERATURE_PIN, E0_STEPS_PER_MM); 
 
+
+#if HEATED_BED == HEATED_BED_ON
+
 static bed heatedBed(BED_HEATER_PIN, BED_TEMPERATURE_PIN);
 
-#endif
+#endif //heated bed
+
+
+#endif  // extruder controller
+
+
 
 static hostcom talkToHost;
 
@@ -182,12 +191,15 @@ void setup()
   init_process_string();
   
   talkToHost.start();
-  
-#if MOTHERBOARD == 2 
+ 
+ // turn on remote powersupply, if it's possible
+#ifdef PS_ON_PIN 
     pinMode(PS_ON_PIN, OUTPUT);  // add to run G3 as built by makerbot
     digitalWrite(PS_ON_PIN, LOW);   // ditto
     delay(2000);    
-    rs485Interface.begin(RS485_BAUD);  
+#endif
+#if EXTRUDER_CONTROLLER == EXTRUDER_CONTROLLER_RS485
+rs485Interface.begin(RS485_BAUD);  
 #endif
 
   setTimer(DEFAULT_TICK);
@@ -210,11 +222,14 @@ void shutdown()
   cancelAndClearQueue();
   
 
-  // Motors off
-  
-#if MOTHERBOARD > 0  
+// Motors off
+#if DISABLE_X 
   digitalWrite(X_ENABLE_PIN, !ENABLE_ON);
+#endif
+#if DISABLE_Y 
   digitalWrite(Y_ENABLE_PIN, !ENABLE_ON);
+  #endif
+#if DISABLE_Z 
   digitalWrite(Z_ENABLE_PIN, !ENABLE_ON);
 #endif
 
@@ -225,7 +240,7 @@ void shutdown()
 
 // If we run the bed, turn it off.
 
-#if MOTHERBOARD != 2
+#if HEATED_BED == HEATED_BED_ON
   heatedBed.shutdown();
 #endif
 
@@ -249,7 +264,7 @@ void manage()
 {
   for(byte i = 0; i < EXTRUDER_COUNT; i++)
     ex[i]->manage();
-#if MOTHERBOARD != 2    
+#if HEATED_BED == HEATED_BED_ON   
   heatedBed.manage();
 #endif  
 }
@@ -262,7 +277,7 @@ void loop()
   nonest = false;
    manage();
    get_and_do_command(); 
-#if MOTHERBOARD == 2
+#if EXTRUDER_CONTROLLER == EXTRUDER_CONTROLLER_RS485
    talker.tick();
 #endif
 }

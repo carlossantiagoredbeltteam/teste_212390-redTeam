@@ -4,7 +4,7 @@
 // Features:   
 //  Each of these defines relates specifically to a component electronic or hardware function or 
 //     capability that may or may not exist in your particular machine.
-//  You should select which of these are used, in your instance, in configuration.h
+//  You should select which of these are used in your instance, in configuration.h
 //-----------------------------------------------------------------------------------------------
 
 //NONE OF THESE CONSTANTS NEED EVER BE CHANGED IN HERE! 
@@ -19,6 +19,9 @@
 //#define MOTHERBOARD_SANGUINO_DD 1
 //#define MOTHERBOARD_REPRAP_RS485 2
 //#define MOTHERBOARD_MEGA 3
+
+
+#define REVISION "1.8"
 
 
 //eg:
@@ -47,6 +50,8 @@
   #define CPUTYPE_ATMEL328 4
  // #define CPU_EMC2  5 // this is just a theoretical one at this time
 
+
+/*   NOT YET USED  
   //eg:
 //#define POSITIONING_HARDWARE POSITIONING_HARDWARE_MENDEL_STYLE // what style XYZ positioning system do you use?
 
@@ -56,6 +61,8 @@
    #define POSITIONING_HARDWARE_CNC_STYLE 4
   // #define POSITIONING_HARDWARE_MOVINGGANTRY_STYLE 5  // this is just a theoretical one at this time
   // #define CUSTOM 6 // this is just a theoretical one at this time
+
+*/
 
 // eg
 //#define MOVEMENT_TYPE MOVEMENT_TYPE_STEP_DIR  // when sending signals to the drivers, what electrical/logical interface will we use? - there are a number of possible different hardware methods for getting directional movement, here we decide which one we want to use normally:  
@@ -99,20 +106,21 @@
 //eg:
 // #define TEMP_SENSOR TEMP_SENSOR_EPCOS_THERMISTOR
   
- #define TEMP_SENSOR_EPCOS540_THERMISTOR   //see: http://reprap.org/wiki/Thermistor
- #define TEMP_SENSOR_EPCOS560_THERMISTOR   //see: http://reprap.org/wiki/Thermistor
- #define TEMP_SENSOR_RRRF100K_THERMISTOR   //see: http://reprap.org/wiki/Thermistor
- #define TEMP_SENSOR_RRRF10K_THERMISTOR   //see: http://reprap.org/wiki/Thermistor
- #define TEMP_SENSOR_RS10K_THERMISTOR   //see: http://reprap.org/wiki/Thermistor
- #define TEMP_SENSOR_AD595_THERMOCOUPLE  // see: http://reprap.org/wiki/Thermocouple_Sensor_1.0
- #define TEMP_SENSOR_MAX6675_THERMOCOUPLE // see: http://reprap.org/wiki/Hacks_to_the_RepRap_Extruder_Controller_v2.2
-// #define USE_THERMISTOR // old  definition, replaced by the above. 
+ #define TEMP_SENSOR_EPCOS540_THERMISTOR 1  //see: http://reprap.org/wiki/Thermistor
+ #define TEMP_SENSOR_EPCOS560_THERMISTOR 2  //see: http://reprap.org/wiki/Thermistor
+ #define TEMP_SENSOR_RRRF100K_THERMISTOR 3  //see: http://reprap.org/wiki/Thermistor
+ #define TEMP_SENSOR_RRRF10K_THERMISTOR 4  //see: http://reprap.org/wiki/Thermistor
+ #define TEMP_SENSOR_RS10K_THERMISTOR 5  //see: http://reprap.org/wiki/Thermistor
+ #define TEMP_SENSOR_AD595_THERMOCOUPLE  6 // see: http://reprap.org/wiki/Thermocouple_Sensor_1.0
+ #define TEMP_SENSOR_MAX6675_THERMOCOUPLE 7 // see: http://reprap.org/wiki/Hacks_to_the_RepRap_Extruder_Controller_v2.2
+ 
+
 
 // #define DATA_SOURCE DATA_SOURCE_USB_SERIAL
 
 #define DATA_SOURCE_USB_SERIAL 1
 #define DATA_SOURCE_SDCARD 2   // is there an SD card reader present?   
-//#define DATA_SOURCE_EEPROM 3   // this is just a theoretical one at this time
+//#define DATA_SOURCE_EPROM 3   // this is just a theoretical one at this time
 
 
 //eg:
@@ -120,6 +128,11 @@
 #define ACCELERATION_ON 1
 #define ACCELERATION_OFF 0
 
+//eg:
+//#define HEATED_BED HEATED_BED_ON
+
+#define HEATED_BED_ON 1
+#define HEATED_BED_OFF 0
 
 //-----------------------------------------------------------------------------------------------
 // IMMUTABLE (READONLY) CONSTANTS GO HERE:
