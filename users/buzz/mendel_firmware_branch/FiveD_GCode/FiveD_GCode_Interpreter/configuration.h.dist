@@ -1,6 +1,8 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
+#include "features.h"
+
 /*
  *  This is the configuration file for the RepRap Motherboard microcontroller.
  *  Set values in it to match your RepRap machine.
@@ -16,227 +18,70 @@
 // Here are the Motherboard codes; set MOTHERBOARD to the right one
 // A standard Mendel is MOTHERBOARD 2
 
-// (Arduino: 0 - no longer in use)
-// Sanguino or RepRap Motherboard with direct drive extruders: 1
-// RepRap Motherboard with RS485 extruders: 2
-// Arduino Mega: 3
+// pre-select a typical setup from the below list
+//   using typical pinouts and typical capabilities. see features.h for what typical setups we have available
+#define DEFAULTS MENDEL_DEFAULTS
 
-#define MOTHERBOARD 2
-
-// The width of Henry VIII's thumb (or something).
-
-#define INCHES_TO_MM 25.4 // *RO
-
-// The number of real extruders in this machine
-
-#define EXTRUDER_COUNT 2
 
 //*********************************************************************************************
-// These settings are mainly for Darwin
+// These settings are for a typical "Darwin" machine: 
 //*********************************************************************************************
-#if MOTHERBOARD == 1
+#if DEFAULTS == DARWIN_DEFAULTS 
 
-// Temperature measurement
-// Uncomment ONE of the next three
-#define USE_THERMISTOR
-//#define AD595_THERMOCOUPLE
-//#define MAX6675_THERMOCOUPLE
+#define CPUTYPE CPUTYPE_ATMEL168  //darwin ran on a classic arduino, but may also run on a CPUTYPE_ATMEL328 or CPUTYPE_MEGA etc. 
 
-// Uncomment the next line if this is driving a paste extruder
-//#define PASTE_EXTRUDER
+#define TEMP_SENSOR TEMP_SENSOR_RRRF10K_THERMISTOR  // Temperature measurement
+ 
+//#define PASTE_EXTRUDER  // Uncomment this line if this is driving a paste extruder
 
+#define EXTRUDER_CONTROLLER EXTRUDER_CONTROLLER_INTERNAL // darwins traditionally had a DC extruder (EXTRUDER_CONTROLLER_DC). later ones have had a direct drive stepper extruder (EXTRUDER_CONTROLLER_INTERNAL)
 
-// Set to 1 if enable pins are inverting
-// For RepRap stepper boards version 1.x the enable pins are *not* inverting.
-// For RepRap stepper boards version 2.x and above the enable pins are inverting.
-#define INVERT_ENABLE_PINS 0
+#define ENABLE_PIN_STATE  ENABLE_PIN_STATE_NORMAL // For RepRap stepper boards version 1.x the enable pins are *not* inverting. later version are.
 
-// Set to one if the axis opto-sensor outputs inverting (ie: 1 means open, 0 means closed)
-// RepRap opto endstops with H21LOI sensors are not inverting; ones with H21LOB
-// are inverting.
+// RepRap opto endstops with H21LOI sensors are not inverting; ones with H21LOB are inverting.
+#define X_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE_H21LOI
+#define Y_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE_H21LOI
+#define Z_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE_H21LOI
 
-#define X_ENDSTOP_INVERTING false
-#define Y_ENDSTOP_INVERTING false
-#define Z_ENDSTOP_INVERTING false
+#define MOVEMENT_TYPE MOVEMENT_TYPE_STEP_DIR // darwin axes are moved around with STEP/DIRECTION logic.
 
+#define STEPPER_TYPE STEPPER_TYPE_LIN_4118S  //to be checked - what was darwins recommended ?   it was a NEMA23, wasn't it? 
+
+// Axis scaling in stepper-motor steps per mm of movement
 #define X_STEPS_PER_MM   7.99735
-#define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM) // *RO
 #define INVERT_X_DIR 0
 
 #define Y_STEPS_PER_MM   7.99735
-#define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM) // *RO
 #define INVERT_Y_DIR 0
 
 #define Z_STEPS_PER_MM   320
-#define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM) // *RO
 #define INVERT_Z_DIR 0
 
-// Stepper-driven extruder
-// E_STEPS_PER_MM is the number of steps needed to 
-// extrude 1mm out of the nozzle.  E0 for extruder 0;
-// E1 for extruder 1, and so on.
+#define TEMP_SENSOR TEMP_SENSOR_RRRF100K_THERMISTOR  // RRRF 100k thermistor was typical for darwin, yes? 
 
-//#define E_STEPS_PER_MM   0.9     // NEMA 17 extruder 5mm diameter drive - empirically adjusted
-#define E0_STEPS_PER_MM   2.2      // NEMA 17 59/11 geared extruder 8mm diameter drive
-#define E1_STEPS_PER_MM   2.2      // NEMA 17 59/11 geared extruder 8mm diameter drive
-
-// The temperature routines get called each time the main loop
-// has gone round this many times
-
-#define SLOW_CLOCK 2000
-
-#endif
-
-//**********************************************************************************************
-// These settings are mainly for a standard Mendel
-//*********************************************************************************************
-
-#if MOTHERBOARD == 2
-
-// Comment out the next line if you are running a Darwin with a MOTHERBOARD > 1
-
-#define MENDEL 1
-
-// Set to 1 if enable pins are inverting
-// For RepRap stepper boards version 1.x the enable pins are *not* inverting.
-// For RepRap stepper boards version 2.x and above the enable pins are inverting.
-#define INVERT_ENABLE_PINS 1
-
-// Set to one if the axis opto-sensor outputs inverting (ie: 1 means open, 0 means closed)
-// RepRap opto endstops with H21LOI sensors are not inverting; ones with H21LOB
-// are inverting.
-
-#define X_ENDSTOP_INVERTING true
-#define Y_ENDSTOP_INVERTING true
-#define Z_ENDSTOP_INVERTING true
-
-#define MY_NAME 'H'           // Byte representing the name of this device
-#define E0_NAME '0'           // Byte representing the name of extruder 0
-#define E1_NAME '1'           // Byte representing the name of extruder 1
-
-#define RS485_MASTER  1       // *RO
-
-// Axis scaling in stepper-motor steps per mm of movement
-
-#define X_STEPS_PER_MM   10.047
-#define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM) // *RO
-#define INVERT_X_DIR 0
-
-#define Y_STEPS_PER_MM   10.047
-#define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM) // *RO
-#define INVERT_Y_DIR 0
-
-#define Z_STEPS_PER_MM   833.398
-#define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM) // *RO
-#define INVERT_Z_DIR 0
+#define DATA_SOURCE DATA_SOURCE_USB_SERIAL // well stream the data from USB to the CPU. 
 
 // Stepper-driven extruder
-// E_STEPS_PER_MM is the number of steps needed to 
-// extrude 1mm out of the nozzle.  E0 for extruder 0;
-// E1 for extruder 1, and so on.
+// E_STEPS_PER_MM is the number of steps needed to extrude 1mm out of the nozzle.  
+// E0 for extruder 0; E1 for extruder 1, and so on.
 
-//#define E_STEPS_PER_MM   0.9     // NEMA 17 extruder 5mm diameter drive - empirically adjusted
-#define E0_STEPS_PER_MM   2.2      // NEMA 17 59/11 geared extruder 8mm diameter drive
-#define E1_STEPS_PER_MM   2.2      // NEMA 17 59/11 geared extruder 8mm diameter drive
+#define E_STEPS_PER_MM   0.9     // NEMA 17 extruder 5mm diameter drive - empirically adjusted
+//#define E0_STEPS_PER_MM   2.2      // NEMA 17 59/11 geared extruder 8mm diameter drive
+//#define E1_STEPS_PER_MM   2.2      // NEMA 17 59/11 geared extruder 8mm diameter drive
 
-#endif
+// The number of real extruders in this machine
+#define EXTRUDER_COUNT 1
 
-//**********************************************************************************************
-// These settings are mainly for a Mendel with an Arduino Mega controller and Pololu stepper drivers
-// See http://reprap.org/wiki/Pololu_Electronics
-//*********************************************************************************************
-
-#if MOTHERBOARD == 3
-
-#define MENDEL 1
-
-// Comment out this if you are using a thermocouple
-#define USE_THERMISTOR
-
-// Set to 1 if enable pins are inverting
-// For RepRap stepper boards version 1.x the enable pins are *not* inverting.
-// For RepRap stepper boards version 2.x and above the enable pins are inverting.
-#define INVERT_ENABLE_PINS 1
-
-// Set to one if the axis opto-sensor outputs inverting (ie: 1 means open, 0 means closed)
-// RepRap opto endstops with H21LOI sensors are not inverting; ones with H21LOB
-// are inverting.
-
-#define X_ENDSTOP_INVERTING true
-#define Y_ENDSTOP_INVERTING true
-#define Z_ENDSTOP_INVERTING true
-
-// Motherboard 3 driving Pololu microstepping controllers - 16 microsteps
-
-// Axis scaling in stepper-motor steps per mm of movement
-
-#define X_STEPS_PER_MM   80.376
-#define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM) // *RO
-#define INVERT_X_DIR 0
-
-#define Y_STEPS_PER_MM   80.376
-#define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM) // *RO
-#define INVERT_Y_DIR 0
-
-#define Z_STEPS_PER_MM   6667.184
-#define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM) // *RO
-#define INVERT_Z_DIR 1
-
-// Stepper-driven extruder
-// E_STEPS_PER_MM is the number of steps needed to 
-// extrude 1mm out of the nozzle.  E0 for extruder 0;
-// E1 for extruder 1, and so on.
-
-//#define E_STEPS_PER_MM   0.9      // NEMA 17 extruder 5mm diameter drive - empirically adjusted
-#define E0_STEPS_PER_MM   17.6      // NEMA 17 59/11 geared extruder 8mm diameter drive
-#define E1_STEPS_PER_MM   17.6      // NEMA 17 59/11 geared extruder 8mm diameter drive
-
-// The temperature routines get called each time the main loop
-// has gone round this many times
-
-#define SLOW_CLOCK 2000
-
-#endif
-
-//**********************************************************************************************
-//  All other Settings not specific to the motherboard type: 
-//*********************************************************************************************
-
-// The speed at which to talk with the host computer; default is 19200
-
-#define HOST_BAUD 19200 // *RO
-
-// Set 1s where you have endstops; 0s where you don't
 // Both Darwin and Mendel have MIN endstops, but not MAX ones.
-
 #define ENDSTOPS_MIN_ENABLED 1
 #define ENDSTOPS_MAX_ENABLED 0
-
-// The number of mm below which distances are insignificant (one tenth the
-// resolution of the machine is the default value).
-
-#define SMALL_DISTANCE 0.01 // *RO
-
-// Useful to have its square
-
-#define SMALL_DISTANCE2 (SMALL_DISTANCE*SMALL_DISTANCE) // *RO
 
 //our maximum feedrates in mm/minute
 #define FAST_XY_FEEDRATE 3000.0
 #define FAST_Z_FEEDRATE  50.0
 
-// Data for acceleration calculations
-// Comment out the next line to turn accelerations off
-#define ACCELERATION_ON
-#define SLOW_XY_FEEDRATE 1000.0 // Speed from which to start accelerating
-#define SLOW_Z_FEEDRATE 20
-
-
-#if INVERT_ENABLE_PINS == 1  // *RO
-#define ENABLE_ON LOW        // *RO
-#else                        // *RO
-#define ENABLE_ON HIGH       // *RO
-#endif                       // *RO
+//darwin didn't support acceleration normally
+#define ACCELERATION  ACCELERATION_OFF
 
 // Set these to 1 to disable an axis when it's not being used,
 // and for the extruder.  Usually only Z is disabled when not in
@@ -244,46 +89,269 @@
 // powering down the steppers that drive them) when the ends of
 // movements are reached causes poor-quality builds.  (Inertia
 // causes overshoot if the motors are not left powered up.)
-
 #define DISABLE_X 0
 #define DISABLE_Y 0
 #define DISABLE_Z 1
 #define DISABLE_E 0
 
+#endif
+
+//**********************************************************************************************
+// These settings are typical for a standard Mendel
+//*********************************************************************************************
+#if DEFAULTS ==  MENDEL_DEFAULTS 
+
+//#define MENDEL 1
+
+#define CPUTYPE CPUTYPE_SANGUINO
+
+#define ENABLE_PIN_STATE  ENABLE_PIN_STATE_INVERTING // For RepRap stepper boards version 2.x and above the enable pins are inverting.
+
+// RepRap opto endstops with H21LOI sensors are not inverting; ones with H21LOB are inverting.
+#define X_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE_H21LOB
+#define Y_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE_H21LOB
+#define Z_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE_H21LOB
+
+
+#if EXTRUDER_CONTROLLER == EXTRUDER_CONTROLLER_RS485
+#define MY_NAME 'H'           // Byte representing the name of this device
+#define E0_NAME '0'           // Byte representing the name of extruder 0
+#define E1_NAME '1'           // Byte representing the name of extruder 1
+#define RS485_MASTER  1       // *RO
+#endif
+
+// Axis scaling in stepper-motor steps per mm of movement
+
+#define X_STEPS_PER_MM   10.047
+#define INVERT_X_DIR 0
+
+#define Y_STEPS_PER_MM   10.047
+#define INVERT_Y_DIR 0
+
+#define Z_STEPS_PER_MM   833.398
+#define INVERT_Z_DIR 0
+
+#define TEMP_SENSOR TEMP_SENSOR_RRRF100K_THERMISTOR  // RRRF 100k thermistor is typical for mendel, yes? 
+
+#define DATA_SOURCE DATA_SOURCE_USB_SERIAL // well stream the data from USB to the CPU. 
+
+// Stepper-driven extruder
+// E_STEPS_PER_MM is the number of steps needed to extrude 1mm out of the nozzle.  
+// E0 for extruder 0; E1 for extruder 1, and so on.
+
+//#define E_STEPS_PER_MM   0.9     // NEMA 17 extruder 5mm diameter drive - empirically adjusted
+#define E0_STEPS_PER_MM   2.2      // NEMA 17 59/11 geared extruder 8mm diameter drive
+//#define E1_STEPS_PER_MM   2.2      // NEMA 17 59/11 geared extruder 8mm diameter drive
+
+// The number of real extruders in this machine
+#define EXTRUDER_COUNT 1
+
+// Both Darwin and Mendel have MIN endstops, but not MAX ones.
+#define ENDSTOPS_MIN_ENABLED 1
+#define ENDSTOPS_MAX_ENABLED 0
+
+//our maximum feedrates in mm/minute
+#define FAST_XY_FEEDRATE 3000.0
+#define FAST_Z_FEEDRATE  50.0
+
+#define ACCELERATION  ACCELERATION_ON
+
+// Set these to 1 to disable an axis when it's not being used,
+// and for the extruder.  Usually only Z is disabled when not in
+// use.  You will probably find that disabling the others (i.e.
+// powering down the steppers that drive them) when the ends of
+// movements are reached causes poor-quality builds.  (Inertia
+// causes overshoot if the motors are not left powered up.)
+#define DISABLE_X 0
+#define DISABLE_Y 0
+#define DISABLE_Z 1
+#define DISABLE_E 0
+
+#endif
+
+//**********************************************************************************************
+// These settings are typical for a Mendel with an Arduino Mega controller and Pololu stepper drivers or similar
+// See http://reprap.org/wiki/Pololu_Electronics
+//*********************************************************************************************
+
+#if DEFAULTS ==  MENDEL_MEGA_DEFAULTS
+
+//#define MENDEL 1
+
+// Comment out this if you are using a thermocouple
+//#define USE_THERMISTOR
+#define TEMP_SENSOR TEMP_SENSOR_RRRF100K_THERMISTOR  // RRRF 100k thermistor is typical for mendel, yes? 
+
+// Set to 1 if enable pins are inverting
+// For RepRap stepper boards version 1.x the enable pins are *not* inverting.
+// For RepRap stepper boards version 2.x and above the enable pins are inverting.
+//#define INVERT_ENABLE_PINS 1
+#define ENABLE_PIN_STATE  ENABLE_PIN_STATE_INVERTING // For RepRap stepper boards version 2.x and above the enable pins are inverting.
+
+// Set to one if the axis opto-sensor outputs inverting (ie: 1 means open, 0 means closed)
+// RepRap opto endstops with H21LOI sensors are not inverting; ones with H21LOB
+// are inverting.
+// RepRap opto endstops with H21LOI sensors are not inverting; ones with H21LOB are inverting.
+#define X_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE_H21LOB
+#define Y_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE_H21LOB
+#define Z_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE_H21LOB
+
+// Motherboard 3 driving Pololu microstepping controllers - 16 microsteps
+#define MICROSTEPPING 16
+// Axis scaling in stepper-motor steps per mm of movement
+
+#define X_STEPS_PER_MM   MICROSTEPPING*5.0235
+#define INVERT_X_DIR 0
+
+#define Y_STEPS_PER_MM   MICROSTEPPING*5.0235
+#define INVERT_Y_DIR 0
+
+#define Z_STEPS_PER_MM   MICROSTEPPING*416.699
+#define INVERT_Z_DIR 1
+
+// Stepper-driven extruder
+// E_STEPS_PER_MM is the number of steps needed to extrude 1mm out of the nozzle.  
+// E0 for extruder 0; E1 for extruder 1, and so on.
+//TODO use MICROSTEPPING constant here too? 
+//#define E_STEPS_PER_MM   0.9      // NEMA 17 extruder 5mm diameter drive - empirically adjusted
+#define E0_STEPS_PER_MM   17.6      // NEMA 17 59/11 geared extruder 8mm diameter drive
+#define E1_STEPS_PER_MM   17.6      // NEMA 17 59/11 geared extruder 8mm diameter drive
+
+// The number of real extruders in this machine
+#define EXTRUDER_COUNT 1
+
+// Both Darwin and Mendel have MIN endstops, but not MAX ones.
+#define ENDSTOPS_MIN_ENABLED 1
+#define ENDSTOPS_MAX_ENABLED 0
+
+//our maximum feedrates in mm/minute
+#define FAST_XY_FEEDRATE 3000.0
+#define FAST_Z_FEEDRATE  50.0
+
+#define ACCELERATION  ACCELERATION_ON
+
+// Set these to 1 to disable an axis when it's not being used,
+// and for the extruder.  Usually only Z is disabled when not in
+// use.  You will probably find that disabling the others (i.e.
+// powering down the steppers that drive them) when the ends of
+// movements are reached causes poor-quality builds.  (Inertia
+// causes overshoot if the motors are not left powered up.)
+#define DISABLE_X 0
+#define DISABLE_Y 0
+#define DISABLE_Z 0
+#define DISABLE_E 0
+
+#endif
+
+
+//**********************************************************************************************
+// These settings are for the Bath prototype Mendel
+//*********************************************************************************************
+
+
+#if DEFAULTS == BATHPROTO_DEFAULTS
+// parameters for the Bath U. mendel prototype
+#define X_STEPS_PER_MM 13.333333
+#define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM)
+#define INVERT_X_DIR 0
+
+#define Y_STEPS_PER_MM 13.333333
+#define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM)
+#define INVERT_Y_DIR 0
+
+#define Z_STEPS_PER_MM 938.64
+#define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM)
+#define INVERT_Z_DIR 0
+
+// The number of real extruders in this machine
+#define EXTRUDER_COUNT 1
+
+// Both Darwin and Mendel have MIN endstops, but not MAX ones.
+#define ENDSTOPS_MIN_ENABLED 1
+#define ENDSTOPS_MAX_ENABLED 0
+
+//our maximum feedrates in mm/minute
+#define FAST_XY_FEEDRATE 3000.0
+#define FAST_Z_FEEDRATE  50.0
+
+#define ACCELERATION  ACCELERATION_ON
+
+// Set these to 1 to disable an axis when it's not being used,
+// and for the extruder.  Usually only Z is disabled when not in
+// use.  You will probably find that disabling the others (i.e.
+// powering down the steppers that drive them) when the ends of
+// movements are reached causes poor-quality builds.  (Inertia
+// causes overshoot if the motors are not left powered up.)
+#define DISABLE_X 0
+#define DISABLE_Y 0
+#define DISABLE_Z 1
+#define DISABLE_E 0
+
+#endif
+
+//**********************************************************************************************
+// These settings are for Makerbot hardware running Reprap firmware! 
+//*********************************************************************************************
+
+#if DEFAULTS == MAKERBOT_DEFAULTS
+
+// add your own  settings here if you have a makerbot and know what to use! 
+
+#define ACCELERATION  ACCELERATION_OFF  //makerbot DC extruders are not acceleration capable
+
+//TODO add more here! 
+
+#endif
+
+//**********************************************************************************************
+// These settings are for CUSTOM RepStraps, etc.
+//*********************************************************************************************
+
+#if DEFAULTS == CUSTOM_DEFAULTS
+
+// add your own custom settings here if you aren't using any of the above common types! 
+
+//TODO add more here! 
+
+#endif
+
+//**********************************************************************************************
+//  All other Settings not specific to the motherboard type, or derived from the above settings
+//*********************************************************************************************
+
+
+// support imperial settings derived from metric:
+#define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM) // *RO
+#define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM) // *RO
+#define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM) // *RO
+
+
+// Data for acceleration calculations - change the ACCELERATION variable above, not here
+#if ACCELERATION == ACCELERATION_ON
+#define SLOW_XY_FEEDRATE 1000.0 // Speed from which to start accelerating
+#define SLOW_Z_FEEDRATE 20
+#endif
+
+#if INVERT_ENABLE_PINS == 1  // *RO
+#define ENABLE_ON LOW        // *RO
+#else                        // *RO
+#define ENABLE_ON HIGH       // *RO
+#endif                       // *RO
+
+
+
 // The number of 5-second intervals to wait at the target temperature for things to stabilise.
 // Too short, and the extruder will jam as only part of it will be hot enough.
 // Too long and the melt will extend too far up the insulating tube.
 // Default value: 10
-
 #define WAIT_AT_TEMPERATURE 10
 
 // PID gains.  These are about right for a brass extruder about 8 mm 
 // in diameter and 30 mm long heated by a 6 ohm coil with a 12v supply.
-
 #define TEMP_PID_PGAIN 2
 #define TEMP_PID_IGAIN 0.07
 #define TEMP_PID_DGAIN 1
 
-//our command string length
-
-#define COMMAND_SIZE 128 // *RO
-
-// Our response string length
-
-#define RESPONSE_SIZE 256 // *RO
-
-// The size of the movement buffer
-
-#define BUFFER_SIZE 4 // *RO
-
-// Number of microseconds between timer interrupts when no movement
-// is happening
-
-#define DEFAULT_TICK (long)1000 // *RO
-
-// What delay() value to use when waiting for things to free up in milliseconds
-
-#define WAITING_DELAY 1 // *RO
 
 //******************************************************************************
 
@@ -319,26 +387,3 @@ inline void resetTimer()
 
 //*************************************************************************
 
-#if 0
-// Green machine:
-//#define ENDSTOPS_INVERTING 0
-
-// parameters for the Bath U. mendel prototype
-#define X_STEPS_PER_MM   13.333333
-#define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM)
-#define INVERT_X_DIR 0
-
-#define Y_STEPS_PER_MM   13.333333
-#define Y_STEPS_PER_INCH (Y_STEPS_PER_MM*INCHES_TO_MM)
-#define INVERT_Y_DIR 0
-
-// Green machine:
-#define Z_STEPS_PER_MM   944.88
-// Fat Z cog machine:
-//#define Z_STEPS_PER_MM   558.864
-// Standard Mendel:
-//#define Z_STEPS_PER_MM   833.398
-#define Z_STEPS_PER_INCH (Z_STEPS_PER_MM*INCHES_TO_MM)
-#define INVERT_Z_DIR 0
-
-#endif

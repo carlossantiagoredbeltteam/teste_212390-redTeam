@@ -36,7 +36,7 @@ http://objects.reprap.org/wiki/Mendel_User_Manual:_RepRapGCodes
 // Sanguino v1.5 by Adrian Bowyer - implemented 4D Bressenham XYZ+ stepper control... (a.bowyer@bath.ac.uk)
 // Sanguino v1.6 by Adrian Bowyer - implemented RS485 extruders
 // Arduino Mega v1.7 by Adrian Bowyer
-
+// Features code v1.8 by David Bussenschutt July 2010
 
 
 
