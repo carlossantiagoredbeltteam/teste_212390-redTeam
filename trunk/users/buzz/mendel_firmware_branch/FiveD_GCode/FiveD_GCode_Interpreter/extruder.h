@@ -18,7 +18,7 @@ void newExtruder(byte e);
 
 */
 
-#if MOTHERBOARD == 1
+#if EXTRUDER_CONTROLLER == EXTRUDER_CONTROLLER_DC
 
 #define EXTRUDER_FORWARD true
 #define EXTRUDER_REVERSE false
@@ -102,12 +102,16 @@ inline void extruder::disableStep()
 #endif
 }
 
+#if MOVEMENT_TYPE == MOVEMENT_TYPE_STEP_DIR
 inline void extruder::sStep()
 {
    digitalWrite(motor_speed_pin, HIGH);
    delayMicrosecondsInterruptible(5); 
    digitalWrite(motor_speed_pin, LOW);
 }
+#else 
+error TODO not yet implemented hjere
+#endif
 
 
 inline void extruder::setDirection(bool dir)
@@ -131,7 +135,7 @@ inline void extruder::setCooler(byte sp)
 *
 */
 
-#if MOTHERBOARD == 2
+#if EXTRUDER_CONTROLLER == EXTRUDER_CONTROLLER_RS485
 
 #define WAIT_T 'W'        // wait_for_temperature();
 #define VALVE 'V'         // valve_set(bool open, int dTime);
@@ -356,7 +360,7 @@ inline bool extruder::ping()
 *
 */
 
-#if MOTHERBOARD == 3
+#if EXTRUDER_CONTROLLER == EXTRUDER_CONTROLLER_INTERNAL
 
 //******************************************************************************************************
 
