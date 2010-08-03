@@ -20,7 +20,10 @@
 
 // pre-select a typical setup from the below list
 //   using typical pinouts and typical capabilities. see features.h for what typical setups we have available
-#define DEFAULTS MENDEL_DEFAULTS
+//#define DEFAULTS DARWIN_DEFAULTS
+//#define DEFAULTS MENDEL_DEFAULTS
+#define DEFAULTS MENDEL_MEGA_DEFAULTS
+
 
 
 //*********************************************************************************************
@@ -30,7 +33,7 @@
 
 #define CPUTYPE CPUTYPE_ATMEL168  //darwin ran on a classic arduino, but may also run on a CPUTYPE_ATMEL328 or CPUTYPE_MEGA etc. 
 
-#define TEMP_SENSOR TEMP_SENSOR_RRRF10K_THERMISTOR  // Temperature measurement
+#define TEMP_SENSOR TEMP_SENSOR_RRRF10K_THERMISTOR  // Temperature measurement ( BED or Internal Extruder code. IF you use BOTH, you MUST use same measurement type - TODO fix this).
  
 //#define PASTE_EXTRUDER  // Uncomment this line if this is driving a paste extruder
 
@@ -39,9 +42,12 @@
 #define ENABLE_PIN_STATE  ENABLE_PIN_STATE_NORMAL // For RepRap stepper boards version 1.x the enable pins are *not* inverting. later version are.
 
 // RepRap opto endstops with H21LOI sensors are not inverting; ones with H21LOB are inverting.
-#define X_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE_H21LOI
-#define Y_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE_H21LOI
-#define Z_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE_H21LOI
+#define ENDSTOP_OPTO_TYPE ENDSTOP_OPTO_TYPE_H21LOI
+
+// are all axes using the same opto? 
+#define X_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE
+#define Y_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE
+#define Z_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE
 
 #define MOVEMENT_TYPE MOVEMENT_TYPE_STEP_DIR // darwin axes are moved around with STEP/DIRECTION logic.
 
@@ -108,9 +114,17 @@
 #define ENABLE_PIN_STATE  ENABLE_PIN_STATE_INVERTING // For RepRap stepper boards version 2.x and above the enable pins are inverting.
 
 // RepRap opto endstops with H21LOI sensors are not inverting; ones with H21LOB are inverting.
-#define X_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE_H21LOB
-#define Y_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE_H21LOB
-#define Z_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE_H21LOB
+#define ENDSTOP_OPTO_TYPE ENDSTOP_OPTO_TYPE_H21LOI
+
+// are all axes using the same opto? 
+#define X_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE
+#define Y_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE
+#define Z_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE
+
+// normal Mendel uses neither a heated bed, nor an Internal extruder PID code: 
+//#define TEMP_SENSOR TEMP_SENSOR_RRRF10K_THERMISTOR  // Temperature measurement ( BED or Internal Extruder code. IF you use BOTH, you MUST use same measurement type - TODO fix this).
+
+#define EXTRUDER_CONTROLLER EXTRUDER_CONTROLLER_RS485 // mendel usuallty uses RS485 extruder
 
 
 #if EXTRUDER_CONTROLLER == EXTRUDER_CONTROLLER_RS485
@@ -119,6 +133,9 @@
 #define E1_NAME '1'           // Byte representing the name of extruder 1
 #define RS485_MASTER  1       // *RO
 #endif
+
+#define MOVEMENT_TYPE MOVEMENT_TYPE_STEP_DIR // darwin axes are moved around with STEP/DIRECTION logic.
+
 
 // Axis scaling in stepper-motor steps per mm of movement
 
@@ -178,9 +195,12 @@
 
 //#define MENDEL 1
 
-// Comment out this if you are using a thermocouple
-//#define USE_THERMISTOR
-#define TEMP_SENSOR TEMP_SENSOR_RRRF100K_THERMISTOR  // RRRF 100k thermistor is typical for mendel, yes? 
+#define CPUTYPE CPUTYPE_MEGA
+
+#define TEMP_SENSOR TEMP_SENSOR_RRRF100K_THERMISTOR  // RRRF 100k thermistor is typical yes?   ( BED or Internal Extruder code. IF you use BOTH, you MUST use same measurement type - TODO fix this).
+
+#define EXTRUDER_CONTROLLER EXTRUDER_CONTROLLER_INTERNAL // mendel usuallty uses RS485 extruder
+
 
 // Set to 1 if enable pins are inverting
 // For RepRap stepper boards version 1.x the enable pins are *not* inverting.
@@ -188,13 +208,23 @@
 //#define INVERT_ENABLE_PINS 1
 #define ENABLE_PIN_STATE  ENABLE_PIN_STATE_INVERTING // For RepRap stepper boards version 2.x and above the enable pins are inverting.
 
+// Both Darwin and Mendel have MIN endstops, but not MAX ones.
+#define ENDSTOPS_MIN_ENABLED 1
+#define ENDSTOPS_MAX_ENABLED 0
+
+#define MOVEMENT_TYPE MOVEMENT_TYPE_STEP_DIR // darwin axes are moved around with STEP/DIRECTION logic.
+
+
 // Set to one if the axis opto-sensor outputs inverting (ie: 1 means open, 0 means closed)
 // RepRap opto endstops with H21LOI sensors are not inverting; ones with H21LOB
 // are inverting.
 // RepRap opto endstops with H21LOI sensors are not inverting; ones with H21LOB are inverting.
-#define X_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE_H21LOB
-#define Y_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE_H21LOB
-#define Z_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE_H21LOB
+#define ENDSTOP_OPTO_TYPE ENDSTOP_OPTO_TYPE_H21LOI
+
+// are all axes using the same opto? 
+#define X_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE
+#define Y_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE
+#define Z_ENDSTOP_INVERTING ENDSTOP_OPTO_TYPE
 
 // Motherboard 3 driving Pololu microstepping controllers - 16 microsteps
 #define MICROSTEPPING 16
@@ -220,15 +250,16 @@
 // The number of real extruders in this machine
 #define EXTRUDER_COUNT 1
 
-// Both Darwin and Mendel have MIN endstops, but not MAX ones.
-#define ENDSTOPS_MIN_ENABLED 1
-#define ENDSTOPS_MAX_ENABLED 0
+#define DATA_SOURCE DATA_SOURCE_USB_SERIAL // well stream the data from USB to the CPU. 
+
 
 //our maximum feedrates in mm/minute
 #define FAST_XY_FEEDRATE 3000.0
 #define FAST_Z_FEEDRATE  50.0
 
 #define ACCELERATION  ACCELERATION_ON
+
+#define HEATED_BED HEATED_BED_ON
 
 // Set these to 1 to disable an axis when it's not being used,
 // and for the extruder.  Usually only Z is disabled when not in
@@ -250,6 +281,10 @@
 
 
 #if DEFAULTS == BATHPROTO_DEFAULTS
+
+#define MOVEMENT_TYPE MOVEMENT_TYPE_STEP_DIR // darwin axes are moved around with STEP/DIRECTION logic.
+
+
 // parameters for the Bath U. mendel prototype
 #define X_STEPS_PER_MM 13.333333
 #define X_STEPS_PER_INCH (X_STEPS_PER_MM*INCHES_TO_MM)
@@ -265,6 +300,9 @@
 
 // The number of real extruders in this machine
 #define EXTRUDER_COUNT 1
+
+#define DATA_SOURCE DATA_SOURCE_USB_SERIAL // well stream the data from USB to the CPU. 
+
 
 // Both Darwin and Mendel have MIN endstops, but not MAX ones.
 #define ENDSTOPS_MIN_ENABLED 1
@@ -332,12 +370,16 @@
 #define SLOW_Z_FEEDRATE 20
 #endif
 
-#if INVERT_ENABLE_PINS == 1  // *RO
+#if ENABLE_PIN_STATE == ENABLE_PIN_STATE_INVERTING 
 #define ENABLE_ON LOW        // *RO
 #else                        // *RO
 #define ENABLE_ON HIGH       // *RO
 #endif                       // *RO
 
+//derived generic thermistor truth test? 
+#if ((TEMP_SENSOR == TEMP_SENSOR_EPCOS540_THERMISTOR) || (TEMP_SENSOR == TEMP_SENSOR_EPCOS560_THERMISTOR) || (TEMP_SENSOR == TEMP_SENSOR_RRRF100K_THERMISTOR) || (TEMP_SENSOR ==  TEMP_SENSOR_RRRF10K_THERMISTOR) || (TEMP_SENSOR == TEMP_SENSOR_RS10K_THERMISTOR )) 
+#define USE_THERMISTOR 1 //generic definition, set by the above. 
+#endif
 
 
 // The number of 5-second intervals to wait at the target temperature for things to stabilise.
