@@ -1858,19 +1858,6 @@ public class BooleanGrid
 			case 6:
 				Debug.e("BooleanGrid.marchRound() - dud 2x2 grid: " + m + " at " + 
 						here.toString() + "\n" + printNearby(here,4) + "\n\n");
-//				pix = here.add(neighbour[3]);
-//				if(!vGet(pix))
-//				{
-//					result.add(pix);
-//					vSet(pix,true);
-//				}
-//				pix = here.add(neighbour[1]);
-//				if(!vGet(pix))
-//				{
-//					result.add(pix);
-//					vSet(pix,true);
-//				}						
-//				break;
 				step = false;
 				pix = here.add(neighbour[3]);
 				set(pix, false);
@@ -1879,31 +1866,19 @@ public class BooleanGrid
 				set(pix, false);
 				vSet(pix, false);				
 				here = result.point(result.size() - 1);
+				if(!get(here))
+				{
+					result.remove(result.size() - 1);
+					here = result.point(result.size() - 1);
+					if(!get(here))
+					{
+						Debug.e("BooleanGrid.marchRound() - backtracked to an unfilled point!" + printNearby(here,4) + "\n\n");
+						result.remove(result.size() - 1);
+						here = result.point(result.size() - 1);
+					}
+				}
 				break;
-//				if(poll(pix, 3) > 0.5)
-//				{
-//					pix = pix.add(neighbour[2]);
-//					set(pix, true);
-//					vSet(pix, false);
-//				} else
-//				{
-//					pix = pix.add(neighbour[1]);
-//					set(pix, false);
-//					vSet(pix, false);					
-//				}
-//				step = false;
-//				if(!vGet(pix))
-//				{
-//					result.add(pix);
-//					vSet(pix,true);
-//				}
-//				pix = pix.add(neighbour[0]);
-//				if(!vGet(pix))
-//				{
-//					result.add(pix);
-//					vSet(pix,true);
-//				}		
-//				break;
+
 			case 7:
 				pix = here.add(neighbour[1]);
 				if(!vGet(pix))
@@ -1929,18 +1904,6 @@ public class BooleanGrid
 			case 9:
 				Debug.e("BooleanGrid.marchRound() - dud 2x2 grid: " + m + " at " + 
 						here.toString() + "\n" + printNearby(here,4) + "\n\n");
-//				if(!vGet(here))
-//				{
-//					result.add(here);
-//					vSet(here,true);
-//				}
-//				pix = here.add(neighbour[2]);
-//				if(!vGet(pix))
-//				{
-//					result.add(pix);
-//					vSet(pix,true);
-//				}						
-//				break;				
 				step = false;
 				set(here, false);
 				vSet(here, false);
@@ -1948,30 +1911,19 @@ public class BooleanGrid
 				set(pix, false);
 				vSet(pix, false);				
 				here = result.point(result.size() - 1);
+				if(!get(here))
+				{
+					result.remove(result.size() - 1);
+					here = result.point(result.size() - 1);
+					if(!get(here))
+					{
+						Debug.e("BooleanGrid.marchRound() - backtracked to an unfilled point!" + printNearby(here,4) + "\n\n");
+						result.remove(result.size() - 1);
+						here = result.point(result.size() - 1);
+					}
+				}
 				break;
-//				if(poll(pix, 3) > 0.5)
-//				{
-//					pix = pix.add(neighbour[1]);
-//					set(pix, true);
-//					vSet(pix, false);
-//				} else
-//				{
-//					set(pix, false);
-//					vSet(pix, false);					
-//				}
-//				pix = pix.add(neighbour[2]);
-//				if(!vGet(pix))
-//				{
-//					result.add(pix);
-//					vSet(pix,true);
-//				}
-//				pix = pix.add(neighbour[6]);
-//				if(!vGet(pix))
-//				{
-//					result.add(pix);
-//					vSet(pix,true);
-//				}						
-//				break;
+
 			case 10:
 				pix = here.add(neighbour[3]);
 				if(!vGet(pix))
