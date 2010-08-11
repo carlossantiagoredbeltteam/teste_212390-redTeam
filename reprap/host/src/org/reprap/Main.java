@@ -548,16 +548,12 @@ public class Main {
 		t.start();
 	}
 	
-    public String onOpen(boolean rfo) 
+    public String onOpen(String description, String extension) 
     {
         String result = null;
         File f;
-        FileFilter filter;
-        
-        if(rfo)
-        	filter = new ExtensionFileFilter("RFO", new String[] { "RFO" });
-        else
-        	filter = new ExtensionFileFilter("STL", new String[] { "STL" });
+        FileFilter filter = new ExtensionFileFilter(description, new String[] { extension });
+
         chooser.setFileFilter(filter);
 
         int returnVal = chooser.showOpenDialog(null);// chooser.showOpenDialog(mainFrame);
@@ -565,9 +561,9 @@ public class Main {
         {
             f = chooser.getSelectedFile();
             result = "file:" + f.getAbsolutePath();
-            if(rfo)
+            if(extension.toUpperCase().contentEquals("RFO"))
             	builder.addRFOFile(result);
-            else
+            if(extension.toUpperCase().contentEquals("STL"))
             	builder.anotherSTLFile(result);
 
             return f.getName();

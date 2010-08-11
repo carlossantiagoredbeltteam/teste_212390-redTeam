@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 
 import org.reprap.Main;
 import org.reprap.Printer;
+import org.reprap.pcb.PCB;
 
 /**
  *
@@ -156,6 +157,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
     private void initComponents() {
         buttonGroup1 = new javax.swing.ButtonGroup();
         printButton = new java.awt.Button();
+        pcbButton = new java.awt.Button();
         pauseButton = new java.awt.Button();
         stopButton = new java.awt.Button();
         exitButton = new java.awt.Button();
@@ -188,6 +190,15 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
         printButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 printButtonActionPerformed(evt);
+            }
+        });
+        
+        pcbButton.setBackground(new java.awt.Color(152, 99, 62));
+        pcbButton.setFont(pcbButton.getFont());
+        pcbButton.setLabel("PCB"); // NOI18N
+        pcbButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pcbButtonActionPerformed(evt);
             }
         });
 
@@ -361,6 +372,8 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
                             .add(layout.createSequentialGroup()
                                 .add(printButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 72, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(pcbButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 72, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(pauseButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 78, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(stopButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 75, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -421,6 +434,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                                     .add(pauseButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 39, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                     .add(printButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 39, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                    .add(pcbButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 39, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                     .add(stopButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 39, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                     .add(exitButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 39, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                                 .add(layout.createSequentialGroup()
@@ -475,6 +489,27 @@ private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     	org.reprap.Main.gui.onProduceB();
     //parentBotConsoleFrame.resumePolling();
 }//GEN-LAST:event_printButtonActionPerformed
+
+private void pcbButtonActionPerformed(java.awt.event.ActionEvent evt)
+{
+	parentBotConsoleFrame.suspendPolling();
+	String inputGerber = org.reprap.Main.gui.onOpen("Gerber code file", "plc");
+	if(inputGerber.contentEquals(""))
+	{
+		JOptionPane.showMessageDialog(null, "No Gerber file was loaded.");
+		return;
+	}
+	
+	String outputGCode = org.reprap.Main.gui.onOpen("G-Code file for PCB printing", "gcode");
+	if(outputGCode.contentEquals(""))
+	{
+		JOptionPane.showMessageDialog(null, "No GCode file was chosen.");
+		return;
+	}
+	PCB p = new PCB();
+	p.pcb(inputGerber, outputGCode);
+	parentBotConsoleFrame.resumePolling();
+}
 
 public void pauseAction()
 {
@@ -808,6 +843,7 @@ private void enableGLoad()
     private java.awt.Button pauseButton;
     private java.awt.Button preferencesButton;
     private java.awt.Button printButton;
+    private java.awt.Button pcbButton;
     private javax.swing.JProgressBar progressBar;
     private javax.swing.JLabel progressLabel;
     private java.awt.Button saveRFO;
