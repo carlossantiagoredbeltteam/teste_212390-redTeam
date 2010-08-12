@@ -102,11 +102,11 @@ $setting['anti-backlash'] = array(
 // Y backlash was .30
 	//'Y'=>array('fwd_dynamic'=>0.45/*mm*/, 'rev_dynamic'=>0.45/*mm*/,'fwd_static'=>0.1/*mm*/, 'rev_static'=>0.1/*mm*/ ), // Backlash on Y-axis
 );
-if(ereg("^(.+)_export\.".$setting['extension']."$",basename($argv[1]),$regs))
+if(my_ereg("^(.+)_export\.".$setting['extension']."$",basename($argv[1]),$regs))
   $setting['output_file'] = $regs[1].'.'.$setting['extension'];
-elseif(ereg("^(.+)\.".$setting['extension']."$",basename($argv[1]),$regs))
+elseif(my_ereg("^(.+)\.".$setting['extension']."$",basename($argv[1]),$regs))
   $setting['output_file'] = $regs[1].'.'.$setting['extension'];
-elseif(ereg("^([^\.]+)$",basename($argv[1]),$regs))
+elseif(my_ereg("^([^\.]+)$",basename($argv[1]),$regs))
   $setting['output_file'] = $regs[1].'.'.$setting['extension'];
 else
   $setting['output_file'] = 'out-5D.'.$setting['extension']; // null = output directly.
@@ -251,11 +251,11 @@ foreach($lines as $line)
     if($line{0}=='\'') continue;
     if($line{0}=='(') continue;
   }
-  #ereg("[GMEXYZFS]{1
+  #my_ereg("[GMEXYZFS]{1
 
   $comment = '';
 
-  if(ereg("M[ ]*108[ ]S([0-9.]+)",$line,$regs))
+  if(my_ereg("M[ ]*108[ ]S([0-9.]+)",$line,$regs))
   {
     $line = trim($line)." ; fw/bck/off";
     $speed = $regs[1];
@@ -272,13 +272,13 @@ foreach($lines as $line)
   $lastY = $Y;
   $lastZ = $Z;
 
-  if(ereg("X[ ]*(-?[0-9.]+)",$line,$regs))
+  if(my_ereg("X[ ]*(-?[0-9.]+)",$line,$regs))
     $X = $regs[1];
-  if(ereg("Y[ ]*(-?[0-9.]+)",$line,$regs))
+  if(my_ereg("Y[ ]*(-?[0-9.]+)",$line,$regs))
     $Y = $regs[1];
-  if(ereg("Z[ ]*(-?[0-9.]+)",$line,$regs))
+  if(my_ereg("Z[ ]*(-?[0-9.]+)",$line,$regs))
     $Z = $regs[1];
-  if(ereg("F[ ]*(-?[0-9.]+)",$line,$regs))
+  if(my_ereg("F[ ]*(-?[0-9.]+)",$line,$regs))
     $F = $regs[1];
 
   if(isset($setting['scale']['X']))
@@ -294,7 +294,7 @@ foreach($lines as $line)
     $line = str_replace("F$F","F".$F_replace,$line);
   }
 
-  if(ereg("M[ ]*10([123])",$line,$regs))
+  if(my_ereg("M[ ]*10([123])",$line,$regs))
   {
     $last_dir = $dir;//Anti-Ooze
     switch($regs[1])
@@ -375,9 +375,9 @@ foreach($lines as $line)
   }
 
 
-  if(ereg("G[ ]*90",$line))
+  if(my_ereg("G[ ]*90",$line,$_dummy))
     $abs = true;
-  if(ereg("G[ ]*91",$line))
+  if(my_ereg("G[ ]*91",$line,$_dummy))
     $abs = false;
   // G20 - inches, G21 - mm
   unset($E);
@@ -419,7 +419,7 @@ foreach($lines as $line)
   $amount_extruded += $E;
 
   // Only when cartesian coordinates are used???
-  //if(ereg("[^;(].*[XYZ])",$line,$regs))
+  //if(my_ereg("[^;(].*[XYZ])",$line,$regs))
   //{}
 
   $line = trim($line);
@@ -571,10 +571,10 @@ if($E && ($setting['add_E_codes']))
 	    foreach($action['actions'] as $actParam => $actVal)
 	    {// Todo: eval expressions?
 	    //echo "Condit: $conditionOk";
-	      if(ereg('([XYZFE])_mul',$actParam,$regs))
+	      if(my_ereg('([XYZFE])_mul',$actParam,$regs))
 	      {
 		$actOnAxis=$regs[1];
-		if(ereg("$actOnAxis([0-9\.]+)",$orrigLine,$regs2)) // eval action against original line?
+		if(my_ereg("$actOnAxis([0-9\.]+)",$orrigLine,$regs2)) // eval action against original line?
 		{
 		  $newRate = bcmul($regs2[1],$actVal);
 		  $line = str_replace("$actOnAxis$regs2[1]","$actOnAxis$newRate",$line);
@@ -599,7 +599,7 @@ G1 X23.5700 Y-18.1700 Z22.75 F126.2727 (smthd)
       // mm/(mm/s) = s
       // dZmm/s = ...
         //out("(dist=$dist, dZ=$dZ, F=$regs[1], time=".($dist/$regs[1])."s Z-speed=".($dZ/($dist/$regs[1])).")");
-      if(ereg("F([0-9\.]+)",$line,$regs))
+      if(my_ereg("F([0-9\.]+)",$line,$regs))
       {
         //out("(dist=$dist,F=$regs[1])");
         $Zspeed = (abs($dZ)/($dist/$regs[1]));
@@ -703,19 +703,19 @@ function out($str,$buffered = 'nochange') // TODO: writer class
   }
   if(isset($setting['remove_redundant_Gcodes']) && $setting['remove_redundant_Gcodes'])
   {
-    if(ereg("G([0-9]+)[^0-9]",$str,$regs))
+    if(my_ereg("G([0-9]+)[^0-9]",$str,$regs))
     {
       if($setting['last_gcode']==$regs[1]) 
         $str = str_replace("G".$regs[1].' ','',$str);
       $setting['last_gcode'] = $regs[1];
     }
-    if(ereg("Z([0-9\.]+)[^0-9]",$str,$regs))
+    if(my_ereg("Z([0-9\.]+)[^0-9]",$str,$regs))
     {
       if($setting['last_Z']==$regs[1]) 
         $str = str_replace("Z".$regs[1],'',$str);
       $setting['last_Z'] = $regs[1];
     }
-    if(ereg("F([0-9\.]+)[^0-9]",$str,$regs))
+    if(my_ereg("F([0-9\.]+)[^0-9]",$str,$regs))
     {
       if($setting['last_F']==$regs[1]) 
         $str = str_replace("F".$regs[1],'',$str);
@@ -841,5 +841,9 @@ function init_sd($setting)
       $setting['sd_mount'] = dirname($sd_mounted[0]);
       echo "Notice: SD mounted on ".dirname($setting['sd_mount'])."\n";
     }
+}
+function my_ereg($reg,$str,&$regs)
+{
+  return @ereg($reg,$str,$regs);
 }
 ?>
