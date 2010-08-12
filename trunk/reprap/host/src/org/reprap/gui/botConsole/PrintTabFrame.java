@@ -9,7 +9,7 @@ package org.reprap.gui.botConsole;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
-
+import java.io.File;
 import javax.swing.JOptionPane;
 
 import org.reprap.Main;
@@ -493,15 +493,18 @@ private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 private void pcbButtonActionPerformed(java.awt.event.ActionEvent evt)
 {
 	parentBotConsoleFrame.suspendPolling();
-	String inputGerber = org.reprap.Main.gui.onOpen("Gerber code file", "plc");
-	if(inputGerber.contentEquals(""))
+	File inputGerber = org.reprap.Main.gui.onOpen("Gerber code file", "plc", "");
+	if(inputGerber == null)
 	{
 		JOptionPane.showMessageDialog(null, "No Gerber file was loaded.");
 		return;
 	}
-	
-	String outputGCode = org.reprap.Main.gui.onOpen("G-Code file for PCB printing", "gcode");
-	if(outputGCode.contentEquals(""))
+	int sp = inputGerber.getName().toLowerCase().indexOf(".plc");
+	String fileRoot = "";
+	if(sp > 0)
+		fileRoot = inputGerber.getName().substring(0, sp);
+	File outputGCode = org.reprap.Main.gui.onOpen("G-Code file for PCB printing", "gcode", fileRoot);
+	if(outputGCode == null)
 	{
 		JOptionPane.showMessageDialog(null, "No GCode file was chosen.");
 		return;

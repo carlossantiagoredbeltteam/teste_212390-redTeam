@@ -1164,7 +1164,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	{
 		gcodeLoaded = false;		
 		stlLoaded = true;
-		return org.reprap.Main.gui.onOpen("STL triangulation file", "stl");
+		return org.reprap.Main.gui.onOpen("STL triangulation file", "stl", "").getName();
 	}
 	
 	/**
@@ -1175,7 +1175,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	{
 		gcodeLoaded = false;		
 		stlLoaded = true;
-		return org.reprap.Main.gui.onOpen("RFO multiple-object file", "rfo");
+		return org.reprap.Main.gui.onOpen("RFO multiple-object file", "rfo", "").getName();
 	}
 	
 	/**
