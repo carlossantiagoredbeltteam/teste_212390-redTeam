@@ -4,13 +4,15 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.File;
+
 //import java.io.IOException;
 
 public class PCB {
 	/**
 	 * @param args
 	 */
-	public void pcb(String inputFilename, String outputFilename) {
+	public void pcb(File inputFile, File outputFile) {
 		GerberGCode gerberGcode; 
 		String[] splitline;
 		boolean debug = false;
@@ -35,8 +37,8 @@ public class PCB {
 		System.out.println("Gerber RS274X to GCoder Converter for RepRap's\n");
 
 
-		System.out.println("Input: " + inputFilename);
-		System.out.println("Output: " + outputFilename+"\n");
+		System.out.println("Input: " + inputFile.getName());
+		System.out.println("Output: " + outputFile.getName()+"\n");
 		System.out.println("Pen Width: " + penWidth + " mm");
 		System.out.println("Offset X: " + offsetX + " mm");
 		System.out.println("Offset Y: " + offsetY + " mm");
@@ -47,7 +49,7 @@ public class PCB {
 
 		// processing Gerber file
 		try {
-			in = new BufferedReader(new FileReader(inputFilename));
+			in = new BufferedReader(new FileReader(inputFile));
 
 
 
@@ -187,7 +189,7 @@ public class PCB {
 
 			BufferedWriter outfile;
 
-			outfile = new BufferedWriter(new FileWriter(outputFilename));
+			outfile = new BufferedWriter(new FileWriter(outputFile));
 			outfile.write(gerberGcode.getGCode());
 			outfile.close();
 
