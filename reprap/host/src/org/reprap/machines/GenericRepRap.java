@@ -1,7 +1,7 @@
 package org.reprap.machines;
 
 import java.io.IOException;
-
+import java.io.File;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import org.reprap.Attributes;
@@ -1164,7 +1164,11 @@ public abstract class GenericRepRap implements CartesianPrinter
 	{
 		gcodeLoaded = false;		
 		stlLoaded = true;
-		return org.reprap.Main.gui.onOpen("STL triangulation file", "stl", "").getName();
+		File f = org.reprap.Main.gui.onOpen("STL triangulation file", "stl", "");
+		if(f == null)
+			return "";
+		else 
+			return f.getName();
 	}
 	
 	/**
@@ -1175,7 +1179,11 @@ public abstract class GenericRepRap implements CartesianPrinter
 	{
 		gcodeLoaded = false;		
 		stlLoaded = true;
-		return org.reprap.Main.gui.onOpen("RFO multiple-object file", "rfo", "").getName();
+		File f = org.reprap.Main.gui.onOpen("RFO multiple-object file", "rfo", "");
+		if(f == null)
+			return "";
+		else 
+			return f.getName();
 	}
 	
 	/**
