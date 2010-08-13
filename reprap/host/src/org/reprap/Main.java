@@ -548,30 +548,30 @@ public class Main {
 		t.start();
 	}
 	
-    public File onOpen(String description, String extension, String defaultRoot) 
+    public File onOpen(String description, String[] extensions, String defaultRoot) 
     {
         String result = null;
         File f;
-        FileFilter filter = new ExtensionFileFilter(description, new String[] { extension });
+        FileFilter filter = new ExtensionFileFilter(description, extensions);
 
         chooser.setFileFilter(filter);
-        if(!defaultRoot.contentEquals(""))
+        if(!defaultRoot.contentEquals("") && extensions.length == 1)
         {
-        	File defaultFile = new File(defaultRoot + "." + extension);
+        	File defaultFile = new File(defaultRoot + "." + extensions[0]);
         	chooser.setSelectedFile(defaultFile);
         }
         
-        int returnVal = chooser.showOpenDialog(null);// chooser.showOpenDialog(mainFrame);
+        int returnVal = chooser.showOpenDialog(null);
         if(returnVal == JFileChooser.APPROVE_OPTION) 
         {
             f = chooser.getSelectedFile();
             result = "file:" + f.getAbsolutePath();
-            if(extension.toUpperCase().contentEquals("RFO"))
+            if(extensions[0].toUpperCase().contentEquals("RFO"))
             	builder.addRFOFile(result);
-            if(extension.toUpperCase().contentEquals("STL"))
+            if(extensions[0].toUpperCase().contentEquals("STL"))
             	builder.anotherSTLFile(result);
 
-            return f;// .getName();
+            return f;
         }
         return null;
     }

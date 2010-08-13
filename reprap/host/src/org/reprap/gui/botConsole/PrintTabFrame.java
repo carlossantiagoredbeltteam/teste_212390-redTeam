@@ -351,6 +351,7 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                        	.add(pcbButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 100, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)	
                             .add(saveRFO, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 100, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(loadGCode, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 100, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -372,8 +373,8 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
                             .add(layout.createSequentialGroup()
                                 .add(printButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 72, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(pcbButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 72, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                //.add(pcbButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 72, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                //.addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(pauseButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 78, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(stopButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 75, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -440,7 +441,10 @@ public class PrintTabFrame extends javax.swing.JInternalFrame {
                                 .add(layout.createSequentialGroup()
                                     .add(loadRFO, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                     .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                    .add(saveRFO, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))))
+                                    .add(saveRFO, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                    .add(pcbButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 41, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                    )))))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(expectedBuildTimeLabel)
@@ -492,21 +496,25 @@ private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 
 private void pcbButtonActionPerformed(java.awt.event.ActionEvent evt)
 {
+	if(!SLoadOK)
+		return;
 	parentBotConsoleFrame.suspendPolling();
-	File inputGerber = org.reprap.Main.gui.onOpen("Gerber code file", "plc", "");
+	File inputGerber = org.reprap.Main.gui.onOpen("PCB Gerber file", new String[] {"cmp", "sol"}, "");
 	if(inputGerber == null)
 	{
 		JOptionPane.showMessageDialog(null, "No Gerber file was loaded.");
 		return;
 	}
-	int sp = inputGerber.getName().toLowerCase().indexOf(".plc");
+	int sp = inputGerber.getName().toLowerCase().indexOf(".cmp");
+	if(sp < 0)
+		sp = inputGerber.getName().toLowerCase().indexOf(".sol");
 	String fileRoot = "";
 	if(sp > 0)
 		fileRoot = inputGerber.getName().substring(0, sp);
-	File outputGCode = org.reprap.Main.gui.onOpen("G-Code file for PCB printing", "gcode", fileRoot);
+	File outputGCode = org.reprap.Main.gui.onOpen("G-Code file for PCB printing", new String[] {"gcode"}, fileRoot);
 	if(outputGCode == null)
 	{
-		JOptionPane.showMessageDialog(null, "No GCode file was chosen.");
+		JOptionPane.showMessageDialog(null, "No G-Code file was chosen.");
 		return;
 	}
 	PCB p = new PCB();
@@ -762,7 +770,13 @@ private void preferences(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pref
 }//GEN-LAST:event_preferences
 
 private void saveRFO(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveRFO
-    // TODO add your handling code here:
+	if(!SLoadOK)
+		return;
+	if(loadedFiles.contentEquals(""))
+	{
+		JOptionPane.showMessageDialog(null, "There's nothing to save...");
+		return;
+	}
 	int sp = Math.max(loadedFiles.indexOf(".stl"), Math.max(loadedFiles.indexOf(".STL"), Math.max(loadedFiles.indexOf(".rfo"), loadedFiles.indexOf(".RFO"))));
 	if(sp <= 0)
    	{
@@ -793,6 +807,7 @@ private void enableSLoad()
 	loadSTL.setBackground(new java.awt.Color(0, 204, 255));
 	loadRFO.setBackground(new java.awt.Color(0, 204, 255));
 	saveRFO.setBackground(new java.awt.Color(0, 204, 255));
+	pcbButton.setBackground(new java.awt.Color(152, 99, 62));
 	try
 	{	
 		org.reprap.Preferences.setGlobalString("RepRap_Machine", "GCodeRepRap");
@@ -813,6 +828,7 @@ private void enableGLoad()
 	loadSTL.setBackground(new java.awt.Color(153, 153, 153));
     loadRFO.setBackground(new java.awt.Color(153, 153, 153));
     saveRFO.setBackground(new java.awt.Color(153, 153, 153));
+    pcbButton.setBackground(new java.awt.Color(153, 153, 153));
 	try
 	{
 		org.reprap.Preferences.setGlobalString("RepRap_Machine", "GCodeRepRap");
