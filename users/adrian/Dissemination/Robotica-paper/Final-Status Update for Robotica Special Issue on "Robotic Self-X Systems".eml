@@ -1,0 +1,105 @@
+Return-Path: <amenezes@umich.edu>
+Received: from lmtpproxyd (sauber-z1.bath.ac.uk [138.38.3.67])
+	 by sauber.bath.ac.uk (Cyrus v2.3.13) with LMTPA;
+	 Fri, 13 Aug 2010 04:54:43 +0100
+X-Sieve: CMU Sieve 2.3
+Received: from imaphost.bath.ac.uk ([unix socket])
+	 by imaphost.bath.ac.uk (Cyrus v2.3.13) with LMTPA;
+	 Fri, 13 Aug 2010 04:54:43 +0100
+Delivery-date: Fri, 13 Aug 2010 04:54:43 +0100
+Received: from mansell.bath.ac.uk ([138.38.0.35])
+	by imaphost.bath.ac.uk with esmtp (Exim 4.69)
+	(envelope-from <amenezes@umich.edu>)
+	id 1OjlLv-0007nr-2N
+	for ensab@imaps.bath.ac.uk; Fri, 13 Aug 2010 04:54:43 +0100
+Received: from webrelay-macc.mr.itd.umich.edu ([141.211.12.74])
+	by mansell.bath.ac.uk with esmtp (Exim 4)
+	(envelope-from <amenezes@umich.edu>)
+	id 1OjlLv-0002bB-4r
+	for A.Bowyer@bath.ac.uk; Fri, 13 Aug 2010 04:54:44 +0100
+Received: FROM jackiebrown-repl.mail.umich.edu (jackiebrown-repl.mail.umich.edu [141.211.125.75])
+	By webrelay-macc.mr.itd.umich.edu ID 4C64C1E6.34DCE.28855 ;
+	12 Aug 2010 23:54:14 EDT
+Received: (from www@localhost)
+	by jackiebrown-repl.mail.umich.edu () id o7D3sALE006239;
+	Thu, 12 Aug 2010 23:54:10 -0400
+Received: from 141.212.59.231 ([141.212.59.231]) by web.mail.umich.edu
+ (Horde Framework) with HTTP; Thu, 12 Aug 2010 23:54:10 -0400
+Message-ID: <20100812235410.38126he6gtssh5gc@web.mail.umich.edu>
+Date: Thu, 12 Aug 2010 23:54:10 -0400
+From: Amor Menezes <amenezes@umich.edu>
+To: Amor Menezes <amenezes@umich.edu>
+Cc: Pierre Kabamba <kabamba@umich.edu>, Gregory Chirikjian <gregc@jhu.edu>,
+        Matthew Moses <matt.moses@jhu.edu>
+Subject: Status Update for Robotica Special Issue on "Robotic Self-X
+ Systems"
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=ISO-8859-1;
+ DelSp="Yes";
+ format="flowed"
+Content-Disposition: inline
+Content-Transfer-Encoding: 7bit
+User-Agent: Internet Messaging Program (IMP) H3 (4.3.5)
+X-Remote-Browser: Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US)
+ AppleWebKit/533.4 (KHTML, like Gecko) Chrome/5.0.375.125 Safari/533.4
+X-IMP-Server: 192.168.225.75 (jackiebrown-repl)
+X-Originating-IP: 141.212.59.231
+X-Originating-User: amenezes
+X-Spam-Score: 0.4 (/)
+X-Spam-Report: 0.4/6.0
+	---- Start SpamAssassin results 
+	*  0.4 UNPARSEABLE_RELAY Informational: message has unparseable relay lines
+	---- End SpamAssassin results
+X-Scanner: 0d25c4d7ab2c51b9635b1762d725a461a2ac8726
+
+
+Dear Corresponding Author,
+
+Thank you for your patience as we continue to process submissions to  
+the January 2011 Robotica special issue on "Robotic Self-X Systems."   
+You have either received, or will very shortly receive, the second  
+editorial decision on your contribution.  In this round, two types of  
+decisions were issued.
+
+1)  Accept with minor revisions: Your manuscript has been accepted for  
+publication in the special issue, pending corrections in accordance  
+with reviewer suggestions.  Please take special care to incorporate  
+all reviewer comments, and thoroughly proof-read a final version of  
+your manuscript.  The image and document/tex source files of this  
+final version are to be uploaded by October 15, 2010.  Since your  
+manuscript has to be checked prior to final acceptance, we would  
+greatly appreciate the upload of these files before October 1, 2010.   
+Final acceptance by us then sends your files to the publisher.
+
+2) Revisions required: Reviewers of your manuscript would like to see  
+further changes prior to a decision on publication in the special  
+issue.  That is, the outcome of a third round of reviews will  
+determine whether your manuscript is published in the special issue,  
+or deferred to another issue of Robotica.  Please upload your revised  
+manuscript no later than September 3, 2010.  You can expect a third  
+editorial decision around October 8, 2010.  If your manuscript is  
+accepted pending minor revisions at that time, then image and  
+document/tex source files of the final version are to be uploaded by  
+October 15, 2010.  Your manuscript will be checked shortly thereafter.  
+  Final acceptance by us then sends your files to the publisher.
+
+Please note that there is very little flexibility with the above  
+deadline dates.  This is because we now have a publisher timeline to  
+adhere to.  With the above dates, the first proof of each article will  
+be available on November 8, 2010.  Corrections to first proofs are due  
+to the publisher on November 15, 2010.  Revised proofs will be issued  
+by the publisher on November 23, 2010, with final corrections due on  
+November 29, 2010.  All files go to the printer on December 3, 2010,  
+in preparation for a January 2011 publication.
+
+Please contact us if you have any questions or concerns.  In addition,  
+we ask that you forward this message to your co-authors.
+
+Thank you again for your participation.
+
+With best regards,
+
+Pierre Kabamba
+Amor Menezes
+

@@ -1,0 +1,129 @@
+Return-Path: <onbehalfof+eic.robotica+gmail.com@manuscriptcentral.com>
+Received: from lmtpproxyd (sauber-z1.bath.ac.uk [138.38.3.67])
+	 by sauber.bath.ac.uk (Cyrus v2.3.13) with LMTPA;
+	 Thu, 12 Aug 2010 17:15:31 +0100
+X-Sieve: CMU Sieve 2.3
+Received: from imaphost.bath.ac.uk ([unix socket])
+	 by imaphost.bath.ac.uk (Cyrus v2.3.13) with LMTPA;
+	 Thu, 12 Aug 2010 17:15:31 +0100
+Delivery-date: Thu, 12 Aug 2010 17:15:31 +0100
+Received: from piquet.bath.ac.uk ([138.38.0.36])
+	by imaphost.bath.ac.uk with esmtp (Exim 4.69)
+	(envelope-from <onbehalfof+eic.robotica+gmail.com@manuscriptcentral.com>)
+	id 1OjaRH-00013t-9e
+	for ensab@imaps.bath.ac.uk; Thu, 12 Aug 2010 17:15:31 +0100
+Received: from uranus.scholarone.com ([170.107.181.135])
+	by piquet.bath.ac.uk with esmtp (Exim 4)
+	(envelope-from <onbehalfof+eic.robotica+gmail.com@manuscriptcentral.com>)
+	id 1OjaRI-000670-72
+	for A.Bowyer@bath.ac.uk; Thu, 12 Aug 2010 17:15:32 +0100
+Received: from tss1be0002 (tss1be0002 [10.237.148.23])
+	by uranus.scholarone.com (Postfix) with ESMTP id 13821B28610
+	for <A.Bowyer@bath.ac.uk>; Thu, 12 Aug 2010 12:15:16 -0400 (EDT)
+Date: Thu, 12 Aug 2010 12:15:15 -0400 (EDT)
+From: eic.robotica@gmail.com
+Sender: onbehalfof+eic.robotica+gmail.com@manuscriptcentral.com
+To: A.Bowyer@bath.ac.uk
+Message-ID: <1802083128.1251281629716077.JavaMail.wladmin@tss1be0002>
+Subject: Robotica - Decision on Manuscript ID ROB-REG-09-0184.R1
+Errors-To: eic.robotica@gmail.com
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Errors-To: eic.robotica@gmail.com
+S1_REAL_RETURN_ADDRESS: eic.robotica@gmail.com
+X-Spam-Score: 0.0 (/)
+X-Spam-Report: 0.0/6.0
+	---- Start SpamAssassin results 
+	---- End SpamAssassin results
+X-Scanner: 241bbaabd3ba2c17fea95a1ea8c1dbb1212e98ca
+
+12-Aug-2010
+
+Dear Dr. Bowyer:
+
+I would like to accept your manuscript entitled "RepRap - The Replicating R=
+apid Prototyper" after revision for publication in Robotica.  The comments =
+of the reviewer(s) who reviewed your manuscript are included at the foot of=
+ this letter.
+
+-------------------
+Editor's Comments
+
+The guest editors recommend that this submission be accepted for the specia=
+l issue on Robotic Self-X Systems. However, the guest editors expect that t=
+he final version of this submission will address the current round of revie=
+wer concerns, including the requests of Reviewer 2. =20
+
+Where possible, please make the tone of the paper more formal.  In places i=
+t reads more like a press-release than an academic paper.  Please omit figu=
+res that are unnecessary or frivolous, in particular Figures 5 and 13.  The=
+ sale depicted in Figure 13 certainly deserves mention in the article, but =
+the figure is unnecessary, especially since it was featured prominently on =
+the RepRap website. =20
+
+Where applicable please make sure information is up-to-date.  For example t=
+he map information and estimated number of users should be as recent as pos=
+sible.
+---------------------
+
+In order to finalize the decision and send your manuscript to production, I=
+ kindly ask you to upload your revised manuscript in editable format to our=
+ Manuscript Central site. PDF files are not suitable for production, so ple=
+ase upload MS Word or LaTex files. Figures should be uploaded separately as=
+ high-resolution files.
+
+You will find the manuscript in your author center under "Manuscripts with =
+Decisions". Please select "Create Revision", upload your source files and s=
+ubmit them online.
+
+PLEASE NOTE: The manuscript will only be officially accepted once you have =
+submitted the source files. Any delay will hold up the publication of your =
+paper, so please upload the files as soon as possible.
+
+Sincerely,
+Prof. Greg Chirikjian
+Editor in Chief, Robotica
+eic.robotica@gmail.com
+
+
+Reviewer(s)' Comments to Author:
+
+Reviewer: 1
+Comments to the Author
+The technical concerns I brought up have been addressed appropriately.
+
+Reviewer: 2
+Comments to the Author
+This paper appears very similar to the one I reviewed in December 2009.  Pe=
+rhaps this is a resubmission of that paper, in corrected form?
+
+If so, I notice that the one factual error I found has not yet been correct=
+ed in this version.  Specifically:  on the last line of page 6, =E2=80=9CRe=
+producing Concepts Team=E2=80=9D should be corrected to =E2=80=9CReplicatin=
+g Systems Concepts Team=E2=80=9D, which was the actual name of the group in=
+ this study.
+
+This version also does not appear to respond to the two other simple reques=
+ts that I made:
+
+(1) I didn=E2=80=99t see a statement of the estimated lifetime of a typical=
+ machine, e.g., how many hours you can get out of key parts, such as a head=
+, before it must be replaced.
+
+(2)  I didn=E2=80=99t see a statement of the smallest attainable feature si=
+ze (or =E2=80=9Cfeature resolution=E2=80=9D) on product objects that can be=
+ fabricated.  As the authors realize, this is different from the raw positi=
+oning accuracy, which is stated to be 0.1 mm.
+
+Adding these two bits of information to the text would improve the paper, b=
+ut are not critical.
+
+Again, I will note that this is a very excellent review of the kinematic re=
+plication field and a fine summary of the history and accomplishments of th=
+e RepRap project.  There=E2=80=99s the same exciting feel as in the earlies=
+t days in the PC industry back in the late 1970s, when Radio Shack and othe=
+rs started selling the first assemble-it-yourself home computers.  I enthus=
+iastically recommend this paper for publication in Robotica, after the abov=
+e minor matters are properly corrected.
+
