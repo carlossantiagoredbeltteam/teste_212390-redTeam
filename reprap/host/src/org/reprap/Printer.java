@@ -140,7 +140,7 @@ public interface Printer {
 	 * Start a production run (as opposed to moving the machine about
 	 * interactively, for example).
 	 */
-	public void startRun() throws Exception;
+	public void startRun(LayerRules lc) throws Exception;
 	
 	/**
 	 * Indicates end of job, homes extruder, powers down etc

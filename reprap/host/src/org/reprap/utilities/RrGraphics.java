@@ -120,6 +120,11 @@ public class RrGraphics
 	private RrPolygonList p_list = null;
 	
 	/**
+	 * The layer being built
+	 */
+	private int layerNumber;
+	
+	/**
 	 * 
 	 */
 	//private RrCSGPolygon csg_p = null;
@@ -133,11 +138,6 @@ public class RrGraphics
 	 * 
 	 */
 	private boolean csgSolid = true;
-	
-	/**
-	 * 
-	 */
-	//private STLSlice stlc = null;
 	
 	/**
 	 * 
@@ -183,11 +183,9 @@ public class RrGraphics
 	public RrGraphics(RrRectangle b, String t) 
 	{
 		p_list = null;
-		//csg_p = null;
-		//stlc = null;
 		hp = null;
 		title = t;
-		init(b, false);
+		init(b, false, 0);
 	}
 	
 	/**
@@ -198,86 +196,18 @@ public class RrGraphics
 	public RrGraphics(String t) 
 	{
 		p_list = null;
-		//csg_p = null;
-		//stlc = null;
 		hp = null;
 		title = t;
 		initialised = false;
+		layerNumber = 0;
 	}
 	
-	public void cleanPolygons()
+	public void cleanPolygons(int ln)
 	{
 		p_list = null;
-		//csg_p = null;
-		//stlc = null;
 		hp = null;
+		layerNumber = ln;
 	}
-//	/**
-//	 * Constructor for point-list polygon
-//	 * @param pl
-//	 * @param pb
-//	 */
-//	public RrGraphics(RrPolygonList pl) 
-//	{
-//		if(pl.size() <= 0)
-//		{
-//			System.err.println("Attempt to plot a null polygon list!");
-//			return;
-//		}
-//		
-//		p_list = pl;
-//		hp = null;
-//		csg_p = null;
-//		stlc = null;
-//		
-//		init(pl.getBox(), true);
-//	}
-//	
-//	/**
-//	 * Constructor for CSG polygon
-//	 * @param cp
-//	 */
-//	public RrGraphics(RrCSGPolygon cp) 
-//	{
-//		p_list = null;
-//		hp = null;
-//		csg_p = cp;
-//		stlc = null;
-//		
-//		init(csg_p.box(), true);
-//	}
-//	
-//	/**
-//	 * Constructor for CSG polygon and crossing lines
-//	 * @param cp
-//	 * @param pb
-//	 */
-//	public RrGraphics(RrCSGPolygon cp, List<RrHalfPlane> h) 
-//	{
-//		p_list = null;
-//		csg_p = cp;
-//		hp = h;
-//		stlc = null;
-//		
-//		init(csg_p.box(), true);
-//	}
-//	
-//	/**
-//	 * Constructor for STL polygons
-//	 * @param s
-//	 * @param pb
-//	 */
-//	public RrGraphics(STLSlice s) 
-//	{
-//		p_list = null;
-//		csg_p = null;
-//		hp = null;
-//		stlc = s;
-//		
-//		init(stlc.box(), true);
-//	}
-//	
-
 	
 	private void setScales(RrRectangle b)
 	{
@@ -302,8 +232,6 @@ public class RrGraphics
 		else
 			scale = ys;	
 		
-		// God alone knows why the 5 and 20 are needed next...
-		
 		p_0 = new Rr2Point((frameWidth - (width + 2*scaledBox.x().low())*scale)*0.5,
 				(frameHeight - (height + 2*scaledBox.y().low())*scale)*0.5);
 		
@@ -313,7 +241,7 @@ public class RrGraphics
 	/**
 	 * @param b
 	 */
-	public void init(RrRectangle b, boolean waitTillDone)
+	public void init(RrRectangle b, boolean waitTillDone, int ln)
 	{
 		originalBox = b;
 		setScales(b);
@@ -329,6 +257,8 @@ public class RrGraphics
 		jframe.setIgnoreRepaint(false);
 		
 		initialised = true;
+		
+		layerNumber = ln;
 		
 		if(waitTillDone)
 		{
@@ -365,7 +295,48 @@ public class RrGraphics
 		return initialised;
 	}
 	
-
+	/**
+	 * Plot a G code
+	 * @param gCode
+	 */
+	public void add(String gCode)
+	{
+		if(p_list == null)
+			p_list = new RrPolygonList();
+		RrRectangle box = new RrRectangle(new RrInterval(0, 200), new RrInterval(0, 200)); // Default is entire plot area
+		int com = gCode.indexOf(';');
+		if(com > 0)
+			gCode = gCode.substring(0, com);
+		if(com != 0)
+		{
+			gCode = gCode.trim();
+			if(gCode.length() > 0)
+			{
+				if(!isInitialised())
+				{
+					Debug.d("RrGraphics.add(G Codes) - plot area not initialized.");
+					init(box, false, 0);
+				}
+			}
+			return;
+		}
+		if(gCode.startsWith(";#!LAYER:"))
+		{
+			int l = Integer.parseInt(gCode.substring(gCode.indexOf(" ") + 1, gCode.indexOf("/")));
+			cleanPolygons(l);
+		}
+		if(gCode.startsWith(";#!RECTANGLE:"))
+		{
+			String xs = gCode.substring(gCode.indexOf("x:") + 1, gCode.indexOf("y"));
+			String ys = gCode.substring(gCode.indexOf("y:") + 1, gCode.indexOf(">"));
+			double x0 = Double.parseDouble(xs.substring(xs.indexOf("l:") + 1, xs.indexOf(",")));
+			double x1 = Double.parseDouble(xs.substring(xs.indexOf("h:") + 1, xs.indexOf("]")));
+			double y0 = Double.parseDouble(ys.substring(ys.indexOf("l:") + 1, ys.indexOf(",")));
+			double y1 = Double.parseDouble(ys.substring(ys.indexOf("h:") + 1, ys.indexOf("]")));
+			box = new RrRectangle(new RrInterval(x0, x1), new RrInterval(y0, y1));
+			init(box, false, 0);
+		}
+	}
 	
 	/**
 	 * @param pl
@@ -388,33 +359,6 @@ public class RrGraphics
 		bg = b;
 		jframe.repaint();
 	}
-	
-//	/**
-//	 * @param cp
-//	 */
-//	public void add(RrCSGPolygon cp)
-//	{
-//		csg_p = cp;
-//		jframe.repaint();
-//	}
-//	
-//	/**
-//	 * @param s
-//	 */
-//	public void add(STLSlice s)
-//	{
-//		stlc = s;
-//		jframe.repaint();
-//	}
-//	
-//	/**
-//	 * @param h
-//	 */
-//	public void add(List<RrHalfPlane>h)
-//	{
-//		hp = h;
-//		jframe.repaint();
-//	}
 	
 	/**
 	 * Real-world coordinates to pixels
@@ -478,35 +422,6 @@ public class RrGraphics
 	}
 	
 	/**
-	 * Plot the half-plane list
-	 * @param b
-	 */
-//	private void plot(List<RrHalfPlane> hl)
-//	{
-//		for(int i = 0; i < hl.size(); i++)
-//		{
-//			RrHalfPlane h = hl.get(i);
-//			if(!scaledBox.wipe(h.pLine(), RrInterval.bigInterval()).empty())
-//			{
-//				if(h.size() > 0)
-//				{
-//					move(h.getPoint(0));
-//					boolean even = false;
-//					for(int j = 1; j < h.size(); j++)
-//					{
-//						even = !even;
-//						if(even)
-//							g2d.setColor(hatch1);
-//						else
-//							g2d.setColor(hatch0);
-//						plot(h.getPoint(j));
-//					}
-//				}
-//			}
-//		}
-//	}
-	
-	/**
 	 * Set the colour from a RepRap attribute
 	 * @param at
 	 */
@@ -544,112 +459,8 @@ public class RrGraphics
 			g2d.setColor(Color.RED);
 			plot(p.point(0));
 		}
-	}
-	
-	/**
-	 * Plot a section of parametric line
-	 * @param a
-	 * @param i
-	 */
-	private void plot(RrLine a, RrInterval i)
-	{
-		if(i.empty()) return;
-		move(a.point(i.low()));
-		plot(a.point(i.high()));
-	}
-	
-//	/**
-//	 * Recursively fill a CSG quad where it's solid.
-//	 * @param q
-//	 */
-//	private void fillCSG(RrCSGPolygon q)
-//	{
-//		if(RrRectangle.intersection(q.box(), scaledBox).empty())
-//			return;
-//		
-//		if(q.c_1() != null)
-//		{
-//			fillCSG(q.c_1());
-//			fillCSG(q.c_2());
-//			fillCSG(q.c_3());
-//			fillCSG(q.c_4());
-//			return;
-//		}
-//		
-//		if(q.csg().operator() == RrCSGOp.NULL)
-//			return;
-//			
-//		g2d.setColor(infill);
-//		Rr2Point sw = transform(q.box().sw());
-//		Rr2Point ne = transform(q.box().ne());
-//
-//		int x0 = (int)Math.round(sw.x());
-//		int y0 = (int)Math.round(sw.y());
-//		int x1 = (int)Math.round(ne.x());
-//		int y1 = (int)Math.round(ne.y());
-//
-//		if(q.csg().operator() == RrCSGOp.UNIVERSE)
-//		{
-//			g2d.fillRect(x0, y1, x1 - x0 + 1, y0 - y1 + 1);
-//			return;
-//		}
-//
-//		for(int x = x0; x <= x1; x++)
-//		{
-//			for(int y = y1; y <= y0; y++)  // Bloody backwards coordinates...
-//			{
-//				Rr2Point p = iTransform(x, y);
-//				double v = q.csg().value(p);
-//				if(v <= 0)
-//					g2d.fillRect(x, y, 1, 1);
-//			}
-//		}
-//
-//	}
-//	
-//	private void boxCSG(RrCSGPolygon q)
-//	{
-//		if(RrRectangle.intersection(q.box(), scaledBox).empty())
-//			return;
-//		
-//		if(q.c_1() != null)
-//		{
-//			boxCSG(q.c_1());
-//			boxCSG(q.c_2());
-//			boxCSG(q.c_3());
-//			boxCSG(q.c_4());
-//			return;
-//		}
-//		plot(q.box());
-//	}
-//	
-//	/**
-//	 * Plot a divided CSG polygon recursively
-//	 * @param p
-//	 */
-//	private void plot(RrCSGPolygon q)
-//	{
-//		if(RrRectangle.intersection(q.box(), scaledBox).empty())
-//			return;		
-//		
-//		if(q.c_1() != null)
-//		{
-//			plot(q.c_1());
-//			plot(q.c_2());
-//			plot(q.c_3());
-//			plot(q.c_4());
-//			return;
-//		}
-//		
-//		g2d.setColor(polygon1);
-//		if(q.csg().complexity() == 1)
-//			plot(q.csg().plane().pLine(), q.interval1());
-//		else if (q.csg().complexity() == 2)
-//		{
-//			plot(q.csg().c_1().plane().pLine(), q.interval1());
-//			plot(q.csg().c_2().plane().pLine(), q.interval2());
-//		}
-//	}
+	}	
+
 	
 	/**
 	 * Recursively fill a Boolean Grid where it's solid.
@@ -657,81 +468,10 @@ public class RrGraphics
 	 */
 	private void fillBG(BooleanGrid b)
 	{
-//		if(RrRectangle.intersection(b.box(), scaledBox).empty())
-//			return;
-//		
-//		if(!b.leaf())
-//		{
-//			fillBG(b.northEast());
-//			fillBG(b.northWest());
-//			fillBG(b.southEast());
-//			fillBG(b.southWest());
-//			return;
-//		}
-//		
-//		if(!b.value())
-//			return;
-//			
-//		g2d.setColor(infill);
-//		Rr2Point sw = transform(b.box().sw());
-//		Rr2Point ne = transform(b.box().ne());
-//
-//		int x0 = (int)Math.round(sw.x());
-//		int y0 = (int)Math.round(sw.y());
-//		int x1 = (int)Math.round(ne.x());
-//		int y1 = (int)Math.round(ne.y());
-//
-//
-//		g2d.fillRect(x0, y1, x1 - x0 + 1, y0 - y1 + 1);
+
 	}
 	
-//	/**
-//	 * Recursively plot the boxes for an STL object
-//	 * @param s
-//	 */
-//	private void boxSTL(STLSlice s)
-//	{
-//		if(RrRectangle.intersection(s.box(), scaledBox).empty())
-//			return;
-//		
-//		if(s.leaf())
-//		{
-//			g2d.setColor(boxes);
-//			plot(s.box());
-//		} else
-//		{
-//			boxSTL(s.c_1());
-//			boxSTL(s.c_2());
-//			boxSTL(s.c_3());
-//			boxSTL(s.c_4());
-//		}
-//	}
-	
-//	/**
-//	 * Plot a divided STL recursively
-//	 * @param s
-//	 */
-//	private void plot(STLSlice s)
-//	{
-//		if(RrRectangle.intersection(s.box(), scaledBox).empty())
-//			return;
-//		
-//		if(s.leaf())
-//		{
-//			g2d.setColor(polygon1);
-//			for(int i = 0; i < s.edges().size(); i++)
-//			{
-//				move(s.segmentA(i));
-//				plot(s.segmentB(i));
-//			}
-//		} else
-//		{
-//			plot(s.c_1());
-//			plot(s.c_2());
-//			plot(s.c_3());
-//			plot(s.c_4());
-//		}
-//	}
+
 	
 	/**
 	 * Master plot function - draw everything
@@ -744,19 +484,6 @@ public class RrGraphics
 			fillBG(bg);
 		}
 		
-//		if(csg_p != null)
-//		{
-//			if(csgSolid)
-//				fillCSG(csg_p);
-//			
-//			if(plot_box)
-//				boxCSG(csg_p);
-//			//else
-//				//plot(csg_p.box());
-//			
-//			plot(csg_p);
-//		}
-		
 		if(p_list != null)
 		{
 			int leng = p_list.size();
@@ -766,26 +493,9 @@ public class RrGraphics
 			{
 				for(int i = 0; i < leng; i++)
 					plot(p_list.polygon(i).getBox());
-			} //else
-				//plot(p_list.getBox());
+			} 
 		}
-		
-//		if(stlc != null)
-//		{
-//			if(plot_box)
-//				boxSTL(stlc);
-//			//else
-//				//plot(stlc.box());
-//			
-//			plot(stlc);
-//		}
-
-//		if(hp != null)
-//		{
-//			plot(hp);
-//		}
-		
-
+		jframe.setTitle(title + ", layer: " + Integer.toString(layerNumber));
 	}
 	
 	class myKB implements KeyListener
@@ -853,12 +563,7 @@ public class RrGraphics
 				break;
 
 			case MouseEvent.BUTTON2:
-//				if(csg_p != null)
-//				{
-//					Rr2Point pc = iTransform(ix, iy);
-//					JOptionPane.showMessageDialog(null, "Potential at " + pc.toString() + " is " + csg_p.value(pc) +
-//							"\nQuad: " + csg_p.quad(pc).toString());
-//				}
+
 				break;
 				
 			case MouseEvent.BUTTON3:

@@ -314,7 +314,7 @@ public abstract class GenericRepRap implements CartesianPrinter
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#startRun()
 	 */
-	public void startRun() throws Exception
+	public void startRun(LayerRules lc) throws Exception
 	{
 		//if (previewer != null)
 			//previewer.reset();

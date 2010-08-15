@@ -1,6 +1,7 @@
 package org.reprap.pcb;
 
 import org.reprap.pcb.Cords;
+import org.reprap.geometry.polygons.*;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -53,6 +54,9 @@ public class GerberGCode {
 	Aperture curAperture = null;
 	boolean inInch=false;
 	Cords lastCords = null;
+	
+	RrPolygonList thePattern = new RrPolygonList();
+	RrPolygon currentPolygon = null;
 	
 	int XYFeedrate = 1000;
 	int ZFeedrate = 70;
