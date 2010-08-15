@@ -131,7 +131,7 @@ public class RrInterval
 	{
 		if(empty)
 			return "[empty]";
-		return "[" + Double.toString(low) + ", " + Double.toString(high) + "]";
+		return "[l:" + Double.toString(low) + ", h:" + Double.toString(high) + "]";
 	}
 	
 	/**

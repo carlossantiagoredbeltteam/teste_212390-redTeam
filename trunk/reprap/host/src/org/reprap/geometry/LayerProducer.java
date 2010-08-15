@@ -317,9 +317,9 @@ public class LayerProducer {
 				RrRectangle rec = lc.getBox();
 				if(Preferences.loadGlobalBool("Shield"))
 					rec.expand(Rr2Point.add(rec.sw(), new Rr2Point(-7, -7))); // TODO: Yuk - this should be a parameter
-				simulationPlot.init(rec, false);
+				simulationPlot.init(rec, false, lc.getModelLayer());
 			} else
-				simulationPlot.cleanPolygons();
+				simulationPlot.cleanPolygons(lc.getModelLayer());
 		}
 	}
 	

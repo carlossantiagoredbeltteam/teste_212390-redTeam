@@ -301,7 +301,7 @@ public class RrRectangle
 	{
 		if(empty)
 			return "<empty>";
-		return "<BOX x:" + x.toString() + ", y: " + y.toString() + ">";
+		return "<BOX x:" + x.toString() + ", y:" + y.toString() + ">";
 	}
 	
 	/**

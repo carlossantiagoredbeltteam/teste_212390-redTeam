@@ -141,7 +141,7 @@ public class Producer {
 				new Rr2Point(gp.x().high() + 6, gp.y().high() + 6));
 		
 		
-		layerRules.getPrinter().startRun();
+		layerRules.getPrinter().startRun(layerRules);
 		
 		if(Preferences.loadGlobalBool("Subtractive"))
 			produceSubtractive();

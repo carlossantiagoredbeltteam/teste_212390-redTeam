@@ -441,7 +441,7 @@ public class GCodeRepRap extends GenericRepRap {
 	/* (non-Javadoc)
 	 * @see org.reprap.Printer#initialise()
 	 */
-	public void startRun() throws Exception
+	public void startRun(LayerRules lc) throws Exception
 	{	
 		// If we are printing from a file, that should contain all the headers we need.
 		if(gcode.buildingFromFile())
@@ -454,6 +454,8 @@ public class GCodeRepRap extends GenericRepRap {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd:HH-mm-ss");
 		String myDateString = sdf.format(myDate);
 		gcode.queue("; Created: " + myDateString);
+		
+		gcode.queue(";#!RECTANGLE: " + lc.getBox());
 
 		//take us to fun, safe metric land.
 		gcode.queue("G21 ;metric is good!");
@@ -473,7 +475,7 @@ public class GCodeRepRap extends GenericRepRap {
 		setBedTemperature(bedTemperatureTarget);
 				
 		try	{
-			super.startRun();
+			super.startRun(lc);
 		} catch (Exception E) {
 			Debug.d("Initialization error: " + E.toString());
 		}
@@ -761,7 +763,7 @@ public class GCodeRepRap extends GenericRepRap {
 	{
 		currentFeedrate = -1;  // Force it to set the feedrate
 		gcode.startingLayer(lc);
-		gcode.queue(";#!LAYER: " + (lc.getMachineLayer() + 1) + "/" + lc.getMachineLayerMax());		
+		gcode.queue(";#!LAYER: " + (lc.getMachineLayer() + 1) + "/" + lc.getMachineLayerMax());
 		super.startingLayer(lc);
 	}
 	

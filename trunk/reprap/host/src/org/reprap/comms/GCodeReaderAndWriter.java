@@ -20,6 +20,7 @@ import gnu.io.SerialPort;
 import gnu.io.UnsupportedCommOperationException;
 
 import org.reprap.utilities.Debug;
+import org.reprap.utilities.RrGraphics;
 import org.reprap.utilities.ExtensionFileFilter;
 import org.reprap.Main;
 import org.reprap.Preferences;
@@ -37,7 +38,7 @@ public class GCodeReaderAndWriter
 	private double eTemp;
 	private double bTemp;
 	private double x, y, z, e;
-	
+	private RrGraphics simulationPlot = null;
 	/**
 	 * Stop sending a file (if we are).
 	 */
@@ -285,6 +286,14 @@ public class GCodeReaderAndWriter
 			return false;
 		}
 		
+		simulationPlot = null;
+		try 
+		{
+			if(Preferences.loadGlobalBool("DisplaySimulation"))
+				simulationPlot = new RrGraphics("RepRap building simulation");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 //		if(bufferThread == null)
 //		{
 //			System.err.println("GCodeWriter: attempt to write to non-existent buffer.");
@@ -490,6 +499,9 @@ public class GCodeReaderAndWriter
 	 */
 	private void bufferQueue(String cmd, int retries) throws Exception
 	{
+		if(simulationPlot != null)
+			simulationPlot.add(cmd);
+		
 		if(serialOutStream == null)
 		{
 			Debug.d("bufferQueue: attempt to queue: " + cmd + " to a non-running output buffer.");
