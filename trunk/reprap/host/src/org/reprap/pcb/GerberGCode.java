@@ -1,7 +1,15 @@
 package org.reprap.pcb;
 
+import javax.media.j3d.Appearance;
+import javax.media.j3d.Material;
+import javax.vecmath.Color3f;
 import org.reprap.pcb.Cords;
 import org.reprap.geometry.polygons.*;
+import org.reprap.Attributes;
+import org.reprap.utilities.RrGraphics;
+import org.reprap.Preferences;
+
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -54,7 +62,6 @@ public class GerberGCode {
 	Aperture curAperture = null;
 	boolean inInch=false;
 	Cords lastCords = null;
-	
 	RrPolygonList thePattern = new RrPolygonList();
 	RrPolygon currentPolygon = null;
 	
@@ -63,7 +70,7 @@ public class GerberGCode {
 
 	float drawingHeight = 1.8f;
 	float freemoveHeight = 3.8f;//1.7f;
-
+	Appearance looksLike;
 	
 	public GerberGCode(float penWidth, float drawingHeight, float freemoveHeight, int XYFeedrate, int ZFeedrate)
 	{
@@ -75,6 +82,27 @@ public class GerberGCode {
 		
 		enableAbsolute();
 		
+		looksLike = new Appearance();
+		looksLike.setMaterial(new Material(new Color3f(0.5f, 0.5f, 0.5f), new Color3f(0f, 0f, 0f), new Color3f(0.5f, 0.5f, 0.5f), new Color3f(0f, 0f, 0f), 0f));
+		
+	}
+	
+	private void polygon(double x, double y)
+	{
+		if(currentPolygon == null && dawingOn)
+		{
+			currentPolygon = new RrPolygon(new Attributes(null, null, null, looksLike), false);
+			currentPolygon.add(new Rr2Point(x, y));
+			return;
+		}
+		if(!dawingOn)
+		{
+			if(currentPolygon != null)
+				thePattern.add(new RrPolygon(currentPolygon));
+			currentPolygon = null;
+			return;
+		}
+		currentPolygon.add(new Rr2Point(x, y));
 	}
 	
 	public void enableAbsolute()
@@ -232,12 +260,14 @@ public class GerberGCode {
 			{
 				disableDrawing();
 				addFeedForMove();				
-				gcodestr += "G1 X"+start.x+" Y"+start.y+" F"+XYFeedrate+"\n";					
+				gcodestr += "G1 X"+start.x+" Y"+start.y+" F"+XYFeedrate+"\n";
+				polygon(start.x, start.y);
 			}
 			
 			enableDrawing();
 			addFeedForMove();				
 			gcodestr += "G1 X"+end.x+" Y"+end.y+"  F"+XYFeedrate+"\n";
+			polygon(end.x, end.y);
 			lastCords = new Cords(end.x, end.y, false);
 			
 			//disableDrawing();
@@ -264,7 +294,7 @@ public class GerberGCode {
 		disableDrawing();
 		addFeedForMove();
 		gcodestr += "G1 X"+p.x+" Y"+p.y+" F2000\n";
-
+		polygon(p.x, p.y);
 		lastCords = new Cords(p.x, p.y, false);
 	}
 	
@@ -345,6 +375,21 @@ public class GerberGCode {
 	public String getGCode()
 	{
 		disableDrawing();
+		try 
+		{
+			if(Preferences.loadGlobalBool("DisplaySimulation"))
+			{
+				RrGraphics simulationPlot = new RrGraphics("PCB simulation");
+				if(currentPolygon != null)
+					thePattern.add(new RrPolygon(currentPolygon));
+				simulationPlot.init(thePattern.getBox(), false, 0);
+				simulationPlot.add(thePattern);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		return gcodestr;
 	}
 	

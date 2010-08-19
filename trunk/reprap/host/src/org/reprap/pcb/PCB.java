@@ -15,7 +15,7 @@ public class PCB {
 	public void pcb(File inputFile, File outputFile) {
 		GerberGCode gerberGcode; 
 		String[] splitline;
-		boolean debug = false;
+		boolean debug = true;
 
 		BufferedReader in;
 		String line;
@@ -34,7 +34,7 @@ public class PCB {
 		// Config end
 
 
-		System.out.println("Gerber RS274X to GCoder Converter for RepRap's\n");
+		System.out.println("Gerber RS274X to GCoder Converter for RepRap\n");
 
 
 		System.out.println("Input: " + inputFile.getName());
@@ -113,11 +113,15 @@ public class PCB {
 						if(line.startsWith("G90"))
 						{
 							gerberGcode.enableAbsolute();
+							if(debug)
+								System.out.println("Absolute coordinates");
 						}
 						else
 							if(line.startsWith("G91"))
 							{
 								gerberGcode.enableRelative();
+								if(debug)
+									System.out.println("Relative coordinates");
 							}
 							else
 								if(line.startsWith("G70"))
@@ -127,11 +131,15 @@ public class PCB {
 
 									offsetX = offsetX/25.4f;
 									offsetY = offsetY/25.4f;
+									if(debug)
+										System.out.println("Inches");
 								}
 								else
 									if(line.startsWith("G71"))
 									{
-										gerberGcode.setMetric();			
+										gerberGcode.setMetric();
+										if(debug)
+											System.out.println("Metric");
 									}
 									else
 										if(line.startsWith("G54"))
@@ -140,6 +148,8 @@ public class PCB {
 
 											aperture = Integer.valueOf(line.substring(4, line.length()-1).trim());
 											gerberGcode.selectAperture(aperture);
+											if(debug)
+												System.out.println("Apature: " + aperture + " selected.");
 
 										}
 										else
@@ -181,6 +191,8 @@ public class PCB {
 
 													aperture = Integer.valueOf(line.substring(1, 3));
 													gerberGcode.selectAperture(aperture);
+													if(debug)
+														System.out.println("Apature: " + aperture + " selected.");
 												}
 			}
 
