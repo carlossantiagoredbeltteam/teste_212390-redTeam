@@ -20,17 +20,18 @@ public class PCB {
 		BufferedReader in;
 		String line;
 		String formatX = "23", formatY="23";
-		boolean inInch = false;
+
+		double scale = 1;
 
 
 		// Config
-		float penWidth = 0.7f;		
-		float offsetX=40;
-		float offsetY=40;
+		double penWidth = 0.7f;		
+		double offsetX=40;
+		double offsetY=40;
 		int XYFeedrate = 1000;
 		int ZFeedrate = 70;
-		float drawingHeight = 1.8f;
-		float freemoveHeight = 3.8f;//1.7f;
+		double drawingHeight = 1.8f;
+		double freemoveHeight = 3.8f;//1.7f;
 		// Config end
 
 
@@ -82,25 +83,31 @@ public class PCB {
 						{
 							System.out.println("\n\nAparture: " + apertureNum);
 							System.out.println("Type: " + apertureType);
-							System.out.println("Size: " + apertureSize);
 						}
 
 						if(apertureType.equals("C"))
 						{
-							gerberGcode.addCircleAperture(Integer.parseInt(apertureNum), Float.parseFloat(apertureSize));
+							double s = scale*Double.parseDouble(apertureSize);
+							gerberGcode.addCircleAperture(Integer.parseInt(apertureNum), s);
+							if(debug) 
+								System.out.println("Size: " + s + " mm");
 						}
 						else
 							if(apertureType.equals("R"))
 							{
 
 								String rectSides[] = apertureSize.split("X");
+								double x = scale*Double.parseDouble(rectSides[0]);
+								double y = scale*Double.parseDouble(rectSides[1]);
 
-								gerberGcode.addRectangleAperture(Integer.parseInt(apertureNum), Float.parseFloat(rectSides[0]), Float.parseFloat(rectSides[1]));
+								gerberGcode.addRectangleAperture(Integer.parseInt(apertureNum), x, y);
+								if(debug) 
+									System.out.println("Size: " + x + "x" + y + "mm x mm");
 							}
 							else
 								if(apertureType.equals("OC8"))
 								{
-									gerberGcode.addCircleAperture(Integer.parseInt(apertureNum), Float.parseFloat(apertureSize));							
+									gerberGcode.addCircleAperture(Integer.parseInt(apertureNum), scale*Double.parseDouble(apertureSize));							
 								}
 								else
 								{
@@ -126,18 +133,14 @@ public class PCB {
 							else
 								if(line.startsWith("G70"))
 								{
-									gerberGcode.setImperial();
-									inInch = true;
-
-									offsetX = offsetX/25.4f;
-									offsetY = offsetY/25.4f;
+									scale = 25.4;
 									if(debug)
 										System.out.println("Inches");
 								}
 								else
 									if(line.startsWith("G71"))
 									{
-										gerberGcode.setMetric();
+										scale = 1;
 										if(debug)
 											System.out.println("Metric");
 									}
@@ -155,33 +158,34 @@ public class PCB {
 										else
 											if(line.startsWith("X"))
 											{
-												float x, y;
+												double x, y;
 												int d;
 												int divFactorX = (int)Math.pow(10.0,Integer.parseInt(formatX.substring(1)));
 												int divFactorY = (int)Math.pow(10.0,Integer.parseInt(formatY.substring(1)));
 
-												x = Float.valueOf(line.substring(1, line.indexOf("Y")))/divFactorX;
-												y = Float.valueOf(line.substring(line.indexOf("Y")+1, line.indexOf("D")))/divFactorY;
+												x = scale*Double.valueOf(line.substring(1, line.indexOf("Y")))/divFactorX;
+												y = scale*Double.valueOf(line.substring(line.indexOf("Y")+1, line.indexOf("D")))/divFactorY;
 												d = Integer.valueOf(line.substring(line.indexOf("D")+1, line.indexOf("D")+3));
 
 												x += offsetX;
 												y += offsetY;
 
-												if(debug)  System.out.println(" X: "+x+" Y:"+y+" D:"+d);
+												if(debug)
+													System.out.println(" X: "+x+" Y:"+y+" D:"+d);
 
 												if(d==1)
 												{
-													gerberGcode.addLine(new Cords(x, y, inInch));
+													gerberGcode.drawLine(new Coords(x, y));
 												}
 												else
 													if(d==2)
 													{
-														gerberGcode.goTo(new Cords(x, y, inInch));
+														gerberGcode.goTo(new Coords(x, y));
 													}	
 													else
 														if(d==3)
 														{
-															gerberGcode.exposePoint(new Cords(x, y, inInch));
+															gerberGcode.exposePoint(new Coords(x, y));
 														}
 											}
 											else
@@ -201,11 +205,12 @@ public class PCB {
 
 			BufferedWriter outfile;
 
-			outfile = new BufferedWriter(new FileWriter(outputFile));
-			outfile.write(gerberGcode.getGCode());
-			outfile.close();
+//			outfile = new BufferedWriter(new FileWriter(outputFile));
+//			outfile.write(gerberGcode.getPolygons());
+//			outfile.close();
 
-
+			gerberGcode.getPolygons();
+			
 			System.out.println("GCode file generated succesfully !");
 
 		} catch (Exception e) {
