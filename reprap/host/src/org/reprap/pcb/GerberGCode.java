@@ -218,6 +218,7 @@ public class GerberGCode {
 	private void drawFatLine(Coords c)
 	{
 		//TODO: make this draw a fat line
+		double r = 0.5*curAperture.width;
 		addPointToPolygons(c);
 	}
 
