@@ -726,7 +726,7 @@ public class BooleanGrid
 	private static final double pixSize = Preferences.machineResolution()*0.6;
 	private static final double realResolution = pixSize*1.5;
 	private static final double rSwell = 0.5; // mm by which to swell rectangles to give margins round stuff
-	private static final int searchDepth = 3;
+	//private static final int searchDepth = 3;
 	
 	/**
 	 * How simple does a CSG expression have to be to not be worth pruning further?
@@ -811,7 +811,7 @@ public class BooleanGrid
 	private BitSet bits;
 	
 	/**
-	 * Flags for visited poxels during searches
+	 * Flags for visited pixels during searches
 	 */
 	private BitSet visited;
 	
@@ -1071,6 +1071,17 @@ public class BooleanGrid
 	}
 	
 	/**
+	 * Fill a disc centre c radius r with v
+	 * @param c
+	 * @param r
+	 * @param v
+	 */
+	public void disc(Rr2Point c, double r, boolean v)
+	{
+		disc(new iPoint(c), iScale(r), v);
+	}
+	
+	/**
 	 * Fill a rectangle with centreline running from p0 to p1 of width 2r with v
 	 * @param p0
 	 * @param p1
@@ -1121,6 +1132,18 @@ public class BooleanGrid
 					bits.set(pixI(x, yLow), pixI(x, yHigh) + 1, v);
 			} 
 		}
+	}
+	
+	/**
+	 * Fill a rectangle with centreline running from p0 to p1 of width 2r with v
+	 * @param p0
+	 * @param p1
+	 * @param r
+	 * @param v
+	 */
+	public void rectangle(Rr2Point p0, Rr2Point p1, double r, boolean v)
+	{
+		rectangle(new iPoint(p0), new iPoint(p1), iScale(r), v);
 	}
 	
 	/**
