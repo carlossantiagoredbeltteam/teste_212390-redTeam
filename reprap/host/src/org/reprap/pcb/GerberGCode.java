@@ -3,7 +3,7 @@ package org.reprap.pcb;
 import javax.media.j3d.Appearance;
 import javax.media.j3d.Material;
 import javax.vecmath.Color3f;
-import org.reprap.pcb.Coords;
+//import org.reprap.pcb.Coords;
 import org.reprap.geometry.polygons.*;
 import org.reprap.Attributes;
 import org.reprap.utilities.RrGraphics;
@@ -46,31 +46,34 @@ public class GerberGCode {
 	double penWidth;
 	Aperture curAperture = null;
 	boolean absolute = true;
-	Coords lastCoords = null;
+	BooleanGrid pcb;
+	Rr2Point lastCoords = null;
 	RrPolygonList thePattern = new RrPolygonList();
-	RrPolygon currentPolygon = null;
+//	RrPolygon currentPolygon = null;
 	
 	Appearance looksLike;
 	
-	public GerberGCode(double penWidth, double drawingHeight, double freemoveHeight, int XYFeedrate, int ZFeedrate)
+	public GerberGCode(double penWidth, BooleanGrid p) //, double drawingHeight, double freemoveHeight, int XYFeedrate, int ZFeedrate)
 	{
 		this.penWidth = penWidth;
 		enableAbsolute();
 		disableDrawing();
-		lastCoords = new Coords(0, 0);
+		pcb = p;
+		lastCoords = new Rr2Point(0, 0);
 		looksLike = new Appearance();
 		looksLike.setMaterial(new Material(new Color3f(0.5f, 0.5f, 0.5f), new Color3f(0f, 0f, 0f), new Color3f(0.5f, 0.5f, 0.5f), new Color3f(0f, 0f, 0f), 0f));
 	}
 	
-	public void drawLine(Coords c)
+	public RrRectangle drawLine(Rr2Point c)
 	{
-		drawFatLine(fixCoords(c));
+		return drawFatLine(fixCoords(c));
 	}	
 	
-	public void goTo(Coords c)
+	public void goTo(Rr2Point c)
 	{
-		disableDrawing();
-		addPointToPolygons(fixCoords(c));
+		lastCoords = new Rr2Point(fixCoords(c));
+//		disableDrawing();
+//		addPointToPolygons(fixCoords(c));
 	}
 	
 	public void enableAbsolute()
@@ -109,48 +112,37 @@ public class GerberGCode {
 		apertures.add(new Aperture(apertureNum, width, height, 'R'));
 	}
 	
-	public void exposePoint(Coords c)
+	public RrRectangle exposePoint(Rr2Point c)
 	{
 		if(curAperture.type == 'C')
-			createCircle(fixCoords(c));
+			return createCircle(fixCoords(c));
 		else
-			createRec(fixCoords(c));
+			return createRec(fixCoords(c));
 		
 	}
 	
-	public void createRec(Coords c)
+	public RrRectangle createRec(Rr2Point c)
 	{	
 		//TODO: make this fill the rectangle
 		double recWidth = curAperture.width/2.0f;
 		double recHeight = curAperture.height/2.0f;
 		c = fixCoords(c);
-		Coords x = new Coords(recWidth, 0);
-		Coords y = new Coords(0, recHeight);
-		Coords sw = c.clone();
-		Coords nw = c.clone();
-		Coords ne = c.clone();
-		Coords se = c.clone();		
-		sw.sub(x);
-		sw.sub(y);
-		nw.sub(x);
-		nw.add(y);
-		ne.add(x);
-		ne.add(y);
-		se.add(x);
-		se.sub(y);
-		disableDrawing();	
-		drawOneLine(sw);
-		drawOneLine(nw);
-		drawOneLine(ne);
-		drawOneLine(se);
-		drawOneLine(sw);		
-		disableDrawing();		
+		Rr2Point p = new Rr2Point(recWidth, recHeight);
+		RrRectangle result = new RrRectangle(Rr2Point.sub(c, p), Rr2Point.add(c, p));
+		if(pcb == null)
+			return result;
+		pcb.homogeneous(result.sw(), result.ne(), true);
+		return result;
 	}
 	
-	public void createCircle(Coords c)
+	public RrRectangle createCircle(Rr2Point c)
 	{
-		//TODO: make this fill the circle
-		octagon(fixCoords(c), curAperture.width);
+		RrRectangle result = circleToRectangle(c);
+		if(pcb == null)
+			return result;
+		pcb.disc(c, curAperture.width*0.5, true);
+		//octagon(fixCoords(c), curAperture.width);
+		return result;
 	}
 	
 	public RrPolygonList getPolygons()
@@ -160,10 +152,10 @@ public class GerberGCode {
 			if(Preferences.loadGlobalBool("DisplaySimulation"))
 			{
 				RrGraphics simulationPlot = new RrGraphics("PCB simulation");
-				if(currentPolygon != null)
-					thePattern.add(new RrPolygon(currentPolygon));
-				simulationPlot.init(thePattern.getBox(), false, 0);
-				simulationPlot.add(thePattern);
+//				if(currentPolygon != null)
+//					thePattern.add(new RrPolygon(currentPolygon));
+				simulationPlot.init(pcb.box(), false, 0);
+				simulationPlot.add(pcb);
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -173,53 +165,66 @@ public class GerberGCode {
 		return thePattern;
 	}
 	
-	private void addPointToPolygons(Coords c)
-	{		
-		if(currentPolygon == null && dawingOn)
-		{
-			currentPolygon = new RrPolygon(new Attributes(null, null, null, looksLike), false);
-			currentPolygon.add(new Rr2Point(c.x, c.y));
-		} else if(!dawingOn)
-		{
-			if(currentPolygon != null)
-				if(currentPolygon.size() > 1)
-					thePattern.add(new RrPolygon(currentPolygon));
-			currentPolygon = new RrPolygon(new Attributes(null, null, null, looksLike), false);
-			currentPolygon.add(new Rr2Point(c.x, c.y));
-		} else
-			currentPolygon.add(new Rr2Point(c.x, c.y));
-		
-		lastCoords = c.clone();
-		enableDrawing();
+//	private void addPointToPolygons(Rr2Point c)
+//	{		
+//		if(currentPolygon == null && dawingOn)
+//		{
+//			currentPolygon = new RrPolygon(new Attributes(null, null, null, looksLike), false);
+//			currentPolygon.add(new Rr2Point(c));
+//		} else if(!dawingOn)
+//		{
+//			if(currentPolygon != null)
+//				if(currentPolygon.size() > 1)
+//					thePattern.add(new RrPolygon(currentPolygon));
+//			currentPolygon = new RrPolygon(new Attributes(null, null, null, looksLike), false);
+//			currentPolygon.add(new Rr2Point(c));
+//		} else
+//			currentPolygon.add(new Rr2Point(c));
+//		
+//		lastCoords = new Rr2Point(c);
+//		enableDrawing();
+//	}
+	
+	private RrRectangle circleToRectangle(Rr2Point c)
+	{
+		Rr2Point p = new Rr2Point(0.5*curAperture.width, 0.5*curAperture.width);
+		return new RrRectangle(Rr2Point.sub(c, p), Rr2Point.add(c, p));
 	}
 	
-	private void octagon(Coords p, double diameter)
-	{
-		double x, y, r;
-		double ang = 22.5*Math.PI/180;
-		r = 0.5*diameter;
-		Coords q;
-		disableDrawing();
-		for(int i = 0; i <= 8; i++)
-		{
-			q = p.clone();
-			q.add(new Coords(r*Math.cos(ang), r*Math.sin(ang)));
-			addPointToPolygons(q);
-			ang += 0.25*Math.PI;
-		}
-		disableDrawing();		
-	}
+//	private void octagon(Rr2Point p, double diameter)
+//	{
+//		double x, y, r;
+//		double ang = 22.5*Math.PI/180;
+//		r = 0.5*diameter;
+//		Rr2Point q;
+//		disableDrawing();
+//		for(int i = 0; i <= 8; i++)
+//		{
+//			q = new Rr2Point(p);
+//			q = Rr2Point.add(q, new Rr2Point(r*Math.cos(ang), r*Math.sin(ang)));
+//			addPointToPolygons(q);
+//			ang += 0.25*Math.PI;
+//		}
+//		disableDrawing();		
+//	}
 	
-	private void drawOneLine(Coords c)
-	{
-		addPointToPolygons(c);
-	}
+//	private void drawOneLine(Rr2Point c)
+//	{
+//		addPointToPolygons(c);
+//	}
 	
-	private void drawFatLine(Coords c)
+	private RrRectangle drawFatLine(Rr2Point c)
 	{
+		RrRectangle result = circleToRectangle(c);
+		result = RrRectangle.union(result, circleToRectangle(lastCoords));
+		if(pcb == null)
+			return result;
 		//TODO: make this draw a fat line
-		double r = 0.5*curAperture.width;
-		addPointToPolygons(c);
+		pcb.rectangle(lastCoords, c, 0.5*curAperture.width, true);
+		pcb.disc(c, curAperture.width*0.5, true);
+		pcb.disc(lastCoords, curAperture.width*0.5, true);
+		lastCoords = new Rr2Point(c);
+		return result;
 	}
 
 	private void enableDrawing()
@@ -232,12 +237,12 @@ public class GerberGCode {
 		dawingOn = false;
 	}
 	
-	Coords fixCoords(Coords c)
+	Rr2Point fixCoords(Rr2Point c)
 	{
 		if(!absolute)
 		{
-			c = c.clone();
-			c.add(lastCoords);
+			c = new Rr2Point(c);
+			c = Rr2Point.add(c, lastCoords);
 		}
 		return c;
 	}

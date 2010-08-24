@@ -423,6 +423,10 @@ public class RrInterval
 	 */
 	public static RrInterval intersection(RrInterval a, RrInterval b)
 	{
+		if(a.empty())
+			return a;
+		if(b.empty())
+			return b;
 		return new RrInterval(Math.max(a.low, b.low), Math.min(a.high, b.high));	
 	}
 	
@@ -434,6 +438,10 @@ public class RrInterval
 	 */
 	public static RrInterval union(RrInterval a, RrInterval b)
 	{
+		if(a.empty())
+			return b;
+		if(b.empty())
+			return a;
 		return new RrInterval(Math.min(a.low, b.low), Math.max(a.high, b.high));	
 	}
 }
