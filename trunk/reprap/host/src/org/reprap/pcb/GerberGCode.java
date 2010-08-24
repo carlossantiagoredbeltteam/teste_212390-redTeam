@@ -5,7 +5,7 @@ import javax.media.j3d.Material;
 import javax.vecmath.Color3f;
 //import org.reprap.pcb.Coords;
 import org.reprap.geometry.polygons.*;
-import org.reprap.Attributes;
+//import org.reprap.Attributes;
 import org.reprap.utilities.RrGraphics;
 import org.reprap.Preferences;
 
