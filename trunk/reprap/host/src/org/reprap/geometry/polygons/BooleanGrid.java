@@ -1159,6 +1159,17 @@ public class BooleanGrid
 	}
 	
 	/**
+	 * Set a whole rectangle to one value
+	 * @param ipsw
+	 * @param ipne
+	 * @param v
+	 */
+	public void homogeneous(Rr2Point ipsw, Rr2Point ipne, boolean v)
+	{
+		homogeneous(new iPoint(ipsw), new iPoint(ipne), v);
+	}
+	
+	/**
 	 * Set a whole rectangle to the right values for a CSG expression
 	 * @param ipsw
 	 * @param ipne
@@ -1190,6 +1201,16 @@ public class BooleanGrid
 		if(!inside(p))
 			return false;
 		return bits.get(pixI(p));
+	}
+	
+	/**
+	 * Get the value at the point corresponding to somewhere in the real world
+	 * @param p
+	 * @return
+	 */
+	public boolean get(Rr2Point p)
+	{
+		return get(new iPoint(p));
 	}
 	
 	/**

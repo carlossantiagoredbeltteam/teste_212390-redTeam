@@ -518,7 +518,7 @@ private void pcbButtonActionPerformed(java.awt.event.ActionEvent evt)
 		return;
 	}
 	PCB p = new PCB();
-	p.pcb(inputGerber, outputGCode);
+	p.pcb(inputGerber, outputGCode, printer.getExtruder("PCB-pen"));
 	parentBotConsoleFrame.resumePolling();
 }
 

@@ -463,12 +463,25 @@ public class RrGraphics
 
 	
 	/**
-	 * Recursively fill a Boolean Grid where it's solid.
+	 * Fill a Boolean Grid where it's solid.
 	 * @param q
 	 */
 	private void fillBG(BooleanGrid b)
 	{
-
+	    if(b.attribute().getAppearance() == null)
+	    {
+	    	System.err.println("RrGraphics: booleanGrid has null appearance.");
+	    	return;
+	    }
+	    
+	    setColour(b.attribute());
+		for(int x = 0; x < frameWidth; x++)
+			for(int y = 0; y < frameHeight; y++)
+			{
+				boolean v = b.get(iTransform(x, y));
+				if(v)
+					g2d.drawRect(x, y, 1, 1);  // Is this really the most efficient way?
+			}
 	}
 	
 

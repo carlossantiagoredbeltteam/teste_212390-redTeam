@@ -429,6 +429,10 @@ public class RrRectangle
 	 */
 	public static RrRectangle intersection(RrRectangle a, RrRectangle b)
 	{
+		if(a.empty)
+			return a;
+		if(b.empty)
+			return b;
 		return new RrRectangle(RrInterval.intersection(a.x, b.x), RrInterval.intersection(a.y, b.y));	
 	}
 	
@@ -440,6 +444,10 @@ public class RrRectangle
 	 */
 	public static RrRectangle union(RrRectangle a, RrRectangle b)
 	{
+		if(a.empty)
+			return b;
+		if(b.empty)
+			return a;
 		return new RrRectangle(RrInterval.union(a.x, b.x), RrInterval.union(a.y, b.y));	
 	}
 }
