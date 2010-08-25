@@ -499,15 +499,20 @@ private void pcbButtonActionPerformed(java.awt.event.ActionEvent evt)
 	if(!SLoadOK)
 		return;
 	parentBotConsoleFrame.suspendPolling();
-	File inputGerber = org.reprap.Main.gui.onOpen("PCB Gerber file", new String[] {"cmp", "sol"}, "");
+	File inputGerber = org.reprap.Main.gui.onOpen("PCB Gerber file", new String[] {"top", "bot"}, "");
 	if(inputGerber == null)
 	{
 		JOptionPane.showMessageDialog(null, "No Gerber file was loaded.");
 		return;
 	}
-	int sp = inputGerber.getName().toLowerCase().indexOf(".cmp");
+	File inputDrill = org.reprap.Main.gui.onOpen("PCB drill file", new String[] {"hol"}, "");
+	if(inputDrill == null)
+	{
+		JOptionPane.showMessageDialog(null, "No Drill file was loaded; pcb centres will not be marked");
+	}
+	int sp = inputGerber.getName().toLowerCase().indexOf(".top");
 	if(sp < 0)
-		sp = inputGerber.getName().toLowerCase().indexOf(".sol");
+		sp = inputGerber.getName().toLowerCase().indexOf(".bot");
 	String fileRoot = "";
 	if(sp > 0)
 		fileRoot = inputGerber.getName().substring(0, sp);
@@ -518,7 +523,7 @@ private void pcbButtonActionPerformed(java.awt.event.ActionEvent evt)
 		return;
 	}
 	PCB p = new PCB();
-	p.pcb(inputGerber, outputGCode, printer.getExtruder("PCB-pen"));
+	p.pcb(inputGerber, inputDrill, outputGCode, printer.getExtruder("PCB-pen"));
 	parentBotConsoleFrame.resumePolling();
 }
 
