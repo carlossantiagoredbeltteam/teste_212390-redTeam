@@ -49,16 +49,18 @@ public class GerberGCode {
 	BooleanGrid pcb;
 	Rr2Point lastCoords = null;
 	RrPolygonList thePattern = new RrPolygonList();
+	boolean colour = true;
 //	RrPolygon currentPolygon = null;
 	
 	Appearance looksLike;
 	
-	public GerberGCode(double penWidth, BooleanGrid p) //, double drawingHeight, double freemoveHeight, int XYFeedrate, int ZFeedrate)
+	public GerberGCode(double penWidth, BooleanGrid p, boolean c) //, double drawingHeight, double freemoveHeight, int XYFeedrate, int ZFeedrate)
 	{
 		this.penWidth = penWidth;
 		enableAbsolute();
 		disableDrawing();
 		pcb = p;
+		colour = c;
 		lastCoords = new Rr2Point(0, 0);
 		looksLike = new Appearance();
 		looksLike.setMaterial(new Material(new Color3f(0.5f, 0.5f, 0.5f), new Color3f(0f, 0f, 0f), new Color3f(0.5f, 0.5f, 0.5f), new Color3f(0f, 0f, 0f), 0f));
@@ -131,7 +133,7 @@ public class GerberGCode {
 		RrRectangle result = new RrRectangle(Rr2Point.sub(c, p), Rr2Point.add(c, p));
 		if(pcb == null)
 			return result;
-		pcb.homogeneous(result.sw(), result.ne(), true);
+		pcb.homogeneous(result.sw(), result.ne(), colour);
 		return result;
 	}
 	
@@ -140,7 +142,7 @@ public class GerberGCode {
 		RrRectangle result = circleToRectangle(c);
 		if(pcb == null)
 			return result;
-		pcb.disc(c, curAperture.width*0.5, true);
+		pcb.disc(c, curAperture.width*0.5, colour);
 		//octagon(fixCoords(c), curAperture.width);
 		return result;
 	}
@@ -220,9 +222,9 @@ public class GerberGCode {
 		if(pcb == null)
 			return result;
 		//TODO: make this draw a fat line
-		pcb.rectangle(lastCoords, c, 0.5*curAperture.width, true);
+		pcb.rectangle(lastCoords, c, 0.5*curAperture.width, colour);
 		pcb.disc(c, curAperture.width*0.5, true);
-		pcb.disc(lastCoords, curAperture.width*0.5, true);
+		pcb.disc(lastCoords, curAperture.width*0.5, colour);
 		lastCoords = new Rr2Point(c);
 		return result;
 	}

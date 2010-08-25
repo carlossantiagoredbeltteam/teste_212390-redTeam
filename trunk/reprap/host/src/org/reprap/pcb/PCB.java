@@ -35,7 +35,7 @@ public class PCB {
 	/**
 	 * @param args
 	 */
-	public void pcb(File inputFile, File outputFile, Extruder pcbPen) {
+	public void pcb(File inputFile, File inputDrill, File outputFile, Extruder pcbPen) {
 
 		// Config end
 
@@ -52,7 +52,7 @@ public class PCB {
 		System.out.println("Drawing Height: " + drawingHeight + " mm");
 		System.out.println("Freemove Height: " + freemoveHeight + " mm\n");
 
-		gerberGcode = new GerberGCode(penWidth, null); //, drawingHeight, freemoveHeight, XYFeedrate, ZFeedrate);
+		gerberGcode = new GerberGCode(penWidth, null, true); //, drawingHeight, freemoveHeight, XYFeedrate, ZFeedrate);
 		
 		RrRectangle box = new RrRectangle();
 
@@ -62,7 +62,7 @@ public class PCB {
 
 			while((line = in.readLine()) != null)
 			{
-				RrRectangle r = processLine(line);
+				RrRectangle r = processLine(line, false);
 				if(r != null)
 					box = RrRectangle.union(box, r);
 			}
@@ -72,13 +72,24 @@ public class PCB {
 			
 			in = new BufferedReader(new FileReader(inputFile));
 			
-			gerberGcode = new GerberGCode(penWidth, new BooleanGrid(RrCSG.nothing(), box, new Attributes(null, null, null, pcbPen.getAppearance())));
+			BooleanGrid pattern = new BooleanGrid(RrCSG.nothing(), box, new Attributes(null, null, null, pcbPen.getAppearance()));
+			
+			gerberGcode = new GerberGCode(penWidth, pattern, true);
 
 			while((line = in.readLine()) != null)
 			{
-				processLine(line);
+				processLine(line, false);
 			}
 
+			if(inputDrill != null)
+			{
+				in = new BufferedReader(new FileReader(inputDrill));
+				gerberGcode = new GerberGCode(penWidth, pattern, false);
+				while((line = in.readLine()) != null)
+				{
+					processLine(line, true);
+				}
+			}
 
 			//System.out.println(gerberGcode.getGCode());
 
@@ -101,11 +112,18 @@ public class PCB {
 
 	}
 	
-	private RrRectangle processLine(String line)
+	private RrRectangle processLine(String line, boolean drill)
 	{
 		if(debug) System.out.println(line);
 		
+		boolean drillDef = false;
+		
 		RrRectangle result = null;
+		if(drill)
+		{
+			formatX = "24";
+			formatY = "24";			
+		}
 
 		if(line.startsWith("%FSLA"))
 		{
@@ -164,89 +182,134 @@ public class PCB {
 							//System.exit(-1);
 						}
 
-			}
-			else
-				if(line.startsWith("G90"))
+			} else
+				if(line.startsWith("T") && drill && line.length() > 3)
 				{
-					gerberGcode.enableAbsolute();
-					if(debug)
-						System.out.println("Absolute coordinates");
+					if(line.charAt(3) == 'C')
+					{
+						String apertureNum, apertureSize;
+
+
+						line = line.substring(1, line.length()); 
+
+						splitline = line.split("C");
+						apertureNum = splitline[0];
+						apertureSize = splitline[1]; 
+
+						if(debug) 
+							System.out.println("\n\nDrill: " + apertureNum);
+
+						drillDef = true;
+
+						double s = scale*Double.parseDouble(apertureSize);
+						gerberGcode.addCircleAperture(Integer.parseInt(apertureNum), s);
+						if(debug) 
+							System.out.println("Size: " + s + " mm");
+					}
 				}
 				else
-					if(line.startsWith("G91"))
+					if(line.startsWith("G90"))
 					{
-						gerberGcode.enableRelative();
+						gerberGcode.enableAbsolute();
 						if(debug)
-							System.out.println("Relative coordinates");
+							System.out.println("Absolute coordinates");
 					}
 					else
-						if(line.startsWith("G70"))
+						if(line.startsWith("G91"))
 						{
-							scale = 25.4;
+							gerberGcode.enableRelative();
 							if(debug)
-								System.out.println("Inches");
+								System.out.println("Relative coordinates");
 						}
 						else
-							if(line.startsWith("G71"))
+							if(line.startsWith("G70") || (drill && line.startsWith("M72")))
 							{
-								scale = 1;
+								scale = 25.4;
 								if(debug)
-									System.out.println("Metric");
+									System.out.println("Inches");
 							}
 							else
-								if(line.startsWith("G54"))
+								if(line.startsWith("G71")|| (drill && line.startsWith("M71")))
 								{
-									int aperture;
-
-									aperture = Integer.valueOf(line.substring(4, line.length()-1).trim());
-									gerberGcode.selectAperture(aperture);
+									scale = 1;
 									if(debug)
-										System.out.println("Apature: " + aperture + " selected.");
-
+										System.out.println("Metric");
 								}
 								else
-									if(line.startsWith("X"))
+									if(line.startsWith("G54"))
 									{
-										double x, y;
-										int d;
-										int divFactorX = (int)Math.pow(10.0,Integer.parseInt(formatX.substring(1)));
-										int divFactorY = (int)Math.pow(10.0,Integer.parseInt(formatY.substring(1)));
+										int aperture;
 
-										x = scale*Double.valueOf(line.substring(1, line.indexOf("Y")))/divFactorX;
-										y = scale*Double.valueOf(line.substring(line.indexOf("Y")+1, line.indexOf("D")))/divFactorY;
-										d = Integer.valueOf(line.substring(line.indexOf("D")+1, line.indexOf("D")+3));
-
-										x += offsetX;
-										y += offsetY;
-
+										aperture = Integer.valueOf(line.substring(4, line.length()-1).trim());
+										gerberGcode.selectAperture(aperture);
 										if(debug)
-											System.out.println(" X: "+x+" Y:"+y+" D:"+d);
+											System.out.println("Apature: " + aperture + " selected.");
 
-										if(d==1)
-										{
-											result = gerberGcode.drawLine(new Rr2Point(x, y));
-										}
-										else
-											if(d==2)
-											{
-												gerberGcode.goTo(new Rr2Point(x, y));
-											}	
-											else
-												if(d==3)
-												{
-													result = gerberGcode.exposePoint(new Rr2Point(x, y));
-												}
 									}
 									else
-										if(line.startsWith("D"))
+										if(line.startsWith("X"))
 										{
-											int aperture;
+											double x, y;
+											int d;
+											if(drill)
+											{
+												d = 3;
+												line = line.substring(1);
+												splitline = line.split("Y");
+												while(splitline[0].length() < 6)
+													splitline[0] = "0" + splitline[0];
+												while(splitline[1].length() < 6)
+													splitline[1] = "0" + splitline[1];
+											} else
+											{
+												splitline[0] = line.substring(1, line.indexOf("Y"));
+												splitline[1] = line.substring(line.indexOf("Y")+1, line.indexOf("D"));
+												d = Integer.valueOf(line.substring(line.indexOf("D")+1, line.indexOf("D")+3));
+											}
+							
+											int divFactorX = (int)Math.pow(10.0,Integer.parseInt(formatX.substring(1)));
+											int divFactorY = (int)Math.pow(10.0,Integer.parseInt(formatY.substring(1)));
 
-											aperture = Integer.valueOf(line.substring(1, 3));
-											gerberGcode.selectAperture(aperture);
+											x = scale*Double.valueOf(splitline[0])/divFactorX;
+											y = scale*Double.valueOf(splitline[1])/divFactorY;
+
+											x += offsetX;
+											y += offsetY;
+
 											if(debug)
-												System.out.println("Apature: " + aperture + " selected.");
+												System.out.println(" X: "+x+" Y:"+y+" D:"+d);
+
+											if(d==1)
+											{
+												result = gerberGcode.drawLine(new Rr2Point(x, y));
+											}
+											else
+												if(d==2)
+												{
+													gerberGcode.goTo(new Rr2Point(x, y));
+												}	
+												else
+													if(d==3)
+													{
+														result = gerberGcode.exposePoint(new Rr2Point(x, y));
+													}
 										}
+										else
+											if(line.startsWith("D") || (line.startsWith("T") && drill && !drillDef))
+											{
+												int aperture;
+
+												aperture = Integer.valueOf(line.substring(1, 3));
+												gerberGcode.selectAperture(aperture);
+												if(debug)
+												{
+													if(drill)
+														System.out.print("Drill: ");
+													else
+														System.out.print("Apature: ");
+													System.out.print(aperture + " selected.");
+												}
+											}
 		return result;
 	}
 }
