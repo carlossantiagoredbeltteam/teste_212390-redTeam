@@ -102,7 +102,7 @@ public class RrGraphics
 	/**
 	 * Pixels 
 	 */
-	private final int frame = 600;
+	private final int frame = 1200;
 	
 	/**
 	 * 

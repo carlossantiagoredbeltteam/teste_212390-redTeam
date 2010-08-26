@@ -8,7 +8,7 @@ import org.reprap.geometry.polygons.*;
 //import org.reprap.Attributes;
 import org.reprap.utilities.RrGraphics;
 import org.reprap.Preferences;
-
+import org.reprap.Extruder;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -43,27 +43,29 @@ public class GerberGCode {
 	
 	boolean dawingOn = false;
 	LinkedList <Aperture> apertures = new LinkedList<Aperture>(); 
-	double penWidth;
+	//double penWidth;
 	Aperture curAperture = null;
 	boolean absolute = true;
+	Extruder pcbPen;
 	BooleanGrid pcb;
 	Rr2Point lastCoords = null;
-	RrPolygonList thePattern = new RrPolygonList();
+//	RrPolygonList thePattern = new RrPolygonList();
 	boolean colour = true;
 //	RrPolygon currentPolygon = null;
 	
-	Appearance looksLike;
+	//Appearance looksLike;
 	
-	public GerberGCode(double penWidth, BooleanGrid p, boolean c) //, double drawingHeight, double freemoveHeight, int XYFeedrate, int ZFeedrate)
+	public GerberGCode(Extruder pp, BooleanGrid p, boolean c) //, double drawingHeight, double freemoveHeight, int XYFeedrate, int ZFeedrate)
 	{
-		this.penWidth = penWidth;
+		pcbPen = pp;
+		//this.penWidth = penWidth;
 		enableAbsolute();
 		disableDrawing();
 		pcb = p;
 		colour = c;
 		lastCoords = new Rr2Point(0, 0);
-		looksLike = new Appearance();
-		looksLike.setMaterial(new Material(new Color3f(0.5f, 0.5f, 0.5f), new Color3f(0f, 0f, 0f), new Color3f(0.5f, 0.5f, 0.5f), new Color3f(0f, 0f, 0f), 0f));
+		//looksLike = new Appearance();
+		//looksLike.setMaterial(new Material(new Color3f(0.5f, 0.5f, 0.5f), new Color3f(0f, 0f, 0f), new Color3f(0.5f, 0.5f, 0.5f), new Color3f(0f, 0f, 0f), 0f));
 	}
 	
 	public RrRectangle drawLine(Rr2Point c)
@@ -147,26 +149,7 @@ public class GerberGCode {
 		return result;
 	}
 	
-	public RrPolygonList getPolygons()
-	{
-		try 
-		{
-			if(Preferences.loadGlobalBool("DisplaySimulation"))
-			{
-				RrGraphics simulationPlot = new RrGraphics("PCB simulation");
-//				if(currentPolygon != null)
-//					thePattern.add(new RrPolygon(currentPolygon));
-				simulationPlot.init(pcb.box(), false, 0);
-				simulationPlot.add(pcb);
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
-		return thePattern;
-	}
-	
 //	private void addPointToPolygons(Rr2Point c)
 //	{		
 //		if(currentPolygon == null && dawingOn)
@@ -248,5 +231,50 @@ public class GerberGCode {
 		}
 		return c;
 	}
+	
+	public RrPolygonList getPolygons()
+	{
+		try 
+		{
+			if(Preferences.loadGlobalBool("DisplaySimulation"))
+			{
+				RrGraphics simulationPlot1 = new RrGraphics("PCB pattern");
+//				if(currentPolygon != null)
+//					thePattern.add(new RrPolygon(currentPolygon));
+				simulationPlot1.init(pcb.box(), false, 0);
+				simulationPlot1.add(pcb);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		RrPolygonList result = new RrPolygonList();
+		double penWidth = pcbPen.getExtrusionSize();
+		pcb = pcb.offset(-0.5*penWidth);
+		RrPolygonList pol = pcb.allPerimiters(pcb.attribute());
+		
+		while( pol.size() > 0 )
+		{
+			result.add(pol);
+			pcb = pcb.offset(-penWidth);
+			pol = pcb.allPerimiters(pcb.attribute());
+		}
+		try 
+		{
+			if(Preferences.loadGlobalBool("DisplaySimulation"))
+			{
+				RrGraphics simulationPlot2 = new RrGraphics("PCB plotlines");
+//				if(currentPolygon != null)
+//					thePattern.add(new RrPolygon(currentPolygon));
+				simulationPlot2.init(result.getBox(), false, 0);
+				simulationPlot2.add(result);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
 
 }

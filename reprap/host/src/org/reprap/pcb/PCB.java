@@ -15,7 +15,7 @@ public class PCB {
 	
 	GerberGCode gerberGcode; 
 	String[] splitline;
-	boolean debug = true;
+	boolean debug = false;
 
 	BufferedReader in;
 	String line;
@@ -28,10 +28,10 @@ public class PCB {
 	double penWidth = 0.7f;		
 	double offsetX=40;
 	double offsetY=40;
-	int XYFeedrate = 1000;
-	int ZFeedrate = 70;
-	double drawingHeight = 1.8f;
-	double freemoveHeight = 3.8f;//1.7f;
+//	int XYFeedrate = 1000;
+//	int ZFeedrate = 70;
+//	double drawingHeight = 1.8f;
+//	double freemoveHeight = 3.8f;//1.7f;
 	/**
 	 * @param args
 	 */
@@ -49,10 +49,10 @@ public class PCB {
 		System.out.println("Pen Width: " + penWidth + " mm");
 		System.out.println("Offset X: " + offsetX + " mm");
 		System.out.println("Offset Y: " + offsetY + " mm");
-		System.out.println("Drawing Height: " + drawingHeight + " mm");
-		System.out.println("Freemove Height: " + freemoveHeight + " mm\n");
+//		System.out.println("Drawing Height: " + drawingHeight + " mm");
+//		System.out.println("Freemove Height: " + freemoveHeight + " mm\n");
 
-		gerberGcode = new GerberGCode(penWidth, null, true); //, drawingHeight, freemoveHeight, XYFeedrate, ZFeedrate);
+		gerberGcode = new GerberGCode(pcbPen, null, true); //, drawingHeight, freemoveHeight, XYFeedrate, ZFeedrate);
 		
 		RrRectangle box = new RrRectangle();
 
@@ -74,7 +74,7 @@ public class PCB {
 			
 			BooleanGrid pattern = new BooleanGrid(RrCSG.nothing(), box, new Attributes(null, null, null, pcbPen.getAppearance()));
 			
-			gerberGcode = new GerberGCode(penWidth, pattern, true);
+			gerberGcode = new GerberGCode(pcbPen, pattern, true);
 
 			while((line = in.readLine()) != null)
 			{
@@ -84,7 +84,8 @@ public class PCB {
 			if(inputDrill != null)
 			{
 				in = new BufferedReader(new FileReader(inputDrill));
-				gerberGcode = new GerberGCode(penWidth, pattern, false);
+				gerberGcode = new GerberGCode(pcbPen, pattern, false);
+				gerberGcode.addCircleAperture(-1, 0.3);
 				while((line = in.readLine()) != null)
 				{
 					processLine(line, true);
@@ -238,12 +239,20 @@ public class PCB {
 								else
 									if(line.startsWith("G54"))
 									{
-										int aperture;
+										if(drill)
+										{
+											gerberGcode.selectAperture(-1);
+											if(debug)
+												System.out.println("Drill centre selected.");
+										} else
+										{
+											int aperture;
 
-										aperture = Integer.valueOf(line.substring(4, line.length()-1).trim());
-										gerberGcode.selectAperture(aperture);
-										if(debug)
-											System.out.println("Apature: " + aperture + " selected.");
+											aperture = Integer.valueOf(line.substring(4, line.length()-1).trim());
+											gerberGcode.selectAperture(aperture);
+											if(debug)
+												System.out.println("Apature: " + aperture + " selected.");
+										}
 
 									}
 									else
@@ -297,17 +306,20 @@ public class PCB {
 										else
 											if(line.startsWith("D") || (line.startsWith("T") && drill && !drillDef))
 											{
-												int aperture;
-
-												aperture = Integer.valueOf(line.substring(1, 3));
-												gerberGcode.selectAperture(aperture);
-												if(debug)
+												if(drill)
 												{
-													if(drill)
-														System.out.print("Drill: ");
-													else
-														System.out.print("Apature: ");
-													System.out.print(aperture + " selected.");
+													gerberGcode.selectAperture(-1);
+													if(debug)
+														System.out.println("Drill centre selected.");
+												} else
+												{
+													int aperture;
+
+													aperture = Integer.valueOf(line.substring(1, 3));
+													gerberGcode.selectAperture(aperture);
+
+													if(debug)
+														System.out.print("Apature: " + aperture + " selected.");
 												}
 											}
 		return result;
