@@ -2057,6 +2057,8 @@ public class BooleanGrid
 	private iPolygonList marchAll()
 	{
 		iPolygonList result = new iPolygonList();
+		if(isEmpty())
+			return result;
 		iPoint start;
 		iPolygon p;
 		int m;
@@ -2562,6 +2564,8 @@ public class BooleanGrid
 				result.disc(p1, Math.abs(r), r > 0);
 			}
 		}
+		if(result.isEmpty())
+			return nothingThere;
 		//if(dist < 0)
 			result.deWhisker();
 		return result;
