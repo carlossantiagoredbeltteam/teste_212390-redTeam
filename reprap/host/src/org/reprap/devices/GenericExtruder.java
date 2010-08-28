@@ -284,6 +284,11 @@ public abstract class GenericExtruder implements Extruder
 	protected double extrusionDelayForLayer = 0;
 	
 	/**
+	 * How high to move above the surface for non-extruding movements
+	 */
+	protected double lift = 0;
+	
+	/**
 	 * The number of milliseconds to wait before starting a hatch track
 	 */
 	protected double extrusionDelayForPolygon = 0;
@@ -458,6 +463,7 @@ public abstract class GenericExtruder implements Extruder
 			arcCompensationFactor = Preferences.loadGlobalDouble(prefName + "ArcCompensationFactor(0..)");
 			arcShortSides = Preferences.loadGlobalDouble(prefName + "ArcShortSides(0..)");
 			extrudeRatio = Preferences.loadGlobalDouble(prefName + "ExtrudeRatio(0..)");
+			lift = Preferences.loadGlobalDouble(prefName + "Lift(mm)");
 			
 			evenHatchDirection = Preferences.loadGlobalDouble(prefName + "EvenHatchDirection(degrees)");
 			oddHatchDirection = Preferences.loadGlobalDouble(prefName + "OddHatchDirection(degrees)");			
@@ -1340,6 +1346,11 @@ public abstract class GenericExtruder implements Extruder
     public boolean getMiddleStart()
     {
     	return middleStart;
+    }
+    
+    public double getLift()
+    {
+    	return lift;
     }
     
 }
