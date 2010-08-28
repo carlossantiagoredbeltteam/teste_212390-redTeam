@@ -61,6 +61,7 @@ import java.util.List;
 
 import org.reprap.Extruder;
 import org.reprap.geometry.LayerRules;
+import org.reprap.utilities.Debug;
 
 /**
  * Small class to hold a polygon index and the index of a point within it
@@ -72,22 +73,26 @@ class PolPoint
 	private int pNear;
 	private int pEnd;
 	private int pg;
+	private double d2;
 	private RrPolygon pol;
 	
-	public PolPoint()
-	{	
+	public PolPoint(int pnr, int pgn, RrPolygon poly, double s)
+	{
+		set(pnr, pgn, poly, s);
 	}
 	
 	public int near() { return pNear; }
 	public int end() { return pEnd; }
 	public int pIndex() { return pg; }
 	public RrPolygon polygon() { return pol; }
+	public double dist2() { return d2; }
 	
-	public void set(int pnr, int pgn, RrPolygon poly)
+	public void set(int pnr, int pgn, RrPolygon poly, double s)
 	{
 		pNear = pnr;
 		pg = pgn;
 		pol = poly;
+		d2 = s;
 	}
 	
 	private void midPoint(int i, int j)
@@ -100,7 +105,7 @@ class PolPoint
 		}
 		
 		if(i < 0 || i > pol.size() -1 || j < 0 || j > pol.size() -1)
-			System.err.println("RrPolygonList.midPoint(): i and/or j wrong: i = " + i + ", j = " + j);
+			Debug.e("RrPolygonList.midPoint(): i and/or j wrong: i = " + i + ", j = " + j);
 		
 		Rr2Point p = Rr2Point.add(pol.point(i), pol.point(j));
 		p = Rr2Point.mul(p, 0.5);
@@ -282,7 +287,7 @@ class treeList
 	{
 		if(children == null)
 		{
-			System.err.println("treeList: attempt to get child from null list!");
+			Debug.e("treeList: attempt to get child from null list!");
 			return null;
 		}
 		return children.get(i);
@@ -704,12 +709,12 @@ public class RrPolygonList
 	/**
 	 * Re-order and (if need be) reverse the order of the polygons
 	 * in a list so the end of the first is near the start of the second and so on.
-	 * This is a heuristic - it does not do a full traveling salesman...
-	 * This deals with both open and closed polygons, but it does not allow closed ones to
-	 * be re-ordered, even if that would give a shorter path.
+	 * This is a heuristic - it does not do a full travelling salesman...
+	 * This deals with both open and closed polygons, but it only allows closed ones to
+	 * be re-ordered if free is true.
 	 * @return new ordered polygon list
 	 */
-	public RrPolygonList nearEnds(Rr2Point startNearHere)
+	public RrPolygonList nearEnds(Rr2Point startNearHere, boolean free)
 	{
 		RrPolygonList r = new RrPolygonList();
 		if(size() <= 0)
@@ -727,6 +732,7 @@ public class RrPolygonList
 		double d = Double.POSITIVE_INFINITY;
 		double d2;
 		int near = -1;
+		int nearV = -1;
 		Rr2Point e1;
 		
 		if(startNearHere != null)
@@ -738,16 +744,32 @@ public class RrPolygonList
 				if(d2 < d)
 				{
 					near = i;
+					nearV = -1;
 					d = d2;
 					neg = false;
 				}
-				if(!r.polygon(i).isClosed())
+				if(r.polygon(i).isClosed())
+				{
+					if(free)
+					{
+						int nv = polygon(i).nearestVertex(startNearHere);
+						d2 = Rr2Point.dSquared(startNearHere, polygon(i).point(nv));
+						if(d2 < d)
+						{
+							near = i;
+							nearV = nv;
+							d = d2;
+							neg = false;
+						}
+					}
+				} else
 				{
 					e1 = r.polygon(i).point(r.polygon(i).size() - 1);
 					d2 = Rr2Point.dSquared(startNearHere, e1);
 					if(d2 < d)
 					{
 						near = i;
+						nearV = -1;
 						d = d2;
 						neg = true;
 					}
@@ -756,11 +778,13 @@ public class RrPolygonList
 
 			if(near < 0)
 			{
-				System.err.println("RrPolygonList.nearEnds(): no nearest end found to start point!");
+				Debug.e("RrPolygonList.nearEnds(): no nearest end found to start point!");
 				return r;
 			}
 
 			r.swap(0, near);
+			if(free && nearV >= 0)
+				set(0, polygon(0).newStart(nearV));
 			if(neg)
 				r.negate(0);
 		}
@@ -780,33 +804,33 @@ public class RrPolygonList
 				end = pgp.point(pgp.size() - 1);
 			neg = false;
 			near = -1;
-			int nearv = -1;
+			nearV = -1;
 			d = Double.POSITIVE_INFINITY;
 			for(i = pg+1; i < r.size(); i++)
 			{
 				pgp = r.polygon(i);
 				e1 = pgp.point(0);
 				
-//				if(pgp.isClosed())
-//				{
-//					int nv = pgp.nearestVertex(e1);
-//					d2 = Rr2Point.dSquared(pgp.point(nv), e1);
-//					if(d2 < d)
-//					{
-//						near = i;
-//						d = d2;
-//						neg = false;
-//						nearv = nv;
-//					} 
-//				} else
-//				{
+				if(pgp.isClosed() && free)
+				{
+					int nv = pgp.nearestVertex(e1);
+					d2 = Rr2Point.dSquared(pgp.point(nv), e1);
+					if(d2 < d)
+					{
+						near = i;
+						d = d2;
+						neg = false;
+						nearV = nv;
+					} 
+				} else
+				{
 					d2 = Rr2Point.dSquared(end, e1);
 					if(d2 < d)
 					{
 						near = i;
 						d = d2;
 						neg = false;
-						nearv = -1;
+						nearV = -1;
 					}
 
 					e1 = pgp.point(pgp.size() - 1);
@@ -816,14 +840,14 @@ public class RrPolygonList
 						near = i;
 						d = d2;
 						neg = true && !pgp.isClosed();
-						nearv = -1;
+						nearV = -1;
 					}
-//				}
+				}
 			}
 			
 			if(near < 0)
 			{
-				System.err.println("RrPolygonList.nearEnds(): no nearest end found!");
+				Debug.e("RrPolygonList.nearEnds(): no nearest end found!");
 				return r;
 			}
 			
@@ -831,8 +855,8 @@ public class RrPolygonList
 				r.swap(pg+1, near);
 			if(neg)
 				r.negate(pg+1);
-			if(nearv > 0)
-				r.set(pg+1, r.polygon(pg+1).newStart(nearv));
+			if(nearV > 0)
+				r.set(pg+1, r.polygon(pg+1).newStart(nearV));
 			
 			pg++;
 		}
@@ -882,12 +906,13 @@ public class RrPolygonList
 	
 	/**
 	 * Search a polygon list to find the nearest point on all the polygons within it
-	 * to the point p.
+	 * to the point p.  If omit is non-negative, ignore that polygon in the search.
 	 * 
 	 * @param p
+	 * @param omit
 	 * @return
 	 */
-	private PolPoint ppSearch(Rr2Point p)
+	private PolPoint ppSearch(Rr2Point p, int omit)
 	{
 		double d = Double.POSITIVE_INFINITY;
 		PolPoint result = null;
@@ -897,20 +922,24 @@ public class RrPolygonList
 		
 		for(int i = 0; i < size(); i++)
 		{
-			RrPolygon pgon = polygon(i);
-			int n = pgon.nearestVertex(p);
-			double d2 = Rr2Point.dSquared(p, pgon.point(n));
-			if(d2 < d)
+			if(i != omit)
 			{
-				if(result == null)
-					result = new PolPoint();
-				result.set(n, i, pgon);
-				d = d2;
+				RrPolygon pgon = polygon(i);
+				int n = pgon.nearestVertex(p);
+				double d2 = Rr2Point.dSquared(p, pgon.point(n));
+				if(d2 < d)
+				{
+					if(result == null)
+						result = new PolPoint(n, i, pgon, d2);
+					else
+						result.set(n, i, pgon, d2);
+					d = d2;
+				}
 			}
 		}
 		
 		if(result == null)
-			System.err.println("RrPolygonList.ppSearch(): no point found!");
+			Debug.e("RrPolygonList.ppSearch(): no point found!");
 		
 		return result;
 	}
@@ -943,7 +972,7 @@ public class RrPolygonList
 				outline = outline.newStart(outline.maximalVertex(l));
 
 				Rr2Point start = outline.point(0);
-				PolPoint pp = hatching.ppSearch(start);
+				PolPoint pp = hatching.ppSearch(start, -1);
 				if(pp != null)
 				{
 					pp.findLongEnough(10, 30);
@@ -1039,7 +1068,7 @@ public class RrPolygonList
 		boolean b = (exp.value(p) <= 0);
 		if (a != b)
 		{
-			System.err.println("RrPolygonList:inside() - i is both inside and outside j!");
+			Debug.e("RrPolygonList:inside() - i is both inside and outside j!");
 			// casting vote...
 			p = polygon(i).point(polygon(i).size()/3);
 			return exp.value(p) <= 0;
@@ -1103,7 +1132,7 @@ public class RrPolygonList
 		{		
 			treeList isList = universe.walkFind(i);
 			if(isList == null)
-				System.err.println("RrPolygonList.resolveInsides() - can't find list for polygon " + i);
+				Debug.e("RrPolygonList.resolveInsides() - can't find list for polygon " + i);
 			treeList parent = isList.getParent();
 			if(parent != null)
 			{

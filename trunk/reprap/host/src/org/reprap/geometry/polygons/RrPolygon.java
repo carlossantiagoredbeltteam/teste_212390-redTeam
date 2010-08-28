@@ -176,7 +176,7 @@ public class RrPolygon
 	public RrPolygon(Attributes a, boolean c)
 	{
 		if(a == null)
-			System.err.println("RrPolygon(): null attributes!");
+			Debug.e("RrPolygon(): null attributes!");
 		points = new ArrayList<Rr2Point>();
 		speeds = null;
 		att = a;
@@ -204,7 +204,7 @@ public class RrPolygon
 	{
 		if(speeds == null)
 		{
-			System.err.println("Rr2Point.speed(int i): speeds null!");
+			Debug.e("Rr2Point.speed(int i): speeds null!");
 			return 0;
 		}
 		return speeds.get(i).doubleValue();
@@ -277,7 +277,7 @@ public class RrPolygon
 	public void add(Rr2Point p)
 	{
 		if(speeds != null)
-			System.err.println("Rr2Point.add(): adding a point to a polygon with its speeds set.");
+			Debug.e("Rr2Point.add(): adding a point to a polygon with its speeds set.");
 		points.add(new Rr2Point(p));
 		box.expand(p);
 	}
@@ -290,7 +290,7 @@ public class RrPolygon
 	public void add(int i, Rr2Point p)
 	{
 		if(speeds != null)
-			System.err.println("Rr2Point.add(): adding a point to a polygon with its speeds set.");
+			Debug.e("Rr2Point.add(): adding a point to a polygon with its speeds set.");
 		points.add(i, new Rr2Point(p));
 		box.expand(p);
 	}
@@ -303,7 +303,7 @@ public class RrPolygon
 	public void set(int i, Rr2Point p)
 	{
 		if(speeds != null)
-			System.err.println("Rr2Point.set(): adding a point to a polygon with its speeds set.");
+			Debug.e("Rr2Point.set(): adding a point to a polygon with its speeds set.");
 		points.set(i, new Rr2Point(p));
 		box.expand(p);
 	}
@@ -317,7 +317,7 @@ public class RrPolygon
 	public void add(int i, Rr2Point p, double s)
 	{
 		if(speeds == null)
-			System.err.println("Rr2Point.add(): adding a point and a speed to a polygon without its speeds set.");
+			Debug.e("Rr2Point.add(): adding a point and a speed to a polygon without its speeds set.");
 		points.add(i, new Rr2Point(p));
 		speeds.add(i, s);
 		box.expand(p);
@@ -332,7 +332,7 @@ public class RrPolygon
 	public void set(int i, Rr2Point p, double s)
 	{
 		if(speeds == null)
-			System.err.println("Rr2Point.set(): adding a point and a speed to a polygon without its speeds set.");
+			Debug.e("Rr2Point.set(): adding a point and a speed to a polygon without its speeds set.");
 		points.set(i, new Rr2Point(p));
 		speeds.set(i, s);
 		box.expand(p);
@@ -382,12 +382,12 @@ public class RrPolygon
 		if(speeds == null)
 		{
 			if(p.speeds != null)
-				System.err.println("Rr2Point.add(): adding a polygon to another polygon but discarding it's speeds.");
+				Debug.e("Rr2Point.add(): adding a polygon to another polygon but discarding it's speeds.");
 			return;
 		}
 		if(p.speeds == null)
 		{
-			System.err.println("Rr2Point.add(): adding a polygon to another polygon, but it has no needed speeds.");
+			Debug.e("Rr2Point.add(): adding a polygon to another polygon, but it has no needed speeds.");
 			return;
 		}
 		for(int i = 0; i < p.size(); i++)
@@ -465,7 +465,7 @@ public class RrPolygon
 	{
 		return newStart(rangen.nextInt(size()));
 //		if(!isClosed())
-//			System.err.println("RrPolygon.randomStart(): random-starting an open polygon!");
+//			Debug.e("RrPolygon.randomStart(): random-starting an open polygon!");
 //		RrPolygon result = new RrPolygon(att, closed);
 //		int i = rangen.nextInt(size());
 //		for(int j = 0; j < size(); j++)
@@ -484,10 +484,10 @@ public class RrPolygon
 	public RrPolygon newStart(int i)
 	{
 		if(!isClosed())
-			System.err.println("RrPolygon.newStart(i): reordering an open polygon!");
+			Debug.e("RrPolygon.newStart(i): reordering an open polygon!");
 		if(i < 0 || i >= size())
 		{
-			System.err.println("RrPolygon.newStart(i): dud index: " + i);
+			Debug.e("RrPolygon.newStart(i): dud index: " + i);
 			return this;
 		}
 		RrPolygon result = new RrPolygon(att, closed);
@@ -534,7 +534,7 @@ public class RrPolygon
 			}
 		}
 		if(result < 0)
-			System.err.println("RrPolygon.nearestVertex(): no point found!");
+			Debug.e("RrPolygon.nearestVertex(): no point found!");
 		return result;
 	}
 	
@@ -558,7 +558,7 @@ public class RrPolygon
 			}
 		}
 		if(result < 0)
-			System.err.println("RrPolygon.maximalVertex(): no point found!");
+			Debug.e("RrPolygon.maximalVertex(): no point found!");
 		return result;		
 	}
 	
@@ -999,14 +999,14 @@ public class RrPolygon
 					break;
 					
 				default:
-					System.err.println("RrPolygon.setSpeeds(): dud VelocityProfile flat value.");	
+					Debug.e("RrPolygon.setSpeeds(): dud VelocityProfile flat value.");	
 				}
 			} 
 		}
 
 		
 		if(speeds.size() != points.size())
-			System.err.println("Speeds and points arrays different: " + speeds.size() + ", " + points.size());
+			Debug.e("Speeds and points arrays different: " + speeds.size() + ", " + points.size());
 	}
 	
 	// ****************************************************************************
@@ -1126,7 +1126,7 @@ public class RrPolygon
 				a.set(1, k);
 			}
 		} else
-			System.err.println("clockWise(): not called for a triangle!");
+			Debug.e("clockWise(): not called for a triangle!");
 	}
 	
 	
@@ -1178,7 +1178,7 @@ public class RrPolygon
 	{	
 		if(points.size() < 3)
 		{
-			System.err.println("convexHull(): attempt to compute hull for " + points.size() + " points!");
+			Debug.e("convexHull(): attempt to compute hull for " + points.size() + " points!");
 			return new ArrayList<Integer>();
 		}
 		
@@ -1241,7 +1241,7 @@ public class RrPolygon
 				inConsideration.remove(corner);
 			} else if(inConsideration.size() > 0)
 			{
-				System.err.println("convexHull(): points left, but none included!");
+				Debug.e("convexHull(): points left, but none included!");
 				return result;
 			}
 			
@@ -1347,7 +1347,7 @@ public class RrPolygon
 		List<Integer> ch = convexHull(a);
 		if(ch.size() < 3)
 		{
-			System.err.println("toCSGRecursive() - null convex hull: " + ch.size() +
+			Debug.e("toCSGRecursive() - null convex hull: " + ch.size() +
 					" points.");
 			return RrCSG.nothing();
 		}
@@ -1429,7 +1429,7 @@ public class RrPolygon
 		//RrRectangle b = copy.box.scale(1.1);
 		//expression = expression.simplify(tolerance);
 		//if(att == null)
-		//	System.err.println("toCSG(): null attribute!");
+		//	Debug.e("toCSG(): null attribute!");
 		//RrCSGPolygon result = new RrCSGPolygon(expression, b, att);
 		
 		return expression;

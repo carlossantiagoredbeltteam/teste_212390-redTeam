@@ -165,6 +165,21 @@ public class GCodeReaderAndWriter
 		
 	public GCodeReaderAndWriter()
 	{
+		init();
+	}
+	
+	/**
+	 * constructor for when we definitely want to send GCodes to a known file
+	 * @param fos
+	 */
+	public GCodeReaderAndWriter(PrintStream fos)
+	{
+		init();
+		fileOutStream = fos;
+	}
+	
+	private void init()
+	{
 		resetReceived();
 		paused = false;
 		iAmPaused = false;
@@ -194,20 +209,6 @@ public class GCodeReaderAndWriter
 		myPriority = Thread.currentThread().getPriority();
 
 		bufferThread = null;
-		
-//		if(serialOutStream != null)
-//		{
-//			bufferThread = new Thread() 
-//			{
-//				public void run() 
-//				{
-//					Thread.currentThread().setName("GCodeWriter() Buffer Thread");
-//					bufferDeQueue();
-//				}
-//			};
-//
-//			bufferThread.start();
-//		}
 	}
 
 	

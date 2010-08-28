@@ -500,6 +500,12 @@ public interface Extruder
 	public double getExtrusionInfillWidth();
 	
 	/**
+	 * How high to lift above the surface for in-air movements
+	 * @return
+	 */
+	public double getLift();
+	
+	/**
 	 * 
 	 * @return
 	 */
