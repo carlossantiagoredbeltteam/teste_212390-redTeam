@@ -253,26 +253,13 @@ public class GerberGCode {
 		pcb = pcb.offset(-0.5*penWidth);
 		RrPolygonList pol = pcb.allPerimiters(pcb.attribute());
 		
-		while( pol.size() > 0 )
+		while(pol.size() > 0)
 		{
 			result.add(pol);
 			pcb = pcb.offset(-penWidth);
 			pol = pcb.allPerimiters(pcb.attribute());
 		}
-		try 
-		{
-			if(Preferences.loadGlobalBool("DisplaySimulation"))
-			{
-				RrGraphics simulationPlot2 = new RrGraphics("PCB plotlines");
-//				if(currentPolygon != null)
-//					thePattern.add(new RrPolygon(currentPolygon));
-				simulationPlot2.init(result.getBox(), false, 0);
-				simulationPlot2.add(result);
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
 		return result;
 	}
 	

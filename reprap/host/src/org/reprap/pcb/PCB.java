@@ -3,6 +3,7 @@ package org.reprap.pcb;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -11,7 +12,9 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 import org.reprap.Extruder;
 import org.reprap.Attributes;
+import org.reprap.Preferences;
 import org.reprap.geometry.polygons.*;
+import org.reprap.utilities.RrGraphics;
 import org.reprap.comms.GCodeReaderAndWriter;
 
 //import java.io.IOException;
@@ -64,7 +67,22 @@ public class PCB {
 
 		penPaths = gerberGcode.getPolygons();
 		
-		penPaths = penPaths.nearEnds(new Rr2Point(0, 0), true);
+		penPaths = penPaths.nearEnds(new Rr2Point(0, 0), true, 1.5*penWidth);
+		
+		try 
+		{
+			if(Preferences.loadGlobalBool("DisplaySimulation"))
+			{
+				RrGraphics simulationPlot2 = new RrGraphics("PCB plotlines");
+//				if(currentPolygon != null)
+//					thePattern.add(new RrPolygon(currentPolygon));
+				simulationPlot2.init(penPaths.getBox(), false, 0);
+				simulationPlot2.add(penPaths);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		writeGCodes();
 			

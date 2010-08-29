@@ -397,8 +397,35 @@ public class RrPolygon
 	}
 	
 	/**
+	 * Put a new polygon in the middle (at vertex k, which will be at
+	 * the end of the inserted polygon afterwards).
+	 * (N.B. Attributes of the new polygon are ignored)
+	 * @param k
+	 * @param p
+	 */
+	public void add(int k, RrPolygon p)
+	{
+		if(p.size() == 0)
+			return;
+		if(speeds != p.speeds)
+		{
+			Debug.e("Rr2Point.add(): attempt to add a polygon to another polygon when one has speeds and the other doesn't.");
+			return;
+		}			
+		for(int i = 0; i < p.size(); i++)
+		{
+			if(speeds != null)
+				add(k, new Rr2Point(p.point(i)), p.speed(i));
+			else
+				points.add(k, new Rr2Point(p.point(i)));
+			k++;
+		}
+		box.expand(p.box);
+	}
+	
+	/**
 	 * Remove a point.
-	 * N.B. This does not ammend the enclosing box
+	 * N.B. This does not amend the enclosing box
 	 * @param i
 	 */
 	public void remove(int i)
@@ -536,6 +563,45 @@ public class RrPolygon
 		if(result < 0)
 			Debug.e("RrPolygon.nearestVertex(): no point found!");
 		return result;
+	}
+	
+	/**
+	 * Find the nearest vertex on this polygon to any on polygon p,
+	 * reorder p so that its nearest is its first one, then merge that polygon
+	 * into this one.  The reordering is only done if the distance^2 is less 
+	 * than linkUp.  If no reordering and merging are done false is returned, 
+	 * otherwise true is returned.
+	 * 
+	 * @param p
+	 * @param linkUp
+	 * @return
+	 */
+	public boolean nearestVertexReorderMerge(RrPolygon p, double linkUp)
+	{
+		if(!p.isClosed())
+			Debug.e("RrPolygon.nearestVertexReorder(): called for non-closed polygon.");
+		double d = Double.POSITIVE_INFINITY;
+		int myPoint = -1;
+		int itsPoint = -1;
+		for(int i = 0; i < size(); i++)
+		{
+			int j = p.nearestVertex(point(i));
+			double d2 = Rr2Point.dSquared(point(i), p.point(j));
+			if(d2 < d)
+			{
+				d = d2;
+				myPoint = i;
+				itsPoint = j;
+			}
+		}
+		if(itsPoint >= 0 && d < linkUp*linkUp)
+		{
+			RrPolygon ro = p.newStart(itsPoint);
+			ro.add(0, point(myPoint));
+			add(myPoint, ro);
+			return true;
+		} else
+			return false;
 	}
 	
 	/**
