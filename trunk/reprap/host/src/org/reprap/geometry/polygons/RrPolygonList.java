@@ -705,22 +705,27 @@ public class RrPolygonList
 	}
 	
 	
-	
 	/**
 	 * Re-order and (if need be) reverse the order of the polygons
 	 * in a list so the end of the first is near the start of the second and so on.
 	 * This is a heuristic - it does not do a full travelling salesman...
 	 * This deals with both open and closed polygons, but it only allows closed ones to
-	 * be re-ordered if free is true.
+	 * be re-ordered if reOrder is true.  If any point on a closed polygon is closer to 
+	 * any point on any other than linkUp, the two polygons are merged at their closest
+	 * points.  This is suppressed by setting linkUp negative.
+	 * 
+	 * @param startNearHere
+	 * @param reOrder
+	 * @param linkUp
 	 * @return new ordered polygon list
 	 */
-	public RrPolygonList nearEnds(Rr2Point startNearHere, boolean free)
+	public RrPolygonList nearEnds(Rr2Point startNearHere, boolean reOrder, double linkUp)
 	{
 		RrPolygonList r = new RrPolygonList();
 		if(size() <= 0)
 			return r;
 		
-		int i;
+		int i, j;
 		
 		for(i = 0; i < size(); i++)
 			r.add(polygon(i));
@@ -730,48 +735,49 @@ public class RrPolygonList
 		
 		boolean neg = false;
 		double d = Double.POSITIVE_INFINITY;
+		
 		double d2;
 		int near = -1;
 		int nearV = -1;
-		Rr2Point e1;
+		
+		// Begin by moving the polygon nearest the specified start point to the head
+		// of the list.
 		
 		if(startNearHere != null)
 		{
 			for(i = 0; i < size(); i++)
 			{
-				e1 = r.polygon(i).point(0);
-				d2 = Rr2Point.dSquared(startNearHere, e1);
-				if(d2 < d)
+				if(r.polygon(i).isClosed() && reOrder)
 				{
-					near = i;
-					nearV = -1;
-					d = d2;
-					neg = false;
-				}
-				if(r.polygon(i).isClosed())
-				{
-					if(free)
+					int nv = polygon(i).nearestVertex(startNearHere);
+					d2 = Rr2Point.dSquared(startNearHere, polygon(i).point(nv));
+					if(d2 < d)
 					{
-						int nv = polygon(i).nearestVertex(startNearHere);
-						d2 = Rr2Point.dSquared(startNearHere, polygon(i).point(nv));
-						if(d2 < d)
-						{
-							near = i;
-							nearV = nv;
-							d = d2;
-							neg = false;
-						}
+						near = i;
+						nearV = nv;
+						d = d2;
+						neg = false;
 					}
 				} else
 				{
-					e1 = r.polygon(i).point(r.polygon(i).size() - 1);
-					d2 = Rr2Point.dSquared(startNearHere, e1);
+					d2 = Rr2Point.dSquared(startNearHere, r.polygon(i).point(0));
 					if(d2 < d)
 					{
 						near = i;
 						nearV = -1;
 						d = d2;
-						neg = true;
+						neg = false;
+					}
+					if(!r.polygon(i).isClosed())
+					{
+						d2 = Rr2Point.dSquared(startNearHere, r.polygon(i).point(r.polygon(i).size() - 1));
+						if(d2 < d)
+						{
+							near = i;
+							nearV = -1;
+							d = d2;
+							neg = true;
+						}
 					}
 				}
 			}
@@ -783,82 +789,60 @@ public class RrPolygonList
 			}
 
 			r.swap(0, near);
-			if(free && nearV >= 0)
+			if(reOrder && nearV >= 0)
 				set(0, polygon(0).newStart(nearV));
 			if(neg)
 				r.negate(0);
 		}
 		
+		if(reOrder && linkUp >= 0)
+			for(i = 0; i < r.size() - 1; i++)
+				for(j = i+1; j < r.size(); j++)
+					if(r.polygon(j).isClosed())
+						if(r.polygon(i).nearestVertexReorderMerge(r.polygon(j), linkUp))
+							r.remove(j);
 		
 		// Go through the rest of the polygons getting them as close as
 		// reasonable.
 		
-		int pg = 0;
-		while(pg < r.size() - 1)
+		for(i = 0; i < r.size() - 1; i++)
 		{
-			RrPolygon pgp = r.polygon(pg);
 			Rr2Point end;
-			if(pgp.isClosed())
-				end = pgp.point(0);
+			if(r.polygon(i).isClosed())
+				end = r.polygon(i).point(0);
 			else
-				end = pgp.point(pgp.size() - 1);
+				end = r.polygon(i).point(r.polygon(i).size() - 1);
 			neg = false;
 			near = -1;
-			nearV = -1;
 			d = Double.POSITIVE_INFINITY;
-			for(i = pg+1; i < r.size(); i++)
-			{
-				pgp = r.polygon(i);
-				e1 = pgp.point(0);
-				
-				if(pgp.isClosed() && free)
+			for(j = i+1; j < r.size(); j++)
+			{	
+				d2 = Rr2Point.dSquared(end, r.polygon(j).point(0));
+				if(d2 < d)
 				{
-					int nv = pgp.nearestVertex(e1);
-					d2 = Rr2Point.dSquared(pgp.point(nv), e1);
-					if(d2 < d)
-					{
-						near = i;
-						d = d2;
-						neg = false;
-						nearV = nv;
-					} 
-				} else
-				{
-					d2 = Rr2Point.dSquared(end, e1);
-					if(d2 < d)
-					{
-						near = i;
-						d = d2;
-						neg = false;
-						nearV = -1;
-					}
+					near = j;
+					d = d2;
+					neg = false;
+				}
 
-					e1 = pgp.point(pgp.size() - 1);
-					d2 = Rr2Point.dSquared(end, e1);
+				if(!r.polygon(j).isClosed())
+				{
+					d2 = Rr2Point.dSquared(end, r.polygon(j).point(r.polygon(j).size() - 1));
 					if(d2 < d)
 					{
-						near = i;
+						near = j;
 						d = d2;
-						neg = true && !pgp.isClosed();
-						nearV = -1;
+						neg = true;
 					}
 				}
 			}
-			
-			if(near < 0)
+
+			if(near > 0)
 			{
-				Debug.e("RrPolygonList.nearEnds(): no nearest end found!");
-				return r;
+				if(neg)
+					r.negate(near);
+				r.swap(i+1, near);
 			}
-			
-			if(near != pg+1)
-				r.swap(pg+1, near);
-			if(neg)
-				r.negate(pg+1);
-			if(nearV > 0)
-				r.set(pg+1, r.polygon(pg+1).newStart(nearV));
-			
-			pg++;
 		}
 		
 		return r;

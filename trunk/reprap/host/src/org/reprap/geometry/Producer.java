@@ -363,19 +363,19 @@ public class Producer {
 					RrPolygonList fills = allSTLs.computeInfill(stl, layerRules); //, startNearHere);
 					RrPolygonList borders = allSTLs.computeOutlines(stl, layerRules, fills, shield);
 					RrPolygonList support = allSTLs.computeSupport(stl, layerRules);
-					borders = borders.nearEnds(startNearHere, false);
+					borders = borders.nearEnds(startNearHere, false, -1);
 					if(borders.size() > 0)
 					{
 						RrPolygon last = borders.polygon(borders.size() - 1);
 						startNearHere = last.point(last.size() - 1);
 					}
-					fills = fills.nearEnds(startNearHere, false);
+					fills = fills.nearEnds(startNearHere, false, -1);
 					if(fills.size() > 0)
 					{
 						RrPolygon last = fills.polygon(fills.size() - 1);
 						startNearHere = last.point(last.size() - 1);
 					}
-					support = support.nearEnds(startNearHere, false);
+					support = support.nearEnds(startNearHere, false, -1);
 					if(support.size() > 0)
 					{
 						RrPolygon last = support.polygon(support.size() - 1);
