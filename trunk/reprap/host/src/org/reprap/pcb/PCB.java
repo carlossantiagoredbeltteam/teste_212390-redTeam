@@ -34,8 +34,8 @@ public class PCB {
 
 	// Config
 	double penWidth = 0.7f;		
-	double offsetX=40;
-	double offsetY=40;
+	double offsetX=70;
+	double offsetY=10;
 	File inputTracksAndPads;
 	File inputDrill;
 	File outputGCodes;
@@ -123,6 +123,8 @@ public class PCB {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd:HH-mm-ss");
 			String myDateString = sdf.format(myDate);
 			gcode.queue("; Created: " + myDateString);
+			gcode.queue("; Gerber tracks and pads file: " + inputTracksAndPads.getName());
+			gcode.queue("; Drill file: " + inputDrill.getName());
 			gcode.queue(";#!RECTANGLE: " + bigBox);
 			gcode.queue(";#!LAYER: 1/1");
 			gcode.queue("G21 ;metric");
@@ -218,7 +220,7 @@ public class PCB {
 			{
 				in = new BufferedReader(new FileReader(inputDrill));
 				gerberGcode = new GerberGCode(pcbPen, pattern, false);
-				gerberGcode.addCircleAperture(-1, 0.3); // Just mark drill centres with an 0.3mm disc
+				gerberGcode.addCircleAperture(-1, 0.6); // Just mark drill centres with an 0.3mm disc
 				while((line = in.readLine()) != null)
 				{
 					processLine(line, true);
