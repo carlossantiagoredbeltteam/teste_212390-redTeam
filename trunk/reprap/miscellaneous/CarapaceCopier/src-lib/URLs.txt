@@ -1,0 +1,2 @@
+Updates for JAMA can be downloaded from: http://math.nist.gov/javanumerics/jama/
+Updates for swing can be downloaded from: https://swing-layout.dev.java.net/servlets/ProjectDocumentList
