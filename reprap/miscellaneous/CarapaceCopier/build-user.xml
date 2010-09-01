@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This is a hand built file -->
+
+<project basedir="." default="build" name="Reprap3DScanning">
+<property name="zip.dir"     value="zip"/>
+<property name="zip.file"     value="CarapaceCopier.zip"/>
+<property name="src.zip.file"     value="CarapaceCopier-src.zip"/>
+<property name="jar.dir"     value="jar"/>
+<property name="jar.file"     value="CarapaceCopier.jar"/>
+<property name="bin.dir"     value="bin"/>
+<property name="lib.dir"     value="lib"/>
+<property name="src.lib.dir"     value="src-lib"/>
+<property name="src.dir"     value="src"/>
+<property name="docs.dir"     value="docs"/>
+<property name="extras.dir"     value="extras"/>
+<property name="main-class"  value="org.reprap.scanning.GUI.Main"/>
+<property name="javacSource"  value="1.5"/>
+<property name="javacTarget"  value="1.5"/>
+
+    <path id="project.classpath">
+        <pathelement location="${bin.dir}"/>
+    </path>
+    
+
+   <path id="classpath">
+       	<fileset dir="${lib.dir}" includes="**/*.jar"/>
+    </path>
+
+    <target name="init">
+        <mkdir dir="${bin.dir}"/>
+    	<mkdir dir="${jar.dir}"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${bin.dir}"/>
+        <delete dir="${jar.dir}"/>
+	<delete dir="${zip.dir}"/>
+    </target>
+
+    <target name="build" depends="init">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+   
+        <javac source="${javacSource}" target="${javacTarget}" destdir="${bin.dir}" classpathref="classpath">
+            <src path="${src.dir}"/>
+            <classpath refid="project.classpath"/>
+        </javac>
+    </target>
+
+<target name="help">
+    <echo message="Please run: $ ant -v -projecthelp"/>
+</target>
+
+
+<target name="jar" depends="build">
+    <jar destfile="${jar.dir}/${jar.file}" basedir="${bin.dir}">
+        <manifest>
+             <attribute name="Main-Class" value="${main-class}"/>
+        </manifest>
+    </jar>
+</target>
+
+<target name="zip" depends="jar">
+<mkdir dir="${zip.dir}"/>
+<zip destfile="${zip.dir}/${zip.file}">
+    <zipfileset dir="${docs.dir}" prefix="${docs.dir}"/>
+    <zipfileset dir="${lib.dir}" prefix="${lib.dir}"/>
+    <zipfileset dir="${jar.dir}" includes="${jar.file}" />
+    <zipfileset dir="." includes="run.sh" filemode="755" />
+    <zipfileset dir="." includes="run.bat" filemode="755" />
+    <zipfileset dir="." includes="run.command" filemode="755" />
+    <zipfileset dir="." includes="LICENSE" />
+    <zipfileset dir="${extras.dir}" />
+    </zip>
+</target>
+
+<target name="src.zip" depends="init">
+<mkdir dir="${zip.dir}"/>
+<zip destfile="${zip.dir}/${src.zip.file}">
+    <zipfileset dir="${src.dir}" prefix="${src.dir}" />
+    <zipfileset dir="${src.lib.dir}" prefix="${src.lib.dir}" />
+    <zipfileset dir="${docs.dir}" prefix="${docs.dir}"/>
+    <zipfileset dir="${lib.dir}" prefix="${lib.dir}"/>
+   <zipfileset dir="." includes="run.sh" filemode="755" />
+    <zipfileset dir="." includes="run.bat" filemode="755" />
+    <zipfileset dir="." includes="run.command" filemode="755" />
+    <zipfileset dir="." includes="LICENSE" />
+    <zipfileset dir="." includes="build-user-jre-5.xml" />
+    <zipfileset dir="." includes="build-user-jre-6.xml" />
+    <zipfileset dir="." includes="package-release.sh" filemode="755" />
+    <zipfileset dir="." includes="compile-and-run.sh" filemode="755" />
+    <zipfileset dir="${extras.dir}" />
+   </zip>
+</target>
+
+<target name="run" depends="jar">
+    <java fork="true" classname="${main-class}">
+        <classpath>
+            <path refid="classpath"/>
+            <path location="${jar.dir}/${jar.file}"/>
+        </classpath>
+    </java>
+</target>
+
+
+
+</project>
