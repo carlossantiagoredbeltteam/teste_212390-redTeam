@@ -31,11 +31,12 @@ public class PCB {
 
 	double scale = 1;
 
-
-	// Config
-	double penWidth = 0.7f;		
-	double offsetX=70;
-	double offsetY=10;
+	double penWidth = 0.7;
+	double zFeedRate = 50;
+	double zDown = 0;
+	static final double centreWidth = 0.9;
+	static final double offsetX=10;
+	static final double offsetY=10;
 	File inputTracksAndPads;
 	File inputDrill;
 	File outputGCodes;
@@ -46,9 +47,8 @@ public class PCB {
 	/**
 	 * @param args
 	 */
-	public void pcb(File itp, File id, File og, Extruder pp) {
-
-		// Config end
+	public void pcb(File itp, File id, File og, Extruder pp) 
+	{
 		inputTracksAndPads = itp;
 		inputDrill = id;
 		outputGCodes = og;
@@ -92,7 +92,7 @@ public class PCB {
 	private void raisePen()
 	{
 		try {
-			gcode.queue("G1 F30; Z feedrate"); //FIXME!
+			gcode.queue("G1 F" + zFeedRate + "; Z feedrate");
 			gcode.queue("G1 Z" + pcbPen.getLift() + "; Z clearance height");
 			gcode.queue("G1 F" + pcbPen.getSlowXYFeedrate() + "; XY feedrate");
 		} catch (Exception e) {
@@ -104,8 +104,8 @@ public class PCB {
 	private void lowerPen()
 	{
 		try {
-			gcode.queue("G1 F30; Z feedrate"); //FIXME!
-			gcode.queue("G1 Z0; Z clearance height");
+			gcode.queue("G1 F" + zFeedRate + "; Z feedrate");
+			gcode.queue("G1 Z" + zDown + "; Z drawing height");
 			gcode.queue("G1 F" + pcbPen.getSlowXYFeedrate() + "; XY feedrate");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -220,7 +220,7 @@ public class PCB {
 			{
 				in = new BufferedReader(new FileReader(inputDrill));
 				gerberGcode = new GerberGCode(pcbPen, pattern, false);
-				gerberGcode.addCircleAperture(-1, 0.6); // Just mark drill centres with an 0.3mm disc
+				gerberGcode.addCircleAperture(-1, centreWidth); // Just mark drill centres with a disc
 				while((line = in.readLine()) != null)
 				{
 					processLine(line, true);
