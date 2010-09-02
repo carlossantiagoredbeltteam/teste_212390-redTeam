@@ -43,29 +43,23 @@ public class GerberGCode {
 	
 	boolean dawingOn = false;
 	LinkedList <Aperture> apertures = new LinkedList<Aperture>(); 
-	//double penWidth;
 	Aperture curAperture = null;
 	boolean absolute = true;
 	Extruder pcbPen;
 	BooleanGrid pcb;
 	Rr2Point lastCoords = null;
-//	RrPolygonList thePattern = new RrPolygonList();
+
 	boolean colour = true;
-//	RrPolygon currentPolygon = null;
+
 	
-	//Appearance looksLike;
-	
-	public GerberGCode(Extruder pp, BooleanGrid p, boolean c) //, double drawingHeight, double freemoveHeight, int XYFeedrate, int ZFeedrate)
+	public GerberGCode(Extruder pp, BooleanGrid p, boolean c) 
 	{
 		pcbPen = pp;
-		//this.penWidth = penWidth;
 		enableAbsolute();
 		disableDrawing();
 		pcb = p;
 		colour = c;
 		lastCoords = new Rr2Point(0, 0);
-		//looksLike = new Appearance();
-		//looksLike.setMaterial(new Material(new Color3f(0.5f, 0.5f, 0.5f), new Color3f(0f, 0f, 0f), new Color3f(0.5f, 0.5f, 0.5f), new Color3f(0f, 0f, 0f), 0f));
 	}
 	
 	public RrRectangle drawLine(Rr2Point c)
@@ -76,8 +70,6 @@ public class GerberGCode {
 	public void goTo(Rr2Point c)
 	{
 		lastCoords = new Rr2Point(fixCoords(c));
-//		disableDrawing();
-//		addPointToPolygons(fixCoords(c));
 	}
 	
 	public void enableAbsolute()
@@ -234,20 +226,20 @@ public class GerberGCode {
 	
 	public RrPolygonList getPolygons()
 	{
-//		try 
-//		{
-//			if(Preferences.loadGlobalBool("DisplaySimulation"))
-//			{
-//				RrGraphics simulationPlot1 = new RrGraphics("PCB pattern");
-////				if(currentPolygon != null)
-////					thePattern.add(new RrPolygon(currentPolygon));
-//				simulationPlot1.init(pcb.box(), false, 0);
-//				simulationPlot1.add(pcb);
-//			}
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		try 
+		{
+			if(Preferences.loadGlobalBool("DisplaySimulation"))
+			{
+				RrGraphics simulationPlot1 = new RrGraphics("PCB pattern");
+//				if(currentPolygon != null)
+//					thePattern.add(new RrPolygon(currentPolygon));
+				simulationPlot1.init(pcb.box(), false, 0);
+				simulationPlot1.add(pcb);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		RrPolygonList result = new RrPolygonList();
 		double penWidth = pcbPen.getExtrusionSize();
 		pcb = pcb.offset(-0.5*penWidth);

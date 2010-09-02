@@ -1908,17 +1908,23 @@ public class BooleanGrid
 				vSet(pix, false);
 				pix = here.add(neighbour[1]);
 				set(pix, false);
-				vSet(pix, false);				
+				vSet(pix, false);
 				here = result.point(result.size() - 1);
 				if(!get(here))
 				{
-					result.remove(result.size() - 1);
-					here = result.point(result.size() - 1);
-					if(!get(here))
+					if(result.size() > 1)
 					{
-						Debug.e("BooleanGrid.marchRound() - backtracked to an unfilled point!" + printNearby(here,4) + "\n\n");
 						result.remove(result.size() - 1);
 						here = result.point(result.size() - 1);
+						if(!get(here))
+						{
+							Debug.e("BooleanGrid.marchRound() - backtracked to an unfilled point!" + printNearby(here,4) + "\n\n");
+							result.remove(result.size() - 1);
+							here = result.point(result.size() - 1);
+						}
+					} else
+					{
+						here = start;
 					}
 				}
 				break;
@@ -1957,15 +1963,22 @@ public class BooleanGrid
 				here = result.point(result.size() - 1);
 				if(!get(here))
 				{
-					result.remove(result.size() - 1);
-					here = result.point(result.size() - 1);
-					if(!get(here))
+					if(result.size() > 1)
 					{
-						Debug.e("BooleanGrid.marchRound() - backtracked to an unfilled point!" + printNearby(here,4) + "\n\n");
 						result.remove(result.size() - 1);
 						here = result.point(result.size() - 1);
+						if(!get(here))
+						{
+							Debug.e("BooleanGrid.marchRound() - backtracked to an unfilled point!" + printNearby(here,4) + "\n\n");
+							result.remove(result.size() - 1);
+							here = result.point(result.size() - 1);
+						}
+					}else
+					{
+						here = start;
 					}
 				}
+				
 				break;
 
 			case 10:
