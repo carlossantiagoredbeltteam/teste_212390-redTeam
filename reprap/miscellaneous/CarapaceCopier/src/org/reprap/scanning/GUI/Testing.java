@@ -149,13 +149,28 @@ public class Testing {
 			else System.out.println();
 		} // end for n
 	} // end method
+
+
+	// Wrapper to call the below to give just the initial estimation of the calibration sheet using the first 3 point pair matches.  
+	public void CalculateBarycentricTransformedCalibrationsheet(int pixelswide, int pixelshigh, String filename){CalculateBarycentricTransformedCalibrationsheet(pixelswide,pixelshigh,filename,false);}
+		
+		
 	
-	// Note this assumes the global variable image has been initialised with the source image
+//	 Note this assumes the global variable image has been initialised with the source image
 	// This has been hastily changed to output colour images rather than greyscale. It is not efficient and if it to be used extensively should be rewritten
-	public void CalculateBarycentricTransformedCalibrationsheet(int pixelswide, int pixelshigh, String filename){
-		//Use only the first 3 to get the estimated greyscale values of the entire calibration sheet
-		PointPair2D[] basepairs=new PointPair2D[3];
-		for (int i=0;i<3;i++) basepairs[i]=correct[i].clone();
+	public void CalculateBarycentricTransformedCalibrationsheet(int pixelswide, int pixelshigh, String filename, boolean useallpointpairs){
+		PointPair2D[] basepairs;
+		if (useallpointpairs) {
+			//Use the best 3 to get the estimated greyscale values of the pixel for the calibration sheet
+			basepairs=new PointPair2D[correct.length];
+			for (int i=0;i<correct.length;i++) basepairs[i]=correct[i].clone();
+		}
+		else{
+			//Use only the first 3 to get the estimated greyscale values of the entire calibration sheet
+			basepairs=new PointPair2D[3];
+			for (int i=0;i<3;i++) basepairs[i]=correct[i].clone();
+		}		
+		
 		Point2d offset=new Point2d((double)calibrationwidth/2,(double)calibrationheight/2);
 		byte[][][] newimage=new byte[pixelswide][pixelshigh][3];
 		for (int colours=0;colours<3;colours++){
@@ -195,7 +210,7 @@ public class Testing {
 		GraphicsFeedback graphics=new GraphicsFeedback(false);
 		graphics.ShowByteArray(newimage,pixelswide,pixelshigh);
 		graphics.SaveImage(filename);
-	}
+	}// Note this assumes the global variable image has been initialised with the source image
 	
 	public void CalculateMatches(Point2d[] subsetofcentres, int n){
 			long starttime=System.currentTimeMillis();
