@@ -2477,11 +2477,12 @@ public class BooleanGrid
 			break;
 			
 		case 3:
+		default:			// Rounding error brings us here...
 			org = big.se();
 			break;
 			
-		default:
-			Debug.e("BooleanGrid.hatch(): The atan2 function doesn't seem to work...");
+//		default:
+//			Debug.e("BooleanGrid.hatch(): The atan2 function doesn't seem to work...");
 		}
 		
 		RrHalfPlane hatcher = new 
