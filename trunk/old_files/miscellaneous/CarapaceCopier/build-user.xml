@@ -84,8 +84,7 @@
     <zipfileset dir="." includes="run.bat" filemode="755" />
     <zipfileset dir="." includes="run.command" filemode="755" />
     <zipfileset dir="." includes="LICENSE" />
-    <zipfileset dir="." includes="build-user-jre-5.xml" />
-    <zipfileset dir="." includes="build-user-jre-6.xml" />
+    <zipfileset dir="." includes="build-user.xml" />
     <zipfileset dir="." includes="package-release.sh" filemode="755" />
     <zipfileset dir="." includes="compile-and-run.sh" filemode="755" />
     <zipfileset dir="${extras.dir}" />
