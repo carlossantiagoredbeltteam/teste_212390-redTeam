@@ -44,11 +44,11 @@ import org.reprap.scanning.FeatureExtraction.EdgeExtraction2D.direction; // This
 * 2002 available for download from http://doi.ieeecomputersociety.org/10.1109/ICPR.2002.1048464
 * But with additional checks and balances because of the assoicated convexity direction and tangential direction. It also has the idea of using a bounding rectangle based on the max long axis length to restrict the combinations that need to be checked (optionally set by a boolean parameter passed into the constructor)
 * 
-* 	
+* Note that some formulae that traditionally use pi have been replaced to use tau where tau is defined as 2*pi. For an explanation of why this may make things clearer see That Tau Manifesto available at http://tauday.com/	
 ***********************************************************************************/
 
 public class FindEllipses {
-
+	private final static double tau=Math.PI*2;
 	boolean[] skipped;
 	private final Point2d[] edge; //populated by the constructor
 	//private final convexity[] convexdirection;// populated by the constructor. This needs to be combined with the tangent direction to give meaningful answers except that if the convexdirection is skip then obviously this edge is to be skipped.
@@ -170,7 +170,7 @@ public class FindEllipses {
 		if (MinLongAxisSquared<(minimumaxislength*minimumaxislength)) MinLongAxisSquared=(minimumaxislength*minimumaxislength);
 		if (MaxLongAxisSquared>((width*width)+(height*height))) MaxLongAxisSquared=(width*width)+(height*height);
 		if (MaxLongAxisSquared<MinLongAxisSquared) MaxLongAxisSquared=MinLongAxisSquared;
-		if (lowestangle>(Math.PI/2)) lowestangle=Math.PI/2;
+		if (lowestangle>(tau*0.25)) lowestangle=tau*0.25;
 		
 		// Try and speed up using the bounding box if it may make a difference
 		boolean useboundingbox=edge.length>(MaxLongAxisSquared);
@@ -238,8 +238,8 @@ public class FindEllipses {
 							//if (convexdirection[i]==convexity.valueOf("left")) angle=edge[i].GetAngleMeasuredClockwiseFromPositiveX(edge[j]);
 						//	if (convexdirection[i]==convexity.valueOf("right")) angle=edge[i].GetAngleMeasuredClockwiseFromPositiveX(edge[j]);
 						//	else angle=edge[j].GetAngleMeasuredClockwiseFromPositiveX(edge[i]);
-						//	angle=(angle+(Math.PI/8))%Math.PI; // offset by pi/8 (22.5 degrees) mod pi radians to make the comparison easier: rather than testing if between -22.5 or 337.5 degrees to 155.5 degrees simply test if <=180 degrees (pi radians)
-						//	continueprocessing=(Math.abs(angle)<=Math.PI);
+						//	angle=(angle+(tau/16))%(tau*0.5); // offset by tau/16 (22.5 degrees) mod tau/2 radians to make the comparison easier: rather than testing if between -22.5 or 337.5 degrees to 155.5 degrees simply test if <=180 degrees
+						//	continueprocessing=(Math.abs(angle)<=(tau/2));
 						//}
 						// TODO uncomment if can get to work
 						//Check that the angle between the two is appropriate - more or less superceded by the checking that the left is actually to the left of the right one.
@@ -261,8 +261,8 @@ public class FindEllipses {
 							double a=Math.sqrt(edge[i].CalculateDistanceSquared(edge[j]))/2;
 							double asquared=a*a;
 							double orientationangle;
-							if ((int)edge[i].x==(int)edge[j].x) orientationangle=Math.PI/2; // The below formula won't work when the long axis is on the y axis
-							else orientationangle=Math.atan((edge[j].y-edge[i].y)/(edge[j].x-edge[i].x)); // atan returns the angle with -pi/2 - pi/2 i.e. -90 - 90 degrees 
+							if ((int)edge[i].x==(int)edge[j].x) orientationangle=tau*0.25; // The below formula won't work when the long axis is on the y axis
+							else orientationangle=Math.atan((edge[j].y-edge[i].y)/(edge[j].x-edge[i].x)); // atan returns the angle with -tau/4 - tau/4 i.e. -90 - 90 degrees 
 					
 							// Then use these values to calculate the short axis length for each of the remaining edge points and put them into an accumulator to get the best result
 							// The accumulator will measure the b axis within limits of a calculated minimum and a in steps
@@ -314,17 +314,18 @@ public class FindEllipses {
 											//double fdashsquared=edge[i].CalculateDistanceSquared(edge[k]);
 											//if (fdashsquared<fsquared)fsquared=fdashsquared;
 								
-											// tau is the angle at the center between the lines from the center to the second point and the third point
+											// Tau is the angle at the center between the lines from the center to the second point and the third point
+											// (not to be confused with tau=2*pi)
 											// Note that by definition this is between 0-180 degrees or 0-pi radians so don't have to worry about acos function mapping tau to the wrong angle
 											//From the cosine rule:
 											//cosine rule: b^2=a^2+c^2-2ac*cosB or CosB=(a^2+c^2-b^2)/2ac
-											double cosinetau=(asquared+dsquared-fsquared)/Math.sqrt(4*asquared*dsquared);
-											double tau=Math.acos(cosinetau);// acos will get the tau within 0-pi 0-180 degrees
-											double sinetau=Math.sin(tau);
-											double bsquared=(asquared*dsquared*sinetau*sinetau)/(asquared-(dsquared*cosinetau*cosinetau));
+											double cosineTau=(asquared+dsquared-fsquared)/Math.sqrt(4*asquared*dsquared);
+											double Tau=Math.acos(cosineTau);// acos will get the tau within 0-pi 0-180 degrees
+											double sineTau=Math.sin(Tau);
+											double bsquared=(asquared*dsquared*sineTau*sineTau)/(asquared-(dsquared*cosineTau*cosineTau));
 											double b=Math.sqrt(bsquared);
 											//double angle=center.GetAngleMeasuredClockwiseFromPositiveX(edge[k]);
-											//int oct=(int)Math.floor((angle/Math.PI)*4)%8;
+											//int oct=(int)Math.floor((angle/tau)*8)%8;
 											int oct=center.GetOctant(edge[k]);
 											// Set the accumulators
 											accumulator.increment(b); 
@@ -343,11 +344,11 @@ public class FindEllipses {
 							if ((octcount==6) || (octcount==7)) {
 								// Add in the octant of the initial two anchor points if it may make a difference between accepting and rejecting the ellipse
 								//double angle=center.GetAngleMeasuredClockwiseFromPositiveX(edge[i]);
-								//int oct=(int)Math.floor((angle/Math.PI)*4)%8;
+								//int oct=(int)Math.floor((angle/tau)*8)%8;
 								int oct=center.GetOctant(edge[i]);
 								octants.Set(max,oct,true);
 								//angle=center.GetAngleMeasuredClockwiseFromPositiveX(edge[j]);
-								//oct=(int)Math.floor((angle/Math.PI)*4)%8;
+								//oct=(int)Math.floor((angle/tau)*8)%8;
 								oct=center.GetOctant(edge[j]);
 								octants.Set(max,oct,true);
 								octcount=octants.GetNumberOfTrue(max);
@@ -405,14 +406,14 @@ public class FindEllipses {
 		//	e.g. if two points have a vertical tangent direction then the angle between them must be within +/- 22.5 degrees of horizontal
 		// if one is set to left then the angle measured clockwise from the positive x axis must be within +/- 22.5 degrees
 		// but if the convexity is to the right then the angle must be 180 degrees +/- 22.5.
-		angle=Math.abs(angle%(Math.PI*2));
+		angle=Math.abs(angle%tau);
 		boolean returnvalue;
 		// Note that there is a special case for the direction tangent being vertical and the convexity to the right so check that first 
-		if ((convexdirection==convexity.valueOf("right")) && (directiontangent==direction.valueOf("vertical"))) returnvalue=((angle<=(Math.PI/8)) || (angle>=(Math.PI*15/8)));
+		if ((convexdirection==convexity.valueOf("right")) && (directiontangent==direction.valueOf("vertical"))) returnvalue=((angle<=(tau/16)) || (angle>=(tau*15/16)));
 		else {
-			double anglemin=((directiontangent.ordinal()*(Math.PI/4))+(convexdirection.ordinal()*(Math.PI/2))+(Math.PI/8))%(2*Math.PI); 
+			double anglemin=((directiontangent.ordinal()*(tau/8))+(convexdirection.ordinal()*(tau/4))+(tau/16))%tau; 
 			// The anglemin is +22.5 (45/2) degrees +45 degrees for each additional direction and 180 degrees if the first convexdirection is right  
-			returnvalue=((angle>=anglemin) && (angle<(anglemin+(Math.PI/4))));
+			returnvalue=((angle>=anglemin) && (angle<(anglemin+(tau/8))));
 		}
 		return returnvalue;
 		
@@ -425,7 +426,7 @@ public class FindEllipses {
 	// 0 is viewed from "above" so b/a=1 and pi/2 or 90 degrees is viewed from the side with b/a at infinity at this point.
 	private double CalculateMinorToMajorSemiAxisAspectRatio(double lowestangle){
 		double returnvalue=1;
-		lowestangle=Math.abs(lowestangle%(Math.PI/2)); // Makes sure the angle is between 0-pi/2 radians i.e. 0-90 degrees
+		lowestangle=Math.abs(lowestangle%(tau*0.25)); // Makes sure the angle is between 0-tau/4 radians i.e. 0-90 degrees
 		// From "Eccentricity in Ellipses" by L. A. Kenna in Mathematics Magazine, Vol. 32, No. 3 (Jan. - Feb., 1959), pp. 133-135
 		// downloadable from http://www.jstor.org/stable/3029496
 		// if we assume that the ellipse is made from intersecting a plane with a cylinder, the eccentricity of an ellipse is the sine of the angle between the normal 
