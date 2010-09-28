@@ -34,6 +34,8 @@ package org.reprap.scanning.FeatureExtraction;
  * i.e. if it backprojects to an image that registers that pixel as part of the calibration sheet then it is obviously outside the object.
  * 
  * Note that the segmentation is conservative in that if it says something is part of the calibration sheet it is, but if it says it isn't it may still in fact be part of the calibration sheet.
+ * 
+ * Note that some formulae that traditionally use pi have been replaced to use tau where tau is defined as 2*pi. For an explanation of why this may make things clearer see That Tau Manifesto available at http://tauday.com/
  *******************************************************************************/  
 
 
@@ -63,7 +65,7 @@ class PointBrightnessArray{
 }
 
 public class ImageSegmentation {
-	
+	private final static double tau=Math.PI*2;
 	private enum states {unknown, calibrationsheet, edge, other};
 	private states[][] currentstate;
 	private states[][] nextstate;
@@ -321,7 +323,7 @@ public ImageSegmentation clone(){
 			// Set the cardinal points to be the same max distance away from the center of the ellipse and interpolate the pixel brightness
 			double maxdistance=Math.sqrt(maxdsquared);
 			for (int j=0;j<8;j++){
-				cardinalpoints.points[j]=ellipses[i].GetCenter().GetOtherPoint(j*0.25*Math.PI,maxdistance);
+				cardinalpoints.points[j]=ellipses[i].GetCenter().GetOtherPoint(j*(tau/8),maxdistance);
 				cardinalpoints.values[j]=(int)(image.InterpolatePixelBrightness(cardinalpoints.points[j]) & 0xff);
 				
 			}

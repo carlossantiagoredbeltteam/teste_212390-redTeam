@@ -29,6 +29,8 @@ package org.reprap.scanning.GUI;
  * the libraries need to be added. They can be downloaded from: https://jogl.dev.java.net/servlets/ProjectDocumentList?folderID=9260&expandFolder=9260&folderID=8798
  *  This was to be used in the Main class for debugging purposes only.
  *  
+ *  Note that some formulae that traditionally use pi have been replaced to use tau where tau is defined as 2*pi. For an explanation of why this may make things clearer see That Tau Manifesto available at http://tauday.com/
+ *  
 *************************************************************************************/
 /*
 
@@ -59,6 +61,7 @@ import com.sun.opengl.util.Animator;
 import Jama.*;
 
 public class Graphics3DFeedback {
+	private final static double tau=Math.PI*2;
 	private static final int displayfudgefactorY=24;
 	private static final int displayfudgefactorX=8;
 	//These are used for the initial display area size (set in the constructor). The problem is setting the display window size using the FrameSize method
@@ -279,7 +282,7 @@ public class Graphics3DFeedback {
 			       temp.ResetCenter(calibrationcirclecenters[i]);
 					//For each step draw a triangle from the fan.
 					for (int step = 0; step < steps; step++) {
-						double angle = (2 * Math.PI / steps) * step;
+						double angle = (tau / steps) * step;
 						Point2d circumferencepoint=temp.GetEllipseEdgePointPolar(angle);
 						gl.glVertex3d(circumferencepoint.x,circumferencepoint.y, 0);
 					}
@@ -527,14 +530,14 @@ public class Graphics3DFeedback {
 		   }
 		   if (updownrotation){
 			   // Do the rotation for the initial eyepoint to get the current eyepoint
-			  // axisofrotationvector=axisofrotationvector.times((Math.PI*(angle/180))/Math.sqrt(axisofrotationvector.lengthSquared())); // set length equal to number of degrees, converted to radians
+			  // axisofrotationvector=axisofrotationvector.times((tau*(angle/360))/Math.sqrt(axisofrotationvector.lengthSquared())); // set length equal to number of degrees, converted to radians
         	//	Matrix R=new MatrixManipulations().getRotationMatrixFromRodriguesRotationVector(new MatrixManipulations().ConvertPointTo3x1Matrix(axisofrotationvector));
         	//	eyepoint=lookat.plus(new Point3d(R.times(new MatrixManipulations().ConvertPointTo3x1Matrix(eyevector))));
         		// rotate the initial up vector as well to get the current up vector
         	//	up=new Point3d(R.times(new MatrixManipulations().ConvertPointTo3x1Matrix(upvector)));
 			   
 			   // Rotate the lookat point around the eyepoint
-			   axisofrotationvector=axisofrotationvector.times((Math.PI*(angle/180))/Math.sqrt(axisofrotationvector.lengthSquared())); // set length equal to number of degrees, converted to radians
+			   axisofrotationvector=axisofrotationvector.times((tau*(angle/360))/Math.sqrt(axisofrotationvector.lengthSquared())); // set length equal to number of degrees, converted to radians
 			   Matrix R=new MatrixManipulations().getRotationMatrixFromRodriguesRotationVector(new MatrixManipulations().ConvertPointTo3x1Matrix(axisofrotationvector));
 			   lookat=eyepoint.minus(new Point3d(R.times(new MatrixManipulations().ConvertPointTo3x1Matrix(eyevector))));
        			// rotate the initial up vector as well to get the current up vector

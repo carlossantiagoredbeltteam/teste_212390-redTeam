@@ -25,11 +25,14 @@ package org.reprap.scanning.Geometry;
  * 
  * Last modified by Reece Arnott 12th May 2010
  * 
+ * Note that some formulae that traditionally use pi have been replaced to use tau where tau is defined as 2*pi. For an explanation of why this may make things clearer see That Tau Manifesto available at http://tauday.com/
+ * 
  *********************************************************************************/
 import Jama.*;
 
 public class Point2d
 {
+	private final static double tau=Math.PI*2;
 	public double x, y;
 	// constructors
 	public Point2d(double newX,double newY) {x = newX; y = newY; }
@@ -73,7 +76,7 @@ public class Point2d
 		// This forms a right angle triangle with the angle we want at B. However this cannot be done in the special case of C being directly above or below B i.e. angle is 90 or 270 degrees
 		
 		double angle;
-		if (C.x==x) angle=Math.PI/2; // set the angle to 90 degrees
+		if (C.x==x) angle=tau/4; // set the angle to 90 degrees
 		else {
 			// So first figure out the angle b, using standard trig this is cos(b)=BA/BC=abs(B.x-C-x)/BC
 			double cosineangle=Math.abs(x-C.x)/Math.sqrt(CalculateDistanceSquared(C));
@@ -81,9 +84,9 @@ public class Point2d
 			angle=Math.acos(cosineangle);
 		}
 		// If point B is to the right of point C, adjust the angle to take this into account so that it is in the 90-180 degree range
-		if (x>C.x) angle=Math.PI-angle;
+		if (x>C.x) angle=(tau/2)-angle;
 		// If point B is below point C adjust to  take this into account so that it is in the range 180-360 degrees
-		if (y<C.y) angle=(2*Math.PI)-angle;
+		if (y<C.y) angle=tau-angle;
 		return angle;
 	}
 	
@@ -116,15 +119,15 @@ public class Point2d
 	public Point2d GetOtherPoint(double angle, double distance){
 		Point2d returnvalue;
 		// Adjust angle so it is within 0 and 2 pi
-		angle=angle%(Math.PI*2); // This isn't actually a mod function, it is a remainder so can give a negative number
+		angle=angle%tau; // This isn't actually a mod function, it is a remainder so can give a negative number
 		// adjust if it is negative
-		if (angle<0) angle=(Math.PI*2)-angle;
+		if (angle<0) angle=tau-angle;
 		
 		// Construct a line of the form y=mx+c that crosses the current point.
 		// m is directly calculated as tan(angle)
 		// Note that there is a special case where the angle is exactly 90 or 270 degrees
-		if (angle==(Math.PI/2)) returnvalue=new Point2d(x,y+distance);
-		else if (angle==(3*Math.PI/2)) returnvalue=new Point2d(x,y-distance);
+		if (angle==(tau*0.25)) returnvalue=new Point2d(x,y+distance);
+		else if (angle==(tau*0.75)) returnvalue=new Point2d(x,y-distance);
 		else {
 			double m=Math.tan(angle);
 			// Use the point to find the constant c in the equation
@@ -134,7 +137,7 @@ public class Point2d
 			// so deltax=sqrt(distance^2/(m^2+1))
 			double deltax=Math.sqrt((distance*distance)/(1+(m*m)));
 			// If the angle is between 90 and 270 degrees then deltax is negative
-			if ((angle>(Math.PI/2)) && (angle<(3*Math.PI/2))) deltax=deltax*-1;
+			if ((angle>(tau*0.25)) && (angle<(tau*0.75))) deltax=deltax*-1;
 			
 			double newx=x+deltax;
 			double newy=(m*newx)+c;

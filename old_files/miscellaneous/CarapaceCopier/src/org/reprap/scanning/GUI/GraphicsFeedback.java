@@ -29,6 +29,7 @@ package org.reprap.scanning.GUI;
  * the libraries need to be added. They can be downloaded from: https://jogl.dev.java.net/servlets/ProjectDocumentList?folderID=9260&expandFolder=9260&folderID=8798
  *  This was to be used in the Main class for debugging purposes only.
  *
+ * Note that some formulae that traditionally use pi have been replaced to use tau where tau is defined as 2*pi. For an explanation of why this may make things clearer see That Tau Manifesto available at http://tauday.com/
  *  
 *************************************************************************************/
 import javax.swing.JFrame;
@@ -53,6 +54,8 @@ import Jama.Matrix;
 
 
 public class GraphicsFeedback {
+	private final static double tau=Math.PI*2;
+	
 	/* These first parameters are the default number of colour channels and format we are using - currently 3 in the format RGB 
 	 *
 	 * The JOGLcolourformat is a number recognised by the JOGL GL.glDrawPixels method as its third parameter.
@@ -134,7 +137,7 @@ public class GraphicsFeedback {
 		Ellipse ellipse=originalellipse.clone();
 		ellipse.OffsetCenter(offset);
 		for (int t=0;t<360;t++){
-			double tradians=((double)t/(double)180)*Math.PI;
+			double tradians=((double)t/(double)360)*tau;
 			Point2d edge=ellipse.GetEllipseEdgePointParametric(tradians);
 			Print((int)edge.x,(int)edge.y,colour,1,1);
 		}

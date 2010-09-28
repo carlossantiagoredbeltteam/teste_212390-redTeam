@@ -44,6 +44,8 @@
  * The space is carved into tetrahedrons using these 3d points as vertices for the tetrahedrons and the knowledge of which points are visible from which cameras used to delete the tetrahedra that don't belong to the object.
  * The surviving tetrahedra are finally split into their triangular faces and these triangles are used to create the output STL file. 
  * 
+ *  Note that some formulae that traditionally use pi have been replaced to use tau where tau is defined as 2*pi. For an explanation of why this may make things clearer see That Tau Manifesto available at http://tauday.com/
+ * 
  * 
  ********************************************************************************/  
 package org.reprap.scanning.GUI;
@@ -87,6 +89,7 @@ import org.reprap.scanning.DataStructures.*;
 
 
 public class Main extends JFrame {
+	private final static double tau=Math.PI*2;
 	private boolean save = true;
 	private static final long serialVersionUID = 1L; //serial number needed as this a a serializable class
 //	 These are standard global variables used in multiple methods 
@@ -1244,7 +1247,7 @@ private void FindCalibrationSheetCirclesEtc(){
 		    		   // And that the edge finding is exactly pixel perfect. To make up for where this is not the case we use the lowest angle to be 10 degrees which means it will find ellipses with the minor axis being at least 98.5% of the size of the major axis
 		    		   bar.setValue(0);
 		    		   double minsquared=0;
-		    		   double angle=((double)10/180)*Math.PI; // Have to cast the numbers to double otherwise it does the calculation as int then casts to double which gives the value of 0.0
+		    		   double angle=((double)10/360)*tau; // Have to cast the numbers to double otherwise it does the calculation as int then casts to double which gives the value of 0.0
 		    		   double maxsquared=Double.MAX_VALUE;
 		    		 while (bar.getValue()<bar.getMaximum()){
 		    					  bar=find.ExtractEllipses(minsquared,maxsquared,angle,1);
@@ -1349,7 +1352,7 @@ private void FindCalibrationSheetCirclesEtc(){
 		    		   calibrationsheetxlength=circleradius*xscale;
 		    		   calibrationsheetylength=circleradius*yscale;
 		    		   double calibrationsheetangle=0;
-		    		   if (calibrationsheetylength>calibrationsheetxlength)  calibrationsheetangle=Math.PI/2;
+		    		   if (calibrationsheetylength>calibrationsheetxlength)  calibrationsheetangle=tau/4;
 		    		   standardcalibrationcircleonprintedsheet=new Ellipse(new Point2d(0,0),calibrationsheetxlength,calibrationsheetylength,calibrationsheetangle);
 		    		
   
@@ -1381,7 +1384,7 @@ private void FindCalibrationSheetCirclesEtc(){
 			  }
 		  }); 
 		
-		double lowestangleinradians=((double)prefs.AlgorithmSettingMaximumCameraAngleFromVerticalInDegrees/180)*Math.PI; 
+		double lowestangleinradians=((double)prefs.AlgorithmSettingMaximumCameraAngleFromVerticalInDegrees/360)*tau; 
 		   // Load up the kernel to apply a semi-Gaussian filter of radius 3 (where the radius is the 3-sigma point) to the image at the same time as reading into memory
 		   float[] kernel=GetGaussianFilter(3);
 		   //Load the image in with no pre-processing filtering
@@ -2329,7 +2332,7 @@ public class Point3dArray {
 				if (distancesquared > ((r*r)+1)) // the plus 1 is just so that the mask also includes those that are just outside of the radius which is helpful when the radius is rather small 
 				mask[index] = 0;
 			else{
-				mask[index] = (float)(Math.exp(-(distancesquared)/(2*sigma*sigma)) / (2*Math.PI*sigma*sigma));
+				mask[index] = (float)(Math.exp(-(distancesquared)/(2*sigma*sigma)) / (tau*sigma*sigma));
 				total+=mask[index];
 			} // end else
 				index++;

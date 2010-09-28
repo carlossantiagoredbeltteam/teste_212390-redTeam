@@ -29,6 +29,8 @@ package org.reprap.scanning.Geometry;
 * The native class is simply defined by a bounding rectangle.
 * There is also the org.eclipse.tptp.platform.report.igc.util.internal.Ellipse class which has additional functionality not used by this.
 *		
+*Note that some formulae that traditionally use pi have been replaced to use tau where tau is defined as 2*pi. For an explanation of why this may make things clearer see That Tau Manifesto available at http://tauday.com/
+*
 ***********************************************************************************/
 import org.reprap.scanning.DataStructures.Image;
 import org.reprap.scanning.DataStructures.MatrixManipulations;
@@ -36,6 +38,7 @@ import org.reprap.scanning.DataStructures.MatrixManipulations;
 import Jama.Matrix;
 
 public class Ellipse {
+	private final static double tau=Math.PI*2;
 	Point2d center;
 	double a,b; // The minor and major semi-axis lengths
 	// Note that due to the symmetrical nature of the ellipse the angle may be out by 180 degrees (pi radians)
@@ -51,7 +54,7 @@ public class Ellipse {
 		b=othersemiaxis;
 		// rearrange a and b if need be
 		if (a<b){ a=othersemiaxis; b=onesemiaxis;}
-		orientationangle=longaxisanglewithxaxis%(Math.PI/2); // the angle can only be -90-90 degrees 
+		orientationangle=longaxisanglewithxaxis%(tau*0.25); // the angle can only be -90-90 degrees 
 		Calculatefocalpoints();
 	} // end constructor
 	
@@ -71,7 +74,7 @@ public class Ellipse {
 		
 		// We can not simply find the mid-point of 2 transformed points 180 degrees apart
 		// as angles are not preserved
-		double stepsize=(Math.PI*2)/(double)numberofsteps;
+		double stepsize=tau/(double)numberofsteps;
     	AxisAlignedBoundingBox box=new AxisAlignedBoundingBox();
 		Point2d[] newpoint=new Point2d[numberofsteps];
     	for (int i=0;i<numberofsteps;i++){
@@ -105,11 +108,11 @@ public class Ellipse {
 		b=Math.sqrt(bsquared);
   		// Remember orientation angle can only be -90-90 degrees
 		orientationangle=center.GetAngleMeasuredClockwiseFromPositiveX(newpoint[maxaindex]);
-		if (orientationangle>(Math.PI*1.5)) orientationangle=0-((Math.PI*2)-orientationangle);
-  		else if ((orientationangle<=(Math.PI) && (orientationangle>(Math.PI/2)))) orientationangle=0-(Math.PI-orientationangle);
-  		else if ((orientationangle>(Math.PI))  && (orientationangle<=(Math.PI*1.5))) orientationangle=orientationangle-Math.PI;
-		//orientationangle=orientationangle%Math.PI;
-  		//if (orientationangle>(Math.PI/2)) orientationangle=orientationangle-Math.PI; 
+		if (orientationangle>(tau*0.75)) orientationangle=0-(tau-orientationangle);
+  		else if ((orientationangle<=(tau*0.5) && (orientationangle>(tau*0.25)))) orientationangle=0-((tau*0.5)-orientationangle);
+  		else if ((orientationangle>(tau*0.5))  && (orientationangle<=(tau*0.75))) orientationangle=orientationangle-(tau*0.5);
+		//orientationangle=orientationangle%(tau*0.5);
+  		//if (orientationangle>(tau*0.25)) orientationangle=orientationangle-(tau*0.5); 
   		
   		Calculatefocalpoints();
 	} // end constructor
@@ -260,7 +263,7 @@ public class Ellipse {
 		
 		//Now go around the ellipse and increase the bounding box if need be at each point
 		for (int t=0;t<360;t++){
-			double tradians=((double)t/(double)180)*Math.PI;
+			double tradians=((double)t/(double)360)*tau;
 			Point2d edge=GetEllipseEdgePointParametric(tradians);
 			returnvalue.Expand2DBoundingBox(edge);
 		}
@@ -294,7 +297,7 @@ public class Ellipse {
 		// so we follow the y=mx+c line out from the center by +/- ae. This line can be constructed from the center point and orientationangle.
 		// But the method to do so assumes the distance is positive so adjust the angle by 180 degrees to do the negative one.
 		f1=center.GetOtherPoint(orientationangle,ae);
-		f2=center.GetOtherPoint(orientationangle+Math.PI,ae);	
+		f2=center.GetOtherPoint(orientationangle+(tau*0.5),ae);	
 	}
 	
 }
