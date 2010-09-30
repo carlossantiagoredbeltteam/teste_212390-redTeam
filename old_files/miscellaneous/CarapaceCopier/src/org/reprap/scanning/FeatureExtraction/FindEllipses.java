@@ -316,11 +316,11 @@ public class FindEllipses {
 								
 											// Tau is the angle at the center between the lines from the center to the second point and the third point
 											// (not to be confused with tau=2*pi)
-											// Note that by definition this is between 0-180 degrees or 0-pi radians so don't have to worry about acos function mapping tau to the wrong angle
+											// Note that by definition this is between 0-180 degrees or 0-tau/2 radians so don't have to worry about acos function mapping Tau to the wrong angle
 											//From the cosine rule:
 											//cosine rule: b^2=a^2+c^2-2ac*cosB or CosB=(a^2+c^2-b^2)/2ac
 											double cosineTau=(asquared+dsquared-fsquared)/Math.sqrt(4*asquared*dsquared);
-											double Tau=Math.acos(cosineTau);// acos will get the tau within 0-pi 0-180 degrees
+											double Tau=Math.acos(cosineTau);// acos will get the Tau within 0-tau/2 0-180 degrees
 											double sineTau=Math.sin(Tau);
 											double bsquared=(asquared*dsquared*sineTau*sineTau)/(asquared-(dsquared*cosineTau*cosineTau));
 											double b=Math.sqrt(bsquared);
@@ -330,7 +330,6 @@ public class FindEllipses {
 											// Set the accumulators
 											accumulator.increment(b); 
 											octants.Set(b,oct,true); // Set the boolean variable for this octant to true
-											
 											//} // end if direction within limits
 									} // end if within the correct distance
 								} // end if skip k
@@ -402,7 +401,7 @@ public class FindEllipses {
 	/*
 	private boolean ConvexDirectionWithinLimits(double angle, convexity convexdirection, direction directiontangent){
 		// Checks that the angle is appropriate
-		// i.e if the angle is +/- pi/8 radians (22.5 degrees) from the mid angle for this particular opposite
+		// i.e if the angle is +/-tau/16 radians (22.5 degrees) from the mid angle for this particular opposite
 		//	e.g. if two points have a vertical tangent direction then the angle between them must be within +/- 22.5 degrees of horizontal
 		// if one is set to left then the angle measured clockwise from the positive x axis must be within +/- 22.5 degrees
 		// but if the convexity is to the right then the angle must be 180 degrees +/- 22.5.

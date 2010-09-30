@@ -33,6 +33,7 @@ package org.reprap.scanning.Geometry;
 *
 ***********************************************************************************/
 import org.reprap.scanning.DataStructures.Image;
+import org.reprap.scanning.DataStructures.PixelColour;
 import org.reprap.scanning.DataStructures.MatrixManipulations;
 
 import Jama.Matrix;
@@ -215,7 +216,7 @@ public class Ellipse {
 		AxisAlignedBoundingBox boundingrectangle=GetAxisAlignedBoundingRectangle();
 		for (int x=(int)(boundingrectangle.minx-1);x<=(boundingrectangle.maxx+1);x++){
 			for (int y=(int)(boundingrectangle.miny-1);y<=(boundingrectangle.maxy+1);y++){
-				int value=(int)(image.InterpolatePixelBrightness(new Point2d(x,y)) & 0xff);
+				int value=(int)(image.InterpolatePixelColour(new Point2d(x,y)).getGreyscale() & 0xff);
 				if (value<black) black=value;
 				if (value>white) white=value; //whitestpixel=new Point2d(x,y);}
 			}
@@ -231,7 +232,7 @@ public class Ellipse {
 			for (int x=(int)(boundingrectangle.minx-1);x<=(boundingrectangle.maxx+1);x++){
 				for (int y=(int)(boundingrectangle.miny-1);y<=(boundingrectangle.maxy+1);y++){
 					Point2d point=new Point2d(x,y);
-					int value=(int)(image.InterpolatePixelBrightness(point) & 0xff);
+					int value=(int)(image.InterpolatePixelColour(point).getGreyscale() & 0xff);
 					if (PointInsideEllipse(point)){
 						totalinside++;
 						if ((value-black)<brightnessthreshold) blackinside++;
@@ -275,11 +276,12 @@ public class Ellipse {
 			int count=0;
 			double COGx=0;
 			double COGy=0;
+			PixelColour centercolour=image.InterpolatePixelColour(center);
 			for (int x=(int)(boundingbox.minx-1);x<(boundingbox.maxx+1);x++){
 				for (int y=(int)(boundingbox.miny-1);y<(boundingbox.maxy+1);y++){
 					Point2d ellipsepoint=new Point2d(x,y);
 					//if (PointInsideEllipse(ellipsepoint)){
-						if (image.CompareBrightness(ellipsepoint,center,threshold)){
+						if (centercolour.CompareColours(image.InterpolatePixelColour(ellipsepoint),threshold)){
 							COGx=COGx+(x-center.x);
 							COGy=COGy+(y-center.y);
 							count++;

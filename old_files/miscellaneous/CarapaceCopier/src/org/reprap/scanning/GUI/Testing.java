@@ -50,6 +50,7 @@ package org.reprap.scanning.GUI;
  *******************************************************************************/  
 import org.reprap.scanning.Calibration.CalibrateImage;
 import org.reprap.scanning.DataStructures.Image;
+import org.reprap.scanning.DataStructures.PixelColour;
 import org.reprap.scanning.FeatureExtraction.PointPairMatch;
 import org.reprap.scanning.Geometry.*;
 import javax.swing.JProgressBar;
@@ -187,7 +188,7 @@ public class Testing {
 				PointPair2D pair=new PointPair2D();
 				pair.pointone=point.clone();
 				boolean success=pair.EstimateSecondPoint(basepairs);
-				if (success) newimage[x][y][colours]=image.InterpolatePixelBrightness(pair.pointtwo);
+				if (success) newimage[x][y][colours]=image.InterpolatePixelColour(pair.pointtwo).getGreyscale();
 				else newimage[x][y][colours]=(byte)0;
 			}
 			if (x%100==0) System.out.print(".");

@@ -78,7 +78,7 @@ public class EdgeExtraction2D {
 		threshold=0;
 		height=image.height;
 		width=image.width;
-		byte[][] imagemap=image.ExportImageMap(); //The image map is currently the greyscale values of the blurred image
+		byte[][] imagemap=image.ExportGreyscaleImageMap(); //The image map is currently the greyscale values of the blurred image
 		// This is used as the source to create the edge strength, direction and convexity maps.
 		strengthmap=new byte[width][height];
 		directionmap=new direction[width][height];
