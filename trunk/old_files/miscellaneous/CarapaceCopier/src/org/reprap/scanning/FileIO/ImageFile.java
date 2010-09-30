@@ -41,6 +41,8 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
+import org.reprap.scanning.DataStructures.PixelColour;
+
 public class ImageFile {
 	private static final int bufferedimageformat=BufferedImage.TYPE_INT_RGB; // this is the colour format the internal representation of the image is in.
 	private String filename;
@@ -54,9 +56,9 @@ public class ImageFile {
 	// This reads in an image, potentially blurs it, and returns one channel of colour
 	//TODO if we are going to use colour for more than display purposes this should be changed, its a bad hack!
 	// The channel number is -1 for greyscale, 0 for blue, 8 for green, 16 for red, and 24 for the alpha
-	public byte[][] ReadImageFromFile(float[] filter, int channel){
+	public PixelColour[][] ReadImageFromFile(float[] filter, int channel){
 		BufferedImage image=null;
-		byte[][] imagemap=new byte[0][0];
+		PixelColour[][] imagemap=new PixelColour[0][0];
 		width=0;
 		height=0;
 			try{
@@ -85,13 +87,13 @@ public class ImageFile {
 					colourchannel=0;
 				}
 				// Convert the BufferedImage to a 2D byte array - note that by doing this y is the same direction as the initial buffered image i.e. 0 at top increasing down the image
-				imagemap=new byte[width][height];
+				imagemap=new PixelColour[width][height];
 				int temp[]= new int[width*height];
 				temp=image.getRGB(0,0,width,height,temp,0,width); //read the pixels into the int array
 				// This is the easiest native method to do this but we want to only have one channel
 				for(int y=0;y<height;y++)
 					for(int x=0;x<width;x++)
-						imagemap[x][y]=(byte)((temp[(y*width)+x] >> colourchannel) & 0xff);
+						imagemap[x][y]=new PixelColour((byte)((temp[(y*width)+x] >> colourchannel) & 0xff));
 			}
 		catch (Exception e) {
 				System.out.println("Error reading in file "+filename);

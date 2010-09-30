@@ -37,12 +37,10 @@ package org.reprap.scanning.Geometry;
  ******************************************************************************/
 
 	
-	
 	public class Coordinates
 	{
 		public Point2d pixel;
 		public double barycoordinates [];
-		public byte greyscale;
 		public int weight;
 		
 		
@@ -51,13 +49,11 @@ package org.reprap.scanning.Geometry;
 		{
 			pixel=new Point2d(0,0);
 			barycoordinates=new double[numCorners];
-			greyscale=(byte)0;
 			weight=0;
 		}
 		public Coordinates(){
 			pixel=new Point2d(0,0);
 			barycoordinates=new double[1];
-			greyscale=(byte)0;
 			weight=0;
 		   }
 		
@@ -69,7 +65,6 @@ package org.reprap.scanning.Geometry;
 			temp.pixel=new Point2d(pixel.x,pixel.y);
 			temp.barycoordinates=barycoordinates.clone();
 			temp.weight=weight;
-			temp.greyscale=greyscale;
 			return temp;
 		}
 

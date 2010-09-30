@@ -76,7 +76,6 @@ public class ImageSegmentation {
 	private PointBrightnessArray knowncalibrationsheetpointbrightnessvalues;
 	private double edgeresolutionthreshold;
 		// Constructors
-	// I
 	public ImageSegmentation(EdgeExtraction2D edges,Point2d[] calibrationsheetcorners){
 	width=edges.GetWidth();
 	height=edges.GetHeight();
@@ -118,7 +117,7 @@ public class ImageSegmentation {
 				nextstate[x][y]=states.valueOf("unknown");
 			}
 		}
-	//*/
+	
 	
 	// Go through and set unknown to edge if is an edge within the resolution threshold
 ///*
@@ -207,7 +206,7 @@ public ImageSegmentation clone(){
 				break;
 			case 2:
 				SetCalibrationSheetWeightedAverageWhitePixelsForEllipseCenters(ellipses, image);
-				SetKnownNonCalibrationSheetByBrightness(image);
+				SetKnownNonCalibrationSheetByGreyscaleValue(image);
 				break;
 			case 3:
 				FinalFloodFill();
@@ -279,7 +278,7 @@ public ImageSegmentation clone(){
 			// use the center of the ellipse as a starting point and work the way out in all four directions until finding a point that isn't calibration sheet
 			// take the brightness values of these four points and get the weighted average and use this as the value for the ellipse center
 			// It is assumed that the ellipse center is black and any values detected within the threshold of this black value are to be ignored
-			int blackvalue=(int)(image.InterpolatePixelBrightness(ellipses[i].GetCenter()) & 0xff);
+			int blackvalue=(int)(image.InterpolatePixelColour(ellipses[i].GetCenter()).getGreyscale() & 0xff);
 			PointBrightnessArray cardinalpoints=new PointBrightnessArray(8);
 			double maxdsquared=0;
 			for (int j=0;j<8;j++){
@@ -324,14 +323,14 @@ public ImageSegmentation clone(){
 			double maxdistance=Math.sqrt(maxdsquared);
 			for (int j=0;j<8;j++){
 				cardinalpoints.points[j]=ellipses[i].GetCenter().GetOtherPoint(j*(tau/8),maxdistance);
-				cardinalpoints.values[j]=(int)(image.InterpolatePixelBrightness(cardinalpoints.points[j]) & 0xff);
+				cardinalpoints.values[j]=(int)(image.InterpolatePixelColour(cardinalpoints.points[j]).getGreyscale() & 0xff);
 				
 			}
 			// Strip out those values that are too close to the blackvalue i.e. actually part of the black spot on the white calibration sheet
 			// First how many are there
 			int count=0;
 			for (int j=0;j<8;j++) if (Math.abs(cardinalpoints.values[j]-blackvalue)>threshold) count++;
-			if (count==8) knowncalibrationsheetpointbrightnessvalues.values[i]=GetAverageValueWeightedByInverseDistanceSquared(ellipses[i].GetCenter(), cardinalpoints.points,cardinalpoints.values);
+			if (count==8) knowncalibrationsheetpointbrightnessvalues.values[i]=GetAverageGreyscaleValueWeightedByInverseDistanceSquared(ellipses[i].GetCenter(), cardinalpoints.points,cardinalpoints.values);
 			else {
 				// Strip out the ones we don't want and use the rest.
 				Point2d[] points=new Point2d[count];
@@ -344,19 +343,19 @@ public ImageSegmentation clone(){
 						count++;
 					} // end if
 				} // end for j
-				knowncalibrationsheetpointbrightnessvalues.values[i]=GetAverageValueWeightedByInverseDistanceSquared(ellipses[i].GetCenter(), points,values);
+				knowncalibrationsheetpointbrightnessvalues.values[i]=GetAverageGreyscaleValueWeightedByInverseDistanceSquared(ellipses[i].GetCenter(), points,values);
 			} // end else
 		} // end for i
 	} // end method
 	
-	private void SetKnownNonCalibrationSheetByBrightness(Image image){
+	private void SetKnownNonCalibrationSheetByGreyscaleValue(Image image){
 		for (int x=0;x<width;x++){
 			for (int y=0;y<height;y++){
 				if (currentstate[x][y]==states.valueOf("unknown")){
 					// Find the brightness value of this pixel and compare it to the expected, if it is out by more than the threshold, set this unknown cell to other
 					Point2d point=new Point2d(x,y);
-					double expectedvalue=GetAverageValueWeightedByInverseDistanceSquared(point,knowncalibrationsheetpointbrightnessvalues.points,knowncalibrationsheetpointbrightnessvalues.values);
-					if (!image.CompareBrightness(point,(int)expectedvalue,threshold)) nextstate[x][y]=states.valueOf("other");
+					int expectedvalue=GetAverageGreyscaleValueWeightedByInverseDistanceSquared(point,knowncalibrationsheetpointbrightnessvalues.points,knowncalibrationsheetpointbrightnessvalues.values);
+					if (image.InterpolatePixelColour(point).CompareGreyscale(expectedvalue,threshold)) nextstate[x][y]=states.valueOf("other");
 				} // end if
 			} // end for y
 		} // end for x
@@ -420,7 +419,7 @@ boolean returnvalue=true;
 
 	// This takes as input an array of points and values for these points plus a target point and produces an expected value for the target point
 	// by taking the weighted average of the values using the inverse of the distance squared to the target point to weight them.
-	private double GetAverageValueWeightedByInverseDistanceSquared(Point2d target, Point2d[] points, double[] values){
+	private int GetAverageGreyscaleValueWeightedByInverseDistanceSquared(Point2d target, Point2d[] points, double[] values){
 		double oneoverdsquaredsum=0;
 		double weightedsum=0;
 		for (int i=0;i<points.length;i++){
@@ -428,7 +427,7 @@ boolean returnvalue=true;
 			oneoverdsquaredsum=oneoverdsquaredsum+oneoverdsquared;
 			weightedsum=weightedsum+(values[i]*oneoverdsquared);
 		}
-		return (weightedsum/oneoverdsquaredsum);
+		return (int)(weightedsum/oneoverdsquaredsum);
 	}
 	
 	private boolean[][] GetBoolean(states teststate){
