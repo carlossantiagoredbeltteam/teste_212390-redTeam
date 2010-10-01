@@ -86,7 +86,7 @@ public class Image {
 		edges=new EdgeExtraction2D();
 	//	distortion=new LensDistortion(); // creates a zero distortion class
 	}
-	// used to load in a image, convert it to greyscale but not additional filtering applied
+	// used to load in a image but no additional filtering applied
 	public Image(String imagename) {
 		// Initialise the imagemap etc. and set to defaults then try and load from file
 		// Then try and load preferences from file
@@ -206,7 +206,10 @@ public class Image {
 
 
 
-// 
+public void setWorldtoImageTransformMatrix(Matrix P){
+	WorldtoImageTransform=P.copy();
+	setWorldtoImageTransform=true;
+}
 public void setWorldtoImageTransformMatrix(){
 	Matrix K=getCameraMatrix();
 	Matrix R=calibration.getRotation();
@@ -234,6 +237,7 @@ public Point2d getWorldtoImageTransform(Point3d point){
 }
 
 // Methods to pass information to and from the more complicated private variables
+
 public Point2d[] GetEdgePoints(){
 	return edges.GetEdgePoints(originofimagecoordinates);
 }
@@ -246,11 +250,15 @@ public double GetEdgeResolution(){
 public void SetEdges(EdgeExtraction2D edge){
 	edges=edge.clone();
 }
+
 public void LimitEdgesToRaysThatIntersectAVolumeOfInterest(AxisAlignedBoundingBox boundingbox, AxisAlignedBoundingBox[] volumesofinterest){
 	edges.LimitToEdgeRaysThatIntersectAVolumeOfInterest(boundingbox, volumesofinterest,getWorldtoImageTransformMatrix(),originofimagecoordinates);
 }
 public void SetCalibrationSheet(boolean[][] calibration){
 	calibrationsheet=calibration.clone();
+}
+public boolean[][] getCalibrationSheetSegmentation(){
+	return calibrationsheet;
 }
 public boolean IsCalibrationSheet(Point3d worldpoint){
 	return IsCalibrationSheet(new MatrixManipulations().ConvertPointTo4x1Matrix(worldpoint));
@@ -379,7 +387,6 @@ public byte[] ConvertImageForDisplay(int numcolours)
 		tempindex=(height-y-1)*width*numcolours;
 		// if the y coordinate is already stored internally as inverted then don't worry about flipping it for display
 		for (int x=0;x<width;x++){
-			// TODO Apply the undistortion function to the pixel
 			Point2d target=new Point2d(x,y);
 			index=tempindex+(x*numcolours);
 			PixelColour colour=InterpolatePixelColour(target, Math.sqrt(2));
