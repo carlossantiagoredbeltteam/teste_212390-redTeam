@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  *
- * Last modified by Reece Arnott 7th August 2010
+ * Last modified by Reece Arnott 1st October 2010
  * 
  * Note that most of the layout commands were initially produced by NetBeans for JDK 6
  * and significantly modified by hand. For future reference if it needs to be done the other way the main things to change are:
@@ -249,10 +249,13 @@ public class Main extends JFrame {
 					else ChooseImagesAndOutputFile(); break;
 				case calibrationsheetinterrogation : 
 					FindCalibrationSheetCirclesEtc(); break;
+					// There is an if statement in this step that reads values from a file if it is an automatic step
 					// Note that the end is an unconditional call to this method with an incremented step
 					// i.e. automatically go onto the next step
+					// There is an if statement 
 				case calibration : 
 					Calibration(); break;  // this is one of the big ones
+					// There is an if statement in this step that reads values from: a properties file and two image files per original image file if it is an automatic step
 					// Note that the end is an unconditional call to this method with an incremented step
 					// i.e. automatically go onto the next step
 				case objectfinding : 
@@ -853,6 +856,31 @@ private void FindCalibrationSheetCirclesEtc(){
 								 catch (Exception e) { 
 									 System.out.println("Exception in updating the progress bar"+e.getMessage());
 						         }
+								 
+								 boolean compute=true;
+								
+								 if (prefs.AutomaticStep[currentstep.ordinal()])	{
+										compute=false;
+										try{
+											// Load the undistorted image
+											images[j]=new Image(new File(prefs.imagefiles.getElementAt(j).toString()).getParent()+File.separatorChar+"UndistortedImage"+new File(prefs.imagefiles.getElementAt(j).toString()).getName());
+											// Load the processed image properties
+											ProcessedImageProperties io=new ProcessedImageProperties(prefs.imagefiles.getElementAt(j).toString()+".properties");
+											io.loadProperties();
+											images[j].originofimagecoordinates=io.originofimagecoordinates.clone();
+											images[j].setWorldtoImageTransformMatrix(io.WorldToImageTransform); 	
+											images[j].skipprocessing=io.skipprocessing;
+											// Load the calibration sheet boolean array
+											// First load it from file into a PixelColour array, then convert that to a boolean array, dividing at greyscale value 128
+											if (!io.skipprocessing) images[j].SetCalibrationSheet(new PixelColour().ConvertGreyscaleToBoolean(new ImageFile(new File(prefs.imagefiles.getElementAt(j).toString()).getParent()+File.separatorChar+"SegmentedImage"+new File(prefs.imagefiles.getElementAt(j).toString()).getName()).ReadImageFromFile(new float[0],-1),images[j].width,images[j].height,128));		  		    				 
+										} // end try
+										catch (Exception e){
+											System.out.println("Error reading processed image properties from file, initiating real-time processing");
+											compute=true;
+											} // end catch
+								 } // end if
+
+								 if (compute){
 //Step 1
 								 Point2d[] ellipsecenters=FindEllipses(j);
 
@@ -872,8 +900,29 @@ private void FindCalibrationSheetCirclesEtc(){
 		      				ImageSegmentation(j); 
 		      				
     					  } // end if continue
-    		   
-	    					  if (print) System.out.println("Time to process image "+(j+1)+":"+(System.currentTimeMillis()-starttime)+"ms");
+	    					 // Save processed image if necessary
+	    					 if (prefs.SaveProcessedImageProperties){
+	    						 // Save the important calculated properties of the image
+	    						 ProcessedImageProperties io=new ProcessedImageProperties(prefs.imagefiles.getElementAt(j).toString()+".properties");
+	  		    			   	io.originofimagecoordinates=images[j].originofimagecoordinates.clone();
+	  		    			   	io.WorldToImageTransform=images[j].getWorldtoImageTransformMatrix().copy();
+	  		    			   	io.skipprocessing=images[j].skipprocessing;
+	  		    			   	try{io.saveProperties();}
+	  		    			   	catch (Exception e){System.out.println("Error writing processed image properties.");}
+	  		    			     // save the undistorted image
+	  		    				 GraphicsFeedback graphics=new GraphicsFeedback(print);
+	  		    				 graphics.ShowImage(images[j]);
+	  		    				 graphics.SaveImage(new File(prefs.imagefiles.getElementAt(j).toString()).getParent()+File.separatorChar+"UndistortedImage"+new File(prefs.imagefiles.getElementAt(j).toString()).getName());
+	  		    				 if (!images[j].skipprocessing){
+	  		    					 // save the image segmentation
+	  		    					 graphics=new GraphicsFeedback(print);
+	  		    					 graphics.ShowBinaryimage(images[j].getCalibrationSheetSegmentation(),images[j].width,images[j].height);
+	  		    					 graphics.SaveImage(new File(prefs.imagefiles.getElementAt(j).toString()).getParent()+File.separatorChar+"SegmentedImage"+new File(prefs.imagefiles.getElementAt(j).toString()).getName());
+	  		  					}
+	  		    		   } // end if save
+	    					 
+						} // end if compute    		   
+								  if (print) System.out.println("Time to process image "+(j+1)+":"+(System.currentTimeMillis()-starttime)+"ms");
 	    		    		   starttime=System.currentTimeMillis();
  // End of loop steps 1-5
 	    	 final int value=calibrationsheetinterrogationnumberofsteps+(calibrationnumberofsubsteps*(j+1));
@@ -1233,10 +1282,32 @@ private void FindCalibrationSheetCirclesEtc(){
 								 catch (Exception e) { 
 									 System.out.println("Exception in updating the progress bar"+e.getMessage());
 						         }
-							
-									
+	
+								 // We need to find values for these local variables, either by loading from file or by processing the calibration sheet
+								 // then we can use them to set the global variables needed
+								 Image calibrationsheet=new Image(); // only using the width and height values after the if statement
+								 double circleradius=0;
+								 Ellipse[] calibrationcircles=new Ellipse[0]; // only use the ellipse centers after the if statement
+								 boolean compute=true; // used to contol if the calibration sheet is interrogated or not
+	if (prefs.AutomaticStep[currentstep.ordinal()])	{
+		compute=false;
+		CalibrationSheetProperties io=new CalibrationSheetProperties(prefs.calibrationpatterns.getElementAt(prefs.CurrentCalibrationPatternIndexNumber).toString()+".properties");
+		try{
+			io.load();
+			circleradius=io.circleradius;
+			calibrationsheet.width=io.width;
+			calibrationsheet.height=io.height;
+			calibrationcircles=io.calibrationcircles.clone();
+			   
+		}
+		catch (Exception e){
+			System.out.println("Error reading in pre-computed calibration sheet properties. Reverting to interrogation of calibration sheet image");
+			compute=true;
+		}
+	}
+	if (compute) {
 		    		   // Read in the calibration image
-		    		   Image calibrationsheet=new Image(prefs.calibrationpatterns.getElementAt(prefs.CurrentCalibrationPatternIndexNumber).toString()); // Read in the image with no blurring filter kernel
+		    		   calibrationsheet=new Image(prefs.calibrationpatterns.getElementAt(prefs.CurrentCalibrationPatternIndexNumber).toString()); // Read in the image with no blurring filter kernel
 		    		   // Get the edge map for the calibration image	
 		    		   EdgeExtraction2D edges=new EdgeExtraction2D(calibrationsheet);
 		    		   edges.NonMaximalLocalSuppressionAndThresholdStrengthMap(prefs.AlgorithmSettingEdgeStrengthThreshold);
@@ -1277,14 +1348,24 @@ private void FindCalibrationSheetCirclesEtc(){
 									 System.out.println("Exception in updating the progress bar"+e.getMessage());
 						         }
 							  } // end while
-		    		   Ellipse[] calibrationcircles=find.getEllipses();
+		    		   calibrationcircles=find.getEllipses();
+		    		   circleradius=0;
 		    		   // Find the consensus radius for the calibration sheet circles i.e. the average of all the semi-minor and semi-major axis lengths
-		    		   double circleradius=0;
 		    		   for (int i=0;i<calibrationcircles.length;i++)  circleradius=circleradius+calibrationcircles[i].GetMinorSemiAxisLength()+calibrationcircles[i].GetMajorSemiAxisLength();
 		    		   circleradius=circleradius/(2*calibrationcircles.length);
+		    			if (prefs.SaveCalibrationSheetProperties){
+		    			   CalibrationSheetProperties io=new CalibrationSheetProperties(prefs.calibrationpatterns.getElementAt(prefs.CurrentCalibrationPatternIndexNumber).toString()+".properties");
+		    			   io.circleradius=circleradius;
+		    			   io.width=calibrationsheet.width;
+		    			   io.height=calibrationsheet.height;
+		    			   io.calibrationcircles=calibrationcircles.clone();
+		    			   try{io.save();}
+		    			   catch (Exception e){System.out.println("Error writing calibration sheet properties.");}
+		    		   } // end if save
+	} // end if compute
+		    		 		   
 		    		   // simple if statements to find the width and height of the calibration sheet in mm.
-		    		   // 
-		   				double w,h;
+		    		   double w,h;
 		   				if (prefs.PaperSizeIsCustom.isSelected()){ w= Double.valueOf(prefs.PaperCustomSizeWidthmm.getText()); h=Double.valueOf(prefs.PaperCustomSizeHeightmm.getText());}
 		   				else {Papersize current=(Papersize)prefs.PaperSizeList.getElementAt(prefs.CurrentPaperSizeIndexNumber);w=current.width;h=current.height;}
 		   				// Swap w and h around if using landscape
@@ -1323,12 +1404,9 @@ private void FindCalibrationSheetCirclesEtc(){
 		       		   }
 		 
 		    		   // Convert the centres of the circles from the calibration sheet to a real world (i.e. in terms of mm) coordinate system with the origin at the center of the sheet and round them to the nearest pixel
-		    		  // And put them in a Point2d array
+		    		  // And put them in a Point2d array after changing the coordinate system to have the origin in the center of the calibration sheet (assuming the current calibration sheet coordinate system has 0,0 at the bottom left corner.)
 					  calibrationcirclecenters=new Point2d[calibrationcircles.length];
-		    		  Point2d calibrationcsheetcenter=new Point2d(calibrationsheetwidth/2,calibrationsheetheight/2); // This assumes the current calibration sheet coordinate system has 0,0 at the bottom left corner.
-		    		  // Also set the calibration sheet origin to be the centre in case it is needed later on
-		    		  calibrationsheet.originofimagecoordinates=new Point2d(0,0);
-		    		  calibrationsheet.originofimagecoordinates.minus(calibrationcsheetcenter);
+		    		  Point2d calibrationcsheetcenter=new Point2d(calibrationsheetwidth/2,calibrationsheetheight/2); 
 		    		  for (int i=0;i<calibrationcircles.length;i++){
 		    			  calibrationcirclecenters[i]=new Point2d((calibrationcircles[i].GetCenter().x*xscale),(calibrationcircles[i].GetCenter().y*yscale));
 		    			   calibrationcirclecenters[i].minus(calibrationcsheetcenter);

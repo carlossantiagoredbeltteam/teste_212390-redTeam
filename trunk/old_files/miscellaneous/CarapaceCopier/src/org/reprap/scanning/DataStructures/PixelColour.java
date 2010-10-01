@@ -101,4 +101,12 @@ public class PixelColour {
 	public boolean CompareGreyscale(PixelColour other, int threshold){
 		return CompareGreyscale(other.greyscale,threshold);
 	}
+	public boolean[][] ConvertGreyscaleToBoolean(PixelColour[][] array, int width, int height,int threshold){
+		boolean[][] returnvalue=new boolean[width][height];
+		for (int i=0;i<width;i++)
+			for (int j=0;j<height;j++){
+				returnvalue[i][j]=(int)(array[i][j].greyscale & 0xff)>=threshold;
+			}
+		return returnvalue;
+	}
 }

@@ -105,7 +105,25 @@ public class GraphicsFeedback {
 		imagewidth=w;
 		imageheight=h;
 	}
-
+	public void ShowBinaryimage(boolean[][] image, int w, int h){
+		GLimage=new byte[(h+1)*(w+1)*numcolours];
+		imagewidth=w;
+		imageheight=h;
+		int tempindex,index;
+		// 	Read pixels in a row at a time taking care to flip the image at the same time
+		for (int y=0;y<h; y++)
+		{
+			tempindex=(h-y-1)*w*numcolours;
+			// if the y coordinate is already stored internally as inverted then don't worry about flipping it for display
+			for (int x=0;x<w;x++){
+				index=tempindex+(x*numcolours);
+				byte colour;
+				if (image[x][y]) colour=(byte)255; else colour=(byte)0;
+				for (int colours=0;colours<numcolours;colours++) GLimage[index+colours]=colour;
+			} // end for x
+		} // end for y
+		
+	}
 	public void ShowByteArray(byte[][][] map, int w, int h){
 			GLimage=new byte[(h+1)*(w+1)*numcolours];
 			imagewidth=w;

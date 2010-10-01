@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 10th August 2010
+ * Last modified by Reece Arnott 1st October 2010
  *
  *****************************************************************************/
 
@@ -64,7 +64,7 @@ public class MainPreferences {
 	// These variables determine the preferences file names and folder
 	private static final String propsFile = "reprapscanning.properties";
 	private static final String propsFolder = ".reprap";
-	private static String path; // The path to the preferences folder. Set by the constructor
+	private static String path; // The path to the preferences file. Set by the constructor
 	public JTextField OutputFileName;
 	public JTextField OutputObjectName;
 	public String DebugSaveOutputImagesFolder;
@@ -75,12 +75,13 @@ public class MainPreferences {
 	public int AlgorithmSettingEdgeStrengthThreshold;
 	public int AlgorithmSettingMinimumNumberofIntersectingRayPairsForPointEstimation;
 	public int AlgorithmSettingVolumeSubDivision;
-	
 	public JFormattedTextField PaperMarginHorizontalmm;
 	public JFormattedTextField PaperMarginVerticalmm;
 	public JFormattedTextField PaperCustomSizeWidthmm;
 	public JFormattedTextField PaperCustomSizeHeightmm;
 	public boolean SaveOnProgramWindowClose;
+	public boolean SaveCalibrationSheetProperties;
+	public boolean SaveProcessedImageProperties;
 	public boolean[] AutomaticStep; 
 	public boolean SaveOnProgramCancel;
 	public boolean SaveOnProgramFinish;
@@ -123,6 +124,8 @@ public class MainPreferences {
 		SaveOnProgramWindowClose = true;
 		SaveOnProgramCancel = false;
 		SaveOnProgramFinish = true;
+		SaveCalibrationSheetProperties=true;
+		SaveProcessedImageProperties=false;
 		//DebugShow3DModel=false;
 		DebugImageOverlay=false;
 		DebugImageSegmentation=false;
@@ -130,7 +133,7 @@ public class MainPreferences {
 		BlankOutputFilenameOnLoad=true;
 		AutomaticStep = new boolean[numberofsteps];
 		for (int i=0;i<AutomaticStep.length;i++) AutomaticStep[i]=false;
-		
+		AutomaticStep[2]=true;
 		// Set up checkboxes (including default selected state)
 		CalibrationSheetKeepAspectRatioWhenPrinted=new JCheckBox("Preserve Aspect Ratio",true);
 		PaperSizeIsCustom=new JCheckBox("Custom Paper Size",false);
@@ -210,6 +213,8 @@ public class MainPreferences {
 			if (temp.getProperty("SaveOnProgramWindowClose")!=null) SaveOnProgramWindowClose = temp.getProperty("SaveOnProgramWindowClose").equals("true");
 			if (temp.getProperty("SaveOnProgramCancel")!=null) SaveOnProgramCancel = temp.getProperty("SaveOnProgramCancel").equals("true");
 			if (temp.getProperty("SaveOnProgramFinish")!=null) SaveOnProgramFinish = temp.getProperty("SaveOnProgramFinish").equals("true");
+			if (temp.getProperty("SaveCalibrationSheetProperties")!=null) SaveCalibrationSheetProperties = temp.getProperty("SaveCalibrationSheetProperties").equals("true");
+			if (temp.getProperty("SaveProcessedImageProperties")!=null) SaveProcessedImageProperties = temp.getProperty("SaveProcessedImageProperties").equals("true");
 			if (temp.getProperty("BlankOutputFilenameOnLoad")!=null) BlankOutputFilenameOnLoad = temp.getProperty("BlankOutputFilenameOnLoad").equals("true");
 			//if (temp.getProperty("DebugShow3DModel")!=null) DebugShow3DModel = temp.getProperty("DebugShow3DModel").equals("true");
 			if (temp.getProperty("DebugImageOverlay")!=null) DebugImageOverlay = temp.getProperty("DebugImageOverlay").equals("true");
@@ -352,11 +357,12 @@ public class MainPreferences {
 	    temp.setProperty("PaperCustomSizeHeightmm",PaperCustomSizeHeightmm.getText());
 		// Save Strings
 		temp.setProperty("DebugSaveOutputImagesFolder",DebugSaveOutputImagesFolder);
-		
 		// Save boolean variables
 		temp.setProperty("SaveOnProgramFinish", String.valueOf(SaveOnProgramFinish));
 		temp.setProperty("SaveOnProgramWindowClose", String.valueOf(SaveOnProgramWindowClose));
 		temp.setProperty("SaveOnProgramCancel", String.valueOf(SaveOnProgramCancel));
+		temp.setProperty("SaveCalibrationSheetProperties", String.valueOf(SaveCalibrationSheetProperties));
+		temp.setProperty("SaveProcessedImageProperties", String.valueOf(SaveProcessedImageProperties));
 		temp.setProperty("BlankOutputFilenameOnLoad", String.valueOf(BlankOutputFilenameOnLoad));
 		//temp.setProperty("DebugShow3DModel", String.valueOf(DebugShow3DModel));
 		temp.setProperty("DebugImageOverlay", String.valueOf(DebugImageOverlay));

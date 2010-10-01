@@ -133,7 +133,7 @@ public class ImageSegmentation {
 									currentstate[x+dx][y+dy]=states.valueOf("edge");
 									nextstate[x+dx][y+dy]=states.valueOf("edge");
 								} // end if
-	//*/			
+	//*/		
 } // end constructor
 
 	public ImageSegmentation(int w,int h, int t){
@@ -213,8 +213,6 @@ public ImageSegmentation clone(){
 				break;
 			}
 			NextTimeStep();
-			//Display();
-			
 		}
 		return progressbar;
 	} // end of method
@@ -355,7 +353,7 @@ public ImageSegmentation clone(){
 					// Find the brightness value of this pixel and compare it to the expected, if it is out by more than the threshold, set this unknown cell to other
 					Point2d point=new Point2d(x,y);
 					int expectedvalue=GetAverageGreyscaleValueWeightedByInverseDistanceSquared(point,knowncalibrationsheetpointbrightnessvalues.points,knowncalibrationsheetpointbrightnessvalues.values);
-					if (image.InterpolatePixelColour(point).CompareGreyscale(expectedvalue,threshold)) nextstate[x][y]=states.valueOf("other");
+					if (!image.InterpolatePixelColour(point).CompareGreyscale(expectedvalue,threshold)) nextstate[x][y]=states.valueOf("other");
 				} // end if
 			} // end for y
 		} // end for x
