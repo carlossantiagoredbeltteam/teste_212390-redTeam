@@ -68,7 +68,7 @@ public class PixelColour {
 		return returnvalue;
 	}
 	
-	public PixelColour WeightedAverageColour(double[] weights, PixelColour[] colours){
+	public void SetPixelToWeightedAverageColour(double[] weights, PixelColour[] colours){
 		double weightsum=0;
 		double redsum=0;
 		double greensum=0;
@@ -83,13 +83,13 @@ public class PixelColour {
 				// can't just add 128 as it is 2's complement so -1<->255, -2<->254 .. -127<->128 etc.
 			}
 		}
-		byte red=(byte)((int)(redsum/weightsum));
-		byte green=(byte)((int)(greensum/weightsum));
-		byte blue=(byte)((int)(bluesum/weightsum));
-		PixelColour returnvalue=new PixelColour(red,green,blue);
-		return returnvalue;
+		r=(byte)((int)(redsum/weightsum));
+		g=(byte)((int)(greensum/weightsum));
+		b=(byte)((int)(bluesum/weightsum));
+		greyscale=ConvertColourToGreyscale(r,g,b);
 	}
-	public PixelColour WeightedAverageColour(double[] weights, PixelColour[] colours, int truncate){
+	
+	public void SetPixelToWeightedAverageColour(double[] weights, PixelColour[] colours, int truncate){
 	PixelColour[] newcolours=colours.clone();
 	double[] newweights=weights.clone();
 		if (truncate<colours.length){
@@ -100,8 +100,9 @@ public class PixelColour {
 			newweights=new double[truncate];
 			for (int i=0;i<truncate;i++) newweights[i]=weights[i];
 		}
-		return WeightedAverageColour(newweights,newcolours);
+		SetPixelToWeightedAverageColour(newweights,newcolours);
 	}
+	
 	public byte getGreyscale(){
 		return greyscale;
 	}
