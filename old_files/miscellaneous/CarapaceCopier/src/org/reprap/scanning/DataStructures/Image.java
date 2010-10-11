@@ -453,7 +453,9 @@ public PixelColour InterpolatePixelColour(Point2d target){
 				} // end for x
 			} //end for y.
 			// now get the weighted average colour
-			return new PixelColour().WeightedAverageColour(weights,colours,count);
+			PixelColour returnvalue=new PixelColour();
+			returnvalue.SetPixelToWeightedAverageColour(weights,colours,count);
+			return returnvalue;
 			} // end else
 		} // end of method
 	
@@ -471,7 +473,9 @@ public PixelColour InterpolatePixelColour(Point2d target){
 		double oneoverrsquared=1/maxdistancesquared;
 		for (int i=0;i<source.length;i++)	weights[i]=1-(dsquared[i]*oneoverrsquared);
 		// now get the weighted average colour
-		return new PixelColour().WeightedAverageColour(weights,colours);
+		PixelColour returnvalue=new PixelColour();
+		returnvalue.SetPixelToWeightedAverageColour(weights,colours);
+		return returnvalue;
 		} // end of method
 	
 	
