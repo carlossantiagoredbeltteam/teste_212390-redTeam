@@ -78,13 +78,24 @@ public class ImageFile {
 					image=blur.filter(image,null);
 				}
 				// Convert the BufferedImage to a 2D PixelColour array - note that by doing this y is the same direction as the initial buffered image i.e. 0 at top increasing down the image
+				// First get the colours and then greyscale values into 2 1d int arrays, then combine them
 				imagemap=new PixelColour[width][height];
-				int temp[]= new int[width*height];
-				temp=image.getRGB(0,0,width,height,temp,0,width); //read the pixels into the int array
+				int colour[]= new int[width*height];
+				colour=image.getRGB(0,0,width,height,colour,0,width); //read the pixels into the int array
 				// This is the easiest native method to do this but we want to read the pixels into a 2d array with the colour channels seperated and the greyscale value pre-calculated
+				// so also set up a greyscale version of the array and then feed the information into a 2d PixelColour array
+				// First convert the buffered image to greyscale
+				ColorConvertOp colorConvert = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+				colorConvert.filter(image, image);
+				int greyscale[]= new int[width*height];
+				greyscale=image.getRGB(0,0,width,height,greyscale,0,width); //read the pixels into the int array
+				// Now load up the PixelColour Array
 				for(int y=0;y<height;y++)
-					for(int x=0;x<width;x++)
-						imagemap[x][y]=new PixelColour(temp[(y*width)+x]);
+					for(int x=0;x<width;x++){
+						int index=(y*width)+x;
+						imagemap[x][y]=new PixelColour(colour[index],(byte)(greyscale[index] & 0xff));
+					}
+						
 			}
 		catch (Exception e) {
 				System.out.println("Error reading in file "+filename);
