@@ -23,7 +23,7 @@ package org.reprap.scanning.FileIO;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 6th August 2010
+* Last modified by Reece Arnott 11th October 2010
 *  
 *************************************************************************************/
 import java.awt.Graphics;
@@ -54,9 +54,7 @@ public class ImageFile {
 	
 	
 	// This reads in an image, potentially blurs it, and returns one channel of colour
-	//TODO if we are going to use colour for more than display purposes this should be changed, its a bad hack!
-	// The channel number is -1 for greyscale, 0 for blue, 8 for green, 16 for red, and 24 for the alpha
-	public PixelColour[][] ReadImageFromFile(float[] filter, int channel){
+	public PixelColour[][] ReadImageFromFile(float[] filter){
 		BufferedImage image=null;
 		PixelColour[][] imagemap=new PixelColour[0][0];
 		width=0;
@@ -79,21 +77,14 @@ public class ImageFile {
 					BufferedImageOp blur = new ConvolveOp( new Kernel(n,n,filter));
 					image=blur.filter(image,null);
 				}
-				int colourchannel=channel;
-				//convert to greyscale using the inbuilt functions. This replaces the if statements below in the nested for loops
-				if (channel==-1){
-					ColorConvertOp colorConvert = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
-					colorConvert.filter(image, image);
-					colourchannel=0;
-				}
-				// Convert the BufferedImage to a 2D byte array - note that by doing this y is the same direction as the initial buffered image i.e. 0 at top increasing down the image
+				// Convert the BufferedImage to a 2D PixelColour array - note that by doing this y is the same direction as the initial buffered image i.e. 0 at top increasing down the image
 				imagemap=new PixelColour[width][height];
 				int temp[]= new int[width*height];
 				temp=image.getRGB(0,0,width,height,temp,0,width); //read the pixels into the int array
-				// This is the easiest native method to do this but we want to only have one channel
+				// This is the easiest native method to do this but we want to read the pixels into a 2d array with the colour channels seperated and the greyscale value pre-calculated
 				for(int y=0;y<height;y++)
 					for(int x=0;x<width;x++)
-						imagemap[x][y]=new PixelColour((byte)((temp[(y*width)+x] >> colourchannel) & 0xff));
+						imagemap[x][y]=new PixelColour(temp[(y*width)+x]);
 			}
 		catch (Exception e) {
 				System.out.println("Error reading in file "+filename);
