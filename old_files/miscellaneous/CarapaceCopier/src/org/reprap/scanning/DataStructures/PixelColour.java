@@ -26,6 +26,7 @@ package org.reprap.scanning.DataStructures;
 * Last modified by Reece Arnott 11th October 2010
 * 
 * Colour abstracted out so that both greyscale and colour processing can take place
+* Note that the greyscale value is not calculated from the RGB colour values. It is assumed to be precalculated and feed to the constructor
 *
 ************************************************************************************/
 
@@ -42,29 +43,28 @@ public class PixelColour {
 		g=grey;
 		b=grey;
 	}
-	public PixelColour(byte red, byte green, byte blue){
-		r=red;
-		g=green;
-		b=blue;
-		greyscale=ConvertColourToGreyscale(r,g,b);
-	}
 	public PixelColour(){
 		greyscale=(byte)0;
 		r=(byte)0;
 		g=(byte)0;
 		b=(byte)0;
 		}
-	public PixelColour(int ARGB){
+	public PixelColour(int ARGB, byte grey){
 	// Note that it is assumed that the int encodes the pixel colour in the default format of 8 bits for each of Alpha, Red, Green, Blue (and we are ignoring the Alpha channel)
+	// The greyscale value is a given and is not calculated within this class
 		r=(byte)((ARGB >> 16) & 0xff);
 		g=(byte)((ARGB >> 8) & 0xff);
 		b=(byte)((ARGB >> 0) & 0xff);
-		greyscale=ConvertColourToGreyscale(r,g,b);
+		greyscale=grey;
 	}
 	
 	
 	public PixelColour clone(){
-		PixelColour returnvalue=new PixelColour(r,g,b);
+		PixelColour returnvalue=new PixelColour();
+		returnvalue.r=r;
+		returnvalue.g=g;
+		returnvalue.b=b;
+		returnvalue.greyscale=greyscale;
 		return returnvalue;
 	}
 	
@@ -73,12 +73,14 @@ public class PixelColour {
 		double redsum=0;
 		double greensum=0;
 		double bluesum=0;
+		double greysum=0;
 		for (int i=0;i<colours.length;i++){
 			if (i<weights.length){
 				weightsum=weightsum+weights[i];
 				redsum=redsum+((int)(colours[i].r & 0xff)*weights[i]);
 				greensum=greensum+((int)(colours[i].g & 0xff)*weights[i]);
 				bluesum=bluesum+((int)(colours[i].b & 0xff)*weights[i]);
+				greysum=greysum+((int)(colours[i].greyscale & 0xff)*weights[i]);
 				// note the & 0xff of the signed bit as otherwise direct conversion to int assumes it -128..127 not 0..255 
 				// can't just add 128 as it is 2's complement so -1<->255, -2<->254 .. -127<->128 etc.
 			}
@@ -86,7 +88,7 @@ public class PixelColour {
 		r=(byte)((int)(redsum/weightsum));
 		g=(byte)((int)(greensum/weightsum));
 		b=(byte)((int)(bluesum/weightsum));
-		greyscale=ConvertColourToGreyscale(r,g,b);
+		greyscale=(byte)((int)(greysum/weightsum));
 	}
 	
 	public void SetPixelToWeightedAverageColour(double[] weights, PixelColour[] colours, int truncate){
@@ -129,6 +131,7 @@ public class PixelColour {
 	public boolean CompareGreyscale(PixelColour other, int threshold){
 		return CompareGreyscale(other.greyscale,threshold);
 	}
+	
 	public boolean[][] ConvertGreyscaleToBoolean(PixelColour[][] array, int width, int height,int threshold){
 		boolean[][] returnvalue=new boolean[width][height];
 		for (int i=0;i<width;i++)
@@ -137,19 +140,5 @@ public class PixelColour {
 			}
 		return returnvalue;
 	}
-	
-	
-	
-	
-	
-	private byte ConvertColourToGreyscale(byte red, byte green, byte blue){
-		//TODO replace this with a call to a standard java library colour conversion library?
-		// Use the standard formulation for Luminance to convert to greyscale using different weightings 
-		// of the photometric brightness of an object, taking into account the wavelength-dependent sensitivity of the human eye
-		// and assumning there is no gamma correction.
-		double grey=0.3*((int)(red & 0xff))+0.59*((int)(green & 0xff))+0.11*((int)(blue & 0xff));
-		return (byte)((int)grey & 0xff);
-	}
-	
 	
 }
