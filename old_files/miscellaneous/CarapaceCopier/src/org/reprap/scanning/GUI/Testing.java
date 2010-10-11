@@ -23,7 +23,7 @@ package org.reprap.scanning.GUI;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 4th Feburary 2010
+ * Last modified by Reece Arnott 11th October 2010
  * 
  * This is test code used to test the success of the combinatorial approach to point matching on different combinations/permutations of found points on a calibration sheet
  *
@@ -173,23 +173,17 @@ public class Testing {
 		}		
 		
 		Point2d offset=new Point2d((double)calibrationwidth/2,(double)calibrationheight/2);
-		byte[][][] newimage=new byte[pixelswide][pixelshigh][3];
-		for (int colours=0;colours<3;colours++){
-			switch (colours){
-			case 0: image.OverwriteGreyscaleWithRedChannel(); break;
-			case 1: image.OverwriteGreyscaleWithGreenChannel(); break;
-			case 2: image.OverwriteGreyscaleWithBlueChannel(); break;
-			}
+		PixelColour[][] newimage=new PixelColour[pixelswide][pixelshigh];
 		for (int x=0;x<pixelswide;x++){
 			for (int y=0;y<pixelshigh;y++){
-				// calculate the point pair for each pixel of the calibration sheet and get the greyscale value
+				// calculate the point pair for each pixel of the calibration sheet and get the colour value
 				Point2d point=new Point2d(x*(calibrationwidth/pixelswide),y*(calibrationheight/pixelshigh));
 				point.minus(offset);
 				PointPair2D pair=new PointPair2D();
 				pair.pointone=point.clone();
 				boolean success=pair.EstimateSecondPoint(basepairs);
-				if (success) newimage[x][y][colours]=image.InterpolatePixelColour(pair.pointtwo).getGreyscale();
-				else newimage[x][y][colours]=(byte)0;
+				if (success) newimage[x][y]=image.InterpolatePixelColour(pair.pointtwo);
+				else newimage[x][y]=new PixelColour();
 			}
 			if (x%100==0) System.out.print(".");
 		}
@@ -201,15 +195,13 @@ public class Testing {
 			int y=(int)(point.y*(pixelshigh/calibrationheight));
 			for (int dx=-(int)pixelswide/200;dx<pixelswide/200;dx++){
 				for (int dy=-(int)pixelshigh/200;dy<pixelshigh/200;dy++){
-					if ((x+dx>=0) && (x+dx<pixelswide) && (y+dy>=0) && (y+dy<=pixelshigh)) newimage[x+dx][y+dy][colours]=(byte)255;
+					if ((x+dx>=0) && (x+dx<pixelswide) && (y+dy>=0) && (y+dy<=pixelshigh)) newimage[x+dx][y+dy]=new PixelColour((byte)255);
 				}
 			}
 		}
-		System.out.println();
-		} // end for colours
 		
 		GraphicsFeedback graphics=new GraphicsFeedback(false);
-		graphics.ShowByteArray(newimage,pixelswide,pixelshigh);
+		graphics.ShowPixelColourArray(newimage,pixelswide,pixelshigh);
 		graphics.SaveImage(filename);
 	}// Note this assumes the global variable image has been initialised with the source image
 	

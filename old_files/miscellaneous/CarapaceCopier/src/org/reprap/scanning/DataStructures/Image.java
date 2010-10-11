@@ -23,7 +23,7 @@ package org.reprap.scanning.DataStructures;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 30th September 2010
+ * Last modified by Reece Arnott 11th October 2010
  * 
  * These are methods that store the image and and additional information together
  * This includes the edge map, camera calibration matrices and the point pair matches of points in the image with the calibration sheet 
@@ -160,7 +160,8 @@ public class Image {
 
 	
 	 //TODO these are only used in the Gui Testing class. If they are to be used elsewhere this should be changed. Its a bad hack!
- 	public void OverwriteGreyscaleWithRedChannel(){
+ 	/*
+	public void OverwriteGreyscaleWithRedChannel(){
  	ImageFile inputfile=new ImageFile(filename);
  	imagemap=inputfile.ReadImageFromFile(blur,16); // 16 is the red channel by default
  	}
@@ -176,7 +177,7 @@ public class Image {
  	ImageFile inputfile=new ImageFile(filename);
  	imagemap=inputfile.ReadImageFromFile(blur,-1); // -1 is for a greyscale image
  	}
-
+*/
 	
 	
 	public void CopyCalibrationParameters(Image other){
@@ -478,7 +479,7 @@ public PixelColour InterpolatePixelColour(Point2d target){
 	private void ReadImageFromFile(float[] filter){
 		blur=filter.clone();
 		ImageFile inputfile=new ImageFile(filename);
-		imagemap=inputfile.ReadImageFromFile(filter,-1); // -1 is greyscale image
+		imagemap=inputfile.ReadImageFromFile(filter); 
 		width=inputfile.width;
 		height=inputfile.height;
 		calibrationsheet=new boolean[width][height];

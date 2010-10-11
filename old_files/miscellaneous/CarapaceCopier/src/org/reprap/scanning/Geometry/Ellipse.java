@@ -281,7 +281,7 @@ public class Ellipse {
 				for (int y=(int)(boundingbox.miny-1);y<(boundingbox.maxy+1);y++){
 					Point2d ellipsepoint=new Point2d(x,y);
 					//if (PointInsideEllipse(ellipsepoint)){
-						if (centercolour.CompareColours(image.InterpolatePixelColour(ellipsepoint),threshold)){
+						if (centercolour.CompareGreyscale(image.InterpolatePixelColour(ellipsepoint),threshold)){
 							COGx=COGx+(x-center.x);
 							COGy=COGy+(y-center.y);
 							count++;

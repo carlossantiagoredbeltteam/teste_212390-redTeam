@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  *
- * Last modified by Reece Arnott 1st October 2010
+ * Last modified by Reece Arnott 11th October 2010
  * 
  * Note that most of the layout commands were initially produced by NetBeans for JDK 6
  * and significantly modified by hand. For future reference if it needs to be done the other way the main things to change are:
@@ -872,7 +872,7 @@ private void FindCalibrationSheetCirclesEtc(){
 											images[j].skipprocessing=io.skipprocessing;
 											// Load the calibration sheet boolean array
 											// First load it from file into a PixelColour array, then convert that to a boolean array, dividing at greyscale value 128
-											if (!io.skipprocessing) images[j].SetCalibrationSheet(new PixelColour().ConvertGreyscaleToBoolean(new ImageFile(new File(prefs.imagefiles.getElementAt(j).toString()).getParent()+File.separatorChar+"SegmentedImage"+new File(prefs.imagefiles.getElementAt(j).toString()).getName()).ReadImageFromFile(new float[0],-1),images[j].width,images[j].height,128));		  		    				 
+											if (!io.skipprocessing) images[j].SetCalibrationSheet(new PixelColour().ConvertGreyscaleToBoolean(new ImageFile(new File(prefs.imagefiles.getElementAt(j).toString()).getParent()+File.separatorChar+"SegmentedImage"+new File(prefs.imagefiles.getElementAt(j).toString()).getName()).ReadImageFromFile(new float[0]),images[j].width,images[j].height,128));		  		    				 
 										} // end try
 										catch (Exception e){
 											System.out.println("Error reading processed image properties from file, initiating real-time processing");
