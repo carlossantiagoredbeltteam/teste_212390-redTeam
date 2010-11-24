@@ -23,7 +23,7 @@ package org.reprap.scanning.FeatureExtraction;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 25th May 2010
+ * Last modified by Reece Arnott 25th November 2010
  * 
  *  Steps to do 3D edge detection:
  *  	- Construct fundamental matrix and from that get image rectification homographies (y coordinates are lined up for corresponding 3d points)
@@ -312,7 +312,6 @@ public class EdgeExtraction3D {
 	public void CalculateValid3DEdges(Image[] images, int minnumberofintersectingraypairs){
 		TotalPoints=0;
 		for (int index=0;index<images.length;index++){
-		// TODO consistent tests in voxel and edgeextraction3d - maybe abstract them out into calibrated image?
 		for (int i=0;i<numberofedges[index];i++){
 			boolean valid=(!estimated[index][i].skip(minnumberofintersectingraypairs*2));
 			if (valid) { // If there is any point to estimate, do so	
@@ -320,25 +319,9 @@ public class EdgeExtraction3D {
 				Point3d value=estimated[index][i].GetEstimated3dPoint();
 				// Make sure the point is inside the volume of interest
 				valid=volumeofinterest.PointInside3DBoundingBox(value);
-				// Skip if the point is not within any image (or behind the camera).
-				if (valid){
-					boolean voxelisoutside=false;
-					for (int j=0; j<images.length;j++)  if (!images[j].skipprocessing) if (!voxelisoutside){
-					Point2d p=images[j].getWorldtoImageTransform(value);
-					voxelisoutside=(p.x<0) || (p.x>=images[j].width) || (p.y<0) || (p.y>=images[j].height) || (images[j].WorldPointBehindCamera(new MatrixManipulations().ConvertPointTo4x1Matrix(value)));
-					} // end if/for j
-					valid=!voxelisoutside;
-				}
-				if (valid){
-					//	Skip if the point is back projected to the calibration sheet in any image 
-					boolean isCalibrationSheet=false;
-					for (int j=0; j<images.length;j++)  if (!images[j].skipprocessing) {
-						if (!isCalibrationSheet) isCalibrationSheet=images[j].IsCalibrationSheet(value);
-					} // end if/for j
-					valid=!isCalibrationSheet;
-				}
+				// Check the point is designated as part of the object for each image
+				for (int j=0; j<images.length;j++)  if (!images[j].skipprocessing) if (valid) valid=images[j].PointIsPartOfObject(value);
 				if (valid) TotalPoints++; 
-
 			}
 			estimated[index][i].SetSkip(!valid);
 		}

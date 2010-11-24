@@ -2,7 +2,6 @@ package org.reprap.scanning.DataStructures;
 
 import org.reprap.scanning.Geometry.AxisAlignedBoundingBox;
 import org.reprap.scanning.Geometry.Point2d;
-import org.reprap.scanning.Geometry.Point3d;
 import org.reprap.scanning.Geometry.PointPair2D;
 
 import ZS.Solve.LM;
@@ -33,7 +32,7 @@ import Jama.*;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 5th August 2010
+* Last modified by Reece Arnott 25th November 2010
 * 
 * This is just a class with a few common matrix functions that are not in the Jama toolset.
 *  (As well as some more uncommon ones that have proven useful in more than one place) 	 
@@ -490,40 +489,10 @@ public class MatrixManipulations {
 		return returnvalue;
 		
 	}
-	public Matrix ConvertPointTo2x1Matrix(Point2d point){
-		Matrix p=new Matrix(2,1);
-		p.set(0,0,point.x);
-		p.set(1,0,point.y);
-		return p;
-	}
-	
-	public Matrix ConvertPointTo3x1Matrix(Point2d point){
-		Matrix p=new Matrix(3,1);
-		p.set(0,0,point.x);
-		p.set(1,0,point.y);
-		p.set(2,0,1);
-		return p;
-	}
-	
-	public Matrix ConvertPointTo3x1Matrix(Point3d point){
-		Matrix p=new Matrix(3,1);
-		p.set(0,0,point.x);
-		p.set(1,0,point.y);
-		p.set(2,0,point.z);
-		return p;
-	}
-	public Matrix ConvertPointTo4x1Matrix(Point3d point){
-		Matrix p=new Matrix(4,1);
-		p.set(0,0,point.x);
-		p.set(1,0,point.y);
-		p.set(2,0,point.z);
-		p.set(3,0,1);
-		return p;
-	}
+
 	public double DistanceFromOriginof3x1Vector(Matrix temp){
 		return Math.sqrt(Math.pow(temp.get(0,0),2)+Math.pow(temp.get(1,0),2)+Math.pow(temp.get(2,0),2));
 	}
-	
 	//	 This returns the normalisation matrix calculated from a set of 2D points and a hardcoded average distance sqrt(2) 
 	public Matrix CalculateNormalisationMatrix(Point2d[] pointsarray){
 			return CalculateNormalisationMatrix(pointsarray,Math.sqrt(2));
@@ -575,7 +544,7 @@ public class MatrixManipulations {
 		return true;
 	}
 	//Note that the Matrix class has an inverse function that tries to get the pseudoinverse through QR decomposition if the matrix is not square but this can fail with an error "Matrix is rank deficient"
-	// so here are two other ways of doing it without this problem
+	// so here is another of doing it without this problem
 	public Matrix PseudoInverse(Matrix A){
 		// Given a square diagonal matrix D we define the psuedo inverse D+ to be a square diagonal matrix with values of 1/d where d is the corresponding element from D except when d=0, in which case we set the element to be 0
 		// In the general case, a matrix A can be decomposed via SVD into A=USV^T and so A+ is defined as VS+U^T
@@ -750,7 +719,7 @@ public class MatrixManipulations {
 		double sin=r.transpose().times(rdash).get(0,0)/2;
 		double length=Math.atan2(sin,cos);
 		r.timesEquals(length);
-		//This is a simpler way of doing it but is not numerically accurate (out by parts in a thousand but this is enough to make it unstable) and fails when angle is pi
+		//This is a simpler way of doing it but is not numerically accurate (out by parts in a thousand but this is enough to make it unstable) and fails when angle is 180 degrees
 		//double length=Math.abs(Math.acos(((R.trace()-1)/2))); 
 		//r.set(0,0,R.get(2,1)-R.get(1,2));
 		//r.set(1,0,R.get(0,2)-R.get(2,0));
@@ -786,6 +755,8 @@ public class MatrixManipulations {
 		P[1]=P2.copy();
 		return Find3dPoint(point,P,2);
 	}
+	// This takes a number of points in images, each point defines a ray in space when given the corresponfing camera matrix.
+	// This method finds an estimate of where the rays intersect to give a point in object/real space.
 	public Matrix Find3dPoint(Point2d point[], Matrix P[], int length){
 //		 This is simply the Homogeneous Linear triangulation method, an extension of the DLT method
 		//To find the point X we solve the equation AX=0 where X is not 0 and A is constructed from the points and camera matrices provided

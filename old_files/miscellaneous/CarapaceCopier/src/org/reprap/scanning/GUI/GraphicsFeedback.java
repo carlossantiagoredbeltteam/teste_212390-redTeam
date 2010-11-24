@@ -23,7 +23,7 @@ package org.reprap.scanning.GUI;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 11th October 2010
+ * Last modified by Reece Arnott 25th November 2010
  * 
  * The code commented out needs the JOGL OS dependent libraries. If this code is to be used
  * the libraries need to be added. They can be downloaded from: https://jogl.dev.java.net/servlets/ProjectDocumentList?folderID=9260&expandFolder=9260&folderID=8798
@@ -44,7 +44,6 @@ import javax.swing.JFrame;
 //import javax.media.opengl.*;
 //import javax.media.opengl.glu.*;
 //import com.sun.opengl.util.Animator;
-
 
 import org.reprap.scanning.DataStructures.Image;
 import org.reprap.scanning.DataStructures.PixelColour;
@@ -174,7 +173,7 @@ public class GraphicsFeedback {
 				for (int k=0;k<max;k++){
 					if (rootvoxel.SubVoxel[i][j][k].isSurface()){
 						AxisAlignedBoundingBox temp=rootvoxel.getSubVoxel(i,j,k);
-						Point3d center=temp.GetMidpointof3DBoundingBox();
+						Matrix center=temp.GetMidpointof3DBoundingBox().ConvertPointTo4x1Matrix();
 						Point2d point=givenimage.getWorldtoImageTransform(center);
 						PrintPoint(point.x,point.y,colour);
 					}
@@ -190,8 +189,7 @@ public class GraphicsFeedback {
 				for (int k=0;k<max;k++){
 					if (rootvoxel.SubVoxel[i][j][k].isInside()){
 						AxisAlignedBoundingBox temp=rootvoxel.getSubVoxel(i,j,k);
-						Point3d center=temp.GetMidpointof3DBoundingBox();
-						
+						Matrix center=temp.GetMidpointof3DBoundingBox().ConvertPointTo4x1Matrix();
 						Point2d point=givenimage.getWorldtoImageTransform(center);
 						PrintPoint(point.x,point.y,colour);
 					}
@@ -207,8 +205,7 @@ public class GraphicsFeedback {
 				for (int k=0;k<max;k++){
 					if (rootvoxel.SubVoxel[i][j][k].isOutside()){
 						AxisAlignedBoundingBox temp=rootvoxel.getSubVoxel(i,j,k);
-						Point3d center=temp.GetMidpointof3DBoundingBox();
-						
+						Matrix center=temp.GetMidpointof3DBoundingBox().ConvertPointTo4x1Matrix();
 						Point2d point=givenimage.getWorldtoImageTransform(center);
 						PrintPoint(point.x,point.y,colour);
 					}

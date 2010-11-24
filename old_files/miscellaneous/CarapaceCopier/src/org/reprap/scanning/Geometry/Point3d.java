@@ -111,5 +111,19 @@ public class Point3d {
 	public double CalculateDistanceSquared(Point3d other){
 		return (((x-other.x)*(x-other.x))+((y-other.y)*(y-other.y))+((z-other.z)*(z-other.z)));
 	}
-	
+	public Matrix ConvertPointTo3x1Matrix(){
+		Matrix p=new Matrix(3,1);
+		p.set(0,0,x);
+		p.set(1,0,y);
+		p.set(2,0,z);
+		return p;
+	}
+	public Matrix ConvertPointTo4x1Matrix(){
+		Matrix p=new Matrix(4,1);
+		p.set(0,0,x);
+		p.set(1,0,y);
+		p.set(2,0,z);
+		p.set(3,0,1);
+		return p;
+	}
 }
