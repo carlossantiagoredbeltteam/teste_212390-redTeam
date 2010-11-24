@@ -70,6 +70,23 @@ def addElementToPixelListFromPoint( element, pixelDictionary, point ):
 	'Add an element to the pixel list.'
 	addElementToPixelList( element, pixelDictionary, int( round( point.real ) ), int( round( point.imag ) ) )
 
+def addHorizontallyBoundedPoint(begin, center, end, horizontalBegin, horizontalEnd, path):
+	'Add point if it is within the horizontal bounds.'
+	if center.real >= horizontalEnd and center.real <= horizontalBegin:
+		path.append(center)
+		return
+	if end != None:
+		if center.real > horizontalBegin and end.real <= horizontalBegin:
+			centerMinusEnd = center - end
+			along = (center.real - horizontalBegin) / centerMinusEnd.real
+			path.append(center - along * centerMinusEnd)
+			return
+	if begin != None:
+		if center.real < horizontalEnd and begin.real >= horizontalEnd:
+			centerMinusBegin = center - begin
+			along = (center.real - horizontalEnd) / centerMinusBegin.real
+			path.append(center - along * centerMinusBegin)
+
 def addListToListTable( elementList, key, listTable ):
 	'Add a list to the list table.'
 	if key in listTable:
@@ -578,6 +595,21 @@ def getComplexPolygon(center, radius, sides, startAngle=0.0):
 		startAngle += sideAngle
 	return complexPolygon
 
+def getComplexPolygonByStartEnd(endAngle, radius, sides, startAngle=0.0):
+	'Get the complex polygon by start and end angle.'
+	if endAngle == startAngle:
+		return getComplexPolygon(complex(), radius, sides, startAngle)
+	angleExtent = endAngle - startAngle
+	sideAngle = 2.0 * math.pi / float(sides)
+	sides = math.ceil(abs(angleExtent / sideAngle))
+	sideAngle = angleExtent / float(sides)
+	complexPolygon = []
+	for side in xrange(abs(sides) + 1):
+		unitPolar = getWiddershinsUnitPolar(startAngle)
+		complexPolygon.append(unitPolar * radius)
+		startAngle += sideAngle
+	return complexPolygon
+
 def getConcatenatedList( originalLists ):
 	'Get the lists as one concatenated list.'
 	concatenatedList = []
@@ -603,6 +635,10 @@ def getCrossProduct( firstComplex, secondComplex ):
 	'Get z component cross product of a pair of complexes.'
 	return firstComplex.real * secondComplex.imag - firstComplex.imag * secondComplex.real
 
+def getDecimalPlacesCarried(extraDecimalPlaces, value):
+	'Get decimal places carried by the decimal places of the value plus the extraDecimalPlaces.'
+	return max(0, 1 + int(math.ceil(extraDecimalPlaces - math.log10(value))))
+
 def getDiagonalFlippedLoop(loop):
 	'Get loop flipped over the dialogonal, in other words with the x and y swapped.'
 	diagonalFlippedLoop = []
@@ -616,6 +652,28 @@ def getDiagonalFlippedLoops(loops):
 	for loop in loops:
 		diagonalFlippedLoops.append( getDiagonalFlippedLoop(loop) )
 	return diagonalFlippedLoops
+
+def getDistanceToLine(begin, end, point):
+	'Get the distance from a vector3 point to an infinite line.'
+	pointMinusBegin = point - begin
+	if begin == end:
+		return abs(pointMinusBegin)
+	endMinusBegin = end - begin
+	return abs(endMinusBegin.cross(pointMinusBegin)) / abs(endMinusBegin)
+
+def getDistanceToLineByPath(begin, end, path):
+	'Get the maximum distance from a path to an infinite line.'
+	distanceToLine = -987654321.0
+	for point in path:
+		distanceToLine = max(getDistanceToLine(begin, end, point), distanceToLine)
+	return distanceToLine
+
+def getDistanceToLineByPaths(begin, end, paths):
+	'Get the maximum distance from paths to an infinite line.'
+	distanceToLine = -987654321.0
+	for path in paths:
+		distanceToLine = max(getDistanceToLineByPath(begin, end, path), distanceToLine)
+	return distanceToLine
 
 def getDistanceToPlaneSegment( segmentBegin, segmentEnd, point ):
 	'Get the distance squared from a point to the x & y components of a segment.'
@@ -748,10 +806,10 @@ def getFourSignificantFigures(number):
 		return None
 	absoluteNumber = abs(number)
 	if absoluteNumber >= 100.0:
-		return getRoundedToDecimalPlacesString( 2, number )
+		return getRoundedToPlacesString( 2, number )
 	if absoluteNumber < 0.000000001:
-		return getRoundedToDecimalPlacesString( 13, number )
-	return getRoundedToDecimalPlacesString( 3 - math.floor( math.log10( absoluteNumber ) ), number )
+		return getRoundedToPlacesString( 13, number )
+	return getRoundedToPlacesString( 3 - math.floor( math.log10( absoluteNumber ) ), number )
 
 def getFrontOfLoops(loops):
 	'Get the front of the loops.'
@@ -811,6 +869,21 @@ def getHalfSimplifiedPath(path, radius, remainder):
 			simplified.append(point)
 	simplified.append(path[-1])
 	return simplified
+
+def getHorizontallyBoundedPath(horizontalBegin, horizontalEnd, path):
+	'Get horizontally bounded path.'
+	horizontallyBoundedPath = []
+	for pointIndex, point in enumerate(path):
+		begin = None
+		previousIndex = pointIndex - 1
+		if previousIndex >= 0:
+			begin = path[previousIndex]
+		end = None
+		nextIndex = pointIndex + 1
+		if nextIndex < len(path):
+			end = path[nextIndex]
+		addHorizontallyBoundedPoint(begin, point, end, horizontalBegin, horizontalEnd, horizontallyBoundedPath)
+	return horizontallyBoundedPath
 
 def getHorizontalSegmentListsFromLoopLists( alreadyFilledArounds, front, numberOfLines, rotatedFillLoops, width ):
 	'Get horizontal segment lists inside loops.'
@@ -1036,9 +1109,9 @@ def getLoopWithoutCloseSequentialPoints( close, loop ):
 		lastPoint = point
 	return loopWithoutCloseSequentialPoints
 
-def getMaximum( firstComplex, secondComplex ):
+def getMaximum(firstComplex, secondComplex):
 	'Get a complex with each component the maximum of the respective components of a pair of complexes.'
-	return complex( max( firstComplex.real, secondComplex.real ), max( firstComplex.imag, secondComplex.imag ) )
+	return complex(max(firstComplex.real, secondComplex.real), max(firstComplex.imag, secondComplex.imag))
 
 def getMaximumByPathComplex(path):
 	'Get a complex with each component the maximum of the respective components of a list of complex points.'
@@ -1059,9 +1132,9 @@ def getMaximumSpan(loop):
 	extent = getMaximumByPathComplex(loop) - getMinimumByPathComplex(loop)
 	return max( extent.real, extent.imag )
 
-def getMinimum( firstComplex, secondComplex ):
+def getMinimum(firstComplex, secondComplex):
 	'Get a complex with each component the minimum of the respective components of a pair of complexes.'
-	return complex( min( firstComplex.real, secondComplex.real ), min( firstComplex.imag, secondComplex.imag ) )
+	return complex(min(firstComplex.real, secondComplex.real), min(firstComplex.imag, secondComplex.imag))
 
 def getMinimumByPathComplex(path):
 	'Get a complex with each component the minimum of the respective components of a list of complex points.'
@@ -1083,6 +1156,16 @@ def getMinimumFromVec3List( vec3List ):
 	for point in vec3List:
 		minimum = getMinimum( minimum, point.dropAxis(2) )
 	return minimum
+
+def getMirrorPath(path):
+	"Get mirror path."
+	close = 0.001 * getPathLength(path)
+	for pointIndex in xrange(len(path) - 1, -1, -1):
+		point = path[pointIndex]
+		flipPoint = complex(-point.real, point.imag)
+		if abs(flipPoint - path[-1]) > close:
+			path.append(flipPoint)
+	return path
 
 def getNearestDistanceIndex( point, loop ):
 	'Get the distance squared to the nearest segment of the loop and index of that segment.'
@@ -1110,12 +1193,31 @@ def getNearestPointOnSegment( segmentBegin, segmentEnd, point ):
 	intercept = min(intercept, 1.0)
 	return segmentBegin + segmentDifference * intercept
 
+def getNormal(begin, center, end):
+	'Get normal.'
+	centerMinusBegin = (center - begin).getNormalized()
+	endMinusCenter = (end - center).getNormalized()
+	return centerMinusBegin.cross(endMinusCenter)
+
+def getNormalByPath(path):
+	'Get normal by path.'
+	totalNormal = Vector3()
+	for pointIndex, point in enumerate(path):
+		center = path[(pointIndex + 1) % len(path)]
+		end = path[(pointIndex + 2) % len(path)]
+		totalNormal += getNormalWeighted(point, center, end)
+	return totalNormal.getNormalized()
+
 def getNormalized( complexNumber ):
 	'Get the normalized complex.'
 	complexNumberLength = abs( complexNumber )
 	if complexNumberLength > 0.0:
 		return complexNumber / complexNumberLength
 	return complexNumber
+
+def getNormalWeighted(begin, center, end):
+	'Get weighted normal.'
+	return (center - begin).cross(end - center)
 
 def getNumberOfIntersectionsToLeft(loop, point):
 	'Get the number of intersections through the loop for the line going left.'
@@ -1259,30 +1361,30 @@ def getRandomComplex(begin, end):
 	endMinusBegin = end - begin
 	return begin + complex(random.random() * endMinusBegin.real, random.random() * endMinusBegin.imag)
 
-def getRank( width ):
+def getRank(width):
 	'Get the rank which is 0 at 1 and increases by three every power of ten.'
-	return int( math.floor( 3.0 * math.log10( width ) ) )
+	return int(math.floor(3.0 * math.log10(width)))
 
 def getRotatedWiddershinsQuarterAroundZAxis(vector3):
 	'Get Vector3 rotated a quarter widdershins turn around Z axis.'
-	return Vector3( - vector3.y, vector3.x, vector3.z )
+	return Vector3(-vector3.y, vector3.x, vector3.z)
 
 def getRoundedPoint(point):
 	'Get point with each component rounded.'
-	return Vector3( round(point.x), round( point.y ), round(point.z) )
+	return Vector3(round(point.x), round( point.y ), round(point.z))
 
-def getRoundedToDecimalPlaces( decimalPlaces, number ):
+def getRoundedToPlaces(decimalPlaces, number):
 	'Get number rounded to a number of decimal places.'
-	decimalPlacesRounded = max( 1, int( round( decimalPlaces ) ) )
-	return round( number, decimalPlacesRounded )
+	decimalPlacesRounded = max(1, int(round(decimalPlaces)))
+	return round(number, decimalPlacesRounded )
 
-def getRoundedToDecimalPlacesString( decimalPlaces, number ):
+def getRoundedToPlacesString(decimalPlaces, number):
 	'Get number rounded to a number of decimal places as a string.'
-	return str( getRoundedToDecimalPlaces( decimalPlaces, number ) )
+	return str(getRoundedToPlaces(decimalPlaces, number))
 
 def getRoundedToThreePlaces(number):
 	'Get number rounded to three places as a string.'
-	return str( round( number, 3 ) )
+	return str(round(number, 3))
 
 def getRoundZAxisByPlaneAngle( planeAngle, vector3 ):
 	'Get Vector3 rotated by a plane angle.'
@@ -1418,10 +1520,10 @@ def getThreeSignificantFigures(number):
 	'Get number rounded to three significant figures as a string.'
 	absoluteNumber = abs(number)
 	if absoluteNumber >= 10.0:
-		return getRoundedToDecimalPlacesString( 1, number )
+		return getRoundedToPlacesString( 1, number )
 	if absoluteNumber < 0.000000001:
-		return getRoundedToDecimalPlacesString( 12, number )
-	return getRoundedToDecimalPlacesString( 1 - math.floor( math.log10( absoluteNumber ) ), number )
+		return getRoundedToPlacesString( 12, number )
+	return getRoundedToPlacesString( 1 - math.floor( math.log10( absoluteNumber ) ), number )
 
 def getTopPath(path):
 	'Get the top of the path.'
@@ -2074,14 +2176,23 @@ class ProjectiveSpace:
 		'Get by x basis x and y basis.'
 		self.basisX = basisX
 		self.basisX.normalize()
-		self.basisY = basisZ.cross( self.basisX )
+		self.basisY = basisZ.cross(self.basisX)
 		self.basisY.normalize()
 		self.basisZ = basisZ
 		return self
 
-	def getByBasisZTop( self, basisZ, top ):
-		'Get by z basis and top.'
-		return self.getByBasisXZ( top.cross( basisZ ), basisZ )
+	def getByBasisZFirst(self, basisZ, firstVector3):
+		'Get by basisZ and first.'
+		self.basisY = basisZ.cross(firstVector3)
+		self.basisY.normalize()
+		self.basisX = self.basisY.cross(self.basisZ)
+		self.basisX.normalize()
+		self.basisZ = basisZ
+		return self
+
+	def getByBasisZTop(self, basisZ, top):
+		'Get by basisZ and top.'
+		return self.getByBasisXZ(top.cross(basisZ), basisZ)
 
 	def getByLatitudeLongitude( self, viewpointLatitude, viewpointLongitude ):
 		'Get by latitude and longitude.'
@@ -2096,7 +2207,7 @@ class ProjectiveSpace:
 		self.basisX = Vector3( xPlaneAngle.real, 0.0,  xPlaneAngle.imag )
 		yPlaneAngle = getWiddershinsUnitPolar( tilt.imag )
 		self.basisY = Vector3( 0.0,  yPlaneAngle.real, yPlaneAngle.imag )
-		self.basisZ = self.basisX.cross( self.basisY )
+		self.basisZ = self.basisX.cross(self.basisY)
 		return self
 
 	def getComplexByComplex( self, pointComplex ):
@@ -2109,11 +2220,11 @@ class ProjectiveSpace:
 
 	def getDotComplex(self, point):
 		'Get the dot complex.'
-		return complex( point.dot( self.basisX ), point.dot( self.basisY ) )
+		return complex( point.dot(self.basisX), point.dot(self.basisY) )
 
 	def getDotVector3(self, point):
 		'Get the dot vector3.'
-		return Vector3( point.dot( self.basisX ), point.dot( self.basisY ), point.dot( self.basisZ ) )
+		return Vector3(point.dot(self.basisX), point.dot(self.basisY), point.dot(self.basisZ))
 
 	def getNextSpace( self, nextNormal ):
 		'Get next space by next normal.'

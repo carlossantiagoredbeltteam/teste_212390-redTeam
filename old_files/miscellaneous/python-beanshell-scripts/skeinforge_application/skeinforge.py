@@ -27,7 +27,7 @@ http://reprap.org/wiki/Installing_RepRap_on_your_computer
 
 ===Contribute===
 You can contribute by helping develop the manual at:
-http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge
+http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge
 
 There is also a forum thread about how to contribute to skeinforge development at:
 http://dev.forums.reprap.org/read.php?12,27562
@@ -36,12 +36,12 @@ I will only reply to emails from contributors or to complete bug reports.
 
 ===Documentation===
 There is a manual at:
-http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge
+http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge
 
 There is also documentation is in the documentation folder, in the doc strings for each module and it can be called from the '?' button or the menu or by clicking F1 in each setting dialog.
 
 A list of other tutorials is at:
-http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge#Tutorials
+http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge#Tutorials
 
 ===Fabrication===
 To fabricate a model with gcode and the Arduino you can use the send.py in the fabricate folder.  The documentation for it is in the folder as send.html and at:
@@ -204,6 +204,7 @@ from __future__ import absolute_import
 import __init__
 
 from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
+from fabmetheus_utilities import archive
 from fabmetheus_utilities import euclidean
 from fabmetheus_utilities import gcodec
 from fabmetheus_utilities import settings
@@ -214,21 +215,22 @@ import os
 import sys
 
 
-# test grid types
-# ,, into None,None,
-# get list of XMLElements for paths
+# 
+# update
+# bottom and scale read / write
+# demozendium EnriquePerez, privacy policy, maybe thumbnail logo
+# check out intersection algorithm
+# maybe have circle end at 0 instead of 360.0
+# MenuRadioStrings
+# class, pymethe
+# linear bearing cage
 # mirror axis center & origin, concatenate
 # matrixTetragrid to tetragrid, matrix.transform, target
 # maybe matrix array form a00 a01.. also
-# move stuff to archive
 # matrix rotate around axis http://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Transformations
-# linear bearing
+# lathe, transform normal in getRemaining, getConnection
 # grate separate
-# float decimal places
-# drill from teardrop
 # xml_creation
-# bring back original xml in svgWriter
-# move StartEnd to segment
 # fill rename shortenedSegmentList gridSegmentList and delete comments
 # array paths, follow paths, later maybe targetequation radius xyz give index
 # writeTagged, tags, creationTags, writeMatrix='true'
@@ -237,36 +239,31 @@ import sys
 # bound.bottom to cube, sphere, cylinder input, maybe mesh., bound.bottom & left & right & top for xy plane
 # look over copy module, make copy solid like copy lineation
 # document gear script
-# big save, initial circling moved to raft from temperature
+# eliminate variable bridge height
+# stretch add back addAlong
+# multiply to table + boundary bedBound bedWidth bedHeight bedFile.csv
 #
-# classify more of evaluate.xml
 # maybe in svgReader if loop intersection with previous union else add
 #
 # unimportant
 # minor outline problem when an end path goes through a path, like in the letter A
-# carve time is missing
 # view profile 1 mm thickness
-# svg inskcape layer label, import into inskscape in general
 # only parse svg once, do not parse again if yAxisPointingUpward="true"
-# getControlPoints, also handle no controlPoint in which case make coincident
-# maybe vector3 relative to previous
 #
 # close, getPillarByLoopLists, addConcave, polymorph original graph section, loop, add step object, add continuous object
 # del previous, add begin & end if far  get actual path
 # polling
-# svgCanvas with xmlWriter instead of directly writing
-# speed up CircleIntersection by performing isWithinCircles before creation
 # getNormal, getIsFlat?
-# write svg for visible paths
-# distance in equation
+# write svg for visible paths???
 # combine xmlelement with csvelement using example.csv & geometry.csv, csv _format, _column, _row, _text
 # getConnection of some kind like getConnectionVertexes, getConnection
 # import module, overwriteRoot
 # pixel, voxel, surfaxel/boxel, lattice, mesh
-# maybe replace getOverlapRatio with getOverlap if getOverlapRatio is never small, always 0.0
+# probably not replace getOverlapRatio with getOverlap if getOverlapRatio is never small, always 0.0
+# probably not speed up CircleIntersection by performing isWithinCircles before creation
 # equation for vertexes if not already
 # mesh. for cube, then cyliner, then sphere after lathe
-# extrude take radius
+# probably not move alterations and profiles
 # tube
 # rotor
 # test translate
@@ -277,25 +274,23 @@ import sys
 # manipulate solid, maybe manipulate around elements
 # hollow top
 # boolean loop corner outset
+# dovetail
+# creationID, addObject, getTarget, copyXMLElement?
+# maybe not getNewObject, getNew, addToBoolean
 # work out close and radius
+# maybe try to get rid of comment if possible
 # voronoi average location intersection looped inset intercircles
 # maybe move and give geometryOutput to cube, cylinder, sphere
 #
 # comb -> maybe add back running jump look at outside loops only for jump, find closest points, find slightly away inside points, link
 # global simplify pathBetween
 # comb documentation
-# maybe move after clip
 #
-# stretch add back addAlong
+# maybe move widen before bottom
 # maybe save all generated_files option
-# creationID, addObject, getTarget, copyXMLElement?
-# drill
-# dovetail
 # maybe meta overhang
-# maybe not getNewObject, getNew, addToBoolean
 # convert global repository settings to local settings
 # table to dictionary
-# maybe try to get rid of comment if possible
 # check for last existing then remove unneeded fill code (getLastExistingFillLoops) from euclidean
 # remove cool set at end of layer
 # add fan on when hot in chamber
@@ -308,11 +303,13 @@ import sys
 #
 #
 # add hook _extrusion
+# smooth _extrusion
 # implement acceleration & collinear removal in penultimate viewers _extrusion
 # integral thin width _extrusion
 # layer color, for multilayer start http://reprap.org/pub/Main/MultipleMaterialsFiles/legend.xml _extrusion
 # maybe double height shells option _extrusion
 # raft triple layer base, middle interface with hot loop or ties
+# apron _extrusion
 # somehow, add pattern to outside, http://blog.makerbot.com/2010/09/03/lampshades/
 #
 # arch, ceiling
@@ -324,6 +321,7 @@ import sys
 # save all analyze viewers of the same name except itself, update help menu self.wikiManualPrimary.setUpdateFunction
 # check alterations folder first, if there is something copy it to the home directory, if not check the home directory
 # set temperature in temperature
+# maybe add hop only if long option
 # move alterations and profiles to top level
 #
 #
@@ -338,7 +336,7 @@ import sys
 # maybe status bar
 # maybe measurement ruler mouse tool
 # search rss from blogs, add search links for common materials, combine created on or progress bar with searchable help
-# boundaries, center radius z bottom top, circular or rectangular, polygon, put cool minimum radius orbits within boundaries
+# boundaries, center radius z bottom top, alterations file, circular or rectangular, polygon, put cool minimum radius orbits within boundaries, <bounds> bound.. </bounds>
 # move & rotate model
 # possible jitter bug http://cpwebste.blogspot.com/2010/04/hydras-first-print.html
 # trial, meta in a grid settings
@@ -365,6 +363,7 @@ import sys
 # svg triangle mesh, svg polygon mesh
 # simulate
 #transform
+# juricator
 #extrude loops I guess make circles? and/or run along sparse infill
 #custom inclined plane, inclined plane from model, screw, fillet travel as well maybe
 # probably not stretch single isLoop
@@ -400,8 +399,9 @@ import sys
 #6 16855,3226
 #7 20081, 2189
 #8 22270, 2625
-#9 24895, 2967
-#10 27862
+#9 24895, 2967, 98
+#10 27862, 3433, 110
+#11 31295
 #85 jan7, 86jan11, 87 jan13, 88 jan15, 91 jan21, 92 jan23, 95 jan30, 98 feb6
 #make one piece electromagnet spool
 #stepper rotor with ceramic disk magnet in middle, electromagnet with long thin spool line?
@@ -489,11 +489,11 @@ def addToProfileMenu( profileSelection, profileType, repository ):
 
 def getPluginsDirectoryPath():
 	"Get the plugins directory path."
-	return gcodec.getAbsoluteFolderPath( __file__, 'skeinforge_plugins')
+	return archive.getAbsoluteFrozenFolderPath( __file__, 'skeinforge_plugins')
 
 def getPluginFileNames():
 	"Get analyze plugin fileNames."
-	return gcodec.getPluginFileNamesFromDirectoryPath( getPluginsDirectoryPath() )
+	return archive.getPluginFileNamesFromDirectoryPath( getPluginsDirectoryPath() )
 
 def getNewRepository():
 	"Get the repository constructor."
@@ -512,8 +512,11 @@ def getRadioPluginsAddPluginGroupFrame( directoryPath, importantFileNames, names
 	return radioPlugins
 
 def writeOutput(fileName):
-	"Craft a gcode file."
-	skeinforge_craft.writeOutput(fileName)
+	"Craft a file, display dialog."
+	repository = getNewRepository()
+	repository.fileNameInput.value = fileName
+	repository.execute()
+	settings.startMainLoopFromConstructor(repository)
 
 
 class SkeinforgeRepository:
@@ -531,7 +534,7 @@ class SkeinforgeRepository:
 		skeinforgeSearch.column += 2
 		webSearch = settings.HelpPage().getFromNameAfterHTTP('members.axion.net/~enrique/search_web.html', 'Web', self )
 		webSearch.column += 4
-		versionText = gcodec.getFileText( gcodec.getVersionFileName() )
+		versionText = archive.getFileText( archive.getVersionFileName() )
 		self.version = settings.LabelDisplay().getFromName('Version: ' + versionText, self )
 		settings.LabelDisplay().getFromName('', self )
 		importantFileNames = ['craft', 'profile']
@@ -542,7 +545,7 @@ class SkeinforgeRepository:
 		"Skeinforge button has been clicked."
 		fileNames = skeinforge_polyfile.getFileOrDirectoryTypesUnmodifiedGcode(self.fileNameInput.value, fabmetheus_interpret.getImportPluginFileNames(), self.fileNameInput.wasCancelled)
 		for fileName in fileNames:
-			writeOutput(fileName)
+			skeinforge_craft.writeOutput(fileName)
 
 	def save(self):
 		"Profile has been saved and profile menu should be updated."

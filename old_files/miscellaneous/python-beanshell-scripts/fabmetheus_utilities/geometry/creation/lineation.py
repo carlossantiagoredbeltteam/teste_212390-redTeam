@@ -115,8 +115,7 @@ def getFloatByPrefixSide( prefix, side, xmlElement ):
 def getGeometryOutput(derivation, xmlElement):
 	"Get geometry output from paths."
 	if derivation == None:
-		derivation = LineationDerivation()
-		derivation.setToXMLElement(xmlElement)
+		derivation = LineationDerivation(xmlElement)
 	geometryOutput = []
 	for path in derivation.target:
 		sideLoop = SideLoop(path)
@@ -130,7 +129,7 @@ def getGeometryOutputByArguments(arguments, xmlElement):
 def getGeometryOutputByFunction( manipulationFunction, xmlElement ):
 	"Get geometry output by manipulationFunction."
 	geometryOutput = []
-	target = evaluate.getPathsByKey('target', xmlElement )
+	target = evaluate.getPathsByKey([], 'target', xmlElement )
 	for path in target:
 		geometryOutput += getGeometryOutputByLoopFunction(manipulationFunction, SideLoop(path), xmlElement)
 	return getUnpackedLoops(geometryOutput)
@@ -245,18 +244,13 @@ def setClosedAttribute(revolutions, xmlElement):
 
 class LineationDerivation:
 	"Class to hold lineation variables."
-	def __init__(self):
+	def __init__(self, xmlElement):
 		'Set defaults.'
-		self.target = []
+		self.target = evaluate.getTransformedPathsByKey([], 'target', xmlElement)
 
 	def __repr__(self):
 		"Get the string representation of this LineationDerivation."
 		return str(self.__dict__)
-
-	def setToXMLElement(self, xmlElement):
-		"Set to the xmlElement."
-		if len(self.target) < 1:
-			self.target = evaluate.getTransformedPathsByKey('target', xmlElement)
 
 
 class SideLoop:
@@ -280,6 +274,23 @@ class SideLoop:
 		self.sideLength = sideLength
 		self.close = 0.001 * sideLength
 
+	def getManipulationPluginLoops(self, xmlElement):
+		"Get loop manipulated by the plugins in the manipulation paths folder."
+		xmlProcessor = xmlElement.getXMLProcessor()
+#		matchingPlugins = evaluate.getFromCreationEvaluatorPlugins(xmlProcessor.manipulationEvaluatorDictionary, xmlElement)
+		matchingPlugins = evaluate.getMatchingPlugins(xmlProcessor.manipulationEvaluatorDictionary, xmlElement)
+		matchingPlugins += evaluate.getMatchingPlugins(xmlProcessor.manipulationPathDictionary, xmlElement)
+		matchingPlugins += evaluate.getMatchingPlugins(xmlProcessor.manipulationShapeDictionary, xmlElement)
+		matchingPlugins.sort(evaluate.compareExecutionOrderAscending)
+		loops = [self.loop]
+		for matchingPlugin in matchingPlugins:
+			matchingLoops = []
+			prefix = matchingPlugin.__name__ + '.'
+			for loop in loops:
+				matchingLoops += matchingPlugin.getManipulatedPaths(self.close, loop, prefix, self.sideLength, xmlElement)
+			loops = matchingLoops
+		return loops
+
 	def rotate(self, xmlElement):
 		"Rotate."
 		rotation = math.radians( evaluate.getEvaluatedFloatDefault(0.0, 'rotation', xmlElement ) )
@@ -294,22 +305,6 @@ class SideLoop:
 			isClockwise = euclidean.getBooleanFromValue( evaluate.getEvaluatedValueObliviously('clockwise', xmlElement ) )
 			if isClockwise == euclidean.getIsWiddershinsByVector3( self.loop ):
 				self.loop.reverse()
-
-	def getManipulationPluginLoops(self, xmlElement):
-		"Get loop manipulated by the plugins in the manipulation paths folder."
-		xmlProcessor = xmlElement.getXMLProcessor()
-		matchingPlugins = evaluate.getFromCreationEvaluatorPlugins(xmlProcessor.manipulationEvaluatorDictionary, xmlElement)
-		matchingPlugins += evaluate.getMatchingPlugins(xmlProcessor.manipulationPathDictionary, xmlElement)
-		matchingPlugins += evaluate.getMatchingPlugins(xmlProcessor.manipulationShapeDictionary, xmlElement)
-		matchingPlugins.sort(evaluate.compareExecutionOrderAscending)
-		loops = [self.loop]
-		for matchingPlugin in matchingPlugins:
-			matchingLoops = []
-			prefix = matchingPlugin.__name__ + '.'
-			for loop in loops:
-				matchingLoops += matchingPlugin.getManipulatedPaths(self.close, loop, prefix, self.sideLength, xmlElement)
-			loops = matchingLoops
-		return loops
 
 
 class Spiral:
@@ -333,21 +328,3 @@ class Spiral:
 		vector3 += Vector3(unitPolar.real * self.spiralTotal.x, unitPolar.imag * self.spiralTotal.y, self.spiralTotal.z)
 		self.spiralTotal += self.spiralIncrement
 		return vector3
-
-
-class StartEnd:
-	'Class to get a start through end range.'
-	def __init__(self, modulo, prefix, xmlElement):
-		"Initialize."
-		self.start = evaluate.getEvaluatedIntDefault(0, prefix + 'start', xmlElement)
-		self.start = getWrappedInteger(self.start, modulo)
-		self.extent = evaluate.getEvaluatedIntDefault(modulo - self.start, prefix + 'extent', xmlElement)
-		self.end = evaluate.getEvaluatedIntDefault(self.start + self.extent, prefix + 'end', xmlElement)
-		self.end = getWrappedInteger(self.end, modulo)
-		self.revolutions = evaluate.getEvaluatedIntDefault(1, prefix + 'revolutions', xmlElement)
-		if self.revolutions > 1:
-			self.end += modulo * (self.revolutions - 1)
-
-	def __repr__(self):
-		"Get the string representation of this StartEnd."
-		return '%s, %s, %s' % (self.start, self.end, self.revolutions)

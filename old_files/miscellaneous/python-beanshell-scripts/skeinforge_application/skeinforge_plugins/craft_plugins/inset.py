@@ -4,7 +4,7 @@ This page is in the table of contents.
 Inset will inset the outside outlines by half the perimeter width, and outset the inside outlines by the same amount.
 
 The inset manual page is at:
-http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Inset
+http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Inset
 
 ==Settings==
 ===Add Custom Code for Temperature Reading===
@@ -80,13 +80,14 @@ except:
 #Init has to be imported first because it has code to workaround the python bug where relative imports don't work if the module is imported as a main module.
 import __init__
 
+from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
+from fabmetheus_utilities.geometry.solids import trianglemesh
+from fabmetheus_utilities.vector3 import Vector3
+from fabmetheus_utilities import archive
 from fabmetheus_utilities import euclidean
 from fabmetheus_utilities import gcodec
 from fabmetheus_utilities import intercircle
-from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
 from fabmetheus_utilities import settings
-from fabmetheus_utilities.geometry.solids import trianglemesh
-from fabmetheus_utilities.vector3 import Vector3
 from skeinforge_application.skeinforge_utilities import skeinforge_craft
 from skeinforge_application.skeinforge_utilities import skeinforge_polyfile
 from skeinforge_application.skeinforge_utilities import skeinforge_profile
@@ -168,7 +169,7 @@ def addSegmentOutline( isThick, outlines, pointBegin, pointEnd, width ):
 
 def getCraftedText( fileName, text = '', repository=None):
 	"Inset the preface file or text."
-	return getCraftedTextFromText( gcodec.getTextIfEmpty( fileName, text ), repository )
+	return getCraftedTextFromText( archive.getTextIfEmpty( fileName, text ), repository )
 
 def getCraftedTextFromText(gcodeText, repository=None):
 	"Inset the preface gcode text."
@@ -255,7 +256,7 @@ class InsetRepository:
 		"Set the default settings, execute title & settings fileName."
 		skeinforge_profile.addListsToCraftTypeRepository('skeinforge_application.skeinforge_plugins.craft_plugins.inset.html', self )
 		self.fileNameInput = settings.FileNameInput().getFromFileName( fabmetheus_interpret.getGNUTranslatorGcodeFileTypeTuples(), 'Open File for Inset', self, '')
-		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Inset')
+		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Inset')
 		self.addCustomCodeForTemperatureReading = settings.BooleanSetting().getFromValue('Add Custom Code for Temperature Reading', self, True )
 		self.bridgeWidthMultiplier = settings.FloatSpin().getFromValue( 0.8, 'Bridge Width Multiplier (ratio):', self, 1.2, 1.0 )
 		self.loopOrderChoice = settings.MenuButtonDisplay().getFromName('Loop Order Choice:', self )
@@ -374,7 +375,7 @@ class InsetSkein:
 	def getCraftedGcode(self, gcodeText, repository):
 		"Parse gcode text and store the bevel gcode."
 		self.repository = repository
-		self.lines = gcodec.getTextLines(gcodeText)
+		self.lines = archive.getTextLines(gcodeText)
 		self.parseInitialization()
 		for line in self.lines[self.lineIndex :]:
 			self.parseLine(line)
@@ -392,8 +393,6 @@ class InsetSkein:
 				self.distanceFeedRate.addTagBracketedLine('bridgeWidthMultiplier', self.distanceFeedRate.getRounded( self.repository.bridgeWidthMultiplier.value ) )
 			elif firstWord == '(</extruderInitialization>)':
 				self.distanceFeedRate.addTagBracketedLine('procedureDone', 'inset')
-			elif firstWord == '(<extrusion>)':
-				self.distanceFeedRate.addLine(line)
 				return
 			elif firstWord == '(<perimeterWidth>':
 				self.perimeterWidth = float(splitLine[1])
@@ -413,7 +412,7 @@ class InsetSkein:
 		elif ( firstWord == '(<bridgeRotation>' or firstWord == '<!--bridgeRotation-->'):
 			secondWordWithoutBrackets = splitLine[1].replace('(', '').replace(')', '')
 			self.rotatedBoundaryLayer.rotation = complex( secondWordWithoutBrackets )
-		elif firstWord == '(</extrusion>)':
+		elif firstWord == '(</crafting>)':
 				self.distanceFeedRate.addLine(line)
 				if self.repository.turnExtruderHeaterOffAtShutDown.value:
 					self.distanceFeedRate.addLine('M104 S0') # Turn extruder heater off.

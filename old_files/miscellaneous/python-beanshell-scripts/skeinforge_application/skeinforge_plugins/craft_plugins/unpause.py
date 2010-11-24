@@ -4,7 +4,7 @@ The unpause script is based on the Shane Hathaway's patch to speed up a line seg
 http://shane.willowrise.com/archives/delay-compensation-in-firmware/
 
 The unpause manual page is at:
-http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Unpause
+http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Unpause
 
 ==Operation==
 The default 'Activate Unpause' checkbox is off.  When it is on, the functions described below will work, when it is off, the functions will not be called.
@@ -58,6 +58,7 @@ from __future__ import absolute_import
 #Init has to be imported first because it has code to workaround the python bug where relative imports don't work if the module is imported as a main module.
 import __init__
 
+from fabmetheus_utilities import archive
 from fabmetheus_utilities import euclidean
 from fabmetheus_utilities import gcodec
 from fabmetheus_utilities import intercircle
@@ -76,7 +77,7 @@ __license__ = 'GPL 3.0'
 
 def getCraftedText( fileName, gcodeText, repository=None):
 	"Unpause a gcode linear move file or text."
-	return getCraftedTextFromText( gcodec.getTextIfEmpty( fileName, gcodeText ), repository )
+	return getCraftedTextFromText( archive.getTextIfEmpty( fileName, gcodeText ), repository )
 
 def getCraftedTextFromText(gcodeText, repository=None):
 	"Unpause a gcode linear move text."
@@ -112,7 +113,7 @@ class UnpauseRepository:
 		"Set the default settings, execute title & settings fileName."
 		settings.addListsToRepository('skeinforge_application.skeinforge_plugins.craft_plugins.unpause.html', None, self )
 		self.fileNameInput = settings.FileNameInput().getFromFileName( fabmetheus_interpret.getGNUTranslatorGcodeFileTypeTuples(), 'Open File for Unpause', self, '')
-		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Unpause')
+		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Unpause')
 		self.activateUnpause = settings.BooleanSetting().getFromValue('Activate Unpause', self, False )
 		self.delay = settings.FloatSpin().getFromValue( 2.0, 'Delay (milliseconds):', self, 42.0, 28.0 )
 		self.maximumSpeed = settings.FloatSpin().getFromValue( 1.1, 'Maximum Speed (ratio):', self, 1.9, 1.3 )
@@ -140,7 +141,7 @@ class UnpauseSkein:
 		self.maximumSpeed = repository.maximumSpeed.value
 		self.minimumSpeedUpReciprocal = 1.0 / self.maximumSpeed
 		self.repository = repository
-		self.lines = gcodec.getTextLines(gcodeText)
+		self.lines = archive.getTextLines(gcodeText)
 		self.parseInitialization()
 		for self.lineIndex in xrange( self.lineIndex, len(self.lines) ):
 			line = self.lines[self.lineIndex]

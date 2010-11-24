@@ -3,7 +3,7 @@ This page is in the table of contents.
 Oozebane is a script to turn off the extruder before the end of a thread and turn it on before the beginning.
 
 The oozebane manual page is at:
-http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Oozebane
+http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Oozebane
 
 After oozebane turns the extruder on, it slows the feed rate down where the thread starts.  Then it speeds it up in steps so in theory the thread will remain at roughly the same thickness from the beginning.
 
@@ -89,9 +89,10 @@ from __future__ import absolute_import
 #Init has to be imported first because it has code to workaround the python bug where relative imports don't work if the module is imported as a main module.
 import __init__
 
+from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
+from fabmetheus_utilities import archive
 from fabmetheus_utilities import euclidean
 from fabmetheus_utilities import gcodec
-from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
 from fabmetheus_utilities import settings
 from skeinforge_application.skeinforge_utilities import skeinforge_craft
 from skeinforge_application.skeinforge_utilities import skeinforge_polyfile
@@ -107,7 +108,7 @@ __license__ = 'GPL 3.0'
 
 def getCraftedText( fileName, text, oozebaneRepository = None ):
 	"Oozebane a gcode linear move file or text."
-	return getCraftedTextFromText( gcodec.getTextIfEmpty( fileName, text ), oozebaneRepository )
+	return getCraftedTextFromText( archive.getTextIfEmpty( fileName, text ), oozebaneRepository )
 
 def getCraftedTextFromText( gcodeText, oozebaneRepository = None ):
 	"Oozebane a gcode linear move text."
@@ -136,7 +137,7 @@ class OozebaneRepository:
 		"Set the default settings, execute title & settings fileName."
 		skeinforge_profile.addListsToCraftTypeRepository('skeinforge_application.skeinforge_plugins.craft_plugins.oozebane.html', self )
 		self.fileNameInput = settings.FileNameInput().getFromFileName( fabmetheus_interpret.getGNUTranslatorGcodeFileTypeTuples(), 'Open File for Oozebane', self, '')
-		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Oozebane')
+		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Oozebane')
 		self.activateOozebane = settings.BooleanSetting().getFromValue('Activate Oozebane', self, False )
 		self.afterStartupDistance = settings.FloatSpin().getFromValue( 0.7, 'After Startup Distance (millimeters):', self, 1.7, 1.2 )
 		self.earlyShutdownDistance = settings.FloatSpin().getFromValue( 0.7, 'Early Shutdown Distance (millimeters):', self, 1.7, 1.2 )
@@ -288,7 +289,7 @@ class OozebaneSkein:
 
 	def getCraftedGcode( self, gcodeText, oozebaneRepository ):
 		"Parse gcode text and store the oozebane gcode."
-		self.lines = gcodec.getTextLines(gcodeText)
+		self.lines = archive.getTextLines(gcodeText)
 		self.oozebaneRepository = oozebaneRepository
 		self.parseInitialization( oozebaneRepository )
 		for self.lineIndex in xrange( self.lineIndex, len(self.lines) ):

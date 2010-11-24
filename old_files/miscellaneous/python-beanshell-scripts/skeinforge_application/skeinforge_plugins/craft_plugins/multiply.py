@@ -3,7 +3,7 @@ This page is in the table of contents.
 Multiply is a script to multiply the shape into an array of copies arranged in a table.
 
 The multiply manual page is at:
-http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Multiply
+http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Multiply
 
 Besides using the multiply tool, another way of printing many copies of the model is to duplicate the model in Art of Illusion, however many times you want, with the appropriate offsets.  Then you can either use the Join Objects script in the scripts submenu to create a combined shape or you can export the whole scene as an xml file, which skeinforge can then slice.
 
@@ -74,12 +74,13 @@ from __future__ import absolute_import
 #Init has to be imported first because it has code to workaround the python bug where relative imports don't work if the module is imported as a main module.
 import __init__
 
+from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
+from fabmetheus_utilities.vector3 import Vector3
+from fabmetheus_utilities import archive
 from fabmetheus_utilities import euclidean
 from fabmetheus_utilities import gcodec
 from fabmetheus_utilities import intercircle
-from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
 from fabmetheus_utilities import settings
-from fabmetheus_utilities.vector3 import Vector3
 from skeinforge_application.skeinforge_utilities import skeinforge_craft
 from skeinforge_application.skeinforge_utilities import skeinforge_polyfile
 from skeinforge_application.skeinforge_utilities import skeinforge_profile
@@ -94,7 +95,7 @@ __license__ = 'GPL 3.0'
 
 def getCraftedText( fileName, text = '', multiplyRepository = None ):
 	"Multiply the fill file or text."
-	return getCraftedTextFromText( gcodec.getTextIfEmpty( fileName, text ), multiplyRepository )
+	return getCraftedTextFromText( archive.getTextIfEmpty( fileName, text ), multiplyRepository )
 
 def getCraftedTextFromText( gcodeText, multiplyRepository = None ):
 	"Multiply the fill text."
@@ -123,7 +124,7 @@ class MultiplyRepository:
 		"Set the default settings, execute title & settings fileName."
 		skeinforge_profile.addListsToCraftTypeRepository('skeinforge_application.skeinforge_plugins.craft_plugins.multiply.html', self )
 		self.fileNameInput = settings.FileNameInput().getFromFileName( fabmetheus_interpret.getGNUTranslatorGcodeFileTypeTuples(), 'Open File for Multiply', self, '')
-		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Multiply')
+		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Multiply')
 		self.activateMultiply = settings.BooleanSetting().getFromValue('Activate Multiply:', self, False )
 		settings.LabelSeparator().getFromRepository(self)
 		settings.LabelDisplay().getFromName('- Center -', self )
@@ -148,6 +149,7 @@ class MultiplySkein:
 	"A class to multiply a skein of extrusions."
 	def __init__(self):
 		self.distanceFeedRate = gcodec.DistanceFeedRate()
+		self.isExtrusionActive = False
 		self.layerCount = settings.LayerCount()
 		self.layerIndex = 0
 		self.layerLines = []
@@ -207,7 +209,7 @@ class MultiplySkein:
 		self.multiplyRepository = multiplyRepository
 		self.numberOfColumns = multiplyRepository.numberOfColumns.value
 		self.numberOfRows = multiplyRepository.numberOfRows.value
-		self.lines = gcodec.getTextLines(gcodeText)
+		self.lines = archive.getTextLines(gcodeText)
 		self.parseInitialization()
 		self.setCorners()
 		for line in self.lines[self.lineIndex :]:
@@ -246,7 +248,7 @@ class MultiplySkein:
 			self.addLayer()
 			self.distanceFeedRate.addLine(line)
 			return
-		elif firstWord == '(</extrusion>)':
+		elif firstWord == '(</crafting>)':
 			self.shouldAccumulate = False
 		if self.shouldAccumulate:
 			self.layerLines.append(line)
@@ -255,16 +257,22 @@ class MultiplySkein:
 
 	def setCorners(self):
 		"Set maximum and minimum corners and z."
-		locationComplexes = []
+		cornerHighComplex = complex(-987654321.0, -987654321.0)
+		cornerLowComplex = -cornerHighComplex
 		for line in self.lines[self.lineIndex :]:
 			splitLine = gcodec.getSplitLineBeforeBracketSemicolon(line)
 			firstWord = gcodec.getFirstWord(splitLine)
 			if firstWord == 'G1':
 				location = gcodec.getLocationFromSplitLine(self.oldLocation, splitLine)
-				locationComplexes.append( location.dropAxis(2) )
+				if self.isExtrusionActive:
+					locationComplex = location.dropAxis()
+					cornerHighComplex = euclidean.getMaximum(locationComplex,  cornerHighComplex)
+					cornerLowComplex = euclidean.getMinimum(locationComplex,  cornerLowComplex)
 				self.oldLocation = location
-		cornerHighComplex = euclidean.getMaximumByPathComplex( locationComplexes )
-		cornerLowComplex = euclidean.getMinimumByPathComplex( locationComplexes )
+			elif firstWord == 'M101':
+				self.isExtrusionActive = True
+			elif firstWord == 'M103':
+				self.isExtrusionActive = False
 		self.extent = cornerHighComplex - cornerLowComplex
 		self.shapeCenter = 0.5 * ( cornerHighComplex + cornerLowComplex )
 		self.separation = self.multiplyRepository.separationOverPerimeterWidth.value * self.absolutePerimeterWidth

@@ -3,7 +3,7 @@ This page is in the table of contents.
 Statistic is a script to generate statistics a gcode file.
 
 The statistic manual page is at:
-http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Statistic
+http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Statistic
 
 ==Operation==
 The default 'Activate Statistic' checkbox is on.  When it is on, the functions described below will work when called from the skeinforge toolchain, when it is off, the functions will not be called from the toolchain.  The functions will still be called, whether or not the 'Activate Statistic' checkbox is on, when statistic is run directly.
@@ -68,6 +68,7 @@ from __future__ import absolute_import
 import __init__
 
 from fabmetheus_utilities.vector3 import Vector3
+from fabmetheus_utilities import archive
 from fabmetheus_utilities import euclidean
 from fabmetheus_utilities import gcodec
 from fabmetheus_utilities import settings
@@ -88,13 +89,13 @@ def getNewRepository():
 
 def getWindowAnalyzeFile(fileName):
 	"Write statistics for a gcode file."
-	return getWindowAnalyzeFileGivenText( fileName, gcodec.getFileText(fileName) )
+	return getWindowAnalyzeFileGivenText( fileName, archive.getFileText(fileName) )
 
 def getWindowAnalyzeFileGivenText( fileName, gcodeText, repository=None):
 	"Write statistics for a gcode file."
 	print('')
 	print('')
-	print('Statistics are being generated for the file ' + gcodec.getSummarizedFileName(fileName) )
+	print('Statistics are being generated for the file ' + archive.getSummarizedFileName(fileName) )
 	if repository == None:
 		repository = settings.getReadRepository( StatisticRepository() )
 	skein = StatisticSkein()
@@ -102,13 +103,13 @@ def getWindowAnalyzeFileGivenText( fileName, gcodeText, repository=None):
 	if repository.printStatistics.value:
 		print( statisticGcode )
 	if repository.saveStatistics.value:
-		gcodec.writeFileMessageEnd('.txt', fileName, statisticGcode, 'The statistics file is saved as ')
+		archive.writeFileMessageEnd('.txt', fileName, statisticGcode, 'The statistics file is saved as ')
 
 def writeOutput( fileName, fileNameSuffix, gcodeText = ''):
 	"Write statistics for a skeinforge gcode file, if 'Write Statistics File for Skeinforge Chain' is selected."
 	repository = settings.getReadRepository( StatisticRepository() )
 	if gcodeText == '':
-		gcodeText = gcodec.getFileText( fileNameSuffix )
+		gcodeText = archive.getFileText( fileNameSuffix )
 	if repository.activateStatistic.value:
 		getWindowAnalyzeFileGivenText( fileNameSuffix, gcodeText, repository )
 
@@ -118,7 +119,7 @@ class StatisticRepository:
 	def __init__(self):
 		"Set the default settings, execute title & settings fileName."
 		settings.addListsToRepository('skeinforge_application.skeinforge_plugins.analyze_plugins.statistic.html', None, self )
-		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Statistic')
+		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Statistic')
 		self.activateStatistic = settings.BooleanSetting().getFromValue('Activate Statistic', self, True )
 		settings.LabelSeparator().getFromRepository(self)
 		settings.LabelDisplay().getFromName('- Cost -', self )
@@ -188,7 +189,7 @@ class StatisticSkein:
 		self.totalBuildTime = 0.0
 		self.totalDistanceExtruded = 0.0
 		self.totalDistanceTraveled = 0.0
-		lines = gcodec.getTextLines(gcodeText)
+		lines = archive.getTextLines(gcodeText)
 		for line in lines:
 			self.parseLine(line)
 		averageFeedRate = self.totalDistanceTraveled / self.totalBuildTime
@@ -262,7 +263,7 @@ class StatisticSkein:
 	def getLocationSetFeedRateToSplitLine( self, splitLine ):
 		"Get location ans set feed rate to the plsit line."
 		location = gcodec.getLocationFromSplitLine(self.oldLocation, splitLine)
-		indexOfF = gcodec.indexOfStartingWithSecond( "F", splitLine )
+		indexOfF = gcodec.getIndexOfStartingWithSecond( "F", splitLine )
 		if indexOfF > 0:
 			self.feedRateMinute = gcodec.getDoubleAfterFirstLetter( splitLine[indexOfF] )
 		return location
@@ -274,7 +275,7 @@ class StatisticSkein:
 		location = self.getLocationSetFeedRateToSplitLine(splitLine)
 		location += self.oldLocation
 		center = self.oldLocation.copy()
-		indexOfR = gcodec.indexOfStartingWithSecond( "R", splitLine )
+		indexOfR = gcodec.getIndexOfStartingWithSecond( "R", splitLine )
 		if indexOfR > 0:
 			radius = gcodec.getDoubleAfterFirstLetter( splitLine[ indexOfR ] )
 			halfLocationMinusOld = location - self.oldLocation

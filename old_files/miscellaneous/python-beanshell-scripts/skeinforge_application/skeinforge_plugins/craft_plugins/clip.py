@@ -3,7 +3,7 @@ This page is in the table of contents.
 Clip clips the ends of loops to prevent bumps from forming.
 
 The clip manual page is at:
-http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Clip
+http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Clip
 
 ==Operation==
 The default 'Activate Clip' checkbox is on.  When it is on, the functions described below will work, when it is off, the functions will not be called.
@@ -57,6 +57,7 @@ from __future__ import absolute_import
 #Init has to be imported first because it has code to workaround the python bug where relative imports don't work if the module is imported as a main module.
 import __init__
 
+from fabmetheus_utilities import archive
 from fabmetheus_utilities import euclidean
 from fabmetheus_utilities import gcodec
 from fabmetheus_utilities import intercircle
@@ -76,7 +77,7 @@ __license__ = 'GPL 3.0'
 
 def getCraftedText( fileName, text, clipRepository = None ):
 	"Clip a gcode linear move file or text."
-	return getCraftedTextFromText( gcodec.getTextIfEmpty( fileName, text ), clipRepository )
+	return getCraftedTextFromText( archive.getTextIfEmpty( fileName, text ), clipRepository )
 
 def getCraftedTextFromText( gcodeText, clipRepository = None ):
 	"Clip a gcode linear move text."
@@ -105,7 +106,7 @@ class ClipRepository:
 		"Set the default settings, execute title & settings fileName."
 		skeinforge_profile.addListsToCraftTypeRepository('skeinforge_application.skeinforge_plugins.craft_plugins.clip.html', self )
 		self.fileNameInput = settings.FileNameInput().getFromFileName( fabmetheus_interpret.getGNUTranslatorGcodeFileTypeTuples(), 'Open File for Clip', self, '')
-		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Clip')
+		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Clip')
 		self.activateClip = settings.BooleanSetting().getFromValue('Activate Clip', self, True )
 		self.clipOverPerimeterWidth = settings.FloatSpin().getFromValue( 0.1, 'Clip Over Perimeter Width (ratio):', self, 0.8, 0.5 )
 		self.maximumConnectionDistanceOverPerimeterWidth = settings.FloatSpin().getFromValue( 1.0, 'Maximum Connection Distance Over Perimeter Width (ratio):', self, 20.0, 10.0 )
@@ -219,7 +220,7 @@ class ClipSkein:
 
 	def getCraftedGcode( self, clipRepository, gcodeText ):
 		"Parse gcode text and store the clip gcode."
-		self.lines = gcodec.getTextLines(gcodeText)
+		self.lines = archive.getTextLines(gcodeText)
 		self.parseInitialization( clipRepository )
 		for self.lineIndex in xrange( self.lineIndex, len(self.lines) ):
 			line = self.lines[self.lineIndex]

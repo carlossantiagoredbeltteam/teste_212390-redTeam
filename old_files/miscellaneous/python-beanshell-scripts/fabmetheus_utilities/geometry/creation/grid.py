@@ -36,8 +36,7 @@ def addGridRow(diameter, gridPath, loopsComplex, maximumComplex, rowIndex, x, y,
 def getGeometryOutput(derivation, xmlElement):
 	"Get vector3 vertexes from attribute dictionary."
 	if derivation == None:
-		derivation = GridDerivation()
-		derivation.setToXMLElement(xmlElement)
+		derivation = GridDerivation(xmlElement)
 	diameter = derivation.radius + derivation.radius
 	typeStringTwoCharacters = derivation.typeString.lower()[: 2]
 	typeStringFirstCharacter = typeStringTwoCharacters[: 1]
@@ -52,7 +51,7 @@ def getGeometryOutput(derivation, xmlElement):
 	if typeStringTwoCharacters == 'he':
 		gridPath = getHexagonalGrid(diameter, loopsComplex, maximumComplex, minimumComplex, derivation.zigzag)
 	elif typeStringTwoCharacters == 'ra' or typeStringFirstCharacter == 'a':
-		gridPath = getRandomGrid(diameter, loopsComplex, maximumComplex, minimumComplex, xmlElement)
+		gridPath = getRandomGrid(derivation, diameter, loopsComplex, maximumComplex, minimumComplex, xmlElement)
 	elif typeStringTwoCharacters == 're' or typeStringFirstCharacter == 'e':
 		gridPath = getRectangularGrid(diameter, loopsComplex, maximumComplex, minimumComplex, derivation.zigzag)
 	if gridPath == None:
@@ -105,19 +104,17 @@ def getIsPointInsideZoneAwayOthers(diameterReciprocal, loopsComplex, point, pixe
 	euclidean.addElementToPixelListFromPoint(pointOverDiameter, pixelDictionary, pointOverDiameter)
 	return True
 
-def getRandomGrid(diameter, loopsComplex, maximumComplex, minimumComplex, xmlElement):
+def getRandomGrid(derivation, diameter, loopsComplex, maximumComplex, minimumComplex, xmlElement):
 	"Get rectangular grid."
-	packingDensity = evaluate.getEvaluatedFloatByKeys(0.2, ['packingDensity', 'density'], xmlElement)
 	gridPath = []
 	diameterReciprocal = complex(1.0 / diameter.real, 1.0 / diameter.imag)
 	diameterSquared = diameter.real * diameter.real + diameter.imag * diameter.imag
-	elements = int(math.ceil(packingDensity * euclidean.getAreaLoops(loopsComplex) / diameterSquared / math.sqrt(0.75)))
+	elements = int(math.ceil(derivation.packingDensity * euclidean.getAreaLoops(loopsComplex) / diameterSquared / math.sqrt(0.75)))
 	elements = evaluate.getEvaluatedIntDefault(elements, 'elements', xmlElement)
 	failedPlacementAttempts = 0
 	pixelDictionary = {}
-	seed = evaluate.getEvaluatedIntDefault(None, 'seed', xmlElement)
-	if seed != None:
-		random.seed(seed)
+	if derivation.seed != None:
+		random.seed(derivation.seed)
 	successfulPlacementAttempts = 0
 	while failedPlacementAttempts < 100:
 		point = euclidean.getRandomComplex(minimumComplex, maximumComplex)
@@ -151,27 +148,20 @@ def processXMLElement(xmlElement):
 
 class GridDerivation:
 	"Class to hold grid variables."
-	def __init__(self):
+	def __init__(self, xmlElement):
 		'Set defaults.'
-		self.inradius = complex(10.0, 10.0)
-		self.radius = complex(1.0, 1.0)
-		self.target = []
-		self.typeString = 'rectangular'
-		self.zigzag = True
+		self.inradius = lineation.getComplexByPrefixes(['demisize', 'inradius'], complex(10.0, 10.0), xmlElement)
+		self.inradius = lineation.getComplexByMultiplierPrefix(2.0, 'size', self.inradius, xmlElement)
+		self.demiwidth = lineation.getFloatByPrefixBeginEnd('demiwidth', 'width', self.inradius.real, xmlElement)
+		self.demiheight = lineation.getFloatByPrefixBeginEnd('demiheight', 'height', self.inradius.imag, xmlElement)
+		self.packingDensity = evaluate.getEvaluatedFloatByKeys(0.2, ['packingDensity', 'density'], xmlElement)
+		self.radius = lineation.getComplexByPrefixBeginEnd('elementRadius', 'elementDiameter', complex(1.0, 1.0), xmlElement)
+		self.radius = lineation.getComplexByPrefixBeginEnd('radius', 'diameter', self.radius, xmlElement)
+		self.seed = evaluate.getEvaluatedIntDefault(None, 'seed', xmlElement)
+		self.target = evaluate.getTransformedPathsByKey([], 'target', xmlElement)
+		self.typeString = evaluate.getEvaluatedStringDefault('rectangular', 'type', xmlElement)
+		self.zigzag = evaluate.getEvaluatedBooleanDefault(True, 'zigzag', xmlElement)
 
 	def __repr__(self):
 		"Get the string representation of this GridDerivation."
 		return str(self.__dict__)
-
-	def setToXMLElement(self, xmlElement):
-		"Set to the xmlElement."
-		self.inradius = lineation.getComplexByPrefixes(['demisize', 'inradius'], self.inradius, xmlElement)
-		self.inradius = lineation.getComplexByMultiplierPrefix(2.0, 'size', self.inradius, xmlElement)
-		self.demiwidth = lineation.getFloatByPrefixBeginEnd('demiwidth', 'width', self.inradius.real, xmlElement)
-		self.demiheight = lineation.getFloatByPrefixBeginEnd('demiheight', 'height', self.inradius.imag, xmlElement)
-		self.radius = lineation.getComplexByPrefixBeginEnd('elementRadius', 'elementDiameter', self.radius, xmlElement)
-		self.radius = lineation.getComplexByPrefixBeginEnd('radius', 'diameter', self.radius, xmlElement)
-		if len(self.target) < 1:
-			self.target = evaluate.getTransformedPathsByKey('target', xmlElement)
-		self.typeString = evaluate.getEvaluatedStringDefault(self.typeString, 'type', xmlElement)
-		self.zigzag = evaluate.getEvaluatedBooleanDefault(self.zigzag, 'zigzag', xmlElement)

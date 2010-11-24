@@ -3,7 +3,7 @@ This page is in the table of contents.
 Splodge turns the extruder on just before the start of a thread.  This is to give the extrusion a bit anchoring at the beginning.
 
 The splodge manual page is at:
-http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Splodge
+http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Splodge
 
 ==Operation==
 The default 'Activate Splodge' checkbox is on.  When it is on, the functions described below will work, when it is off, the functions will not be called.
@@ -79,9 +79,10 @@ from __future__ import absolute_import
 #Init has to be imported first because it has code to workaround the python bug where relative imports don't work if the module is imported as a main module.
 import __init__
 
+from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
+from fabmetheus_utilities import archive
 from fabmetheus_utilities import euclidean
 from fabmetheus_utilities import gcodec
-from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
 from fabmetheus_utilities import settings
 from skeinforge_application.skeinforge_utilities import skeinforge_craft
 from skeinforge_application.skeinforge_utilities import skeinforge_polyfile
@@ -97,7 +98,7 @@ __license__ = 'GPL 3.0'
 
 def getCraftedText( fileName, text, splodgeRepository = None ):
 	"Splodge a gcode linear move file or text."
-	return getCraftedTextFromText( gcodec.getTextIfEmpty( fileName, text ), splodgeRepository )
+	return getCraftedTextFromText( archive.getTextIfEmpty( fileName, text ), splodgeRepository )
 
 def getCraftedTextFromText( gcodeText, splodgeRepository = None ):
 	"Splodge a gcode linear move text."
@@ -126,7 +127,7 @@ class SplodgeRepository:
 		"Set the default settings, execute title & settings fileName."
 		skeinforge_profile.addListsToCraftTypeRepository('skeinforge_application.skeinforge_plugins.craft_plugins.splodge.html', self )
 		self.fileNameInput = settings.FileNameInput().getFromFileName( fabmetheus_interpret.getGNUTranslatorGcodeFileTypeTuples(), 'Open File for Splodge', self, '')
-		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Splodge')
+		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Splodge')
 		self.activateSplodge = settings.BooleanSetting().getFromValue('Activate Splodge', self, False )
 		settings.LabelSeparator().getFromRepository(self)
 		settings.LabelDisplay().getFromName('- Initial -', self )
@@ -186,7 +187,7 @@ class SplodgeSkein:
 
 	def getCraftedGcode( self, gcodeText, splodgeRepository ):
 		"Parse gcode text and store the splodge gcode."
-		self.lines = gcodec.getTextLines(gcodeText)
+		self.lines = archive.getTextLines(gcodeText)
 		self.setRotations()
 		self.splodgeRepository = splodgeRepository
 		self.parseInitialization( splodgeRepository )

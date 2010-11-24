@@ -49,7 +49,7 @@ class Document:
 		elementByID = self.xmlElement.getXMLElementByImportID(idKey)
 		if elementByID == None:
 			print('Warning, could not get elementByID in getElementByID in document for:')
-			print(arguments[0])
+			print(idKey)
 			print(self.xmlElement)
 		return elementByID
 
@@ -66,6 +66,10 @@ class Document:
 		"Get parent element."
 		return self.getParentElement()
 
+	def getParentElement(self):
+		"Get parent element."
+		return self.xmlElement.parent
+
 	def getPrevious(self):
 		"Get previous element."
 		return self.getPreviousElement()
@@ -74,9 +78,9 @@ class Document:
 		"Get previous element."
 		return self.xmlElement.getPreviousXMLElement()
 
-	def getParentElement(self):
-		"Get parent element."
-		return self.xmlElement.parent
+	def getPreviousVertex(self):
+		'Get previous element.'
+		return self.xmlElement.getPreviousVertex()
 
 	def getRoot(self):
 		"Get root element."
@@ -96,5 +100,6 @@ class Document:
 
 
 globalAccessibleAttributes = 'getByID getByName getCascadeValue getElementByID getElementsByName getParent'.split()
-globalAccessibleAttributes += 'getParentElement getPrevious getPreviousElement getRoot getRootElement getSelf getSelfElement'.split()
+globalAccessibleAttributes += 'getParentElement getPrevious getPreviousElement getPreviousVertex getRoot'.split()
+globalAccessibleAttributes += 'getRootElement getSelf getSelfElement'.split()
 globalAccessibleAttributeSet = set(globalAccessibleAttributes)

@@ -3,7 +3,7 @@ This page is in the table of contents.
 Fillet rounds the corners slightly in a variety of ways.  This is to reduce corner blobbing and sudden extruder acceleration.
 
 The fillet manual page is at:
-http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Fillet
+http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Fillet
 
 ==Operation==
 The default 'Activate Fillet' checkbox is off.  When it is on, the functions described below will work, when it is off, the functions will not be called.
@@ -82,11 +82,12 @@ from __future__ import absolute_import
 #Init has to be imported first because it has code to workaround the python bug where relative imports don't work if the module is imported as a main module.
 import __init__
 
+from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
+from fabmetheus_utilities.vector3 import Vector3
+from fabmetheus_utilities import archive
 from fabmetheus_utilities import euclidean
 from fabmetheus_utilities import gcodec
-from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
 from fabmetheus_utilities import settings
-from fabmetheus_utilities.vector3 import Vector3
 from skeinforge_application.skeinforge_utilities import skeinforge_craft
 from skeinforge_application.skeinforge_utilities import skeinforge_polyfile
 from skeinforge_application.skeinforge_utilities import skeinforge_profile
@@ -101,7 +102,7 @@ __license__ = 'GPL 3.0'
 
 def getCraftedText( fileName, gcodeText, repository = None ):
 	"Fillet a gcode linear move file or text."
-	return getCraftedTextFromText( gcodec.getTextIfEmpty( fileName, gcodeText ), repository )
+	return getCraftedTextFromText( archive.getTextIfEmpty( fileName, gcodeText ), repository )
 
 def getCraftedTextFromText( gcodeText, repository = None ):
 	"Fillet a gcode linear move text."
@@ -160,7 +161,7 @@ class BevelSkein:
 	def getCraftedGcode( self, repository, gcodeText ):
 		"Parse gcode text and store the bevel gcode."
 		self.cornerFeedRateOverOperatingFeedRate = repository.cornerFeedRateOverOperatingFeedRate.value
-		self.lines = gcodec.getTextLines(gcodeText)
+		self.lines = archive.getTextLines(gcodeText)
 		self.repository = repository
 		self.parseInitialization( repository )
 		for self.lineIndex in xrange( self.lineIndex, len(self.lines) ):
@@ -381,7 +382,7 @@ class FilletRepository:
 		"Set the default settings, execute title & settings fileName."
 		skeinforge_profile.addListsToCraftTypeRepository('skeinforge_application.skeinforge_plugins.craft_plugins.fillet.html', self )
 		self.fileNameInput = settings.FileNameInput().getFromFileName( fabmetheus_interpret.getGNUTranslatorGcodeFileTypeTuples(), 'Open File to be Filleted', self, '')
-		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Fillet')
+		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Fillet')
 		self.activateFillet = settings.BooleanSetting().getFromValue('Activate Fillet', self, False )
 		self.filletProcedureChoiceLabel = settings.LabelDisplay().getFromName('Fillet Procedure Choice: ', self )
 		filletLatentStringVar = settings.LatentStringVar()

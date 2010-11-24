@@ -3,7 +3,7 @@ This page is in the table of contents.
 Comb is a script to comb the extrusion hair of a gcode file.
 
 The comb manual page is at:
-http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Comb
+http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Comb
 
 Comb bends the extruder travel paths around holes in the slices, to avoid stringers.  It moves the extruder to the inside of perimeters before turning the extruder on so any start up ooze will be inside the shape.
 
@@ -58,10 +58,11 @@ except:
 #Init has to be imported first because it has code to workaround the python bug where relative imports don't work if the module is imported as a main module.
 import __init__
 
+from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
+from fabmetheus_utilities import archive
 from fabmetheus_utilities import euclidean
 from fabmetheus_utilities import gcodec
 from fabmetheus_utilities import intercircle
-from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
 from fabmetheus_utilities import settings
 from skeinforge_application.skeinforge_utilities import skeinforge_craft
 from skeinforge_application.skeinforge_utilities import skeinforge_polyfile
@@ -77,7 +78,7 @@ __license__ = 'GPL 3.0'
 
 def getCraftedText( fileName, text, combRepository = None ):
 	"Comb a gcode linear move text."
-	return getCraftedTextFromText( gcodec.getTextIfEmpty( fileName, text ), combRepository )
+	return getCraftedTextFromText( archive.getTextIfEmpty( fileName, text ), combRepository )
 
 def getCraftedTextFromText( gcodeText, combRepository = None ):
 	"Comb a gcode linear move text."
@@ -146,7 +147,7 @@ class CombRepository:
 		"Set the default settings, execute title & settings fileName."
 		skeinforge_profile.addListsToCraftTypeRepository('skeinforge_application.skeinforge_plugins.craft_plugins.comb.html', self )
 		self.fileNameInput = settings.FileNameInput().getFromFileName( fabmetheus_interpret.getGNUTranslatorGcodeFileTypeTuples(), 'Open File for Comb', self, '')
-		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Comb')
+		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Comb')
 		self.activateComb = settings.BooleanSetting().getFromValue('Activate Comb', self, False )
 		self.executeTitle = 'Comb'
 
@@ -160,6 +161,8 @@ class CombRepository:
 class CombSkein:
 	"A class to comb a skein of extrusions."
 	def __init__(self):
+		'Initialize'
+		self.isAlteration = False
 		self.betweenTable = {}
 		self.boundaryLoop = None
 		self.distanceFeedRate = gcodec.DistanceFeedRate()
@@ -184,7 +187,7 @@ class CombSkein:
 	def addIfTravel( self, splitLine ):
 		"Add travel move around loops if the extruder is off."
 		location = gcodec.getLocationFromSplitLine(self.oldLocation, splitLine)
-		if not self.extruderActive and self.oldLocation != None:
+		if not self.isAlteration and not self.extruderActive and self.oldLocation != None:
 			if len( self.getBoundaries() ) > 0:
 				highestZ = max( location.z, self.oldLocation.z )
 				self.addGcodePathZ( self.travelFeedRatePerMinute, self.getPathsBetween( self.oldLocation.dropAxis(2), location.dropAxis(2) ), highestZ )
@@ -210,7 +213,7 @@ class CombSkein:
 			return []
 		self.betweenTable[ self.layerZ ] = []
 		for boundaryLoop in self.layerTable[ self.layerZ ]:
-			self.betweenTable[ self.layerZ ] += intercircle.getInsetLoopsFromLoop( self.betweenInset, boundaryLoop )
+			self.betweenTable[ self.layerZ ] += intercircle.getInsetLoopsFromLoop(boundaryLoop, self.betweenInset)
 		return self.betweenTable[ self.layerZ ]
 
 	def getBoundaries(self):
@@ -222,7 +225,7 @@ class CombSkein:
 	def getCraftedGcode( self, combRepository, gcodeText ):
 		"Parse gcode text and store the comb gcode."
 		self.combRepository = combRepository
-		self.lines = gcodec.getTextLines(gcodeText)
+		self.lines = archive.getTextLines(gcodeText)
 		self.parseInitialization( combRepository )
 		for lineIndex in xrange( self.lineIndex, len(self.lines) ):
 			line = self.lines[lineIndex]
@@ -416,6 +419,10 @@ class CombSkein:
 			self.extruderActive = True
 		elif firstWord == 'M103':
 			self.extruderActive = False
+		elif firstWord == '(<alteration>)':
+			self.isAlteration = True
+		elif firstWord == '(</alteration>)':
+			self.isAlteration = False
 		elif firstWord == '(<layer>':
 			self.layerCount.printProgressIncrement('comb')
 			self.nextLayerZ = float(splitLine[1])

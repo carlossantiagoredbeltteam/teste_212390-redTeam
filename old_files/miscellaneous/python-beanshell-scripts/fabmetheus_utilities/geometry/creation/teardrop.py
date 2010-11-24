@@ -9,11 +9,8 @@ import __init__
 
 from fabmetheus_utilities.geometry.creation import extrude
 from fabmetheus_utilities.geometry.creation import lineation
-from fabmetheus_utilities.geometry.manipulation_evaluator import matrix
 from fabmetheus_utilities.geometry.geometry_utilities import evaluate
-from fabmetheus_utilities.geometry.solids import trianglemesh
 from fabmetheus_utilities.vector3 import Vector3
-from fabmetheus_utilities.vector3index import Vector3Index
 from fabmetheus_utilities import euclidean
 import math
 
@@ -24,20 +21,23 @@ __date__ = "$Date: 2008/02/05 $"
 __license__ = 'GPL 3.0'
 
 
-def addNegativesByRadius(end, negatives, radius, start, xmlElement):
+def addNegativesByDerivation(end, extrudeDerivation, negatives, radius, start, xmlElement):
 	"Add teardrop drill hole to negatives."
-	extrudeDerivation = extrude.ExtrudeDerivation()
 	extrudeDerivation.offsetAlongDefault = [start, end]
 	extrudeDerivation.tiltFollow = True
 	extrudeDerivation.tiltTop = Vector3(0.0, 0.0, 1.0)
-	extrudeDerivation.setToXMLElement()
+	extrudeDerivation.setToXMLElement(xmlElement.getCopyShallow())
 	extrude.addNegatives(extrudeDerivation, negatives, [getTeardropPathByEndStart(end, radius, start, xmlElement)])
+
+def addNegativesByRadius(end, negatives, radius, start, xmlElement):
+	"Add teardrop drill hole to negatives."
+	extrudeDerivation = extrude.ExtrudeDerivation()
+	addNegativesByDerivation(end, extrudeDerivation, negatives, radius, start, xmlElement)
 
 def getGeometryOutput(derivation, xmlElement):
 	"Get vector3 vertexes from attribute dictionary."
 	if derivation == None:
-		derivation = TeardropDerivation()
-		derivation.setToXMLElement(xmlElement)
+		derivation = TeardropDerivation(xmlElement)
 	teardropPath = getTeardropPath(derivation.inclination, derivation.radius, xmlElement)
 	return lineation.getGeometryOutputByLoop(lineation.SideLoop(teardropPath), xmlElement)
 
@@ -95,23 +95,18 @@ def processXMLElement(xmlElement):
 
 class TeardropDerivation:
 	"Class to hold teardrop variables."
-	def __init__(self):
+	def __init__(self, xmlElement):
 		'Set defaults.'
-		self.inclination = 0.0
-		self.radius = 1.0
-
-	def __repr__(self):
-		"Get the string representation of this TeardropDerivation."
-		return str(self.__dict__)
-
-	def setToXMLElement(self, xmlElement):
-		"Set to the xmlElement."
-		end = evaluate.getVector3ByPrefix('end', None, xmlElement)
-		start = evaluate.getVector3ByPrefix('start', Vector3(), xmlElement)
+		end = evaluate.getVector3ByPrefix(None, 'end', xmlElement)
+		start = evaluate.getVector3ByPrefix(Vector3(), 'start', xmlElement)
 		inclinationDegree = math.degrees(getInclination(end, start))
 		self.inclination = math.radians(evaluate.getEvaluatedFloatDefault(inclinationDegree, 'inclination', xmlElement))
-		self.radius = lineation.getFloatByPrefixBeginEnd('radius', 'diameter', self.radius, xmlElement)
+		self.radius = lineation.getFloatByPrefixBeginEnd('radius', 'diameter', 1.0, xmlElement)
 		size = evaluate.getEvaluatedFloatDefault(None, 'size', xmlElement)
 		if size != None:
 			self.radius = 0.5 * size
 		self.xmlElement = xmlElement
+
+	def __repr__(self):
+		"Get the string representation of this TeardropDerivation."
+		return str(self.__dict__)
