@@ -5,7 +5,7 @@ At the beginning of a layer, depending on the settings, wipe will move the nozzl
 The wipe path is machine specific, so you'll probably have to change all the default locations.
 
 The wipe manual page is at:
-http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Wipe
+http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Wipe
 
 ==Operation==
 The default 'Activate Wipe' checkbox is off.  When it is on, the functions described below will work, when it is off, the functions will not be called.
@@ -102,11 +102,12 @@ from __future__ import absolute_import
 #Init has to be imported first because it has code to workaround the python bug where relative imports don't work if the module is imported as a main module.
 import __init__
 
+from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
+from fabmetheus_utilities.vector3 import Vector3
+from fabmetheus_utilities import archive
 from fabmetheus_utilities import euclidean
 from fabmetheus_utilities import gcodec
-from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
 from fabmetheus_utilities import settings
-from fabmetheus_utilities.vector3 import Vector3
 from skeinforge_application.skeinforge_utilities import skeinforge_craft
 from skeinforge_application.skeinforge_utilities import skeinforge_polyfile
 from skeinforge_application.skeinforge_utilities import skeinforge_profile
@@ -121,7 +122,7 @@ __license__ = 'GPL 3.0'
 
 def getCraftedText( fileName, text, wipeRepository = None ):
 	"Wipe a gcode linear move text."
-	return getCraftedTextFromText( gcodec.getTextIfEmpty( fileName, text ), wipeRepository )
+	return getCraftedTextFromText( archive.getTextIfEmpty( fileName, text ), wipeRepository )
 
 def getCraftedTextFromText( gcodeText, wipeRepository = None ):
 	"Wipe a gcode linear move text."
@@ -150,7 +151,7 @@ class WipeRepository:
 		"Set the default settings, execute title & settings fileName."
 		skeinforge_profile.addListsToCraftTypeRepository('skeinforge_application.skeinforge_plugins.craft_plugins.wipe.html', self )
 		self.fileNameInput = settings.FileNameInput().getFromFileName( fabmetheus_interpret.getGNUTranslatorGcodeFileTypeTuples(), 'Open File for Wipe', self, '')
-		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Wipe')
+		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Wipe')
 		self.activateWipe = settings.BooleanSetting().getFromValue('Activate Wipe', self, False )
 		settings.LabelSeparator().getFromRepository(self)
 		settings.LabelDisplay().getFromName('- Location Arrival -', self )
@@ -224,7 +225,7 @@ class WipeSkein:
 
 	def getCraftedGcode( self, gcodeText, wipeRepository ):
 		"Parse gcode text and store the wipe gcode."
-		self.lines = gcodec.getTextLines(gcodeText)
+		self.lines = archive.getTextLines(gcodeText)
 		self.wipePeriod = wipeRepository.wipePeriod.value
 		self.parseInitialization( wipeRepository )
 		self.locationArrival = Vector3( wipeRepository.locationArrivalX.value, wipeRepository.locationArrivalY.value, wipeRepository.locationArrivalZ.value )

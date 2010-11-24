@@ -3,7 +3,7 @@ This page is in the table of contents.
 Hop is a script to raise the extruder when it is not extruding.
 
 The hop manual page is at:
-http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Hop
+http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Hop
 
 ==Operation==
 The default 'Activate Hop' checkbox is off.  It is off because Vik and Nophead found better results without hopping.  When it is on, the functions described below will work, when it is off, the functions will not be called.
@@ -57,9 +57,10 @@ from __future__ import absolute_import
 #Init has to be imported first because it has code to workaround the python bug where relative imports don't work if the module is imported as a main module.
 import __init__
 
+from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
+from fabmetheus_utilities import archive
 from fabmetheus_utilities import euclidean
 from fabmetheus_utilities import gcodec
-from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
 from fabmetheus_utilities import settings
 from skeinforge_application.skeinforge_utilities import skeinforge_craft
 from skeinforge_application.skeinforge_utilities import skeinforge_polyfile
@@ -75,7 +76,7 @@ __license__ = 'GPL 3.0'
 
 def getCraftedText( fileName, text, hopRepository = None ):
 	"Hop a gcode linear move text."
-	return getCraftedTextFromText( gcodec.getTextIfEmpty( fileName, text ), hopRepository )
+	return getCraftedTextFromText( archive.getTextIfEmpty( fileName, text ), hopRepository )
 
 def getCraftedTextFromText( gcodeText, hopRepository = None ):
 	"Hop a gcode linear move text."
@@ -104,7 +105,7 @@ class HopRepository:
 		"Set the default settings, execute title & settings fileName."
 		skeinforge_profile.addListsToCraftTypeRepository('skeinforge_application.skeinforge_plugins.craft_plugins.hop.html', self )
 		self.fileNameInput = settings.FileNameInput().getFromFileName( fabmetheus_interpret.getGNUTranslatorGcodeFileTypeTuples(), 'Open File for Hop', self, '')
-		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Hop')
+		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Hop')
 		self.activateHop = settings.BooleanSetting().getFromValue('Activate Hop', self, False )
 		self.hopOverLayerThickness = settings.FloatSpin().getFromValue( 0.5, 'Hop Over Layer Thickness (ratio):', self, 1.5, 1.0 )
 		self.minimumHopAngle = settings.FloatSpin().getFromValue( 20.0, 'Minimum Hop Angle (degrees):', self, 60.0, 30.0 )
@@ -132,7 +133,7 @@ class HopSkein:
 
 	def getCraftedGcode( self, gcodeText, hopRepository ):
 		"Parse gcode text and store the hop gcode."
-		self.lines = gcodec.getTextLines(gcodeText)
+		self.lines = archive.getTextLines(gcodeText)
 		self.minimumSlope = math.tan( math.radians( hopRepository.minimumHopAngle.value ) )
 		self.parseInitialization( hopRepository )
 		for self.lineIndex in xrange( self.lineIndex, len(self.lines) ):

@@ -4,7 +4,7 @@ This page is in the table of contents.
 Fill is a script to fill the perimeters of a gcode file.
 
 The fill manual page is at:
-http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Fill
+http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Fill
 
 Allan Ecker aka The Masked Retriever has written the "Skeinforge Quicktip: Fill" at:
 http://blog.thingiverse.com/2009/07/21/mysteries-of-skeinforge-fill/
@@ -184,13 +184,14 @@ except:
 #Init has to be imported first because it has code to workaround the python bug where relative imports don't work if the module is imported as a main module.
 import __init__
 
+from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
+from fabmetheus_utilities.geometry.solids import trianglemesh
+from fabmetheus_utilities.vector3 import Vector3
+from fabmetheus_utilities import archive
 from fabmetheus_utilities import euclidean
 from fabmetheus_utilities import gcodec
 from fabmetheus_utilities import intercircle
 from fabmetheus_utilities import settings
-from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
-from fabmetheus_utilities.geometry.solids import trianglemesh
-from fabmetheus_utilities.vector3 import Vector3
 from skeinforge_application.skeinforge_utilities import skeinforge_craft
 from skeinforge_application.skeinforge_utilities import skeinforge_polyfile
 from skeinforge_application.skeinforge_utilities import skeinforge_profile
@@ -401,7 +402,7 @@ def getAdditionalLength( path, point, pointIndex ):
 
 def getCraftedText( fileName, gcodeText = '', repository=None):
 	"Fill the inset file or gcode text."
-	return getCraftedTextFromText( gcodec.getTextIfEmpty(fileName, gcodeText), repository )
+	return getCraftedTextFromText( archive.getTextIfEmpty(fileName, gcodeText), repository )
 
 def getCraftedTextFromText(gcodeText, repository=None):
 	"Fill the inset gcode text."
@@ -776,7 +777,7 @@ class FillRepository:
 		"Set the default settings, execute title & settings fileName."
 		skeinforge_profile.addListsToCraftTypeRepository('skeinforge_application.skeinforge_plugins.craft_plugins.fill.html', self )
 		self.fileNameInput = settings.FileNameInput().getFromFileName( fabmetheus_interpret.getGNUTranslatorGcodeFileTypeTuples(), 'Open File for Fill', self, '')
-		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Fill')
+		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Fill')
 		self.activateFill = settings.BooleanSetting().getFromValue('Activate Fill:', self, True )
 		settings.LabelSeparator().getFromRepository(self)
 		settings.LabelDisplay().getFromName('- Diaphragm -', self )
@@ -839,6 +840,7 @@ class FillSkein:
 		self.lineIndex = 0
 		self.oldLocation = None
 		self.oldOrderedLocation = Vector3()
+		self.perimeterWidth = None
 		self.rotatedLayer = None
 		self.rotatedLayers = []
 		self.shutdownLineIndex = sys.maxint
@@ -895,7 +897,7 @@ class FillSkein:
 				self.isJunctionWide = False
 		rotatedLoops = []
 #		for surroundingLoop in rotatedLayer.surroundingLoops:
-#			surroundingLoop.fillBoundaries = intercircle.getInsetLoopsFromLoop( betweenWidth, surroundingLoop.boundary )
+#			surroundingLoop.fillBoundaries = intercircle.getInsetLoopsFromLoop( surroundingLoop.boundary, betweenWidth )
 #			surroundingLoop.lastExistingFillLoops = surroundingLoop.fillBoundaries
 		surroundingLoops = euclidean.getOrderedSurroundingLoops( self.layerExtrusionWidth, rotatedLayer.surroundingLoops )
 #		if isPerimeterPathInSurroundLoops( surroundingLoops ):
@@ -1128,7 +1130,7 @@ class FillSkein:
 	def getCraftedGcode( self, repository, gcodeText ):
 		"Parse gcode text and store the bevel gcode."
 		self.repository = repository
-		self.lines = gcodec.getTextLines(gcodeText)
+		self.lines = archive.getTextLines(gcodeText)
 		self.threadSequence = None
 		if repository.threadSequenceInfillLoops.value:
 			self.threadSequence = ['infill', 'loops', 'perimeter']
@@ -1149,6 +1151,9 @@ class FillSkein:
 			print('If you want to stretch the infill a lot, set "Path Stretch over Perimeter Width" in stretch to a high value instead of setting "Infill Perimeter Overlap" to a high value.')
 			print('')
 		self.parseInitialization()
+		if self.perimeterWidth == None:
+			print('Warning, nothing will be done because self.perimeterWidth in getCraftedGcode in FillSkein was None.')
+			return ''
 		self.betweenWidth = self.perimeterWidth - 0.5 * self.infillWidth
 		self.fillInset = self.infillWidth - self.infillWidth * self.repository.infillPerimeterOverlap.value
 		if self.repository.infillInteriorDensityOverExteriorDensity.value > 0:
@@ -1277,7 +1282,7 @@ class FillSkein:
 				self.distanceFeedRate.addTagBracketedLine('threadSequenceString', threadSequenceString )
 			elif firstWord == '(</extruderInitialization>)':
 				self.distanceFeedRate.addLine('(<procedureDone> fill </procedureDone>)')
-			elif firstWord == '(<extrusion>)':
+			elif firstWord == '(<crafting>)':
 				self.distanceFeedRate.addLine(line)
 				return
 			elif firstWord == '(<bridgeWidthMultiplier>':
@@ -1314,7 +1319,7 @@ class FillSkein:
 		elif firstWord == '(<bridgeRotation>':
 			secondWordWithoutBrackets = splitLine[1].replace('(', '').replace(')', '')
 			self.rotatedLayer.rotation = complex( secondWordWithoutBrackets )
-		elif firstWord == '(</extrusion>)':
+		elif firstWord == '(</crafting>)':
 			self.shutdownLineIndex = lineIndex
 		elif firstWord == '(<layer>':
 			self.rotatedLayer = RotatedLayer(float(splitLine[1]))

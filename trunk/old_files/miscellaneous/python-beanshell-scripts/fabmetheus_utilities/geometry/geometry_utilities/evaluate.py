@@ -109,9 +109,24 @@ def convertToPaths(dictionary):
 		value = dictionary[key]
 		if value.__class__.__name__ == 'XMLElement':
 			if value.object != None:
-				dictionary[key] = getFloatListListsByPaths( value.object.getPaths() )
+				dictionary[key] = getFloatListListsByPaths(value.object.getPaths())
 		else:
 			convertToPaths(dictionary[key])
+
+def convertToTransformedPaths(dictionary):
+	'Recursively convert any XMLElements to paths.'
+	if dictionary.__class__ == Vector3 or dictionary.__class__.__name__ == 'Vector3Index':
+		return
+	keys = getKeys(dictionary)
+	if keys == None:
+		return
+	for key in keys:
+		value = dictionary[key]
+		if value.__class__.__name__ == 'XMLElement':
+			if value.object != None:
+				dictionary[key] = value.object.getTransformedPaths()
+		else:
+			convertToTransformedPaths(dictionary[key])
 
 def executeLeftOperations( evaluators, operationLevel ):
 	"Evaluate the expression value from the numeric and operation evaluators."
@@ -119,11 +134,11 @@ def executeLeftOperations( evaluators, operationLevel ):
 		evaluatorIndex = negativeIndex + len(evaluators)
 		evaluators[evaluatorIndex].executeLeftOperation( evaluators, evaluatorIndex, operationLevel )
 
-def executePairOperations( evaluators, operationLevel ):
+def executePairOperations(evaluators, operationLevel):
 	"Evaluate the expression value from the numeric and operation evaluators."
-	for negativeIndex in xrange( 1 - len(evaluators), - 1 ):
+	for negativeIndex in xrange(1 - len(evaluators), - 1):
 		evaluatorIndex = negativeIndex + len(evaluators)
-		evaluators[evaluatorIndex].executePairOperation( evaluators, evaluatorIndex, operationLevel )
+		evaluators[evaluatorIndex].executePairOperation(evaluators, evaluatorIndex, operationLevel)
 
 def getArchivableObjectAddToParent( archivableClass, xmlElement ):
 	"Get the archivable object and add it to the parent object."
@@ -136,7 +151,7 @@ def getArchivableObjectAddToParent( archivableClass, xmlElement ):
 
 def getBracketEvaluators(bracketBeginIndex, bracketEndIndex, evaluators):
 	'Get the bracket evaluators.'
-	return getEvaluatedExpressionValueEvaluators( evaluators[ bracketBeginIndex + 1 : bracketEndIndex ] )
+	return getEvaluatedExpressionValueEvaluators(evaluators[bracketBeginIndex + 1 : bracketEndIndex])
 
 def getBracketsExist(evaluators):
 	"Evaluate the expression value."
@@ -170,16 +185,16 @@ def getBracketValuesDeleteEvaluator(bracketBeginIndex, bracketEndIndex, evaluato
 
 def getCumulativeVector3(prefix, vector3, xmlElement):
 	"Get cumulative vector3 and delete the prefixed attributes."
-	cumulativeVector3 = getVector3ByPrefix(prefix + 'rectangular', vector3, xmlElement)
-	cylindrical = getVector3ByPrefix(prefix + 'cylindrical', Vector3(), xmlElement)
+	cumulativeVector3 = getVector3ByPrefix(vector3, prefix + 'rectangular', xmlElement)
+	cylindrical = getVector3ByPrefix(Vector3(), prefix + 'cylindrical', xmlElement)
 	if not cylindrical.getIsDefault():
 		cylindricalComplex = euclidean.getWiddershinsUnitPolar(math.radians(cylindrical.y)) * cylindrical.x
 		cumulativeVector3 += Vector3(cylindricalComplex.real, cylindricalComplex.imag, cylindrical.z)
-	polar = getVector3ByPrefix(prefix + 'polar', Vector3(), xmlElement)
+	polar = getVector3ByPrefix(Vector3(), prefix + 'polar', xmlElement)
 	if not polar.getIsDefault():
 		polarComplex = euclidean.getWiddershinsUnitPolar(math.radians(polar.y)) * polar.x
 		cumulativeVector3 += Vector3(polarComplex.real, polarComplex.imag)
-	spherical = getVector3ByPrefix(prefix + 'spherical', Vector3(), xmlElement)
+	spherical = getVector3ByPrefix(Vector3(), prefix + 'spherical', xmlElement)
 	if not spherical.getIsDefault():
 		radius = spherical.x
 		elevationComplex = euclidean.getWiddershinsUnitPolar(math.radians(spherical.z)) * radius
@@ -289,7 +304,8 @@ def getEvaluatedExpressionValueEvaluators(evaluators):
 	for negativeIndex in xrange( - len(evaluators), 0 ):
 		evaluatorIndex = negativeIndex + len(evaluators)
 		evaluators[evaluatorIndex].executePairOperation( evaluators, evaluatorIndex, 10 )
-	executePairOperations( evaluators, 0 )
+	for evaluatorIndex in xrange(len(evaluators) - 1, -1, -1):
+		evaluators[evaluatorIndex].executePairOperation(evaluators, evaluatorIndex, 0)
 	return evaluators
 
 def getEvaluatedFloat(key, xmlElement=None):
@@ -540,7 +556,7 @@ def getMatchingPlugins( namePathDictionary, xmlElement ):
 		if dotIndex > - 1:
 			keyUntilDot = key[: dotIndex]
 			if keyUntilDot in namePathDictionaryCopy:
-				pluginModule = gcodec.getModuleWithPath( namePathDictionaryCopy[ keyUntilDot ] )
+				pluginModule = archive.getModuleWithPath( namePathDictionaryCopy[ keyUntilDot ] )
 				del namePathDictionaryCopy[ keyUntilDot ]
 				if pluginModule != None:
 					matchingPlugins.append( pluginModule )
@@ -561,17 +577,17 @@ def getOverhangSupportAngle(xmlElement):
 	"Get the overhang support angle in radians."
 	return math.radians(xmlElement.getCascadeFloat(45.0, 'overhangSupportAngle'))
 
-def getPathByKey(key, xmlElement):
+def getPathByKey(defaultPath, key, xmlElement):
 	"Get path from prefix and xml element."
 	if key not in xmlElement.attributeDictionary:
-		return []
+		return defaultPath
 	word = str(xmlElement.attributeDictionary[key]).strip()
 	evaluatedLinkValue = getEvaluatedLinkValue(word, xmlElement)
 	if evaluatedLinkValue.__class__ == list:
 		return getPathByList(evaluatedLinkValue)
 	xmlElementObject = getXMLElementObject(evaluatedLinkValue)
 	if xmlElementObject == None:
-		return []
+		return defaultPath
 	return xmlElementObject.getPaths()[0]
 
 def getPathByList( vertexList ):
@@ -591,20 +607,20 @@ def getPathByPrefix(path, prefix, xmlElement):
 	if len(path) < 2:
 		print('Warning, bug, path is too small in evaluate in setPathByPrefix.')
 		return
-	pathByKey = getPathByKey( prefix + 'path', xmlElement )
+	pathByKey = getPathByKey([], prefix + 'path', xmlElement)
 	if len( pathByKey ) < len(path):
 		for pointIndex in xrange( len( pathByKey ) ):
 			path[ pointIndex ] = pathByKey[ pointIndex ]
 	else:
 		path = pathByKey
-	path[0] = getVector3ByPrefix( prefix + 'start', path[0], xmlElement )
-	path[-1] = getVector3ByPrefix( prefix + 'end', path[-1], xmlElement )
+	path[0] = getVector3ByPrefix(path[0], prefix + 'pathStart', xmlElement)
+	path[-1] = getVector3ByPrefix(path[-1], prefix + 'pathEnd', xmlElement)
 	return path
 
-def getPathsByKey(key, xmlElement):
+def getPathsByKey(defaultPaths, key, xmlElement):
 	"Get paths by key."
 	if key not in xmlElement.attributeDictionary:
-		return []
+		return defaultPaths
 	word = str(xmlElement.attributeDictionary[key]).strip()
 	evaluatedLinkValue = getEvaluatedLinkValue(word, xmlElement)
 	if evaluatedLinkValue.__class__ == dict or evaluatedLinkValue.__class__ == list:
@@ -612,21 +628,14 @@ def getPathsByKey(key, xmlElement):
 		return getPathsByLists(evaluatedLinkValue)
 	xmlElementObject = getXMLElementObject(evaluatedLinkValue)
 	if xmlElementObject == None:
-		return []
+		return defaultPaths
 	return xmlElementObject.getPaths()
-
-def getPathsByKeys(keys, xmlElement):
-	"Get paths by keys."
-	pathsByKeys = []
-	for key in keys:
-		pathsByKeys += getPathsByKey(key, xmlElement)
-	return pathsByKeys
 
 def getPathsByLists(vertexLists):
 	"Get paths by lists."
 	vector3Lists = getVector3ListsRecursively(vertexLists)
 	paths = []
-	addToPathsRecursively( paths, vector3Lists )
+	addToPathsRecursively(paths, vector3Lists)
 	return paths
 
 def getPrecision(xmlElement):
@@ -675,17 +684,17 @@ def getTokenByNumber(number):
 	"Get token by number."
 	return '_%s_' % number
 
-def getTransformedPathByKey(key, xmlElement):
+def getTransformedPathByKey(defaultTransformedPath, key, xmlElement):
 	"Get transformed path from prefix and xml element."
 	if key not in xmlElement.attributeDictionary:
-		return []
+		return defaultTransformedPath
 	word = str(xmlElement.attributeDictionary[key]).strip()
 	evaluatedLinkValue = getEvaluatedLinkValue(word, xmlElement)
 	if evaluatedLinkValue.__class__ == list:
 		return getPathByList(evaluatedLinkValue)
 	xmlElementObject = getXMLElementObject(evaluatedLinkValueClass)
 	if xmlElementObject == None:
-		return []
+		return defaultTransformedPath
 	return xmlElementObject.getTransformedPaths()[0]
 
 def getTransformedPathByPrefix(path, prefix, xmlElement):
@@ -693,28 +702,28 @@ def getTransformedPathByPrefix(path, prefix, xmlElement):
 	if len(path) < 2:
 		print('Warning, bug, path is too small in evaluate in setPathByPrefix.')
 		return
-	pathByKey = getTransformedPathByKey( prefix + 'path', xmlElement )
+	pathByKey = getTransformedPathByKey([], prefix + 'path', xmlElement)
 	if len( pathByKey ) < len(path):
 		for pointIndex in xrange( len( pathByKey ) ):
 			path[ pointIndex ] = pathByKey[ pointIndex ]
 	else:
 		path = pathByKey
-	path[0] = getVector3ByPrefix( prefix + 'start', path[0], xmlElement )
-	path[-1] = getVector3ByPrefix( prefix + 'end', path[-1], xmlElement )
+	path[0] = getVector3ByPrefix(path[0], prefix + 'pathStart', xmlElement)
+	path[-1] = getVector3ByPrefix(path[-1], prefix + 'pathEnd', xmlElement)
 	return path
 
-def getTransformedPathsByKey(key, xmlElement):
+def getTransformedPathsByKey(defaultTransformedPaths, key, xmlElement):
 	"Get transformed paths by key."
 	if key not in xmlElement.attributeDictionary:
-		return []
+		return defaultTransformedPaths
 	word = str(xmlElement.attributeDictionary[key]).strip()
 	evaluatedLinkValue = getEvaluatedLinkValue(word, xmlElement)
 	if evaluatedLinkValue.__class__ == dict or evaluatedLinkValue.__class__ == list:
-		convertToPaths(evaluatedLinkValue)
+		convertToTransformedPaths(evaluatedLinkValue)
 		return getPathsByLists(evaluatedLinkValue)
 	xmlElementObject = getXMLElementObject(evaluatedLinkValue)
 	if xmlElementObject == None:
-		return []
+		return defaultTransformedPaths
 	return xmlElementObject.getTransformedPaths()
 
 def getUniqueQuoteIndex( uniqueQuoteIndex, word ):
@@ -783,7 +792,7 @@ def getVector3ByMultiplierPrefix( multiplier, prefix, vector3, xmlElement ):
 	if multiplier == 0.0:
 		return vector3
 	oldMultipliedValueVector3 = vector3 * multiplier
-	vector3ByPrefix = getVector3ByPrefix( prefix, oldMultipliedValueVector3.copy(), xmlElement )
+	vector3ByPrefix = getVector3ByPrefix(oldMultipliedValueVector3.copy(), prefix, xmlElement)
 	if vector3ByPrefix == oldMultipliedValueVector3:
 		return vector3
 	return vector3ByPrefix / multiplier
@@ -794,29 +803,29 @@ def getVector3ByMultiplierPrefixes( multiplier, prefixes, vector3, xmlElement ):
 		vector3 = getVector3ByMultiplierPrefix( multiplier, prefix, vector3, xmlElement )
 	return vector3
 
-def getVector3ByPrefix(prefix, vector3, xmlElement):
+def getVector3ByPrefix(defaultVector3, prefix, xmlElement):
 	"Get vector3 from prefix and xml element."
 	value = getEvaluatedValue(prefix, xmlElement)
 	if value != None:
-		vector3 = getVector3ByDictionaryListValue(value, vector3)
+		defaultVector3 = getVector3ByDictionaryListValue(value, defaultVector3)
 	x = getEvaluatedFloat(prefix + '.x', xmlElement)
 	if x != None:
-		vector3 = getVector3IfNone(vector3)
-		vector3.x = x
+		defaultVector3 = getVector3IfNone(defaultVector3)
+		defaultVector3.x = x
 	y = getEvaluatedFloat(prefix + '.y', xmlElement)
 	if y != None:
-		vector3 = getVector3IfNone(vector3)
-		vector3.y = y
+		defaultVector3 = getVector3IfNone(defaultVector3)
+		defaultVector3.y = y
 	z = getEvaluatedFloat(prefix + '.z', xmlElement)
 	if z != None:
-		vector3 = getVector3IfNone(vector3)
-		vector3.z = z
-	return vector3
+		defaultVector3 = getVector3IfNone(defaultVector3)
+		defaultVector3.z = z
+	return defaultVector3
 
 def getVector3ByPrefixes( prefixes, vector3, xmlElement ):
 	"Get vector3 from prefixes and xml element."
 	for prefix in prefixes:
-		vector3 = getVector3ByPrefix(prefix, vector3, xmlElement)
+		vector3 = getVector3ByPrefix(vector3, prefix, xmlElement)
 	return vector3
 
 def getVector3FromXMLElement(xmlElement):
@@ -849,7 +858,7 @@ def getVector3ListsRecursively(floatLists):
 
 def getVector3RemoveByPrefix(prefix, vector3, xmlElement):
 	"Get vector3 from prefix and xml element, then remove prefix attributes from dictionary."
-	vector3RemoveByPrefix = getVector3ByPrefix(prefix, vector3, xmlElement)
+	vector3RemoveByPrefix = getVector3ByPrefix(vector3, prefix, xmlElement)
 	euclidean.removePrefixFromDictionary( xmlElement.attributeDictionary, prefix )
 	return vector3RemoveByPrefix
 
@@ -1325,8 +1334,16 @@ class EvaluatorComma(Evaluator):
 	'Class to join two evaluators.'
 	def executePairOperation(self, evaluators, evaluatorIndex, operationLevel):
 		'Operate on two evaluators.'
-		if operationLevel == 0:
-			del evaluators[evaluatorIndex]
+		if operationLevel != 0:
+			return
+		previousIndex = evaluatorIndex - 1
+		if previousIndex < 0:
+			evaluators[evaluatorIndex].value = None
+			return
+		if evaluators[previousIndex].word == ',':
+			evaluators[evaluatorIndex].value = None
+			return
+		del evaluators[evaluatorIndex]
 
 
 class EvaluatorConcatenate(Evaluator):
@@ -1423,7 +1440,7 @@ class EvaluatorElement(Evaluator):
 			return
 		pluginModule = None
 		if moduleName in globalElementNameSet:
-			pluginModule = gcodec.getModuleWithPath(archive.getElementsPath(moduleName))
+			pluginModule = archive.getModuleWithPath(archive.getElementsPath(moduleName))
 		if pluginModule == None:
 			print('Warning, EvaluatorElement in evaluate can not get a pluginModule for:')
 			print(moduleName)
@@ -1528,11 +1545,11 @@ class EvaluatorFundamental(EvaluatorAttribute):
 			return
 		pluginModule = None
 		if moduleName in globalFundamentalNameSet:
-			pluginModule = gcodec.getModuleWithPath(archive.getFundamentalsPath(moduleName))
+			pluginModule = archive.getModuleWithPath(archive.getFundamentalsPath(moduleName))
 		else:
 			underscoredName = '_' + moduleName
 			if underscoredName in globalFundamentalNameSet:
-				pluginModule = gcodec.getModuleWithPath(archive.getFundamentalsPath(underscoredName))
+				pluginModule = archive.getModuleWithPath(archive.getFundamentalsPath(underscoredName))
 		if pluginModule == None:
 			print('Warning, EvaluatorFundamental in evaluate can not get a pluginModule for:')
 			print(moduleName)
@@ -1777,7 +1794,7 @@ class ModuleXMLElement:
 		xmlProcessor = xmlElement.getXMLProcessor()
 		if lowerClassName not in xmlProcessor.namePathDictionary:
 			return
-		self.pluginModule = gcodec.getModuleWithPath( xmlProcessor.namePathDictionary[ lowerClassName ] )
+		self.pluginModule = archive.getModuleWithPath( xmlProcessor.namePathDictionary[ lowerClassName ] )
 		if self.pluginModule == None:
 			return
 		self.elseElement = nextXMLElement
@@ -1797,9 +1814,9 @@ globalDictionaryOperatorBegin = {
 	'!=' : EvaluatorNotEqual,
 	'**' : EvaluatorPower }
 globalModuleEvaluatorDictionary = {}
-globalFundamentalNameSet = set(gcodec.getPluginFileNamesFromDirectoryPath(archive.getFundamentalsPath()))
+globalFundamentalNameSet = set(archive.getPluginFileNamesFromDirectoryPath(archive.getFundamentalsPath()))
 addPrefixDictionary(globalModuleEvaluatorDictionary, globalFundamentalNameSet, EvaluatorFundamental)
-globalElementNameSet = set(gcodec.getPluginFileNamesFromDirectoryPath(archive.getElementsPath()))
+globalElementNameSet = set(archive.getPluginFileNamesFromDirectoryPath(archive.getElementsPath()))
 addPrefixDictionary(globalModuleEvaluatorDictionary, globalElementNameSet, EvaluatorElement)
 globalSplitDictionaryOperator = {
 	'+' : EvaluatorAddition,

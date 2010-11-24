@@ -4,7 +4,7 @@ Some filaments contract too much and to prevent this you have to print the objec
 http://reprap.org/wiki/Mendel_User_Manual:_RepRapGCodes
 
 The chamber manual page is at:
-http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Chamber
+http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Chamber
 
 ==Operation==
 The default 'Activate Chamber' checkbox is on.  When it is on, the functions described below will work, when it is off, the functions will not be called.
@@ -140,9 +140,10 @@ from __future__ import absolute_import
 #Init has to be imported first because it has code to workaround the python bug where relative imports don't work if the module is imported as a main module.
 import __init__
 
+from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
+from fabmetheus_utilities import archive
 from fabmetheus_utilities import euclidean
 from fabmetheus_utilities import gcodec
-from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
 from fabmetheus_utilities import settings
 from skeinforge_application.skeinforge_utilities import skeinforge_craft
 from skeinforge_application.skeinforge_utilities import skeinforge_polyfile
@@ -157,7 +158,7 @@ __license__ = 'GPL 3.0'
 
 def getCraftedText(fileName, text='', repository=None):
 	"Chamber the file or text."
-	return getCraftedTextFromText(gcodec.getTextIfEmpty(fileName, text), repository)
+	return getCraftedTextFromText(archive.getTextIfEmpty(fileName, text), repository)
 
 def getCraftedTextFromText(gcodeText, repository=None):
 	"Chamber a gcode linear move text."
@@ -187,7 +188,7 @@ class ChamberRepository:
 		"Set the default settings, execute title & settings fileName."
 		skeinforge_profile.addListsToCraftTypeRepository('skeinforge_application.skeinforge_plugins.craft_plugins.chamber.html', self )
 		self.fileNameInput = settings.FileNameInput().getFromFileName( fabmetheus_interpret.getGNUTranslatorGcodeFileTypeTuples(), 'Open File for Chamber', self, '')
-		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Chamber')
+		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Chamber')
 		self.activateChamber = settings.BooleanSetting().getFromValue('Activate Chamber:', self, True )
 		self.bedTemperature = settings.FloatSpin().getFromValue( 20.0, 'Bed Temperature (Celcius):', self, 90.0, 60.0 )
 		self.chamberTemperature = settings.FloatSpin().getFromValue( 20.0, 'Chamber Temperature (Celcius):', self, 90.0, 30.0 )
@@ -212,7 +213,7 @@ class ChamberSkein:
 	def getCraftedGcode(self, gcodeText, repository):
 		"Parse gcode text and store the chamber gcode."
 		self.repository = repository
-		self.lines = gcodec.getTextLines(gcodeText)
+		self.lines = archive.getTextLines(gcodeText)
 		self.parseInitialization()
 		for line in self.lines[self.lineIndex :]:
 			self.parseLine(line)
@@ -236,7 +237,7 @@ class ChamberSkein:
 		if len(splitLine) < 1:
 			return
 		firstWord = splitLine[0]
-		if firstWord == '(<extrusion>)':
+		if firstWord == '(<crafting>)':
 			self.distanceFeedRate.addLine(line)
 			self.distanceFeedRate.addParameter('M140', self.repository.bedTemperature.value ) # Set bed temperature.
 			self.distanceFeedRate.addParameter('M141', self.repository.chamberTemperature.value ) # Set chamber temperature.

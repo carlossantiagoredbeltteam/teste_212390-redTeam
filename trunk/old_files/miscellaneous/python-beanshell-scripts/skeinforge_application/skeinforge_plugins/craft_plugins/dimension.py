@@ -8,7 +8,7 @@ and in Erik de Bruijn's conversion script page at:
 http://objects.reprap.org/wiki/3D-to-5D-Gcode.php
 
 The dimension manual page is at:
-http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Dimension
+http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Dimension
 
 ==Operation==
 The default 'Activate Dimension' checkbox is off.  When it is on, the functions described below will work, when it is off, the functions will not be called.
@@ -76,10 +76,11 @@ The dimension tool has created the file:
 import __init__
 
 from datetime import date
+from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
+from fabmetheus_utilities import archive
 from fabmetheus_utilities import euclidean
 from fabmetheus_utilities import gcodec
 from fabmetheus_utilities import intercircle
-from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
 from fabmetheus_utilities import settings
 from skeinforge_application.skeinforge_utilities import skeinforge_craft
 from skeinforge_application.skeinforge_utilities import skeinforge_polyfile
@@ -96,7 +97,7 @@ __license__ = 'GPL 3.0'
 
 def getCraftedText( fileName, gcodeText = '', repository=None):
 	"Dimension a gcode file or text."
-	return getCraftedTextFromText( gcodec.getTextIfEmpty(fileName, gcodeText), repository )
+	return getCraftedTextFromText( archive.getTextIfEmpty(fileName, gcodeText), repository )
 
 def getCraftedTextFromText(gcodeText, repository=None):
 	"Dimension a gcode text."
@@ -125,7 +126,7 @@ class DimensionRepository:
 		"Set the default settings, execute title & settings fileName."
 		skeinforge_profile.addListsToCraftTypeRepository('skeinforge_application.skeinforge_plugins.craft_plugins.dimension.html', self )
 		self.fileNameInput = settings.FileNameInput().getFromFileName( fabmetheus_interpret.getGNUTranslatorGcodeFileTypeTuples(), 'Open File for Dimension', self, '')
-		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Dimension')
+		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Dimension')
 		self.activateDimension = settings.BooleanSetting().getFromValue('Activate Dimension', self, False )
 		extrusionDistanceFormatLatentStringVar = settings.LatentStringVar()
 		self.extrusionDistanceFormatChoiceLabel = settings.LabelDisplay().getFromName('Extrusion Distance Format Choice: ', self )
@@ -164,7 +165,7 @@ class DimensionSkein:
 	def getCraftedGcode(self, gcodeText, repository):
 		"Parse gcode text and store the dimension gcode."
 		self.repository = repository
-		self.lines = gcodec.getTextLines(gcodeText)
+		self.lines = archive.getTextLines(gcodeText)
 		self.parseInitialization()
 		if self.operatingFlowRate == None:
 			print('There is no operatingFlowRate so dimension will do nothing.')

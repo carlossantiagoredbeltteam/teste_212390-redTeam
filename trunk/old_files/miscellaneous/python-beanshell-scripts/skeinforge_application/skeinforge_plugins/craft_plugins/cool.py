@@ -3,7 +3,7 @@ This page is in the table of contents.
 Cool is a script to cool the shape.
 
 The cool manual page is at:
-http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Cool
+http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Cool
 
 Allan Ecker aka The Masked Retriever's has written the "Skeinforge Quicktip: Cool" at:
 http://blog.thingiverse.com/2009/07/28/skeinforge-quicktip-cool/
@@ -94,10 +94,11 @@ from __future__ import absolute_import
 #Init has to be imported first because it has code to workaround the python bug where relative imports don't work if the module is imported as a main module.
 import __init__
 
+from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
+from fabmetheus_utilities import archive
 from fabmetheus_utilities import euclidean
 from fabmetheus_utilities import gcodec
 from fabmetheus_utilities import intercircle
-from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
 from fabmetheus_utilities import settings
 from skeinforge_application.skeinforge_utilities import skeinforge_craft
 from skeinforge_application.skeinforge_utilities import skeinforge_polyfile
@@ -113,7 +114,7 @@ __license__ = 'GPL 3.0'
 
 def getCraftedText( fileName, text, coolRepository = None ):
 	"Cool a gcode linear move text."
-	return getCraftedTextFromText( gcodec.getTextIfEmpty( fileName, text ), coolRepository )
+	return getCraftedTextFromText( archive.getTextIfEmpty( fileName, text ), coolRepository )
 
 def getCraftedTextFromText( gcodeText, coolRepository = None ):
 	"Cool a gcode linear move text."
@@ -142,7 +143,7 @@ class CoolRepository:
 		"Set the default settings, execute title & settings fileName."
 		skeinforge_profile.addListsToCraftTypeRepository('skeinforge_application.skeinforge_plugins.craft_plugins.cool.html', self )
 		self.fileNameInput = settings.FileNameInput().getFromFileName( fabmetheus_interpret.getGNUTranslatorGcodeFileTypeTuples(), 'Open File for Cool', self, '')
-		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Cool')
+		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Cool')
 		self.activateCool = settings.BooleanSetting().getFromValue('Activate Cool', self, True )
 		self.coolType = settings.MenuButtonDisplay().getFromName('Cool Type:', self )
 		self.orbit = settings.MenuRadio().getFromMenuButtonDisplay( self.coolType, 'Orbit', self, True )
@@ -246,12 +247,12 @@ class CoolSkein:
 	def getCraftedGcode( self, gcodeText, coolRepository ):
 		"Parse gcode text and store the cool gcode."
 		self.coolRepository = coolRepository
-		self.coolEndText = settings.getFileInAlterationsOrGivenDirectory( os.path.dirname( __file__ ), 'Cool_End.gcode')
-		self.coolEndLines = gcodec.getTextLines( self.coolEndText )
-		self.coolStartText = settings.getFileInAlterationsOrGivenDirectory( os.path.dirname( __file__ ), 'Cool_Start.gcode')
-		self.coolStartLines = gcodec.getTextLines( self.coolStartText )
+		self.coolEndText = settings.getFileInAlterationsOrGivenDirectory( os.path.dirname(__file__), 'Cool_End.gcode')
+		self.coolEndLines = archive.getTextLines( self.coolEndText )
+		self.coolStartText = settings.getFileInAlterationsOrGivenDirectory( os.path.dirname(__file__), 'Cool_Start.gcode')
+		self.coolStartLines = archive.getTextLines( self.coolStartText )
 		self.halfCorner = complex( coolRepository.minimumOrbitalRadius.value, coolRepository.minimumOrbitalRadius.value )
-		self.lines = gcodec.getTextLines(gcodeText)
+		self.lines = archive.getTextLines(gcodeText)
 		self.minimumArea = 4.0 * coolRepository.minimumOrbitalRadius.value * coolRepository.minimumOrbitalRadius.value
 		self.parseInitialization()
 		self.boundingRectangle = gcodec.BoundingRectangle().getFromGcodeLines( self.lines[self.lineIndex :], 0.5 * self.perimeterWidth )

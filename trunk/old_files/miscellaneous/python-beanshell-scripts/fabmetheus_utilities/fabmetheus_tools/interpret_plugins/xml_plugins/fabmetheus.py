@@ -85,7 +85,7 @@ class XMLBooleanGeometryProcessor():
 		lowerClassName = firstKey.lower()
 		if lowerClassName not in self.namePathDictionary:
 			return None
-		pluginModule = gcodec.getModuleWithPath( self.namePathDictionary[ lowerClassName ] )
+		pluginModule = archive.getModuleWithPath( self.namePathDictionary[ lowerClassName ] )
 		if pluginModule == None:
 			return None
 		xmlElement.className = lowerClassName
@@ -104,11 +104,11 @@ class XMLBooleanGeometryProcessor():
 			self.processXMLElement( child )
 
 	def processXMLElement(self, xmlElement):
-		"Process the xml element."
+		'Process the xml element.'
 		lowerClassName = xmlElement.className.lower()
 		if lowerClassName not in self.namePathDictionary:
 			return None
-		pluginModule = gcodec.getModuleWithPath( self.namePathDictionary[ lowerClassName ] )
+		pluginModule = archive.getModuleWithPath(self.namePathDictionary[lowerClassName])
 		if pluginModule == None:
 			return None
 		try:

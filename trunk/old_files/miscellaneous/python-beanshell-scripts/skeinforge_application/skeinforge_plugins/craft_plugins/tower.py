@@ -3,7 +3,7 @@ This page is in the table of contents.
 Tower commands the fabricator to extrude a disconnected region for a few layers, then go to another disconnected region and extrude there.  Its purpose is to reduce the number of stringers between a shape and reduce extruder travel.
 
 The tower manual page is at:
-http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Tower
+http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Tower
 
 ==Operation==
 The default 'Activate Tower' checkbox is off.  The default is off because tower could result in the extruder colliding with an already extruded part of the shape and because extruding in one region for more than one layer could result in the shape melting.  When it is on, the functions described below will work, when it is off, the functions will not be called.
@@ -62,12 +62,13 @@ from __future__ import absolute_import
 #Init has to be imported first because it has code to workaround the python bug where relative imports don't work if the module is imported as a main module.
 import __init__
 
+from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
+from fabmetheus_utilities.vector3 import Vector3
+from fabmetheus_utilities import archive
 from fabmetheus_utilities import euclidean
 from fabmetheus_utilities import gcodec
 from fabmetheus_utilities import intercircle
-from fabmetheus_utilities.fabmetheus_tools import fabmetheus_interpret
 from fabmetheus_utilities import settings
-from fabmetheus_utilities.vector3 import Vector3
 from skeinforge_application.skeinforge_utilities import skeinforge_craft
 from skeinforge_application.skeinforge_utilities import skeinforge_polyfile
 from skeinforge_application.skeinforge_utilities import skeinforge_profile
@@ -81,7 +82,7 @@ __license__ = 'GPL 3.0'
 
 def getCraftedText( fileName, text, towerRepository = None ):
 	"Tower a gcode linear move file or text."
-	return getCraftedTextFromText( gcodec.getTextIfEmpty( fileName, text ), towerRepository )
+	return getCraftedTextFromText( archive.getTextIfEmpty( fileName, text ), towerRepository )
 
 def getCraftedTextFromText( gcodeText, towerRepository = None ):
 	"Tower a gcode linear move text."
@@ -143,7 +144,7 @@ class TowerRepository:
 		"Set the default settings, execute title & settings fileName."
 		skeinforge_profile.addListsToCraftTypeRepository('skeinforge_application.skeinforge_plugins.craft_plugins.tower.html', self )
 		self.fileNameInput = settings.FileNameInput().getFromFileName( fabmetheus_interpret.getGNUTranslatorGcodeFileTypeTuples(), 'Open File for Tower', self, '')
-		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Tower')
+		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Tower')
 		self.activateTower = settings.BooleanSetting().getFromValue('Activate Tower', self, False )
 		self.extruderPossibleCollisionConeAngle = settings.FloatSpin().getFromValue( 40.0, 'Extruder Possible Collision Cone Angle (degrees):', self, 80.0, 60.0 )
 		self.maximumTowerHeight = settings.IntSpin().getFromValue( 2, 'Maximum Tower Height (layers):', self, 10, 5 )
@@ -242,7 +243,7 @@ class TowerSkein:
 
 	def getCraftedGcode( self, gcodeText, towerRepository ):
 		"Parse gcode text and store the tower gcode."
-		self.lines = gcodec.getTextLines(gcodeText)
+		self.lines = archive.getTextLines(gcodeText)
 		self.towerRepository = towerRepository
 		self.parseInitialization()
 		if gcodec.isThereAFirstWord('(<operatingLayerEnd>', self.lines, self.lineIndex ):
@@ -344,7 +345,7 @@ class TowerSkein:
 			self.island.createBoundingLoop()
 		elif firstWord == '(<boundaryPoint>':
 			self.island.addToBoundary(splitLine)
-		elif firstWord == '(</extrusion>)':
+		elif firstWord == '(</crafting>)':
 			self.shutdownLineIndex = lineIndex
 		elif firstWord == '(<layer>':
 			self.beforeExtrusionLines = [ line ]

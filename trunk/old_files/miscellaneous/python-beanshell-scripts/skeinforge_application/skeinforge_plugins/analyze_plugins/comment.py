@@ -3,7 +3,7 @@ This page is in the table of contents.
 Comment is a script to comment a gcode file.
 
 The comment manual page is at:
-http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Comment
+http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Comment
 
 ==Operation==
 The default 'Activate Comment' checkbox is on.  When it is on, the functions described below will work when called from the skeinforge toolchain, when it is off, the functions will not be called from the toolchain.  The functions will still be called, whether or not the 'Activate Comment' checkbox is on, when comment is run directly.
@@ -49,6 +49,7 @@ from __future__ import absolute_import
 #Init has to be imported first because it has code to workaround the python bug where relative imports don't work if the module is imported as a main module.
 import __init__
 
+from fabmetheus_utilities import archive
 from fabmetheus_utilities import gcodec
 from fabmetheus_utilities import settings
 from skeinforge_application.skeinforge_utilities import skeinforge_polyfile
@@ -67,20 +68,20 @@ def getNewRepository():
 
 def getWindowAnalyzeFile(fileName):
 	"Comment a gcode file."
-	gcodeText = gcodec.getFileText(fileName)
+	gcodeText = archive.getFileText(fileName)
 	return getWindowAnalyzeFileGivenText(fileName, gcodeText)
 
 def getWindowAnalyzeFileGivenText(fileName, gcodeText):
 	"Write a commented gcode file for a gcode file."
 	skein = CommentSkein()
 	skein.parseGcode(gcodeText)
-	gcodec.writeFileMessageEnd('_comment.gcode', fileName, skein.output.getvalue(), 'The commented file is saved as ')
+	archive.writeFileMessageEnd('_comment.gcode', fileName, skein.output.getvalue(), 'The commented file is saved as ')
 
 def writeOutput( fileName, fileNameSuffix, gcodeText = ''):
 	"Write a commented gcode file for a skeinforge gcode file, if 'Write Commented File for Skeinforge Chain' is selected."
 	repository = settings.getReadRepository( CommentRepository() )
 	if gcodeText == '':
-		gcodeText = gcodec.getFileText( fileNameSuffix )
+		gcodeText = archive.getFileText( fileNameSuffix )
 	if repository.activateComment.value:
 		getWindowAnalyzeFileGivenText( fileNameSuffix, gcodeText )
 
@@ -90,7 +91,7 @@ class CommentRepository:
 	def __init__(self):
 		"Set the default settings, execute title & settings fileName."
 		settings.addListsToRepository('skeinforge_application.skeinforge_plugins.analyze_plugins.comment.html', None, self )
-		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://www.bitsfrombytes.com/wiki/index.php?title=Skeinforge_Comment')
+		self.openWikiManualHelpPage = settings.HelpPage().getOpenFromAbsolute('http://fabmetheus.crsndoo.com/wiki/index.php/Skeinforge_Comment')
 		self.activateComment = settings.BooleanSetting().getFromValue('Activate Comment', self, False )
 		self.fileNameInput = settings.FileNameInput().getFromFileName( [ ('Gcode text files', '*.gcode') ], 'Open File to Write Comments for', self, '')
 		self.executeTitle = 'Write Comments'
@@ -120,7 +121,7 @@ class CommentSkein:
 
 	def parseGcode( self, gcodeText ):
 		"Parse gcode text and store the commented gcode."
-		lines = gcodec.getTextLines(gcodeText)
+		lines = archive.getTextLines(gcodeText)
 		for line in lines:
 			self.parseLine(line)
 
