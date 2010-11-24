@@ -241,6 +241,23 @@ public class Point2d
 		return success;
 	} // end of ApplyTransform method
 	
+	public Matrix ConvertPointTo2x1Matrix(){
+		Matrix p=new Matrix(2,1);
+		p.set(0,0,x);
+		p.set(1,0,y);
+		return p;
+	}
+	
+	public Matrix ConvertPointTo3x1Matrix(){
+		Matrix p=new Matrix(3,1);
+		p.set(0,0,x);
+		p.set(1,0,y);
+		p.set(2,0,1);
+		return p;
+	}
+	
+	
+	
 	public void print(){
 		System.out.print("("+x+","+y+")");
 	}

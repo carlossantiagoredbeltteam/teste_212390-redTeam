@@ -23,7 +23,7 @@ package org.reprap.scanning.DataStructures;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 11th October 2010
+ * Last modified by Reece Arnott 25th November 2010
  * 
  * These are methods that store the image and and additional information together
  * This includes the edge map, camera calibration matrices and the point pair matches of points in the image with the calibration sheet 
@@ -157,28 +157,6 @@ public class Image {
 		returnvalue.blur=blur.clone();
 		return returnvalue;
 	} // end of clone method
-
-	
-	 //TODO these are only used in the Gui Testing class. If they are to be used elsewhere this should be changed. Its a bad hack!
- 	/*
-	public void OverwriteGreyscaleWithRedChannel(){
- 	ImageFile inputfile=new ImageFile(filename);
- 	imagemap=inputfile.ReadImageFromFile(blur,16); // 16 is the red channel by default
- 	}
- 	public void OverwriteGreyscaleWithGreenChannel(){
- 	ImageFile inputfile=new ImageFile(filename);
- 	imagemap=inputfile.ReadImageFromFile(blur,8); // 8 is the green channel by default
- 	}
- 	public void OverwriteGreyscaleWithBlueChannel(){
- 	ImageFile inputfile=new ImageFile(filename);
- 	imagemap=inputfile.ReadImageFromFile(blur,0); // 0 is the blue channel by default
- 	}
- 	public void OverwriteColourWithGreyscaleChannel(){
- 	ImageFile inputfile=new ImageFile(filename);
- 	imagemap=inputfile.ReadImageFromFile(blur,-1); // -1 is for a greyscale image
- 	}
-*/
-	
 	
 	public void CopyCalibrationParameters(Image other){
 		setWorldtoImageTransform=other.setWorldtoImageTransform;
@@ -233,9 +211,6 @@ public Point2d getWorldtoImageTransform(Matrix point){
 	Point2d imagepoint=new Point2d(manipulate.WorldToImageTransform(point,originofimagecoordinates));
 	return imagepoint;
 }
-public Point2d getWorldtoImageTransform(Point3d point){
-	return getWorldtoImageTransform(new MatrixManipulations().ConvertPointTo4x1Matrix(point));
-}
 
 // Methods to pass information to and from the more complicated private variables
 
@@ -261,19 +236,21 @@ public void SetCalibrationSheet(boolean[][] calibration){
 public boolean[][] getCalibrationSheetSegmentation(){
 	return calibrationsheet;
 }
-public boolean IsCalibrationSheet(Point3d worldpoint){
-	return IsCalibrationSheet(new MatrixManipulations().ConvertPointTo4x1Matrix(worldpoint));
-}
-
-public boolean IsCalibrationSheet(Matrix worldpoint){
-	Point2d imagepoint=getWorldtoImageTransform(worldpoint);
-	int x=(int)imagepoint.x;
-	int y=(int)imagepoint.y;
-	boolean returnvalue=false;
-	if ((x>=0) && (x<width) && (y>=0) && (y<height)) returnvalue=calibrationsheet[x][y];
+public boolean PointIsPartOfObject(Point3d worldpoint){
+	Matrix worldpointmatrix=worldpoint.ConvertPointTo4x1Matrix();
+	// First test to see if the point is behind the camera
+	boolean returnvalue=!WorldPointBehindCamera(worldpointmatrix);
+	if (returnvalue){
+		Point2d imagepoint=getWorldtoImageTransform(worldpointmatrix);
+		// Test to see if the image point is actually in the image 	
+		int x=(int)imagepoint.x;
+		int y=(int)imagepoint.y;
+		returnvalue=((x>=0) && (x<width) && (y>=0) && (y<height));
+		// Then finally test if the pixel is part of the calibration sheet or the object (if it passes the above tests)
+		if (returnvalue) returnvalue=!calibrationsheet[x][y];
+	}
 	return returnvalue;
 }
-
 public void NegateLensDistortion(LensDistortion distortion, JProgressBar bar){
 	
 	bar.setMinimum(0);
@@ -340,12 +317,6 @@ public Matrix getImagetoWorldTransform(Point2d point){
 	Matrix worldline=WorldtoImageTransform.transpose().times(imagepoint);
 	return worldline;
 }
-
-//public boolean WorldPointBehindCamera(Point3d worldpoint){
-//	return WorldPointBehindCamera(new MatrixManipulations().ConvertPointTo4x1Matrix(worldpoint));
-//}
-
-
 // This takes a 4x1 homogeneous world point and tests whether it is behind the camera
 public boolean WorldPointBehindCamera(Matrix worldpoint){
 	boolean returnvalue=true;
@@ -398,12 +369,6 @@ public byte[] ConvertImageForDisplay(int numcolours)
 	} // end for y
 return GLimage;	
 } // end of method
-
-
-
-
-
-
 
 //This method calculates a colour value using a circular filter around a target pixel coordinate with a fixed radius of sqrt(2) and returns the estimated colour
 public PixelColour InterpolatePixelColour(Point2d target){

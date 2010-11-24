@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  *
- * Last modified by Reece Arnott 11th October 2010
+ * Last modified by Reece Arnott 25th November 2010
  * 
  * Note that most of the layout commands were initially produced by NetBeans for JDK 6
  * and significantly modified by hand. For future reference if it needs to be done the other way the main things to change are:
@@ -38,6 +38,9 @@
  *
  * This gives a set of known point pairs for each image which are used to 'calibrate' the camera which gives us, among other things, knowledge about where the cameras were in each image.
  * The visible calibration sheet is found for each image and this knowledge, along with camera position, used to create a crude estimation of the maximum volume occupied by the unknown object.
+ * 
+ * The following is currently commented out: 
+ * 
  * Each image is then inspected for edge pixels, each of which when combine with camera position give a ray in space. The lines that go through \
  * the above maximum volume are then triangulated and give an estimation of 3d edge points in space.
  * 
@@ -135,7 +138,8 @@ public class Main extends JFrame {
  *  
  */ 
 
-    public enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration, objectfinding,end};
+   public enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration, objectfinding,end};
+    //public enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration, test,end};
     private final static steps stepsarray[]=steps.values();
     private static steps laststep = steps.valueOf("end");
     private static steps firststep = steps.valueOf("calibrationsheet");
@@ -258,11 +262,12 @@ public class Main extends JFrame {
 					// There is an if statement in this step that reads values from: a properties file and two image files per original image file if it is an automatic step
 					// Note that the end is an unconditional call to this method with an incremented step
 					// i.e. automatically go onto the next step
-				case objectfinding : 
-					FindObject(); break; // this is the other big one
+				//case objectfinding : 
+				//	FindObject(); break; // this is the other big one
 					// Note that the end is a call to this method with an incremented step if the next step is set to Automatic
 					// i.e. exit without the user pressing the exit button
-				case end : end(); break; 
+				case end : end(); break;
+				//case test :Test();break;
 				}
 			}
 			catch (Exception e) {
@@ -272,6 +277,13 @@ public class Main extends JFrame {
 			
 			
     	} // end of method
+ 	//This method is only called for testing purposes in the above method if the steps enum definition has it specified.
+ 	// This should only happen during testing and the case statement in the above method should be commented out with the enum definition not having a test element
+ 	// for the production system.
+ 	public void Test(){
+ 		
+ 	}
+ 	
  	
 //  This method redraws the Window for the step in which the calibration pattern is chosen
  	 private void ChooseCalibrationSheet() {
@@ -1767,10 +1779,10 @@ private void FindCalibrationSheetCirclesEtc(){
   		// Find the calibration sheet corners in the image and order them anti/clockwise (so that corners 1 and 3 are on opposite sides of the calibration sheet)
   		// Note that the calibration sheet corners are adjusted 1mm out in both x and y to take ocare of possible rounding errors.
   		Point2d[] corners=new Point2d[4];
-  		corners[0]=images[i].getWorldtoImageTransform(new Point3d(((double)(-calibrationsheetwidth)/2)-1,((double)(-calibrationsheetheight)/2)-1,0));
-  		corners[1]=images[i].getWorldtoImageTransform(new Point3d(((double)(-calibrationsheetwidth)/2)-1,((double)(calibrationsheetheight)/2)+1,0));
-  		corners[2]=images[i].getWorldtoImageTransform(new Point3d(((double)(calibrationsheetwidth)/2)+1,((double)(calibrationsheetheight)/2)+1,0));
-  		corners[3]=images[i].getWorldtoImageTransform(new Point3d(((double)(calibrationsheetwidth)/2)+1,((double)(-calibrationsheetheight)/2)-1,0));
+  		corners[0]=images[i].getWorldtoImageTransform(new Point3d(((double)(-calibrationsheetwidth)/2)-1,((double)(-calibrationsheetheight)/2)-1,0).ConvertPointTo4x1Matrix());
+  		corners[1]=images[i].getWorldtoImageTransform(new Point3d(((double)(-calibrationsheetwidth)/2)-1,((double)(calibrationsheetheight)/2)+1,0).ConvertPointTo4x1Matrix());
+  		corners[2]=images[i].getWorldtoImageTransform(new Point3d(((double)(calibrationsheetwidth)/2)+1,((double)(calibrationsheetheight)/2)+1,0).ConvertPointTo4x1Matrix());
+  		corners[3]=images[i].getWorldtoImageTransform(new Point3d(((double)(calibrationsheetwidth)/2)+1,((double)(-calibrationsheetheight)/2)-1,0).ConvertPointTo4x1Matrix());
   		
 		// Give this information to the ImageSegmentation class	
   		ImageSegmentation segmented=new ImageSegmentation(edges,corners);

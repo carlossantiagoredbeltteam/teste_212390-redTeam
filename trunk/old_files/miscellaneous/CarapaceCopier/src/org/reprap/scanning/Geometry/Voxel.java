@@ -31,7 +31,7 @@ import Jama.Matrix;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 23rd August 2010
+* Last modified by Reece Arnott 25th November 2010
 *
 * 
 **********************************************************************************/
@@ -231,26 +231,11 @@ boolean end=false;
 			int z=bar.getValue();
 			for (int y=0;y<=subdivision;y++){
 				for (int x=0;x<=subdivision;x++){
-					Matrix point=new MatrixManipulations().ConvertPointTo4x1Matrix(vertices[VertexTo1DIndex(x,y,z)]);
+					Point3d point=vertices[VertexTo1DIndex(x,y,z)].clone();
 					boolean voxelisoutside=false; // Start with the assumption that the voxel is to be defined as inside
-					// TODO consistent tests in voxel and edgeextraction3d - maybe abstract them out into calibrated image?
-					// if vertex is outside of display area in any image 
-					for (int i=0; i<images.length;i++)  if ((!voxelisoutside) && (!images[i].skipprocessing)) {
-						Point2d p=images[i].getWorldtoImageTransform(point);
-						voxelisoutside=(p.x<0) || (p.x>=images[i].width) || (p.y<0) || (p.y>=images[i].height);
-					} // end if/for
-					// If the vertex is behind any of the cameras
-						if (!voxelisoutside)
-							for (int i=0; i<images.length;i++) if ((!voxelisoutside) && (!images[i].skipprocessing)) voxelisoutside=(images[i].WorldPointBehindCamera(point));
-						if (!voxelisoutside){
-							//	Skip if the point is back projected to the calibration sheet in any image 
-							boolean isCalibrationSheet=false;
-							for (int i=0; i<images.length;i++)  if (!images[i].skipprocessing) {
-								if (!isCalibrationSheet) isCalibrationSheet=images[i].IsCalibrationSheet(point);
-							} // end if/for i
-							voxelisoutside=isCalibrationSheet;
-						}
-						// Update the vertex for up to 8 different voxels
+					// Check to see if the point is outside the object in any image
+					for (int j=0; j<images.length;j++)  if (!images[j].skipprocessing) if (!voxelisoutside) voxelisoutside=!images[j].PointIsPartOfObject(point);
+					// Update the vertex for up to 8 different voxels
 						// To keep track of things we will use 3 combinations of 3 pairs: left/right (x), front/back (y) and top/bottom (z)
 						// The voxels are numbered compared to the vertices based on the left front bottom vertex
 						
