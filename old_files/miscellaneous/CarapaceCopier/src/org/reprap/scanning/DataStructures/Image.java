@@ -23,7 +23,7 @@ package org.reprap.scanning.DataStructures;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 25th November 2010
+ * Last modified by Reece Arnott 30th November 2010
  * 
  * These are methods that store the image and and additional information together
  * This includes the edge map, camera calibration matrices and the point pair matches of points in the image with the calibration sheet 
@@ -51,7 +51,7 @@ public class Image {
 	public Point2d originofimagecoordinates; // This is only used so that the camera calibration class can use the assumption that the prinicipal point is at the origin (as it would be difficult to force the Image of the Absolute Conic to contain a specific prinicpal point of anything but the origin)
 	 // and in the lens distortion class when calculating k1 as the centre of distortion is assumed to be at the origin.
 	public PointPair2D[] matchingpoints; 
-	private boolean[][] calibrationsheet;
+	private boolean[][] processedpixel;
 	private EdgeExtraction2D edges;
 	private float[] blur=new float[0]; // This is set when the file is read into memory and is filtering kernel. Could be a zero length array if there is no blurring 
 
@@ -68,7 +68,7 @@ public class Image {
 	// Constructors
 	// Currently just used by clone method
 	public Image(){
-		calibrationsheet=new boolean[0][0];
+		processedpixel=new boolean[0][0];
 		imagemap=new PixelColour[0][0];
 		originofimagecoordinates=new Point2d(0,0);
 		width=0;
@@ -90,7 +90,7 @@ public class Image {
 	public Image(String imagename) {
 		// Initialise the imagemap etc. and set to defaults then try and load from file
 		// Then try and load preferences from file
-		calibrationsheet=new boolean[0][0];
+		processedpixel=new boolean[0][0];
 		setWorldtoImageTransform=false;
 		imagemap=new PixelColour[0][0];
 		originofimagecoordinates=new Point2d(0,0);
@@ -113,7 +113,7 @@ public class Image {
 	public Image(String imagename, float[] kernel) {
 		// Initialise the imagemap etc. and set to defaults then try and load from file
 		// Then try and load the image from file
-		calibrationsheet=new boolean[0][0];
+		processedpixel=new boolean[0][0];
 		setWorldtoImageTransform=false;
 		imagemap=new PixelColour[0][0];
 		originofimagecoordinates=new Point2d(0,0);
@@ -140,7 +140,7 @@ public class Image {
 		Image returnvalue=new Image();
 		returnvalue.skipprocessing=skipprocessing;
 		//returnvalue.distortion=distortion.clone();
-		returnvalue.calibrationsheet=calibrationsheet.clone();
+		returnvalue.processedpixel=processedpixel.clone();
 		if (!skipprocessing){
 			returnvalue.setWorldtoImageTransform=setWorldtoImageTransform;
 			if (setWorldtoImageTransform) returnvalue.WorldtoImageTransform=WorldtoImageTransform.copy();
@@ -231,12 +231,12 @@ public void LimitEdgesToRaysThatIntersectAVolumeOfInterest(AxisAlignedBoundingBo
 	edges.LimitToEdgeRaysThatIntersectAVolumeOfInterest(boundingbox, volumesofinterest,getWorldtoImageTransformMatrix(),originofimagecoordinates);
 }
 public void SetCalibrationSheet(boolean[][] calibration){
-	calibrationsheet=calibration.clone();
+	processedpixel=calibration.clone();
 }
-public boolean[][] getCalibrationSheetSegmentation(){
-	return calibrationsheet;
+public boolean[][] getProcessedPixels(){
+	return processedpixel;
 }
-public boolean PointIsPartOfObject(Point3d worldpoint){
+public boolean PointIsUnprocessed(Point3d worldpoint){
 	Matrix worldpointmatrix=worldpoint.ConvertPointTo4x1Matrix();
 	// First test to see if the point is behind the camera
 	boolean returnvalue=!WorldPointBehindCamera(worldpointmatrix);
@@ -246,11 +246,18 @@ public boolean PointIsPartOfObject(Point3d worldpoint){
 		int x=(int)imagepoint.x;
 		int y=(int)imagepoint.y;
 		returnvalue=((x>=0) && (x<width) && (y>=0) && (y<height));
-		// Then finally test if the pixel is part of the calibration sheet or the object (if it passes the above tests)
-		if (returnvalue) returnvalue=!calibrationsheet[x][y];
+		// Then finally test if the pixel is processed (if it passes the above tests)
+		if (returnvalue) returnvalue=!processedpixel[x][y];
 	}
 	return returnvalue;
 }
+
+public void setProcessedPixel(Point2d imagepoint){
+	int x=(int)imagepoint.x;
+	int y=(int)imagepoint.y;
+	if ((x>=0) && (x<width) && (y>=0) && (y<height)) processedpixel[x][y]=true;
+}
+
 public void NegateLensDistortion(LensDistortion distortion, JProgressBar bar){
 	
 	bar.setMinimum(0);
@@ -451,10 +458,10 @@ public PixelColour InterpolatePixelColour(Point2d target){
 		imagemap=inputfile.ReadImageFromFile(filter); 
 		width=inputfile.width;
 		height=inputfile.height;
-		calibrationsheet=new boolean[width][height];
+		processedpixel=new boolean[width][height];
 		for(int y=0;y<height;y++)
 			for(int x=0;x<width;x++)
-				calibrationsheet[x][y]=false;
+				processedpixel[x][y]=false;
 	} // end of ReadImageFromFile
 
 	

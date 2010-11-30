@@ -233,8 +233,8 @@ boolean end=false;
 				for (int x=0;x<=subdivision;x++){
 					Point3d point=vertices[VertexTo1DIndex(x,y,z)].clone();
 					boolean voxelisoutside=false; // Start with the assumption that the voxel is to be defined as inside
-					// Check to see if the point is outside the object in any image
-					for (int j=0; j<images.length;j++)  if (!images[j].skipprocessing) if (!voxelisoutside) voxelisoutside=!images[j].PointIsPartOfObject(point);
+					// Check to see if the point projects to a proccessed pixel (at this point thats just the calibration sheet) in any image
+					for (int j=0; j<images.length;j++)  if (!images[j].skipprocessing) if (!voxelisoutside) voxelisoutside=!images[j].PointIsUnprocessed(point);
 					// Update the vertex for up to 8 different voxels
 						// To keep track of things we will use 3 combinations of 3 pairs: left/right (x), front/back (y) and top/bottom (z)
 						// The voxels are numbered compared to the vertices based on the left front bottom vertex
