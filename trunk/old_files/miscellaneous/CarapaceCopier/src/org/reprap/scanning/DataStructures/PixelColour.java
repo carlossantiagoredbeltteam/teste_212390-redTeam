@@ -105,6 +105,48 @@ public class PixelColour {
 		SetPixelToWeightedAverageColour(newweights,newcolours);
 	}
 	
+	// This returns the variance in the red, green, blue, and greyscale colours seperately as well as a fifth element that is the combined variance in the RGB 3d colour space
+	public double[] SetPixelToMeanColourAndReturnVariance(PixelColour[] colours){
+		
+		// Find the sum of R,G,B, and greyscale
+		double redsum=0;
+		double greensum=0;
+		double bluesum=0;
+		double greysum=0;
+		for (int i=0;i<colours.length;i++){
+			redsum=redsum+(int)(colours[i].r & 0xff);
+			greensum=greensum+(int)(colours[i].g & 0xff);
+			bluesum=bluesum+(int)(colours[i].b & 0xff);
+			greysum=greysum+(int)(colours[i].greyscale & 0xff);
+				// note the & 0xff of the signed bit as otherwise direct conversion to int assumes it -128..127 not 0..255 
+				// can't just add 128 as it is 2's complement so -1<->255, -2<->254 .. -127<->128 etc.
+			}
+		// Now find the mean as a number convert these numbers to byte (after converting to closest whole number) for storage 
+		double redmean=redsum/colours.length;
+		double greenmean=greensum/colours.length;
+		double bluemean=bluesum/colours.length;
+		double greymean=greysum/colours.length;
+		r=(byte)((int)redmean);
+		g=(byte)((int)greenmean);
+		b=(byte)((int)bluemean);
+		greyscale=(byte)((int)greymean);
+		
+		// Now work out the variance
+		double[] variance=new double[5];
+		for (int i=0;i<colours.length;i++){
+			variance[0]=variance[0]+((redmean-(int)(colours[i].r & 0xff))*(redmean-(int)(colours[i].r & 0xff)));
+			variance[1]=variance[1]+((greenmean-(int)(colours[i].g & 0xff))*(greenmean-(int)(colours[i].g & 0xff)));
+			variance[2]=variance[2]+((bluemean-(int)(colours[i].b & 0xff))*(bluemean-(int)(colours[i].b & 0xff)));
+			variance[3]=variance[3]+((greymean-(int)(colours[i].greyscale & 0xff))*(greymean-(int)(colours[i].greyscale & 0xff)));
+			
+		}
+		for (int i=0;i<4;i++) variance[i]=variance[i]/colours.length;
+		variance[4]=variance[0]+variance[1]+variance[2];
+		return variance;
+		
+	}
+		
+	
 	public byte getGreyscale(){
 		return greyscale;
 	}

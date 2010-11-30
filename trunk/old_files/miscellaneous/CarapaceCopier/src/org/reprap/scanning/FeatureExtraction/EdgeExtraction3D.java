@@ -319,8 +319,8 @@ public class EdgeExtraction3D {
 				Point3d value=estimated[index][i].GetEstimated3dPoint();
 				// Make sure the point is inside the volume of interest
 				valid=volumeofinterest.PointInside3DBoundingBox(value);
-				// Check the point is designated as part of the object for each image
-				for (int j=0; j<images.length;j++)  if (!images[j].skipprocessing) if (valid) valid=images[j].PointIsPartOfObject(value);
+				// Check the point is designated as part of the object for each image, the only processed pixels are those that are part of the calibration sheet
+				for (int j=0; j<images.length;j++)  if (!images[j].skipprocessing) if (valid) valid=images[j].PointIsUnprocessed(value);
 				if (valid) TotalPoints++; 
 			}
 			estimated[index][i].SetSkip(!valid);

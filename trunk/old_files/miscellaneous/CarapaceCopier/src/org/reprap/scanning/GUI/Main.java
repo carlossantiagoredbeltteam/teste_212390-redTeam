@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  *
- * Last modified by Reece Arnott 25th November 2010
+ * Last modified by Reece Arnott 30th November 2010
  * 
  * Note that most of the layout commands were initially produced by NetBeans for JDK 6
  * and significantly modified by hand. For future reference if it needs to be done the other way the main things to change are:
@@ -139,7 +139,7 @@ public class Main extends JFrame {
  */ 
 
    public enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration, objectfinding,end};
-    //public enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration, test,end};
+   // public enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration, test,end};
     private final static steps stepsarray[]=steps.values();
     private static steps laststep = steps.valueOf("end");
     private static steps firststep = steps.valueOf("calibrationsheet");
@@ -262,8 +262,8 @@ public class Main extends JFrame {
 					// There is an if statement in this step that reads values from: a properties file and two image files per original image file if it is an automatic step
 					// Note that the end is an unconditional call to this method with an incremented step
 					// i.e. automatically go onto the next step
-				//case objectfinding : 
-				//	FindObject(); break; // this is the other big one
+				case objectfinding : 
+					FindObject(); break; // this is the other big one
 					// Note that the end is a call to this method with an incremented step if the next step is set to Automatic
 					// i.e. exit without the user pressing the exit button
 				case end : end(); break;
@@ -281,8 +281,111 @@ public class Main extends JFrame {
  	// This should only happen during testing and the case statement in the above method should be commented out with the enum definition not having a test element
  	// for the production system.
  	public void Test(){
- 		
- 	}
+ 		int pixelswide=630;
+ 		int pixelshigh=891;
+ 		// each pixel is 1/3mm square (if calibration sheet is A4 paper with no margin) 
+ 		PixelColour black=new PixelColour((byte)0);
+ 		PixelColour white=new PixelColour((byte)255);
+ 		PixelColour red=new PixelColour(16711680,(byte)255);
+ 		PixelColour green=new PixelColour(65280,(byte)255);
+ 		PixelColour blue=new PixelColour(255,(byte)255);
+ 		// Find the camera center of each image
+ 		Point3d[] C=new Point3d[images.length];
+ 		for (int i=0;i<C.length;i++) C[i]=new Point3d(new MatrixManipulations().GetRightNullSpace(images[i].getWorldtoImageTransformMatrix()));
+		// To do this sweep properly we need to sweep in all eight combinations of +/- x/y/z
+ 		volumeofinterest.maxz=100; // for testing purposes only
+ 		double x=volumeofinterest.minx;double xstep=(volumeofinterest.maxx-volumeofinterest.minx)/pixelswide;
+ 		double y=volumeofinterest.miny;double ystep=(volumeofinterest.maxy-volumeofinterest.miny)/pixelshigh;
+ 		double z=volumeofinterest.minz;double zstep=(volumeofinterest.maxz-volumeofinterest.minz)/100;
+ 		//TODO comment code!
+ 		for (int zdir=-1;zdir<=1;zdir=zdir+2) {
+ 			if (zdir==-1) z=volumeofinterest.maxz;
+ 			else z=volumeofinterest.minz-1; // escapes from loop after processing down z as test images all taken above max z height
+ 			while ((z>=volumeofinterest.minz) && (z<=volumeofinterest.maxz)){
+ 				System.out.print(z+" ");
+ 				PixelColour[][] newimage=new PixelColour[pixelswide][pixelshigh];
+ 				for (int i=0;i<pixelswide;i++)
+ 					for (int j=0;j<pixelshigh;j++)
+ 						newimage[i][j]=white.clone();
+ 				
+ 				for (int ydir=1;ydir>=-1;ydir=ydir-2){
+ 					int yindex;
+ 					if (ydir==-1){ y=volumeofinterest.maxy; yindex=pixelshigh-1;}
+ 		 			else {y=volumeofinterest.miny;yindex=0;}
+ 					while ((yindex>=0) && (yindex<pixelshigh)){	
+ 						for (int xdir=1;xdir>=-1;xdir=xdir-2){
+ 		 					int xindex;
+ 							if (xdir==-1) {x=volumeofinterest.maxx; xindex=pixelswide-1;}
+ 		 		 			else {x=volumeofinterest.minx; xindex=0;}
+ 		 		 			while ((xindex>=0) && (xindex<pixelswide)){
+ 		 		 			//Find if the point is unprocessed in all scenes or not
+ 		 						Point3d point=new Point3d(x,y,z);
+ 		 						boolean unprocessed=true;
+ 		 						for (int i=0;i<images.length;i++) if ((!images[i].skipprocessing) && unprocessed) unprocessed=images[i].PointIsUnprocessed(point);
+ 		 						if (unprocessed) {
+ 		 							// 1) find the mean colour using only those images where the camera center is in the correct octant (determined by the current 3d point and the direction of the x/y/z loops
+ 		 							PixelColour[] colours=new PixelColour[images.length];
+ 		 							int[] cameras=new int[images.length];
+ 		 							int index=0;
+ 		 							for (int i=0;i<images.length;i++) if (!images[i].skipprocessing){
+ 		 								// TODO make sure this calculation and the case statements are correct
+ 		 								// make the combinations of +/- x,y,z a number between 0 and 7 to make the case statements easier
+ 		 								int correctoctant=(int)((xdir==1)?1:0)+((int)((ydir==1)?1:0)*2)+((int)((zdir==1)?1:0)*4);
+ 		 								boolean process=false;
+ 		 								switch (correctoctant){
+ 		 									case 0:process=(C[i].x>x) && (C[i].y>y) && (C[i].z>z);break;
+ 		 									case 1:process=(C[i].x<x) && (C[i].y>y) && (C[i].z>z);break;
+ 		 									case 2:process=(C[i].x>x) && (C[i].y<y) && (C[i].z>z);break;
+ 		 									case 3:process=(C[i].x<x) && (C[i].y<y) && (C[i].z>z);break;
+ 		 									case 4:process=(C[i].x>x) && (C[i].y>y) && (C[i].z<z);break;
+ 		 									case 5:process=(C[i].x<x) && (C[i].y>y) && (C[i].z<z);break;
+ 		 									case 6:process=(C[i].x>x) && (C[i].y<y) && (C[i].z<z);break;
+ 		 									case 7:process=(C[i].x<x) && (C[i].y<y) && (C[i].z<z);break;
+ 		 								} // end switch statement
+ 		 								if (process){
+ 		 									colours[index]=images[i].InterpolatePixelColour(images[i].getWorldtoImageTransform(point.ConvertPointTo4x1Matrix()));
+ 		 									cameras[index]=i;
+ 		 									index++;
+ 		 								} // end if camera centre in correct octant
+ 		 							} // end for i
+ 		 							// 2) find similarity measure and mean colour if in two or more images
+ 		 							if (index>1) {
+ 		 								PixelColour[] truncatedcolours=new PixelColour[index];
+ 		 								for (int i=0;i<index;i++) truncatedcolours[i]=colours[i].clone();
+ 		 								PixelColour newcolour=new PixelColour();
+ 		 								double[] variance=newcolour.SetPixelToMeanColourAndReturnVariance(truncatedcolours);
+ 		 								// if similar enough set display colour and set processed flag on pixels in each contributing image
+ 		 								if (variance[4]<300) {
+ 		 									newimage[xindex][yindex]=newcolour.clone();
+ 		 		 							// 3) TODO reset binary pixel in each contributing image so this pixel is not used in successive runs through the loop if similar enough
+ 		 									for (int j=0;j<index;j++){
+ 		 										int i=cameras[j];
+ 		 										Point2d imagepoint=images[i].getWorldtoImageTransform(point.ConvertPointTo4x1Matrix());
+ 		 										images[i].setProcessedPixel(imagepoint);
+ 		 									}
+ 		 								} // end if similar enough
+ 		 							} // end if match in more than one image
+
+ 		 						} // end if potentially part of surface of object
+ 		 					x=x+(xdir*xstep);
+ 		 					xindex=xindex+xdir;
+ 		 		 			}} // end while and for x
+ 					y=y+(ydir*ystep);
+ 					yindex=yindex+ydir;
+ 					if (yindex%100==0) System.out.print(".");
+ 					}} // end while and for y
+ 			
+ 			GraphicsFeedback graphics=new GraphicsFeedback(false);
+ 			graphics.ShowPixelColourArray(newimage,pixelswide,pixelshigh);
+ 			if (prefs.DebugSaveOutputImagesFolder!=""){
+				String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"TestImageAtZ="+String.valueOf(z)+String.valueOf(zdir)+".jpg";
+				graphics.SaveImage(filename);
+				System.out.print("Saved "+filename);	
+			}
+ 			 		System.out.println();
+	 					z=z+(zdir*zstep);
+	 			}} // end while and for z
+ 	} // end of method
  	
  	
 //  This method redraws the Window for the step in which the calibration pattern is chosen
@@ -928,7 +1031,7 @@ private void FindCalibrationSheetCirclesEtc(){
 	  		    				 if (!images[j].skipprocessing){
 	  		    					 // save the image segmentation
 	  		    					 graphics=new GraphicsFeedback(print);
-	  		    					 graphics.ShowBinaryimage(images[j].getCalibrationSheetSegmentation(),images[j].width,images[j].height);
+	  		    					 graphics.ShowBinaryimage(images[j].getProcessedPixels(),images[j].width,images[j].height);
 	  		    					 graphics.SaveImage(new File(prefs.imagefiles.getElementAt(j).toString()).getParent()+File.separatorChar+"SegmentedImage"+new File(prefs.imagefiles.getElementAt(j).toString()).getName());
 	  		  					}
 	  		    		   } // end if save
@@ -1875,7 +1978,6 @@ private void FindCalibrationSheetCirclesEtc(){
 							  jTextAreaOutput.setText(jTextAreaOutput.getText()+text2);
 							}
 					  });
-
 				return rootvoxel;	  
 }
 	
