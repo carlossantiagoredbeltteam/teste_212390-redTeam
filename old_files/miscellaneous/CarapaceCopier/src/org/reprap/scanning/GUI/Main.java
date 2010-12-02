@@ -343,7 +343,7 @@ public class Main extends JFrame {
  		 									case 7:process=(C[i].x<x) && (C[i].y<y) && (C[i].z<z);break;
  		 								} // end switch statement
  		 								if (process){
- 		 									colours[index]=images[i].InterpolatePixelColour(images[i].getWorldtoImageTransform(point.ConvertPointTo4x1Matrix()));
+ 		 									colours[index]=images[i].InterpolatePixelColour(images[i].getWorldtoImageTransform(point.ConvertPointTo4x1Matrix()),true);
  		 									cameras[index]=i;
  		 									index++;
  		 								} // end if camera centre in correct octant
@@ -1011,7 +1011,7 @@ private void FindCalibrationSheetCirclesEtc(){
 	      					}
 	      					
 	      					LensDistortion distortion=EstimatingCameraParameters(j,circles);									  
-	      					UndoLensDistortion(j,distortion);
+	      					UndoLensDistortion(j,distortion,false);
 		      				ImageSegmentation(j); 
 		      				
     					  } // end if continue
@@ -1026,7 +1026,7 @@ private void FindCalibrationSheetCirclesEtc(){
 	  		    			   	catch (Exception e){System.out.println("Error writing processed image properties.");}
 	  		    			     // save the undistorted image
 	  		    				 GraphicsFeedback graphics=new GraphicsFeedback(print);
-	  		    				 graphics.ShowImage(images[j]);
+	  		    				 graphics.ShowImage(images[j],false);
 	  		    				 graphics.SaveImage(new File(prefs.imagefiles.getElementAt(j).toString()).getParent()+File.separatorChar+"UndistortedImage"+new File(prefs.imagefiles.getElementAt(j).toString()).getName());
 	  		    				 if (!images[j].skipprocessing){
 	  		    					 // save the image segmentation
@@ -1580,7 +1580,7 @@ private void FindCalibrationSheetCirclesEtc(){
 		double lowestangleinradians=((double)prefs.AlgorithmSettingMaximumCameraAngleFromVerticalInDegrees/360)*tau; 
 		   // Load up the kernel to apply a semi-Gaussian filter of radius 3 (where the radius is the 3-sigma point) to the image at the same time as reading into memory
 		   float[] kernel=GetGaussianFilter(3);
-		   //Load the image in with no pre-processing filtering
+		   //Load the greyscale image in with no pre-processing filtering
 		   //images[i]=new CalibratedImage(prefs.imagefiles.getElementAt(i).toString());	
 		   // Load the image in apply the Gaussian filtering kernel as a pre-processing filtering step
 		   images[i]=new Image(prefs.imagefiles.getElementAt(i).toString(), kernel);	
@@ -1839,7 +1839,7 @@ private void FindCalibrationSheetCirclesEtc(){
 				//} // end while loop
 				return distortion;
 	}
-	private void UndoLensDistortion(int i,LensDistortion distortion){
+	private void UndoLensDistortion(int i,LensDistortion distortion, boolean colour){
 		// Update progress bars
 		EventQueue.invokeLater(new Runnable(){
 					  public void run(){
@@ -1849,7 +1849,7 @@ private void FindCalibrationSheetCirclesEtc(){
 					  }
 				  });	    		 
 
-		  images[i].NegateLensDistortion(distortion,jProgressBar1);
+		  images[i].NegateLensDistortion(distortion,jProgressBar1, colour);
 		  }
 	private void ImageSegmentation(int i){
 		//From the known camera calibration and the matching circle centers on the calibration sheet found, determine the visible portion of the calibration sheet
@@ -2048,7 +2048,7 @@ private void FindCalibrationSheetCirclesEtc(){
 			 for (int j=0;j<images.length;j++){     						
 				 byte[] colour=new byte[3];
 				 GraphicsFeedback graphics=new GraphicsFeedback(print);
-				 graphics.ShowImage(images[j]);
+				 graphics.ShowImage(images[j],true); // Note that the graphics feedback should be called at the end, otherwise the colour image may not exist
 				 if (!images[j].skipprocessing){
 					 PointPair2D[] matchingpoints=images[j].matchingpoints.clone();
 	    				

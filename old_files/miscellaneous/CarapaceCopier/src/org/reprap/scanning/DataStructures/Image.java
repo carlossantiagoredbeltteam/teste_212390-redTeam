@@ -23,11 +23,17 @@ package org.reprap.scanning.DataStructures;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 30th November 2010
+ * Last modified by Reece Arnott 2nd December 2010
  * 
  * These are methods that store the image and and additional information together
  * This includes the edge map, camera calibration matrices and the point pair matches of points in the image with the calibration sheet 
  * 
+ * Note that there is currently a large kludge for speed purposes!
+ * The colours could be read in to the PixelColour array at initialisation time but this slows any further method calls to the image instance down (by 4-10 times) so
+ * most of the initial processing is done on the greyscale image, stored internally as a 2d byte array, and the method to read the image in (and reverse distortion)
+ * is only called when it is needed near the end of the Main program execution.
+ * It could be that the colour information could be stored internally as one of the native image primitive types (or as the 32 bits of an int) and then only converted to a PixelColour when
+ * operations need to be performed. Not sure what the speed difference would be with that though. 
  * 
  *********************************************************************************/
 import javax.swing.JProgressBar;
@@ -56,9 +62,14 @@ public class Image {
 	private float[] blur=new float[0]; // This is set when the file is read into memory and is filtering kernel. Could be a zero length array if there is no blurring 
 
 	
-	// The imagemap is currently a 2d greyscale representation of the image.
-	// The ImageColour class can be readily expanded to handle R,G,B colour in the future
-	private PixelColour[][] imagemap;
+	// The greyscalemap is currently a 2d greyscale representation of the image.
+	// The PixelColour class handles R,G,B and greyscale but is not filled initially due to the large slow down in speed this makes.
+	// Instead the greyscaleimagemap is loaded initially and the colour only added later if needed.
+	// This is a kludge to get a speed up!
+	// TODO should this be changed to be stored as a native image handler (maybe converted to PixelColour as it is passed out) instead of this kludgey workaround?
+	private byte[][] greyscaleimagemap;
+	private PixelColour[][] colourimagemap;
+	private boolean colourinformationexists;
 	 //The height and width parameters are read at the time the image is first accessed by the constructor
 	public int width;
 	public int height;
@@ -69,11 +80,13 @@ public class Image {
 	// Currently just used by clone method
 	public Image(){
 		processedpixel=new boolean[0][0];
-		imagemap=new PixelColour[0][0];
+		greyscaleimagemap=new byte[0][0];
+		colourimagemap=new PixelColour[0][0];
 		originofimagecoordinates=new Point2d(0,0);
 		width=0;
 		height=0;
 		filename="";
+		colourinformationexists=false;
 		setWorldtoImageTransform=false;
 		// Set the camera matrix to be the identity matrix 
 		CameraMatrix=new Matrix(3,3);
@@ -91,8 +104,10 @@ public class Image {
 		// Initialise the imagemap etc. and set to defaults then try and load from file
 		// Then try and load preferences from file
 		processedpixel=new boolean[0][0];
+		colourinformationexists=false;
 		setWorldtoImageTransform=false;
-		imagemap=new PixelColour[0][0];
+		greyscaleimagemap=new byte[0][0];
+		colourimagemap=new PixelColour[0][0];
 		originofimagecoordinates=new Point2d(0,0);
 		filename=imagename;
 		width=0;
@@ -107,15 +122,17 @@ public class Image {
 		calibration=new CalibrateImage();
 		edges=new EdgeExtraction2D();
 	//	distortion=new LensDistortion(); // creates zero distortion to begin with
-		ReadImageFromFile(new float[0]); // read in the image but don't apply any filtering
+		ReadGreyscaleImageFromFile(new float[0]); // read in the image but don't apply any filtering
 	}
-	// Read in the image and apply a filter
+	// Read in the image (initially as greyscale only) and apply a filter
 	public Image(String imagename, float[] kernel) {
 		// Initialise the imagemap etc. and set to defaults then try and load from file
 		// Then try and load the image from file
 		processedpixel=new boolean[0][0];
+		colourinformationexists=false;
 		setWorldtoImageTransform=false;
-		imagemap=new PixelColour[0][0];
+		greyscaleimagemap=new byte[0][0];
+		colourimagemap=new PixelColour[0][0];
 		originofimagecoordinates=new Point2d(0,0);
 		filename=imagename;
 		width=0;
@@ -130,7 +147,7 @@ public class Image {
 		calibration=new CalibrateImage();
 		edges=new EdgeExtraction2D();
 	//	distortion=new LensDistortion(); // creates zero distortion to begin with 
-		ReadImageFromFile(kernel);
+		ReadGreyscaleImageFromFile(kernel);
 	}
 	// end of constructors
 	
@@ -152,7 +169,8 @@ public class Image {
 		returnvalue.width=width;
 		returnvalue.height=height;
 		returnvalue.filename=filename;
-		returnvalue.imagemap=imagemap.clone();
+		returnvalue.greyscaleimagemap=greyscaleimagemap.clone();
+		returnvalue.colourimagemap=colourimagemap.clone();
 		returnvalue.originofimagecoordinates=originofimagecoordinates.clone();
 		returnvalue.blur=blur.clone();
 		return returnvalue;
@@ -179,7 +197,7 @@ public class Image {
 	byte[][]returnvalue=new byte[width][height];
 	for (int x=0;x<width;x++)
 		for (int y=0;y<height;y++)
-			returnvalue[x][y]=InterpolatePixelColour(new Point2d(x,y)).getGreyscale();
+			returnvalue[x][y]=InterpolatePixelColour(new Point2d(x,y),false).getGreyscale();
 	return returnvalue;
 }
 
@@ -333,9 +351,15 @@ public void setPixelsInsideBackProjectedVolumeToProcessed(AxisAlignedBoundingBox
 	} // end for i
 } // end method
 
+public void ReadColourInformationFromFile(){
+	ImageFile inputfile=new ImageFile(filename);
+	colourimagemap=inputfile.ReadImageFromFile(blur);
+	colourinformationexists=true;
+} // end of ReadImageFromFile
 
-public void NegateLensDistortion(LensDistortion distortion, JProgressBar bar){
-	
+
+public void NegateLensDistortion(LensDistortion distortion, JProgressBar bar,boolean colour){
+	if ((colour) && (!colourinformationexists)) ReadColourInformationFromFile();
 	bar.setMinimum(0);
 	bar.setMaximum(height*2);
 	bar.setValue(0);
@@ -373,14 +397,20 @@ public void NegateLensDistortion(LensDistortion distortion, JProgressBar bar){
 						points[i]=lookuptable[indexes[i]].clone();
 						int oldx=(indexes[i]%width);
 						int oldy=(int)((double)(indexes[i]-oldx)/(double)width);
-						colours[i]=imagemap[oldx][oldy].clone(); 
+						if (colour) colours[i]=colourimagemap[oldx][oldy].clone();
+						else colours[i]=new PixelColour(greyscaleimagemap[oldx][oldy]); 
 					}
 					newimage[x][y]=InterpolatePixelColour(target,points,colours);
 				}
 				else newimage[x][y]=new PixelColour();
 				}
 			}
-		imagemap=newimage.clone();
+		if (colour) colourimagemap=newimage.clone();
+		else {
+			for (int x=0;x<width;x++)
+				for (int y=0;y<height;y++)
+			greyscaleimagemap[x][y]=newimage[x][y].getGreyscale();
+		}
 	}
 	else {
 		// TODO If we aren't using the distortion function then distortion is estimated by a matrix so we should be able to invert it 
@@ -431,8 +461,10 @@ public double GetDsquaredSumError(){
 //This method flips the image y coordinates if needed
 //It reads the image into a byte array that can be used by the OpenGL display method to display it
 
-public byte[] ConvertImageForDisplay(int numcolours)
+public byte[] ConvertImageForDisplay(int numcolours, boolean coloured)
 {
+	if ((coloured) && (!colourinformationexists)) ReadColourInformationFromFile();
+	
 	int tempindex,index;
 	byte[] GLimage=new byte[(height+1)*(width+1)*numcolours];
 	
@@ -444,7 +476,7 @@ public byte[] ConvertImageForDisplay(int numcolours)
 		for (int x=0;x<width;x++){
 			Point2d target=new Point2d(x,y);
 			index=tempindex+(x*numcolours);
-			PixelColour colour=InterpolatePixelColour(target, Math.sqrt(2));
+			PixelColour colour=InterpolatePixelColour(target, Math.sqrt(2), coloured);
 			GLimage[index+0]=colour.getRed();
 			GLimage[index+1]=colour.getGreen();
 			GLimage[index+2]=colour.getBlue();
@@ -454,8 +486,8 @@ return GLimage;
 } // end of method
 
 //This method calculates a colour value using a circular filter around a target pixel coordinate with a fixed radius of sqrt(2) and returns the estimated colour
-public PixelColour InterpolatePixelColour(Point2d target){
-	return InterpolatePixelColour(target,Math.sqrt(2));
+public PixelColour InterpolatePixelColour(Point2d target, boolean colour){
+	return InterpolatePixelColour(target,Math.sqrt(2), colour);
 }
 
 
@@ -468,11 +500,16 @@ public PixelColour InterpolatePixelColour(Point2d target){
 
 //This method calculates a colour using a circular filter around a target pixel coordinate with radius value passed in along with the coordinate
 //this method returns the estimated colour
-	private PixelColour InterpolatePixelColour(Point2d target, double radius){
+	private PixelColour InterpolatePixelColour(Point2d target, double radius, boolean colour){
+		if ((colour) && (!colourinformationexists)) ReadColourInformationFromFile();
+		
 		// Don't bother with interpolating if the target pixel is very close to an actual pixel, just return that pixel value	
 		int roundedx=Math.round((long)target.x);
 		int roundedy=Math.round((long)target.y);
-		if ((target.isApproxEqual(new Point2d(roundedx,roundedy),0.0001)) && (roundedx>=0) && (roundedx<width) && (roundedy>=0) && (roundedy<height)) return imagemap[roundedx][roundedy];
+		if ((target.isApproxEqual(new Point2d(roundedx,roundedy),0.0001)) && (roundedx>=0) && (roundedx<width) && (roundedy>=0) && (roundedy<height)) {
+			if (colour) return colourimagemap[roundedx][roundedy];
+			else return new PixelColour(greyscaleimagemap[roundedx][roundedy]);
+		}
 		else {
 			double maxdistancesquared=radius*radius;
 			// find the maximum and minimum pixels to add to filter
@@ -495,7 +532,8 @@ public PixelColour InterpolatePixelColour(Point2d target){
 					if ((distancesquared<=maxdistancesquared) && (x>=0) && (x<width) && (y>=0) && (y<height)){
 						// This is a very simple weighting, simply 1-(d^2/R^2)
 						weights[count]=1-(distancesquared*oneoverrsquared);
-						colours[count]=imagemap[x][y].clone();
+						if (colour) colours[count]=colourimagemap[x][y];
+						else colours[count]=new PixelColour(greyscaleimagemap[x][y]);
 						count++;
 					} // end if
 				} // end for x
@@ -508,6 +546,7 @@ public PixelColour InterpolatePixelColour(Point2d target){
 		} // end of method
 	
 	private PixelColour InterpolatePixelColour(Point2d target, Point2d[] source, PixelColour[] colours){
+		
 		// Find the distances squared to the source pixels and also find the maximum distance squared
 		double[] dsquared=new double[source.length];
 		double maxdistancesquared=0;
@@ -528,16 +567,19 @@ public PixelColour InterpolatePixelColour(Point2d target){
 	
 	
 	
-	private void ReadImageFromFile(float[] filter){
+	private void ReadGreyscaleImageFromFile(float[] filter){
 		blur=filter.clone();
 		ImageFile inputfile=new ImageFile(filename);
-		imagemap=inputfile.ReadImageFromFile(filter); 
+		PixelColour[][] pixelcolours=inputfile.ReadImageFromFile(filter);
 		width=inputfile.width;
 		height=inputfile.height;
 		processedpixel=new boolean[width][height];
+		greyscaleimagemap=new byte[width][height];
 		for(int y=0;y<height;y++)
-			for(int x=0;x<width;x++)
+			for(int x=0;x<width;x++){
 				processedpixel[x][y]=false;
+				greyscaleimagemap[x][y]=pixelcolours[x][y].getGreyscale();	
+			}
 	} // end of ReadImageFromFile
 
 	
