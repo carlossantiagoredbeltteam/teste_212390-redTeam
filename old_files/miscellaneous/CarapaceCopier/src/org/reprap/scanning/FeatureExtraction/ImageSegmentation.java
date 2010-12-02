@@ -258,7 +258,7 @@ public ImageSegmentation clone(){
 			AxisAlignedBoundingBox boundingrectangle=ellipses[i].GetAxisAlignedBoundingRectangle();
 			for (int x=(int)(boundingrectangle.minx-1);x<=(boundingrectangle.maxx+1);x++){
 				for (int y=(int)(boundingrectangle.miny-1);y<=(boundingrectangle.maxy+1);y++){
-					if ((x>=0) && (x<width) && (y>=0) && (y>=height)){ 
+					if ((x>=0) && (x<width) && (y>=0) && (y<height)){ 
 						if (ellipses[i].PointInsideEllipse(new Point2d(x,y)))	nextstate[x][y]=states.valueOf("calibrationsheet");
 					} // end if
 				} // end for y
