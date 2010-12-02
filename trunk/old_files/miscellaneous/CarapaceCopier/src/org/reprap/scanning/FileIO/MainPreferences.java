@@ -90,6 +90,8 @@ public class MainPreferences {
 	public boolean DebugImageOverlay;
 	public boolean DebugImageSegmentation;
 	public boolean DebugCalibrationSheetBarycentricEstimate;
+	public boolean DebugRestrictedSearch;
+	public boolean Debug;
 	public JCheckBox CalibrationSheetKeepAspectRatioWhenPrinted;
 	public JCheckBox PaperSizeIsCustom;
 	public DefaultComboBoxModel PaperSizeList;
@@ -126,10 +128,11 @@ public class MainPreferences {
 		SaveOnProgramFinish = true;
 		SaveCalibrationSheetProperties=true;
 		SaveProcessedImageProperties=false;
-		//DebugShow3DModel=false;
 		DebugImageOverlay=false;
 		DebugImageSegmentation=false;
+		DebugRestrictedSearch=false;
 		DebugCalibrationSheetBarycentricEstimate=false;
+		Debug=false;
 		BlankOutputFilenameOnLoad=true;
 		AutomaticStep = new boolean[numberofsteps];
 		for (int i=0;i<AutomaticStep.length;i++) AutomaticStep[i]=false;
@@ -208,7 +211,7 @@ public class MainPreferences {
 			if (temp.getProperty("OutputFileName")!=null) OutputFileName.setText(temp.getProperty("OutputFileName"));
 			if (temp.getProperty("OutputObjectName")!=null) OutputObjectName.setText(temp.getProperty("OutputObjectName"));
 			// Load Strings
-			if (temp.getProperty("DebugSaveOutputImagesFolder")!=null) DebugSaveOutputImagesFolder=temp.getProperty("DebugSaveOutputImagesFolder");
+			if (temp.getProperty("DebugSaveOutputImagesFolder")!=null) {DebugSaveOutputImagesFolder=temp.getProperty("DebugSaveOutputImagesFolder");Debug=true;}
 			// Load boolean variables
 			if (temp.getProperty("SaveOnProgramWindowClose")!=null) SaveOnProgramWindowClose = temp.getProperty("SaveOnProgramWindowClose").equals("true");
 			if (temp.getProperty("SaveOnProgramCancel")!=null) SaveOnProgramCancel = temp.getProperty("SaveOnProgramCancel").equals("true");
@@ -219,6 +222,7 @@ public class MainPreferences {
 			//if (temp.getProperty("DebugShow3DModel")!=null) DebugShow3DModel = temp.getProperty("DebugShow3DModel").equals("true");
 			if (temp.getProperty("DebugImageOverlay")!=null) DebugImageOverlay = temp.getProperty("DebugImageOverlay").equals("true");
 			if (temp.getProperty("DebugImageSegmentation")!=null) DebugImageSegmentation = temp.getProperty("DebugImageSegmentation").equals("true");
+			if (temp.getProperty("DebugRestrictedSearch")!=null) DebugRestrictedSearch = temp.getProperty("DebugRestrictedSearch").equals("true");
 			if (temp.getProperty("DebugCalibrationSheetBarycentricEstimate")!=null) DebugCalibrationSheetBarycentricEstimate = temp.getProperty("DebugCalibrationSheetBarycentricEstimate").equals("true");
 			
 			
@@ -367,6 +371,7 @@ public class MainPreferences {
 		//temp.setProperty("DebugShow3DModel", String.valueOf(DebugShow3DModel));
 		temp.setProperty("DebugImageOverlay", String.valueOf(DebugImageOverlay));
 		temp.setProperty("DebugImageSegmentation", String.valueOf(DebugImageSegmentation));
+		temp.setProperty("DebugRestrictedSearch", String.valueOf(DebugRestrictedSearch));
 		temp.setProperty("DebugCalibrationSheetBarycentricEstimate", String.valueOf(DebugCalibrationSheetBarycentricEstimate));
 		
 		

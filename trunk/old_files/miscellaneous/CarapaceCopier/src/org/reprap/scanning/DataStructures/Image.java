@@ -55,6 +55,7 @@ public class Image {
 	 // and in the lens distortion class when calculating k1 as the centre of distortion is assumed to be at the origin.
 	public PointPair2D[] matchingpoints; 
 	private boolean[][] processedpixel;
+	private AxisAlignedBoundingBox unprocessedpixelsarea;
 	private EdgeExtraction2D edges;
 	private float[] blur=new float[0]; // This is set when the file is read into memory and is filtering kernel. Could be a zero length array if there is no blurring 
 
@@ -75,6 +76,7 @@ public class Image {
 		width=0;
 		height=0;
 		filename="";
+		unprocessedpixelsarea=new AxisAlignedBoundingBox();
 		setWorldtoImageTransform=false;
 		// Set the camera matrix to be the identity matrix 
 		CameraMatrix=new Matrix(3,3);
@@ -96,6 +98,7 @@ public class Image {
 		imagemap=new int[0][0];
 		originofimagecoordinates=new Point2d(0,0);
 		filename=imagename;
+		unprocessedpixelsarea=new AxisAlignedBoundingBox();
 		width=0;
 		height=0;
 		matchingpoints=new PointPair2D[0];
@@ -119,6 +122,7 @@ public class Image {
 		imagemap=new int[0][0];
 		originofimagecoordinates=new Point2d(0,0);
 		filename=imagename;
+		unprocessedpixelsarea=new AxisAlignedBoundingBox();
 		width=0;
 		height=0;
 		matchingpoints=new PointPair2D[0];
@@ -156,6 +160,7 @@ public class Image {
 		returnvalue.imagemap=imagemap.clone();
 		returnvalue.originofimagecoordinates=originofimagecoordinates.clone();
 		returnvalue.blur=blur.clone();
+		returnvalue.unprocessedpixelsarea=unprocessedpixelsarea.clone();
 		return returnvalue;
 	} // end of clone method
 	
@@ -233,6 +238,7 @@ public void LimitEdgesToRaysThatIntersectAVolumeOfInterest(AxisAlignedBoundingBo
 }
 public void SetProcessedPixels(boolean[][] pixels){
 	processedpixel=pixels.clone();
+	SetUnProcessedPixelsBoundingArea();
 }
 public boolean[][] getProcessedPixels(){
 	return processedpixel;
@@ -243,15 +249,51 @@ public boolean PointIsUnprocessed(Point3d worldpoint){
 	boolean returnvalue=!WorldPointBehindCamera(worldpointmatrix);
 	if (returnvalue){
 		Point2d imagepoint=getWorldtoImageTransform(worldpointmatrix);
-		// Test to see if the image point is actually in the image 	
-		int x=(int)imagepoint.x;
-		int y=(int)imagepoint.y;
-		returnvalue=((x>=0) && (x<width) && (y>=0) && (y<height));
+		// Test to see if the image point is within the known unprocessed area 	
+		returnvalue=unprocessedpixelsarea.PointInside2DBoundingBox(imagepoint);
 		// Then finally test if the pixel is processed (if it passes the above tests)
-		if (returnvalue) returnvalue=!processedpixel[x][y];
+		if (returnvalue){
+			int x=(int)imagepoint.x;
+			int y=(int)imagepoint.y;
+			returnvalue=!processedpixel[x][y];
+		}
 	}
 	return returnvalue;
 }
+public void setPixeltoProcessedIfRayNotIntersectAnyVolumesOfInterest(AxisAlignedBoundingBox[] volumeofinterest){
+	//Precalculate the camera centre point and the psuedo-inverse of the camera matrix as they will be used for the constructed lines later
+		Point3d C=new Point3d(new MatrixManipulations().GetRightNullSpace(getWorldtoImageTransformMatrix()));
+		Matrix Pplus=new MatrixManipulations().PseudoInverse(getWorldtoImageTransformMatrix()); 
+		// If the camera centre is in the volume of interest all the rays will obviously intersect so we don't need to continue
+		boolean intersect=false;
+		int i=0;
+		while ((!intersect) && (i<volumeofinterest.length)){
+				intersect=volumeofinterest[i].PointInside3DBoundingBox(C);
+				i++;
+			} // end while 
+		if (!intersect){
+			// Go through each unprocessed point and construct a line for it based on the camera matrix pseudoinverse and camera centre
+			// Then see if that line intersects a volume of interest
+			for (int x=(int)unprocessedpixelsarea.minx;x<=(int)unprocessedpixelsarea.maxx;x++){
+				for (int y=(int)unprocessedpixelsarea.miny;y<=(int)unprocessedpixelsarea.maxy;y++){
+							if (!processedpixel[x][y]){
+						Point2d point=new Point2d(x,y);
+						point.minus(originofimagecoordinates);
+						//Line3d l=new Line3d(point,Pplus,C);
+						Line3d l=new Line3d(C,Pplus,point);
+						intersect=false;
+						i=0;
+						while ((!intersect) && (i<volumeofinterest.length)){
+								intersect=volumeofinterest[i].Intersects(l);
+								i++;
+							} // end while
+						if (!intersect) processedpixel[x][y]=true;
+					} // end if unprocessedpixel
+				} // end for y
+			} // end for x
+			SetUnProcessedPixelsBoundingArea();
+		} // end if C not inside the volumes of interest
+		}
 
 
 public void setPixeltoProcessed(Point2d imagepoint){
@@ -270,8 +312,8 @@ public void setPixelsOutsideBackProjectedVolumeToProcessed(AxisAlignedBoundingBo
 	Point2d[] pixelvertices=new Point2d[vertices.length];
 	for (int i=0;i<pixelvertices.length;i++) pixelvertices[i]=getWorldtoImageTransform(vertices[i].ConvertPointTo4x1Matrix());
 	//Go through all the pixels and test
-	for (int x=0;x<width;x++){
-		for (int y=0;y<height;y++){
+	for (int x=(int)unprocessedpixelsarea.minx;x<=(int)unprocessedpixelsarea.maxx;x++){
+		for (int y=(int)unprocessedpixelsarea.miny;y<=(int)unprocessedpixelsarea.maxy;y++){
 			//	if the pixel is not already processed
 			if (!processedpixel[x][y]){
 				// Use the barycentric coordinates to test if the point is outside all the triangles
@@ -289,51 +331,8 @@ public void setPixelsOutsideBackProjectedVolumeToProcessed(AxisAlignedBoundingBo
 			} // end if not already processed
 		} // end for y
 	} // end for x
+	SetUnProcessedPixelsBoundingArea();
 } // end method
-
-public void setPixelsInsideBackProjectedVolumeToProcessed(AxisAlignedBoundingBox volumeofinterest){
-	// Convert the faces of the volume into triangles. Assuming the camera is not within the volume of interest we can 
-	// just set the pixels that fall inside the backprojection of these triangles 
-	TrianglePlusVertexArray trianglesplusvertices=volumeofinterest.GetTrianglesMakingUpFaces();
-	TriangularFace[] triangles=trianglesplusvertices.GetTriangleArray();
-	Point3d[] vertices=trianglesplusvertices.GetVertexArray();
-	// Back project the vertices
-	Point2d[] pixelvertices=new Point2d[vertices.length];
-	for (int i=0;i<pixelvertices.length;i++) pixelvertices[i]=getWorldtoImageTransform(vertices[i].ConvertPointTo4x1Matrix());
-	// Now go through the triangles and process them
-	for (int i=0;i<triangles.length;i++){
-		int[] trianglevertices=triangles[i].GetFace();
-		// Find the rectangle that surronds this triangle
-		AxisAlignedBoundingBox boundingbox=new AxisAlignedBoundingBox();
-		boundingbox.minx=pixelvertices[trianglevertices[0]].x;
-		boundingbox.maxx=pixelvertices[trianglevertices[0]].x;
-		boundingbox.miny=pixelvertices[trianglevertices[0]].y;
-		boundingbox.maxy=pixelvertices[trianglevertices[0]].y;
-		boundingbox.Expand2DBoundingBox(pixelvertices[trianglevertices[1]]);
-		boundingbox.Expand2DBoundingBox(pixelvertices[trianglevertices[2]]);
-		int minx=(int)(boundingbox.minx-1);
-		int maxx=(int)(boundingbox.maxx+1);
-		int miny=(int)(boundingbox.miny-1);
-		int maxy=(int)(boundingbox.maxy+1);
-		// Now process all pixels inside this rectangle
-		for (int x=minx;x<=maxx;x++){
-			for (int y=miny;y<=maxy;y++){
-				// If within image
-				if ((x>=0) && (x<width) && (y>=0) && (y<height)){
-					// if the pixel is not already processed
-					if (!processedpixel[x][y]){
-						// Use the barycentric coordinates to test to see if this is point is within the triangle
-						Coordinates point=new Coordinates(3);
-						point.pixel=new Point2d(x,y);
-						point.calculatebary(pixelvertices,trianglevertices[0],trianglevertices[1],trianglevertices[2]);
-						processedpixel[x][y]=!point.isOutside();
-					} // end if not already processed
-				} // end if within image
-			} // end for y
-		} // end for x
-	} // end for i
-} // end method
-
 
 public void NegateLensDistortion(LensDistortion distortion, JProgressBar bar){
 	bar.setMinimum(0);
@@ -538,6 +537,8 @@ public PixelColour InterpolatePixelColour(Point2d target){
 		PixelColour[][] pixelcolours=inputfile.ReadImageFromFile(filter);
 		width=inputfile.width;
 		height=inputfile.height;
+		unprocessedpixelsarea.maxx=width-1;
+		unprocessedpixelsarea.maxy=height-1;
 		processedpixel=new boolean[width][height];
 		imagemap=new int[width][height];
 		for(int y=0;y<height;y++)
@@ -546,6 +547,24 @@ public PixelColour InterpolatePixelColour(Point2d target){
 				imagemap[x][y]=pixelcolours[x][y].ExportAsInt();	
 			}
 	} // end of ReadImageFromFile
+
+	private void SetUnProcessedPixelsBoundingArea(){
+		AxisAlignedBoundingBox newarea=new AxisAlignedBoundingBox();
+		boolean first=true;
+		for (int x=(int)unprocessedpixelsarea.minx;x<=(int)unprocessedpixelsarea.maxx;x++)
+			for (int y=(int)unprocessedpixelsarea.miny;y<=(int)unprocessedpixelsarea.maxy;y++)
+				if (!processedpixel[x][y]){
+					if (first){
+						first=false;
+						newarea.minx=x;
+						newarea.maxx=x;
+						newarea.miny=y;
+						newarea.maxy=y;
+					}
+					else newarea.Expand2DBoundingBox(new Point2d(x,y));
+				} // end if
+		unprocessedpixelsarea=newarea.clone();
+	}
 
 	
 } // end of class
