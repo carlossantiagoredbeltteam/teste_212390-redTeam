@@ -183,10 +183,6 @@ boolean end=false;
 	public AxisAlignedBoundingBox[] getSurfaceVoxels(){
 		// Count up how many there are
 		int surfacesubvoxels=getNumberofSurfaceSubVoxels();
-		for (int z=0;z<subvoxeldivision;z++)
-			for (int y=0;y<subvoxeldivision;y++)
-				for (int x=0;x<subvoxeldivision;x++)
-					if (SubVoxel[x][y][z].isSurface()) surfacesubvoxels++;
 		AxisAlignedBoundingBox[] returnvalue=new AxisAlignedBoundingBox[surfacesubvoxels];
 		int count=0;
 		for (int z=0;z<subvoxeldivision;z++)
@@ -201,10 +197,13 @@ boolean end=false;
 	
 	public int getNumberofSurfaceSubVoxels(){
 		int surfacesubvoxels=0;
-		for (int z=0;z<subvoxeldivision;z++)
-			for (int y=0;y<subvoxeldivision;y++)
-				for (int x=0;x<subvoxeldivision;x++)
+		for (int z=0;z<subvoxeldivision;z++){
+			for (int y=0;y<subvoxeldivision;y++){
+				for (int x=0;x<subvoxeldivision;x++){
 					if (SubVoxel[x][y][z].isSurface()) surfacesubvoxels++;
+				}
+			}
+		}
 		return surfacesubvoxels;
 	}
 	
@@ -297,8 +296,8 @@ boolean end=false;
 		TrianglePlusVertexArray returnvalue=new TrianglePlusVertexArray(vertices);
 		int z=0;
 		while (bar.getValue()!=bar.getMaximum()){
-			for (int y=0;y<subvoxeldivision;y++)
-					for (int x=0;x<subvoxeldivision;x++)
+			for (int y=0;y<subvoxeldivision;y++){
+					for (int x=0;x<subvoxeldivision;x++){
 						if ((SubVoxel[x][y][z].isSurface()) && (bar.getValue()!=bar.getMaximum())){
 							Point3d center=getSubVoxel(x,y,z).GetMidpointof3DBoundingBox();
 							// Extract the 6 faces, each having the four corners in order, either clockwise or anti clockwise (so that quad 1 and 2 are on opposite edges of the face) as well as the neighbours
@@ -365,7 +364,10 @@ boolean end=false;
 								}// end if add
 							} // end for
 							bar.setValue(bar.getValue()+1);
+							//System.out.println(x+" "+y+" "+z+" "+bar.getValue()+" free memory="+Runtime.getRuntime().freeMemory()+" number of triangles="+returnvalue.GetTriangleArrayLength());
 						} // end if
+					} // end for x
+			} // end for y
 		z++;
 		} // end while
 		returnvalue.PurgeIrreleventVertices();
