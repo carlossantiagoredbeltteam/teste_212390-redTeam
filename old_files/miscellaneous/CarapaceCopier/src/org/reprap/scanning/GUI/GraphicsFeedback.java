@@ -96,10 +96,10 @@ public class GraphicsFeedback {
 		print=printtrue;
 	}
 	
-	public void ShowImage(Image givenimage, boolean colour){
+	public void ShowImage(Image givenimage){
 		imageheight=givenimage.height;
 		imagewidth=givenimage.width;
-		GLimage=givenimage.ConvertImageForDisplay(numcolours, colour);
+		GLimage=givenimage.ConvertImageForDisplay(numcolours);
 	}
 	public void ShowGLimage(byte[] image, int w, int h){
 		GLimage=image.clone();

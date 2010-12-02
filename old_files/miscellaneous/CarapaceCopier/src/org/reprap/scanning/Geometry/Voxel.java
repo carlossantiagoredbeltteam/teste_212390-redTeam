@@ -209,7 +209,7 @@ boolean end=false;
 	
 //	 This should be called from a while progressbar != max type loop
 	public JProgressBar Voxelise(Image[] images,AxisAlignedBoundingBox volumeofinterest, int subdivision, JProgressBar bar){
-		
+		//long starttime=System.currentTimeMillis();
 		if (bar.getValue()==bar.getMinimum()){
 			bar.setMaximum(subdivision);
 			subvoxeldivision=subdivision;
@@ -285,6 +285,7 @@ boolean end=false;
 								} // end if
 											
 		} // end if bar value = max
+		//System.out.println(bar.getValue()+" "+(System.currentTimeMillis()-starttime));
 			return bar;
 	} // end of SubDivideVoxel method
 

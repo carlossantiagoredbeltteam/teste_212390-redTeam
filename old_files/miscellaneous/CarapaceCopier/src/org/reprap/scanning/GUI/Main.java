@@ -137,7 +137,7 @@ public class Main extends JFrame {
 
    //public enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration, objectfindingvoxelisation,writetofile,end};
    public enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration, objectfindingvoxelisation,end};
-   //public enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration, test,end};
+   //public enum steps {calibrationsheet, test,end};
     private final static steps stepsarray[]=steps.values();
     private static steps laststep = steps.valueOf("end");
     private static steps firststep = steps.valueOf("calibrationsheet");
@@ -264,8 +264,9 @@ public class Main extends JFrame {
 					FindObject(); break; // this is the other big one
 					// Note that the end is a call to this method with an incremented step if the next step is set to Automatic
 					// i.e. exit without the user pressing the exit button
+				
 				case end : end(); break;
-				//case test :Test2();break;
+				//case test :Test();break;
 				}
 			}
 			catch (Exception e) {
@@ -276,7 +277,7 @@ public class Main extends JFrame {
 			
     	} // end of method
  
- 	
+ 
  	//This method is only called for testing purposes in the above method if the steps enum definition has it specified.
  	// This should only happen during testing and the case statement in the above method should be commented out with the enum definition not having a test element
  	// for the production system.
@@ -343,7 +344,7 @@ public class Main extends JFrame {
  		 									case 7:process=(C[i].x<x) && (C[i].y<y) && (C[i].z<z);break;
  		 								} // end switch statement
  		 								if (process){
- 		 									colours[index]=images[i].InterpolatePixelColour(images[i].getWorldtoImageTransform(point.ConvertPointTo4x1Matrix()),true);
+ 		 									colours[index]=images[i].InterpolatePixelColour(images[i].getWorldtoImageTransform(point.ConvertPointTo4x1Matrix()));
  		 									cameras[index]=i;
  		 									index++;
  		 								} // end if camera centre in correct octant
@@ -1026,7 +1027,7 @@ private void FindCalibrationSheetCirclesEtc(){
 	  		    			   	catch (Exception e){System.out.println("Error writing processed image properties.");}
 	  		    			     // save the undistorted image
 	  		    				 GraphicsFeedback graphics=new GraphicsFeedback(print);
-	  		    				 graphics.ShowImage(images[j],false);
+	  		    				 graphics.ShowImage(images[j]);
 	  		    				 graphics.SaveImage(new File(prefs.imagefiles.getElementAt(j).toString()).getParent()+File.separatorChar+"UndistortedImage"+new File(prefs.imagefiles.getElementAt(j).toString()).getName());
 	  		    				 if (!images[j].skipprocessing){
 	  		    					 // save the image segmentation
@@ -1849,7 +1850,7 @@ private void FindCalibrationSheetCirclesEtc(){
 					  }
 				  });	    		 
 
-		  images[i].NegateLensDistortion(distortion,jProgressBar1, colour);
+		  images[i].NegateLensDistortion(distortion,jProgressBar1);
 		  }
 	private void ImageSegmentation(int i){
 		//From the known camera calibration and the matching circle centers on the calibration sheet found, determine the visible portion of the calibration sheet
@@ -2048,7 +2049,7 @@ private void FindCalibrationSheetCirclesEtc(){
 			 for (int j=0;j<images.length;j++){     						
 				 byte[] colour=new byte[3];
 				 GraphicsFeedback graphics=new GraphicsFeedback(print);
-				 graphics.ShowImage(images[j],true); // Note that the graphics feedback should be called at the end, otherwise the colour image may not exist
+				 graphics.ShowImage(images[j]); // Note that the graphics feedback should be called at the end, otherwise the colour image may not exist
 				 if (!images[j].skipprocessing){
 					 PointPair2D[] matchingpoints=images[j].matchingpoints.clone();
 	    				

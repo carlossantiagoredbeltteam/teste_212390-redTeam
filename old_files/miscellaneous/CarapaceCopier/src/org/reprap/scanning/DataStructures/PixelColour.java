@@ -1,4 +1,8 @@
 package org.reprap.scanning.DataStructures;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 /******************************************************************************
 * This program is free software; you can redistribute it and/or modify it under
 * the terms of the GNU General Public License as published by the Free Software
@@ -23,10 +27,13 @@ package org.reprap.scanning.DataStructures;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 11th October 2010
+* Last modified by Reece Arnott 2nd December 2010
 * 
 * Colour abstracted out so that both greyscale and colour processing can take place
 * Note that the greyscale value is not calculated from the RGB colour values. It is assumed to be precalculated and feed to the constructor
+* 
+* For storage efficiency there is also the capability of exporting the information stored in this class to an int and it can then be fed back into the constructor
+* when needed. 
 *
 ************************************************************************************/
 
@@ -49,6 +56,15 @@ public class PixelColour {
 		g=(byte)0;
 		b=(byte)0;
 		}
+	// Note that this assumes the 4 sets of 8 bits in the int are the colours in the order indicated
+	// This is not recommended for use as an ordinary constructor but rather for reconstructing previously exported data 
+	public PixelColour(int greyRGB){
+		greyscale=(byte)((greyRGB >> 24) & 0xff);
+		r=(byte)((greyRGB >> 16) & 0xff);
+		g=(byte)((greyRGB >> 8) & 0xff);
+		b=(byte)((greyRGB >> 0) & 0xff);
+		}
+	
 	public PixelColour(int ARGB, byte grey){
 	// Note that it is assumed that the int encodes the pixel colour in the default format of 8 bits for each of Alpha, Red, Green, Blue (and we are ignoring the Alpha channel)
 	// The greyscale value is a given and is not calculated within this class
@@ -67,7 +83,14 @@ public class PixelColour {
 		returnvalue.greyscale=greyscale;
 		return returnvalue;
 	}
-	
+	// Note that if the ordering in this method changes the int constructor should also be changed to reflect this. 
+	public int ExportAsInt(){
+		int returnvalue=(greyscale & 0xff);
+		returnvalue=(returnvalue << 8) | (r & 0xff);
+		returnvalue=(returnvalue << 8) | (g & 0xff);
+		returnvalue=(returnvalue << 8) | (b & 0xff);
+		return returnvalue;
+	}
 	public void SetPixelToWeightedAverageColour(double[] weights, PixelColour[] colours){
 		double weightsum=0;
 		double redsum=0;
