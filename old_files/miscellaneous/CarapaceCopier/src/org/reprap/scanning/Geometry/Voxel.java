@@ -1,11 +1,8 @@
 package org.reprap.scanning.Geometry;
 
 import org.reprap.scanning.DataStructures.Image;
-import org.reprap.scanning.DataStructures.MatrixManipulations;
 import org.reprap.scanning.DataStructures.TrianglePlusVertexArray;
 import javax.swing.JProgressBar;
-
-import Jama.Matrix;
 
 /******************************************************************************
 * This program is free software; you can redistribute it and/or modify it under
@@ -31,7 +28,7 @@ import Jama.Matrix;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 25th November 2010
+* Last modified by Reece Arnott 1st December 2010
 *
 * 
 **********************************************************************************/
@@ -185,7 +182,7 @@ boolean end=false;
 	}
 	public AxisAlignedBoundingBox[] getSurfaceVoxels(){
 		// Count up how many there are
-		int surfacesubvoxels=0;
+		int surfacesubvoxels=getNumberofSurfaceSubVoxels();
 		for (int z=0;z<subvoxeldivision;z++)
 			for (int y=0;y<subvoxeldivision;y++)
 				for (int x=0;x<subvoxeldivision;x++)
@@ -200,6 +197,15 @@ boolean end=false;
 						count++;
 					}
 		return returnvalue;
+	}
+	
+	public int getNumberofSurfaceSubVoxels(){
+		int surfacesubvoxels=0;
+		for (int z=0;z<subvoxeldivision;z++)
+			for (int y=0;y<subvoxeldivision;y++)
+				for (int x=0;x<subvoxeldivision;x++)
+					if (SubVoxel[x][y][z].isSurface()) surfacesubvoxels++;
+		return surfacesubvoxels;
 	}
 	
 //	 This should be called from a while progressbar != max type loop
@@ -284,15 +290,16 @@ boolean end=false;
 	} // end of SubDivideVoxel method
 
 	// TODO add recursion?
+	//TODO delete when not needed anymore
 	public  TrianglePlusVertexArray ConvertSurfaceVoxelsToTriangles(JProgressBar bar){
 		bar.setMinimum(0);
-		bar.setMaximum(subvoxeldivision);
+		bar.setMaximum(getNumberofSurfaceSubVoxels());
 		TrianglePlusVertexArray returnvalue=new TrianglePlusVertexArray(vertices);
-		for (int z=0;z<subvoxeldivision;z++){
-			bar.setValue(z);
+		int z=0;
+		while (bar.getValue()!=bar.getMaximum()){
 			for (int y=0;y<subvoxeldivision;y++)
 					for (int x=0;x<subvoxeldivision;x++)
-						if (SubVoxel[x][y][z].isSurface()){
+						if ((SubVoxel[x][y][z].isSurface()) && (bar.getValue()!=bar.getMaximum())){
 							Point3d center=getSubVoxel(x,y,z).GetMidpointof3DBoundingBox();
 							// Extract the 6 faces, each having the four corners in order, either clockwise or anti clockwise (so that quad 1 and 2 are on opposite edges of the face) as well as the neighbours
 							for (int i=0;i<6;i++){
@@ -357,16 +364,14 @@ boolean end=false;
 									returnvalue.AddTriangle(tri2);
 								}// end if add
 							} // end for
-							} // end if
-		
-		} // end for z
+							bar.setValue(bar.getValue()+1);
+						} // end if
+		z++;
+		} // end while
 		returnvalue.PurgeIrreleventVertices();
 		return returnvalue;
 		
 	}
-	
-	
-	
 	//	outside = outside && skip
 	//inside = inside && !skip
 	

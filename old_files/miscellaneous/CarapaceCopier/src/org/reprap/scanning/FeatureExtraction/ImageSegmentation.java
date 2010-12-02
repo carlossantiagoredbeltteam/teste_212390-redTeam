@@ -254,16 +254,13 @@ public ImageSegmentation clone(){
 	
 	private void SetEllipsesToCalibrationSheet(Ellipse[] ellipses){
 		for (int i=0;i<ellipses.length;i++){
-			//Take the ellipse and expand the axis lengths by edgeresolutionthreshold
-			//Ellipse newellipse=new Ellipse(ellipses[i].GetCenter(), (ellipses[i].GetMinorSemiAxisLength()+edgeresolutionthreshold),(ellipses[i].GetMajorSemiAxisLength()+edgeresolutionthreshold), ellipses[i].GetOrientationAngleinRadians());
-			// New ellipse, same as old ellipse, delete when finished testing
-			Ellipse newellipse=new Ellipse(ellipses[i].GetCenter(), ellipses[i].GetMinorSemiAxisLength(),ellipses[i].GetMajorSemiAxisLength(), ellipses[i].GetOrientationAngleinRadians());
 			// Go through the bounding rectangle and set any pixels inside the ellipse to be calibration sheet
-			AxisAlignedBoundingBox boundingrectangle=newellipse.GetAxisAlignedBoundingRectangle();
+			AxisAlignedBoundingBox boundingrectangle=ellipses[i].GetAxisAlignedBoundingRectangle();
 			for (int x=(int)(boundingrectangle.minx-1);x<=(boundingrectangle.maxx+1);x++){
 				for (int y=(int)(boundingrectangle.miny-1);y<=(boundingrectangle.maxy+1);y++){
-						if (newellipse.PointInsideEllipse(new Point2d(x,y)))	nextstate[x][y]=states.valueOf("calibrationsheet");
-					//} // end if
+					if ((x>=0) && (x<width) && (y>=0) && (y>=height)){ 
+						if (ellipses[i].PointInsideEllipse(new Point2d(x,y)))	nextstate[x][y]=states.valueOf("calibrationsheet");
+					} // end if
 				} // end for y
 			} // end for x
 		} // end for i

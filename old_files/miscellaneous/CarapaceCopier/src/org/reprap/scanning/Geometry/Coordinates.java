@@ -119,8 +119,21 @@ public boolean isOutside(){
 	}// end RotateBaryCoordinates method
 	
 
-	
-	
+	public boolean calculatebary(Point2d cornerarray[],int a, int b){
+		Point2d[] newcornerarray=new Point2d[2];
+		newcornerarray[0]=cornerarray[a].clone();
+		newcornerarray[1]=cornerarray[b].clone();
+		return calculatebary(newcornerarray);
+	}
+
+	public boolean calculatebary(Point2d cornerarray[],int a, int b, int c){
+		Point2d[] newcornerarray=new Point2d[3];
+		newcornerarray[0]=cornerarray[a].clone();
+		newcornerarray[1]=cornerarray[b].clone();
+		newcornerarray[2]=cornerarray[c].clone();
+		return calculatebary(newcornerarray);
+	}
+		
 		
 // This general method can be used with 3 points or with 2 points if the pixel we're looking at is collinear with them.
 // But it it cannot scale to more than 3 points.
