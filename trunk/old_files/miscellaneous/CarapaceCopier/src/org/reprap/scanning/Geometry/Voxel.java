@@ -28,7 +28,7 @@ import javax.swing.JProgressBar;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 1st December 2010
+* Last modified by Reece Arnott 2nd December 2010
 *
 * 
 **********************************************************************************/

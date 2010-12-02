@@ -273,7 +273,7 @@ public ImageSegmentation clone(){
 			// use the center of the ellipse as a starting point and work the way out in all four directions until finding a point that isn't calibration sheet
 			// take the brightness values of these four points and get the weighted average and use this as the value for the ellipse center
 			// It is assumed that the ellipse center is black and any values detected within the threshold of this black value are to be ignored
-			int blackvalue=(int)(image.InterpolatePixelColour(ellipses[i].GetCenter()).getGreyscale() & 0xff);
+			int blackvalue=(int)(image.InterpolatePixelColour(ellipses[i].GetCenter(),false).getGreyscale() & 0xff);
 			PointBrightnessArray cardinalpoints=new PointBrightnessArray(8);
 			double maxdsquared=0;
 			for (int j=0;j<8;j++){
@@ -318,7 +318,7 @@ public ImageSegmentation clone(){
 			double maxdistance=Math.sqrt(maxdsquared);
 			for (int j=0;j<8;j++){
 				cardinalpoints.points[j]=ellipses[i].GetCenter().GetOtherPoint(j*(tau/8),maxdistance);
-				cardinalpoints.values[j]=(int)(image.InterpolatePixelColour(cardinalpoints.points[j]).getGreyscale() & 0xff);
+				cardinalpoints.values[j]=(int)(image.InterpolatePixelColour(cardinalpoints.points[j],false).getGreyscale() & 0xff);
 				
 			}
 			// Strip out those values that are too close to the blackvalue i.e. actually part of the black spot on the white calibration sheet
@@ -350,7 +350,7 @@ public ImageSegmentation clone(){
 					// Find the brightness value of this pixel and compare it to the expected, if it is out by more than the threshold, set this unknown cell to other
 					Point2d point=new Point2d(x,y);
 					int expectedvalue=GetAverageGreyscaleValueWeightedByInverseDistanceSquared(point,knowncalibrationsheetpointbrightnessvalues.points,knowncalibrationsheetpointbrightnessvalues.values);
-					if (!image.InterpolatePixelColour(point).CompareGreyscale(expectedvalue,threshold)) nextstate[x][y]=states.valueOf("other");
+					if (!image.InterpolatePixelColour(point,false).CompareGreyscale(expectedvalue,threshold)) nextstate[x][y]=states.valueOf("other");
 				} // end if
 			} // end for y
 		} // end for x
