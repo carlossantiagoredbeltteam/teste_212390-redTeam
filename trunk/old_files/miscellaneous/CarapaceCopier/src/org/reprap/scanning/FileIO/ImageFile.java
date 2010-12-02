@@ -53,7 +53,7 @@ public class ImageFile {
 	}
 	
 	
-	// This reads in an image, potentially blurs it, and returns one channel of colour
+	// This reads in an image, potentially blurs it and returns the R,G,B and greyscale values in a PixelColour 2d array
 	public PixelColour[][] ReadImageFromFile(float[] filter){
 		BufferedImage image=null;
 		PixelColour[][] imagemap=new PixelColour[0][0];

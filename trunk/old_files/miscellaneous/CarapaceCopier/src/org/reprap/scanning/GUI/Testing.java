@@ -182,7 +182,7 @@ public class Testing {
 				PointPair2D pair=new PointPair2D();
 				pair.pointone=point.clone();
 				boolean success=pair.EstimateSecondPoint(basepairs);
-				if (success) newimage[x][y]=image.InterpolatePixelColour(pair.pointtwo,false);
+				if (success) newimage[x][y]=image.InterpolatePixelColour(pair.pointtwo);
 				else newimage[x][y]=new PixelColour();
 			}
 			if (x%100==0) System.out.print(".");
@@ -307,7 +307,7 @@ public class Testing {
 	private void ShowImage(Matrix H, Point2d[] points){
 		
 		GraphicsFeedback graphics=new GraphicsFeedback(false);
-		graphics.ShowImage(image,false); // Show original greyscaleimage
+		graphics.ShowImage(image); // Show original image
 		byte[] colour=new byte[3];
 		 
 		 // Show the matched points (image frame) in red
