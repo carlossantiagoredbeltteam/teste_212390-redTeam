@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  *
- * Last modified by Reece Arnott 30th November 2010
+ * Last modified by Reece Arnott 1st December 2010
  * 
  * Note that most of the layout commands were initially produced by NetBeans for JDK 6
  * and significantly modified by hand. For future reference if it needs to be done the other way the main things to change are:
@@ -99,12 +99,9 @@ public class Main extends JFrame {
     private double calibrationsheetwidth,calibrationsheetheight; // these relate to the real world physical dimensions of the printed calibration sheet calculated from the paper size, orientation and margins
     private double calibrationsheetxlength,calibrationsheetylength; // these relate to the calculated physical dimensions of circles on the printed calibration sheet.
     private AxisAlignedBoundingBox volumeofinterest;
-    private AxisAlignedBoundingBox[] surfacevoxels;
     private Point2d[] calibrationcirclecenters;
 	private Point3d[] surfacepoints;
-	private TriangularFace[] spacecarvedtetrahedrons;
 	private TriangularFace[] surfacetriangles;
-	private boolean[][] sources;
 	private MainPreferences prefs;
 	private JProgressBar jProgressBar1,jProgressBar2; 
 	private JLabel jLabelTitle,jLabelProgressBar1,jLabelProgressBar2,jLabelOutputLog;
@@ -138,8 +135,9 @@ public class Main extends JFrame {
  *  
  */ 
 
-   public enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration, objectfinding,end};
-   // public enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration, test,end};
+   //public enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration, objectfindingvoxelisation,writetofile,end};
+   public enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration, objectfindingvoxelisation,end};
+   //public enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration, test,end};
     private final static steps stepsarray[]=steps.values();
     private static steps laststep = steps.valueOf("end");
     private static steps firststep = steps.valueOf("calibrationsheet");
@@ -262,12 +260,12 @@ public class Main extends JFrame {
 					// There is an if statement in this step that reads values from: a properties file and two image files per original image file if it is an automatic step
 					// Note that the end is an unconditional call to this method with an incremented step
 					// i.e. automatically go onto the next step
-				case objectfinding : 
+				case objectfindingvoxelisation : 
 					FindObject(); break; // this is the other big one
 					// Note that the end is a call to this method with an incremented step if the next step is set to Automatic
 					// i.e. exit without the user pressing the exit button
 				case end : end(); break;
-				//case test :Test();break;
+				//case test :Test2();break;
 				}
 			}
 			catch (Exception e) {
@@ -277,6 +275,8 @@ public class Main extends JFrame {
 			
 			
     	} // end of method
+ 
+ 	
  	//This method is only called for testing purposes in the above method if the steps enum definition has it specified.
  	// This should only happen during testing and the case statement in the above method should be commented out with the enum definition not having a test element
  	// for the production system.
@@ -361,7 +361,7 @@ public class Main extends JFrame {
  		 									for (int j=0;j<index;j++){
  		 										int i=cameras[j];
  		 										Point2d imagepoint=images[i].getWorldtoImageTransform(point.ConvertPointTo4x1Matrix());
- 		 										images[i].setProcessedPixel(imagepoint);
+ 		 										images[i].setPixeltoProcessed(imagepoint);
  		 									}
  		 								} // end if similar enough
  		 							} // end if match in more than one image
@@ -987,7 +987,7 @@ private void FindCalibrationSheetCirclesEtc(){
 											images[j].skipprocessing=io.skipprocessing;
 											// Load the calibration sheet boolean array
 											// First load it from file into a PixelColour array, then convert that to a boolean array, dividing at greyscale value 128
-											if (!io.skipprocessing) images[j].SetCalibrationSheet(new PixelColour().ConvertGreyscaleToBoolean(new ImageFile(new File(prefs.imagefiles.getElementAt(j).toString()).getParent()+File.separatorChar+"SegmentedImage"+new File(prefs.imagefiles.getElementAt(j).toString()).getName()).ReadImageFromFile(new float[0]),images[j].width,images[j].height,128));		  		    				 
+											if (!io.skipprocessing) images[j].SetProcessedPixels(new PixelColour().ConvertGreyscaleToBoolean(new ImageFile(new File(prefs.imagefiles.getElementAt(j).toString()).getParent()+File.separatorChar+"SegmentedImage"+new File(prefs.imagefiles.getElementAt(j).toString()).getName()).ReadImageFromFile(new float[0]),images[j].width,images[j].height,128));		  		    				 
 										} // end try
 										catch (Exception e){
 											System.out.println("Error reading processed image properties from file, initiating real-time processing");
@@ -1912,7 +1912,10 @@ private void FindCalibrationSheetCirclesEtc(){
 				edges.ApplyMask(segmented.GetEdges());
 				
 				images[i].SetEdges(edges);
-				images[i].SetCalibrationSheet(segmented.GetCalibrationSheet());
+				images[i].SetProcessedPixels(segmented.GetCalibrationSheet());
+				// Also take out those pixels that are do not form rays that cross out volume of interest
+				//TODO uncomment
+				//images[i].setPixelsOutsideBackProjectedVolumeToProcessed(volumeofinterest);
 			  if (prefs.DebugImageSegmentation) segmented.Display(prefs.DebugSaveOutputImagesFolder+File.separatorChar+"SegmentedImage"+i+".jpg");
 			
 			  
@@ -1964,7 +1967,7 @@ private void FindCalibrationSheetCirclesEtc(){
 				  } // end while
 					  rootvoxel.RestrictSubVoxelsToGroundedOnes();
 					  // Find the new volume of interest based on the surface voxels we've found
-					 surfacevoxels=rootvoxel.getSurfaceVoxels();
+					  AxisAlignedBoundingBox[] surfacevoxels=rootvoxel.getSurfaceVoxels();
 					 //insidevoxels=rootvoxel.getInsideVoxels(); // currently only used in CreatePointCloud()
 						for (int i=0;i<surfacevoxels.length;i++) {
 							if (i==0) volumeofinterest=surfacevoxels[i].clone();
@@ -2009,296 +2012,7 @@ private void FindCalibrationSheetCirclesEtc(){
 
 	}
 	
-	
-	private void CreatePointCloud(){
-		// Update progress bar
-		EventQueue.invokeLater(new Runnable(){
-			  public void run(){
-				  jProgressBar1.setValue(jProgressBar1.getMinimum());
-				  jProgressBar2.setValue(jProgressBar2.getValue()+1);
-				  jLabelProgressBar1.setText("Estimating 3D Edge Points");
-			  }
-		  });
-		  
-			//TODO Add in progressbar for constructor?
-		  EdgeExtraction3D Edges3d;
-		  Edges3d=new EdgeExtraction3D(images,surfacevoxels);
-			
-		  //TODO comment constructor above and uncomment below? 
-		  // limit to only those rays that intersect one of the surface voxels or the inside voxels 
-		  // This probably isn't needed, if it is will have to also uncomment inside voxels assignment in Voxelisation() method 
-		  //AxisAlignedBoundingBox[] voxelsofinterest=new AxisAlignedBoundingBox[surfacevoxels.length+insidevoxels.length];
-			//for (int j=0;j<voxelsofinterest.length;j++){
-			//	if (j<surfacevoxels.length) voxelsofinterest[j]=surfacevoxels[j].clone();
-			//	else voxelsofinterest[j]=insidevoxels[j-surfacevoxels.length].clone();
-		//	}
-		//	Edges3d=new EdgeExtraction3D(images,voxelsofinterest);
-			
-		Edges3d.CollectTriangulationInformationForEdgePoints();
-		Edges3d.CalculateValid3DEdges(images,prefs.AlgorithmSettingMinimumNumberofIntersectingRayPairsForPointEstimation);
-		surfacepoints=Edges3d.GetEstimatedPoints();
-		sources=Edges3d.GetSourceCamerasForPoints();
-		volumeofinterest=Edges3d.volumeofinterest; // recalculated volume of interest based on the voxels feed in as part of the constructor 
-		
-		
-		// Update display
-		final String text;
-		if (surfacepoints.length>1) text="Found "+surfacepoints.length+" point(s) within the volume of interest\n";
-		else if (surfacepoints.length==1) text="Only found 1 point within the volume of interest\n";
-		else text="No points found within the volume of interest\n";
-		EventQueue.invokeLater(new Runnable(){
-			  public void run(){
-				  jTextAreaOutput.setText(jTextAreaOutput.getText()+text);
-			  }
-		  });
-						 
-	}
-	private void FromPointsToTetrahedrons(){
-		// Update progress bars 
-		EventQueue.invokeLater(new Runnable(){
-			  public void run(){
-				  jProgressBar1.setValue(jProgressBar1.getMinimum());
-				  jProgressBar2.setValue(jProgressBar2.getValue()+1);
-				  jLabelProgressBar1.setText("Chopping Volume up into Irregular Tetrahedrons based on Point Cloud");
-			  }
-		  });
-		 
-		//DeWall Divide and Conquer recursive space-carving into Delauney tetrahedrons. If pathological case may need to try different starting parameters
-	   DeWall dewall=new DeWall(surfacepoints);
-		spacecarvedtetrahedrons=new TriangularFace[0];
-	  int attempt=1;
-	  String errors;
-	  // These are set to true by the recursive triangularisation if the initial creation didn't work i.e. the array is zero length. 
-	  // And tested if the sequential version is later called so that it can be skipped.
-	  boolean[] initialcreationerror=new boolean[3];
-	  for (int i=0;i<3;i++) initialcreationerror[i]=false;
-	  while (attempt<=4){
-		  errors="";
-		  switch (attempt){
-		  case 1:
-			  dewall=new DeWall(surfacepoints);
-			  spacecarvedtetrahedrons=dewall.Triangularisation(jProgressBar1,true,"x");
-			  if (spacecarvedtetrahedrons.length==0) {
-				  initialcreationerror[0]=true;
-				  errors="Initial Tetrahedron Creation failed. Trying a different starting point.\n";
-				  attempt++;
-			  }
-				 if (dewall.IsCyclicTetrahedronCreationError()) {
-					 errors="Cyclic Tetrahedron Creation Error. Probably due to rounding error in a recursive split-plane. Trying a different starting point.\n";	  
-					 attempt++;
-				 }
-			  break;
-		  case 2:
-			  dewall=new DeWall(surfacepoints);
-			  spacecarvedtetrahedrons=dewall.Triangularisation(jProgressBar1,true,"y");
-			  if (spacecarvedtetrahedrons.length==0) {
-				  initialcreationerror[1]=true;
-				  errors="Initial Tetrahedron Creation failed. Trying a final different starting point.\n";
-				  attempt++;
-			  }
-			  if (dewall.IsCyclicTetrahedronCreationError()) {
-					 errors="Cyclic Tetrahedron Creation Error. Probably due to rounding error in a recursive split-plane. Trying a different starting point.\n";	  
-					 attempt++;
-				 }
-			  break;
-		   case 3:
-			  dewall=new DeWall(surfacepoints);
-			  spacecarvedtetrahedrons=dewall.Triangularisation(jProgressBar1,true,"z");
-			  if (spacecarvedtetrahedrons.length==0) {
-				  initialcreationerror[2]=true;
-				  errors="Initial Tetrahedron Creation failed. Possible pathological set of points: either a grid or the surface of a sphere or simply not enough points.\n";
-				  attempt++;
-			  }
-			  if (dewall.IsCyclicTetrahedronCreationError()) {
-					 errors="Cyclic Tetrahedron Creation Error. Probably due to rounding error in a recursive split-plane.\n";
-					 errors=errors+"Now trying a sequential method that could be magnitudes of times slower. Please be patient.\n";
-					 attempt++;
-				 }
-			  break;
-		  case 4:
-			  attempt++;
-			  if (!initialcreationerror[0]){
-				  dewall=new DeWall(surfacepoints);
-				  spacecarvedtetrahedrons=dewall.Triangularisation(jProgressBar1,false,"x");
-			  }
-			  else if (!initialcreationerror[1]){
-					dewall=new DeWall(surfacepoints);
-					spacecarvedtetrahedrons=dewall.Triangularisation(jProgressBar1,false,"y");
-			  }
-			  else if (!initialcreationerror[2]){
-					dewall=new DeWall(surfacepoints);
-					spacecarvedtetrahedrons=dewall.Triangularisation(jProgressBar1,false,"z");
-			  }
-			  else {
-				  errors="No solution seems to possible. Possible pathological set of points\n";
-				  spacecarvedtetrahedrons=new TriangularFace[0];
-			  }
-			  break;
-		  } // end switch
-		 final String text3=errors;
-				// Update the error messages
-						  EventQueue.invokeLater(new Runnable(){
-							  public void run(){
-								  jTextAreaOutput.setText(jTextAreaOutput.getText()+text3);
-							  }
-						  });
-						  if ((spacecarvedtetrahedrons.length!=0) && (!dewall.IsCyclicTetrahedronCreationError())) attempt=5; // exit while loop if have good solution
-	  } // end while
-	  
-//	display output
-final String text="Volume segmented into "+spacecarvedtetrahedrons.length+" candidate tetrahedrons\n";
-	  EventQueue.invokeLater(new Runnable(){
-		  public void run(){
-			  jTextAreaOutput.setText(jTextAreaOutput.getText()+text);
-		  }
-	  });
-}
-	private void FromTetrahedronsToTriangles(){
-//		 Update the second progress bar, reset the first
-			  EventQueue.invokeLater(new Runnable(){
-				  public void run(){
-					  jProgressBar1.setValue(jProgressBar1.getMinimum());
-					  jProgressBar2.setValue(jProgressBar2.getValue()+1);
-					  jLabelProgressBar1.setText("Eliminating non-object tetrahedrons");
-				  }
-			  });
-			  //Go through tetrahedrons and take out ones that are spurious.
-			  //This is found by seeing if a face intersects a ray from a 3d point and one of the camera centres that contributed to its calculation.
-		 				   
-		  //TODO Should this be replaced with a probabilistic approach such as in the ProFORMA paper?
-		  // Find the camera centres of all cameras
-		  Point3d[] C=new Point3d[images.length];
-		  for (int i=0;i<C.length;i++) C[i]=new Point3d(new MatrixManipulations().GetRightNullSpace(images[i].getWorldtoImageTransformMatrix()));
-		  JProgressBar bar=new JProgressBar(0,surfacepoints.length);
-		  bar.setValue(0);
-		  for (int i=0;i<surfacepoints.length;i++){
-			  int newlength=spacecarvedtetrahedrons.length;
-			  for (int j=0;j<images.length;j++){
-				  if (sources[i][j]){
-						//Make a linesegment that connects the point and camera centre
-					  Line3d line=new Line3d(surfacepoints[i],C[j]);
-						boolean[] delete=new boolean[spacecarvedtetrahedrons.length];
-						//For each tetrahedron, for each face (that doesn't include the point) test whether the ray intersects, if it does mark that tetrahedron for deletion and decrement the newlength counter
-						for (int k=0;k<spacecarvedtetrahedrons.length;k++){
-							TriangularFace[] triangles=spacecarvedtetrahedrons[k].GetFaces(surfacepoints);
-							delete[k]=false;
-							int index=0;
-							while ((index<triangles.length) && (!delete[k])) {
-								if (!triangles[index].IncludesPoint(i)) delete[k]=triangles[index].LineSegmentIntersectionTriangularFace(line,surfacepoints);
-								index++;
-							} // end while
-							if (delete[k]) newlength--;
-						} // end k
-						// Now Construct the new face array without those tetrahedrons marked for deletion in it
-						TriangularFace[] newarray=new TriangularFace[newlength];
-						int count=0;
-						for (int k=0;k<spacecarvedtetrahedrons.length;k++){
-							if (!delete[k]) {newarray[count]=spacecarvedtetrahedrons[k].clone();count++;}
-						}
-						spacecarvedtetrahedrons=newarray.clone();
-				  } // end if
-			  } //end for j
-			 
-			  try{ 
-			bar.setValue(i);
-				  final JProgressBar temp=bar;
-				  // This is the recommended way of passing GUI information between threads
-					  EventQueue.invokeLater(new Runnable(){
-						  public void run(){
-							  jProgressBar1.setMinimum(temp.getMinimum());
-							  jProgressBar1.setMaximum(temp.getMaximum());
-							  jProgressBar1.setValue(temp.getValue());
-						 }
-					  });
-				  }
-				  catch (Exception e) { 
-					  System.out.println("Exception in updating the progress bar"+e.getMessage());
-		         }
-			 
-		  } // end for i
-		  
-		  // This may leave the object disjoint so take only the parts that are attached to the point with the lowest z value.
-		  
-		  
-		  // Find the tetrahedron(s) with the lowest z value.
-		  int[] tetraindices=new int[spacecarvedtetrahedrons.length]; 
-		  int tetracount=0;
-		  int lowestzindex=0;
-		 // Find lowest z value and those tetrahedrons associated with it
-		  for (int i=0;i<spacecarvedtetrahedrons.length;i++){
-			  int[] indices=spacecarvedtetrahedrons[i].GetFirstTetrahedron();
-			  for (int j=0;j<indices.length;j++) {
-				  if ((surfacepoints[indices[j]].z<surfacepoints[lowestzindex].z) || ((i==0) && (j==0))) {
-					  lowestzindex=indices[j];
-					  tetracount=0;
-					  tetraindices[tetracount]=i;
-				  }
-				  else if (indices[j]==lowestzindex){
-					  tetraindices[tetracount]=i;
-					  tetracount++;
-				  }
-			  } // end for j
-			} // end for i
-		  // Use these tetras as seeds
-		  boolean[] skip=new boolean[spacecarvedtetrahedrons.length];
-		  for (int i=0;i<skip.length;i++) skip[i]=false;
-		  OrderedListTriangularFace list=new OrderedListTriangularFace(surfacepoints.length);
-		  for (int i=0;i<tetracount;i++){
-			  TriangularFace[] triangles=spacecarvedtetrahedrons[tetraindices[i]].GetFaces(surfacepoints);
-			  for (int j=0;j<triangles.length;j++) list.InsertTetrahedronsIfNotExistAndSetTestedTwiceIfExist(triangles[j],surfacepoints);
-			  skip[tetraindices[i]]=true;
-		  }
-		  
-		  // Now go around in a loop until run out of triangular faces and add the faces of any connected tetras
-		  TriangularFace f=list.GetFirstFIFO();
-		  while (!f.IsNull()){
-			  for (int i=0;i<spacecarvedtetrahedrons.length;i++){
-				  if (!skip[i]) if (spacecarvedtetrahedrons[i].IncludesTriangleinTetrahedron(f)){
-					  TriangularFace[] triangles=spacecarvedtetrahedrons[i].GetFaces(surfacepoints);
-					  for (int j=0;j<triangles.length;j++) list.InsertTetrahedronsIfNotExistAndSetTestedTwiceIfExist(triangles[j],surfacepoints);
-					  skip[i]=true;
-				  } // end if
-			  } //end for
-			  f=list.GetNextFIFO();
-		  } // end while
-		  
-			// Now get them back as an array,   
-			  TriangularFace[] triangles=list.GetFullUnorderedList();
-			
-			// Construct a final triangle array that consists only of those that are surface triangles i.e. those that don't have test twice set
-			int count=0;
-			for (int i=0;i<triangles.length;i++) if (!triangles[i].FaceTestedForMultipleTetrahedrons()) 
-					count++;
-			surfacetriangles=new TriangularFace[count];
-			count=0;
-			for (int i=0;i<triangles.length;i++) if (!triangles[i].FaceTestedForMultipleTetrahedrons())
-				{
-				surfacetriangles[count]=triangles[i].clone();
-				count++;
-			}
-			// Count the number of tetrahedrons used to get the surface triangles and how many points are used as the vertices of the surface triangles.
-			tetracount=0;
-			for (int i=0;i<skip.length;i++) if (!skip[i]) tetracount++;
-			count=0;
-			skip=new boolean[surfacepoints.length];
-			for (int i=0;i<skip.length;i++) skip[i]=true;
-			for (int i=0;i<surfacetriangles.length;i++){
-				int[] indexes=surfacetriangles[i].GetFace();
-				for (int j=0;j<indexes.length;j++) skip[indexes[j]]=false;
-			}
-			for (int i=0;i<skip.length;i++) if (!skip[i]) count++;
-			
-		final String text4="Final object estimated using "+tetracount+" tetrahedrons, from which "+surfacetriangles.length+" surface triangles are extracted\n using a total of "+count+" points\n";
-	// display output
-			  EventQueue.invokeLater(new Runnable(){
-				  public void run(){
-					  jProgressBar1.setValue(jProgressBar1.getMinimum());
-					  jProgressBar2.setValue(jProgressBar2.getValue()+1);
-					  jTextAreaOutput.setText(jTextAreaOutput.getText()+text4);
-					  jLabelProgressBar1.setText("Writing Output STL File");
-				  }
-			  });
-	}
+
 	private void OutputSTLFile(){
 		// Update progress bars
 		EventQueue.invokeLater(new Runnable(){

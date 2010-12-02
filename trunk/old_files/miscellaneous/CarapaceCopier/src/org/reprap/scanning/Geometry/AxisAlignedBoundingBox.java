@@ -1,6 +1,7 @@
 package org.reprap.scanning.Geometry;
 
 import Jama.Matrix;
+import org.reprap.scanning.DataStructures.TrianglePlusVertexArray;
 
 /******************************************************************************
 * This program is free software; you can redistribute it and/or modify it under
@@ -26,7 +27,7 @@ import Jama.Matrix;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 27th May 2010
+* Last modified by Reece Arnott 1st December 2010
 *
 * This class is simply a number of values that can be used to describe a 3d cube where the faces of the cube align with the x,y,z axes.
 * It can also be used to describe a bounding rectangle in 2d space by ignoring the z values
@@ -126,6 +127,24 @@ public class AxisAlignedBoundingBox{
 		}
 	return returnvalue;
 	}
+	
+	public TrianglePlusVertexArray GetTrianglesMakingUpFaces(){
+		Point3d[] corners=GetCornersof3DBoundingBox();
+		TrianglePlusVertexArray returnvalue=new TrianglePlusVertexArray(corners);
+		int[][] quads=GetPointQuadIndicesForBuildingFaces();
+		Point3d center= GetMidpointof3DBoundingBox();
+		for (int i=0;i<6;i++){
+			TriangularFace tri1=new TriangularFace(quads[i][0],quads[i][1],quads[i][2]);
+			TriangularFace tri2=new TriangularFace(quads[i][0],quads[i][2],quads[i][3]);
+			tri1.CalculateNormalAwayFromPoint(corners,center);
+			tri2.CalculateNormalAwayFromPoint(corners,center);
+			returnvalue.AddTriangle(tri1);
+			returnvalue.AddTriangle(tri2);
+		}
+		return returnvalue;
+	}
+	
+	
 	public int[][] GetPointQuadIndicesForBuildingFaces(){
 		int[][] f=new int[6][4];
 		// Bottom face 0,1,2,3

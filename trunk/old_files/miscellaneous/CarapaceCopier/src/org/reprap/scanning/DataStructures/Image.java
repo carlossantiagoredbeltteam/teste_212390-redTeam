@@ -230,8 +230,8 @@ public void SetEdges(EdgeExtraction2D edge){
 public void LimitEdgesToRaysThatIntersectAVolumeOfInterest(AxisAlignedBoundingBox boundingbox, AxisAlignedBoundingBox[] volumesofinterest){
 	edges.LimitToEdgeRaysThatIntersectAVolumeOfInterest(boundingbox, volumesofinterest,getWorldtoImageTransformMatrix(),originofimagecoordinates);
 }
-public void SetCalibrationSheet(boolean[][] calibration){
-	processedpixel=calibration.clone();
+public void SetProcessedPixels(boolean[][] pixels){
+	processedpixel=pixels.clone();
 }
 public boolean[][] getProcessedPixels(){
 	return processedpixel;
@@ -252,11 +252,87 @@ public boolean PointIsUnprocessed(Point3d worldpoint){
 	return returnvalue;
 }
 
-public void setProcessedPixel(Point2d imagepoint){
+
+public void setPixeltoProcessed(Point2d imagepoint){
 	int x=(int)imagepoint.x;
 	int y=(int)imagepoint.y;
 	if ((x>=0) && (x<width) && (y>=0) && (y<height)) processedpixel[x][y]=true;
 }
+
+public void setPixelsOutsideBackProjectedVolumeToProcessed(AxisAlignedBoundingBox volumeofinterest){
+	// Convert the faces of the volume into triangles. Assuming the camera is not within the volume of interest we can 
+	// just set the pixels that fall outside the backprojection of all these triangles 
+	TrianglePlusVertexArray trianglesplusvertices=volumeofinterest.GetTrianglesMakingUpFaces();
+	TriangularFace[] triangles=trianglesplusvertices.GetTriangleArray();
+	Point3d[] vertices=trianglesplusvertices.GetVertexArray();
+	// Back project the vertices
+	Point2d[] pixelvertices=new Point2d[vertices.length];
+	for (int i=0;i<pixelvertices.length;i++) pixelvertices[i]=getWorldtoImageTransform(vertices[i].ConvertPointTo4x1Matrix());
+	//Go through all the pixels and test
+	for (int x=0;x<width;x++){
+		for (int y=0;y<height;y++){
+			//	if the pixel is not already processed
+			if (!processedpixel[x][y]){
+				// Use the barycentric coordinates to test if the point is outside all the triangles
+				Coordinates point=new Coordinates(3);
+				point.pixel=new Point2d(x,y);
+				int i=0;
+				boolean outside=true;
+				while ((i<triangles.length) && (outside)){
+					int[] trianglevertices=triangles[i].GetFace();
+					point.calculatebary(pixelvertices,trianglevertices[0],trianglevertices[1],trianglevertices[2]);
+					outside=point.isOutside();
+					i++;
+				} // end while
+				processedpixel[x][y]=outside;
+			} // end if not already processed
+		} // end for y
+	} // end for x
+} // end method
+
+public void setPixelsInsideBackProjectedVolumeToProcessed(AxisAlignedBoundingBox volumeofinterest){
+	// Convert the faces of the volume into triangles. Assuming the camera is not within the volume of interest we can 
+	// just set the pixels that fall inside the backprojection of these triangles 
+	TrianglePlusVertexArray trianglesplusvertices=volumeofinterest.GetTrianglesMakingUpFaces();
+	TriangularFace[] triangles=trianglesplusvertices.GetTriangleArray();
+	Point3d[] vertices=trianglesplusvertices.GetVertexArray();
+	// Back project the vertices
+	Point2d[] pixelvertices=new Point2d[vertices.length];
+	for (int i=0;i<pixelvertices.length;i++) pixelvertices[i]=getWorldtoImageTransform(vertices[i].ConvertPointTo4x1Matrix());
+	// Now go through the triangles and process them
+	for (int i=0;i<triangles.length;i++){
+		int[] trianglevertices=triangles[i].GetFace();
+		// Find the rectangle that surronds this triangle
+		AxisAlignedBoundingBox boundingbox=new AxisAlignedBoundingBox();
+		boundingbox.minx=pixelvertices[trianglevertices[0]].x;
+		boundingbox.maxx=pixelvertices[trianglevertices[0]].x;
+		boundingbox.miny=pixelvertices[trianglevertices[0]].y;
+		boundingbox.maxy=pixelvertices[trianglevertices[0]].y;
+		boundingbox.Expand2DBoundingBox(pixelvertices[trianglevertices[1]]);
+		boundingbox.Expand2DBoundingBox(pixelvertices[trianglevertices[2]]);
+		int minx=(int)(boundingbox.minx-1);
+		int maxx=(int)(boundingbox.maxx+1);
+		int miny=(int)(boundingbox.miny-1);
+		int maxy=(int)(boundingbox.maxy+1);
+		// Now process all pixels inside this rectangle
+		for (int x=minx;x<=maxx;x++){
+			for (int y=miny;y<=maxy;y++){
+				// If within image
+				if ((x>=0) && (x<width) && (y>=0) && (y<height)){
+					// if the pixel is not already processed
+					if (!processedpixel[x][y]){
+						// Use the barycentric coordinates to test to see if this is point is within the triangle
+						Coordinates point=new Coordinates(3);
+						point.pixel=new Point2d(x,y);
+						point.calculatebary(pixelvertices,trianglevertices[0],trianglevertices[1],trianglevertices[2]);
+						processedpixel[x][y]=!point.isOutside();
+					} // end if not already processed
+				} // end if within image
+			} // end for y
+		} // end for x
+	} // end for i
+} // end method
+
 
 public void NegateLensDistortion(LensDistortion distortion, JProgressBar bar){
 	
