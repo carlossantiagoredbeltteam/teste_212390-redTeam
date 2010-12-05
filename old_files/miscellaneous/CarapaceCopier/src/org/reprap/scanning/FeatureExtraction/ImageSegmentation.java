@@ -23,7 +23,7 @@ package org.reprap.scanning.FeatureExtraction;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 22nd April 2010
+ * Last modified by Reece Arnott 6th December 2010
  * 
  * This 4 state cell map is designed to find the calibration sheet using a series of flood fills and comparisions of expected brightness value if the pixel is part of the calibration sheet compared to actual where each cell corresponds to a pixel in a specific image
  * The initial state of each cell is unknown unless it is part of the edgemap passed to the constructor
@@ -278,7 +278,9 @@ public ImageSegmentation clone(){
 			double maxdsquared=0;
 			for (int j=0;j<8;j++){
 				cardinalpoints.points[j]=ellipses[i].GetCenter().clone();
-				while (currentstate[(int)cardinalpoints.points[j].x][(int)cardinalpoints.points[j].y]==states.valueOf("calibrationsheet")) {
+				boolean cont=((cardinalpoints.points[j].x>=0) && ((int)cardinalpoints.points[j].x<width) && (cardinalpoints.points[j].y>=0) && (cardinalpoints.points[j].y<height));
+				if (cont) cont=currentstate[(int)cardinalpoints.points[j].x][(int)cardinalpoints.points[j].y]==states.valueOf("calibrationsheet");
+				while (cont) {
 					// This could probably be done with a couple of simple formulas using mod on j but I can't think of them at the moment
 					switch (j) {
 					case 0:
@@ -310,6 +312,8 @@ public ImageSegmentation clone(){
 						cardinalpoints.points[j].y++;
 			   			break;
 					}
+					cont=((cardinalpoints.points[j].x>=0) && ((int)cardinalpoints.points[j].x<width) && (cardinalpoints.points[j].y>=0) && (cardinalpoints.points[j].y<height));
+					if (cont) cont=currentstate[(int)cardinalpoints.points[j].x][(int)cardinalpoints.points[j].y]==states.valueOf("calibrationsheet");
 				} // end while
 				double dsquared=cardinalpoints.points[j].CalculateDistanceSquared(ellipses[i].GetCenter());
 				if (dsquared>maxdsquared) maxdsquared=dsquared;
@@ -321,6 +325,7 @@ public ImageSegmentation clone(){
 				cardinalpoints.values[j]=(int)(image.InterpolatePixelColour(cardinalpoints.points[j]).getGreyscale() & 0xff);
 				
 			}
+			
 			// Strip out those values that are too close to the blackvalue i.e. actually part of the black spot on the white calibration sheet
 			// First how many are there
 			int count=0;
