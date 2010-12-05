@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 1st October 2010
+ * Last modified by Reece Arnott 6th December 2010
  *
  *****************************************************************************/
 
@@ -42,6 +42,7 @@ import javax.swing.JTextField;
 import javax.swing.JFormattedTextField;
 import javax.swing.JCheckBox;
 import javax.swing.JRadioButton;
+import javax.swing.JComboBox;
 import javax.swing.ButtonGroup;
 public class MainPreferences {
 	public class Papersize{
@@ -82,7 +83,7 @@ public class MainPreferences {
 	public boolean SaveOnProgramWindowClose;
 	public boolean SaveCalibrationSheetProperties;
 	public boolean SaveProcessedImageProperties;
-	public boolean[] AutomaticStep; 
+	public boolean[] SkipStep; 
 	public boolean SaveOnProgramCancel;
 	public boolean SaveOnProgramFinish;
 	public boolean BlankOutputFilenameOnLoad;
@@ -91,6 +92,7 @@ public class MainPreferences {
 	public boolean DebugImageSegmentation;
 	public boolean DebugCalibrationSheetBarycentricEstimate;
 	public boolean DebugRestrictedSearch;
+	public boolean DebugEllipseFinding;
 	public boolean Debug;
 	public JCheckBox CalibrationSheetKeepAspectRatioWhenPrinted;
 	public JCheckBox PaperSizeIsCustom;
@@ -132,11 +134,12 @@ public class MainPreferences {
 		DebugImageSegmentation=false;
 		DebugRestrictedSearch=false;
 		DebugCalibrationSheetBarycentricEstimate=false;
+		DebugEllipseFinding=false;
 		Debug=false;
 		BlankOutputFilenameOnLoad=true;
-		AutomaticStep = new boolean[numberofsteps];
-		for (int i=0;i<AutomaticStep.length;i++) AutomaticStep[i]=false;
-		AutomaticStep[2]=true;
+		SkipStep = new boolean[numberofsteps];
+		for (int i=0;i<SkipStep.length;i++) SkipStep[i]=false;
+		SkipStep[2]=true;
 		// Set up checkboxes (including default selected state)
 		CalibrationSheetKeepAspectRatioWhenPrinted=new JCheckBox("Preserve Aspect Ratio",true);
 		PaperSizeIsCustom=new JCheckBox("Custom Paper Size",false);
@@ -224,10 +227,11 @@ public class MainPreferences {
 			if (temp.getProperty("DebugImageSegmentation")!=null) DebugImageSegmentation = temp.getProperty("DebugImageSegmentation").equals("true");
 			if (temp.getProperty("DebugRestrictedSearch")!=null) DebugRestrictedSearch = temp.getProperty("DebugRestrictedSearch").equals("true");
 			if (temp.getProperty("DebugCalibrationSheetBarycentricEstimate")!=null) DebugCalibrationSheetBarycentricEstimate = temp.getProperty("DebugCalibrationSheetBarycentricEstimate").equals("true");
+			if (temp.getProperty("DebugEllipseFinding")!=null) DebugEllipseFinding = temp.getProperty("DebugEllipseFinding").equals("true");
 			
 			
 			// Note the i+1 here as humans start counting the steps from 1 but the array starts from 0. 
-			for (i=0;i<AutomaticStep.length;i++) if (temp.getProperty("AutomaticStep"+Integer.toString(i+1))!=null) AutomaticStep[i] = temp.getProperty("AutomaticStep"+Integer.toString(i+1)).equals("true");
+			for (i=0;i<SkipStep.length;i++) if (temp.getProperty("SkipStep"+Integer.toString(i+1))!=null) SkipStep[i] = temp.getProperty("SkipStep"+Integer.toString(i+1)).equals("true");
 
 			// Load the state of checkboxes 
 			if (temp.getProperty("CalibrationSheetKeepAspectRatioWhenPrinted")!=null) CalibrationSheetKeepAspectRatioWhenPrinted.setSelected(temp.getProperty("CalibrationSheetKeepAspectRatioWhenPrinted").equals("true"));
@@ -272,8 +276,10 @@ public class MainPreferences {
 			
 			// Load default index numbers
 			if (temp.getProperty("CurrentCalibrationPatternIndexNumber")!=null) // if the property exists try to convert to integer, just ignore if can't
-				try {CurrentCalibrationPatternIndexNumber = Integer.valueOf(temp.getProperty("CurrentCalibrationPatternIndexNumber"));}catch (Exception e) {System.out.println("Error loading CalibrationPatternIndexNumber - leaving as default: "+e);}
-	        
+				try {CurrentCalibrationPatternIndexNumber = Integer.valueOf(temp.getProperty("CurrentCalibrationPatternIndexNumber"));}catch (Exception e) {System.out.println("Error loading CurrentCalibrationPatternIndexNumber - leaving as default: "+e);}
+			if (temp.getProperty("CurrentPaperSizeIndexNumber")!=null) // if the property exists try to convert to integer, just ignore if can't
+				try {CurrentPaperSizeIndexNumber = Integer.valueOf(temp.getProperty("CurrentPaperSizeIndexNumber"));}catch (Exception e) {System.out.println("Error loading CurrentPaperSizeIndexNumber - leaving as default: "+e);}
+		        
 			// Load lists and potentially rework the index numbers.
 	       
 			i=0;
@@ -305,23 +311,20 @@ public class MainPreferences {
         		i++;
 	        }
 	        i=0;
-		    while ((temp.getProperty("PaperSizeNameList"+Integer.toString(i))!=null)&& (temp.getProperty("PaperSizeWidthmmList"+Integer.toString(i))!=null) && (temp.getProperty("PaperSizeHeightmmList"+Integer.toString(i))!=null)) 
+	        while ((temp.getProperty("PaperSizeNameList"+Integer.toString(i))!=null)&& (temp.getProperty("PaperSizeWidthmmList"+Integer.toString(i))!=null) && (temp.getProperty("PaperSizeHeightmmList"+Integer.toString(i))!=null)) 
 	        {
 	         	Papersize element=new Papersize(temp.getProperty("PaperSizeNameList"+Integer.toString(i)),Double.valueOf(temp.getProperty("PaperSizeWidthmmList"+Integer.toString(i))), Double.valueOf(temp.getProperty("PaperSizeHeightmmList"+Integer.toString(i))));
 	 	     	boolean add=true;
 	        	// If the element is already in the list
 	        	for (int j=0;j<PaperSizeList.getSize();j++) if (((Papersize)PaperSizeList.getElementAt(j)).equals(element)) add=false;
 	        	if (add) PaperSizeList.addElement(element);
-        		else if (CurrentPaperSizeIndexNumber>i)
-        			CurrentPaperSizeIndexNumber--; // If the file wasn't added then the index of the default may need to be changed.
-        		i++;
+        			i++;
 	        }
-	       
-		 	
+	        
 	        // Sanity check on the Indexes. Reset to zero if not in range. Remember the indexnumber starts at zero but the size starts counting from 1.
 	        if ((CurrentCalibrationPatternIndexNumber<0) || (CurrentCalibrationPatternIndexNumber>=calibrationpatterns.getSize())) CurrentCalibrationPatternIndexNumber=0;
 	        if ((CurrentPaperSizeIndexNumber<0) || (CurrentPaperSizeIndexNumber>=PaperSizeList.getSize())) CurrentPaperSizeIndexNumber=0;
-	    	
+	       
 	    	// load double variables and run sanity checks
 			if (temp.getProperty("PaperCustomSizeWidthmm")!=null){ // if the property exists try to convert to integer, just ignore if can't
 				try {PaperCustomSizeWidthmm.setText(temp.getProperty("PaperCustomSizeWidthmm"));}catch (Exception e) {System.out.println("Error loading PaperCustomSizeWidthmm - leaving as default: "+e);}
@@ -373,10 +376,11 @@ public class MainPreferences {
 		temp.setProperty("DebugImageSegmentation", String.valueOf(DebugImageSegmentation));
 		temp.setProperty("DebugRestrictedSearch", String.valueOf(DebugRestrictedSearch));
 		temp.setProperty("DebugCalibrationSheetBarycentricEstimate", String.valueOf(DebugCalibrationSheetBarycentricEstimate));
+		temp.setProperty("DebugEllipseFinding", String.valueOf(DebugEllipseFinding));
 		
 		
 		// Note the i+1 here as humans start counting the steps from 1 but the array starts from 0. 
-		for (int i=0;i<AutomaticStep.length;i++)temp.setProperty("AutomaticStep"+Integer.toString(i+1),String.valueOf(AutomaticStep[i]));
+		for (int i=0;i<SkipStep.length;i++)temp.setProperty("SkipStep"+Integer.toString(i+1),String.valueOf(SkipStep[i]));
 		// Save state of checkboxes
 		temp.setProperty("CalibrationSheetKeepAspectRatioWhenPrinted", String.valueOf(CalibrationSheetKeepAspectRatioWhenPrinted.isSelected()));
 		temp.setProperty("PaperSizeIsCustom", String.valueOf(PaperSizeIsCustom.isSelected()));
@@ -404,6 +408,7 @@ public class MainPreferences {
 		  
 	    // Save default index numbers
 	    temp.setProperty("CurrentCalibrationPatternIndexNumber",String.valueOf(CurrentCalibrationPatternIndexNumber));
+	    temp.setProperty("CurrentPaperSizeIndexNumber",String.valueOf(CurrentPaperSizeIndexNumber));
 	    // Write to file with headers.
 		String comments = "Reprap 3D Scanning properties http://reprap.org/ - can be edited by hand but not recommended as elements may be reordered by the program\n";
 		comments=comments+"Note that for boolean values, anything other than true (all in lowercase), will be evaluated as false \n";

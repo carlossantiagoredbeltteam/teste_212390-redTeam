@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  *
- * Last modified by Reece Arnott 3rd December 2010
+ * Last modified by Reece Arnott 6th December 2010
  * 
  * Note that most of the layout commands were initially produced by NetBeans for JDK 6
  * and significantly modified by hand. For future reference if it needs to be done the other way the main things to change are:
@@ -136,8 +136,8 @@ public class Main extends JFrame {
  */ 
 
    public enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration, objectfindingvoxelisation,writetofile,end};
-   //public enum steps {calibrationsheet, test,end};
-    private final static steps stepsarray[]=steps.values();
+   //public enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration, test,end};
+     private final static steps stepsarray[]=steps.values();
     private static steps laststep = steps.valueOf("end");
     private static steps firststep = steps.valueOf("calibrationsheet");
     private steps currentstep=firststep;
@@ -214,24 +214,24 @@ public class Main extends JFrame {
     		JButtonCancel.setText("Cancel");
 			JButtonPrevious.setText("Previous");
 
-			// Find whether or not the currentstep is the first non-automatic one.
+			// Find whether or not the currentstep is the first non-skipped one.
 			boolean first=true;
-			for (int i=0;i<(currentstep.ordinal());i++) if (prefs.AutomaticStep[i]==false) first=false;
+			for (int i=0;i<(currentstep.ordinal());i++) if (prefs.SkipStep[i]==false) first=false;
 			
 			// Set the Previous button to be disabled if it is
 			JButtonPrevious.setEnabled(!first);
 			
-			// Find whether or not the currentstep is the last non-automatic one.
+			// Find whether or not the currentstep is the last non-skipped one.
 			boolean finish=true;
-			for (int i=(currentstep.ordinal()+2);i<prefs.AutomaticStep.length;i++) 
-				if (prefs.AutomaticStep[i]==false) finish=false;
+			for (int i=(currentstep.ordinal()+2);i<prefs.SkipStep.length;i++) 
+				if (prefs.SkipStep[i]==false) finish=false;
 				
 			// Set the Next button to Finish if it is
 			if (finish) JButtonNext.setText("Finish");
 			else JButtonNext.setText("Next");	
 			
-			// ignore it if the proposed step is the first one and it is Automatic (i.e. we are trying to go back but the currentstep is the first non-automatic step
-			if (!(stepnumber.equals(firststep) && (prefs.AutomaticStep[stepnumber.ordinal()]))) currentstep = stepnumber;
+			// ignore it if the proposed step is the first one and it is to be skipped (i.e. we are trying to go back but the currentstep is the first non-skipped step
+			if (!(stepnumber.equals(firststep) && (prefs.SkipStep[stepnumber.ordinal()]))) currentstep = stepnumber;
 
 			// if the previous button is disabled then this is the first step not skipped, so reset the firststep if need be
 			if (!JButtonPrevious.isEnabled() && !firststep.equals(stepnumber)) firststep=stepnumber;
@@ -243,10 +243,10 @@ public class Main extends JFrame {
 			{
 				switch(currentstep) {
 				case calibrationsheet : 
-					if ((prefs.AutomaticStep[currentstep.ordinal()]) && (prefs.calibrationpatterns.getSize()!=0)) setStep(stepsarray[currentstep.ordinal()+1]);
+					if ((prefs.SkipStep[currentstep.ordinal()]) && (prefs.calibrationpatterns.getSize()!=0)) setStep(stepsarray[currentstep.ordinal()+1]);
 					else ChooseCalibrationSheet(); break;
 				case fileio :
-					if ((prefs.AutomaticStep[currentstep.ordinal()]) && (prefs.imagefiles.getSize()!=0)) setStep(stepsarray[currentstep.ordinal()+1]);
+					if ((prefs.SkipStep[currentstep.ordinal()]) && (prefs.imagefiles.getSize()!=0)) setStep(stepsarray[currentstep.ordinal()+1]);
 					else ChooseImagesAndOutputFile(); break;
 				case calibrationsheetinterrogation : 
 					FindCalibrationSheetCirclesEtc(); break;
@@ -265,6 +265,7 @@ public class Main extends JFrame {
 					// i.e. exit without the user pressing the exit button
 				case writetofile:
 					OutputSTLFile(); break;
+				
 				case end : end(); break;
 				//case test :Test();break;
 				}
@@ -282,9 +283,15 @@ public class Main extends JFrame {
  	// This should only happen during testing and the case statement in the above method should be commented out with the enum definition not having a test element
  	// for the production system.
  	public void Test(){
- 		int pixelswide=630;
- 		int pixelshigh=891;
- 		// each pixel is 1/3mm square (if calibration sheet is A4 paper with no margin) 
+ 		volumeofinterest.minx=-42.65625;
+ 		volumeofinterest.miny=-37.125;
+ 		volumeofinterest.minz=0.0;
+ 		volumeofinterest.maxx=45.9375;
+ 		volumeofinterest.maxy=64.96875;
+ 		volumeofinterest.maxz=81.2109375;
+ 		int pixelswide=(int)((volumeofinterest.maxx-volumeofinterest.minx)*3);
+ 		int pixelshigh=(int)((volumeofinterest.maxy-volumeofinterest.miny)*3);
+ 		// each pixel is 1/3mm square
  		PixelColour black=new PixelColour((byte)0);
  		PixelColour white=new PixelColour((byte)255);
  		PixelColour red=new PixelColour(16711680,(byte)255);
@@ -294,7 +301,6 @@ public class Main extends JFrame {
  		Point3d[] C=new Point3d[images.length];
  		for (int i=0;i<C.length;i++) C[i]=new Point3d(new MatrixManipulations().GetRightNullSpace(images[i].getWorldtoImageTransformMatrix()));
 		// To do this sweep properly we need to sweep in all eight combinations of +/- x/y/z
- 		volumeofinterest.maxz=100; // for testing purposes only
  		double x=volumeofinterest.minx;double xstep=(volumeofinterest.maxx-volumeofinterest.minx)/pixelswide;
  		double y=volumeofinterest.miny;double ystep=(volumeofinterest.maxy-volumeofinterest.miny)/pixelshigh;
  		double z=volumeofinterest.minz;double zstep=(volumeofinterest.maxz-volumeofinterest.minz)/100;
@@ -386,6 +392,10 @@ public class Main extends JFrame {
  			 		System.out.println();
 	 					z=z+(zdir*zstep);
 	 			}} // end while and for z
+
+//		 Automatically go onto the next step
+		  setStep(stepsarray[currentstep.ordinal()+1]);
+
  	} // end of method
  	
  	
@@ -411,11 +421,13 @@ public class Main extends JFrame {
 			papernames[i]=current.Name+", "+current.width+"mm x "+current.height+"mm";
 		}
 		Papersize=new JComboBox(papernames);
-		Papersize.setSelectedIndex(prefs.PaperSizeList.getIndexOf(prefs.PaperSizeList.getSelectedItem()));
-	    	
+		Papersize.setSelectedIndex(prefs.CurrentPaperSizeIndexNumber);
+		
 		jButtonBrowse = new JButton();
 		jButtonBrowse.setText("Browse");
 	    jComboBox= new JComboBox(prefs.calibrationpatterns);
+	    jComboBox.setSelectedIndex(prefs.CurrentCalibrationPatternIndexNumber);
+		
 	    // TODO align the text in the combo box so if the path is too long to fit we see the right hand side
 	    // I would have thought the commented out lines below would work but they don't!
 	   // Alternatively show a tooltip with the full path
@@ -975,7 +987,7 @@ private void FindCalibrationSheetCirclesEtc(){
 								 
 								 boolean compute=true;
 								
-								 if (prefs.AutomaticStep[currentstep.ordinal()])	{
+								 if (prefs.SkipStep[currentstep.ordinal()])	{
 										compute=false;
 										try{
 											// Load the undistorted image
@@ -1004,13 +1016,12 @@ private void FindCalibrationSheetCirclesEtc(){
 //Step 2-5	    						  
 	      					PointPairMatch circles=MatchCircles(j,ellipsecenters);
 	      					
-	      					if (prefs.Debug && prefs.DebugCalibrationSheetBarycentricEstimate){
-	      						Testing test=new Testing(circles.getMatchedPoints(),calibrationcirclecenters,calibrationsheetwidth, calibrationsheetheight);
-	      						test.image=images[j].clone();
-	      						Image calibrationsheet=new Image(prefs.calibrationpatterns.getElementAt(prefs.CurrentCalibrationPatternIndexNumber).toString()); // Read in the image with no blurring filter kernel
-	      						test.CalculateBarycentricTransformedCalibrationsheet(calibrationsheet.width,calibrationsheet.height,prefs.DebugSaveOutputImagesFolder+File.separatorChar+"CalibrationSheetImage"+j+".jpg");
+	      					if ((prefs.Debug) && (prefs.DebugCalibrationSheetBarycentricEstimate)){
+	      							Testing test=new Testing(circles.getMatchedPoints(),calibrationcirclecenters,calibrationsheetwidth, calibrationsheetheight);
+	      							test.image=images[j].clone();
+	      							Image calibrationsheet=new Image(prefs.calibrationpatterns.getElementAt(prefs.CurrentCalibrationPatternIndexNumber).toString()); // Read in the image with no blurring filter kernel
+	      							test.CalculateBarycentricTransformedCalibrationsheet(calibrationsheet.width,calibrationsheet.height,prefs.DebugSaveOutputImagesFolder+File.separatorChar+"CalibrationSheetImage"+j+".jpg");
 	      					}
-	      					
 	      					LensDistortion distortion=EstimatingCameraParameters(j,circles);									  
 	      					UndoLensDistortion(j,distortion,false);
 		      				ImageSegmentation(j); 
@@ -1029,14 +1040,17 @@ private void FindCalibrationSheetCirclesEtc(){
 	  		    				 GraphicsFeedback graphics=new GraphicsFeedback(print);
 	  		    				 graphics.ShowImage(images[j]);
 	  		    				 graphics.SaveImage(new File(prefs.imagefiles.getElementAt(j).toString()).getParent()+File.separatorChar+"UndistortedImage"+new File(prefs.imagefiles.getElementAt(j).toString()).getName());
+	  		    				 
+	  		    				
 	  		    				 if (!images[j].skipprocessing){
 	  		    					 // save the image segmentation
 	  		    					 graphics=new GraphicsFeedback(print);
 	  		    					 graphics.ShowBinaryimage(images[j].getProcessedPixels(),images[j].width,images[j].height);
 	  		    					 graphics.SaveImage(new File(prefs.imagefiles.getElementAt(j).toString()).getParent()+File.separatorChar+"SegmentedImage"+new File(prefs.imagefiles.getElementAt(j).toString()).getName());
 	  		  					}
-	  		    		   } // end if save
-	    					 
+	  		    		   } // end if save	
+	    						 
+	  		    				 
 						} // end if compute    		   
 								  if (print) System.out.println("Time to process image "+(j+1)+":"+(System.currentTimeMillis()-starttime)+"ms");
 	    		    		   starttime=System.currentTimeMillis();
@@ -1164,11 +1178,12 @@ private void FindCalibrationSheetCirclesEtc(){
 	 					}
 	 				  else {
 	 				  	 Voxel voxels=Voxelisation();
+	 				  	 //TODO uncomment when finished testing
 	 				  	 RestrictSearch(voxels);
 	 				  	 SurfaceVoxelsToTriangles(voxels);
-	 				  	 GraphicsFeedback();
-	 					  } // end else for if there are enough images to extract 3D information 
-	 				 
+	 				  	 } // end else for if there are enough images to extract 3D information 
+	 	    		 GraphicsFeedback();
+ 					 
 	 	    		  // automatically continue to the next step
 	 	   		    	setStep(stepsarray[currentstep.ordinal()+1]);
 
@@ -1290,8 +1305,8 @@ private void FindCalibrationSheetCirclesEtc(){
 					  }
 	    		 });
 	    		  
-	    		  // If the last step is set to automatic, automatically exit.
-	   		    	if (prefs.AutomaticStep[currentstep.ordinal()+1])  setStep(stepsarray[currentstep.ordinal()+1]);
+	    		  // If the last step is set to be skipped, automatically exit.
+	   		    	if (prefs.SkipStep[currentstep.ordinal()+1])  setStep(stepsarray[currentstep.ordinal()+1]);
 
 	 	   	} // end run method
 	 	   } // end workingThread class
@@ -1388,6 +1403,10 @@ private void FindCalibrationSheetCirclesEtc(){
  	
 	// This sets the initial GUI interface with just Cancel, Previous, and Next buttons
 	private void initComponents() {
+		surfacetriangles=new TriangularFace[0];
+		surfacepoints=new Point3d[0];
+		
+		
 		setDefaultLookAndFeelDecorated(false);    
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		    // Uncomment if use menus
@@ -1505,7 +1524,8 @@ private void FindCalibrationSheetCirclesEtc(){
 								 double circleradius=0;
 								 Ellipse[] calibrationcircles=new Ellipse[0]; // only use the ellipse centers after the if statement
 								 boolean compute=true; // used to contol if the calibration sheet is interrogated or not
-	if (prefs.AutomaticStep[currentstep.ordinal()])	{
+	 // If this step is supposed to be skipped, load the pre-computed properties if possible.
+	if (prefs.SkipStep[currentstep.ordinal()])	{
 		compute=false;
 		CalibrationSheetProperties io=new CalibrationSheetProperties(prefs.calibrationpatterns.getElementAt(prefs.CurrentCalibrationPatternIndexNumber).toString()+".properties");
 		try{
@@ -1754,9 +1774,23 @@ private void FindCalibrationSheetCirclesEtc(){
 			   keep[j]=imageellipses[j].IsBlackEllipseOnWhiteBackground(images[i],prefs.AlgorithmSettingEdgeStrengthThreshold,prefs.AlgorithmSettingEllipseValidityThresholdPercentage);
 			   if (keep[j]) countellipses++;
 		   }
-	
-		   
-		  Point2d[] ellipsecenters=new Point2d[countellipses];
+		   // Output the debug file if appropriate, this will show all ellipses found, the valid ones in green and the rest in red
+				if ((prefs.Debug) && (prefs.DebugEllipseFinding)){
+						byte[] red,green;
+						red=new byte[3]; red[0]=(byte)255;red[1]=(byte)0;red[2]=(byte)0;
+						green=new byte[3]; green[0]=(byte)0;green[1]=(byte)255;green[2]=(byte)0;
+						
+						GraphicsFeedback graphics=new GraphicsFeedback(print);
+						graphics.ShowImage(images[i]);
+						for (int j=0;j<imageellipses.length;j++){
+							   if (keep[j]) graphics.OutlineEllipse(imageellipses[j],green,images[i].originofimagecoordinates);
+							   else graphics.OutlineEllipse(imageellipses[j],red,images[i].originofimagecoordinates);
+						   }
+						String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"FoundEllipsesInImage"+i+".jpg";
+						graphics.SaveImage(filename);
+					}
+
+		   Point2d[] ellipsecenters=new Point2d[countellipses];
 	      countellipses=0;
 		   for (int j=0;j<imageellipses.length;j++) {
 			   if (keep[j]) {
@@ -2124,11 +2158,29 @@ private void FindCalibrationSheetCirclesEtc(){
 			images[i].setPixeltoProcessedIfRayNotIntersectAnyVolumesOfInterest(surfacevoxels);
 			
 			if (prefs.Debug && prefs.DebugRestrictedSearch){
-				String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"RestrictedSearchForImage"+String.valueOf(i)+".jpg";
+				String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"RestrictedSearchForImageBinaryImage"+String.valueOf(i)+".jpg";
+				boolean[][] processedpixels=images[i].getProcessedPixels();
 				GraphicsFeedback graphics=new GraphicsFeedback(print);
-				graphics.ShowBinaryimage(images[i].getProcessedPixels(),images[i].width,images[i].height);
+				graphics.ShowBinaryimage(processedpixels,images[i].width,images[i].height);
 				graphics.SaveImage(filename);
 				System.out.println("Saved "+filename);	
+				// now save image with black background except where unprocessed pixels
+				byte[] colour=new byte[3];
+				colour[0]=(byte)0;
+				colour[1]=(byte)0;
+				colour[2]=(byte)0;
+				graphics.ShowImage(images[i]);
+				
+				for (int x=0;x<images[i].width;x++)
+					for (int y=0;y<images[i].height;y++){
+						if (processedpixels[x][y]){
+							graphics.Print(x,y,colour,1,1);
+						}
+					}
+				filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"RestrictedSearchForImageColourImage"+String.valueOf(i)+".jpg";
+				graphics.SaveImage(filename);
+				System.out.println("Saved "+filename);	
+				
 			}
 			// Update progress bar
 			bar.setValue(bar.getValue()+1);
