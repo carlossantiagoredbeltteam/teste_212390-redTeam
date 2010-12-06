@@ -23,7 +23,7 @@ package org.reprap.scanning.GUI;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 25th November 2010
+ * Last modified by Reece Arnott 6th December 2010
  * 
  * The code commented out needs the JOGL OS dependent libraries. If this code is to be used
  * the libraries need to be added. They can be downloaded from: https://jogl.dev.java.net/servlets/ProjectDocumentList?folderID=9260&expandFolder=9260&folderID=8798
@@ -90,11 +90,15 @@ public class GraphicsFeedback {
 	// The variable needs to be set outside of this if it is to be used or by an external call to SaveImage
 	
 	public JFrame frame;
-	public boolean print; // Show where mouse clicked if true
+	public boolean print; // Show where mouse clicked if have image with user interaction (currently commented out) true and message when 
 	
 	public GraphicsFeedback(boolean printtrue){
 		print=printtrue;
 	}
+	public GraphicsFeedback(){
+		print=false;
+	}
+	
 	
 	public void ShowImage(Image givenimage){
 		imageheight=givenimage.height;
@@ -147,6 +151,33 @@ public class GraphicsFeedback {
 				} // end for x
 			} // end for y
 			
+	}
+	// This returns the RGB values of 16 colours taken from http://www.febooti.com/products/iezoom/online-help/html-color-names-16-color-chart.html
+	// based on the integer input. 15 colours are used for the numbers 0-14 and everything else returns black
+	public byte[] GetColour(int i){
+		byte[] colour=new byte[3];
+		// These are hopefully ordered so that the earlier colours are not easily confused
+		switch (i){
+		case (0) :colour[0]=(byte)0;colour[1]=(byte)255;colour[2]=(byte)255;break;//Aqua
+		case (1) :colour[0]=(byte)255;colour[1]=(byte)255;colour[2]=(byte)0;break;//Yellow  
+		case (2) :colour[0]=(byte)255;colour[1]=(byte)0;colour[2]=(byte)255;break;//Fuchsia
+		case (3) :colour[0]=(byte)255;colour[1]=(byte)0;colour[2]=(byte)0;break;//Red
+		case (4) :colour[0]=(byte)0;colour[1]=(byte)0;colour[2]=(byte)255;break;//Blue
+		case (5) :colour[0]=(byte)0;colour[1]=(byte)128;colour[2]=(byte)0;break;//Green
+		case (6) :colour[0]=(byte)192;colour[1]=(byte)192;colour[2]=(byte)192;break;//Silver
+		case (7) :colour[0]=(byte)128;colour[1]=(byte)128;colour[2]=(byte)0;break;//Olive
+		case (8) :colour[0]=(byte)128;colour[1]=(byte)0;colour[2]=(byte)128;break;//Purple
+		case (9) :colour[0]=(byte)128;colour[1]=(byte)0;colour[2]=(byte)0;break;//Maroon
+		case (10) :colour[0]=(byte)255;colour[1]=(byte)255;colour[2]=(byte)255;break;//White  
+		case (11) :colour[0]=(byte)0;colour[1]=(byte)255;colour[2]=(byte)0;break;//Lime
+		case (12) :colour[0]=(byte)0;colour[1]=(byte)128;colour[2]=(byte)128;break;//Teal
+		case (13) :colour[0]=(byte)0;colour[1]=(byte)0;colour[2]=(byte)128;break;//Navy
+		case (14) :colour[0]=(byte)128;colour[1]=(byte)128;colour[2]=(byte)128;break;//Gray
+		default: colour[0]=(byte)0;colour[1]=(byte)0;colour[2]=(byte)0; //black 
+		}
+		
+		
+		return colour;
 	}
 	public void PrintEllipse(Ellipse originalellipse, byte[] colour,Point2d offset){
 		Ellipse ellipse=originalellipse.clone();
@@ -288,6 +319,7 @@ public class GraphicsFeedback {
 		imagefile.width=imagewidth;
 		imagefile.height=imageheight;
 		if (numcolours==3) imagefile.Save3ChannelDisplayImage(GLimage);
+		if (print) System.out.println("Saved "+filename);	
 	}
 	/*
 	public void initGraphics(){ 

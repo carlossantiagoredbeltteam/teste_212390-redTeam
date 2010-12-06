@@ -93,6 +93,7 @@ public class MainPreferences {
 	public boolean DebugCalibrationSheetBarycentricEstimate;
 	public boolean DebugRestrictedSearch;
 	public boolean DebugEllipseFinding;
+	public boolean DebugPointPairMatching;
 	public boolean Debug;
 	public JCheckBox CalibrationSheetKeepAspectRatioWhenPrinted;
 	public JCheckBox PaperSizeIsCustom;
@@ -135,6 +136,7 @@ public class MainPreferences {
 		DebugRestrictedSearch=false;
 		DebugCalibrationSheetBarycentricEstimate=false;
 		DebugEllipseFinding=false;
+		DebugPointPairMatching=false;
 		Debug=false;
 		BlankOutputFilenameOnLoad=true;
 		SkipStep = new boolean[numberofsteps];
@@ -228,6 +230,7 @@ public class MainPreferences {
 			if (temp.getProperty("DebugRestrictedSearch")!=null) DebugRestrictedSearch = temp.getProperty("DebugRestrictedSearch").equals("true");
 			if (temp.getProperty("DebugCalibrationSheetBarycentricEstimate")!=null) DebugCalibrationSheetBarycentricEstimate = temp.getProperty("DebugCalibrationSheetBarycentricEstimate").equals("true");
 			if (temp.getProperty("DebugEllipseFinding")!=null) DebugEllipseFinding = temp.getProperty("DebugEllipseFinding").equals("true");
+			if (temp.getProperty("DebugPointPairMatching")!=null) DebugPointPairMatching = temp.getProperty("DebugPointPairMatching").equals("true");
 			
 			
 			// Note the i+1 here as humans start counting the steps from 1 but the array starts from 0. 
@@ -377,7 +380,7 @@ public class MainPreferences {
 		temp.setProperty("DebugRestrictedSearch", String.valueOf(DebugRestrictedSearch));
 		temp.setProperty("DebugCalibrationSheetBarycentricEstimate", String.valueOf(DebugCalibrationSheetBarycentricEstimate));
 		temp.setProperty("DebugEllipseFinding", String.valueOf(DebugEllipseFinding));
-		
+		temp.setProperty("DebugPointPairMatching", String.valueOf(DebugPointPairMatching));
 		
 		// Note the i+1 here as humans start counting the steps from 1 but the array starts from 0. 
 		for (int i=0;i<SkipStep.length;i++)temp.setProperty("SkipStep"+Integer.toString(i+1),String.valueOf(SkipStep[i]));

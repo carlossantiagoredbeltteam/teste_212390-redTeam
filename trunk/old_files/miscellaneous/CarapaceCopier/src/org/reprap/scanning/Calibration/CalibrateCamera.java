@@ -236,7 +236,7 @@ public class CalibrateCamera {
 					for (int x=0;x<H.length;x++){
 						double transfererrorsquared=imagecalibrationarray[x].FindMaximumTransferErrorSquared();
 						if 	(transfererrorsquared>maxtransfererrorsquared) maxtransfererrorsquared=transfererrorsquared;
-						System.out.println("The planar homography seems to be over-constrained. Attempting to construct it with fewer points.");
+						System.out.println("The planar homography seems to be  wrongly constrained, probably over-constrained. Attempting to construct it with fewer points.");
 					} // end for
 				} // end if
 				if (repeatcount<maxrepeat){ 
@@ -245,7 +245,7 @@ public class CalibrateCamera {
 						// Set tsquared to be a certain percentage of the maximum transfer error (squared) from the original all points homography
 						// Starting at 100% and going to 0% to get increasingly less inliers and therefore potentially less accurate homography
 						int numberofinliers=imagecalibrationarray[x].setHomograhyusingRANSAC(tsquared);
-						if (numberofinliers<4) repeatcount=maxrepeat;
+						if (numberofinliers<4) {repeatcount=maxrepeat;x=H.length;System.out.println("Planar homography cannot be estimated as using less than 4 points");}
 						else System.out.println("Attempting camera calibration with planar homography estimated using a subset of "+numberofinliers+" points, attempt "+(repeatcount+1)+" of a possible "+maxrepeat);
 					} // end for
 				} // end if
@@ -255,7 +255,7 @@ public class CalibrateCamera {
 					SingularValueDecomposition svd=new SingularValueDecomposition(Omega);
 					Omega=svd.getV().times(svd.getS().times(svd.getV().transpose()));
 					repeat=false;
-					System.out.println("Homography not Semi-positive definite, even after "+repeatcount+" attempts at RANSAC adjustment. This is a bug!\n Trying to get around it by using the SPD part of the homography but it will be less accurate, maybe a lot less!");
+					System.out.println("Homography not Semi-positive definite, even after the maximum number of attempts at RANSAC adjustment. This is a bug!\n Trying to get around it by using the SPD part of the homography but it will be less accurate, maybe a lot less!");
 					
 				} // end if
 				repeatcount++;

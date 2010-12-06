@@ -101,6 +101,8 @@ public class Main extends JFrame {
     private AxisAlignedBoundingBox volumeofinterest;
     private Point2d[] calibrationcirclecenters;
 	private Point3d[] surfacepoints;
+	private Ellipse[] calibrationcircles; // only needs to be a global variable if the DebugPointPairMatching is set to true
+	private Ellipse[] imageellipses; // only needs to be a global variable if the DebugPointPairMatching is set to true
 	private TriangularFace[] surfacetriangles;
 	private MainPreferences prefs;
 	private JProgressBar jProgressBar1,jProgressBar2; 
@@ -382,13 +384,12 @@ public class Main extends JFrame {
  					if (yindex%100==0) System.out.print(".");
  					}} // end while and for y
  			
- 			GraphicsFeedback graphics=new GraphicsFeedback(false);
- 			graphics.ShowPixelColourArray(newimage,pixelswide,pixelshigh);
- 			if (prefs.Debug){
-				String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"TestImageAtZ="+String.valueOf(z)+String.valueOf(zdir)+".jpg";
-				graphics.SaveImage(filename);
-				System.out.print("Saved "+filename);	
-			}
+ 				if (prefs.Debug){
+ 					GraphicsFeedback graphics=new GraphicsFeedback(true);
+ 					graphics.ShowPixelColourArray(newimage,pixelswide,pixelshigh);
+ 					String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"TestImageAtZ="+String.valueOf(z)+String.valueOf(zdir)+".jpg";
+ 					graphics.SaveImage(filename);
+ 				}
  			 		System.out.println();
 	 					z=z+(zdir*zstep);
 	 			}} // end while and for z
@@ -1022,6 +1023,32 @@ private void FindCalibrationSheetCirclesEtc(){
 	      							Image calibrationsheet=new Image(prefs.calibrationpatterns.getElementAt(prefs.CurrentCalibrationPatternIndexNumber).toString()); // Read in the image with no blurring filter kernel
 	      							test.CalculateBarycentricTransformedCalibrationsheet(calibrationsheet.width,calibrationsheet.height,prefs.DebugSaveOutputImagesFolder+File.separatorChar+"CalibrationSheetImage"+j+".jpg");
 	      					}
+	      					if ((prefs.Debug) && (prefs.DebugPointPairMatching)){
+	      						GraphicsFeedback graphics1=new GraphicsFeedback(true);
+	  		    				Image calibrationsheet=new Image(prefs.calibrationpatterns.getElementAt(prefs.CurrentCalibrationPatternIndexNumber).toString()); // Read in the image with no blurring filter kernel
+	  			    		    graphics1.ShowImage(calibrationsheet);
+	  			    		    GraphicsFeedback graphics2=new GraphicsFeedback(true);
+	  		    				 graphics2.ShowImage(images[j]);
+	  		    				 PointPair2D[] pairs=circles.getMatchedPoints();
+	  		    				for (int k=0;k<pairs.length;k++){
+	  		    					// The first point of the pair represents the calibration sheet circle center transformed into real world coordinates
+	  		    					// The second point of the pair represents the centre of the ellipse in the image.
+	  		    					// We want to output 2 images with the colours matching so we need to find the circle the image point were matched with
+	  		    					int calibrationsheetindex=-1;
+	  		    					int imageellipseindex=-1;
+	  		    					for (int l=0;l<calibrationcirclecenters.length;l++) if (calibrationcirclecenters[l].isApproxEqual(pairs[k].pointone,0.001)) calibrationsheetindex=l;
+	  		    					for (int l=0;l<imageellipses.length;l++)if (imageellipses[l].GetCenter().isApproxEqual(pairs[k].pointtwo,0.001)) imageellipseindex=l;
+	  		    					byte[] colour=graphics1.GetColour(k);
+	 							   if(calibrationsheetindex>=0) graphics1.PrintEllipse(calibrationcircles[calibrationsheetindex],colour,new Point2d(0,0));
+	 							   if(imageellipseindex>=0)graphics2.PrintEllipse(imageellipses[imageellipseindex],colour,images[j].originofimagecoordinates);
+	 							 } // end for k
+	  		    				String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"CircleandEllipseMatchesForCalibrationSheetWithImage"+j+".jpg";
+		 						graphics1.SaveImage(filename);
+		      					filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"CircleandEllipseMatchesinImage"+j+".jpg";
+		      					graphics2.SaveImage(filename);
+	      					}
+		      					
+	      					
 	      					LensDistortion distortion=EstimatingCameraParameters(j,circles);									  
 	      					UndoLensDistortion(j,distortion,false);
 		      				ImageSegmentation(j); 
@@ -1037,14 +1064,14 @@ private void FindCalibrationSheetCirclesEtc(){
 	  		    			   	try{io.saveProperties();}
 	  		    			   	catch (Exception e){System.out.println("Error writing processed image properties.");}
 	  		    			     // save the undistorted image
-	  		    				 GraphicsFeedback graphics=new GraphicsFeedback(print);
+	  		    				 GraphicsFeedback graphics=new GraphicsFeedback();
 	  		    				 graphics.ShowImage(images[j]);
 	  		    				 graphics.SaveImage(new File(prefs.imagefiles.getElementAt(j).toString()).getParent()+File.separatorChar+"UndistortedImage"+new File(prefs.imagefiles.getElementAt(j).toString()).getName());
 	  		    				 
 	  		    				
 	  		    				 if (!images[j].skipprocessing){
 	  		    					 // save the image segmentation
-	  		    					 graphics=new GraphicsFeedback(print);
+	  		    					 graphics=new GraphicsFeedback();
 	  		    					 graphics.ShowBinaryimage(images[j].getProcessedPixels(),images[j].width,images[j].height);
 	  		    					 graphics.SaveImage(new File(prefs.imagefiles.getElementAt(j).toString()).getParent()+File.separatorChar+"SegmentedImage"+new File(prefs.imagefiles.getElementAt(j).toString()).getName());
 	  		  					}
@@ -1522,7 +1549,7 @@ private void FindCalibrationSheetCirclesEtc(){
 								 // then we can use them to set the global variables needed
 								 Image calibrationsheet=new Image(); // only using the width and height values after the if statement
 								 double circleradius=0;
-								 Ellipse[] calibrationcircles=new Ellipse[0]; // only use the ellipse centers after the if statement
+								 calibrationcircles=new Ellipse[0]; // only use the ellipse centers after the if statement
 								 boolean compute=true; // used to contol if the calibration sheet is interrogated or not
 	 // If this step is supposed to be skipped, load the pre-computed properties if possible.
 	if (prefs.SkipStep[currentstep.ordinal()])	{
@@ -1767,7 +1794,7 @@ private void FindCalibrationSheetCirclesEtc(){
 			         }
 				  } // end while
 		   int countellipses=0;
-		   Ellipse[] imageellipses=find.getEllipses();
+		   imageellipses=find.getEllipses();
 		   boolean keep[]=new boolean[imageellipses.length];
 		   // Take out those ellipses that aren't black ellipses on a white background
 		   for (int j=0;j<imageellipses.length;j++){
@@ -1780,7 +1807,7 @@ private void FindCalibrationSheetCirclesEtc(){
 						red=new byte[3]; red[0]=(byte)255;red[1]=(byte)0;red[2]=(byte)0;
 						green=new byte[3]; green[0]=(byte)0;green[1]=(byte)255;green[2]=(byte)0;
 						
-						GraphicsFeedback graphics=new GraphicsFeedback(print);
+						GraphicsFeedback graphics=new GraphicsFeedback(true);
 						graphics.ShowImage(images[i]);
 						for (int j=0;j<imageellipses.length;j++){
 							   if (keep[j]) graphics.OutlineEllipse(imageellipses[j],green,images[i].originofimagecoordinates);
@@ -1794,8 +1821,8 @@ private void FindCalibrationSheetCirclesEtc(){
 	      countellipses=0;
 		   for (int j=0;j<imageellipses.length;j++) {
 			   if (keep[j]) {
-				   //ellipsecenters[countellipses]=imageellipses[j].GetCenter();
-				   ellipsecenters[countellipses]=imageellipses[j].GetCentreOfGravity(images[i],prefs.AlgorithmSettingEdgeStrengthThreshold);
+				   imageellipses[j].ResetCenter(imageellipses[j].GetCentreOfGravity(images[i],prefs.AlgorithmSettingEdgeStrengthThreshold));
+				   ellipsecenters[countellipses]=imageellipses[j].GetCenter();
 				   countellipses++;
 			   }
 		   }
@@ -1875,6 +1902,7 @@ private void FindCalibrationSheetCirclesEtc(){
 		  while (bar.getValue()<bar.getMaximum()){
 //			This matches circle centers in the calibration sheet with ellipse centers found in the image
 			 bar=circles.MatchCircles(calibrationcirclecenters);
+			 // bar=circles.OldMatchCircles(calibrationcirclecenters);
 			  final JProgressBar temp=bar; 
 			  try{ 
 			// This is the recommended way of passing GUI information between threads
@@ -2160,10 +2188,9 @@ private void FindCalibrationSheetCirclesEtc(){
 			if (prefs.Debug && prefs.DebugRestrictedSearch){
 				String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"RestrictedSearchForImageBinaryImage"+String.valueOf(i)+".jpg";
 				boolean[][] processedpixels=images[i].getProcessedPixels();
-				GraphicsFeedback graphics=new GraphicsFeedback(print);
+				GraphicsFeedback graphics=new GraphicsFeedback(true);
 				graphics.ShowBinaryimage(processedpixels,images[i].width,images[i].height);
 				graphics.SaveImage(filename);
-				System.out.println("Saved "+filename);	
 				// now save image with black background except where unprocessed pixels
 				byte[] colour=new byte[3];
 				colour[0]=(byte)0;
@@ -2239,7 +2266,7 @@ private void FindCalibrationSheetCirclesEtc(){
 		 if (prefs.Debug && prefs.DebugImageOverlay){
 			 for (int j=0;j<images.length;j++){     						
 				 byte[] colour=new byte[3];
-				 GraphicsFeedback graphics=new GraphicsFeedback(print);
+				 GraphicsFeedback graphics=new GraphicsFeedback();
 				 graphics.ShowImage(images[j]); // Note that the graphics feedback should be called at the end, otherwise the colour image may not exist
 				 if (!images[j].skipprocessing){
 					 PointPair2D[] matchingpoints=images[j].matchingpoints.clone();
