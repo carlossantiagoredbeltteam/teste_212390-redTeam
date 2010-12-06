@@ -187,6 +187,7 @@ public class Testing {
 			}
 			if (x%100==0) System.out.print(".");
 		}
+		System.out.println();
 		// Overwrite the pixels that are the centers of the circles with white
 		for (int i=0;i<correct.length;i++){
 			Point2d point=correct[i].pointone.clone();
@@ -200,7 +201,7 @@ public class Testing {
 			}
 		}
 		
-		GraphicsFeedback graphics=new GraphicsFeedback(false);
+		GraphicsFeedback graphics=new GraphicsFeedback(true);
 		graphics.ShowPixelColourArray(newimage,pixelswide,pixelshigh);
 		graphics.SaveImage(filename);
 	}// Note this assumes the global variable image has been initialised with the source image

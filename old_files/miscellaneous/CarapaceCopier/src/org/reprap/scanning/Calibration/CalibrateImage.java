@@ -23,7 +23,7 @@ package org.reprap.scanning.Calibration;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 9th Feburary 2010
+ * Last modified by Reece Arnott 6th December 2010
  * 
  *   	
  *   
@@ -93,7 +93,7 @@ public CalibrateImage(PointPair2D[] pp){
 // This uses the RANSAC algorithm to calculate a homography based on a subset of the matched points and returns the number of inliers for this homography
 public int setHomograhyusingRANSAC(double tsquared){ // t is the transfer error distance threshold to determine inliers and outliers 
 	Matrix H=new Matrix(3,3);
-	
+	boolean novalidsolution=false;
 	double currentmaxinliersvar=0;
 	int maxinliers=0;
 	boolean[] MaxInliersMask=new boolean[matchedpoints.length];
@@ -102,22 +102,25 @@ public int setHomograhyusingRANSAC(double tsquared){ // t is the transfer error 
 	double p=0.99; // Probability we want of having at least one sample free of outliers if we go around the loop N times.
 	int samplecount=0; // Number of times we've gone around the loop
 	double outliers=1; // worst case proportion of the total that are outliers (1=100%)
-	while (N>samplecount){
+	while ((N>samplecount) && (!novalidsolution)){
 		samplecount++;
 		// Choose a sample set of 4 point pairs and calculate the Homography
 		// Note that we need look out for degenerate samples where any 3 of the 4 points are collinear.
 		// TODO We should also try and choose points that are spatially distributed.
 		int[] pointpairindexes=new int[4];
+		boolean[] tested=new boolean[matchedpoints.length];
+		for (int i=0;i<matchedpoints.length;i++) tested[i]=false;
 		int randomindex=0;
+		
 		for (int i=0;i<4;i++){
 			boolean repeat=true;
-			// This will be an infinite loop if all points in one image are collinear and we need to assume this has been tested for that before entering this loop
-			// Collinearity is currently tested for pointtwo in the Main method but currently the calibration sheet is not tested.
+			// This will not work if all points in either image are collinear 
 			while (repeat){
-				randomindex=Math.round((long)(Math.random()*(matchedpoints.length-1)));
+				randomindex=(int)Math.round(Math.random()*(matchedpoints.length-1));
 				repeat=false;
-				// Check we don't already have this point pair
-				for (int j=0;j<i;j++) if (randomindex==pointpairindexes[j]) repeat=true;
+				// Check we haven't already tested this point pair
+				repeat=tested[randomindex];
+
 				// Check this point pair isn't collinear in either frame
 				if ((i>=2) && !repeat) {
 					repeat=matchedpoints[randomindex].pointone.isCollinear(matchedpoints[pointpairindexes[0]].pointone,matchedpoints[pointpairindexes[1]].pointone);
@@ -129,80 +132,86 @@ public int setHomograhyusingRANSAC(double tsquared){ // t is the transfer error 
 						repeat=repeat || matchedpoints[randomindex].pointtwo.isCollinear(matchedpoints[pointpairindexes[0]].pointtwo,matchedpoints[pointpairindexes[2]].pointtwo);
 					}
 				} // end if
+				tested[randomindex]=true;
+				// Exit the loop if we have tested all the points and still not found a valid additional point
+				int count=0;
+				for (int j=0;j<matchedpoints.length;j++) if (tested[j]) count++;
+				if (count==matchedpoints.length) {repeat=false; novalidsolution=true;}
 			} // end while
-			pointpairindexes[i]=randomindex;
+			if (novalidsolution) i=4; // exit for loop prematurely
+			else pointpairindexes[i]=randomindex;
 		} // end for
-		// Calculate the homography using these 4 point pairs
-		Point2d[] PointsInImageOne=new Point2d[4];
-		Point2d[] PointsInImageTwo=new Point2d[4];
-		for (int i=0;i<4;i++){
-			PointsInImageOne[i]=matchedpoints[pointpairindexes[i]].pointone.clone();
-			PointsInImageTwo[i]=matchedpoints[pointpairindexes[i]].pointtwo.clone();
-		}
-		H=setHomography(PointsInImageOne, PointsInImageTwo);
-		// Count the number of inliers for this homography
-		int inliers=0;
-		boolean[] inlier=new boolean[matchedpoints.length];
-		double[] dsquared=new double[matchedpoints.length];
-		double dsquaredsum=0;
-		for (int i=0;i<matchedpoints.length;i++){
-			
-			// Find symetric transfer error squared and compare it to the t squared distance threshold
-			dsquared[i]=new MatrixManipulations().TransferError(matchedpoints[i],H);
-			dsquaredsum=+dsquared[i];
-			inlier[i]=(dsquared[i]<tsquared);
-			if (inlier[i]) inliers++;
-		} // end for
-		// Calculate variance (square of standard deviation) of inliers - only used if need to test to see if need to replace current contender with this one
-		double variance=0;
-		if (inliers==maxinliers){
-			for (int i=0;i<matchedpoints.length;i++){
-				if (inlier[i]) variance=+Math.pow(dsquared[i]-(dsquaredsum/inliers),2);
+		if (!novalidsolution){
+			// Calculate the homography using these 4 point pairs
+			Point2d[] PointsInImageOne=new Point2d[4];
+			Point2d[] PointsInImageTwo=new Point2d[4];
+			for (int i=0;i<4;i++){
+				PointsInImageOne[i]=matchedpoints[pointpairindexes[i]].pointone.clone();
+				PointsInImageTwo[i]=matchedpoints[pointpairindexes[i]].pointtwo.clone();
 			}
-			variance=variance/inliers;
+			H=setHomography(PointsInImageOne, PointsInImageTwo);
+			// Count the number of inliers for this homography
+			int inliers=0;
+			boolean[] inlier=new boolean[matchedpoints.length];
+			double[] dsquared=new double[matchedpoints.length];
+			double dsquaredsum=0;
+			for (int i=0;i<matchedpoints.length;i++){
+			
+				// Find symetric transfer error squared and compare it to the t squared distance threshold
+				dsquared[i]=new MatrixManipulations().TransferError(matchedpoints[i],H);
+				dsquaredsum=+dsquared[i];
+				inlier[i]=(dsquared[i]<tsquared);
+				if (inlier[i]) inliers++;
+			} // end for
+			// Calculate variance (square of standard deviation) of inliers - only used if need to test to see if need to replace current contender with this one
+			double variance=0;
+			if (inliers==maxinliers){
+				for (int i=0;i<matchedpoints.length;i++)if (inlier[i]) variance=+Math.pow(dsquared[i]-(dsquaredsum/inliers),2);
+				variance=variance/inliers;
+			}
+			// Set the updated estimate percentage of the number of outliers, new N, and the new inlier count threshold if need be 
+			if ((inliers>maxinliers) || ((inliers==maxinliers) && (variance<currentmaxinliersvar))){
+				maxinliers=inliers;
+				currentmaxinliersvar=variance;
+				MaxInliersMask=inlier.clone();
+				outliers=(1-(double)inliers/(double)matchedpoints.length);
+				// This equation is a rearrangement of a simple sampling probability equation
+				// We need to find the the number of samples (N) we need to take of size 4, to ensure that at least one of them contains no outliers
+				// with a probability of p. 
+				// Then we solve the equation (1-x)^N=1-p or rearranging N=log(1-p)/log(1-x)
+				// where x is the probability all data points are inliers. The probability a selected data point is an inlier is 1-(1-outliers) and there are 4 of them so we multiple this number
+				// by itself 4 times to find the probability of any one sample being free from outliers
+				N=(int)(Math.log(1-p)/Math.log(1-Math.pow(1-outliers,4)));
+			} // end if
+		} // end if there is a valid solution
+		} // end while
+	if (!novalidsolution){
+		// Re-estimate the Homography using all the inliers of the largest consensus set
+		Point2d[] PointsInImageOne=new Point2d[maxinliers];
+		Point2d[] PointsInImageTwo=new Point2d[maxinliers];
+		int count=0;
+		for (int i=0;i<matchedpoints.length;i++){
+			if (MaxInliersMask[i]){
+				PointsInImageOne[count]=matchedpoints[i].pointone.clone();
+				PointsInImageTwo[count]=matchedpoints[i].pointtwo.clone();
+				count++;
+			} // end if
+		} // end for
+		H=setHomography(PointsInImageOne, PointsInImageTwo);
+		if (print) {
+			System.out.println("Used "+maxinliers+" of the point pairs to come up with homography");
+			//H.print(10,20);		
 		}
-		// Set the updated estimate percentage of the number of outliers, new N, and the new inlier count threshold if need be 
-		if ((inliers>maxinliers) || ((inliers==maxinliers) && (variance<currentmaxinliersvar))){
-			maxinliers=inliers;
-			currentmaxinliersvar=variance;
-			MaxInliersMask=inlier.clone();
-			outliers=(1-(double)inliers/(double)matchedpoints.length);
-			// This equation is a rearrangement of a simple sampling probability equation
-			// We need to find the the number of samples (N) we need to take of size 4, to ensure that at least one of them contains no outliers
-			// with a probability of p. 
-			// Then we solve the equation (1-x)^N=1-p or rearranging N=log(1-p)/log(1-x)
-			// where x is the probability all data points are inliers. The probability a selected data point is an inlier is 1-(1-outliers) and there are 4 of them so we multiple this number
-			// by itself 4 times to find the probability of any one sample being free from outliers
-			N=(int)(Math.log(1-p)/Math.log(1-Math.pow(1-outliers,4)));
-		} // end if
-	} // end while
-
-	// Re-estimate the Homography using all the inliers of the largest consensus set
-	Point2d[] PointsInImageOne=new Point2d[maxinliers];
-	Point2d[] PointsInImageTwo=new Point2d[maxinliers];
-	int count=0;
-	for (int i=0;i<matchedpoints.length;i++){
-		if (MaxInliersMask[i]){
-			PointsInImageOne[count]=matchedpoints[i].pointone.clone();
-			PointsInImageTwo[count]=matchedpoints[i].pointtwo.clone();
-			count++;
-		} // end if
-	} // end for
-
-	H=setHomography(PointsInImageOne, PointsInImageTwo);
-	
-	if (print) {
-		System.out.println("Used "+maxinliers+" of the point pairs to come up with homography");
-		//H.print(10,20);		
+		//Now do Bundle adjustment on this estimated homography to get a closer match
+		CalibrationBundleAdjustment adjust=new CalibrationBundleAdjustment();
+		adjust.BundleAdjustment(100, PointsInImageOne, PointsInImageTwo,H);
+		//if (print) {
+		//	System.out.println("Adjusted homography");
+		//	H.print(10,20);		
+		//}
+		Homography=H.copy();
 	}
-	//Now do Bundle adjustment on this estimated homography to get a closer match
-	CalibrationBundleAdjustment adjust=new CalibrationBundleAdjustment();
-	adjust.BundleAdjustment(100, PointsInImageOne, PointsInImageTwo,H);
-	//if (print) {
-	//	System.out.println("Adjusted homography");
-	//	H.print(10,20);		
-	//}
-	Homography=H.copy();
+	else maxinliers=0;
 	return maxinliers;
 }
 
