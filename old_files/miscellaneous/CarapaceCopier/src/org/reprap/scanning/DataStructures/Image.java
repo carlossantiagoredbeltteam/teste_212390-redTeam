@@ -339,7 +339,7 @@ public void NegateLensDistortion(LensDistortion distortion, JProgressBar bar){
 	bar.setMaximum(height*2);
 	bar.setValue(0);
 	
-	PixelColour[][] newimage=new PixelColour[width][height];
+	int[][] newimage=new int[width][height];
 	if (distortion.UseDistortionFunction()){
 		// The distortion function is not invertible so the easiest thing to do is to undistort all pixel points and store this mapping and resample
 		// based on the closest mapped point. The best way would be to take a weighted average of the closest n points greyscale values but this distortion function
@@ -362,7 +362,7 @@ public void NegateLensDistortion(LensDistortion distortion, JProgressBar bar){
 			for (int x=0;x<width;x++){
 				//Get the indexes in the grid cell closest to this point
 				Point2d target=new Point2d(x,y);
-				int [] indexes=grid.GetClosestPoints(target); 
+				int [] indexes=grid.GetClosestPoints(target);
 				// this will return an empty list if the pixel is inside the distorted image bounding rectangle but with no pixels near, a list of length 1 and value -1 if the pixel is outside the distorted image bounding box entirely or a list of the nearest pixels if it is inside the image  
 				if (indexes.length==0) {indexes=new int[1]; indexes[0]=-1;}  
 				if (indexes[0]!=-1){
@@ -374,15 +374,15 @@ public void NegateLensDistortion(LensDistortion distortion, JProgressBar bar){
 						int oldy=(int)((double)(indexes[i]-oldx)/(double)width);
 						colours[i]=new PixelColour(imagemap[oldx][oldy]); 
 					}
-					newimage[x][y]=InterpolatePixelColour(target,points,colours);
+					newimage[x][y]=InterpolatePixelColour(target,points,colours).ExportAsInt();
 				}
-				else newimage[x][y]=new PixelColour();
+				else newimage[x][y]=new PixelColour().ExportAsInt();
 				}
 			}
-		// Now convert the image map back into int for storage
+		// Overwrite the old pixel values
 		for (int x=0;x<width;x++)
 				for (int y=0;y<height;y++)
-			imagemap[x][y]=newimage[x][y].ExportAsInt();
+					imagemap[x][y]=newimage[x][y];
 		}
 	else {
 		// TODO If we aren't using the distortion function then distortion is estimated by a matrix so we should be able to invert it 

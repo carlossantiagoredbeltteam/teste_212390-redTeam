@@ -23,7 +23,7 @@ package org.reprap.scanning.GUI;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 11th October 2010
+ * Last modified by Reece Arnott 7th December 2010
  * 
  * This is test code used to test the success of the combinatorial approach to point matching on different combinations/permutations of found points on a calibration sheet
  *
@@ -152,60 +152,7 @@ public class Testing {
 	} // end method
 
 
-	// Wrapper to call the below to give just the initial estimation of the calibration sheet using the first 3 point pair matches.  
-	public void CalculateBarycentricTransformedCalibrationsheet(int pixelswide, int pixelshigh, String filename){CalculateBarycentricTransformedCalibrationsheet(pixelswide,pixelshigh,filename,false);}
-		
-		
-	
-//	 Note this assumes the global variable image has been initialised with the source image
-	// This has been hastily changed to output colour images rather than greyscale. It is not efficient and if it to be used extensively should be rewritten
-	public void CalculateBarycentricTransformedCalibrationsheet(int pixelswide, int pixelshigh, String filename, boolean useallpointpairs){
-		PointPair2D[] basepairs;
-		if (useallpointpairs) {
-			//Use the best 3 to get the estimated greyscale values of the pixel for the calibration sheet
-			basepairs=new PointPair2D[correct.length];
-			for (int i=0;i<correct.length;i++) basepairs[i]=correct[i].clone();
-		}
-		else{
-			//Use only the first 3 to get the estimated greyscale values of the entire calibration sheet
-			basepairs=new PointPair2D[3];
-			for (int i=0;i<3;i++) basepairs[i]=correct[i].clone();
-		}		
-		
-		Point2d offset=new Point2d((double)calibrationwidth/2,(double)calibrationheight/2);
-		PixelColour[][] newimage=new PixelColour[pixelswide][pixelshigh];
-		for (int x=0;x<pixelswide;x++){
-			for (int y=0;y<pixelshigh;y++){
-				// calculate the point pair for each pixel of the calibration sheet and get the colour value
-				Point2d point=new Point2d(x*(calibrationwidth/pixelswide),y*(calibrationheight/pixelshigh));
-				point.minus(offset);
-				PointPair2D pair=new PointPair2D();
-				pair.pointone=point.clone();
-				boolean success=pair.EstimateSecondPoint(basepairs);
-				if (success) newimage[x][y]=image.InterpolatePixelColour(pair.pointtwo);
-				else newimage[x][y]=new PixelColour();
-			}
-			if (x%100==0) System.out.print(".");
-		}
-		System.out.println();
-		// Overwrite the pixels that are the centers of the circles with white
-		for (int i=0;i<correct.length;i++){
-			Point2d point=correct[i].pointone.clone();
-			point.plus(offset);
-			int x=(int)(point.x*(pixelswide/calibrationwidth));
-			int y=(int)(point.y*(pixelshigh/calibrationheight));
-			for (int dx=-(int)pixelswide/200;dx<pixelswide/200;dx++){
-				for (int dy=-(int)pixelshigh/200;dy<pixelshigh/200;dy++){
-					if ((x+dx>=0) && (x+dx<pixelswide) && (y+dy>=0) && (y+dy<=pixelshigh)) newimage[x+dx][y+dy]=new PixelColour((byte)255);
-				}
-			}
-		}
-		
-		GraphicsFeedback graphics=new GraphicsFeedback(true);
-		graphics.ShowPixelColourArray(newimage,pixelswide,pixelshigh);
-		graphics.SaveImage(filename);
-	}// Note this assumes the global variable image has been initialised with the source image
-	
+
 	public void CalculateMatches(Point2d[] subsetofcentres, int n){
 			long starttime=System.currentTimeMillis();
 			PointPairMatch circles=new PointPairMatch(subsetofcentres);
