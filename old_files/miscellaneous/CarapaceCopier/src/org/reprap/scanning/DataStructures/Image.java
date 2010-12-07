@@ -23,7 +23,7 @@ package org.reprap.scanning.DataStructures;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 2nd December 2010
+ * Last modified by Reece Arnott 7th December 2010
  * 
  * These are methods that store the image and and additional information together
  * This includes the edge map, camera calibration matrices and the point pair matches of points in the image with the calibration sheet 

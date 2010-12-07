@@ -24,7 +24,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 17th May 2010
+ * Last modified by Reece Arnott 7th December 2010
  * 
  *    
  *******************************************************************************/
@@ -81,10 +81,13 @@ public class CalibrateCamera {
 //		 Note that there have been mistakes in formulas found in the original paper that have been corrected in the online version of the Microsoft Technical report
 //		 The updated technical report with the mistakes corrected can be downloaded from ftp://ftp.research.microsoft.com/pub/tr/tr-98-71.pdf 
 
-	
+// Note also that if there is an error the returned matrix will be all zeros except for the right bottom element which will be an error code. Currently these error codes are:
+	// -1 Homogrpahy matrix is not Semi-Positive Definite, indicates there is probably a mismatch in the point pairs it is based on.
+	// 1 no error, the standard K matrix is presumably returned.
 
 	 public Matrix getCameraMatrix(){
-		//First calculate a homography relating the calibration sheet to the image.
+		int error=0;
+		 //First calculate a homography relating the calibration sheet to the image.
 		// This contains a combination of the camera calibration matrix, the rotation matrix, and the translation matrix which we will separate out.
 		Matrix[] H=new Matrix[imagecalibrationarray.length];
 		Matrix A=new Matrix(2*imagecalibrationarray.length,6);
@@ -236,7 +239,7 @@ public class CalibrateCamera {
 					for (int x=0;x<H.length;x++){
 						double transfererrorsquared=imagecalibrationarray[x].FindMaximumTransferErrorSquared();
 						if 	(transfererrorsquared>maxtransfererrorsquared) maxtransfererrorsquared=transfererrorsquared;
-						System.out.println("The planar homography seems to be  wrongly constrained, probably over-constrained. Attempting to construct it with fewer points.");
+						System.out.println("The planar homography seems to be wrongly constrained, probably over-constrained with one or more mismatched point-pairs. Attempting to construct it with fewer points.");
 					} // end for
 				} // end if
 				if (repeatcount<maxrepeat){ 
@@ -250,75 +253,75 @@ public class CalibrateCamera {
 					} // end for
 				} // end if
 				if (repeatcount>=maxrepeat) {
-					for (int x=0;x<H.length;x++) imagecalibrationarray[x].setHomographyusingAllPoints();
+					// Not currently doing this as the problem probably can't be fixed by this
+					//for (int x=0;x<H.length;x++) imagecalibrationarray[x].setHomographyusingAllPoints();
 					// You can decompose a matrix into the SPD part and the rest (called polar decomposition)  using a variation of SVD, so we'll just get the SPD part. 
-					SingularValueDecomposition svd=new SingularValueDecomposition(Omega);
-					Omega=svd.getV().times(svd.getS().times(svd.getV().transpose()));
+					//SingularValueDecomposition svd=new SingularValueDecomposition(Omega);
+					//Omega=svd.getV().times(svd.getS().times(svd.getV().transpose()));
 					repeat=false;
-					System.out.println("Homography not Semi-positive definite, even after the maximum number of attempts at RANSAC adjustment. This is a bug!\n Trying to get around it by using the SPD part of the homography but it will be less accurate, maybe a lot less!");
-					
+					String errormessage="Error: There are potentially a significant number of wrongly matched point pairs.\n";
+					warnings=warnings+errormessage;
+					System.out.print("Homography not Semi-positive definite, even after the maximum number of attempts at RANSAC adjustment.\n"+errormessage);
+					error=-1;
 				} // end if
 				repeatcount++;
 			} //end if repeat
 			} // end while repeat loop
-			
-			if (print){
-				System.out.println("Omega=");
-				Omega.print(10,20);
+			if (error==0){
+				if (print){
+					System.out.println("Omega=");
+					Omega.print(10,20);
+				}
+				// Note that there were errors in the original Zhang paper for these formulas that have been fixed in the later versions of the Microsoft Technical Report
+				//The values of the above calculated 3x3 matrix relate to the values mentioned in the formulas in the referenced paper. 
+				double B11=Omega.get(0,0);
+				double B12=Omega.get(0,1);
+				double B22=Omega.get(1,1);
+				double B13=Omega.get(0,2);
+				double B23=Omega.get(1,2);
+				double B33=Omega.get(2,2);
+				double numerator=(B12*B13)-(B11*B23);
+				double denominator=(B11*B22)-(B12*B12);
+				double v0=numerator/denominator;
+				double lambda=B33-(((B13*B13)+(v0*numerator))/B11);
+				double alpha=Math.sqrt(lambda/B11);
+				double beta=Math.sqrt((lambda*B11)/denominator);
+				double gamma=(-1*B12*alpha*alpha*beta)/lambda;
+				double u0=((gamma*v0)/beta)-((B13*alpha*alpha)/lambda);
+				if (print){
+					System.out.println("v0="+v0);
+					System.out.println("lambda="+lambda);
+					System.out.println("alpha="+alpha);
+					System.out.println("alpha^2="+(lambda/B11));
+					System.out.println("beta="+beta);
+					System.out.println("beta^2="+((lambda*B11)/((B11*B22)-(B12*B12))));
+					System.out.println("gamma="+gamma);
+					System.out.println("u0="+u0);
+				}
+				/* So the camera matrix  is:
+				 * 
+				 * alpha	 gamma	u0 
+				 * 0		beta	v0
+				 * 0		0		1
+				 * 
+				 */
+				K=new Matrix(3,3);
+				K.set(0,0,alpha);
+				K.set(1,1,beta);
+				K.set(0,1,gamma);
+				K.set(0,2,u0);
+				K.set(1,2,v0);
+				K.set(2,2,1);
+			} // end if no errors
+			else {
+				// Make the K matrix all zeros except for the right bottom which is the error code
+				K=new Matrix(3,3);
+				K.set(2,2,error);
 			}
-			
-			
-			// Note that there were errors in the original Zhang paper for these formulas that have been fixed in the later versions of the Microsoft Technical Report
-			//The values of the above calculated 3x3 matrix relate to the values mentioned in the formulas in the referenced paper. 
-			double B11=Omega.get(0,0);
-			double B12=Omega.get(0,1);
-			double B22=Omega.get(1,1);
-			double B13=Omega.get(0,2);
-			double B23=Omega.get(1,2);
-			double B33=Omega.get(2,2);
-			double numerator=(B12*B13)-(B11*B23);
-			double denominator=(B11*B22)-(B12*B12);
-			double v0=numerator/denominator;
-			double lambda=B33-(((B13*B13)+(v0*numerator))/B11);
-			double alpha=Math.sqrt(lambda/B11);
-			double beta=Math.sqrt((lambda*B11)/denominator);
-			double gamma=(-1*B12*alpha*alpha*beta)/lambda;
-			double u0=((gamma*v0)/beta)-((B13*alpha*alpha)/lambda);
-			
-			
-			if (print){
-				System.out.println("v0="+v0);
-				System.out.println("lambda="+lambda);
-				System.out.println("alpha="+alpha);
-				System.out.println("alpha^2="+(lambda/B11));
-				System.out.println("beta="+beta);
-				System.out.println("beta^2="+((lambda*B11)/((B11*B22)-(B12*B12))));
-				System.out.println("gamma="+gamma);
-				System.out.println("u0="+u0);
-				
-			}
-			
-			
-			
-			/* So the camera matrix  is:
-			 * 
-			 * alpha	 gamma	u0 
-			 * 0		beta	v0
-			 * 0		0		1
-			 * 
-			 */
-			K=new Matrix(3,3);
-			K.set(0,0,alpha);
-			K.set(1,1,beta);
-			K.set(0,1,gamma);
-			K.set(0,2,u0);
-			K.set(1,2,v0);
-			K.set(2,2,1);
-			
 			if (print) {
 				System.out.println("K=");
 				K.print(10,20);
-			 }
-		return K;
+			}
+			return K;
 	 } // end of method
 }
