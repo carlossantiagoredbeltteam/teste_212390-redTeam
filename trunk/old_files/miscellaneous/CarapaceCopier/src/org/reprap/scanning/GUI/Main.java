@@ -1108,10 +1108,14 @@ private void FindCalibrationSheetCirclesEtc(){
 	      					}// end if
 	      					} // end if Debug
 		      					
-// Sub-Step 3-5	      					
-	      					LensDistortion distortion=EstimatingCameraParameters(j,circles);									  
-	      					UndoLensDistortion(j,distortion,false);
-		      				ImageSegmentation(j); 
+// Sub-Step 3	      					
+	      					LensDistortion distortion=EstimatingCameraParameters(j,circles);
+	      					// Note that the above will set the skipprocessing if the camera matrix cannot be estimated. 
+	      					if (!images[j].skipprocessing){
+// Sub-Steps 4 and 5	      						
+	      						UndoLensDistortion(j,distortion,false);
+	      						ImageSegmentation(j);
+	      					}
 		      				
     					  } // end if continue
 	    					 // Save processed image if necessary
@@ -1119,7 +1123,8 @@ private void FindCalibrationSheetCirclesEtc(){
 	    						 // Save the important calculated properties of the image
 	    						 ProcessedImageProperties io=new ProcessedImageProperties(prefs.imagefiles.getElementAt(j).toString()+".properties");
 	  		    			   	io.originofimagecoordinates=images[j].originofimagecoordinates.clone();
-	  		    			   	io.WorldToImageTransform=images[j].getWorldtoImageTransformMatrix().copy();
+	  		    			   	if (!images[j].skipprocessing) io.WorldToImageTransform=images[j].getWorldtoImageTransformMatrix().copy();
+	  		    			   	else io.WorldToImageTransform=new Matrix(3,3);
 	  		    			   	io.skipprocessing=images[j].skipprocessing;
 	  		    			   	try{io.saveProperties();}
 	  		    			   	catch (Exception e){System.out.println("Error writing processed image properties.");}
@@ -1266,7 +1271,7 @@ private void FindCalibrationSheetCirclesEtc(){
 	 				  else {
 	 				  	 Voxel voxels=Voxelisation();
 	 				  	 //TODO uncomment when finished testing
-	 				  	 RestrictSearch(voxels);
+	 				  	 //RestrictSearch(voxels);
 	 				  	 SurfaceVoxelsToTriangles(voxels);
 	 				  	 } // end else for if there are enough images to extract 3D information 
 	 	    		 GraphicsFeedback();
@@ -2021,9 +2026,10 @@ private void FindCalibrationSheetCirclesEtc(){
 				// Camera Calibration from these matching points. Currently only doing once but could do this a number of times, readjusting the points in light of previously calculated lens distortion
 				//for (int iterate=0;iterate<maxiterations;iterate++){
 					// This is all in a sub-method so the loop is easy to read
-				distortion=IndividualCameraCalibration(i,true,prefs.AlgorithmSettingMaxBundleAdjustmentNumberOfIterations);
+				if (!images[i].skipprocessing) distortion=IndividualCameraCalibration(i,prefs.AlgorithmSettingMaxBundleAdjustmentNumberOfIterations);
 					  // adjust the matched points in the image
-					  for (int j=0;j<images[i].matchingpoints.length;j++) {
+					if (!images[i].skipprocessing) {
+						for (int j=0;j<images[i].matchingpoints.length;j++) {
 						  images[i].matchingpoints[j].pointtwo=distortion.UndoThisLayerOfDistortion(images[i].matchingpoints[j].pointtwo);
 					  }
 					//if (iterate==0)	{ // Initialise the previous values if this is the first time through
@@ -2061,8 +2067,8 @@ private void FindCalibrationSheetCirclesEtc(){
 				  catch (Exception e) { 
 					  System.out.println("Exception in updating the progress bar"+e.getMessage());
 		         }	
-					
-				//} // end while loop
+					}
+				//} // end for loop
 				return distortion;
 	}
 	private void UndoLensDistortion(int i,LensDistortion distortion, boolean colour){
@@ -2075,7 +2081,7 @@ private void FindCalibrationSheetCirclesEtc(){
 					  }
 				  });	    		 
 
-		  images[i].NegateLensDistortion(distortion,jProgressBar1);
+		  if (!images[i].skipprocessing) images[i].NegateLensDistortion(distortion,jProgressBar1);
 		  }
 	private void ImageSegmentation(int i){
 		//From the known camera calibration and the matching circle centers on the calibration sheet found, determine the visible portion of the calibration sheet
@@ -2530,8 +2536,9 @@ public class Point3dArray {
 			return mask;
 	}
 	
-	private LensDistortion IndividualCameraCalibration(int n, boolean printwarnings,int maxbundleadjustmentiterations){
-		CalibrateCamera camera; 
+	private LensDistortion IndividualCameraCalibration(int n,int maxbundleadjustmentiterations){
+		CalibrateCamera camera;
+		LensDistortion distortion=new LensDistortion();
 		 // We need to use the assumption that the principal point is at the origin so start by setting the imagecenter to be the origin
 			 Point2d imagecenter=new Point2d(images[n].width/2,images[n].height/2);
 			images[n].originofimagecoordinates=imagecenter.clone();
@@ -2544,9 +2551,15 @@ public class Point3dArray {
 				 } // end for j
 					images[n].calibration=new CalibrateImage(pointpair);
 					 
-		 camera=new CalibrateCamera(images[n]); 
-		 LensDistortion distortion=CalculateIndividualCameraCalibration(n,camera.getCameraMatrix(),maxbundleadjustmentiterations);
-		 if ((camera.warnings!="") && (printwarnings)){
+		 camera=new CalibrateCamera(images[n]);
+		 Matrix K=camera.getCameraMatrix();
+		 double errorcode=K.get(2,2);
+		if (errorcode==1) distortion=CalculateIndividualCameraCalibration(n,K,maxbundleadjustmentiterations);
+		if ((camera.warnings!="") || (errorcode!=1)){
+			if (errorcode==-1) {
+				images[n].skipprocessing=true;
+				camera.warnings=camera.warnings+"Skipping further processing of this image.\n\n";
+			}
 			 final String warnings="Warnings for image "+(n+1)+"\n"+camera.warnings;
 			  EventQueue.invokeLater(new Runnable(){
 				  public void run(){
