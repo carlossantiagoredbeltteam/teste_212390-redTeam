@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  *
- * Last modified by Reece Arnott 6th December 2010
+ * Last modified by Reece Arnott 7th December 2010
  * 
  * Note that most of the layout commands were initially produced by NetBeans for JDK 6
  * and significantly modified by hand. For future reference if it needs to be done the other way the main things to change are:
@@ -98,6 +98,7 @@ public class Main extends JFrame {
 //	 These are standard global variables used in multiple methods 
     private double calibrationsheetwidth,calibrationsheetheight; // these relate to the real world physical dimensions of the printed calibration sheet calculated from the paper size, orientation and margins
     private double calibrationsheetxlength,calibrationsheetylength; // these relate to the calculated physical dimensions of circles on the printed calibration sheet.
+    private int calibrationsheetpixelswidth,calibrationsheetpixelsheight; // These are only used in writing out images the same size as the calibration sheet if debugging
     private AxisAlignedBoundingBox volumeofinterest;
     private Point2d[] calibrationcirclecenters;
 	private Point3d[] surfacepoints;
@@ -1010,20 +1011,78 @@ private void FindCalibrationSheetCirclesEtc(){
 								 } // end if
 
 								 if (compute){
-//Step 1
+//Sub-Step 1
 								 Point2d[] ellipsecenters=FindEllipses(j);
 
 	    					 if (Continue(j,ellipsecenters)){
-//Step 2-5	    						  
+//Sub-Step 2    						  
 	      					PointPairMatch circles=MatchCircles(j,ellipsecenters);
 	      					
-	      					if ((prefs.Debug) && (prefs.DebugCalibrationSheetBarycentricEstimate)){
-	      							Testing test=new Testing(circles.getMatchedPoints(),calibrationcirclecenters,calibrationsheetwidth, calibrationsheetheight);
-	      							test.image=images[j].clone();
-	      							Image calibrationsheet=new Image(prefs.calibrationpatterns.getElementAt(prefs.CurrentCalibrationPatternIndexNumber).toString()); // Read in the image with no blurring filter kernel
-	      							test.CalculateBarycentricTransformedCalibrationsheet(calibrationsheet.width,calibrationsheet.height,prefs.DebugSaveOutputImagesFolder+File.separatorChar+"CalibrationSheetImage"+j+".jpg");
-	      					}
-	      					if ((prefs.Debug) && (prefs.DebugPointPairMatching)){
+	      					if (prefs.Debug) {
+	      						if (prefs.DebugCalibrationSheetBarycentricEstimate){
+	      						// Write out a file that is the dimensions of the calibration sheet with the colours corresponding to the colours in the image
+	      						// matched using barycentric coordinate transforms between the two using the found point pair matches 
+	      						// Do this all twice, once with all the point pairs, once with just the first 3
+	      						for (int useallpointpairs=0;useallpointpairs<2;useallpointpairs++){
+	      							PointPair2D[] basepairs;
+		      						PointPair2D[] correct=circles.getMatchedPoints();
+	      							if (useallpointpairs==1) {
+		      							basepairs=new PointPair2D[correct.length];
+		      							for (int i=0;i<correct.length;i++) basepairs[i]=correct[i].clone();
+		      						}
+		      						else{
+		      							//Use only the first 3 to get the estimated greyscale values of the entire calibration sheet
+		      							basepairs=new PointPair2D[3];
+		      							for (int i=0;i<3;i++) basepairs[i]=correct[i].clone();
+		      						}
+		      						
+	      							// Note the coordinates of the points in the calibration sheet are not pixel coordinates but are transformed to have the origin at the centre of the sheet
+		      						Point2d offset=new Point2d(calibrationsheetwidth/2,calibrationsheetheight/2);
+		      						// For each pixel of the calibration sheet work out the colour it corresponds to in the image
+	      							// using a barycentric transformation
+		      						PixelColour[][] newimage=new PixelColour[calibrationsheetpixelswidth][calibrationsheetpixelsheight];
+		      						for (int x=0;x<calibrationsheetpixelswidth;x++){
+		      							for (int y=0;y<calibrationsheetpixelsheight;y++){
+		      								// calculate the point pair for each pixel of the calibration sheet and get the colour value
+		      								Point2d point=new Point2d(x,y);
+		      								// Convert from pixel to mm coordinates
+			      							point.x=point.x*(calibrationsheetwidth/calibrationsheetpixelswidth);
+			      							point.y=point.y*(calibrationsheetheight/calibrationsheetpixelsheight);
+			      							point.minus(offset);
+		      								PointPair2D pair=new PointPair2D();
+		      								pair.pointone=point.clone();
+		      								boolean success=pair.EstimateSecondPoint(basepairs);
+		      								if (success) newimage[x][y]=images[j].InterpolatePixelColour(pair.pointtwo);
+		      								else newimage[x][y]=new PixelColour();
+		      							}
+		      							if (x%100==0) System.out.print(".");
+		      						}
+		      						System.out.println();
+		      						// Overwrite the pixels that are the centers of the circles with white to give a guide to how the matching was done
+		      						// With the center represented by a rectangle that it 1% of the size of the calibration sheet
+		      						int dx=(int)(calibrationsheetpixelswidth/200);
+		      						int dy=(int)(calibrationsheetpixelsheight/200);
+		      						
+		      						for (int i=0;i<correct.length;i++){
+		      							Point2d point=correct[i].pointone.clone();
+		      							point.plus(offset);
+		      							// Convert from mm to pixel coordinates
+		      							point.x=point.x*(calibrationsheetpixelswidth/calibrationsheetwidth);
+		      							point.y=point.y*(calibrationsheetpixelsheight/calibrationsheetheight);
+		      							for (int x=(int)point.x-dx;x<(int)point.x+dx;x++)
+		      								for (int y=(int)point.y-dy;y<(int)point.y+dy;y++)
+				      							if ((x>=0) && (x<calibrationsheetpixelswidth) && (y>=0) && (y<=calibrationsheetpixelsheight)) newimage[x][y]=new PixelColour((byte)255);
+		      						} // end for 
+	      							String filename;
+	      							if (useallpointpairs==0) filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"BarycentricCalibrationSheetImageUsingFirst3Matches"+j+".jpg";
+	      							else filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"BarycentricCalibrationSheetImageUsingAllMatches"+j+".jpg";
+		      						GraphicsFeedback graphics=new GraphicsFeedback(true);
+	      							graphics.ShowPixelColourArray(newimage,calibrationsheetpixelswidth,calibrationsheetpixelsheight);
+	      							graphics.SaveImage(filename);
+	      						} // end for useallpointpairs
+	      					}// end if
+	      					
+	      					 if (prefs.DebugPointPairMatching){
 	      						GraphicsFeedback graphics1=new GraphicsFeedback(true);
 	  		    				Image calibrationsheet=new Image(prefs.calibrationpatterns.getElementAt(prefs.CurrentCalibrationPatternIndexNumber).toString()); // Read in the image with no blurring filter kernel
 	  			    		    graphics1.ShowImage(calibrationsheet);
@@ -1046,9 +1105,10 @@ private void FindCalibrationSheetCirclesEtc(){
 		 						graphics1.SaveImage(filename);
 		      					filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"CircleandEllipseMatchesinImage"+j+".jpg";
 		      					graphics2.SaveImage(filename);
-	      					}
+	      					}// end if
+	      					} // end if Debug
 		      					
-	      					
+// Sub-Step 3-5	      					
 	      					LensDistortion distortion=EstimatingCameraParameters(j,circles);									  
 	      					UndoLensDistortion(j,distortion,false);
 		      				ImageSegmentation(j); 
@@ -1627,7 +1687,10 @@ private void FindCalibrationSheetCirclesEtc(){
 		    		   } // end if save
 	} // end if compute
 		    		 		   
-		    		   // simple if statements to find the width and height of the calibration sheet in mm.
+		    		   // Record the calibration sheet width and height in pixels for use in debugging
+						calibrationsheetpixelswidth=calibrationsheet.width;
+						calibrationsheetpixelsheight=calibrationsheet.height;
+						// simple if statements to find the width and height of the calibration sheet in mm.
 		    		   double w,h;
 		   				if (prefs.PaperSizeIsCustom.isSelected()){ w= Double.valueOf(prefs.PaperCustomSizeWidthmm.getText()); h=Double.valueOf(prefs.PaperCustomSizeHeightmm.getText());}
 		   				else {Papersize current=(Papersize)prefs.PaperSizeList.getElementAt(prefs.CurrentPaperSizeIndexNumber);w=current.width;h=current.height;}
