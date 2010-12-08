@@ -239,7 +239,7 @@ public class CalibrateCamera {
 					for (int x=0;x<H.length;x++){
 						double transfererrorsquared=imagecalibrationarray[x].FindMaximumTransferErrorSquared();
 						if 	(transfererrorsquared>maxtransfererrorsquared) maxtransfererrorsquared=transfererrorsquared;
-						System.out.println("The planar homography seems to be wrongly constrained, probably over-constrained with one or more mismatched point-pairs. Attempting to construct it with fewer points.");
+						System.out.println("The Image of the Absolute Conic (IAC) seems to be wrongly constrained, probably due to a wrongly constrained planar homography, in turn probably due to being over-constrained with one or more mismatched point-pairs. Attempting to construct it with fewer points.");
 					} // end for
 				} // end if
 				if (repeatcount<maxrepeat){ 
@@ -261,7 +261,7 @@ public class CalibrateCamera {
 					repeat=false;
 					String errormessage="Error: There are potentially a significant number of wrongly matched point pairs.\n";
 					warnings=warnings+errormessage;
-					System.out.print("Homography not Semi-positive definite, even after the maximum number of attempts at RANSAC adjustment.\n"+errormessage);
+					System.out.print("IAC not Semi-positive definite, even after the maximum number of attempts at RANSAC adjustment.\n"+errormessage);
 					error=-1;
 				} // end if
 				repeatcount++;
