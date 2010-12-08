@@ -63,6 +63,7 @@ import java.math.RoundingMode;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
@@ -423,12 +424,14 @@ public class Main extends JFrame {
 			papernames[i]=current.Name+", "+current.width+"mm x "+current.height+"mm";
 		}
 		Papersize=new JComboBox(papernames);
-		Papersize.setSelectedIndex(prefs.CurrentPaperSizeIndexNumber);
+		if (Papersize.getItemCount()>0)
+			Papersize.setSelectedIndex(prefs.CurrentPaperSizeIndexNumber);
 		
 		jButtonBrowse = new JButton();
 		jButtonBrowse.setText("Browse");
 	    jComboBox= new JComboBox(prefs.calibrationpatterns);
-	    jComboBox.setSelectedIndex(prefs.CurrentCalibrationPatternIndexNumber);
+	    if (jComboBox.getItemCount()>0)
+	    	jComboBox.setSelectedIndex(prefs.CurrentCalibrationPatternIndexNumber);
 		
 	    // TODO align the text in the combo box so if the path is too long to fit we see the right hand side
 	    // I would have thought the commented out lines below would work but they don't!
