@@ -23,7 +23,7 @@ package org.reprap.scanning.GUI;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 6th December 2010
+ * Last modified by Reece Arnott 8th December 2010
  * 
  * The code commented out needs the JOGL OS dependent libraries. If this code is to be used
  * the libraries need to be added. They can be downloaded from: https://jogl.dev.java.net/servlets/ProjectDocumentList?folderID=9260&expandFolder=9260&folderID=8798
@@ -128,6 +128,22 @@ public class GraphicsFeedback {
 			} // end for x
 		} // end for y
 		
+	}
+	public void ShowGreyscaleimage(byte[][] image, int w, int h){
+		GLimage=new byte[(h+1)*(w+1)*numcolours];
+		imagewidth=w;
+		imageheight=h;
+		int tempindex,index;
+		// 	Read pixels in a row at a time taking care to flip the image at the same time
+		for (int y=0;y<h; y++)
+		{
+			tempindex=(h-y-1)*w*numcolours;
+			// if the y coordinate is already stored internally as inverted then don't worry about flipping it for display
+			for (int x=0;x<w;x++){
+				index=tempindex+(x*numcolours);
+				for (int colours=0;colours<numcolours;colours++) GLimage[index+colours]=image[x][y];
+			} // end for x
+		} // end for y
 	}
 	public void ShowPixelColourArray(PixelColour[][] map, int w, int h){
 			GLimage=new byte[(h+1)*(w+1)*numcolours];

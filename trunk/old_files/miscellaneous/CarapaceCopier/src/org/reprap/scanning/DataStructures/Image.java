@@ -23,7 +23,7 @@ package org.reprap.scanning.DataStructures;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 7th December 2010
+ * Last modified by Reece Arnott 8th December 2010
  * 
  * These are methods that store the image and and additional information together
  * This includes the edge map, camera calibration matrices and the point pair matches of points in the image with the calibration sheet 
@@ -113,7 +113,39 @@ public class Image {
 	//	distortion=new LensDistortion(); // creates zero distortion to begin with
 		ReadImageFromFile(new float[0]); // read in the image but don't apply any filtering
 	}
-	// Read in the image (initially as greyscale only) and apply a filter
+	public Image(PixelColour[][] image,int imagewidth,int imageheight) {
+		// Initialise the imagemap etc. and set to defaults then try and load from file
+		// Then try and load preferences from file
+		width=imagewidth;
+		height=imageheight;
+		unprocessedpixelsarea=new AxisAlignedBoundingBox();
+		unprocessedpixelsarea.maxx=width-1;
+		unprocessedpixelsarea.maxy=height-1;
+		processedpixel=new boolean[width][height];
+		imagemap=new int[width][height];
+		for(int y=0;y<height;y++)
+			for(int x=0;x<width;x++){
+				processedpixel[x][y]=false;
+				imagemap[x][y]=image[x][y].ExportAsInt();	
+			}
+		setWorldtoImageTransform=false;
+		originofimagecoordinates=new Point2d(0,0);
+		filename="";
+		matchingpoints=new PointPair2D[0];
+		// Set the camera matrix to be the identity matrix 
+		CameraMatrix=new Matrix(3,3);
+		CameraMatrix.set(0,0,1);
+		CameraMatrix.set(1,1,1);
+		CameraMatrix.set(2,2,1);
+		skipprocessing=true;
+		calibration=new CalibrateImage();
+		edges=new EdgeExtraction2D();
+	//	distortion=new LensDistortion(); // creates zero distortion to begin with
+	}
+	
+	
+	
+	// Read in the image and apply a filter
 	public Image(String imagename, float[] kernel) {
 		// Initialise the imagemap etc. and set to defaults then try and load from file
 		// Then try and load the image from file

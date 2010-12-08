@@ -102,7 +102,6 @@ public class EdgeExtraction2D {
 				} // end for i
 				// In theory the strength could take any of the 512 values between 0 and 255 in steps of 0.5
 				// In practice we don't really care about that 1/2 step so it is ignored and the int converted to a byte and slotted into a byte array
-				// We store the whole strengthmap as well as the thresholded one in case we need to refer to it later.
 				maxstrength=maxstrength/2;
 				strengthmap[x][y]=(byte)(maxstrength & 0xff);
 				directionmap[x][y]=direction.values()[dir];
