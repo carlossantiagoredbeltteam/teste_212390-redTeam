@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  *
- * Last modified by Reece Arnott 8th December 2010
+ * Last modified by Reece Arnott 9th December 2010
  * 
  * Note that most of the layout commands were initially produced by NetBeans for JDK 6
  * and significantly modified by hand. For future reference if it needs to be done the other way the main things to change are:
@@ -1118,8 +1118,8 @@ private void FindCalibrationSheetCirclesEtc(){
 	      						UndoLensDistortion(j,distortion,false);
 	      						ImageSegmentation(j);
 	      					}
-	      				
-    					  } // end if continue
+
+	    					 } // end if continue
 	    					 // Save processed image if necessary
 	    					 if (prefs.SaveProcessedImageProperties){
 	    						 // Save the important calculated properties of the image
@@ -1273,7 +1273,7 @@ private void FindCalibrationSheetCirclesEtc(){
 	 				  else {
 	 				  	 Voxel voxels=Voxelisation();
 	 				  	 //TODO uncomment when finished testing
-	 				  	 //RestrictSearch(voxels);
+	 				  	 RestrictSearch(voxels);
 	 				  	 SurfaceVoxelsToTriangles(voxels);
 	 				  	 } // end else for if there are enough images to extract 3D information 
 	 	    		 GraphicsFeedback();
@@ -1371,11 +1371,11 @@ private void FindCalibrationSheetCirclesEtc(){
 
 		String lasterror;
 		// Write the Output to an STL ASCII file - format available http://en.wikipedia.org/wiki/STL_(file_format)
-		if (prefs.OutputFileName.getText()!=""){
+		if ((prefs.OutputFileName.getText()!="") && (surfacetriangles.length!=0)){
 			STLFile stl=new STLFile(prefs.OutputFileName.getText());
 			lasterror=stl.Write(jProgressBar1, surfacetriangles,surfacepoints,prefs.OutputObjectName.getText());
 		}
-		else lasterror="Output filename blank, not saving.";
+		else lasterror="Output filename blank or nothing to write, not saving.";
 		
 		
 		// Set both progress bars to maximum.
@@ -2338,8 +2338,7 @@ private void FindCalibrationSheetCirclesEtc(){
 					}
 				filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"RestrictedSearchForImageColourImage"+String.valueOf(i)+".jpg";
 				graphics.SaveImage(filename);
-				System.out.println("Saved "+filename);	
-				
+					
 			}
 			// Update progress bar
 			bar.setValue(bar.getValue()+1);
