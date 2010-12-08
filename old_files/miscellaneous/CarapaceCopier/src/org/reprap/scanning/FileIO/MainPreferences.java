@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 6th December 2010
+ * Last modified by Reece Arnott 8th December 2010
  *
  *****************************************************************************/
 
@@ -70,6 +70,7 @@ public class MainPreferences {
 	public JTextField OutputObjectName;
 	public String DebugSaveOutputImagesFolder;
 	public int AlgorithmSettingMaximumCameraAngleFromVerticalInDegrees;
+	public int AlgorithmSettingResampledImageWidthForEllipseDetection;
 	public int AlgorithmSettingMaxBundleAdjustmentNumberOfIterations;
 	public int AlgorithmSettingEllipseValidityThresholdPercentage;
 	public int AlgorithmSettingStepsAroundCircleCircumferenceForEllipseEstimationInBundleAdjustment;
@@ -94,6 +95,7 @@ public class MainPreferences {
 	public boolean DebugRestrictedSearch;
 	public boolean DebugEllipseFinding;
 	public boolean DebugPointPairMatching;
+	public boolean DebugEdgeFindingForEllipseDetection;
 	public boolean Debug;
 	public JCheckBox CalibrationSheetKeepAspectRatioWhenPrinted;
 	public JCheckBox PaperSizeIsCustom;
@@ -137,6 +139,7 @@ public class MainPreferences {
 		DebugCalibrationSheetBarycentricEstimate=false;
 		DebugEllipseFinding=false;
 		DebugPointPairMatching=false;
+		DebugEdgeFindingForEllipseDetection=false;
 		Debug=false;
 		BlankOutputFilenameOnLoad=true;
 		SkipStep = new boolean[numberofsteps];
@@ -173,6 +176,7 @@ public class MainPreferences {
 		AlgorithmSettingEllipseValidityThresholdPercentage=60;
 		AlgorithmSettingMinimumNumberofIntersectingRayPairsForPointEstimation=1;
 		AlgorithmSettingVolumeSubDivision=128;
+		AlgorithmSettingResampledImageWidthForEllipseDetection=1024;
         // Set up default index number(s) - default to 0
         CurrentCalibrationPatternIndexNumber=0;
         CurrentPaperSizeIndexNumber=0;
@@ -231,7 +235,7 @@ public class MainPreferences {
 			if (temp.getProperty("DebugCalibrationSheetBarycentricEstimate")!=null) DebugCalibrationSheetBarycentricEstimate = temp.getProperty("DebugCalibrationSheetBarycentricEstimate").equals("true");
 			if (temp.getProperty("DebugEllipseFinding")!=null) DebugEllipseFinding = temp.getProperty("DebugEllipseFinding").equals("true");
 			if (temp.getProperty("DebugPointPairMatching")!=null) DebugPointPairMatching = temp.getProperty("DebugPointPairMatching").equals("true");
-			
+			if (temp.getProperty("DebugEdgeFindingForEllipseDetection")!=null) DebugEdgeFindingForEllipseDetection = temp.getProperty("DebugEdgeFindingForEllipseDetection").equals("true");
 			
 			// Note the i+1 here as humans start counting the steps from 1 but the array starts from 0. 
 			for (i=0;i<SkipStep.length;i++) if (temp.getProperty("SkipStep"+Integer.toString(i+1))!=null) SkipStep[i] = temp.getProperty("SkipStep"+Integer.toString(i+1)).equals("true");
@@ -249,6 +253,10 @@ public class MainPreferences {
 				try {AlgorithmSettingMaximumCameraAngleFromVerticalInDegrees = Integer.valueOf(temp.getProperty("AlgorithmSettingMaximumCameraAngleFromVerticalInDegrees"));}catch (Exception e) {System.out.println("Error loading AlgorithmSettingMaximumCameraAngleFromVerticalInDegrees - leaving as default: "+e);}
 				if (AlgorithmSettingMaximumCameraAngleFromVerticalInDegrees>89) AlgorithmSettingMaximumCameraAngleFromVerticalInDegrees=89;
 				if (AlgorithmSettingMaximumCameraAngleFromVerticalInDegrees<0) AlgorithmSettingMaximumCameraAngleFromVerticalInDegrees=0;
+			}
+			if (temp.getProperty("AlgorithmSettingResampledImageWidthForEllipseDetection")!=null){ // if the property exists try to convert to integer, just ignore if can't
+				try {AlgorithmSettingResampledImageWidthForEllipseDetection = Integer.valueOf(temp.getProperty("AlgorithmSettingResampledImageWidthForEllipseDetection"));}catch (Exception e) {System.out.println("Error loading AlgorithmSettingResampledImageWidthForEllipseDetection - leaving as default: "+e);}
+				if (AlgorithmSettingResampledImageWidthForEllipseDetection<320) AlgorithmSettingResampledImageWidthForEllipseDetection=320;
 			}
 			if (temp.getProperty("AlgorithmSettingEllipseValidityThresholdPercentage")!=null){ // if the property exists try to convert to integer, just ignore if can't
 				try {AlgorithmSettingEllipseValidityThresholdPercentage = Integer.valueOf(temp.getProperty("AlgorithmSettingEllipseValidityThresholdPercentage"));}catch (Exception e) {System.out.println("Error loading AlgorithmSettingEllipseValidityThresholdPercentage - leaving as default: "+e);}
@@ -381,7 +389,8 @@ public class MainPreferences {
 		temp.setProperty("DebugCalibrationSheetBarycentricEstimate", String.valueOf(DebugCalibrationSheetBarycentricEstimate));
 		temp.setProperty("DebugEllipseFinding", String.valueOf(DebugEllipseFinding));
 		temp.setProperty("DebugPointPairMatching", String.valueOf(DebugPointPairMatching));
-		
+		temp.setProperty("DebugEdgeFindingForEllipseDetection", String.valueOf(DebugPointPairMatching));
+				
 		// Note the i+1 here as humans start counting the steps from 1 but the array starts from 0. 
 		for (int i=0;i<SkipStep.length;i++)temp.setProperty("SkipStep"+Integer.toString(i+1),String.valueOf(SkipStep[i]));
 		// Save state of checkboxes
@@ -408,7 +417,7 @@ public class MainPreferences {
 	    temp.setProperty("AlgorithmSettingEllipseValidityThresholdPercentage",String.valueOf(AlgorithmSettingEllipseValidityThresholdPercentage));
 	    temp.setProperty("AlgorithmSettingMinimumNumberofIntersectingRayPairsForPointEstimation",String.valueOf(AlgorithmSettingMinimumNumberofIntersectingRayPairsForPointEstimation));
 	    temp.setProperty("AlgorithmSettingVolumeSubDivision",String.valueOf(AlgorithmSettingVolumeSubDivision));
-		  
+	    temp.setProperty("AlgorithmSettingResampledImageWidthForEllipseDetection",String.valueOf(AlgorithmSettingResampledImageWidthForEllipseDetection));
 	    // Save default index numbers
 	    temp.setProperty("CurrentCalibrationPatternIndexNumber",String.valueOf(CurrentCalibrationPatternIndexNumber));
 	    temp.setProperty("CurrentPaperSizeIndexNumber",String.valueOf(CurrentPaperSizeIndexNumber));

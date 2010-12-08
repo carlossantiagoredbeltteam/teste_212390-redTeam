@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  *
- * Last modified by Reece Arnott 7th December 2010
+ * Last modified by Reece Arnott 8th December 2010
  * 
  * Note that most of the layout commands were initially produced by NetBeans for JDK 6
  * and significantly modified by hand. For future reference if it needs to be done the other way the main things to change are:
@@ -1116,7 +1116,7 @@ private void FindCalibrationSheetCirclesEtc(){
 	      						UndoLensDistortion(j,distortion,false);
 	      						ImageSegmentation(j);
 	      					}
-		      				
+	      				
     					  } // end if continue
 	    					 // Save processed image if necessary
 	    					 if (prefs.SaveProcessedImageProperties){
@@ -1801,7 +1801,36 @@ private void FindCalibrationSheetCirclesEtc(){
 		   // Load the image in apply the Gaussian filtering kernel as a pre-processing filtering step
 		   images[i]=new Image(prefs.imagefiles.getElementAt(i).toString(), kernel);	
 		  	
-		 
+		   // Re-sample image to be 1024 pixels wide
+		   int width=prefs.AlgorithmSettingResampledImageWidthForEllipseDetection;
+		   double scale=(double)images[i].width/(double)width;
+		   int height=(int)(images[i].height/scale)+1;
+		   PixelColour[][] scaledpixels=new PixelColour[width][height];
+		   for (int x=0;x<width;x++){
+			   final JProgressBar temp=new JProgressBar(0,width);
+			   final int h=height;
+			   temp.setValue(x);
+			     try{ 
+			// This is the recommended way of passing GUI information between threads
+					  EventQueue.invokeLater(new Runnable(){
+					  public void run(){
+						  jProgressBar1.setMinimum(temp.getMinimum());
+						  jProgressBar1.setMaximum(temp.getMaximum());
+						  jProgressBar1.setValue(temp.getValue());
+						  jLabelProgressBar1.setText("Temporarily resampling image to "+temp.getMaximum()+"x"+h);
+					  }
+				  });
+				 }
+				 catch (Exception e) { 
+					 System.out.println("Exception in updating the progress bar"+e.getMessage());
+		         }
+				 for (int y=0;y<height;y++){
+				   Point2d point=new Point2d(x*scale,y*scale);//Note that this assumes the origin of the image coordinates is not changed from the initial reading it in
+				   scaledpixels[x][y]=images[i].InterpolatePixelColour(point); 
+			   }
+			}
+		   Image scaledimage=new Image(scaledpixels,width,height);
+		   
 		   /* Now we construct a right angle triangle. If we label the sides a,b,h (for hypotenuse)
 		    * we can make the length of side a the length of the diagonal across the image and angle(A) is the lowestangle value
 		    * Now we find the lengths of b and h
@@ -1818,7 +1847,7 @@ private void FindCalibrationSheetCirclesEtc(){
 		    *  To get the maximum long axis length therefore we just need the radius of circles in the calibration sheet and the ratio of width to height in the calibration sheet and image.
 		    *  
 		    */
-		   double asquared=Math.pow(images[i].width,2)+Math.pow(images[i].height,2);
+		   double asquared=Math.pow(scaledimage.width,2)+Math.pow(scaledimage.height,2);
 		   double a=Math.sqrt(asquared);
 		   // using standard trig sin(A)=a/h, rearranging to get h we have h=a/sin(A) where A=lowestangleinradians 
 		   double h=a/Math.sin(lowestangleinradians);
@@ -1828,22 +1857,49 @@ private void FindCalibrationSheetCirclesEtc(){
 		   // Find the maximum semi-axis length of an ellipse when the image contains the whole calibration sheet and nothing else.
 		   double radiustowidth=calibrationsheetxlength/calibrationsheetwidth;
 		   double radiustoheight=calibrationsheetylength/calibrationsheetheight;
-		   double maxradius=radiustowidth*images[i].width;
-		   if (radiustoheight*images[i].height>maxradius) maxradius=radiustoheight*images[i].height;
+		   double maxradius=radiustowidth*scaledimage.width;
+		   if (radiustoheight*scaledimage.height>maxradius) maxradius=radiustoheight*scaledimage.height;
 		  
 		   // Now convert this to the max and min long axes squared
 		   double maxsquared=Math.pow((maxradius*2),2);
 		   double minsquared=Math.pow((maxradius*2*(b/h)),2);;
 		   double accumulatorquantumsize=5;
-		   EdgeExtraction2D edges=new EdgeExtraction2D(images[i]);
+		   EdgeExtraction2D edges=new EdgeExtraction2D(scaledimage);
+		   
+		   if ((prefs.Debug) && (prefs.DebugEdgeFindingForEllipseDetection)){
+			   GraphicsFeedback graphics=new GraphicsFeedback(true);
+			   byte[][] temp=edges.GetStrengthMap();
+			   boolean[][] newimage=new boolean[scaledimage.width][scaledimage.height];
+			   for (int x=0;x<scaledimage.width;x++)
+				   for (int y=0;y<scaledimage.height;y++)
+					   newimage[x][y]=((int)temp[x][y]!=0);
+				graphics.ShowBinaryimage(newimage,scaledimage.width,scaledimage.height);
+				String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"InitialEdgeStrengthMapImage"+i+".jpg";
+				graphics.SaveImage(filename);
+		   }
+		   
+		   
 		   edges.NonMaximalLocalSuppressionAndThresholdStrengthMap(prefs.AlgorithmSettingEdgeStrengthThreshold);
 		   edges.RemoveSpuriousPoints();
+		   
+		   if ((prefs.Debug) && (prefs.DebugEdgeFindingForEllipseDetection)){
+			   GraphicsFeedback graphics=new GraphicsFeedback(true);
+			   byte[][] temp=edges.GetStrengthMap();
+			   boolean[][] newimage=new boolean[scaledimage.width][scaledimage.height];
+			   for (int x=0;x<scaledimage.width;x++)
+				   for (int y=0;y<scaledimage.height;y++)
+					   newimage[x][y]=((int)temp[x][y]!=0);
+				graphics.ShowBinaryimage(newimage,scaledimage.width,scaledimage.height);
+				String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"FilteredEdgeStrengthMapImage"+i+".jpg";
+				graphics.SaveImage(filename);
+		   }
+		   
+		   
 		   FindEllipses find=new FindEllipses(edges,standardcalibrationcircleonprintedsheet.GetMinorSemiAxisLength()/standardcalibrationcircleonprintedsheet.GetMajorSemiAxisLength()); 
 		    // Find the ellipses 
 		  JProgressBar bar=new JProgressBar(0,1);
 		   bar.setValue(0);
-		   long starttime=System.currentTimeMillis();
-			
+		  	
 			 while (bar.getValue()<bar.getMaximum()){
 					  bar=find.ExtractEllipses(minsquared,maxsquared,lowestangleinradians,accumulatorquantumsize);
 					  final JProgressBar temp=bar; 
@@ -1854,6 +1910,7 @@ private void FindCalibrationSheetCirclesEtc(){
 							  jProgressBar1.setMinimum(temp.getMinimum());
 							  jProgressBar1.setMaximum(temp.getMaximum());
 							  jProgressBar1.setValue(temp.getValue());
+							  jLabelProgressBar1.setText("Finding Ellipses in the resampled image");
 						  }
 					  });
 					 }
@@ -1866,9 +1923,13 @@ private void FindCalibrationSheetCirclesEtc(){
 		   boolean keep[]=new boolean[imageellipses.length];
 		   // Take out those ellipses that aren't black ellipses on a white background
 		   for (int j=0;j<imageellipses.length;j++){
-			   keep[j]=imageellipses[j].IsBlackEllipseOnWhiteBackground(images[i],prefs.AlgorithmSettingEdgeStrengthThreshold,prefs.AlgorithmSettingEllipseValidityThresholdPercentage);
+			   // Rescale the imageellipses to be the same as the original image size now
+			   	imageellipses[j]=new Ellipse(imageellipses[j].GetCenter().timesEquals(scale),imageellipses[j].GetMajorSemiAxisLength()*scale,imageellipses[j].GetMinorSemiAxisLength()*scale,imageellipses[j].GetOrientationAngleinRadians());
+				// Test to see whether this should be kept or not
+			   	keep[j]=imageellipses[j].IsBlackEllipseOnWhiteBackground(images[i],prefs.AlgorithmSettingEdgeStrengthThreshold,prefs.AlgorithmSettingEllipseValidityThresholdPercentage);
 			   if (keep[j]) countellipses++;
 		   }
+		    
 		   // Output the debug file if appropriate, this will show all ellipses found, the valid ones in green and the rest in red
 				if ((prefs.Debug) && (prefs.DebugEllipseFinding)){
 						byte[] red,green;
