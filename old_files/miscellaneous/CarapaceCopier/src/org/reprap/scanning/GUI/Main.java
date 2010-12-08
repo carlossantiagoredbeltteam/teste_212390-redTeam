@@ -63,7 +63,6 @@ import java.math.RoundingMode;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
@@ -1110,7 +1109,7 @@ private void FindCalibrationSheetCirclesEtc(){
 		      					graphics2.SaveImage(filename);
 	      					}// end if
 	      					} // end if Debug
-		      					
+
 // Sub-Step 3	      					
 	      					LensDistortion distortion=EstimatingCameraParameters(j,circles);
 	      					// Note that the above will set the skipprocessing if the camera matrix cannot be estimated. 
