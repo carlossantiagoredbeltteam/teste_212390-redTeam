@@ -202,7 +202,7 @@ public class GraphicsFeedback {
 		// Output solid ellipse
 		for (int y=(int)(box.miny-1);y<(box.maxy+1);y++)
 			for (int x=(int)(box.minx-1);x<(box.maxx+1);x++)
-					if (ellipse.PointInsideEllipse(new Point2d(x,y))) Print(x,y,colour,1,1);
+					if (ellipse.PointInsideEllipse(new Point2d(x,y))) Print(x,y,colour,0,0);
 	}
 	
 	public void OutlineEllipse(Ellipse originalellipse,byte[]colour,Point2d offset){
@@ -211,7 +211,7 @@ public class GraphicsFeedback {
 		for (int t=0;t<360;t++){
 			double tradians=((double)t/(double)360)*tau;
 			Point2d edge=ellipse.GetEllipseEdgePointParametric(tradians);
-			Print((int)edge.x,(int)edge.y,colour,1,1);
+			Print((int)edge.x,(int)edge.y,colour,0,0);
 		}
 	}
 	public void PrintSurfaceSubVoxels(Voxel rootvoxel, Image givenimage, byte[] colour){

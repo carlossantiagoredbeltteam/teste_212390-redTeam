@@ -389,7 +389,7 @@ public class MainPreferences {
 		temp.setProperty("DebugCalibrationSheetBarycentricEstimate", String.valueOf(DebugCalibrationSheetBarycentricEstimate));
 		temp.setProperty("DebugEllipseFinding", String.valueOf(DebugEllipseFinding));
 		temp.setProperty("DebugPointPairMatching", String.valueOf(DebugPointPairMatching));
-		temp.setProperty("DebugEdgeFindingForEllipseDetection", String.valueOf(DebugPointPairMatching));
+		temp.setProperty("DebugEdgeFindingForEllipseDetection", String.valueOf(DebugEdgeFindingForEllipseDetection));
 				
 		// Note the i+1 here as humans start counting the steps from 1 but the array starts from 0. 
 		for (int i=0;i<SkipStep.length;i++)temp.setProperty("SkipStep"+Integer.toString(i+1),String.valueOf(SkipStep[i]));

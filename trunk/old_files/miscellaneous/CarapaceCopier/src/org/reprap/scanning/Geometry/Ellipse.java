@@ -23,7 +23,7 @@ package org.reprap.scanning.Geometry;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 11th June 2010
+* Last modified by Reece Arnott 8th December 2010
 * 
 * Note that this is *not* an extentsion to the native java.awt.geom.Ellipse2D class but is totally different
 * The native class is simply defined by a bounding rectangle.
@@ -42,7 +42,7 @@ public class Ellipse {
 	private final static double tau=Math.PI*2;
 	Point2d center;
 	double a,b; // The minor and major semi-axis lengths
-	// Note that due to the symmetrical nature of the ellipse the angle may be out by 180 degrees (pi radians)
+	// Note that due to the symmetrical nature of the ellipse the angle may be out by 180 degrees (0.5 tau radians)
 	double orientationangle; // This is the angle made between the long axis a and the x axis (in radians)
 	// These are points calculated by the constructor
 	Point2d f1;
@@ -143,6 +143,8 @@ public class Ellipse {
 	}
 	public void OffsetCenter(Point2d offset){
 		center.minus(offset);
+		Calculatefocalpoints();
+		
 	}
 	
 	// Returns angle (in radians) needed for the ellipse to be rotated to be seen as a circle 
@@ -160,7 +162,7 @@ public class Ellipse {
 	}
 	public boolean PointInsideEllipse(Point2d point){
 		// A point is inside the ellipse if the sum of the distances to the two focal points is less than 2a
-		return (Math.sqrt(point.CalculateDistanceSquared(f1))+Math.sqrt(point.CalculateDistanceSquared(f2))<(2*a));
+		return (Math.sqrt(point.CalculateDistanceSquared(f1))+Math.sqrt(point.CalculateDistanceSquared(f2))<=(2*a));
 	}
 
 	// Note that t is not the angle with the x axis, it is the eccentric anomaly
@@ -173,14 +175,13 @@ public class Ellipse {
 		double y=center.y+(a*Math.cos(t)*Math.sin(orientationangle))+(b*Math.sin(t)*Math.cos(orientationangle));
 		return new Point2d(x,y);
 	}
-	// Note that theta is the angle measured from the major axis
+	// Note that theta is the angle measured from the major axis 
 	public Point2d GetEllipseEdgePointPolar(double theta){
 		// In polar form, relative to the centre, r= ab/sqrt((b*cos(theta))^2+(a*sin(theta))^2)
 		double r=(a*b)/Math.sqrt(Math.pow(b*Math.cos(theta),2)+Math.pow(a*Math.sin(theta),2));
-		// Using the angle and radius we can find the point.
-		return center.GetOtherPoint(theta,r);
+		// Using the angle and radius we can find the point - but first we need to convert theta to an angle relative to the x axis
+		return center.GetOtherPoint(theta+orientationangle,r);
 	}
-	
 	
 	public boolean Overlap(Ellipse e){
 		boolean returnvalue;
@@ -297,7 +298,7 @@ public class Ellipse {
 		// The focal points lie along the major axis and are distance c away from the center where c^2=a^2-b^2=ae (as e=eccentricity=sqrt((a^2-b^2)/a^2)) so c^2=a^2e^2
 		double ae=Math.sqrt((a*a)-(b*b));
 		// so we follow the y=mx+c line out from the center by +/- ae. This line can be constructed from the center point and orientationangle.
-		// But the method to do so assumes the distance is positive so adjust the angle by 180 degrees to do the negative one.
+		// But the method to do so assumes the distance is positive so do this twice, once with the orientation angle, once with 180 degrees added to it
 		f1=center.GetOtherPoint(orientationangle,ae);
 		f2=center.GetOtherPoint(orientationangle+(tau*0.5),ae);	
 	}

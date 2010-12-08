@@ -23,7 +23,7 @@ package org.reprap.scanning.Geometry;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 12th May 2010
+ * Last modified by Reece Arnott 8th December 2010
  * 
  * Note that some formulae that traditionally use pi have been replaced to use tau where tau is defined as 2*pi. For an explanation of why this may make things clearer see That Tau Manifesto available at http://tauday.com/
  * 
@@ -119,9 +119,9 @@ public class Point2d
 	public Point2d GetOtherPoint(double angle, double distance){
 		Point2d returnvalue;
 		// Adjust angle so it is within 0 and 2 pi
-		angle=angle%tau; // This isn't actually a mod function, it is a remainder so can give a negative number
 		// adjust if it is negative
-		if (angle<0) angle=tau-angle;
+		angle=angle%tau; // This isn't actually a mod function, it is a remainder so can give a negative number
+		if (angle<0) angle=tau+angle;
 		
 		// Construct a line of the form y=mx+c that crosses the current point.
 		// m is directly calculated as tan(angle)
