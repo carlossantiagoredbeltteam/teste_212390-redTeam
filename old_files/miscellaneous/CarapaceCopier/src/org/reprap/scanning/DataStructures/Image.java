@@ -23,7 +23,7 @@ package org.reprap.scanning.DataStructures;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 8th December 2010
+ * Last modified by Reece Arnott 9th December 2010
  * 
  * These are methods that store the image and and additional information together
  * This includes the edge map, camera calibration matrices and the point pair matches of points in the image with the calibration sheet 
@@ -45,7 +45,6 @@ import org.reprap.scanning.FileIO.ImageFile;
 
 public class Image {
 	public CalibrateImage calibration;
-	private Matrix CameraMatrix;
 	public boolean skipprocessing; // this is used flag whether or not the image should/can be used at all
 	// Note that the WorldtoImageTransform variable should only be read via the getWorldtoImageTransform method
 	// and set via the setWorldtoImageTransform method. 
@@ -78,11 +77,6 @@ public class Image {
 		filename="";
 		unprocessedpixelsarea=new AxisAlignedBoundingBox();
 		setWorldtoImageTransform=false;
-		// Set the camera matrix to be the identity matrix 
-		CameraMatrix=new Matrix(3,3);
-		CameraMatrix.set(0,0,1);
-		CameraMatrix.set(1,1,1);
-		CameraMatrix.set(2,2,1);
 		skipprocessing=true;
 		matchingpoints=new PointPair2D[0];
 		calibration=new CalibrateImage();
@@ -102,11 +96,6 @@ public class Image {
 		width=0;
 		height=0;
 		matchingpoints=new PointPair2D[0];
-		// Set the camera matrix to be the identity matrix 
-		CameraMatrix=new Matrix(3,3);
-		CameraMatrix.set(0,0,1);
-		CameraMatrix.set(1,1,1);
-		CameraMatrix.set(2,2,1);
 		skipprocessing=true;
 		calibration=new CalibrateImage();
 		edges=new EdgeExtraction2D();
@@ -132,11 +121,6 @@ public class Image {
 		originofimagecoordinates=new Point2d(0,0);
 		filename="";
 		matchingpoints=new PointPair2D[0];
-		// Set the camera matrix to be the identity matrix 
-		CameraMatrix=new Matrix(3,3);
-		CameraMatrix.set(0,0,1);
-		CameraMatrix.set(1,1,1);
-		CameraMatrix.set(2,2,1);
 		skipprocessing=true;
 		calibration=new CalibrateImage();
 		edges=new EdgeExtraction2D();
@@ -158,11 +142,6 @@ public class Image {
 		width=0;
 		height=0;
 		matchingpoints=new PointPair2D[0];
-		// Set the camera matrix to be the identity matrix 
-		CameraMatrix=new Matrix(3,3);
-		CameraMatrix.set(0,0,1);
-		CameraMatrix.set(1,1,1);
-		CameraMatrix.set(2,2,1);
 		skipprocessing=true;
 		calibration=new CalibrateImage();
 		edges=new EdgeExtraction2D();
@@ -182,7 +161,6 @@ public class Image {
 			returnvalue.setWorldtoImageTransform=setWorldtoImageTransform;
 			if (setWorldtoImageTransform) returnvalue.WorldtoImageTransform=WorldtoImageTransform.copy();
 			returnvalue.calibration=calibration.clone();
-			returnvalue.CameraMatrix=CameraMatrix.copy();
 			returnvalue.matchingpoints=matchingpoints.clone();
 			returnvalue.edges=edges.clone();
 		}
@@ -200,17 +178,8 @@ public class Image {
 		setWorldtoImageTransform=other.setWorldtoImageTransform;
 		if (setWorldtoImageTransform) WorldtoImageTransform=other.WorldtoImageTransform.copy();
 		calibration=other.calibration.clone();
-		CameraMatrix=other.CameraMatrix.copy();
 		matchingpoints=other.matchingpoints.clone();
 		originofimagecoordinates=other.originofimagecoordinates.clone();
-	}
-	
-	public void setCameraMatrix(Matrix M){
-		CameraMatrix=M.copy();
-	}
-	
-	public Matrix getCameraMatrix(){
-		return CameraMatrix;
 	}
 
 	public byte[][] ExportGreyscaleImageMap(){
@@ -227,8 +196,7 @@ public void setWorldtoImageTransformMatrix(Matrix P){
 	WorldtoImageTransform=P.copy();
 	setWorldtoImageTransform=true;
 }
-public void setWorldtoImageTransformMatrix(){
-	Matrix K=getCameraMatrix();
+public void setWorldtoImageTransformMatrixUsingCameraMatrix(Matrix K){
 	Matrix R=calibration.getRotation();
 	Matrix t=calibration.getTranslation();
 	Matrix Z=calibration.getZscaleMatrix();
@@ -237,13 +205,11 @@ public void setWorldtoImageTransformMatrix(){
 	setWorldtoImageTransform=true;
 }
 public Matrix getWorldtoImageTransformMatrix(){
-	if (!setWorldtoImageTransform) setWorldtoImageTransformMatrix();
 	return WorldtoImageTransform;
 }
 
 // This assumes the point given is a 4x1 matrix representing a 3d point in homogeneous coordinates
 public Point2d getWorldtoImageTransform(Matrix point){
-	if (!setWorldtoImageTransform) setWorldtoImageTransformMatrix();
 	MatrixManipulations manipulate=new MatrixManipulations();
 	manipulate.SetWorldToImageTransform(WorldtoImageTransform);
 	Point2d imagepoint=new Point2d(manipulate.WorldToImageTransform(point,originofimagecoordinates));
@@ -426,7 +392,6 @@ public void NegateLensDistortion(LensDistortion distortion, JProgressBar bar){
 
 // This converts 2d image coordinates into a line represented by a matrix
 public Matrix getImagetoWorldTransform(Point2d point){
-	if (!setWorldtoImageTransform) setWorldtoImageTransformMatrix();
 	Matrix imagepoint=new Matrix(3,1);
 	imagepoint.set(0,0,point.x);
 	imagepoint.set(1,0,point.y);
@@ -437,7 +402,6 @@ public Matrix getImagetoWorldTransform(Point2d point){
 // This takes a 4x1 homogeneous world point and tests whether it is behind the camera
 public boolean WorldPointBehindCamera(Matrix worldpoint){
 	boolean returnvalue=true;
-	if (!setWorldtoImageTransform) setWorldtoImageTransformMatrix();
 	//There is a formula to work out the depth of a point from a camera:
 	// (sign(det M)*w')/(w||m3||) where M is the left hand 3x3 block of P i.e. K[R|t], m3 is the third row of M and w and w' are the 4th and 3rd homogeneous coordinates in the 4x1 world point and 3x1 image point respectively 
 	//but we are only concerned with the sign - positive means it is in front, negative means behind.

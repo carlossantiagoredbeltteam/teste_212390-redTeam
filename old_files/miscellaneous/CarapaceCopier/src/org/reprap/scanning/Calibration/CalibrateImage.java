@@ -335,7 +335,9 @@ public void CalculateTranslationandRotation(Matrix CameraCalibrationMatrix){
 	setRotationAndTranslation=true;
 
 }
-
+public void setZscalefactor(double s){
+	zscalefactor=s;
+}
 public void setZscalefactor(Point2d originforimage, Matrix CameraCalibrationMatrix){
 	// Set the translation z vector scale
 	// This gives a consistent z scale across multiple images and if we have metadata that measures pixels per inch etc. in the calibration sheet we can then translate this into real world coordinates.
