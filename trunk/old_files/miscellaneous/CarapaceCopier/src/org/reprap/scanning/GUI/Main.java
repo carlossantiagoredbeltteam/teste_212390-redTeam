@@ -2644,14 +2644,61 @@ public class Point3dArray {
 			CalibrateImage calibration=new CalibrateImage(newpointpairs);
 			calibration.CalculateTranslationandRotation(cameramatrix);
 			calibration.setZscalefactor(images[i].originofimagecoordinates,cameramatrix);
-				 
+			
+			
+			if ((prefs.Debug) && (prefs.DebugCalibrationSheetPlanarHomographyEstimate)){
+				// Write out a file that is the dimensions of the calibration sheet with the colours corresponding to the colours in the image
+				// matched using the planar homography transforms between the two 
+				Matrix H=calibration.getHomography();
+				
+					// Note the coordinates of the points in the calibration sheet are not pixel coordinates but are transformed to have the origin at the centre of the sheet
+					Point2d offset=new Point2d(calibrationsheetwidth/2,calibrationsheetheight/2);
+					// For each pixel of the calibration sheet work out the colour it corresponds to in the image
+					// using a barycentric transformation
+					PixelColour[][] newimage=new PixelColour[calibrationsheetpixelswidth][calibrationsheetpixelsheight];
+					for (int x=0;x<calibrationsheetpixelswidth;x++){
+						for (int y=0;y<calibrationsheetpixelsheight;y++){
+							Point2d point=new Point2d(x,y);
+							// Convert from pixel to mm coordinates
+  							point.x=point.x*(calibrationsheetwidth/calibrationsheetpixelswidth);
+  							point.y=point.y*(calibrationsheetheight/calibrationsheetpixelsheight);
+  							point.minus(offset);
+  							//transform to image point via plnar homography
+							Point2d imagepoint=new Point2d(H.times(point.ConvertPointTo3x1Matrix()));
+							imagepoint.plus(images[i].originofimagecoordinates);
+							newimage[x][y]=images[i].InterpolatePixelColour(imagepoint);
+						}
+						if (x%100==0) System.out.print(".");
+					}
+					System.out.println();
+					// Overwrite the pixels that are the centers of the circles with white to give a guide to how the matching was done
+						// With the center represented by a rectangle that it 1% of the size of the calibration sheet
+						int dx=(int)(calibrationsheetpixelswidth/200);
+						int dy=(int)(calibrationsheetpixelsheight/200);
+						
+						for (int j=0;j<images[i].matchingpoints.length;j++){
+							Point2d point=images[i].matchingpoints[j].pointone.clone();
+							point.plus(offset);
+							// Convert from mm to pixel coordinates
+							point.x=point.x*(calibrationsheetpixelswidth/calibrationsheetwidth);
+							point.y=point.y*(calibrationsheetpixelsheight/calibrationsheetheight);
+							for (int x=(int)point.x-dx;x<(int)point.x+dx;x++)
+								for (int y=(int)point.y-dy;y<(int)point.y+dy;y++)
+      							if ((x>=0) && (x<calibrationsheetpixelswidth) && (y>=0) && (y<=calibrationsheetpixelsheight)) newimage[x][y]=new PixelColour((byte)255);
+						} // end for 
+				GraphicsFeedback graphics=new GraphicsFeedback(true);
+				graphics.ShowPixelColourArray(newimage,calibrationsheetpixelswidth,calibrationsheetpixelsheight);
+				String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"PlanarHomographyCalibrationSheetEstimate"+i+".jpg";
+				graphics.SaveImage(filename);
+			} // end if Debug
+			 
 			 // Find the corner furtherest away from the origin and pass the distance to it through to the lens distortion class as the maximum radius
 			 double maxradiussquared=images[i].originofimagecoordinates.CalculateDistanceSquared(new Point2d(0,0));
 			 if (images[i].originofimagecoordinates.CalculateDistanceSquared(new Point2d(images[i].width,0))>maxradiussquared) maxradiussquared=images[i].originofimagecoordinates.CalculateDistanceSquared(new Point2d(images[i].width,0));
 			 if (images[i].originofimagecoordinates.CalculateDistanceSquared(new Point2d(0,images[i].height))>maxradiussquared) maxradiussquared=images[i].originofimagecoordinates.CalculateDistanceSquared(new Point2d(0,images[i].height));
 			 if (images[i].originofimagecoordinates.CalculateDistanceSquared(new Point2d(images[i].width,images[i].height))>maxradiussquared) maxradiussquared=images[i].originofimagecoordinates.CalculateDistanceSquared(new Point2d(images[i].width,images[i].height));
 			 
-			 Matrix K=cameramatrix.copy();
+			  Matrix K=cameramatrix.copy();
 			  Matrix R=calibration.getRotation();
 			  Matrix t=calibration.getTranslation();
 			  double z=calibration.getZscalefactor();
