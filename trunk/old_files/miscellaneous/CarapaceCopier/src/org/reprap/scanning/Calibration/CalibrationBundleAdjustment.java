@@ -25,7 +25,7 @@ package org.reprap.scanning.Calibration;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 16th January 2010
+* Last modified by Reece Arnott 9th December 2010
 * 
 * 
 *   This converts the matrices to internal representations used for LM minimisation and then back to matrices
@@ -125,18 +125,18 @@ public class CalibrationBundleAdjustment {
 	
 	//TODO add in distortion matrix version
 	// This is the Bundle Adjustment for the camera parameters for the world to image transform. Note that it is assumed the circle radius and steps around circle are set before this is run
-	public void BundleAdjustment(int iterations,PointPair2D[] pointpairs, Matrix K, Matrix R, Matrix t, double k1, Point2d imageorigin,JProgressBar bar){
+	public void BundleAdjustment(int iterations,PointPair2D[] pointpairs, Matrix K, Matrix R, Matrix t, double zscalefactor, double k1, Point2d imageorigin,JProgressBar bar){
 			LMfunc f = new LMCameraCalibrationAdjustment();
 
 			// Set up the error scaling array - leave them so that each of the parameters has the same weighting
 			double[] s = new double[pointpairs.length];
 			for (int i=0;i<pointpairs.length;i++) s[i]=1;
 			// Set up vary array - let all the parameters vary
-			boolean[] vary=new boolean[14];
+			boolean[] vary=new boolean[15];
 			for (int i=0;i<vary.length;i++) vary[i]=true;;
 			
 			// Feed in the initial guess for the 14 parameters
-			// 5 for K, 3 for R, 3 for t, 1 for distortion, 2 for the image origin
+			// 5 for K, 3 for R, 3 for t, 1 for z scale factor, 1 for distortion, 2 for the image origin
 			double[] a=new double[vary.length];
 			// Add the camera matrix parameters
 			a[0]=K.get(0,0);
@@ -153,11 +153,13 @@ public class CalibrationBundleAdjustment {
 			a[8]=t.get(0,0);
 			a[9]=t.get(1,0);
 			a[10]=t.get(2,0);
+			// Add the zscale component
+			a[11]=zscalefactor;
 			// Add the distortion coefficient
-			a[11]=k1;
+			a[12]=k1;
 			// Add the image origin
-			a[12]=imageorigin.x;
-			a[13]=imageorigin.y;
+			a[13]=imageorigin.x;
+			a[14]=imageorigin.y;
 		
 			// Split the point pairs apart
 			// x will take the 4 dimensional points of the calibration sheet - taken from pointone, the centre of the circle
@@ -210,8 +212,13 @@ public class CalibrationBundleAdjustment {
 			t.set(0,0,a[8]);
 			t.set(1,0,a[9]);
 			t.set(2,0,a[10]);
-			// And the distortion coefficient
-			k1=a[11];
+			// The zscalecofficient
+			zscalefactor=a[11];
+			// The distortion coefficient
+			k1=a[12];
+			// And the image origin
+			imageorigin.x=a[13];
+			imageorigin.y=a[14];
 			
 	} // end of method
 
@@ -281,9 +288,9 @@ public class CalibrationBundleAdjustment {
 	   public Point2d adjust(Point2d y, double[] a) {
 		LensDistortion undistort=new LensDistortion();
 		//Set the distortion center
-		 Point2d center=new Point2d(a[12],a[13]);
+		 Point2d center=new Point2d(a[13],a[14]);
 		 // Set the distortion coefficient
-		 undistort.SetDistortionCoefficient(a[11],center);
+		 undistort.SetDistortionCoefficient(a[12],center);
 		 // Get the undistorted point
 		 return undistort.UndoDistortion(y);
 	   }
@@ -301,7 +308,7 @@ public class CalibrationBundleAdjustment {
 	   public Point2d val(double[] x, double[] a)
 	    {
 		   
-		   // Set up the K, R, and t matrices from the a array
+		   // Set up the K, R, t and Z matrices from the a array
 		   Matrix K=new Matrix(3,3);
 		   K.set(0,0,a[0]);
 		   K.set(1,1,a[1]);
@@ -324,16 +331,17 @@ public class CalibrationBundleAdjustment {
 		   t.set(1,0,a[9]);
 		   t.set(2,0,a[10]);
 		   
-		   // The image origin
-		   Point2d origin=new Point2d(a[12],a[13]);
-		   
-		   // The Z scale - just set to identity matrix
+		   // The Z scale
 		   Matrix Z=new Matrix (4,4);
 		   Z.set(0,0,1);
 		   Z.set(1,1,1);
-		   Z.set(2,2,1);
+		   Z.set(2,2,a[11]);
 		   Z.set(3,3,1);
 		   
+		 // The image origin
+		   Point2d origin=new Point2d(a[13],a[14]);
+		   
+		     
 		   // Now combine them to give a World to image transform
 		   Matrix P=new MatrixManipulations().WorldToImageTransformMatrix(K, R, t, Z);
 		   

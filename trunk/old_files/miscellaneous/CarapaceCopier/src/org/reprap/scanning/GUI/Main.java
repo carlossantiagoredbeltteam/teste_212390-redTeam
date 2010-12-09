@@ -2637,8 +2637,7 @@ public class Point3dArray {
 	// This is split from the above method in case we want to one day add in calculating the camera matrix parameters from multiple images
 	// That was the original intention of the code but it has now been taken out.
 	private LensDistortion CalculateIndividualCameraCalibration(int i, Matrix cameramatrix, int maxbundleadjustmentiterations){
-			 images[i].setCameraMatrix(cameramatrix);
-			 images[i].calibration.CalculateTranslationandRotation(cameramatrix);
+			images[i].calibration.CalculateTranslationandRotation(cameramatrix);
 			 images[i].calibration.setZscalefactor(images[i].originofimagecoordinates,cameramatrix);
 			 
 			 // Adjust the origin of image coordinates based on the camera matrix
@@ -2665,38 +2664,37 @@ public class Point3dArray {
 			 distortion.CalculateDistortion();
 			 
 			 // Now update the World to image transform matrix to take all of this into account
-			 images[i].setWorldtoImageTransformMatrix();
+			 images[i].setWorldtoImageTransformMatrixUsingCameraMatrix(cameramatrix);
 			 
 			 // Bundle adjustment
 			  CalibrationBundleAdjustment Adjust=new CalibrationBundleAdjustment();
-			  Matrix K=images[i].getCameraMatrix();
+			  Matrix K=cameramatrix.copy();
 			  Matrix R=images[i].calibration.getRotation();
 			  Matrix t=images[i].calibration.getTranslation();
+			  double z=images[i].calibration.getZscalefactor();
 			  // TODO Add in if statements to deal with distortion matrix and distortion formula
 			  double k1=distortion.getDistortionCoefficient();
 			 Point2d origin=images[i].originofimagecoordinates.clone();
 			 // Set the ellipse orientation, a and b lengths
 			 Adjust.ellipse=standardcalibrationcircleonprintedsheet.clone();
 			 Adjust.stepsaroundcircle=prefs.AlgorithmSettingStepsAroundCircleCircumferenceForEllipseEstimationInBundleAdjustment;
-			 Adjust.BundleAdjustment(maxbundleadjustmentiterations, images[i].matchingpoints, K,R,t,k1,origin,jProgressBar1);
+			 Adjust.BundleAdjustment(maxbundleadjustmentiterations, images[i].matchingpoints, K,R,t,z,k1,origin,jProgressBar1);
 			 
 			 distortion.SetDistortionCoefficient(k1,origin); 
 			  images[i].originofimagecoordinates=origin.clone();
-			  images[i].setCameraMatrix(K);
 			  images[i].calibration.setRotationandTranslation(R,t);
-			  images[i].calibration.setZscalefactor(images[i].originofimagecoordinates,K);
+			  images[i].calibration.setZscalefactor(z);
 			  // Update the world to image transform matrix again 
-			  images[i].setWorldtoImageTransformMatrix();
+			  images[i].setWorldtoImageTransformMatrixUsingCameraMatrix(K);
 			 
 			  if (print){
 				System.out.println("Camera Matrix for image "+i);
-				images[i].getCameraMatrix().print(10,20);
+				cameramatrix.print(10,20);
 				System.out.println("Rotation Matrix for image "+i);
-				images[i].calibration.getRotation().print(10,20);
+				R.print(10,20);
 				System.out.println("Translation Vector for image "+i);
-				images[i].calibration.getTranslation().print(10,20);
-				System.out.println("Z scale Matrix for image "+i);
-				images[i].calibration.getZscaleMatrix().print(10,20);
+				t.print(10,20);
+				System.out.println("Z scale for image "+i+": "+z);
 				//System.out.println("Distortion Matrix for image "+i);
 				System.out.println("Distortion coefficient for image "+i+": "+distortion.getDistortionCoefficient());
 				System.out.print("Origin of image coordinates for image "+i+": ");
