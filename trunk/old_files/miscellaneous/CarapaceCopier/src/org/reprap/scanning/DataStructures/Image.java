@@ -44,11 +44,9 @@ import org.reprap.scanning.FileIO.ImageFile;
 
 
 public class Image {
-	public CalibrateImage calibration;
 	public boolean skipprocessing; // this is used flag whether or not the image should/can be used at all
 	// Note that the WorldtoImageTransform variable should only be read via the getWorldtoImageTransform method
 	// and set via the setWorldtoImageTransform method. 
-	private boolean setWorldtoImageTransform=false;
 	private Matrix WorldtoImageTransform; 
 	public Point2d originofimagecoordinates; // This is only used so that the camera calibration class can use the assumption that the prinicipal point is at the origin (as it would be difficult to force the Image of the Absolute Conic to contain a specific prinicpal point of anything but the origin)
 	 // and in the lens distortion class when calculating k1 as the centre of distortion is assumed to be at the origin.
@@ -76,10 +74,8 @@ public class Image {
 		height=0;
 		filename="";
 		unprocessedpixelsarea=new AxisAlignedBoundingBox();
-		setWorldtoImageTransform=false;
 		skipprocessing=true;
 		matchingpoints=new PointPair2D[0];
-		calibration=new CalibrateImage();
 		edges=new EdgeExtraction2D();
 	//	distortion=new LensDistortion(); // creates a zero distortion class
 	}
@@ -88,7 +84,6 @@ public class Image {
 		// Initialise the imagemap etc. and set to defaults then try and load from file
 		// Then try and load preferences from file
 		processedpixel=new boolean[0][0];
-		setWorldtoImageTransform=false;
 		imagemap=new int[0][0];
 		originofimagecoordinates=new Point2d(0,0);
 		filename=imagename;
@@ -97,7 +92,6 @@ public class Image {
 		height=0;
 		matchingpoints=new PointPair2D[0];
 		skipprocessing=true;
-		calibration=new CalibrateImage();
 		edges=new EdgeExtraction2D();
 	//	distortion=new LensDistortion(); // creates zero distortion to begin with
 		ReadImageFromFile(new float[0]); // read in the image but don't apply any filtering
@@ -117,12 +111,10 @@ public class Image {
 				processedpixel[x][y]=false;
 				imagemap[x][y]=image[x][y].ExportAsInt();	
 			}
-		setWorldtoImageTransform=false;
 		originofimagecoordinates=new Point2d(0,0);
 		filename="";
 		matchingpoints=new PointPair2D[0];
 		skipprocessing=true;
-		calibration=new CalibrateImage();
 		edges=new EdgeExtraction2D();
 	//	distortion=new LensDistortion(); // creates zero distortion to begin with
 	}
@@ -134,7 +126,6 @@ public class Image {
 		// Initialise the imagemap etc. and set to defaults then try and load from file
 		// Then try and load the image from file
 		processedpixel=new boolean[0][0];
-		setWorldtoImageTransform=false;
 		imagemap=new int[0][0];
 		originofimagecoordinates=new Point2d(0,0);
 		filename=imagename;
@@ -143,7 +134,6 @@ public class Image {
 		height=0;
 		matchingpoints=new PointPair2D[0];
 		skipprocessing=true;
-		calibration=new CalibrateImage();
 		edges=new EdgeExtraction2D();
 	//	distortion=new LensDistortion(); // creates zero distortion to begin with 
 		ReadImageFromFile(kernel);
@@ -158,9 +148,7 @@ public class Image {
 		//returnvalue.distortion=distortion.clone();
 		returnvalue.processedpixel=processedpixel.clone();
 		if (!skipprocessing){
-			returnvalue.setWorldtoImageTransform=setWorldtoImageTransform;
-			if (setWorldtoImageTransform) returnvalue.WorldtoImageTransform=WorldtoImageTransform.copy();
-			returnvalue.calibration=calibration.clone();
+			returnvalue.WorldtoImageTransform=WorldtoImageTransform.copy();
 			returnvalue.matchingpoints=matchingpoints.clone();
 			returnvalue.edges=edges.clone();
 		}
@@ -174,14 +162,7 @@ public class Image {
 		return returnvalue;
 	} // end of clone method
 	
-	public void CopyCalibrationParameters(Image other){
-		setWorldtoImageTransform=other.setWorldtoImageTransform;
-		if (setWorldtoImageTransform) WorldtoImageTransform=other.WorldtoImageTransform.copy();
-		calibration=other.calibration.clone();
-		matchingpoints=other.matchingpoints.clone();
-		originofimagecoordinates=other.originofimagecoordinates.clone();
-	}
-
+	
 	public byte[][] ExportGreyscaleImageMap(){
 	byte[][]returnvalue=new byte[width][height];
 	for (int x=0;x<width;x++)
@@ -194,26 +175,15 @@ public class Image {
 
 public void setWorldtoImageTransformMatrix(Matrix P){
 	WorldtoImageTransform=P.copy();
-	setWorldtoImageTransform=true;
 }
-public void setWorldtoImageTransformMatrixUsingCameraMatrix(Matrix K){
-	Matrix R=calibration.getRotation();
-	Matrix t=calibration.getTranslation();
-	Matrix Z=calibration.getZscaleMatrix();
-	//TODO add in if statement to deal with distortion matrix
-	WorldtoImageTransform=new MatrixManipulations().WorldToImageTransformMatrix(K,R,t,Z);
-	setWorldtoImageTransform=true;
-}
+
 public Matrix getWorldtoImageTransformMatrix(){
 	return WorldtoImageTransform;
 }
 
 // This assumes the point given is a 4x1 matrix representing a 3d point in homogeneous coordinates
 public Point2d getWorldtoImageTransform(Matrix point){
-	MatrixManipulations manipulate=new MatrixManipulations();
-	manipulate.SetWorldToImageTransform(WorldtoImageTransform);
-	Point2d imagepoint=new Point2d(manipulate.WorldToImageTransform(point,originofimagecoordinates));
-	return imagepoint;
+	return new Point2d(new MatrixManipulations().WorldToImageTransform(point,originofimagecoordinates,WorldtoImageTransform));
 }
 
 // Methods to pass information to and from the more complicated private variables
@@ -406,7 +376,7 @@ public boolean WorldPointBehindCamera(Matrix worldpoint){
 	// (sign(det M)*w')/(w||m3||) where M is the left hand 3x3 block of P i.e. K[R|t], m3 is the third row of M and w and w' are the 4th and 3rd homogeneous coordinates in the 4x1 world point and 3x1 image point respectively 
 	//but we are only concerned with the sign - positive means it is in front, negative means behind.
 	// So we can use a simplified version sign=w'*w*det(M) 
-	Matrix imagepoint=new MatrixManipulations().WorldToImageTransform(worldpoint,WorldtoImageTransform,originofimagecoordinates);
+	Matrix imagepoint=new MatrixManipulations().WorldToImageTransform(worldpoint,originofimagecoordinates,WorldtoImageTransform);
 	returnvalue=((WorldtoImageTransform.getMatrix(0,2,0,2).det()*worldpoint.get(3,0)*imagepoint.get(2,0))<0);
 	return !returnvalue; // TODO find out why we need to invert this. behind the camera should be when w'*w*det(M)<0 but it is not, it is when it is >0. Why????
 }

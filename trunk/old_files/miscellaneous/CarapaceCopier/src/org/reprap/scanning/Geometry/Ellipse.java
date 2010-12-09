@@ -66,9 +66,6 @@ public class Ellipse {
 	// Question is there a better way to get ellipse center?
 	// This creates an ellipse which is an image of the ellipse on a plane when viewed from an angle 
 	public Ellipse(Matrix P, Point2d neworigin,Ellipse ellipse, int numberofsteps){
-		
-		MatrixManipulations manipulate=new MatrixManipulations();
-		manipulate.SetWorldToImageTransform(P);
 		// Now find the centre of the transformed ellipse. In general it won't be the circle center transformed
 		// So we need to take some points on the circumference, transform them and find their center.
 		// The easiest way to do this is to put a bounding box around them and find the mid-point of the 2d bounding box
@@ -82,7 +79,7 @@ public class Ellipse {
   			// Go round the circumference and find the transformed point
   			//Point2d oldpoint=GetEllipseEdgePointParametric((double)i*stepsize);
   			Point2d oldpoint=ellipse.GetEllipseEdgePointPolar((double)i*stepsize);
-  			newpoint[i]=manipulate.TransformCalibrationSheetPointToImagePoint(oldpoint,neworigin);
+  			newpoint[i]=new MatrixManipulations().TransformCalibrationSheetPointToImagePoint(oldpoint,neworigin,P);
     		
       		if (i==0){
 				box.minx=newpoint[i].x;

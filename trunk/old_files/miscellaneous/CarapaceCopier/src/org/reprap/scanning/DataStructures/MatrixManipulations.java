@@ -32,7 +32,7 @@ import Jama.*;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 25th November 2010
+* Last modified by Reece Arnott 9th December 2010
 * 
 * This is just a class with a few common matrix functions that are not in the Jama toolset.
 *  (As well as some more uncommon ones that have proven useful in more than one place) 	 
@@ -44,7 +44,6 @@ import Jama.*;
 
 public class MatrixManipulations {
 	 private Matrix FundamentalMatrix=new Matrix(3,3); 
-	private Matrix WorldtoImageTransform;	
 	 boolean printF=false;// only for testing purposes
 	 boolean printrectification=false; //only for test purposes
 	 
@@ -61,25 +60,21 @@ public class MatrixManipulations {
 	 }
 //	This assumes the point given is a 4x1 matrix representing a 3d point in homogeneous coordinates
 	 public Matrix WorldToImageTransform(Matrix point, Matrix K, Matrix R, Matrix t, Matrix Z, Point2d imageorigin){
-	 	WorldtoImageTransform=WorldToImageTransformMatrix(K,R,t,Z);
-		return WorldToImageTransform(point, imageorigin);
+	 	Matrix P=WorldToImageTransformMatrix(K,R,t,Z);
+		return WorldToImageTransform(point, imageorigin, P);
 	 }
 	
-	 public Matrix WorldToImageTransform(Matrix point, Matrix transform, Point2d imageorigin){
-		 	WorldtoImageTransform=transform.copy();
-			return WorldToImageTransform(point, imageorigin);
-		 }
-	public Point2d TransformCalibrationSheetPointToImagePoint(Point2d calibrationsheetpoint, Point2d imageorigin){
+	public Point2d TransformCalibrationSheetPointToImagePoint(Point2d calibrationsheetpoint, Point2d imageorigin, Matrix P){
 		Matrix point=new Matrix(4,1);
 		point.set(0,0,calibrationsheetpoint.x);
 		point.set(1,0,calibrationsheetpoint.y);
 		point.set(2,0,0);
 		point.set(3,0,1);
-		return new Point2d(WorldToImageTransform(point,imageorigin));
+		return new Point2d(WorldToImageTransform(point,imageorigin,P));
 	}
 	
-	 public Matrix WorldToImageTransform(Matrix point, Point2d imageorigin){
-		Matrix imgpoint=WorldtoImageTransform.times(point);
+	 public Matrix WorldToImageTransform(Matrix point, Point2d imageorigin, Matrix P){
+		Matrix imgpoint=P.times(point);
 		Matrix imgorigin=new Matrix(3,1);
 	 	imgorigin.set(0,0,imageorigin.x);
 	 	imgorigin.set(1,0,imageorigin.y);
@@ -89,10 +84,6 @@ public class MatrixManipulations {
 	 	return imgpoint;
 	 }
 	 
-	 public void SetWorldToImageTransform(Matrix transform){
-		 	WorldtoImageTransform=transform.copy();
-	}
-		 
 	 public double TransferError(PointPair2D pair, Matrix H){
 		 Matrix p1=new Matrix(3,1);
 			p1.set(0,0,pair.pointone.x);
@@ -114,7 +105,14 @@ public class MatrixManipulations {
 		// i.e. M^Tx=0 and just put a call through to that
 		return (GetRightNullSpace(M.transpose()));
 	}
-
+	public Matrix getZscaleMatrix(double zscalefactor){
+		 Matrix returnvalue=new Matrix(4,4);
+		 returnvalue.set(0,0,1);
+		 returnvalue.set(1,1,1);
+		 returnvalue.set(2,2,zscalefactor);
+		 returnvalue.set(3,3,1);
+		 return returnvalue;
+	 }
 	public Matrix GetRightNullSpace(Matrix M){
 		// The right null space is x in the equation Mx=0
 

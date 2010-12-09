@@ -2604,16 +2604,7 @@ public class Point3dArray {
 		 // We need to use the assumption that the principal point is at the origin so start by setting the imagecenter to be the origin
 			 Point2d imagecenter=new Point2d(images[n].width/2,images[n].height/2);
 			images[n].originofimagecoordinates=imagecenter.clone();
-			 // Use the original point matches - note that the second points are the image coordinate ones
-			 PointPair2D[] pointpair=new PointPair2D[images[n].matchingpoints.length];
-			 for (int j=0;j<pointpair.length;j++){
-					 pointpair[j]=images[n].matchingpoints[j].clone();
-				 // set the coordinate origin to the center of the image
-					pointpair[j].pointtwo.minus(imagecenter);
-				 } // end for j
-					images[n].calibration=new CalibrateImage(pointpair);
-					 
-		 camera=new CalibrateCamera(images[n]);
+			camera=new CalibrateCamera(images[n]);
 		 Matrix K=camera.getCameraMatrix();
 		 double errorcode=K.get(2,2);
 		if (errorcode==1) distortion=CalculateIndividualCameraCalibration(n,K,maxbundleadjustmentiterations);
@@ -2637,8 +2628,6 @@ public class Point3dArray {
 	// This is split from the above method in case we want to one day add in calculating the camera matrix parameters from multiple images
 	// That was the original intention of the code but it has now been taken out.
 	private LensDistortion CalculateIndividualCameraCalibration(int i, Matrix cameramatrix, int maxbundleadjustmentiterations){
-			images[i].calibration.CalculateTranslationandRotation(cameramatrix);
-			 images[i].calibration.setZscalefactor(images[i].originofimagecoordinates,cameramatrix);
 			 
 			 // Adjust the origin of image coordinates based on the camera matrix
 			 // TODO - If we are going to do this then we also need to reset the camera matrix u0,v0 to be 0,0 again.
@@ -2652,40 +2641,43 @@ public class Point3dArray {
 				 // reset the coordinate origin to the internal representation with the origin at the image center (or the actual principal point if the above adjustment is uncommented 
 				 newpointpairs[j].pointtwo.minus(images[i].originofimagecoordinates);
 			}
-			 
+			CalibrateImage calibration=new CalibrateImage(newpointpairs);
+			calibration.CalculateTranslationandRotation(cameramatrix);
+			calibration.setZscalefactor(images[i].originofimagecoordinates,cameramatrix);
+				 
 			 // Find the corner furtherest away from the origin and pass the distance to it through to the lens distortion class as the maximum radius
 			 double maxradiussquared=images[i].originofimagecoordinates.CalculateDistanceSquared(new Point2d(0,0));
 			 if (images[i].originofimagecoordinates.CalculateDistanceSquared(new Point2d(images[i].width,0))>maxradiussquared) maxradiussquared=images[i].originofimagecoordinates.CalculateDistanceSquared(new Point2d(images[i].width,0));
 			 if (images[i].originofimagecoordinates.CalculateDistanceSquared(new Point2d(0,images[i].height))>maxradiussquared) maxradiussquared=images[i].originofimagecoordinates.CalculateDistanceSquared(new Point2d(0,images[i].height));
 			 if (images[i].originofimagecoordinates.CalculateDistanceSquared(new Point2d(images[i].width,images[i].height))>maxradiussquared) maxradiussquared=images[i].originofimagecoordinates.CalculateDistanceSquared(new Point2d(images[i].width,images[i].height));
 			 
-			 
-			 LensDistortion distortion=new LensDistortion(images[i].width/10, images[i].height/10, new MatrixManipulations().WorldToImageTransformMatrix(cameramatrix,images[i].calibration.getRotation(),images[i].calibration.getTranslation(),images[i].calibration.getZscaleMatrix()), newpointpairs,false, maxradiussquared);
+			 Matrix K=cameramatrix.copy();
+			  Matrix R=calibration.getRotation();
+			  Matrix t=calibration.getTranslation();
+			  double z=calibration.getZscalefactor();
+			  Matrix Z=new MatrixManipulations().getZscaleMatrix(z);
+			  Matrix P=new MatrixManipulations().WorldToImageTransformMatrix(cameramatrix,R,t,Z);
+			 LensDistortion distortion=new LensDistortion(images[i].width/10, images[i].height/10, P, newpointpairs,false, maxradiussquared);
 			 distortion.CalculateDistortion();
-			 
-			 // Now update the World to image transform matrix to take all of this into account
-			 images[i].setWorldtoImageTransformMatrixUsingCameraMatrix(cameramatrix);
+			 // TODO Add in if statements to deal with distortion matrix and distortion formula
+			  double k1=distortion.getDistortionCoefficient();
+			 Point2d origin=images[i].originofimagecoordinates.clone();
 			 
 			 // Bundle adjustment
 			  CalibrationBundleAdjustment Adjust=new CalibrationBundleAdjustment();
-			  Matrix K=cameramatrix.copy();
-			  Matrix R=images[i].calibration.getRotation();
-			  Matrix t=images[i].calibration.getTranslation();
-			  double z=images[i].calibration.getZscalefactor();
-			  // TODO Add in if statements to deal with distortion matrix and distortion formula
-			  double k1=distortion.getDistortionCoefficient();
-			 Point2d origin=images[i].originofimagecoordinates.clone();
-			 // Set the ellipse orientation, a and b lengths
+			 // Set the ellipse settings
 			 Adjust.ellipse=standardcalibrationcircleonprintedsheet.clone();
 			 Adjust.stepsaroundcircle=prefs.AlgorithmSettingStepsAroundCircleCircumferenceForEllipseEstimationInBundleAdjustment;
+			 // Now do the adjustment
 			 Adjust.BundleAdjustment(maxbundleadjustmentiterations, images[i].matchingpoints, K,R,t,z,k1,origin,jProgressBar1);
 			 
+			 // Set the settings to their final values
 			 distortion.SetDistortionCoefficient(k1,origin); 
 			  images[i].originofimagecoordinates=origin.clone();
-			  images[i].calibration.setRotationandTranslation(R,t);
-			  images[i].calibration.setZscalefactor(z);
-			  // Update the world to image transform matrix again 
-			  images[i].setWorldtoImageTransformMatrixUsingCameraMatrix(K);
+			  // Update the world to image transform matrix 
+			  Z=new MatrixManipulations().getZscaleMatrix(z);
+			  P=new MatrixManipulations().WorldToImageTransformMatrix(K,R,t,Z);
+			  images[i].setWorldtoImageTransformMatrix(P);
 			 
 			  if (print){
 				System.out.println("Camera Matrix for image "+i);

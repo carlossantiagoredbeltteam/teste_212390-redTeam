@@ -30,6 +30,7 @@
  *******************************************************************************/
 
 import org.reprap.scanning.DataStructures.Image;
+import org.reprap.scanning.Geometry.PointPair2D;
 
 import Jama.*;
 
@@ -48,7 +49,14 @@ public class CalibrateCamera {
 		count=0;
 		for (int i=0;i<images.length;i++){
 			if (use[i]){
-				imagecalibrationarray[count]=images[i].calibration.clone();
+				 // Use the original point matches - note that the second points are the image coordinate ones
+				 PointPair2D[] pointpair=new PointPair2D[images[i].matchingpoints.length];
+				 for (int j=0;j<pointpair.length;j++){
+						 pointpair[j]=images[i].matchingpoints[j].clone();
+					 // set the coordinate origin to the center of the image
+						pointpair[j].pointtwo.minus(images[i].originofimagecoordinates);
+					 } // end for j
+				imagecalibrationarray[count]=new CalibrateImage(pointpair);
 				count++;
 			}
 		}
@@ -56,7 +64,14 @@ public class CalibrateCamera {
 	}
 	 public CalibrateCamera(Image image){
 			imagecalibrationarray=new CalibrateImage[1];
-			imagecalibrationarray[0]=image.calibration.clone();
+			 // Use the original point matches - note that the second points are the image coordinate ones
+			 PointPair2D[] pointpair=new PointPair2D[image.matchingpoints.length];
+			 for (int j=0;j<pointpair.length;j++){
+					 pointpair[j]=image.matchingpoints[j].clone();
+				 // set the coordinate origin to the center of the image
+					pointpair[j].pointtwo.minus(image.originofimagecoordinates);
+				 } // end for j
+			imagecalibrationarray[0]=new CalibrateImage(pointpair);
 			warnings="";
 		}
 //	 This is just used in the CalculateCameraMatrix method to make the code tidier

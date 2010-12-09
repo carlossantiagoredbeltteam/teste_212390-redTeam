@@ -258,14 +258,7 @@ public Matrix getHomography(){
 		 return zscalefactor;
 	 }
 
- public Matrix getZscaleMatrix(){
-	 Matrix returnvalue=new Matrix(4,4);
-	 returnvalue.set(0,0,1);
-	 returnvalue.set(1,1,1);
-	 returnvalue.set(2,2,zscalefactor);
-	 returnvalue.set(3,3,1);
-	 return returnvalue;
- }
+ 
  
  public void setRotationandTranslation(Matrix R, Matrix t){
 	 Rotation=R.copy();
