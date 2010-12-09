@@ -376,12 +376,13 @@ public void setZscalefactor(Point2d originforimage, Matrix CameraCalibrationMatr
 	point.set(2,0,-1);
 	Matrix negativezunitvector=new MatrixManipulations().WorldToImageTransform(point,CameraCalibrationMatrix,getRotation(),getTranslation(),Identity,originforimage);
 	Point2d negativez2d=new Point2d(negativezunitvector); // the 2d image plane representation of the negative z point
+	negativezunitvector=negativezunitvector.minus(origin); // The unit vector is the unit point taken away from the origin point
 	
 	double lengthx=Math.sqrt(Math.pow(xunitvector.get(0,0),2)+Math.pow(xunitvector.get(1,0),2)+Math.pow(xunitvector.get(2,0),2));
 	double lengthy=Math.sqrt(Math.pow(yunitvector.get(0,0),2)+Math.pow(yunitvector.get(1,0),2)+Math.pow(yunitvector.get(2,0),2));
-	double lengthz=Math.sqrt(Math.pow(zunitvector.get(0,0),2)+Math.pow(zunitvector.get(1,0),2)+Math.pow(zunitvector.get(2,0),2));
-	double lengthscalefactor=(lengthx+lengthy)/(2*lengthz);
-	zscalefactor=lengthscalefactor;
+	double lengthzpositive=Math.sqrt(Math.pow(zunitvector.get(0,0),2)+Math.pow(zunitvector.get(1,0),2)+Math.pow(zunitvector.get(2,0),2));
+	double lengthznegative=Math.sqrt(Math.pow(negativezunitvector.get(0,0),2)+Math.pow(negativezunitvector.get(1,0),2)+Math.pow(negativezunitvector.get(2,0),2));
+	zscalefactor=(lengthx+lengthy)/(lengthzpositive+lengthznegative);
 	// Note that this scale factor may actually have the wrong sign as all the lengths are positive values by definition and the arbitrary internal z scale may be reversed to the real world coordinates. 
 	// So, if we assume the camera is placed in the positive z then we can compare the projected 2d image points of the origin, positive z, and negative z 
 	// and make a decision based on the length of the vector between postivez and orgin vs. length of vector between negative z and origin 
