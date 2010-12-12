@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  *
- * Last modified by Reece Arnott 9th December 2010
+ * Last modified by Reece Arnott 13th December 2010
  * 
  * Note that most of the layout commands were initially produced by NetBeans for JDK 6
  * and significantly modified by hand. For future reference if it needs to be done the other way the main things to change are:
@@ -302,7 +302,7 @@ public class Main extends JFrame {
  		PixelColour blue=new PixelColour(255,(byte)255);
  		// Find the camera center of each image
  		Point3d[] C=new Point3d[images.length];
- 		for (int i=0;i<C.length;i++) C[i]=new Point3d(new MatrixManipulations().GetRightNullSpace(images[i].getWorldtoImageTransformMatrix()));
+ 		for (int i=0;i<C.length;i++) C[i]=new Point3d(MatrixManipulations.GetRightNullSpace(images[i].getWorldtoImageTransformMatrix()));
 		// To do this sweep properly we need to sweep in all eight combinations of +/- x/y/z
  		double x=volumeofinterest.minx;double xstep=(volumeofinterest.maxx-volumeofinterest.minx)/pixelswide;
  		double y=volumeofinterest.miny;double ystep=(volumeofinterest.maxy-volumeofinterest.miny)/pixelshigh;
@@ -1273,7 +1273,7 @@ private void FindCalibrationSheetCirclesEtc(){
 	 				  else {
 	 				  	 Voxel voxels=Voxelisation();
 	 				  	 //TODO uncomment when finished testing
-	 				  	 RestrictSearch(voxels);
+	 				  	 //RestrictSearch(voxels);
 	 				  	 SurfaceVoxelsToTriangles(voxels);
 	 				  	 } // end else for if there are enough images to extract 3D information 
 	 	    		 GraphicsFeedback();
@@ -2702,8 +2702,8 @@ public class Point3dArray {
 			  Matrix R=calibration.getRotation();
 			  Matrix t=calibration.getTranslation();
 			  double z=calibration.getZscalefactor();
-			  Matrix Z=new MatrixManipulations().getZscaleMatrix(z);
-			  Matrix P=new MatrixManipulations().WorldToImageTransformMatrix(cameramatrix,R,t,Z);
+			  Matrix Z=MatrixManipulations.getZscaleMatrix(z);
+			  Matrix P=MatrixManipulations.WorldToImageTransformMatrix(cameramatrix,R,t,Z);
 			 LensDistortion distortion=new LensDistortion(images[i].width/10, images[i].height/10, P, newpointpairs,false, maxradiussquared);
 			 distortion.CalculateDistortion();
 			 // TODO Add in if statements to deal with distortion matrix and distortion formula

@@ -23,7 +23,7 @@ package org.reprap.scanning.FeatureExtraction;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 25th November 2010
+ * Last modified by Reece Arnott 13th December 2010
  * 
  *  Steps to do 3D edge detection:
  *  	- Construct fundamental matrix and from that get image rectification homographies (y coordinates are lined up for corresponding 3d points)
@@ -203,8 +203,8 @@ public class EdgeExtraction3D {
 						  Matrix F=Tdash.inverse().transpose().times(matrices.getF().times(T.inverse()));
 						  // Find the epipoles and normalise them  i.e. e1^2+e2^2=1 where e=(e1,e2,e3) and e'1^2+e'2^2=1 where e'=(e'1,e'2,e'3)
 						  // Use these to form rotation matrices and apply them to the Fundamental matrix
-						  Matrix e=new MatrixManipulations().GetRightNullSpace(F);
-						  Matrix edash=new MatrixManipulations().GetLeftNullSpace(F);
+						  Matrix e=MatrixManipulations.GetRightNullSpace(F);
+						  Matrix edash=MatrixManipulations.GetLeftNullSpace(F);
 						  double escale=(e.get(0,0)*e.get(0,0))+(e.get(1,0)*e.get(1,0));
 						  double edashscale=(edash.get(0,0)*edash.get(0,0))+(edash.get(1,0)*edash.get(1,0));
 						  e.times(1/escale);
@@ -260,7 +260,7 @@ public class EdgeExtraction3D {
 					C[6]=bcminusad*a*c*f4;
 					
 					// Find the roots
-					double[] roots=new MatrixManipulations().FindPolynomialRoots(C);
+					double[] roots=MatrixManipulations.FindPolynomialRoots(C);
 					// Find the one that has the minimal cost (including evaluating t=infinity i.e 1/f^2+c^2/(a^2+f'^2c^2))
 					double tmin=Double.MAX_VALUE;
 					double mincost=(1/(f*f))+((c*c)/((a*a)+(fdash*fdash*c*c)));

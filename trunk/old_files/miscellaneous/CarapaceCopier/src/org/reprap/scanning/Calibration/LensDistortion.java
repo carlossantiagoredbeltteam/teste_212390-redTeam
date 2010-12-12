@@ -376,12 +376,12 @@ public boolean UseDistortionFunction(){
 		
 		// As the Fundamental matrix was calculated to give pointtwo^TFpointone=0 
 		// then we want the right epipole as secondpoint is the distorted image points 
-		Matrix DistortionCenter=new MatrixManipulations().GetRightNullSpace(FundamentalMatrix);
+		Matrix DistortionCenter=MatrixManipulations.GetRightNullSpace(FundamentalMatrix);
 		if (printdistortion){
 			Matrix e;
 			Matrix edash;
-			edash=new MatrixManipulations().GetRightNullSpace(FundamentalMatrix);
-			e=new MatrixManipulations().GetLeftNullSpace(FundamentalMatrix);
+			edash=MatrixManipulations.GetRightNullSpace(FundamentalMatrix);
+			e=MatrixManipulations.GetLeftNullSpace(FundamentalMatrix);
 			System.out.println("Epipole e=");
 			e.print(10,20);
 			Point2d temp=new Point2d(0,0);

@@ -23,7 +23,7 @@ package org.reprap.scanning.DataStructures;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 9th December 2010
+ * Last modified by Reece Arnott 13th December 2010
  * 
  * These are methods that store the image and and additional information together
  * This includes the edge map, camera calibration matrices and the point pair matches of points in the image with the calibration sheet 
@@ -183,7 +183,7 @@ public Matrix getWorldtoImageTransformMatrix(){
 
 // This assumes the point given is a 4x1 matrix representing a 3d point in homogeneous coordinates
 public Point2d getWorldtoImageTransform(Matrix point){
-	return new Point2d(new MatrixManipulations().WorldToImageTransform(point,originofimagecoordinates,WorldtoImageTransform));
+	return new Point2d(MatrixManipulations.WorldToImageTransform(point,originofimagecoordinates,WorldtoImageTransform));
 }
 
 // Methods to pass information to and from the more complicated private variables
@@ -230,8 +230,8 @@ public boolean PointIsUnprocessed(Point3d worldpoint){
 }
 public void setPixeltoProcessedIfRayNotIntersectAnyVolumesOfInterest(AxisAlignedBoundingBox[] volumeofinterest){
 	//Precalculate the camera centre point and the psuedo-inverse of the camera matrix as they will be used for the constructed lines later
-		Point3d C=new Point3d(new MatrixManipulations().GetRightNullSpace(getWorldtoImageTransformMatrix()));
-		Matrix Pplus=new MatrixManipulations().PseudoInverse(getWorldtoImageTransformMatrix()); 
+		Point3d C=new Point3d(MatrixManipulations.GetRightNullSpace(getWorldtoImageTransformMatrix()));
+		Matrix Pplus=MatrixManipulations.PseudoInverse(getWorldtoImageTransformMatrix()); 
 		// If the camera centre is in the volume of interest all the rays will obviously intersect so we don't need to continue
 		boolean intersect=false;
 		int i=0;
@@ -376,7 +376,7 @@ public boolean WorldPointBehindCamera(Matrix worldpoint){
 	// (sign(det M)*w')/(w||m3||) where M is the left hand 3x3 block of P i.e. K[R|t], m3 is the third row of M and w and w' are the 4th and 3rd homogeneous coordinates in the 4x1 world point and 3x1 image point respectively 
 	//but we are only concerned with the sign - positive means it is in front, negative means behind.
 	// So we can use a simplified version sign=w'*w*det(M) 
-	Matrix imagepoint=new MatrixManipulations().WorldToImageTransform(worldpoint,originofimagecoordinates,WorldtoImageTransform);
+	Matrix imagepoint=MatrixManipulations.WorldToImageTransform(worldpoint,originofimagecoordinates,WorldtoImageTransform);
 	returnvalue=((WorldtoImageTransform.getMatrix(0,2,0,2).det()*worldpoint.get(3,0)*imagepoint.get(2,0))<0);
 	return !returnvalue; // TODO find out why we need to invert this. behind the camera should be when w'*w*det(M)<0 but it is not, it is when it is >0. Why????
 }

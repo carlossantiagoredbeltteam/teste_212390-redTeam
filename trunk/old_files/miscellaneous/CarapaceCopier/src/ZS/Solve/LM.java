@@ -235,7 +235,7 @@ for( int c = 0; c < nparm; c++ ) {
 double[] d;
 if ((throwexceptionwhensingular) || (new Matrix(H).lu().isNonsingular())) d=new Matrix(H).lu().solve(new Matrix(g, nparm)).getRowPackedCopy();
 else // find d as H+-g where H+ is the pseudoinverse of H
-	d=(new MatrixManipulations().PseudoInverse(new Matrix (H))).times(new Matrix(g, nparm)).getRowPackedCopy();
+	d=(MatrixManipulations.PseudoInverse(new Matrix (H))).times(new Matrix(g, nparm)).getRowPackedCopy();
 //double[] na = DoubleVector.add(a, d);
 double[] na = (new Matrix(a, nparm)).plus(new Matrix(d, nparm)).getRowPackedCopy();
 double e1 = chiSquared(x, na, y, s, f);

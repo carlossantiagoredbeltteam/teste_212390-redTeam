@@ -23,7 +23,7 @@ package org.reprap.scanning.Geometry;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 8th December 2010
+* Last modified by Reece Arnott 13th December 2010
 * 
 * Note that this is *not* an extentsion to the native java.awt.geom.Ellipse2D class but is totally different
 * The native class is simply defined by a bounding rectangle.
@@ -79,7 +79,7 @@ public class Ellipse {
   			// Go round the circumference and find the transformed point
   			//Point2d oldpoint=GetEllipseEdgePointParametric((double)i*stepsize);
   			Point2d oldpoint=ellipse.GetEllipseEdgePointPolar((double)i*stepsize);
-  			newpoint[i]=new MatrixManipulations().TransformCalibrationSheetPointToImagePoint(oldpoint,neworigin,P);
+  			newpoint[i]=MatrixManipulations.TransformCalibrationSheetPointToImagePoint(oldpoint,neworigin,P);
     		
       		if (i==0){
 				box.minx=newpoint[i].x;
