@@ -23,7 +23,7 @@ package org.reprap.scanning.Geometry;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 5th May 2010
+* Last modified by Reece Arnott 13th December 2010
 * 
 * Note that this encapsulates a line, a ray, and a line segment in the same class.
 * 
@@ -71,8 +71,8 @@ public class Line3d {
 	// Same as the constructor above except that the camera centre and pseudo-inverse of P are calculated on the fly
 	// Construct a line from a point and the matrix describing the camera position etc.
 	public Line3d(Matrix p, Point2d point){
-		Point3d C=new Point3d(new MatrixManipulations().GetRightNullSpace(p));
-		Matrix Pplus=new MatrixManipulations().PseudoInverse(p);
+		Point3d C=new Point3d(MatrixManipulations.GetRightNullSpace(p));
+		Matrix Pplus=MatrixManipulations.PseudoInverse(p);
 //		 first convert point to a 3x1 matrix x
 		Matrix x=new Matrix(3,1);
 		x.set(0,0,point.x);

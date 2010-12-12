@@ -23,7 +23,7 @@ package org.reprap.scanning.FeatureExtraction;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 27th May 2010
+* Last modified by Reece Arnott 13th December 2010
 *
 * This class uses a modified version of the ADM (Absolute Difference Mask) algorithm to extract edges along with edge strength and direction values.
 *  The modifications are described in "A robust, real-time ellipse detector" by Zhang, S.C. and Liu, Z.Q.in Pattern Recognition Volume 38, Issue 2, February 2005, Pages 273-287
@@ -245,8 +245,8 @@ public class EdgeExtraction2D {
 		public void LimitToEdgeRaysThatIntersectAVolumeOfInterest(AxisAlignedBoundingBox boundingvolume, AxisAlignedBoundingBox[] volumeofinterest, Matrix P, Point2d imageoffset){
 		// Note that it is assumed that the bounding volume is a precalculated maximum volume that encompasses all of the volumes of interest.	
 		//Precalculate the camera centre point and the psuedo-inverse of the camera matrix as they will be used for the constructed lines later
-		Point3d C=new Point3d(new MatrixManipulations().GetRightNullSpace(P));
-		Matrix Pplus=new MatrixManipulations().PseudoInverse(P); 
+		Point3d C=new Point3d(MatrixManipulations.GetRightNullSpace(P));
+		Matrix Pplus=MatrixManipulations.PseudoInverse(P); 
 		// If the camera centre is in the volume of interest all the rays will obviously intersect so we don't need to continue
 		boolean intersect=false;
 		int i=0;

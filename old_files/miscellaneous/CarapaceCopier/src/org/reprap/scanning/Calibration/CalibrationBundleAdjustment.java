@@ -25,7 +25,7 @@ package org.reprap.scanning.Calibration;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 9th December 2010
+* Last modified by Reece Arnott 13th December 2010
 * 
 * 
 *   This converts the matrices to internal representations used for LM minimisation and then back to matrices
@@ -145,7 +145,7 @@ public class CalibrationBundleAdjustment {
 			a[3]=K.get(0,2);
 			a[4]=K.get(1,2);
 			// Add the rotation matrix parameters (after converting to 3x1 Rodrigues rotation vector
-			Matrix r=new MatrixManipulations().getRodriguesRotationVector(R);
+			Matrix r=MatrixManipulations.getRodriguesRotationVector(R);
 			a[5]=r.get(0,0);
 			a[6]=r.get(1,0);
 			a[7]=r.get(2,0);
@@ -197,7 +197,7 @@ public class CalibrationBundleAdjustment {
 			r.set(0,0,a[5]);
 			r.set(1,0,a[6]);
 			r.set(2,0,a[7]);
-			Matrix newR=new MatrixManipulations().getRotationMatrixFromRodriguesRotationVector(r);
+			Matrix newR=MatrixManipulations.getRotationMatrixFromRodriguesRotationVector(r);
 			// Use the set method so the new rotation matrix is passed back
 			R.set(0,0,newR.get(0,0));
 			R.set(1,0,newR.get(1,0));
@@ -323,7 +323,7 @@ public class CalibrationBundleAdjustment {
 		   r.set(1,0,a[6]);
 		   r.set(2,0,a[7]);
 		   
-		   Matrix R=new MatrixManipulations().getRotationMatrixFromRodriguesRotationVector(r);
+		   Matrix R=MatrixManipulations.getRotationMatrixFromRodriguesRotationVector(r);
 		   
 		   // The translation vector
 		   Matrix t=new Matrix(3,1);
@@ -343,7 +343,7 @@ public class CalibrationBundleAdjustment {
 		   
 		     
 		   // Now combine them to give a World to image transform
-		   Matrix P=new MatrixManipulations().WorldToImageTransformMatrix(K, R, t, Z);
+		   Matrix P=MatrixManipulations.WorldToImageTransformMatrix(K, R, t, Z);
 		   
 		   // It is assumed that the x array is 2 values: x and y coordinates on the calibration sheet (z=0)
 		   // that are the centre of a circle (with radius of circleradius). We want to return the centre of the ellipse this circle is transformed to 

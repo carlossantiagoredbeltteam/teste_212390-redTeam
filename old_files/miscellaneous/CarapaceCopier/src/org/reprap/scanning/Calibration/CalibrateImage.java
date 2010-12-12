@@ -23,7 +23,7 @@ package org.reprap.scanning.Calibration;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 6th December 2010
+ * Last modified by Reece Arnott 13th December 2010
  * 
  *   	
  *   
@@ -158,7 +158,7 @@ public int setHomograhyusingRANSAC(double tsquared){ // t is the transfer error 
 			for (int i=0;i<matchedpoints.length;i++){
 			
 				// Find symetric transfer error squared and compare it to the t squared distance threshold
-				dsquared[i]=new MatrixManipulations().TransferError(matchedpoints[i],H);
+				dsquared[i]=MatrixManipulations.TransferError(matchedpoints[i],H);
 				dsquaredsum=+dsquared[i];
 				inlier[i]=(dsquared[i]<tsquared);
 				if (inlier[i]) inliers++;
@@ -218,7 +218,7 @@ public int setHomograhyusingRANSAC(double tsquared){ // t is the transfer error 
 public double FindMaximumTransferErrorSquared(){
 	double maxerrorsquared=0;
 	for (int i=0;i<matchedpoints.length;i++){
-		double errorsquared=new MatrixManipulations().TransferError(matchedpoints[i],Homography);
+		double errorsquared=MatrixManipulations.TransferError(matchedpoints[i],Homography);
 		if (errorsquared>maxerrorsquared) maxerrorsquared=errorsquared;
 	}
 	return maxerrorsquared;
@@ -286,9 +286,9 @@ public void CalculateTranslationandRotation(Matrix CameraCalibrationMatrix){
 	// These lambda values are essentially the scaling needed to fit the homography in the image x and y axis directions.
 	// i.e. if you take an outline of the calibration sheet backprojected using the homography and overlay it with the same outline backprojected using the combination of the camera, rotation and translation matrices you will find that the left and right edges will closely line up if you used lambda1, and the top and bottom line up if you use lambda2.  
 	Matrix temp=CameraCalibrationMatrix.inverse().times(h1);
-	double oneoverlambda1=new MatrixManipulations().DistanceFromOriginof3x1Vector(temp);
+	double oneoverlambda1=MatrixManipulations.DistanceFromOriginof3x1Vector(temp);
 	temp=CameraCalibrationMatrix.inverse().times(h2);
-	double oneoverlambda2=new MatrixManipulations().DistanceFromOriginof3x1Vector(temp);
+	double oneoverlambda2=MatrixManipulations.DistanceFromOriginof3x1Vector(temp);
 	// Note that with perfect camera calibration, lamba1 and lambda2 should be equal but if we assume the camera calibration isn't perfect then we should take the average of the two.
 	double lambda=2/(oneoverlambda1+oneoverlambda2);
 	if ((oneoverlambda1!=oneoverlambda2) && (print)) {
@@ -302,7 +302,7 @@ public void CalculateTranslationandRotation(Matrix CameraCalibrationMatrix){
 	r2.timesEquals(lambda);
 	
 	// r3 is the cross product of r1 with r2
-	Matrix r3=new MatrixManipulations().getCrossProductMatrixof3x1Vector(r1).times(r2);
+	Matrix r3=MatrixManipulations.getCrossProductMatrixof3x1Vector(r1).times(r2);
 	
 	
 	Matrix EstimatedRotation=new Matrix(3,3);
@@ -352,29 +352,29 @@ public void setZscalefactor(Point2d originforimage, Matrix CameraCalibrationMatr
 	Matrix point=new Matrix(4,1);
 	point.set(3,0,1);
 	
-	Matrix origin=new MatrixManipulations().WorldToImageTransform(point,CameraCalibrationMatrix,getRotation(),getTranslation(),Identity,originforimage);// transfer the world origin to image homogeneous coordinates
+	Matrix origin=MatrixManipulations.WorldToImageTransform(point,CameraCalibrationMatrix,getRotation(),getTranslation(),Identity,originforimage);// transfer the world origin to image homogeneous coordinates
 	Point2d origin2d=new Point2d(origin); // the 2d image plane representation of the world origin point
 	point.set(0,0,1);
 //	 transfer the world coordinate 1,0,0 to image homogeneous coordinates and take it away from the transferred origin to give a transferred x unit vector
-	Matrix xunitvector=new MatrixManipulations().WorldToImageTransform(point,CameraCalibrationMatrix,getRotation(),getTranslation(),Identity,originforimage); 
+	Matrix xunitvector=MatrixManipulations.WorldToImageTransform(point,CameraCalibrationMatrix,getRotation(),getTranslation(),Identity,originforimage); 
 	xunitvector=xunitvector.minus(origin); // The unit vector is the unit point taken away from the origin point
 	
 	
 	point.set(0,0,0);
 	point.set(1,0,1);
 //	 transfer the world coordinate 0,1,0 to image homogeneous coordinates and take it away from the transferred origin to give a transferred y unit vector
-	Matrix yunitvector=new MatrixManipulations().WorldToImageTransform(point,CameraCalibrationMatrix,getRotation(),getTranslation(),Identity,originforimage);
+	Matrix yunitvector=MatrixManipulations.WorldToImageTransform(point,CameraCalibrationMatrix,getRotation(),getTranslation(),Identity,originforimage);
 	yunitvector=yunitvector.minus(origin); // The unit vector is the unit point taken away from the origin point
 	
 	point.set(1,0,0);
 	point.set(2,0,1);
 //	 transfer the world coordinate 0,0,1 to image homogeneous coordinates and take it away from the transferred origin to give a transferred z unit vector
-	Matrix zunitvector=new MatrixManipulations().WorldToImageTransform(point,CameraCalibrationMatrix,getRotation(),getTranslation(),Identity,originforimage);
+	Matrix zunitvector=MatrixManipulations.WorldToImageTransform(point,CameraCalibrationMatrix,getRotation(),getTranslation(),Identity,originforimage);
 	Point2d positivez2d=new Point2d(zunitvector); // the 2d image plane representation of the positive z point
 	zunitvector=zunitvector.minus(origin); // The unit vector is the unit point taken away from the origin point
 	//transfer the world coordinate 0,0,-1 to image homogeneous coordinates and take it away from the transferred origin to give a transferred z negative unit vector	
 	point.set(2,0,-1);
-	Matrix negativezunitvector=new MatrixManipulations().WorldToImageTransform(point,CameraCalibrationMatrix,getRotation(),getTranslation(),Identity,originforimage);
+	Matrix negativezunitvector=MatrixManipulations.WorldToImageTransform(point,CameraCalibrationMatrix,getRotation(),getTranslation(),Identity,originforimage);
 	Point2d negativez2d=new Point2d(negativezunitvector); // the 2d image plane representation of the negative z point
 	negativezunitvector=negativezunitvector.minus(origin); // The unit vector is the unit point taken away from the origin point
 	
@@ -404,8 +404,8 @@ private Matrix setHomography(Point2d[] PointsInImageOne, Point2d[] PointsInImage
 	Matrix H=new Matrix(3,3);
 	int length=PointsInImageOne.length;
 	//Calculate the Normalisation matrices for each image.
-	Matrix Normalisation1=new MatrixManipulations().CalculateNormalisationMatrix(PointsInImageOne);
-	Matrix Normalisation2=new MatrixManipulations().CalculateNormalisationMatrix(PointsInImageTwo);
+	Matrix Normalisation1=MatrixManipulations.CalculateNormalisationMatrix(PointsInImageOne);
+	Matrix Normalisation2=MatrixManipulations.CalculateNormalisationMatrix(PointsInImageTwo);
 	//Apply the normalisation matrices to each set of points
 	for (int i=0;i<length;i++){
 		boolean success=PointsInImageOne[i].ApplyTransform(Normalisation1);
