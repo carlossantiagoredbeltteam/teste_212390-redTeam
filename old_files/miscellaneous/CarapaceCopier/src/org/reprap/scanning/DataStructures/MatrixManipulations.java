@@ -32,13 +32,13 @@ import Jama.*;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 9th December 2010
+* Last modified by Reece Arnott 13th December 2010
 * 
 * This is just a class with a few common matrix functions that are not in the Jama toolset.
-*  (As well as some more uncommon ones that have proven useful in more than one place) 	 
+*  (As well as some more uncommon ones that have proven useful in more than one place)
 * 
-*  It contains a couple of methods that do the heavy lifting in other classes such as the Fundamental Matrix calculation
-*   and calculation of Image Homography matrices
+*  Most of these are static methods but it also contains a couple of methods that do the heavy lifting in other classes such as the Fundamental Matrix calculation
+*   and calculation of Image Rectification Homography matrices
 *   
 *******************************************************************************/
 
@@ -48,23 +48,23 @@ public class MatrixManipulations {
 	 boolean printrectification=false; //only for test purposes
 	 
 	 
-	 public Matrix getRotationplusTranslation(Matrix R, Matrix t){
+	 public static Matrix getRotationplusTranslation(Matrix R, Matrix t){
 		 Matrix RplusT=new Matrix(3,4);
 		 RplusT.setMatrix(0,2,0,2,R);
 		 RplusT.setMatrix(0,2,3,3,t);
 		 return RplusT;
 	 }
 //TODO implement DistortionMatrix?
-	 public Matrix WorldToImageTransformMatrix(Matrix K, Matrix R, Matrix t, Matrix Z){
+	 public static Matrix WorldToImageTransformMatrix(Matrix K, Matrix R, Matrix t, Matrix Z){
 			return K.times(getRotationplusTranslation(R,t).times(Z));
 	 }
 //	This assumes the point given is a 4x1 matrix representing a 3d point in homogeneous coordinates
-	 public Matrix WorldToImageTransform(Matrix point, Matrix K, Matrix R, Matrix t, Matrix Z, Point2d imageorigin){
+	 public static Matrix WorldToImageTransform(Matrix point, Matrix K, Matrix R, Matrix t, Matrix Z, Point2d imageorigin){
 	 	Matrix P=WorldToImageTransformMatrix(K,R,t,Z);
 		return WorldToImageTransform(point, imageorigin, P);
 	 }
 	
-	public Point2d TransformCalibrationSheetPointToImagePoint(Point2d calibrationsheetpoint, Point2d imageorigin, Matrix P){
+	public static Point2d TransformCalibrationSheetPointToImagePoint(Point2d calibrationsheetpoint, Point2d imageorigin, Matrix P){
 		Matrix point=new Matrix(4,1);
 		point.set(0,0,calibrationsheetpoint.x);
 		point.set(1,0,calibrationsheetpoint.y);
@@ -73,7 +73,7 @@ public class MatrixManipulations {
 		return new Point2d(WorldToImageTransform(point,imageorigin,P));
 	}
 	
-	 public Matrix WorldToImageTransform(Matrix point, Point2d imageorigin, Matrix P){
+	 public static Matrix WorldToImageTransform(Matrix point, Point2d imageorigin, Matrix P){
 		Matrix imgpoint=P.times(point);
 		Matrix imgorigin=new Matrix(3,1);
 	 	imgorigin.set(0,0,imageorigin.x);
@@ -84,7 +84,7 @@ public class MatrixManipulations {
 	 	return imgpoint;
 	 }
 	 
-	 public double TransferError(PointPair2D pair, Matrix H){
+	 public static double TransferError(PointPair2D pair, Matrix H){
 		 Matrix p1=new Matrix(3,1);
 			p1.set(0,0,pair.pointone.x);
 			p1.set(1,0,pair.pointone.y);
@@ -99,13 +99,13 @@ public class MatrixManipulations {
 	 }
 	  
 	 
-	public Matrix GetLeftNullSpace(Matrix M){
+	public static Matrix GetLeftNullSpace(Matrix M){
 		// The left null space is x in the equation x^TM=0
 		// Note the transpose there. This is so that we can say that the left null space is the same as the right null space for the transpose of the matrix
 		// i.e. M^Tx=0 and just put a call through to that
 		return (GetRightNullSpace(M.transpose()));
 	}
-	public Matrix getZscaleMatrix(double zscalefactor){
+	public static Matrix getZscaleMatrix(double zscalefactor){
 		 Matrix returnvalue=new Matrix(4,4);
 		 returnvalue.set(0,0,1);
 		 returnvalue.set(1,1,1);
@@ -113,7 +113,7 @@ public class MatrixManipulations {
 		 returnvalue.set(3,3,1);
 		 return returnvalue;
 	 }
-	public Matrix GetRightNullSpace(Matrix M){
+	public static Matrix GetRightNullSpace(Matrix M){
 		// The right null space is x in the equation Mx=0
 
 		// take one off all the numbers as we'll be using them as array indexes which start at 0.
@@ -137,7 +137,7 @@ public class MatrixManipulations {
 	}
 	// This is not a generalised skew symetric Cross Product but is specifically for a 3x1 vector which is all we need at the moment.
 	// In the future it may be generalised to include the 7x1 Vector (this is a valid operation for 3 and 7 dimensions only).
-	public Matrix getCrossProductMatrixof3x1Vector(Matrix e){
+	public static Matrix getCrossProductMatrixof3x1Vector(Matrix e){
 		 //[e]x is the skew-symmetric 3 × 3 matrix representing the cross product	
 		 /* of a 3x1 vector e (e1,e2,e3)^T:
 		  *			  0,-e3, e2
@@ -145,6 +145,7 @@ public class MatrixManipulations {
 		  *			-e2, e1, 0
 		  */
 		// By definition axb=[a]xb
+
 		Matrix ex=new Matrix(3,3);
 		if ((e.getRowDimension()==3) && (e.getColumnDimension()==1)){
 			ex.set(0,0,0);
@@ -488,15 +489,15 @@ public class MatrixManipulations {
 		
 	}
 
-	public double DistanceFromOriginof3x1Vector(Matrix temp){
+	public static double DistanceFromOriginof3x1Vector(Matrix temp){
 		return Math.sqrt(Math.pow(temp.get(0,0),2)+Math.pow(temp.get(1,0),2)+Math.pow(temp.get(2,0),2));
 	}
 	//	 This returns the normalisation matrix calculated from a set of 2D points and a hardcoded average distance sqrt(2) 
-	public Matrix CalculateNormalisationMatrix(Point2d[] pointsarray){
+	public static Matrix CalculateNormalisationMatrix(Point2d[] pointsarray){
 			return CalculateNormalisationMatrix(pointsarray,Math.sqrt(2));
 	}
 //	This returns the normalisation matrix calculated from a set of 2D points with a specified average distance between them
-	public Matrix CalculateNormalisationMatrix(Point2d[] pointsarray, double newaveragedistance){
+	public static Matrix CalculateNormalisationMatrix(Point2d[] pointsarray, double newaveragedistance){
 	Matrix T=new Matrix(3,3); // construct a 3x3 matrix of zeros
 
 //	find centroid
@@ -543,7 +544,7 @@ public class MatrixManipulations {
 	}
 	//Note that the Matrix class has an inverse function that tries to get the pseudoinverse through QR decomposition if the matrix is not square but this can fail with an error "Matrix is rank deficient"
 	// so here is another of doing it without this problem
-	public Matrix PseudoInverse(Matrix A){
+	public static Matrix PseudoInverse(Matrix A){
 		// Given a square diagonal matrix D we define the psuedo inverse D+ to be a square diagonal matrix with values of 1/d where d is the corresponding element from D except when d=0, in which case we set the element to be 0
 		// In the general case, a matrix A can be decomposed via SVD into A=USV^T and so A+ is defined as VS+U^T
 
@@ -692,7 +693,7 @@ public class MatrixManipulations {
 	}
 
 //	 The rotation matrix should have 3 dof and they can be represented as a 3x1 vector using the Rodrigues rotation formula
-	public Matrix getRodriguesRotationVector(Matrix R){
+	public static Matrix getRodriguesRotationVector(Matrix R){
 		Matrix r=new Matrix (3,1);
 		// Unit vector r is the solution to (R-I)r=0
 		// In this case: (temp)r=0
@@ -726,15 +727,15 @@ public class MatrixManipulations {
 	return r;
 	}
 	
-	public Matrix getRotationMatrixFromRodriguesRotationVector(Matrix r){
+	public static Matrix getRotationMatrixFromRodriguesRotationVector(Matrix r){
 		Matrix R=new Matrix(3,3);
-		double length=new MatrixManipulations().DistanceFromOriginof3x1Vector(r);
+		double length=DistanceFromOriginof3x1Vector(r);
 		// Set up an Identity matrix
 		Matrix I=new Matrix (3,3);
 		I.set(0,0,1);
 		I.set(1,1,1);
 		I.set(2,2,1);
-		Matrix rx=new MatrixManipulations().getCrossProductMatrixof3x1Vector(r.times(1/length));
+		Matrix rx=getCrossProductMatrixof3x1Vector(r.times(1/length));
 		// This is a bit complicated so split it into 3 terms
 		Matrix firstterm=I;
 		Matrix secondterm=rx.times(Math.sin(length));
@@ -755,7 +756,7 @@ public class MatrixManipulations {
 	}
 	// This takes a number of points in images, each point defines a ray in space when given the corresponfing camera matrix.
 	// This method finds an estimate of where the rays intersect to give a point in object/real space.
-	public Matrix Find3dPoint(Point2d point[], Matrix P[], int length){
+	public static Matrix Find3dPoint(Point2d point[], Matrix P[], int length){
 //		 This is simply the Homogeneous Linear triangulation method, an extension of the DLT method
 		//To find the point X we solve the equation AX=0 where X is not 0 and A is constructed from the points and camera matrices provided
 		Matrix A=new Matrix (length*2,4);
@@ -776,7 +777,7 @@ public class MatrixManipulations {
 		return Point;
 	}
 	
-	public double[] FindPolynomialRoots(double c[]){
+	public static double[] FindPolynomialRoots(double c[]){
 		//From the polynomial coefficients construct a companion matrix. Note that this is only for a monic polynomial\
 		//so we need to divide all the coefficients by the highest power coefficient first
 		int n=c.length-1;
@@ -801,7 +802,6 @@ public class MatrixManipulations {
 	 * 
 	 *
 	 *************************************************************************************************************************************************************/
-	
 	class LMlambdaadjustment implements LMfunc
 	  {
 	   public Matrix A,Adash,B,Bdash;
@@ -824,7 +824,6 @@ public class MatrixManipulations {
 	    * Note that the Matrices A,Adash,B and Bdash are assumed to be set before calling this.
 	    *
 	    */
-	    
 	   public Point2d val(double[] x, double[] a)
 	    {
 		   Matrix z=new Matrix(2,1);
@@ -851,8 +850,7 @@ public class MatrixManipulations {
 	 * Private methods from here on down
 	 * 
 	 **************************************************************************************************************************************************************/ 
-
-	private Point2d CalculateCentroid(Point2d[] pointsarray){
+	private static Point2d CalculateCentroid(Point2d[] pointsarray){
 		Point2d centroid=new Point2d(0,0);
 			for (int i=0;i<pointsarray.length;i++){
 				centroid.x=centroid.x+pointsarray[i].x;
