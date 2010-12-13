@@ -256,10 +256,7 @@ public class Testing {
 		
 		GraphicsFeedback graphics=new GraphicsFeedback(false);
 		graphics.ShowImage(image); // Show original image
-		byte[] colour=new byte[3];
-		 
-		 // Show the matched points (image frame) in red
-			colour[0]=(byte)255; colour[1]=(byte)0;colour[2]=(byte)0;
+		PixelColour colour=new PixelColour(PixelColour.StandardColours.Red);
 			for (int i=0;i<points.length;i++) {
 				graphics.PrintPoint(points[i].x,points[i].y,colour);
 			} // end of for loop

@@ -587,8 +587,8 @@ public class MatrixManipulations {
 			PointsInImageTwo[i]=Two[i].clone();
 		}
 		//Calculate the Normalisation matrices for each image.
-		Matrix Normalisation1=new MatrixManipulations().CalculateNormalisationMatrix(PointsInImageOne);
-		Matrix Normalisation2=new MatrixManipulations().CalculateNormalisationMatrix(PointsInImageTwo);
+		Matrix Normalisation1=CalculateNormalisationMatrix(PointsInImageOne);
+		Matrix Normalisation2=CalculateNormalisationMatrix(PointsInImageTwo);
 
 		//Apply the normalisation matrices to each set of points
 		for (int i=0;i<length;i++){

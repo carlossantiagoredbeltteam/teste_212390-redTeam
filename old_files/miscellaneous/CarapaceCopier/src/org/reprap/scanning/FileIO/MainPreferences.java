@@ -42,7 +42,6 @@ import javax.swing.JTextField;
 import javax.swing.JFormattedTextField;
 import javax.swing.JCheckBox;
 import javax.swing.JRadioButton;
-import javax.swing.JComboBox;
 import javax.swing.ButtonGroup;
 public class MainPreferences {
 	public class Papersize{

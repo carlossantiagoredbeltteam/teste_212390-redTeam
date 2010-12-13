@@ -1,7 +1,5 @@
 package org.reprap.scanning.DataStructures;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 /******************************************************************************
 * This program is free software; you can redistribute it and/or modify it under
@@ -27,7 +25,7 @@ import java.nio.ByteOrder;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 2nd December 2010
+* Last modified by Reece Arnott 13th December 2010
 * 
 * Colour abstracted out so that both greyscale and colour processing can take place
 * Note that the greyscale value is not calculated from the RGB colour values. It is assumed to be precalculated and feed to the constructor
@@ -38,10 +36,34 @@ import java.nio.ByteOrder;
 ************************************************************************************/
 
 public class PixelColour {
-
+	public static enum StandardColours {Aqua,Yellow,Fuchsia,Red,Blue,Green,Silver,Olive,Purple,Maroon,White,Lime,Teal,Navy,Gray,Black} // These are hopefully ordered so that the earlier colours are not easily confused so you can just use as many colours as you need
 	private byte greyscale;
 	 private byte r,g,b;
 	
+	 
+	 //	 This returns the values of 16 colours taken from http://www.febooti.com/products/iezoom/online-help/html-color-names-16-color-chart.html
+		public PixelColour(StandardColours colour){
+			switch (colour){
+			case Aqua :r=(byte)0;g=(byte)255;b=(byte)255;break;//Aqua
+			case Yellow :r=(byte)255;g=(byte)255;b=(byte)0;break;//Yellow  
+			case Fuchsia :r=(byte)255;g=(byte)0;b=(byte)255;break;//Fuchsia
+			case Red :r=(byte)255;g=(byte)0;b=(byte)0;break;//Red
+			case Blue :r=(byte)0;g=(byte)0;b=(byte)255;break;//Blue
+			case Green :r=(byte)0;g=(byte)128;b=(byte)0;break;//Green
+			case Silver :r=(byte)192;g=(byte)192;b=(byte)192;break;//Silver
+			case Olive :r=(byte)128;g=(byte)128;b=(byte)0;break;//Olive
+			case Purple :r=(byte)128;g=(byte)0;b=(byte)128;break;//Purple
+			case Maroon :r=(byte)128;g=(byte)0;b=(byte)0;break;//Maroon
+			case White :r=(byte)255;g=(byte)255;b=(byte)255;break;//White  
+			case Lime :r=(byte)0;g=(byte)255;b=(byte)0;break;//Lime
+			case Teal :r=(byte)0;g=(byte)128;b=(byte)128;break;//Teal
+			case Navy :r=(byte)0;g=(byte)0;b=(byte)128;break;//Navy
+			case Gray :r=(byte)128;g=(byte)128;b=(byte)128;break;//Gray
+			default: r=(byte)0;g=(byte)0;b=(byte)0; //black 
+			}
+			// Now set the greyscale value. There are a number of different ways to calculate this depending on the exact colour model you use but this is one of the common ones
+			greyscale=(byte)(int)((0.299*(int)(r & 0xff) + 0.587*(int)(g & 0xff) + 0.114*(int)(b & 0xff)));
+		}
 	
 	// Constructors
 	public PixelColour(byte grey){
@@ -64,7 +86,7 @@ public class PixelColour {
 		g=(byte)((greyRGB >> 8) & 0xff);
 		b=(byte)((greyRGB >> 0) & 0xff);
 		}
-	
+
 	public PixelColour(int ARGB, byte grey){
 	// Note that it is assumed that the int encodes the pixel colour in the default format of 8 bits for each of Alpha, Red, Green, Blue (and we are ignoring the Alpha channel)
 	// The greyscale value is a given and is not calculated within this class
@@ -182,6 +204,13 @@ public class PixelColour {
 	public byte getBlue(){
 		return b;
 	}
+	public byte[] getRGB(){
+		byte[] returnvalue=new byte[3];
+		returnvalue[0]=r;
+		returnvalue[1]=g;
+		returnvalue[2]=b;
+		return returnvalue;
+	}
 	/*
 	public boolean CompareColours(PixelColour other, int threshold){
 	//TODO???
@@ -205,5 +234,7 @@ public class PixelColour {
 			}
 		return returnvalue;
 	}
-	
+	public boolean isEqual(PixelColour other){
+		return (ExportAsInt()==other.ExportAsInt());
+	}
 }

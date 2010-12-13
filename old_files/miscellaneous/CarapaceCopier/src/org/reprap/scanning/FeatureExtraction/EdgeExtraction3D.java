@@ -69,7 +69,7 @@ class EstimatedPoint{
 		return returnvalue;
 	}
 	public void Estimate3dPoint(){
-		estimatedpoint=new Point3d(new MatrixManipulations().Find3dPoint(points, P,currentpoints));
+		estimatedpoint=new Point3d(MatrixManipulations.Find3dPoint(points, P,currentpoints));
 	}
 	public void SetSkip(boolean value){
 		skip=value;
