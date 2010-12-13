@@ -24,7 +24,7 @@ package org.reprap.scanning.Geometry;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 22nd Feburary 2010
+ * Last modified by Reece Arnott 13th December 2010
  *
  *****************************************************************************/
 
@@ -61,9 +61,10 @@ public class LineSegment2D {
 	public Point2d GetPointOnLine(double U){
 		// The line can be described as start+U(end-start)
 		Point2d vector=end.minusEquals(start);
-		vector.timesEquals(U);
+		vector.scale(U);
 		return start.plusEquals(vector);
 	}
+	
 public double CalculateLengthSquared(){
 		return end.CalculateDistanceSquared(start);
 	}
