@@ -38,7 +38,6 @@ import javax.swing.JProgressBar;
 import Jama.Matrix;
 import org.reprap.scanning.Geometry.*;
 import org.reprap.scanning.FeatureExtraction.*;
-import org.reprap.scanning.Calibration.CalibrateImage;
 import org.reprap.scanning.Calibration.LensDistortion;
 import org.reprap.scanning.FileIO.ImageFile;
 

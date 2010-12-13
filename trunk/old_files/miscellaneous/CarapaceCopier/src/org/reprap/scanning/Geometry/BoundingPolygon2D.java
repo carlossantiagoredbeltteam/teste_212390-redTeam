@@ -46,10 +46,14 @@ public class BoundingPolygon2D {
 	//Constructor
 	public BoundingPolygon2D(Point2d vertices[]){
 		boundingbox=new AxisAlignedBoundingBox();
-		for (int i=0;i<vertices.length;i++)
-			if (i==0){boundingbox.minx=vertices[i].x;boundingbox.maxx=vertices[i].x;boundingbox.miny=vertices[i].y;boundingbox.maxy=vertices[i].y;}
-			else boundingbox.Expand2DBoundingBox(vertices[i]);
-		orderedvertices=FindAndOrderVertices(vertices);
+		orderedvertices=new Point2d[vertices.length];
+		if (vertices.length>1){
+			for (int i=0;i<vertices.length;i++)
+				if (i==0){boundingbox.minx=vertices[i].x;boundingbox.maxx=vertices[i].x;boundingbox.miny=vertices[i].y;boundingbox.maxy=vertices[i].y;}
+				else boundingbox.Expand2DBoundingBox(vertices[i]);
+			orderedvertices=FindAndOrderVertices(vertices);
+		}
+		else if (vertices.length==1) orderedvertices[0]=vertices[0].clone();
 	} // end of constructor
 	
 	public BoundingPolygon2D clone(){
@@ -79,7 +83,8 @@ public class BoundingPolygon2D {
 		for (int i=0;i<orderedvertices.length;i++) newvertices[i]=orderedvertices[i].clone();
 		newvertices[orderedvertices.length]=point.clone();
 		boundingbox.Expand2DBoundingBox(point);
-		orderedvertices=FindAndOrderVertices(newvertices);
+		if (newvertices.length>2) orderedvertices=FindAndOrderVertices(newvertices);
+		else orderedvertices=newvertices.clone();
 	}
 	
 //	 This re-orders the vertices so they are in clockwise or anti-clockwise order, depending on the directions enum array defined at the start of the class
@@ -90,7 +95,6 @@ public class BoundingPolygon2D {
 		Point2d currentcorner=new Point2d(boundingbox.minx-1,boundingbox.miny-1); 
 		// Assuming the bounding box has been calculated correctly, this will start with the leftmost point and try to find the closest point on its right.
 		int[] vertexindices=new int[vertices.length];
-		//Point2d[] tempFeatureCorner=new Point2d[corners.length];
 		boolean[] skip=new boolean[vertices.length]; 
 		for (int i=0;i<skip.length;i++) skip[i]=false;
 		int vertexnumber=0;
@@ -105,21 +109,21 @@ public class BoundingPolygon2D {
 			{
 				if (!skip[i]){	
 				boolean lookat=false;
-					if ((majordirection==direction.right) && (vertices[i].x>=currentcorner.x)) lookat=true; 
-					if ((majordirection==direction.left) && (vertices[i].x<=currentcorner.x)) lookat=true;
-					//if ((majordirection==direction.down) && (vertices[i].y<=currentcorner.y)) lookat=true; // for inverted y
-					if ((majordirection==direction.up) && (vertices[i].y<=currentcorner.y)) lookat=true;
-					if ((majordirection==direction.down) && (vertices[i].y>=currentcorner.y)) lookat=true;
-					//if ((majordirection==direction.up) && (vertices[i].y>=currentcorner.y)) lookat=true; //for inverted y
+					if ((majordirection==direction.right) && (vertices[i].x>currentcorner.x)) lookat=true; 
+					if ((majordirection==direction.left) && (vertices[i].x<currentcorner.x)) lookat=true;
+					if ((majordirection==direction.up) && (vertices[i].y<currentcorner.y)) lookat=true;
+					if ((majordirection==direction.down) && (vertices[i].y>currentcorner.y)) lookat=true;
+					//if ((majordirection==direction.up) && (vertices[i].y>currentcorner.y)) lookat=true; //for inverted y
+					//if ((majordirection==direction.down) && (vertices[i].y<currentcorner.y)) lookat=true; // for inverted y
 					
 					
 					if (lookat){ // if it is in the direction we are interested in, look at it
 						if (minordirection==direction.right) distance=0-vertices[i].x;
 						if (minordirection==direction.left) distance=vertices[i].x;
-						//if (minordirection==direction.down) distance=vertices[i].y; // for inverted y 
 						if (minordirection==direction.down) distance=0-vertices[i].y;
-						//if (minordirection==direction.up) distance=0-vertices[i].y; // for inverted y
 						if (minordirection==direction.up) distance=vertices[i].y; 
+						//if (minordirection==direction.up) distance=0-vertices[i].y; // for inverted y
+						//if (minordirection==direction.down) distance=vertices[i].y; // for inverted y 
 						if ((distance<mindistance) || first) { // if it is closer to the edge in the direction we are interested in (or is the first in this direction) mark it
 							first=false;
 							index=i;
@@ -128,17 +132,20 @@ public class BoundingPolygon2D {
 					} // end if lookat
 				} // end if !skip
 			} //end for
-			if (index==-1) { // if didn't find any corners in that direction, cycle to the next direction.
+			if (index==-1) { // if didn't find any vertices in that direction, cycle to the next direction.
 				minordirection=majordirection;
 				majordirection=directionarray[(majordirection.ordinal()+1)%4];
-			}else { // otherwise add that vertex to the array, skip it next time (unless it is the first vertex as the exit condition depends on eventually selecting this index again) and set this corner to be the current one
-				currentcorner=vertices[index].clone();
-				vertexindices[vertexnumber]= index;
+			}else { // otherwise add that vertex to the array, skip it next time (unless it is the first vertex) and set this corner to be the current one
 				if (vertexnumber!=0){
-					skip[index]=true;
-					exit=index==vertexindices[0];
+					exit=(index==vertexindices[0]);
 				}
-				if (!exit) vertexnumber++;
+				if (!exit){
+					currentcorner=vertices[index].clone();
+					vertexindices[vertexnumber]= index;
+					skip[index]=(vertexnumber!=0); // we need to keep the first vertex in play so that we can detect when to exit the loop i.e. when we have completed encircling the points and come back to the starting point. 
+					vertexnumber++;
+					exit=(vertexnumber==vertices.length);
+				}
 			} // end else
 		} // end while
 		Point2d[] reorderedvertices=new Point2d[vertexnumber];

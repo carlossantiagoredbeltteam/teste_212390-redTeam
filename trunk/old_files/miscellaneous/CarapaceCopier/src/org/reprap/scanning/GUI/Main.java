@@ -138,8 +138,8 @@ public class Main extends JFrame {
  *  
  */ 
 
-   public enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration, objectfindingvoxelisation,writetofile,end};
-   //public enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration, test,end};
+   public static enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration, objectfindingvoxelisation,writetofile,end};
+   //public static enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration, test,end};
      private final static steps stepsarray[]=steps.values();
     private static steps laststep = steps.valueOf("end");
     private static steps firststep = steps.valueOf("calibrationsheet");
@@ -295,11 +295,6 @@ public class Main extends JFrame {
  		int pixelswide=(int)((volumeofinterest.maxx-volumeofinterest.minx)*3);
  		int pixelshigh=(int)((volumeofinterest.maxy-volumeofinterest.miny)*3);
  		// each pixel is 1/3mm square
- 		PixelColour black=new PixelColour((byte)0);
- 		PixelColour white=new PixelColour((byte)255);
- 		PixelColour red=new PixelColour(16711680,(byte)255);
- 		PixelColour green=new PixelColour(65280,(byte)255);
- 		PixelColour blue=new PixelColour(255,(byte)255);
  		// Find the camera center of each image
  		Point3d[] C=new Point3d[images.length];
  		for (int i=0;i<C.length;i++) C[i]=new Point3d(MatrixManipulations.GetRightNullSpace(images[i].getWorldtoImageTransformMatrix()));
@@ -316,7 +311,7 @@ public class Main extends JFrame {
  				PixelColour[][] newimage=new PixelColour[pixelswide][pixelshigh];
  				for (int i=0;i<pixelswide;i++)
  					for (int j=0;j<pixelshigh;j++)
- 						newimage[i][j]=white.clone();
+ 						newimage[i][j]=new PixelColour(PixelColour.StandardColours.White);
  				
  				for (int ydir=1;ydir>=-1;ydir=ydir-2){
  					int yindex;
@@ -388,6 +383,23 @@ public class Main extends JFrame {
  				if (prefs.Debug){
  					GraphicsFeedback graphics=new GraphicsFeedback(true);
  					graphics.ShowPixelColourArray(newimage,pixelswide,pixelshigh);
+ 					BoundingPolygon2D boundingpolygon=new BoundingPolygon2D(new Point2d[0]);
+ 					boolean first=true;
+ 					for (int pixelx=0;pixelx<pixelswide;pixelx++){
+ 						for (int pixely=0;pixely<pixelshigh;pixely++){
+ 							if (!newimage[pixelx][pixely].isEqual(new PixelColour(PixelColour.StandardColours.White))){
+ 								if (first){
+ 									Point2d[] point=new Point2d[1];
+ 									point[0]=new Point2d(pixelx,pixely);
+ 									boundingpolygon=new BoundingPolygon2D(point);
+ 									first=false;
+ 								}
+ 								else boundingpolygon.ExpandPolygon(new Point2d(pixelx,pixely));
+ 							} // end if not white pixel
+ 							
+ 						} // end for pixely
+ 					} //end for pixelx
+ 					graphics.OutlinePolygon(boundingpolygon,new PixelColour(PixelColour.StandardColours.Blue),0,0);
  					String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"TestImageAtZ="+String.valueOf(z)+String.valueOf(zdir)+".jpg";
  					graphics.SaveImage(filename);
  				}
@@ -1091,6 +1103,7 @@ private void FindCalibrationSheetCirclesEtc(){
 	  			    		    GraphicsFeedback graphics2=new GraphicsFeedback(true);
 	  		    				 graphics2.ShowImage(images[j]);
 	  		    				 PointPair2D[] pairs=circles.getMatchedPoints();
+	  		    				PixelColour.StandardColours[] standardcolours=PixelColour.StandardColours.values();
 	  		    				for (int k=0;k<pairs.length;k++){
 	  		    					// The first point of the pair represents the calibration sheet circle center transformed into real world coordinates
 	  		    					// The second point of the pair represents the centre of the ellipse in the image.
@@ -1099,7 +1112,9 @@ private void FindCalibrationSheetCirclesEtc(){
 	  		    					int imageellipseindex=-1;
 	  		    					for (int l=0;l<calibrationcirclecenters.length;l++) if (calibrationcirclecenters[l].isApproxEqual(pairs[k].pointone,0.001)) calibrationsheetindex=l;
 	  		    					for (int l=0;l<imageellipses.length;l++)if (imageellipses[l].GetCenter().isApproxEqual(pairs[k].pointtwo,0.001)) imageellipseindex=l;
-	  		    					byte[] colour=graphics1.GetColour(k);
+	  		    					 PixelColour colour;
+	  		    					if (k<standardcolours.length)colour=new PixelColour(standardcolours[k]);
+	  		    					else colour=new PixelColour(standardcolours[standardcolours.length-1]);
 	 							   if(calibrationsheetindex>=0) graphics1.PrintEllipse(calibrationcircles[calibrationsheetindex],colour,new Point2d(0,0));
 	 							   if(imageellipseindex>=0)graphics2.PrintEllipse(imageellipses[imageellipseindex],colour,images[j].originofimagecoordinates);
 	 							 } // end for k
@@ -1934,9 +1949,8 @@ private void FindCalibrationSheetCirclesEtc(){
 		    
 		   // Output the debug file if appropriate, this will show all ellipses found, the valid ones in green and the rest in red
 				if ((prefs.Debug) && (prefs.DebugEllipseFinding)){
-						byte[] red,green;
-						red=new byte[3]; red[0]=(byte)255;red[1]=(byte)0;red[2]=(byte)0;
-						green=new byte[3]; green[0]=(byte)0;green[1]=(byte)255;green[2]=(byte)0;
+						PixelColour red=new PixelColour(PixelColour.StandardColours.Red);
+						PixelColour green=new PixelColour(PixelColour.StandardColours.Green);
 						
 						GraphicsFeedback graphics=new GraphicsFeedback(true);
 						graphics.ShowImage(images[i]);
@@ -2324,16 +2338,12 @@ private void FindCalibrationSheetCirclesEtc(){
 				graphics.ShowBinaryimage(processedpixels,images[i].width,images[i].height);
 				graphics.SaveImage(filename);
 				// now save image with black background except where unprocessed pixels
-				byte[] colour=new byte[3];
-				colour[0]=(byte)0;
-				colour[1]=(byte)0;
-				colour[2]=(byte)0;
 				graphics.ShowImage(images[i]);
-				
+				PixelColour black=new PixelColour(PixelColour.StandardColours.Black);
 				for (int x=0;x<images[i].width;x++)
 					for (int y=0;y<images[i].height;y++){
 						if (processedpixels[x][y]){
-							graphics.Print(x,y,colour,1,1);
+							graphics.Print(x,y,black,0,0);
 						}
 					}
 				filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"RestrictedSearchForImageColourImage"+String.valueOf(i)+".jpg";
@@ -2396,7 +2406,7 @@ private void FindCalibrationSheetCirclesEtc(){
 	private void GraphicsFeedback(){
 		 if (prefs.Debug && prefs.DebugImageOverlay){
 			 for (int j=0;j<images.length;j++){     						
-				 byte[] colour=new byte[3];
+				 PixelColour colour;
 				 GraphicsFeedback graphics=new GraphicsFeedback();
 				 graphics.ShowImage(images[j]); // Note that the graphics feedback should be called at the end, otherwise the colour image may not exist
 				 if (!images[j].skipprocessing){
@@ -2404,16 +2414,16 @@ private void FindCalibrationSheetCirclesEtc(){
 	    				
 					
 						// Show the matched points (image frame) in white
-						colour[0]=(byte)255; colour[1]=(byte)255;colour[2]=(byte)255;
+						colour=new PixelColour(PixelColour.StandardColours.White);
 						for (int i=0;i<matchingpoints.length;i++) {
 							Point2d temp=matchingpoints[i].pointtwo.clone();
 							graphics.PrintPoint(temp.x,temp.y,colour);
 						}
 						
-					// Show the estimated ellipse center of the matched circle transferred to the image coordinate plane in aqua
+					// Show the estimated ellipse center of the matched circle transferred to the image coordinate plane in teal
 					// as well as the ellipse itself
 						for (int i=0;i<matchingpoints.length;i++) {
-							colour[0]=(byte)0; colour[1]=(byte)128;colour[2]=(byte)128;
+							colour=new PixelColour(PixelColour.StandardColours.Teal);
 							Ellipse tempellipse=standardcalibrationcircleonprintedsheet.clone();
 							tempellipse.ResetCenter(matchingpoints[i].pointone);
 	   						Ellipse ellipse=new Ellipse(images[j].getWorldtoImageTransformMatrix(),images[j].originofimagecoordinates,tempellipse,360);
@@ -2423,7 +2433,7 @@ private void FindCalibrationSheetCirclesEtc(){
 							   							
 						}
 						// Show outline of calibration sheet
-						colour[0]=(byte)0; colour[1]=(byte)128;colour[2]=(byte)128;
+						colour=new PixelColour(PixelColour.StandardColours.Teal);
 						for (int x=(int)(-calibrationsheetwidth/2);x<(calibrationsheetwidth/2);x++){
 							//convert from calibration coordinates to image coordinates and draw top
 							int y=(int)(calibrationsheetheight/2);
@@ -2472,15 +2482,15 @@ private void FindCalibrationSheetCirclesEtc(){
 						
 						/*
 	   					// Show the inside sub voxel centers in black
-						colour[0]=(byte)0; colour[1]=(byte)0;colour[2]=(byte)0;
+						colour=new PixelColour(PixelColour.StandardColours.Black);
 					graphics.PrintInsideSubVoxels(rootvoxel, images[j], colour);
 						// Show the surface sub voxel centers in grey
-						colour[0]=(byte)128; colour[1]=(byte)128;colour[2]=(byte)128;
+						colour=new PixelColour(PixelColour.StandardColours.Gray);
 					graphics.PrintSurfaceSubVoxels(rootvoxel, images[j], colour);
 						//*/
 						// Show the 3d Points backprojected into the image in grey
 					
-						colour[0]=(byte)128; colour[1]=(byte)128;colour[2]=(byte)128;
+						colour=new PixelColour(PixelColour.StandardColours.Gray);
 					for (int i=0;i<surfacepoints.length;i++){
 							Matrix point=new Matrix(4,1);
 							point.set(0,0,surfacepoints[i].x);
@@ -2722,8 +2732,8 @@ public class Point3dArray {
 			 distortion.SetDistortionCoefficient(k1,origin); 
 			  images[i].originofimagecoordinates=origin.clone();
 			  // Update the world to image transform matrix 
-			  Z=new MatrixManipulations().getZscaleMatrix(z);
-			  P=new MatrixManipulations().WorldToImageTransformMatrix(K,R,t,Z);
+			  Z=MatrixManipulations.getZscaleMatrix(z);
+			  P=MatrixManipulations.WorldToImageTransformMatrix(K,R,t,Z);
 			  images[i].setWorldtoImageTransformMatrix(P);
 			 
 			  if (print){

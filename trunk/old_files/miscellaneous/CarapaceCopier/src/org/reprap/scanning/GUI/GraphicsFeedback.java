@@ -168,34 +168,7 @@ public class GraphicsFeedback {
 			} // end for y
 			
 	}
-	// This returns the RGB values of 16 colours taken from http://www.febooti.com/products/iezoom/online-help/html-color-names-16-color-chart.html
-	// based on the integer input. 15 colours are used for the numbers 0-14 and everything else returns black
-	public byte[] GetColour(int i){
-		byte[] colour=new byte[3];
-		// These are hopefully ordered so that the earlier colours are not easily confused
-		switch (i){
-		case (0) :colour[0]=(byte)0;colour[1]=(byte)255;colour[2]=(byte)255;break;//Aqua
-		case (1) :colour[0]=(byte)255;colour[1]=(byte)255;colour[2]=(byte)0;break;//Yellow  
-		case (2) :colour[0]=(byte)255;colour[1]=(byte)0;colour[2]=(byte)255;break;//Fuchsia
-		case (3) :colour[0]=(byte)255;colour[1]=(byte)0;colour[2]=(byte)0;break;//Red
-		case (4) :colour[0]=(byte)0;colour[1]=(byte)0;colour[2]=(byte)255;break;//Blue
-		case (5) :colour[0]=(byte)0;colour[1]=(byte)128;colour[2]=(byte)0;break;//Green
-		case (6) :colour[0]=(byte)192;colour[1]=(byte)192;colour[2]=(byte)192;break;//Silver
-		case (7) :colour[0]=(byte)128;colour[1]=(byte)128;colour[2]=(byte)0;break;//Olive
-		case (8) :colour[0]=(byte)128;colour[1]=(byte)0;colour[2]=(byte)128;break;//Purple
-		case (9) :colour[0]=(byte)128;colour[1]=(byte)0;colour[2]=(byte)0;break;//Maroon
-		case (10) :colour[0]=(byte)255;colour[1]=(byte)255;colour[2]=(byte)255;break;//White  
-		case (11) :colour[0]=(byte)0;colour[1]=(byte)255;colour[2]=(byte)0;break;//Lime
-		case (12) :colour[0]=(byte)0;colour[1]=(byte)128;colour[2]=(byte)128;break;//Teal
-		case (13) :colour[0]=(byte)0;colour[1]=(byte)0;colour[2]=(byte)128;break;//Navy
-		case (14) :colour[0]=(byte)128;colour[1]=(byte)128;colour[2]=(byte)128;break;//Gray
-		default: colour[0]=(byte)0;colour[1]=(byte)0;colour[2]=(byte)0; //black 
-		}
-		
-		
-		return colour;
-	}
-	public void PrintEllipse(Ellipse originalellipse, byte[] colour,Point2d offset){
+		public void PrintEllipse(Ellipse originalellipse, PixelColour colour,Point2d offset){
 		Ellipse ellipse=originalellipse.clone();
 		ellipse.OffsetCenter(offset);
 		AxisAlignedBoundingBox box=ellipse.GetAxisAlignedBoundingRectangle();
@@ -205,7 +178,7 @@ public class GraphicsFeedback {
 					if (ellipse.PointInsideEllipse(new Point2d(x,y))) Print(x,y,colour,0,0);
 	}
 	
-	public void OutlineEllipse(Ellipse originalellipse,byte[]colour,Point2d offset){
+	public void OutlineEllipse(Ellipse originalellipse,PixelColour colour,Point2d offset){
 		Ellipse ellipse=originalellipse.clone();
 		ellipse.OffsetCenter(offset);
 		for (int t=0;t<360;t++){
@@ -214,7 +187,23 @@ public class GraphicsFeedback {
 			Print((int)edge.x,(int)edge.y,colour,0,0);
 		}
 	}
-	public void PrintSurfaceSubVoxels(Voxel rootvoxel, Image givenimage, byte[] colour){
+	public void OutlinePolygon(BoundingPolygon2D polygon,PixelColour colour){OutlinePolygon(polygon,colour,2,2);}
+	public void OutlinePolygon(BoundingPolygon2D polygon,PixelColour colour,int w,int h){
+		LineSegment2D[] lines=polygon.Get2DLineSegments();
+		for (int i=0;i<lines.length;i++) PrintLineSegment(lines[i],colour,w,h);
+	}
+	
+	public void PrintLineSegment(LineSegment2D line,PixelColour colour){ PrintLineSegment(line,colour,2,2);}
+	public void PrintLineSegment(LineSegment2D line,PixelColour colour,int w, int h){ PrintLineSegment(line,colour,1000,w,h);}
+	public void PrintLineSegment(LineSegment2D line,PixelColour colour, int numberofsteps,int w,int h){
+		for (int i=0;i<=numberofsteps;i++){
+				Point2d newpoint=line.GetPointOnLine((double)((double)i/(double)numberofsteps));
+				Print(newpoint.x,newpoint.y,colour,0,0);
+			}	
+	}
+		
+	
+	public void PrintSurfaceSubVoxels(Voxel rootvoxel, Image givenimage, PixelColour colour){
 		int max=rootvoxel.getSubVoxelArraySize();
 		for (int i=0;i<max;i++){
 			for (int j=0;j<max;j++){
@@ -230,7 +219,7 @@ public class GraphicsFeedback {
 		}
 	} // end of print surface subvoxels
 	
-	public void PrintInsideSubVoxels(Voxel rootvoxel, Image givenimage, byte[] colour){
+	public void PrintInsideSubVoxels(Voxel rootvoxel, Image givenimage, PixelColour colour){
 		int max=rootvoxel.getSubVoxelArraySize();
 		for (int i=0;i<max;i++){
 			for (int j=0;j<max;j++){
@@ -246,7 +235,7 @@ public class GraphicsFeedback {
 		}
 	} // end of print inside subvoxels
 	
-	public void PrintOutsideSubVoxels(Voxel rootvoxel, Image givenimage, byte[] colour){
+	public void PrintOutsideSubVoxels(Voxel rootvoxel, Image givenimage, PixelColour colour){
 		int max=rootvoxel.getSubVoxelArraySize();
 		for (int i=0;i<max;i++){
 			for (int j=0;j<max;j++){
@@ -381,21 +370,26 @@ public class GraphicsFeedback {
 */
 
 	
-	public void Print(double xpoint,double ypoint, byte[] colour,int width, int height){
+	public void Print(double xpoint,double ypoint, PixelColour colour,int width, int height){
 		for (int y=(int)(ypoint-height);y<=(int)(ypoint+height);y++){
-			int tempindex=(imageheight-y-1)*imagewidth*colour.length;
+			int tempindex=(imageheight-y-1)*imagewidth*numcolours;
 			for (int x=(int)(xpoint-width);x<=(int)(xpoint+width);x++){
 				if ((x>=0) && (x<imagewidth) && (y>=0) && (y<imageheight)){
-					int index=tempindex+(x*colour.length);
-					for (int colours=0;colours<colour.length;colours++)
-						GLimage[index+colours]=colour[colours];
-				} // end if
+					int index=tempindex+(x*numcolours);
+					for (int colours=0;colours<numcolours;colours++) {
+						switch(colours){
+						case 0:GLimage[index+colours]=colour.getRed();break;
+						case 1:GLimage[index+colours]=colour.getGreen();break;
+						case 2:GLimage[index+colours]=colour.getBlue();break;
+						} // end switch
+					} // end for colours
+					} // end if
 			} // end for x
 		} // end for y
 		
 	}
 	
-public void PrintPoint(double xpoint,double ypoint, byte[] colour){
+public void PrintPoint(double xpoint,double ypoint, PixelColour colour){
 		int square=2; // point will be output as a nxn square where this determines n (actually n=square*2+1)
 		Print(xpoint,ypoint,colour,square,square);
 } // end PrintPoint method
