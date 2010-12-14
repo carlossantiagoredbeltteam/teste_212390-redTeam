@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  *
- * Last modified by Reece Arnott 13th December 2010
+ * Last modified by Reece Arnott 14th December 2010
  * 
  * Note that most of the layout commands were initially produced by NetBeans for JDK 6
  * and significantly modified by hand. For future reference if it needs to be done the other way the main things to change are:
@@ -99,11 +99,11 @@ public class Main extends JFrame {
     private double calibrationsheetwidth,calibrationsheetheight; // these relate to the real world physical dimensions of the printed calibration sheet calculated from the paper size, orientation and margins
     private double calibrationsheetxlength,calibrationsheetylength; // these relate to the calculated physical dimensions of circles on the printed calibration sheet.
     private int calibrationsheetpixelswidth,calibrationsheetpixelsheight; // These are only used in writing out images the same size as the calibration sheet if debugging
-    private AxisAlignedBoundingBox volumeofinterest;
+    private Ellipse[] calibrationcircles; // only needs to be a global variable if the DebugPointPairMatching is set to true
+	private Ellipse[] imageellipses; // only needs to be a global variable if the DebugPointPairMatching is set to true
+	private AxisAlignedBoundingBox volumeofinterest;
     private Point2d[] calibrationcirclecenters;
 	private Point3d[] surfacepoints;
-	private Ellipse[] calibrationcircles; // only needs to be a global variable if the DebugPointPairMatching is set to true
-	private Ellipse[] imageellipses; // only needs to be a global variable if the DebugPointPairMatching is set to true
 	private TriangularFace[] surfacetriangles;
 	private MainPreferences prefs;
 	private JProgressBar jProgressBar1,jProgressBar2; 
@@ -131,16 +131,15 @@ public class Main extends JFrame {
     // This defines how many chunks the shared second progress bar is broken up into for the 3 steps it is shared with
 	 private final static int calibrationsheetinterrogationnumberofsteps=1;
 	   private final static int calibrationnumberofsubsteps=6;
-    private final static int objectvoxelisationnumberofsteps=4;
+    private final static int objectvoxelisationnumberofsteps=2;
     
 /* This enumerated list and associated setstep method is for the programmer to add to if any additional intermediate steps need to be added.
  *  Note that the last enum value should not be used for anything other than exiting the program.
  *  
  */ 
 
-   public static enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration, objectfindingvoxelisation,writetofile,end};
-   //public static enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration, test,end};
-     private final static steps stepsarray[]=steps.values();
+   public static enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration,objectfindingvoxelisation,texturematching,writetofile,end};
+    private final static steps stepsarray[]=steps.values();
     private static steps laststep = steps.valueOf("end");
     private static steps firststep = steps.valueOf("calibrationsheet");
     private steps currentstep=firststep;
@@ -263,14 +262,16 @@ public class Main extends JFrame {
 					// Note that the end is an unconditional call to this method with an incremented step
 					// i.e. automatically go onto the next step
 				case objectfindingvoxelisation : 
-					FindCoarseVoxelisedObject(); break; // this is the other big one
+					FindCoarseVoxelisedObject(); break; // this is another of the big ones
 					// Note that the end is a call to this method with an incremented step if the next step is set to Automatic
 					// i.e. exit without the user pressing the exit button
+				case texturematching :SurfacePointTextureMatching();break;
 				case writetofile:
-					OutputSTLFile(); break;
+					OutputSTLFile(); 
+					GraphicsFeedback(); // image feedback if the debug options are set
+ 					 break;
 				
 				case end : end(); break;
-				//case test :Test();break;
 				}
 			}
 			catch (Exception e) {
@@ -282,37 +283,42 @@ public class Main extends JFrame {
     	} // end of method
  
  
- 	//This method is only called for testing purposes in the above method if the steps enum definition has it specified.
- 	// This should only happen during testing and the case statement in the above method should be commented out with the enum definition not having a test element
- 	// for the production system.
- 	public void Test(){
- 		volumeofinterest.minx=-42.65625;
- 		volumeofinterest.miny=-37.125;
- 		volumeofinterest.minz=0.0;
- 		volumeofinterest.maxx=45.9375;
- 		volumeofinterest.maxy=64.96875;
- 		volumeofinterest.maxz=81.2109375;
+ 	//This method is an intermediary one for testing purposes
+ 	// Eventually this will be replaced by a SurfacePatchTextureMatching method that give better output.
+ 	public void SurfacePointTextureMatching(){
+ 		TrianglePlusVertexArray totaltriplusvertex=new TrianglePlusVertexArray(new Point3d[0]);
+ 		//volumeofinterest.minx=-42.65625;
+ 		//volumeofinterest.miny=-37.125;
+ 		//volumeofinterest.minz=0.0;
+ 		//volumeofinterest.maxx=45.9375;
+ 		//volumeofinterest.maxy=64.96875;
+ 		//volumeofinterest.maxz=81.2109375;
  		int pixelswide=(int)((volumeofinterest.maxx-volumeofinterest.minx)*3);
  		int pixelshigh=(int)((volumeofinterest.maxy-volumeofinterest.miny)*3);
  		// each pixel is 1/3mm square
+ 		
  		// Find the camera center of each image
  		Point3d[] C=new Point3d[images.length];
  		for (int i=0;i<C.length;i++) C[i]=new Point3d(MatrixManipulations.GetRightNullSpace(images[i].getWorldtoImageTransformMatrix()));
 		// To do this sweep properly we need to sweep in all eight combinations of +/- x/y/z
  		double x=volumeofinterest.minx;double xstep=(volumeofinterest.maxx-volumeofinterest.minx)/pixelswide;
  		double y=volumeofinterest.miny;double ystep=(volumeofinterest.maxy-volumeofinterest.miny)/pixelshigh;
- 		double z=volumeofinterest.minz;double zstep=(volumeofinterest.maxz-volumeofinterest.minz)/100;
+ 		double zstep=0.33333;
  		//TODO comment code!
  		for (int zdir=-1;zdir<=1;zdir=zdir+2) {
+ 			double z;
  			if (zdir==-1) z=volumeofinterest.maxz;
  			else z=volumeofinterest.minz-1; // escapes from loop after processing down z as test images all taken above max z height
  			while ((z>=volumeofinterest.minz) && (z<=volumeofinterest.maxz)){
  				System.out.print(z+" ");
  				PixelColour[][] newimage=new PixelColour[pixelswide][pixelshigh];
+ 				boolean[][] skip=new boolean[pixelswide][pixelshigh];
+				
  				for (int i=0;i<pixelswide;i++)
- 					for (int j=0;j<pixelshigh;j++)
+ 					for (int j=0;j<pixelshigh;j++){
  						newimage[i][j]=new PixelColour(PixelColour.StandardColours.White);
- 				
+ 						skip[i][j]=true;
+ 					}
  				for (int ydir=1;ydir>=-1;ydir=ydir-2){
  					int yindex;
  					if (ydir==-1){ y=volumeofinterest.maxy; yindex=pixelshigh-1;}
@@ -333,7 +339,6 @@ public class Main extends JFrame {
  		 							int[] cameras=new int[images.length];
  		 							int index=0;
  		 							for (int i=0;i<images.length;i++) if (!images[i].skipprocessing){
- 		 								// TODO make sure this calculation and the case statements are correct
  		 								// make the combinations of +/- x,y,z a number between 0 and 7 to make the case statements easier
  		 								int correctoctant=(int)((xdir==1)?1:0)+((int)((ydir==1)?1:0)*2)+((int)((zdir==1)?1:0)*4);
  		 								boolean process=false;
@@ -362,7 +367,8 @@ public class Main extends JFrame {
  		 								// if similar enough set display colour and set processed flag on pixels in each contributing image
  		 								if (variance[4]<300) {
  		 									newimage[xindex][yindex]=newcolour.clone();
- 		 		 							// 3) TODO reset binary pixel in each contributing image so this pixel is not used in successive runs through the loop if similar enough
+ 		 									skip[xindex][yindex]=false;
+ 		 		 							// 3) reset binary pixel in each contributing image so this pixel is not used in successive runs through the loop if similar enough
  		 									for (int j=0;j<index;j++){
  		 										int i=cameras[j];
  		 										Point2d imagepoint=images[i].getWorldtoImageTransform(point.ConvertPointTo4x1Matrix());
@@ -379,34 +385,47 @@ public class Main extends JFrame {
  					yindex=yindex+ydir;
  					if (yindex%100==0) System.out.print(".");
  					}} // end while and for y
- 			
+ 				BoundingPolygon2D boundingpolygon=new BoundingPolygon2D(new Point2d[0]);
+ 				BoundingPolygon2D overlaypolygon=new BoundingPolygon2D(new Point2d[0]); // This bounding polygon is just for overlaying on the image
+					boolean first=true;
+					for (int pixelx=0;pixelx<pixelswide;pixelx++){
+						for (int pixely=0;pixely<pixelshigh;pixely++){
+							if (!skip[pixelx][pixely]){
+								if (first){
+									Point2d[] point=new Point2d[1];
+									point[0]=new Point2d(volumeofinterest.minx+(pixelx*xstep),volumeofinterest.miny+(pixely*ystep));
+									boundingpolygon=new BoundingPolygon2D(point);
+									point[0]=new Point2d(pixelx,pixely);
+									overlaypolygon=new BoundingPolygon2D(point);
+									first=false;
+								}
+								else {
+									boundingpolygon.ExpandPolygon(new Point2d(volumeofinterest.minx+(pixelx*xstep),volumeofinterest.miny+(pixely*ystep)));
+									overlaypolygon.ExpandPolygon(new Point2d(pixelx,pixely));
+								}
+							} // end if not skip pixel
+						} // end for pixely
+					} //end for pixelx
+ 					
  				if (prefs.Debug){
  					GraphicsFeedback graphics=new GraphicsFeedback(true);
  					graphics.ShowPixelColourArray(newimage,pixelswide,pixelshigh);
- 					BoundingPolygon2D boundingpolygon=new BoundingPolygon2D(new Point2d[0]);
- 					boolean first=true;
- 					for (int pixelx=0;pixelx<pixelswide;pixelx++){
- 						for (int pixely=0;pixely<pixelshigh;pixely++){
- 							if (!newimage[pixelx][pixely].isEqual(new PixelColour(PixelColour.StandardColours.White))){
- 								if (first){
- 									Point2d[] point=new Point2d[1];
- 									point[0]=new Point2d(pixelx,pixely);
- 									boundingpolygon=new BoundingPolygon2D(point);
- 									first=false;
- 								}
- 								else boundingpolygon.ExpandPolygon(new Point2d(pixelx,pixely));
- 							} // end if not white pixel
- 							
- 						} // end for pixely
- 					} //end for pixelx
- 					graphics.OutlinePolygon(boundingpolygon,new PixelColour(PixelColour.StandardColours.Blue),0,0);
+ 					graphics.OutlinePolygon(overlaypolygon,new PixelColour(PixelColour.StandardColours.Blue),0,0);
  					String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"TestImageAtZ="+String.valueOf(z)+String.valueOf(zdir)+".jpg";
  					graphics.SaveImage(filename);
  				}
- 			 		System.out.println();
+
+ 				TrianglePlusVertexArray triplusvertex=boundingpolygon.ExtrudeTo3DAndConvertToTriangles(zstep,z+(zstep/2));
+				totaltriplusvertex=totaltriplusvertex.MergeAndReturn(triplusvertex);
+				System.out.println(" this layer triangles="+triplusvertex.GetTriangleArrayLength()+" total triangles="+totaltriplusvertex.GetTriangleArrayLength());
 	 					z=z+(zdir*zstep);
 	 			}} // end while and for z
 
+ 		surfacetriangles=totaltriplusvertex.GetTriangleArray();
+ 		surfacepoints=totaltriplusvertex.GetVertexArray();
+ 		System.out.println("triangle length="+surfacetriangles.length);
+ 		System.out.println("points length="+surfacepoints.length);
+ 		
 //		 Automatically go onto the next step
 		  setStep(stepsarray[currentstep.ordinal()+1]);
 
@@ -1288,12 +1307,10 @@ private void FindCalibrationSheetCirclesEtc(){
 	 				  else {
 	 				  	 Voxel voxels=Voxelisation();
 	 				  	 //TODO uncomment when finished testing
-	 				  	 //RestrictSearch(voxels);
-	 				  	 SurfaceVoxelsToTriangles(voxels);
+	 				  	 RestrictSearch(voxels);
+	 				  	 //SurfaceVoxelsToTriangles(voxels);
 	 				  	 } // end else for if there are enough images to extract 3D information 
-	 	    		 GraphicsFeedback();
- 					 
-	 	    		  // automatically continue to the next step
+	 	    		 // automatically continue to the next step
 	 	   		    	setStep(stepsarray[currentstep.ordinal()+1]);
 
 	 	   		    
@@ -1818,10 +1835,10 @@ private void FindCalibrationSheetCirclesEtc(){
 		   // Load the image in apply the Gaussian filtering kernel as a pre-processing filtering step
 		   images[i]=new Image(prefs.imagefiles.getElementAt(i).toString(), kernel);	
 		  	
-		   // Re-sample image to be 1024 pixels wide
+		   // Re-sample image based on the width algorithm parameter and keeping current aspect ratio
 		   int width=prefs.AlgorithmSettingResampledImageWidthForEllipseDetection;
 		   double scale=(double)images[i].width/(double)width;
-		   int height=(int)(images[i].height/scale)+1;
+		   int height=(int)((double)images[i].height/scale);
 		   PixelColour[][] scaledpixels=new PixelColour[width][height];
 		   for (int x=0;x<width;x++){
 			   final JProgressBar temp=new JProgressBar(0,width);
@@ -2372,7 +2389,7 @@ private void FindCalibrationSheetCirclesEtc(){
 	}
 
 	
-	
+	//TODO delete when not needed
 	private void SurfaceVoxelsToTriangles(Voxel rootvoxel){
 		 try{ 
 				// This is the recommended way of passing GUI information between threads

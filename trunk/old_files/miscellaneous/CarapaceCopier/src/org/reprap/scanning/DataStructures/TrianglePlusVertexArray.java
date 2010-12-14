@@ -100,7 +100,6 @@ public class TrianglePlusVertexArray {
 		}
 		
 	}
-	//TODO test this!
 	public TrianglePlusVertexArray MergeAndReturn(TrianglePlusVertexArray other){
 		// Merge the vertices
 		Point3d[] newvertices=new Point3d[vertices.length+other.vertices.length];
@@ -112,11 +111,11 @@ public class TrianglePlusVertexArray {
 		// merge the first set of triangles (no change)
 		TriangularFace[] newtriangles=new TriangularFace[triangles.length+other.triangles.length];
 		for (int i=0;i<triangles.length;i++) newtriangles[i]=triangles[i].clone();
-		// Now the hard part, add the second set of triangles and for each change the indices of the 3 vertices
+		// Now add the second set of triangles and for each change the indices of the 3 vertices
 		for (int i=0;i<other.triangles.length;i++) {
 			TriangularFace tri=other.triangles[i].clone();
 			int[] old=tri.GetFace();
-			tri.ChangeTriangle(old[0]+triangles.length,old[1]+triangles.length,old[2]+triangles.length);
+			tri.ChangeTriangle(old[0]+vertices.length,old[1]+vertices.length,old[2]+vertices.length);
 			tri.resetHash();
 			newtriangles[i+triangles.length]=tri.clone();
 		}
