@@ -227,41 +227,34 @@ public boolean PointIsUnprocessed(Point3d worldpoint){
 	}
 	return returnvalue;
 }
-public void setPixeltoProcessedIfRayNotIntersectAnyVolumesOfInterest(AxisAlignedBoundingBox[] volumeofinterest){
-	//Precalculate the camera centre point and the psuedo-inverse of the camera matrix as they will be used for the constructed lines later
-		Point3d C=new Point3d(MatrixManipulations.GetRightNullSpace(getWorldtoImageTransformMatrix()));
-		Matrix Pplus=MatrixManipulations.PseudoInverse(getWorldtoImageTransformMatrix()); 
-		// If the camera centre is in the volume of interest all the rays will obviously intersect so we don't need to continue
-		boolean intersect=false;
-		int i=0;
-		while ((!intersect) && (i<volumeofinterest.length)){
-				intersect=volumeofinterest[i].PointInside3DBoundingBox(C);
-				i++;
-			} // end while 
-		if (!intersect){
-			// Go through each unprocessed point and construct a line for it based on the camera matrix pseudoinverse and camera centre
-			// Then see if that line intersects a volume of interest
-			for (int x=(int)unprocessedpixelsarea.minx;x<=(int)unprocessedpixelsarea.maxx;x++){
-				for (int y=(int)unprocessedpixelsarea.miny;y<=(int)unprocessedpixelsarea.maxy;y++){
-							if (!processedpixel[x][y]){
-						Point2d point=new Point2d(x,y);
-						point.minus(originofimagecoordinates);
-						//Line3d l=new Line3d(point,Pplus,C);
-						Line3d l=new Line3d(C,Pplus,point);
-						intersect=false;
-						i=0;
-						while ((!intersect) && (i<volumeofinterest.length)){
-								intersect=volumeofinterest[i].Intersects(l);
-								i++;
-							} // end while
-						if (!intersect) processedpixel[x][y]=true;
-					} // end if unprocessedpixel
-				} // end for y
-			} // end for x
+public void setPixeltoProcessedIfNoVolumesOfInterestBackProjectsToIt(AxisAlignedBoundingBox[] volumeofinterest){
+			boolean[][] newprocessedpixel=new boolean[width][height];
+			for (int x=(int)unprocessedpixelsarea.minx;x<=(int)unprocessedpixelsarea.maxx;x++)
+				for (int y=(int)unprocessedpixelsarea.miny;y<=(int)unprocessedpixelsarea.maxy;y++)
+					newprocessedpixel[x][y]=true;
+			
+			// Each volumeofinterest will backproject to an n-sided polygon (normally an octagon) so convert each volumes to polygons
+			for (int i=0;i<volumeofinterest.length;i++){
+				Point2d[] points=volumeofinterest[i].GetImageProjectionOfCornersof3DBoundingBox(originofimagecoordinates,WorldtoImageTransform);
+				BoundingPolygon2D polygon=new BoundingPolygon2D(points);
+				// Change a newprocessedpixel to false if the point is inside the polygon and processedpixel is also false 
+				AxisAlignedBoundingBox bounds2d=polygon.GetAxisAlignedBoundingBox();
+				for (int x=(int)bounds2d.minx;x<=(int)bounds2d.maxx;x++)
+					for (int y=(int)bounds2d.miny;y<=(int)bounds2d.maxy;y++)
+						if ((x>=0) && (x<width) && (y>=0) && (y<height))
+						if (!processedpixel[x][y])
+							if (!polygon.PointIsOutside(new Point2d(x,y))) newprocessedpixel[x][y]=false;
+							
+			
+			} // end for volumeofinterest
+			
+			// Now set the processedpixels area to their final value
+			for (int x=(int)unprocessedpixelsarea.minx;x<=(int)unprocessedpixelsarea.maxx;x++)
+				for (int y=(int)unprocessedpixelsarea.miny;y<=(int)unprocessedpixelsarea.maxy;y++)
+					processedpixel[x][y]=newprocessedpixel[x][y];
+				
 			SetUnProcessedPixelsBoundingArea();
-		} // end if C not inside the volumes of interest
 		}
-
 
 public void setPixeltoProcessed(Point2d imagepoint){
 	int x=(int)imagepoint.x;

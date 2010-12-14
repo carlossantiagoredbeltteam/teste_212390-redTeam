@@ -2,6 +2,7 @@ package org.reprap.scanning.Geometry;
 
 import Jama.Matrix;
 import org.reprap.scanning.DataStructures.TrianglePlusVertexArray;
+import org.reprap.scanning.DataStructures.MatrixManipulations;
 
 /******************************************************************************
 * This program is free software; you can redistribute it and/or modify it under
@@ -33,6 +34,7 @@ import org.reprap.scanning.DataStructures.TrianglePlusVertexArray;
 * It can also be used to describe a bounding rectangle in 2d space by ignoring the z values
 *	
 ***********************************************************************************/
+
 
 public class AxisAlignedBoundingBox{
 	public double minx,miny,minz,maxx,maxy,maxz;
@@ -91,6 +93,13 @@ public class AxisAlignedBoundingBox{
 		for (int i=0;i<4;i++) returnvalue[i].ApplyTransform(M);
 		return returnvalue;
 	}
+	public Point2d[] GetImageProjectionOfCornersof3DBoundingBox(Point2d imageorigin, Matrix P){
+		Point3d[] points=GetCornersof3DBoundingBox();
+		Point2d[] returnvalue=new Point2d[8];
+		for (int i=0;i<8;i++) returnvalue[i]=new Point2d(MatrixManipulations.WorldToImageTransform(points[i].ConvertPointTo4x1Matrix(),imageorigin,P));
+		return returnvalue;
+	}
+	
 	public Point2d[] GetCornersof2DBoundingBox(){
 		Point2d[] returnvalue=new Point2d[4];
 		returnvalue[0]=new Point2d(minx,miny);
@@ -181,6 +190,16 @@ public class AxisAlignedBoundingBox{
 		return f;
 	}
 	
+	public boolean isEqual(AxisAlignedBoundingBox other){
+		boolean returnvalue=true;
+		if (returnvalue) returnvalue=minx==other.minx;
+		if (returnvalue) returnvalue=miny==other.miny;
+		if (returnvalue) returnvalue=minz==other.minz;
+		if (returnvalue) returnvalue=maxx==other.maxx;
+		if (returnvalue) returnvalue=maxy==other.maxy;
+		if (returnvalue) returnvalue=maxz==other.maxz;
+		return returnvalue;
+	}
 	
 	public Line3d[] Get3DWireframeLines(){
 		Point3d[] vertices=GetCornersof3DBoundingBox();

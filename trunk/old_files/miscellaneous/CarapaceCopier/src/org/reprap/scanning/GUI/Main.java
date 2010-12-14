@@ -2346,7 +2346,7 @@ private void FindCalibrationSheetCirclesEtc(){
 	  	 // Go through each image and scope out any pixels outside the volume of interest
 		for (int i=0;i<images.length;i++){
 			images[i].setPixelsOutsideBackProjectedVolumeToProcessed(volumeofinterest);
-			images[i].setPixeltoProcessedIfRayNotIntersectAnyVolumesOfInterest(surfacevoxels);
+			images[i].setPixeltoProcessedIfNoVolumesOfInterestBackProjectsToIt(surfacevoxels);
 			
 			if (prefs.Debug && prefs.DebugRestrictedSearch){
 				String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"RestrictedSearchForImageBinaryImage"+String.valueOf(i)+".jpg";
