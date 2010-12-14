@@ -55,7 +55,7 @@ public class BoundingPolygon2D {
 			for (int i=0;i<vertices.length;i++)
 				if (i==0){boundingbox.minx=vertices[i].x;boundingbox.maxx=vertices[i].x;boundingbox.miny=vertices[i].y;boundingbox.maxy=vertices[i].y;}
 				else boundingbox.Expand2DBoundingBox(vertices[i]);
-			orderedvertices=FindAndOrderVertices(vertices);
+			orderedvertices=FindAndOrderVertices(vertices,boundingbox);
 		}
 		else if (vertices.length==1) orderedvertices[0]=vertices[0].clone();
 	} // end of constructor
@@ -89,10 +89,26 @@ public class BoundingPolygon2D {
 		for (int i=0;i<orderedvertices.length;i++) newvertices[i]=orderedvertices[i].clone();
 		newvertices[orderedvertices.length]=point.clone();
 		boundingbox.Expand2DBoundingBox(point);
-		if (newvertices.length>2) orderedvertices=FindAndOrderVertices(newvertices);
+		if (newvertices.length>2) orderedvertices=FindAndOrderVertices(newvertices,boundingbox);
 		else orderedvertices=newvertices.clone();
 	}
-	
+	public boolean PointIsOutside(Point2d point){
+		// TODO this is an extremely wasteful way to do this!
+		// Replace this!
+		AxisAlignedBoundingBox box=boundingbox.clone();
+		box.Expand2DBoundingBox(point);
+		boolean returnvalue=(!boundingbox.isEqual(box));
+		if (!returnvalue){
+			Point2d[] newvertices=new Point2d[orderedvertices.length+1];
+			for (int i=0;i<orderedvertices.length;i++) newvertices[i]=orderedvertices[i].clone();
+			newvertices[orderedvertices.length]=point.clone();
+			if (newvertices.length>2) {
+				newvertices=FindAndOrderVertices(newvertices,box);
+				for (int i=0;i<newvertices.length;i++) if (newvertices[i].isEqual(point)) returnvalue=true;
+			}
+		}
+		return returnvalue;
+	}
 	public TrianglePlusVertexArray ExtrudeTo3DAndConvertToTriangles(double zheight, double minzvalue){
 		double minz=minzvalue;
 		double maxz=minzvalue+zheight;
@@ -225,10 +241,10 @@ public class BoundingPolygon2D {
 	
 //	 This re-orders the vertices so they are in clockwise or anti-clockwise order, depending on the directions enum array defined at the start of the class
 // Any point in the array that is actually within the bounding polygon is ignored
-	private Point2d[] FindAndOrderVertices(Point2d vertices[]){
+	private static Point2d[] FindAndOrderVertices(Point2d vertices[], AxisAlignedBoundingBox bound){
 		direction majordirection = directionarray[0];
 		direction minordirection = directionarray[3];
-		Point2d currentcorner=new Point2d(boundingbox.minx-1,boundingbox.miny-1); 
+		Point2d currentcorner=new Point2d(bound.minx-1,bound.miny-1); 
 		// Assuming the bounding box has been calculated correctly, this will start with the leftmost point and try to find the closest point on its right.
 		int[] vertexindices=new int[vertices.length];
 		boolean[] skip=new boolean[vertices.length]; 
