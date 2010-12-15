@@ -23,7 +23,7 @@ package org.reprap.scanning.Geometry;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 14th December 2010
+ * Last modified by Reece Arnott 15th December 2010
  * 
  *    This class takes a series of 2d points and creates a standard convex, closed polygon that encloses the points
  *    The polygon is defined by an array of ordered points (ordered in CCW or CW order)   
@@ -72,14 +72,14 @@ public class BoundingPolygon2D {
 	}
 	public LineSegment2D[] Get2DLineSegments(){
 		LineSegment2D[] returnvalue=new LineSegment2D[0];
-		if (orderedvertices.length>1) returnvalue=new LineSegment2D[orderedvertices.length-1];
+		if (orderedvertices.length>1) returnvalue=new LineSegment2D[orderedvertices.length];
 		for (int i=0;i<returnvalue.length;i++)
 			returnvalue[i]=new LineSegment2D(orderedvertices[i],orderedvertices[(i+1)%returnvalue.length]);
 		return returnvalue;
 	}
 	public Line3d[] Get3DLineSegments(double zvalue){
 		Line3d[] returnvalue=new Line3d[0];
-		if (orderedvertices.length>1) returnvalue=new Line3d[orderedvertices.length-1];
+		if (orderedvertices.length>1) returnvalue=new Line3d[orderedvertices.length];
 		for (int i=0;i<returnvalue.length;i++)
 			returnvalue[i]=new Line3d(new Point3d(orderedvertices[i].x,orderedvertices[i].y,zvalue),new Point3d(orderedvertices[(i+1)%returnvalue.length].x,orderedvertices[(i+1)%returnvalue.length].y,zvalue));
 		return returnvalue;
@@ -88,7 +88,10 @@ public class BoundingPolygon2D {
 		Point2d[] newvertices=new Point2d[orderedvertices.length+1];
 		for (int i=0;i<orderedvertices.length;i++) newvertices[i]=orderedvertices[i].clone();
 		newvertices[orderedvertices.length]=point.clone();
-		boundingbox.Expand2DBoundingBox(point);
+		
+		if (orderedvertices.length==0){boundingbox.minx=point.x;boundingbox.maxx=point.x;boundingbox.miny=point.y;boundingbox.maxy=point.y;}
+		else boundingbox.Expand2DBoundingBox(point);
+		
 		if (newvertices.length>2) orderedvertices=FindAndOrderVertices(newvertices,boundingbox);
 		else orderedvertices=newvertices.clone();
 	}
@@ -99,13 +102,32 @@ public class BoundingPolygon2D {
 		box.Expand2DBoundingBox(point);
 		boolean returnvalue=(!boundingbox.isEqual(box));
 		if (!returnvalue){
-			Point2d[] newvertices=new Point2d[orderedvertices.length+1];
-			for (int i=0;i<orderedvertices.length;i++) newvertices[i]=orderedvertices[i].clone();
-			newvertices[orderedvertices.length]=point.clone();
-			if (newvertices.length>2) {
-				newvertices=FindAndOrderVertices(newvertices,box);
-				for (int i=0;i<newvertices.length;i++) if (newvertices[i].isEqual(point)) returnvalue=true;
-			}
+			if (orderedvertices.length==0) returnvalue=true;
+			else if (orderedvertices.length==1) returnvalue=!orderedvertices[0].isEqual(point);
+			else if (orderedvertices.length==2) returnvalue=new LineSegment2D(orderedvertices[0],orderedvertices[1]).Intersect(point);
+			else {
+				// Check for intersection with any of the triangles making up the polygon
+				// The current methods for handling triangles only use 3d points for the vertices and intersection tests with 3d line segments
+				// so need to convert these
+				TrianglePlusVertexArray trianglesplusvertices=ConvertToTrianglesOnZplane(0,true);
+				Line3d line=new Line3d(new Point3d(point.x,point.y,-1),new Point3d(point.x,point.y,1));
+				Point3d[] vertices=trianglesplusvertices.GetVertexArray();
+				TriangularFace[] triangles=trianglesplusvertices.GetTriangleArray();
+				boolean inside=false;
+				for (int i=0;i<triangles.length;i++) 
+					if (!inside) inside=triangles[i].LineSegmentIntersectionTriangularFace(line,vertices);
+				returnvalue=!inside;
+				
+			} //end else
+			
+			//Point2d[] newvertices=new Point2d[orderedvertices.length+1];
+			//for (int i=0;i<orderedvertices.length;i++) newvertices[i]=orderedvertices[i].clone();
+			//newvertices[orderedvertices.length]=point.clone();
+			//if (newvertices.length>2) {
+			//	newvertices=FindAndOrderVertices(newvertices,box);
+			//	returnvalue=(newvertices.length==(orderedvertices.length+1));
+				//if (!returnvalue) for (int i=0;i<orderedvertices.length;i++) if (!newvertices[i].isEqual(orderedvertices[i])) returnvalue=true;
+			//}
 		}
 		return returnvalue;
 	}
