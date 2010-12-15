@@ -23,7 +23,7 @@ package org.reprap.scanning.DataStructures;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 13th December 2010
+ * Last modified by Reece Arnott 15th December 2010
  * 
  * These are methods that store the image and and additional information together
  * This includes the edge map, camera calibration matrices and the point pair matches of points in the image with the calibration sheet 
@@ -228,34 +228,30 @@ public boolean PointIsUnprocessed(Point3d worldpoint){
 	return returnvalue;
 }
 public void setPixeltoProcessedIfNoVolumesOfInterestBackProjectsToIt(AxisAlignedBoundingBox[] volumeofinterest){
-			boolean[][] newprocessedpixel=new boolean[width][height];
-			for (int x=(int)unprocessedpixelsarea.minx;x<=(int)unprocessedpixelsarea.maxx;x++)
-				for (int y=(int)unprocessedpixelsarea.miny;y<=(int)unprocessedpixelsarea.maxy;y++)
-					newprocessedpixel[x][y]=true;
+	boolean[][] newprocessedpixel=new boolean[width][height];
+		for (int x=(int)unprocessedpixelsarea.minx;x<=(int)unprocessedpixelsarea.maxx;x++)
+			for (int y=(int)unprocessedpixelsarea.miny;y<=(int)unprocessedpixelsarea.maxy;y++)
+				newprocessedpixel[x][y]=true;
+		
+		// Each volumeofinterest will backproject to an n-sided polygon (where n will be somewhere between 4 and 8, normally 4 or 6) so convert each volumes to polygons
+		for (int i=0;i<volumeofinterest.length;i++){
+			Point2d[] points=volumeofinterest[i].GetImageProjectionOfCornersof3DBoundingBox(originofimagecoordinates,WorldtoImageTransform);
+			BoundingPolygon2D polygon=new BoundingPolygon2D(points);
+			// Change a newprocessedpixel to false if the point is inside the polygon and processedpixel is also false 
+			AxisAlignedBoundingBox bounds2d=polygon.GetAxisAlignedBoundingBox();
+			for (int x=(int)bounds2d.minx;x<=(int)bounds2d.maxx;x++)
+				for (int y=(int)bounds2d.miny;y<=(int)bounds2d.maxy;y++)
+					if (unprocessedpixelsarea.PointInside2DBoundingBox(new Point2d(x,y)))
+						if (newprocessedpixel[x][y]) if (!processedpixel[x][y]) if (!polygon.PointIsOutside(new Point2d(x,y))) newprocessedpixel[x][y]=false;
+		} // end for volumeofinterest
+		
+		// Now set the processedpixels area to their final value
+		for (int x=(int)unprocessedpixelsarea.minx;x<=(int)unprocessedpixelsarea.maxx;x++)
+			for (int y=(int)unprocessedpixelsarea.miny;y<=(int)unprocessedpixelsarea.maxy;y++)
+				processedpixel[x][y]=newprocessedpixel[x][y];
 			
-			// Each volumeofinterest will backproject to an n-sided polygon (normally an octagon) so convert each volumes to polygons
-			for (int i=0;i<volumeofinterest.length;i++){
-				Point2d[] points=volumeofinterest[i].GetImageProjectionOfCornersof3DBoundingBox(originofimagecoordinates,WorldtoImageTransform);
-				BoundingPolygon2D polygon=new BoundingPolygon2D(points);
-				// Change a newprocessedpixel to false if the point is inside the polygon and processedpixel is also false 
-				AxisAlignedBoundingBox bounds2d=polygon.GetAxisAlignedBoundingBox();
-				for (int x=(int)bounds2d.minx;x<=(int)bounds2d.maxx;x++)
-					for (int y=(int)bounds2d.miny;y<=(int)bounds2d.maxy;y++)
-						if ((x>=0) && (x<width) && (y>=0) && (y<height))
-						if (!processedpixel[x][y])
-							if (!polygon.PointIsOutside(new Point2d(x,y))) newprocessedpixel[x][y]=false;
-							
-			
-			} // end for volumeofinterest
-			
-			// Now set the processedpixels area to their final value
-			for (int x=(int)unprocessedpixelsarea.minx;x<=(int)unprocessedpixelsarea.maxx;x++)
-				for (int y=(int)unprocessedpixelsarea.miny;y<=(int)unprocessedpixelsarea.maxy;y++)
-					processedpixel[x][y]=newprocessedpixel[x][y];
-				
-			SetUnProcessedPixelsBoundingArea();
-		}
-
+		SetUnProcessedPixelsBoundingArea();
+	}
 public void setPixeltoProcessed(Point2d imagepoint){
 	int x=(int)imagepoint.x;
 	int y=(int)imagepoint.y;
@@ -263,32 +259,16 @@ public void setPixeltoProcessed(Point2d imagepoint){
 }
 
 public void setPixelsOutsideBackProjectedVolumeToProcessed(AxisAlignedBoundingBox volumeofinterest){
-	// Convert the faces of the volume into triangles. Assuming the camera is not within the volume of interest we can 
-	// just set the pixels that fall outside the backprojection of all these triangles 
-	TrianglePlusVertexArray trianglesplusvertices=volumeofinterest.GetTrianglesMakingUpFaces();
-	TriangularFace[] triangles=trianglesplusvertices.GetTriangleArray();
-	Point3d[] vertices=trianglesplusvertices.GetVertexArray();
-	// Back project the vertices
-	Point2d[] pixelvertices=new Point2d[vertices.length];
-	for (int i=0;i<pixelvertices.length;i++) pixelvertices[i]=getWorldtoImageTransform(vertices[i].ConvertPointTo4x1Matrix());
+	// The volumeofinterest will backproject to an n-sided polygon (where n will be somewhere between 4 and 8, normally 4 or 6) so convert the volume to a polygon
+	Point2d[] points=volumeofinterest.GetImageProjectionOfCornersof3DBoundingBox(originofimagecoordinates,WorldtoImageTransform);
+	BoundingPolygon2D polygon=new BoundingPolygon2D(points);
 	//Go through all the pixels and test
 	for (int x=(int)unprocessedpixelsarea.minx;x<=(int)unprocessedpixelsarea.maxx;x++){
 		for (int y=(int)unprocessedpixelsarea.miny;y<=(int)unprocessedpixelsarea.maxy;y++){
 			//	if the pixel is not already processed
-			if (!processedpixel[x][y]){
-				// Use the barycentric coordinates to test if the point is outside all the triangles
-				Coordinates point=new Coordinates(3);
-				point.pixel=new Point2d(x,y);
-				int i=0;
-				boolean outside=true;
-				while ((i<triangles.length) && (outside)){
-					int[] trianglevertices=triangles[i].GetFace();
-					point.calculatebary(pixelvertices,trianglevertices[0],trianglevertices[1],trianglevertices[2]);
-					outside=point.isOutside();
-					i++;
-				} // end while
-				processedpixel[x][y]=outside;
-			} // end if not already processed
+			if (!processedpixel[x][y])
+				// test it to see if it is outside the polygon
+				processedpixel[x][y]=polygon.PointIsOutside(new Point2d(x,y));
 		} // end for y
 	} // end for x
 	SetUnProcessedPixelsBoundingArea();

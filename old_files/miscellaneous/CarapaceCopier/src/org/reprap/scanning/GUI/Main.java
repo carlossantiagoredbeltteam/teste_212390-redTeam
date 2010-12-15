@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  *
- * Last modified by Reece Arnott 14th December 2010
+ * Last modified by Reece Arnott 15th December 2010
  * 
  * Note that most of the layout commands were initially produced by NetBeans for JDK 6
  * and significantly modified by hand. For future reference if it needs to be done the other way the main things to change are:
@@ -2317,7 +2317,7 @@ private void FindCalibrationSheetCirclesEtc(){
 		 catch (Exception e) { 
 			  System.out.println("Exception in updating the progress bar"+e.getMessage());
      }		  
-	JProgressBar bar=new JProgressBar(0,images.length+1);
+	JProgressBar bar=new JProgressBar(0,(images.length*2)+1);
 	 bar.setValue(0);
 	  	 // Find the new volume of interest based on the surface voxels we've found
 	  AxisAlignedBoundingBox[] surfacevoxels=rootvoxel.getSurfaceVoxels();
@@ -2325,51 +2325,34 @@ private void FindCalibrationSheetCirclesEtc(){
 			if (i==0) volumeofinterest=surfacevoxels[i].clone();
 			else volumeofinterest.Expand3DBoundingBox(surfacevoxels[i]);
 		}
-		bar.setValue(1);
-		final JProgressBar temp=bar;
-		  
-		  try{ 
-				// This is the recommended way of passing GUI information between threads
-					  EventQueue.invokeLater(new Runnable(){
-						  public void run(){
-							  jProgressBar1.setMinimum(temp.getMinimum());
-							  jProgressBar1.setMaximum(temp.getMaximum());
-							  jProgressBar1.setValue(temp.getValue());
-						  }
-					  });
-				  }
-				  catch (Exception e) { 
-					  System.out.println("Exception in updating the progress bar"+e.getMessage());
-		         }
-		
-		
-	  	 // Go through each image and scope out any pixels outside the volume of interest
+	
+		// Go through each image and scope out any pixels outside the volume of interest
 		for (int i=0;i<images.length;i++){
-			images[i].setPixelsOutsideBackProjectedVolumeToProcessed(volumeofinterest);
-			images[i].setPixeltoProcessedIfNoVolumesOfInterestBackProjectsToIt(surfacevoxels);
 			
-			if (prefs.Debug && prefs.DebugRestrictedSearch){
-				String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"RestrictedSearchForImageBinaryImage"+String.valueOf(i)+".jpg";
-				boolean[][] processedpixels=images[i].getProcessedPixels();
-				GraphicsFeedback graphics=new GraphicsFeedback(true);
-				graphics.ShowBinaryimage(processedpixels,images[i].width,images[i].height);
-				graphics.SaveImage(filename);
-				// now save image with black background except where unprocessed pixels
-				graphics.ShowImage(images[i]);
-				PixelColour black=new PixelColour(PixelColour.StandardColours.Black);
-				for (int x=0;x<images[i].width;x++)
-					for (int y=0;y<images[i].height;y++){
-						if (processedpixels[x][y]){
-							graphics.Print(x,y,black,0,0);
-						}
-					}
-				filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"RestrictedSearchForImageColourImage"+String.valueOf(i)+".jpg";
-				graphics.SaveImage(filename);
-					
-			}
 			// Update progress bar
 			bar.setValue(bar.getValue()+1);
 			final JProgressBar temp2=bar;
+			final String text="Restricting Search space for image "+(i+1)+" of "+images.length;
+			 try{ 
+					// This is the recommended way of passing GUI information between threads
+						  EventQueue.invokeLater(new Runnable(){
+							  public void run(){
+								  jProgressBar1.setMinimum(temp2.getMinimum());
+								  jProgressBar1.setMaximum(temp2.getMaximum());
+								  jProgressBar1.setValue(temp2.getValue());
+								  jLabelProgressBar1.setText(text);
+							  }
+						  });
+					  }
+					  catch (Exception e) { 
+						  System.out.println("Exception in updating the progress bar"+e.getMessage());
+			         }
+			  
+			
+			images[i].setPixelsOutsideBackProjectedVolumeToProcessed(volumeofinterest);
+			
+//			 Update progress bar
+			bar.setValue(bar.getValue()+1);
 			 try{ 
 					// This is the recommended way of passing GUI information between threads
 						  EventQueue.invokeLater(new Runnable(){
@@ -2383,9 +2366,51 @@ private void FindCalibrationSheetCirclesEtc(){
 					  catch (Exception e) { 
 						  System.out.println("Exception in updating the progress bar"+e.getMessage());
 			         }
-			  
+			
+			
+			images[i].setPixeltoProcessedIfNoVolumesOfInterestBackProjectsToIt(surfacevoxels);
+			
+			if (prefs.Debug && prefs.DebugRestrictedSearch){
+				String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"RestrictedSearchForImageBinaryImage"+String.valueOf(i)+".jpg";
+				GraphicsFeedback graphics=new GraphicsFeedback(true);
+				boolean[][] processedpixels=images[i].getProcessedPixels();
+				graphics.ShowBinaryimage(processedpixels,images[i].width,images[i].height);
+				graphics.SaveImage(filename);
+			
+				// now save image with black background except where unprocessed pixels
+				graphics.ShowImage(images[i]);
+				PixelColour black=new PixelColour(PixelColour.StandardColours.Black);
+				for (int x=0;x<images[i].width;x++)
+					for (int y=0;y<images[i].height;y++){
+						if (processedpixels[x][y]){
+							graphics.Print(x,y,black,0,0);
+						}
+					}
+				filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"RestrictedSearchForImageColourImage"+String.valueOf(i)+".jpg";
+				graphics.SaveImage(filename);
+					
+			}
+			
 			
 		} // end for
+		
+		// Update progress bar
+		bar.setValue(bar.getValue()+1);
+		final JProgressBar temp2=bar;
+		 try{ 
+				// This is the recommended way of passing GUI information between threads
+					  EventQueue.invokeLater(new Runnable(){
+						  public void run(){
+							  jProgressBar1.setMinimum(temp2.getMinimum());
+							  jProgressBar1.setMaximum(temp2.getMaximum());
+							  jProgressBar1.setValue(temp2.getValue());
+						  }
+					  });
+				  }
+				  catch (Exception e) { 
+					  System.out.println("Exception in updating the progress bar"+e.getMessage());
+		         }
+		
 	}
 
 	

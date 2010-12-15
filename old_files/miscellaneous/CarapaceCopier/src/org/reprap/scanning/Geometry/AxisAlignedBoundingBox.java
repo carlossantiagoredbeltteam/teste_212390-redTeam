@@ -28,7 +28,7 @@ import org.reprap.scanning.DataStructures.MatrixManipulations;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 1st December 2010
+* Last modified by Reece Arnott 15th December 2010
 *
 * This class is simply a number of values that can be used to describe a 3d cube where the faces of the cube align with the x,y,z axes.
 * It can also be used to describe a bounding rectangle in 2d space by ignoring the z values
@@ -104,8 +104,8 @@ public class AxisAlignedBoundingBox{
 		Point2d[] returnvalue=new Point2d[4];
 		returnvalue[0]=new Point2d(minx,miny);
 		returnvalue[1]=new Point2d(minx,maxy);
-		returnvalue[2]=new Point2d(maxx,miny);
-		returnvalue[3]=new Point2d(maxx,maxy);
+		returnvalue[2]=new Point2d(maxx,maxy);
+		returnvalue[3]=new Point2d(maxx,miny);
 		return returnvalue;
 	}
 	
@@ -134,6 +134,15 @@ public class AxisAlignedBoundingBox{
 		for (int i=8;i<12;i++) { // the connecting lines between the upper and lower square
 			returnvalue[i][0]=i-8;returnvalue[i][1]=i-4;
 		}
+	return returnvalue;
+	}
+	public int[][] GetPointPairIndicesFor2DWireFrameLines(){
+		int[][] returnvalue=new int[4][2];
+		returnvalue[0][0]=0;returnvalue[0][1]=1;
+		returnvalue[1][0]=0;returnvalue[1][1]=3;
+		returnvalue[2][0]=1;returnvalue[2][1]=2;
+		returnvalue[3][0]=3;returnvalue[3][1]=2;
+		
 	return returnvalue;
 	}
 	
@@ -209,7 +218,14 @@ public class AxisAlignedBoundingBox{
 			lines[i]=new Line3d(vertices[pairs[i][0]],vertices[pairs[i][1]]);
 		return lines;
 	}
-	
+	public LineSegment2D[] Get2DWireframeLines(){
+		Point2d[] vertices=GetCornersof2DBoundingBox();
+		int[][] pairs=GetPointPairIndicesFor2DWireFrameLines();
+		LineSegment2D[] lines=new LineSegment2D[4];
+		for (int i=0;i<4;i++)
+			lines[i]=new LineSegment2D(vertices[pairs[i][0]],vertices[pairs[i][1]]);
+		return lines;
+	}
 	
 	
 	public Point2d GetMidpointof2DBoundingBox(){
