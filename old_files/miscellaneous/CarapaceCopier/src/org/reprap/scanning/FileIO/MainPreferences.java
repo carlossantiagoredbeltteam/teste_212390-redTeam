@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 8th December 2010
+ * Last modified by Reece Arnott 16th December 2010
  *
  *****************************************************************************/
 
@@ -76,6 +76,8 @@ public class MainPreferences {
 	public int AlgorithmSettingEdgeStrengthThreshold;
 	public int AlgorithmSettingMinimumNumberofIntersectingRayPairsForPointEstimation;
 	public int AlgorithmSettingVolumeSubDivision;
+	public double AlgorithmSettingSurfacePointTextureVarianceThreshold;
+	public double AlgorithmSettingSurfacePointTextureResolutionmm;
 	public JFormattedTextField PaperMarginHorizontalmm;
 	public JFormattedTextField PaperMarginVerticalmm;
 	public JFormattedTextField PaperCustomSizeWidthmm;
@@ -96,6 +98,7 @@ public class MainPreferences {
 	public boolean DebugPointPairMatching;
 	public boolean DebugEdgeFindingForEllipseDetection;
 	public boolean DebugCalibrationSheetPlanarHomographyEstimate;
+	public boolean DebugSurfacePointTextureMatching;
 	public boolean Debug;
 	public JCheckBox CalibrationSheetKeepAspectRatioWhenPrinted;
 	public JCheckBox PaperSizeIsCustom;
@@ -141,6 +144,7 @@ public class MainPreferences {
 		DebugPointPairMatching=false;
 		DebugEdgeFindingForEllipseDetection=false;
 		DebugCalibrationSheetPlanarHomographyEstimate=false;
+		DebugSurfacePointTextureMatching=false;
 		Debug=false;
 		BlankOutputFilenameOnLoad=true;
 		SkipStep = new boolean[numberofsteps];
@@ -178,6 +182,8 @@ public class MainPreferences {
 		AlgorithmSettingMinimumNumberofIntersectingRayPairsForPointEstimation=1;
 		AlgorithmSettingVolumeSubDivision=128;
 		AlgorithmSettingResampledImageWidthForEllipseDetection=1024;
+		AlgorithmSettingSurfacePointTextureResolutionmm=0.3;
+		AlgorithmSettingSurfacePointTextureVarianceThreshold=300;
         // Set up default index number(s) - default to 0
         CurrentCalibrationPatternIndexNumber=0;
         CurrentPaperSizeIndexNumber=0;
@@ -238,6 +244,7 @@ public class MainPreferences {
 			if (temp.getProperty("DebugPointPairMatching")!=null) DebugPointPairMatching = temp.getProperty("DebugPointPairMatching").equals("true");
 			if (temp.getProperty("DebugEdgeFindingForEllipseDetection")!=null) DebugEdgeFindingForEllipseDetection = temp.getProperty("DebugEdgeFindingForEllipseDetection").equals("true");
 			if (temp.getProperty("DebugCalibrationSheetPlanarHomographyEstimate")!=null) DebugCalibrationSheetPlanarHomographyEstimate = temp.getProperty("DebugCalibrationSheetPlanarHomographyEstimate").equals("true");
+			if (temp.getProperty("DebugSurfacePointTextureMatching")!=null) DebugSurfacePointTextureMatching = temp.getProperty("DebugSurfacePointTextureMatching").equals("true");
 			
 			// Note the i+1 here as humans start counting the steps from 1 but the array starts from 0. 
 			for (i=0;i<SkipStep.length;i++) if (temp.getProperty("SkipStep"+Integer.toString(i+1))!=null) SkipStep[i] = temp.getProperty("SkipStep"+Integer.toString(i+1)).equals("true");
@@ -285,6 +292,14 @@ public class MainPreferences {
 			if (temp.getProperty("AlgorithmSettingVolumeSubDivision")!=null){ // if the property exists try to convert to integer, just ignore if can't
 				try {AlgorithmSettingVolumeSubDivision = Integer.valueOf(temp.getProperty("AlgorithmSettingVolumeSubDivision"));}catch (Exception e) {System.out.println("Error loading AlgorithmSettingMinimumNumberofIntersectingRayPairsForPointEstimation - leaving as default: "+e);}
 				if (AlgorithmSettingVolumeSubDivision<1) AlgorithmSettingVolumeSubDivision=1;
+			}
+			if (temp.getProperty("AlgorithmSettingSurfacePointTextureResolutionmm")!=null){ // if the property exists try to convert to double, just ignore if can't
+				try {AlgorithmSettingSurfacePointTextureResolutionmm = Double.valueOf(temp.getProperty("AlgorithmSettingSurfacePointTextureResolutionmm"));}catch (Exception e) {System.out.println("Error loading AlgorithmSettingSurfacePointTextureResolutionmm - leaving as default: "+e);}
+				if (AlgorithmSettingSurfacePointTextureResolutionmm<=0) AlgorithmSettingSurfacePointTextureResolutionmm=0.3;
+			}
+			if (temp.getProperty("AlgorithmSettingSurfacePointTextureVarianceThreshold")!=null){ // if the property exists try to convert to double, just ignore if can't
+				try {AlgorithmSettingSurfacePointTextureVarianceThreshold = Double.valueOf(temp.getProperty("AlgorithmSettingSurfacePointTextureVarianceThreshold"));}catch (Exception e) {System.out.println("Error loading AlgorithmSettingSurfacePointTextureVarianceThreshold - leaving as default: "+e);}
+				if (AlgorithmSettingSurfacePointTextureVarianceThreshold<0) AlgorithmSettingSurfacePointTextureVarianceThreshold=0;
 			}
 			
 			// Load default index numbers
@@ -393,6 +408,8 @@ public class MainPreferences {
 		temp.setProperty("DebugPointPairMatching", String.valueOf(DebugPointPairMatching));
 		temp.setProperty("DebugEdgeFindingForEllipseDetection", String.valueOf(DebugEdgeFindingForEllipseDetection));
 		temp.setProperty("DebugCalibrationSheetPlanarHomographyEstimate", String.valueOf(DebugCalibrationSheetPlanarHomographyEstimate));
+		temp.setProperty("DebugSurfacePointTextureMatching", String.valueOf(DebugSurfacePointTextureMatching));
+		
 		// Note the i+1 here as humans start counting the steps from 1 but the array starts from 0. 
 		for (int i=0;i<SkipStep.length;i++)temp.setProperty("SkipStep"+Integer.toString(i+1),String.valueOf(SkipStep[i]));
 		// Save state of checkboxes
@@ -420,6 +437,9 @@ public class MainPreferences {
 	    temp.setProperty("AlgorithmSettingMinimumNumberofIntersectingRayPairsForPointEstimation",String.valueOf(AlgorithmSettingMinimumNumberofIntersectingRayPairsForPointEstimation));
 	    temp.setProperty("AlgorithmSettingVolumeSubDivision",String.valueOf(AlgorithmSettingVolumeSubDivision));
 	    temp.setProperty("AlgorithmSettingResampledImageWidthForEllipseDetection",String.valueOf(AlgorithmSettingResampledImageWidthForEllipseDetection));
+	    temp.setProperty("AlgorithmSettingSurfacePointTextureResolutionmm",String.valueOf(AlgorithmSettingSurfacePointTextureResolutionmm));
+	    temp.setProperty("AlgorithmSettingSurfacePointTextureVarianceThreshold",String.valueOf(AlgorithmSettingSurfacePointTextureVarianceThreshold));
+	    
 	    // Save default index numbers
 	    temp.setProperty("CurrentCalibrationPatternIndexNumber",String.valueOf(CurrentCalibrationPatternIndexNumber));
 	    temp.setProperty("CurrentPaperSizeIndexNumber",String.valueOf(CurrentPaperSizeIndexNumber));
