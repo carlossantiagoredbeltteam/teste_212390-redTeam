@@ -86,7 +86,7 @@ package org.reprap.scanning.Geometry;
 
 //		 It is assumed that there are two or three world to image point pairs given to this method and that the 2d point to convert is already stored in pixel
 		public Point3d ConvertPixelCoordinateToWorld3dCoordinatesOnImagePlane(Point2d imagepoints[], Point3d worldpoints[]){
-			Point3d returnpoint=new Point3d(0,0,0);
+			Point3d returnpoint=new Point3d();
 			boolean success=calculatebary(imagepoints);
 			if (success){
 				double total=0;

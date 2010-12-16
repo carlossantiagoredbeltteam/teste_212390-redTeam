@@ -28,7 +28,7 @@ import org.reprap.scanning.DataStructures.MatrixManipulations;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 15th December 2010
+* Last modified by Reece Arnott 16th December 2010
 *
 * This class is simply a number of values that can be used to describe a 3d cube where the faces of the cube align with the x,y,z axes.
 * It can also be used to describe a bounding rectangle in 2d space by ignoring the z values
@@ -234,7 +234,22 @@ public class AxisAlignedBoundingBox{
 	public Point3d GetMidpointof3DBoundingBox(){
 		return new Point3d((maxx+minx)/2,(maxy+miny)/2,(maxz+minz)/2);
 	}
-	
+	public void scale(double s){
+		minx=minx*s;
+		miny=miny*s;
+		minz=minz*s;
+		maxx=maxx*s;
+		maxy=maxy*s;
+		maxz=maxz*s;
+	}
+	public void ResetOrigin(Point3d neworigin){
+		minx=minx-neworigin.x;
+		miny=miny-neworigin.y;
+		minz=minz-neworigin.z;
+		maxx=maxx-neworigin.x;
+		maxy=maxy-neworigin.y;
+		maxz=maxz-neworigin.z;
+	}
 	public void Expand2DBoundingBox(Point2d point){
 		if (point.x<minx) minx=point.x;
 		if (point.x>maxx) maxx=point.x;

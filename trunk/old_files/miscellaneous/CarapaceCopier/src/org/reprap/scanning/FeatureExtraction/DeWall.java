@@ -381,7 +381,7 @@ public class DeWall {
 				Plane p1=new Plane(AB);
 				double minradiussquared=Double.MAX_VALUE;
 				int c=-1;
-				Point3d mincentre=new Point3d(0,0,0);
+				Point3d mincentre=new Point3d();
 				for (int i=0;i<P.length;i++){
 					if ((a!=P[i]) && (b!=P[i])){
 						// Calculate the centre of the circumcircle using this point and from this calculate the radiussquared

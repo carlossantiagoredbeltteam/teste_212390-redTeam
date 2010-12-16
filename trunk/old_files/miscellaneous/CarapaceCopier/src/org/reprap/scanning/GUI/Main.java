@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  *
- * Last modified by Reece Arnott 15th December 2010
+ * Last modified by Reece Arnott 16th December 2010
  * 
  * Note that most of the layout commands were initially produced by NetBeans for JDK 6
  * and significantly modified by hand. For future reference if it needs to be done the other way the main things to change are:
@@ -126,12 +126,13 @@ public class Main extends JFrame {
    //  private final boolean allsameresonsamecamera=false; // TODO - this should eventually be in the GUI as a tickbox and saved as part of the MainPreferences. Note that it also assumes that the image resolutions are the same for the calculation of the principal point etc.  
  //  private final int maxiterations=0;// TODO - this should eventually be added to the GUI and/or as part of the MainPreferences if it is used
 	
-	 private boolean print=false; // Just for testing purposes
+	private boolean print=true; // Just for testing purposes
     
     // This defines how many chunks the shared second progress bar is broken up into for the 3 steps it is shared with
 	 private final static int calibrationsheetinterrogationnumberofsteps=1;
 	   private final static int calibrationnumberofsubsteps=6;
     private final static int objectvoxelisationnumberofsteps=2;
+    private final static int numberofotherprogressbarsteps=2;
     
 /* This enumerated list and associated setstep method is for the programmer to add to if any additional intermediate steps need to be added.
  *  Note that the last enum value should not be used for anything other than exiting the program.
@@ -283,154 +284,7 @@ public class Main extends JFrame {
     	} // end of method
  
  
- 	//This method is an intermediary one for testing purposes
- 	// Eventually this will be replaced by a SurfacePatchTextureMatching method that give better output.
- 	public void SurfacePointTextureMatching(){
- 		TrianglePlusVertexArray totaltriplusvertex=new TrianglePlusVertexArray(new Point3d[0]);
- 		//volumeofinterest.minx=-42.65625;
- 		//volumeofinterest.miny=-37.125;
- 		//volumeofinterest.minz=0.0;
- 		//volumeofinterest.maxx=45.9375;
- 		//volumeofinterest.maxy=64.96875;
- 		//volumeofinterest.maxz=81.2109375;
- 		int pixelswide=(int)((volumeofinterest.maxx-volumeofinterest.minx)*3);
- 		int pixelshigh=(int)((volumeofinterest.maxy-volumeofinterest.miny)*3);
- 		// each pixel is 1/3mm square
- 		
- 		// Find the camera center of each image
- 		Point3d[] C=new Point3d[images.length];
- 		for (int i=0;i<C.length;i++) C[i]=new Point3d(MatrixManipulations.GetRightNullSpace(images[i].getWorldtoImageTransformMatrix()));
-		// To do this sweep properly we need to sweep in all eight combinations of +/- x/y/z
- 		double x=volumeofinterest.minx;double xstep=(volumeofinterest.maxx-volumeofinterest.minx)/pixelswide;
- 		double y=volumeofinterest.miny;double ystep=(volumeofinterest.maxy-volumeofinterest.miny)/pixelshigh;
- 		double zstep=0.33333;
- 		//TODO comment code!
- 		for (int zdir=-1;zdir<=1;zdir=zdir+2) {
- 			double z;
- 			if (zdir==-1) z=volumeofinterest.maxz;
- 			else z=volumeofinterest.minz-1; // escapes from loop after processing down z as test images all taken above max z height
- 			while ((z>=volumeofinterest.minz) && (z<=volumeofinterest.maxz)){
- 				System.out.print(z+" ");
- 				PixelColour[][] newimage=new PixelColour[pixelswide][pixelshigh];
- 				boolean[][] skip=new boolean[pixelswide][pixelshigh];
-				
- 				for (int i=0;i<pixelswide;i++)
- 					for (int j=0;j<pixelshigh;j++){
- 						newimage[i][j]=new PixelColour(PixelColour.StandardColours.White);
- 						skip[i][j]=true;
- 					}
- 				for (int ydir=1;ydir>=-1;ydir=ydir-2){
- 					int yindex;
- 					if (ydir==-1){ y=volumeofinterest.maxy; yindex=pixelshigh-1;}
- 		 			else {y=volumeofinterest.miny;yindex=0;}
- 					while ((yindex>=0) && (yindex<pixelshigh)){	
- 						for (int xdir=1;xdir>=-1;xdir=xdir-2){
- 		 					int xindex;
- 							if (xdir==-1) {x=volumeofinterest.maxx; xindex=pixelswide-1;}
- 		 		 			else {x=volumeofinterest.minx; xindex=0;}
- 		 		 			while ((xindex>=0) && (xindex<pixelswide)){
- 		 		 			//Find if the point is unprocessed in all scenes or not
- 		 						Point3d point=new Point3d(x,y,z);
- 		 						boolean unprocessed=true;
- 		 						for (int i=0;i<images.length;i++) if ((!images[i].skipprocessing) && unprocessed) unprocessed=images[i].PointIsUnprocessed(point);
- 		 						if (unprocessed) {
- 		 							// 1) find the mean colour using only those images where the camera center is in the correct octant (determined by the current 3d point and the direction of the x/y/z loops
- 		 							PixelColour[] colours=new PixelColour[images.length];
- 		 							int[] cameras=new int[images.length];
- 		 							int index=0;
- 		 							for (int i=0;i<images.length;i++) if (!images[i].skipprocessing){
- 		 								// make the combinations of +/- x,y,z a number between 0 and 7 to make the case statements easier
- 		 								int correctoctant=(int)((xdir==1)?1:0)+((int)((ydir==1)?1:0)*2)+((int)((zdir==1)?1:0)*4);
- 		 								boolean process=false;
- 		 								switch (correctoctant){
- 		 									case 0:process=(C[i].x>x) && (C[i].y>y) && (C[i].z>z);break;
- 		 									case 1:process=(C[i].x<x) && (C[i].y>y) && (C[i].z>z);break;
- 		 									case 2:process=(C[i].x>x) && (C[i].y<y) && (C[i].z>z);break;
- 		 									case 3:process=(C[i].x<x) && (C[i].y<y) && (C[i].z>z);break;
- 		 									case 4:process=(C[i].x>x) && (C[i].y>y) && (C[i].z<z);break;
- 		 									case 5:process=(C[i].x<x) && (C[i].y>y) && (C[i].z<z);break;
- 		 									case 6:process=(C[i].x>x) && (C[i].y<y) && (C[i].z<z);break;
- 		 									case 7:process=(C[i].x<x) && (C[i].y<y) && (C[i].z<z);break;
- 		 								} // end switch statement
- 		 								if (process){
- 		 									colours[index]=images[i].InterpolatePixelColour(images[i].getWorldtoImageTransform(point.ConvertPointTo4x1Matrix()));
- 		 									cameras[index]=i;
- 		 									index++;
- 		 								} // end if camera centre in correct octant
- 		 							} // end for i
- 		 							// 2) find similarity measure and mean colour if in two or more images
- 		 							if (index>1) {
- 		 								PixelColour[] truncatedcolours=new PixelColour[index];
- 		 								for (int i=0;i<index;i++) truncatedcolours[i]=colours[i].clone();
- 		 								PixelColour newcolour=new PixelColour();
- 		 								double[] variance=newcolour.SetPixelToMeanColourAndReturnVariance(truncatedcolours);
- 		 								// if similar enough set display colour and set processed flag on pixels in each contributing image
- 		 								if (variance[4]<300) {
- 		 									newimage[xindex][yindex]=newcolour.clone();
- 		 									skip[xindex][yindex]=false;
- 		 		 							// 3) reset binary pixel in each contributing image so this pixel is not used in successive runs through the loop if similar enough
- 		 									for (int j=0;j<index;j++){
- 		 										int i=cameras[j];
- 		 										Point2d imagepoint=images[i].getWorldtoImageTransform(point.ConvertPointTo4x1Matrix());
- 		 										images[i].setPixeltoProcessed(imagepoint);
- 		 									}
- 		 								} // end if similar enough
- 		 							} // end if match in more than one image
-
- 		 						} // end if potentially part of surface of object
- 		 					x=x+(xdir*xstep);
- 		 					xindex=xindex+xdir;
- 		 		 			}} // end while and for x
- 					y=y+(ydir*ystep);
- 					yindex=yindex+ydir;
- 					if (yindex%100==0) System.out.print(".");
- 					}} // end while and for y
- 				BoundingPolygon2D boundingpolygon=new BoundingPolygon2D(new Point2d[0]);
- 				BoundingPolygon2D overlaypolygon=new BoundingPolygon2D(new Point2d[0]); // This bounding polygon is just for overlaying on the image
-					boolean first=true;
-					for (int pixelx=0;pixelx<pixelswide;pixelx++){
-						for (int pixely=0;pixely<pixelshigh;pixely++){
-							if (!skip[pixelx][pixely]){
-								if (first){
-									Point2d[] point=new Point2d[1];
-									point[0]=new Point2d(volumeofinterest.minx+(pixelx*xstep),volumeofinterest.miny+(pixely*ystep));
-									boundingpolygon=new BoundingPolygon2D(point);
-									point[0]=new Point2d(pixelx,pixely);
-									overlaypolygon=new BoundingPolygon2D(point);
-									first=false;
-								}
-								else {
-									boundingpolygon.ExpandPolygon(new Point2d(volumeofinterest.minx+(pixelx*xstep),volumeofinterest.miny+(pixely*ystep)));
-									overlaypolygon.ExpandPolygon(new Point2d(pixelx,pixely));
-								}
-							} // end if not skip pixel
-						} // end for pixely
-					} //end for pixelx
- 					
- 				if (prefs.Debug){
- 					GraphicsFeedback graphics=new GraphicsFeedback(true);
- 					graphics.ShowPixelColourArray(newimage,pixelswide,pixelshigh);
- 					graphics.OutlinePolygon(overlaypolygon,new PixelColour(PixelColour.StandardColours.Blue),0,0);
- 					String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"TestImageAtZ="+String.valueOf(z)+String.valueOf(zdir)+".jpg";
- 					graphics.SaveImage(filename);
- 				}
-
- 				TrianglePlusVertexArray triplusvertex=boundingpolygon.ExtrudeTo3DAndConvertToTriangles(zstep,z+(zstep/2));
-				totaltriplusvertex=totaltriplusvertex.MergeAndReturn(triplusvertex);
-				System.out.println(" this layer triangles="+triplusvertex.GetTriangleArrayLength()+" total triangles="+totaltriplusvertex.GetTriangleArrayLength());
-	 					z=z+(zdir*zstep);
-	 			}} // end while and for z
-
- 		surfacetriangles=totaltriplusvertex.GetTriangleArray();
- 		surfacepoints=totaltriplusvertex.GetVertexArray();
- 		System.out.println("triangle length="+surfacetriangles.length);
- 		System.out.println("points length="+surfacepoints.length);
- 		
-//		 Automatically go onto the next step
-		  setStep(stepsarray[currentstep.ordinal()+1]);
-
- 	} // end of method
- 	
+	
  	
 //  This method redraws the Window for the step in which the calibration pattern is chosen
  	 private void ChooseCalibrationSheet() {
@@ -898,7 +752,7 @@ private void FindCalibrationSheetCirclesEtc(){
 			  JButtonPrevious.setEnabled(false);
 			  
 			  jLabelProgressBar1 = new javax.swing.JLabel();
-    		   jProgressBar2 = new JProgressBar(0,(prefs.imagefiles.getSize()*calibrationnumberofsubsteps)+objectvoxelisationnumberofsteps+calibrationsheetinterrogationnumberofsteps-1); // There are a certain number of steps per image plus an additional number of steps to voxelise the object and process the calibration sheet.  
+    		   jProgressBar2 = new JProgressBar(0,(prefs.imagefiles.getSize()*calibrationnumberofsubsteps)+objectvoxelisationnumberofsteps+calibrationsheetinterrogationnumberofsteps+numberofotherprogressbarsteps); // There are a certain number of steps per image plus an additional number of steps to voxelise the object and process the calibration sheet.  
     		   jProgressBar2.setValue(0);
     		   jLabelProgressBar2 = new javax.swing.JLabel();
     		   jLabelOutputLog = new javax.swing.JLabel();
@@ -1006,8 +860,7 @@ private void FindCalibrationSheetCirclesEtc(){
 
 
     		   for (int j=0;j<prefs.imagefiles.getSize();j++){
-    			   long starttime=System.currentTimeMillis();
-      			   final String text2="Processing image "+(j+1)+" of "+prefs.imagefiles.getSize();
+    			   final String text2="Processing image "+(j+1)+" of "+prefs.imagefiles.getSize();
 					  try{ 
 							// This is the recommended way of passing GUI information between threads
 								  EventQueue.invokeLater(new Runnable(){
@@ -1180,8 +1033,7 @@ private void FindCalibrationSheetCirclesEtc(){
 	    						 
 	  		    				 
 						} // end if compute    		   
-								  if (print) System.out.println("Time to process image "+(j+1)+":"+(System.currentTimeMillis()-starttime)+"ms");
-	    		    		   starttime=System.currentTimeMillis();
+								
  // End of loop steps 1-5
 	    	 final int value=calibrationsheetinterrogationnumberofsteps+(calibrationnumberofsubsteps*(j+1));
     		  EventQueue.invokeLater(new Runnable(){
@@ -1306,9 +1158,8 @@ private void FindCalibrationSheetCirclesEtc(){
 	 					}
 	 				  else {
 	 				  	 Voxel voxels=Voxelisation();
-	 				  	 //TODO uncomment when finished testing
 	 				  	 RestrictSearch(voxels);
-	 				  	 //SurfaceVoxelsToTriangles(voxels);
+	 				  	 //SurfaceVoxelsToTriangles(voxels); //TODO delete when finished testing
 	 				  	 } // end else for if there are enough images to extract 3D information 
 	 	    		 // automatically continue to the next step
 	 	   		    	setStep(stepsarray[currentstep.ordinal()+1]);
@@ -1389,7 +1240,179 @@ private void FindCalibrationSheetCirclesEtc(){
 		Thread t=new Thread(new workingThread());
 		t.start();
 	}
-	
+ 	//This method is an intermediary one for testing purposes
+ 	// Eventually this will be replaced by a SurfacePatchTextureMatching method that give better output.
+ 	public void SurfacePointTextureMatching(){
+		//TODO set the progress bar and text   
+ 		TrianglePlusVertexArray totaltriplusvertex=new TrianglePlusVertexArray(new Point3d[0]);
+ 		   int sampleswide=(int)((volumeofinterest.maxx-volumeofinterest.minx)/prefs.AlgorithmSettingSurfacePointTextureResolutionmm);
+ 		   int sampleshigh=(int)((volumeofinterest.maxy-volumeofinterest.miny)/prefs.AlgorithmSettingSurfacePointTextureResolutionmm);
+ 		   int zsamples=(int)(((volumeofinterest.maxz-volumeofinterest.minz)/prefs.AlgorithmSettingSurfacePointTextureResolutionmm));
+ 		   JProgressBar bar=new JProgressBar(0,(zsamples*2)+1);
+ 		   bar.setValue(0);
+	 		
+ 		   // Increment the second progress bar
+ 		   try{ 
+ 				// This is the recommended way of passing GUI information between threads
+ 					  EventQueue.invokeLater(new Runnable(){
+ 						  public void run(){
+ 							  // Update progress bar
+ 							  jProgressBar2.setValue(jProgressBar2.getValue()+1);
+ 							  
+ 						  }
+ 					  });
+ 				  }
+ 				  catch (Exception e) { 
+ 					  System.out.println("Exception in updating the progress bar"+e.getMessage());
+ 		         } 
+ 		   // Find the camera center of each image
+ 		   Point3d[] C=new Point3d[images.length];
+ 		   for (int i=0;i<C.length;i++) C[i]=new Point3d(MatrixManipulations.GetRightNullSpace(images[i].getWorldtoImageTransformMatrix()));
+ 		   // To do this sweep properly we need to sweep in all eight combinations of +/- x/y/z
+ 		   double xstep=prefs.AlgorithmSettingSurfacePointTextureResolutionmm;
+ 		   double ystep=prefs.AlgorithmSettingSurfacePointTextureResolutionmm;
+ 		   double zstep=prefs.AlgorithmSettingSurfacePointTextureResolutionmm;
+ 		   BoundingPolygon2D[] boundingpolygon=new BoundingPolygon2D[zsamples+1];
+ 		   for (int i=0;i<=zsamples;i++) boundingpolygon[i]=new BoundingPolygon2D(new Point2d[0]);
+			
+ 		   //TODO comment code!
+ 		   for (int zdir=-1;zdir<=1;zdir=zdir+2) {
+ 			   double z=volumeofinterest.minz;
+				if (zdir==-1) z=volumeofinterest.maxz;
+				while ((z>=volumeofinterest.minz) && (z<=volumeofinterest.maxz)){
+					int zindex=(int)(((z-volumeofinterest.minz)/(volumeofinterest.maxz-volumeofinterest.minz))*(double)zsamples);
+					//progressbar update
+			 	 		bar.setValue(bar.getValue()+1);
+			 	 		final JProgressBar temp=bar;
+			 	 		String directionofsweep="down";
+			 	 		if (zdir>0) directionofsweep="up";
+			 	 		// This just shows four significant digits for the resolution
+			 	 		final String text="Finding Surface Points for z="+new BigDecimal(z,new MathContext(4, RoundingMode.DOWN)).toPlainString()+" sweeping "+directionofsweep+".";
+			 	 		  try{ 
+			 	 				// This is the recommended way of passing GUI information between threads
+			 	 					  EventQueue.invokeLater(new Runnable(){
+			 	 						  public void run(){
+			 	 							  // Update progress bar
+			 	 							jProgressBar1.setMinimum(temp.getMinimum());
+			 	 							  jProgressBar1.setMaximum(temp.getMaximum());
+			 	 							  jProgressBar1.setValue(temp.getValue());
+			 	 							  jLabelProgressBar1.setText(text);
+			 	 						  }
+			 	 					  });
+			 	 				  }
+			 	 				  catch (Exception e) { 
+			 	 					  System.out.println("Exception in updating the progress bar"+e.getMessage());
+			 	 		         } 
+			
+					boolean[][] skip=new boolean[sampleswide+1][sampleshigh+1];
+					PixelColour[][] colour=new PixelColour[sampleswide+1][sampleshigh+1]; // currently not used for anything but the debugging images
+					
+					for (int i=0;i<=sampleswide;i++)
+						for (int j=0;j<=sampleshigh;j++){
+							skip[i][j]=true;
+							colour[i][j]=new PixelColour(PixelColour.StandardColours.White);
+						}
+					
+					for (int ydir=1;ydir>=-1;ydir=ydir-2){
+						double y=volumeofinterest.miny;
+						if (ydir==-1) y=volumeofinterest.maxy;
+						while ((y>=volumeofinterest.miny) && (y<=volumeofinterest.maxy)){	
+							for (int xdir=1;xdir>=-1;xdir=xdir-2){
+								double x=volumeofinterest.minx;
+								if (xdir==-1) x=volumeofinterest.maxx;
+								while ((x>=volumeofinterest.minx) && (x<=volumeofinterest.maxx)){
+									//Find if the point is unprocessed in all scenes or not
+									Point3d point=new Point3d(x,y,z);
+									boolean unprocessed=true;
+									for (int i=0;i<images.length;i++) if ((!images[i].skipprocessing) && unprocessed) unprocessed=images[i].PointIsUnprocessed(point);
+									if (unprocessed) {
+										// 1) find the mean colour using only those images where the camera center is in the correct octant (determined by the current 3d point and the direction of the x/y/z loops
+										PixelColour[] colours=new PixelColour[images.length];
+										int[] cameras=new int[images.length];
+										int index=0;
+										for (int i=0;i<images.length;i++) if (!images[i].skipprocessing){
+											// make the combinations of +/- x,y,z a number between 0 and 7 to make the case statements easier
+											int correctoctant=(int)((xdir==1)?1:0)+((int)((ydir==1)?1:0)*2)+((int)((zdir==1)?1:0)*4);
+											boolean process=false;
+											switch (correctoctant){
+												case 0:process=(C[i].x>x) && (C[i].y>y) && (C[i].z>z);break;
+ 												case 1:process=(C[i].x<x) && (C[i].y>y) && (C[i].z>z);break;
+ 												case 2:process=(C[i].x>x) && (C[i].y<y) && (C[i].z>z);break;
+ 												case 3:process=(C[i].x<x) && (C[i].y<y) && (C[i].z>z);break;
+ 												case 4:process=(C[i].x>x) && (C[i].y>y) && (C[i].z<z);break;
+ 												case 5:process=(C[i].x<x) && (C[i].y>y) && (C[i].z<z);break;
+ 												case 6:process=(C[i].x>x) && (C[i].y<y) && (C[i].z<z);break;
+ 												case 7:process=(C[i].x<x) && (C[i].y<y) && (C[i].z<z);break;
+											} // end switch statement
+											if (process){
+												colours[index]=images[i].InterpolatePixelColour(images[i].getWorldtoImageTransform(point.ConvertPointTo4x1Matrix()));
+												cameras[index]=i;
+												index++;
+											} // end if camera centre in correct octant
+										} // end for i
+										// 2) find similarity measure and mean colour if in two or more images
+										if (index>1) {
+											PixelColour[] truncatedcolours=new PixelColour[index];
+											for (int i=0;i<index;i++) truncatedcolours[i]=colours[i].clone();
+											PixelColour newcolour=new PixelColour();
+											double[] variance=newcolour.SetPixelToMeanColourAndReturnVariance(truncatedcolours);
+											// 	if similar enough set set processed flag on pixels in each contributing image and add to the bounding polygon
+											// also storing the colour but currently not used for anything but displaying debug images
+											if (variance[4]<prefs.AlgorithmSettingSurfacePointTextureVarianceThreshold) {
+												int xindex=(int)(((x-volumeofinterest.minx)/(volumeofinterest.maxx-volumeofinterest.minx))*(double)sampleswide);
+												int yindex=(int)(((y-volumeofinterest.miny)/(volumeofinterest.maxy-volumeofinterest.miny))*(double)sampleshigh);
+												colour[xindex][yindex]=newcolour.clone();
+												// Set to be skipped to save time if this is not the last sweep
+												skip[xindex][yindex]=false;
+												// Add to the bounding polygon
+												boundingpolygon[zindex].ExpandPolygon(new Point2d(x,y));
+												// 3) reset binary pixel in each contributing image so this pixel is not used in successive runs through the loop if similar enough
+												for (int j=0;j<index;j++){
+													int i=cameras[j];
+													Point2d imagepoint=images[i].getWorldtoImageTransform(point.ConvertPointTo4x1Matrix());
+													images[i].setPixeltoProcessed(imagepoint);
+												}
+											} // end if similar enough
+										} // end if match in more than one image
+
+									} // end if potentially part of surface of object
+									x=x+(xdir*xstep);
+								}} // end while and for x
+							y=y+(ydir*ystep);
+						}} // end while and for y
+					if ((prefs.Debug) && (prefs.DebugSurfacePointTextureMatching)){
+						GraphicsFeedback graphics=new GraphicsFeedback(true);
+						graphics.ShowPixelColourArray(colour,sampleswide+1,sampleshigh+1);
+						BoundingPolygon2D polygon=boundingpolygon[zindex].clone();
+						// Need to reset the origin and re-scale this before displaying it
+						polygon.ResetOrigin(new Point2d(volumeofinterest.minx,volumeofinterest.miny));
+						polygon.scale(1/prefs.AlgorithmSettingSurfacePointTextureResolutionmm);
+						graphics.OutlinePolygon(polygon,new PixelColour(PixelColour.StandardColours.Blue),0,0);
+						String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"SurfaceTextureMatchImageForZ="+String.valueOf(z)+"-"+directionofsweep+".jpg";
+						graphics.SaveImage(filename);
+					}
+					if (zdir>0){ // only add triangles on the last sweep upwards.
+						System.out.println("Check start");
+						
+						TrianglePlusVertexArray triplusvertex=boundingpolygon[zindex].ExtrudeTo3DAndConvertToTriangles(zstep,z+(zstep/2));
+						System.out.println("Check");
+						totaltriplusvertex=totaltriplusvertex.MergeAndReturn(triplusvertex);
+						System.out.println("Check2");
+						if (print) System.out.println("This layer triangles="+triplusvertex.GetTriangleArrayLength()+" total triangles="+totaltriplusvertex.GetTriangleArrayLength());
+						System.out.println("Finished");
+					}
+					
+ 					z=z+(zdir*zstep);
+				}} // end while and for z
+
+ 		   surfacetriangles=totaltriplusvertex.GetTriangleArray();
+ 		   surfacepoints=totaltriplusvertex.GetVertexArray();
+ 		   if (print) System.out.println("triangle length="+surfacetriangles.length);
+ 		   if (print) System.out.println("points length="+surfacepoints.length);
+ 		   //		 Automatically go onto the next step
+ 		   setStep(stepsarray[currentstep.ordinal()+1]);
+ 	} // end of method
+ 
 	private void OutputSTLFile(){
 		 //Need to split the actual work and the GUI into separate threads 
 	    // The code that paints the GUI and events generated by the GUI are executed on a single thread, called the "event-dispatching thread". 
@@ -1630,7 +1653,7 @@ private void FindCalibrationSheetCirclesEtc(){
 	 **************************************************************************************************************************************************************************/
 	private void ProcessCalibrationSheet(){
 		   JProgressBar bar=new JProgressBar(0,1);
-		   long starttime=System.currentTimeMillis();
+		   
 					   try{ 
 							// This is the recommended way of passing GUI information between threads
 								  EventQueue.invokeLater(new Runnable(){
@@ -1776,9 +1799,7 @@ private void FindCalibrationSheetCirclesEtc(){
 		    			  calibrationcirclecenters[i]=new Point2d((calibrationcircles[i].GetCenter().x*xscale),(calibrationcircles[i].GetCenter().y*yscale));
 		    			   calibrationcirclecenters[i].minus(calibrationcsheetcenter);
 		    		   }
-		    		  if (print) System.out.println("Time to process calibration sheet:"+(System.currentTimeMillis()-starttime)+"ms");
-		    		   starttime=System.currentTimeMillis();
-		    		   
+		    		  
 		    		   //Also construct the volume of interest knowing that the world coordinates have the origin at the centre of the calibration sheet, x and y scales are those of the image
 		    		   // and the z axis is perpindicular to the calibration sheet with positive z above it and a scale based on the x and y scales
 		    		   volumeofinterest=new AxisAlignedBoundingBox();
@@ -2415,6 +2436,7 @@ private void FindCalibrationSheetCirclesEtc(){
 
 	
 	//TODO delete when not needed
+	/*
 	private void SurfaceVoxelsToTriangles(Voxel rootvoxel){
 		 try{ 
 				// This is the recommended way of passing GUI information between threads
@@ -2442,7 +2464,7 @@ private void FindCalibrationSheetCirclesEtc(){
 			  });
 
 	}
-	
+	*/
 
 
 	private void GraphicsFeedback(){
@@ -2778,20 +2800,6 @@ public class Point3dArray {
 			  P=MatrixManipulations.WorldToImageTransformMatrix(K,R,t,Z);
 			  images[i].setWorldtoImageTransformMatrix(P);
 			 
-			  if (print){
-				System.out.println("Camera Matrix for image "+i);
-				cameramatrix.print(10,20);
-				System.out.println("Rotation Matrix for image "+i);
-				R.print(10,20);
-				System.out.println("Translation Vector for image "+i);
-				t.print(10,20);
-				System.out.println("Z scale for image "+i+": "+z);
-				//System.out.println("Distortion Matrix for image "+i);
-				System.out.println("Distortion coefficient for image "+i+": "+distortion.getDistortionCoefficient());
-				System.out.print("Origin of image coordinates for image "+i+": ");
-				images[i].originofimagecoordinates.print();
-				System.out.println();
-			}
 			  return distortion;
 	}
 

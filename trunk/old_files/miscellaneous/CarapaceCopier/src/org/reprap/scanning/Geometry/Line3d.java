@@ -42,8 +42,8 @@ public class Line3d {
 	public Point3d V; // This is a vector not a point
 	// Constructors
 	public Line3d(){ 
-		P=new Point3d(0,0,0);
-		V=new Point3d(0,0,0);
+		P=new Point3d();
+		V=new Point3d();
 	}
 	// Note this constructor has been changed from what it was originally. It does not take a point and vector but two points and calculates the vector from them.
 	// As the point and vector are both Point3d it would be easy to make a mistake!

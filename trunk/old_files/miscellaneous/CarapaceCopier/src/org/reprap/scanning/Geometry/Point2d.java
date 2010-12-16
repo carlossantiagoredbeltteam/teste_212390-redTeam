@@ -61,6 +61,9 @@ public class Point2d
 		Point2d returnvalue=new Point2d(x,y);
 		return returnvalue;
 		}
+	public Point3d ExportAs3DPoint(double z){
+		return new Point3d(x,y,z);
+	}
 	public double CalculateDistanceSquared(Point2d other){
 		return (((x-other.x)*(x-other.x))+((y-other.y)*(y-other.y)));
 		}

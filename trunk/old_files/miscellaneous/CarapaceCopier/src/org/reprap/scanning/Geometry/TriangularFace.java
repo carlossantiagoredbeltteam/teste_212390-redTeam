@@ -332,7 +332,7 @@ public class TriangularFace {
 	// If there is no intersection the origin is returned. Obviously if that is ever possibly going to be an intersection point then the above method should be called to check the result. 
 	public Point3d LineSegmentIntersectTriangularFace(Line3d line,Point3d[] PointsList){
 //		 Test for intersection between face and the linesegment
-		Point3d returnvalue=new Point3d(0,0,0);
+		Point3d returnvalue=new Point3d();
 		double r=0;
 		//Does the line segment intersect with the plane made by the triangle face, logic taken from http://softsurfer.com/Archive/algorithm_0105/algorithm_0105.htm
 		// If it does, the intersection point is P0+r(P1-P0) where r is between 0 and 1 and is defined as normal.(V0-P0)/normal.(P1-P0). If normal.(P1-P0)=0, then the line segment is parallel to the plane
