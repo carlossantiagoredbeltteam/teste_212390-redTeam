@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  *
- * Last modified by Reece Arnott 16th December 2010
+ * Last modified by Reece Arnott 17th December 2010
  * 
  * Note that most of the layout commands were initially produced by NetBeans for JDK 6
  * and significantly modified by hand. For future reference if it needs to be done the other way the main things to change are:
@@ -140,6 +140,7 @@ public class Main extends JFrame {
  */ 
 
    public static enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration,objectfindingvoxelisation,texturematching,writetofile,end};
+   // public static enum steps {calibrationsheet,test,end};
     private final static steps stepsarray[]=steps.values();
     private static steps laststep = steps.valueOf("end");
     private static steps firststep = steps.valueOf("calibrationsheet");
@@ -271,8 +272,8 @@ public class Main extends JFrame {
 					OutputSTLFile(); 
 					GraphicsFeedback(); // image feedback if the debug options are set
  					 break;
-				
-				case end : end(); break;
+ 				case end : end(); break;
+			//	case test: Test();break;
 				}
 			}
 			catch (Exception e) {
@@ -283,7 +284,10 @@ public class Main extends JFrame {
 			
     	} // end of method
  
- 
+ public void Test(){
+	 Testing test=new Testing();
+	 test.TemporaryTestMethod();
+ }
 	
  	
 //  This method redraws the Window for the step in which the calibration pattern is chosen
@@ -1312,7 +1316,6 @@ private void FindCalibrationSheetCirclesEtc(){
 							skip[i][j]=true;
 							colour[i][j]=new PixelColour(PixelColour.StandardColours.White);
 						}
-					
 					for (int ydir=1;ydir>=-1;ydir=ydir-2){
 						double y=volumeofinterest.miny;
 						if (ydir==-1) y=volumeofinterest.maxy;
@@ -1381,25 +1384,50 @@ private void FindCalibrationSheetCirclesEtc(){
 							y=y+(ydir*ystep);
 						}} // end while and for y
 					if ((prefs.Debug) && (prefs.DebugSurfacePointTextureMatching)){
+						
 						GraphicsFeedback graphics=new GraphicsFeedback(true);
 						graphics.ShowPixelColourArray(colour,sampleswide+1,sampleshigh+1);
-						BoundingPolygon2D polygon=boundingpolygon[zindex].clone();
+						BoundingPolygon2D polygon=new BoundingPolygon2D(new Point2d[0]);
+						polygon=boundingpolygon[zindex].clone();
 						// Need to reset the origin and re-scale this before displaying it
 						polygon.ResetOrigin(new Point2d(volumeofinterest.minx,volumeofinterest.miny));
 						polygon.scale(1/prefs.AlgorithmSettingSurfacePointTextureResolutionmm);
 						graphics.OutlinePolygon(polygon,new PixelColour(PixelColour.StandardColours.Blue),0,0);
 						String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"SurfaceTextureMatchImageForZ="+String.valueOf(z)+"-"+directionofsweep+".jpg";
-						graphics.SaveImage(filename);
+						//graphics.SaveImage(filename);
+						
+						boolean selfintersect=boundingpolygon[zindex].isSelfIntersectingPolygon();
+						System.out.println("Self Intersecting test for "+zindex+" (z="+z+") shows "+selfintersect);
+						//if (!selfintersect){
+						// Test that none of the points are outside the polygon
+						Point2d[] points=boundingpolygon[zindex].GetAllPointsWithinPolygon();
+						//Point2d[] vertices=boundingpolygon[zindex].GetOrderedVertices();
+						boolean outside=false;
+						//int numberofvertices=0;
+						for (int i=0;i<points.length;i++){ 
+						//	boolean vertex=false;
+						//	for (int j=0;j<vertices.length;j++) if (points[i].isEqual(vertices[j])) vertex=true; 
+						//	if (vertex) {numberofvertices++;}
+							//else 
+							if (boundingpolygon[zindex].PointIsOutside(points[i])) outside=true;
+						}
+						//if (numberofvertices!=vertices.length) {
+						//	System.out.println("Error: Number of vertices in polygon is "+vertices.length+" but number of vertices detected in all points is "+numberofvertices);
+						//	for (int i=0;i<points.length;i++)points[i].print();
+						//	System.out.println();
+						//	for (int i=0;i<vertices.length;i++)vertices[i].print();
+						//	System.out.println();
+						//}
+						if (outside) System.out.println("Error: Point(s) are outside triangulated polygon");
+					
+						
+						
+					
 					}
 					if (zdir>0){ // only add triangles on the last sweep upwards.
-						System.out.println("Check start");
-						
 						TrianglePlusVertexArray triplusvertex=boundingpolygon[zindex].ExtrudeTo3DAndConvertToTriangles(zstep,z+(zstep/2));
-						System.out.println("Check");
 						totaltriplusvertex=totaltriplusvertex.MergeAndReturn(triplusvertex);
-						System.out.println("Check2");
 						if (print) System.out.println("This layer triangles="+triplusvertex.GetTriangleArrayLength()+" total triangles="+totaltriplusvertex.GetTriangleArrayLength());
-						System.out.println("Finished");
 					}
 					
  					z=z+(zdir*zstep);

@@ -23,7 +23,7 @@ package org.reprap.scanning.Geometry;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 16th December 2010
+ * Last modified by Reece Arnott 17th December 2010
  * 
  *    This class takes a series of 2d points and creates a standard convex, closed polygon that encloses the points
  *    The polygon is defined by an array of ordered points (ordered in CCW or CW order)   
@@ -36,23 +36,24 @@ import org.reprap.scanning.DataStructures.TrianglePlusVertexArray;
 public class BoundingPolygon2D {
 	private final static double tau=Math.PI*2;
 	
-	private static enum direction{up,left,down,right}; // anti-clockwise 
-	//private static enum direction{left, up, right, down}; // clockwise
+	private static enum direction{up,left,down,right}; // clockwise 
+	//private static enum direction{left, up, right, down}; // anti-clockwise
 	// Note that this assumes a right hand coordinate system i.e. up is in the positive y direction, right is positive x etc.
 	// But this is just for readability
 	
 	private static direction[] directionarray=direction.values();//This is a set of directions to cycle through in order to order the corner array in either clockwise or anti-clockwise direction 
-	private static boolean clockwiseordering=directionarray[0]==direction.left; // The triangulation routine needs to know if the vertices are ordered clockwise or anti-clockwise 
+	private static boolean clockwiseordering=directionarray[0]==direction.up; // The triangulation routine needs to know if the vertices are ordered clockwise or anti-clockwise 
 	
 	private Point2d[] orderedvertices;
-	//private Point2d[] allpoints; //TODO currently not used, delete if not needed.
+	private Point2d[] allpoints; //TODO currently not used, except for testing purposes delete if not needed.
 	private AxisAlignedBoundingBox boundingbox;
 	
 	//Constructor
 	public BoundingPolygon2D(Point2d vertices[]){
 		boundingbox=new AxisAlignedBoundingBox();
 		orderedvertices=new Point2d[vertices.length];
-		//allpoints=vertices.clone();
+		allpoints=new Point2d[vertices.length];
+		for (int i=0;i<allpoints.length;i++) allpoints[i]=vertices[i].clone();
 		if (vertices.length>1){
 			for (int i=0;i<vertices.length;i++)
 				if (i==0){boundingbox.minx=vertices[i].x;boundingbox.maxx=vertices[i].x;boundingbox.miny=vertices[i].y;boundingbox.maxy=vertices[i].y;}
@@ -64,7 +65,8 @@ public class BoundingPolygon2D {
 	
 	public BoundingPolygon2D clone(){
 		BoundingPolygon2D returnvalue=new BoundingPolygon2D(orderedvertices);
-		//returnvalue.allpoints=allpoints.clone();
+		returnvalue.allpoints=new Point2d[allpoints.length];
+		for (int i=0;i<allpoints.length;i++) returnvalue.allpoints[i]=allpoints[i].clone();
 		return returnvalue;
 	}
 	public AxisAlignedBoundingBox GetAxisAlignedBoundingBox(){
@@ -73,18 +75,18 @@ public class BoundingPolygon2D {
 	public Point2d[] GetOrderedVertices(){
 		return orderedvertices;
 	}
-	//public Point2d[] GetAllPointsWithinPolygon(){
-	//	return allpoints;
-	//}
+	public Point2d[] GetAllPointsWithinPolygon(){
+		return allpoints;
+	}
 	public void scale(double s){
 		boundingbox.scale(s);
 		for (int i=0;i<orderedvertices.length;i++) orderedvertices[i].scale(s);
-		//for (int i=0;i<allpoints.length;i++) allpoints[i].scale(s);
+		for (int i=0;i<allpoints.length;i++) allpoints[i].scale(s);
 	}
 	public void ResetOrigin(Point2d neworigin){
 		boundingbox.ResetOrigin(neworigin.ExportAs3DPoint(0));
 		for (int i=0;i<orderedvertices.length;i++) orderedvertices[i].minus(neworigin);
-		//for (int i=0;i<allpoints.length;i++) allpoints[i].minus(neworigin);
+		for (int i=0;i<allpoints.length;i++) allpoints[i].minus(neworigin);
 	}
 	
 	public LineSegment2D[] Get2DLineSegments(){
@@ -103,10 +105,10 @@ public class BoundingPolygon2D {
 	}
 	public void ExpandPolygon(Point2d point){
 		// Add the point to the all points array
-		//Point2d[] allnewpoints=new Point2d[allpoints.length+1];
-		//for (int i=0;i<allpoints.length;i++) allnewpoints[i]=allpoints[i].clone();
-		//allnewpoints[allpoints.length]=point.clone();
-		//allpoints=allnewpoints.clone();
+		Point2d[] allnewpoints=new Point2d[allpoints.length+1];
+		for (int i=0;i<allpoints.length;i++) allnewpoints[i]=allpoints[i].clone();
+		allnewpoints[allpoints.length]=point.clone();
+		allpoints=allnewpoints.clone();
 		
 		// expand the bounding box
 		if (orderedvertices.length==0){boundingbox.minx=point.x;boundingbox.maxx=point.x;boundingbox.miny=point.y;boundingbox.maxy=point.y;}
@@ -187,17 +189,43 @@ public class BoundingPolygon2D {
 		return returnvalue;
 	}
 		public TrianglePlusVertexArray ConvertToTrianglesOnZplane(double zvalue, boolean normalfacingup){
-		// convert the 2d vertices to 3d points with the same z value
-		Point3d[] vertices3d=new Point3d[orderedvertices.length];
-		boolean[] skip=new boolean[orderedvertices.length];
-		for (int i=0;i<vertices3d.length;i++) {
-			vertices3d[i]=orderedvertices[i].ExportAs3DPoint(zvalue);
-			skip[i]=false;
-		}
-		
-		TrianglePlusVertexArray triangles=new TrianglePlusVertexArray(vertices3d);
+			TrianglePlusVertexArray triangles=new TrianglePlusVertexArray(new Point3d[0]);
+			if (orderedvertices.length>2){
+			// First test to see if this is a self intersecting polygon, if so split it into two and triangularise them seperately
+			int intersectionlinesegment=GetFirstIntersectingLineSegment();
+			if (intersectionlinesegment!=-1){
+				// Find the intersection point
+				LineSegment2D line1=new LineSegment2D(orderedvertices[0],orderedvertices[orderedvertices.length-1]);
+				LineSegment2D line2=new LineSegment2D(orderedvertices[intersectionlinesegment],orderedvertices[intersectionlinesegment+1]);
+				Point2d newvertex=line1.SingleIntersectionPointBetweenStartAndEndExclusive(line2);
+				// Split the points into two arrays and add the new vertex to the end of both
+				Point2d[] vertices1=new Point2d[intersectionlinesegment+2];
+				Point2d[] vertices2=new Point2d[orderedvertices.length-intersectionlinesegment];
+				for (int i=0;i<orderedvertices.length;i++){
+					if (i<=intersectionlinesegment) vertices1[i]=orderedvertices[i].clone();
+					else  vertices2[i-intersectionlinesegment-1]=orderedvertices[i].clone();
+				}
+				vertices1[vertices1.length-1]=newvertex.clone();
+				vertices2[vertices2.length-1]=newvertex.clone();
+				
+				// Now Triangularise them seperately and then combine the results
+				TrianglePlusVertexArray triangles1=new BoundingPolygon2D(vertices1).ConvertToTrianglesOnZplane(zvalue,normalfacingup);
+				TrianglePlusVertexArray triangles2=new BoundingPolygon2D(vertices2).ConvertToTrianglesOnZplane(zvalue,normalfacingup);
+				triangles=triangles1.MergeAndReturn(triangles2);
+			}
+			else{
+			// convert the 2d vertices to 3d points with the same z value
+			Point3d[] vertices3d=new Point3d[orderedvertices.length];
+			boolean[] skip=new boolean[orderedvertices.length];
+			for (int i=0;i<vertices3d.length;i++) {
+				vertices3d[i]=orderedvertices[i].ExportAs3DPoint(zvalue);
+				skip[i]=false;
+			}
+				
+		triangles=new TrianglePlusVertexArray(vertices3d);
 		// Slice off triangles until nothing remains
-		boolean exit=orderedvertices.length<3;
+		// Logic taken from http://www.gamedev.net/reference/articles/article425.asp
+		boolean exit=(orderedvertices.length==3);
 		while (!exit){
 			double minhypotenusesquared=Double.MAX_VALUE;
 			// traverse around the remaining vertices and find the smallest (internal) triangle that can be made from neighbouring triangles
@@ -213,7 +241,7 @@ public class BoundingPolygon2D {
 					while (skip[(a+j)%skip.length] && (j<=skip.length))j++;
 					b=(a+j)%skip.length;
 					j=1;
-					while (skip[(b+j)%skip.length])j++;
+					while (skip[(b+j)%skip.length] && (j<=skip.length))j++;
 					c=(b+j)%skip.length;
 					exit=((a==b) || (a==c)|| (b==c)); // if there isn't a triangle to form don't continue
 					if (!exit){
@@ -221,10 +249,10 @@ public class BoundingPolygon2D {
 						//1) the hypotenuse is small
 						double hypotenusesquared=orderedvertices[a].CalculateDistanceSquared(orderedvertices[c]);
 						if (hypotenusesquared<minhypotenusesquared){
-							//2) The triangle has the same ordering of points as the polygon 
-							double determ = (orderedvertices[b].x - orderedvertices[a].x) * (orderedvertices[c].y - orderedvertices[a].y) - (orderedvertices[c].x - orderedvertices[a].x) * (orderedvertices[b].y - orderedvertices[a].y);
-							boolean sameorientation=((determ >= 0.0)==clockwiseordering);
-							if (sameorientation){
+							//2) The subset of triangle points has the same ordering as they appear as points in the polygon 
+							double determ = ((orderedvertices[b].x - orderedvertices[a].x) * (orderedvertices[c].y - orderedvertices[a].y)) - ((orderedvertices[c].x - orderedvertices[a].x) * (orderedvertices[b].y - orderedvertices[a].y));
+							boolean sameorientation=((determ<0)==clockwiseordering);
+								if (sameorientation){
 								// 3) no other vertices are inside the triangle
 								boolean alloutside=true;
 								Coordinates test=new Coordinates();
@@ -246,7 +274,10 @@ public class BoundingPolygon2D {
 					} // end if !exit
 				} // end if !skip[i]
 			} // end for i
+			if ((newa==0) && (newb==0) && (newc==0)) System.out.println("Error: This shouldn't happen. Exiting as no new triangle was added to array");
+			exit=exit || ((newa==0) && (newb==0) && (newc==0));
 			if (!exit){
+				//System.out.println("Adding "+newa+" "+newb+" "+newc);
 				// We should now be able to add a triangle to the list and take vertex b out of the list
 				TriangularFace newtriangle=new TriangularFace(newa,newb,newc);
 				if (normalfacingup) newtriangle.CalculateNormalAwayFromPoint(vertices3d,orderedvertices[newa].ExportAs3DPoint(zvalue-1));
@@ -256,15 +287,29 @@ public class BoundingPolygon2D {
 				// Now count up how many vertices are left 
 				int count=0;
 				for (int i=0;i<skip.length;i++) if (!skip[i]) count++;
-				exit=(count<3);
+				exit=(count==3);
 			}	
 		} // end while
+		// The loop should exit when there are only 3 vertices left. So make the final triangle
+		int j=0;
+		// Now go forwards to find the first vertex to be used as a, then b and then again for c
+		while (skip[(j)%skip.length] && (j<=skip.length))j++;
+		int a=j;j=1;while (skip[(a+j)%skip.length] && (j<=skip.length))j++;
+		int b=(a+j)%skip.length;j=1;while (skip[(b+j)%skip.length] && (j<=skip.length))j++;
+		int c=(b+j)%skip.length;
+		TriangularFace newtriangle=new TriangularFace(a,b,c);
+		if (normalfacingup) newtriangle.CalculateNormalAwayFromPoint(vertices3d,orderedvertices[a].ExportAs3DPoint(zvalue-1));
+		else newtriangle.CalculateNormalAwayFromPoint(vertices3d,orderedvertices[a].ExportAs3DPoint(zvalue+1));
+		triangles.AddTriangle(newtriangle);
 		
-		
+		} // end else for if self-intersecting polygon
+			} // end if >2 vertices
 		return triangles;
 	}
 	
-	
+	public boolean isSelfIntersectingPolygon(){
+		return (GetFirstIntersectingLineSegment()!=-1);
+	}
 	
 	
 	
@@ -273,7 +318,24 @@ public class BoundingPolygon2D {
 	 * Private methods from here down
 	 * 
 	 ***********************************************************************************************************************************************/
-	
+	// If there is an intersecting line segment it gets it's index, otherwise it returns -1
+	private int GetFirstIntersectingLineSegment(){
+		int returnvalue=-1;
+		if (orderedvertices.length>2){
+		LineSegment2D[] lines=Get2DLineSegments();
+		// In theory the only line that should intersect others is the last one from the last vertex back to the first
+		// And only when the points are in roughly a straight line (normally only when there are very few of them)
+		LineSegment2D endtostart=lines[lines.length-1].clone();
+		int i=0;
+		while ((i<(lines.length-1)) && (returnvalue==-1)){
+			Point2d intersectionpoint=endtostart.SingleIntersectionPointBetweenStartAndEndExclusive(lines[i]);
+			if (!intersectionpoint.isEqual(endtostart.start))returnvalue=i;
+			i++;
+		} //end while
+		} // end if
+		return returnvalue;
+		
+	}
 	
 	
 	
