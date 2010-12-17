@@ -24,7 +24,7 @@ package org.reprap.scanning.Geometry;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 13th December 2010
+ * Last modified by Reece Arnott 17th December 2010
  *
  *****************************************************************************/
 
@@ -65,7 +65,7 @@ public class LineSegment2D {
 		return start.plusEquals(vector);
 	}
 	
-public double CalculateLengthSquared(){
+	public double CalculateLengthSquared(){
 		return end.CalculateDistanceSquared(start);
 	}
 	
@@ -73,5 +73,32 @@ public double CalculateLengthSquared(){
 		// Due to rounding errors in the calculations we will accept a point as intersecting if it is within 0.001 of the closest point on the line
 		return (CalculateClosestPoint(other).isApproxEqual(other,0.001));
 	}
-	
+	// This returns the intersection point x and y if there is one, otherwise it returns the start of this line segment 
+	public Point2d SingleIntersectionPointBetweenStartAndEndExclusive(LineSegment2D other){
+		// We want to find if 2 line segments intersect, we will exlucde an intersection if it happens at the start or end or either line and also if the two line segments are parallel
+		// See http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline2d/ for the derivation of this
+		Point2d returnvalue=start.clone();
+		double denominator=((other.end.y-other.start.y)*(end.x-start.x))-((other.end.x-other.start.x)*(end.y-start.y));
+		if (denominator!=0){		//if the denominator is zero the two lines are parallel
+			double numeratora=((other.end.x-other.start.x)*(start.y-other.start.y))-((other.end.y-other.start.y)*(start.x-other.start.x));
+			double numeratorb=((end.x-start.x)*(start.y-other.start.y))-((end.y-start.y)*(start.x-other.start.x));
+			double ua=numeratora/denominator;
+			double ub=numeratorb/denominator;
+			if ((ua>0) && (ua<1) && (ub>0) && (ub<1)) returnvalue=GetPointOnLine(ua);// Note we are excluding the start and end points themselves
+		}
+		return returnvalue;
+	}
+	public boolean Overlap(LineSegment2D other){
+		double denominator=((other.end.y-other.start.y)*(end.x-start.x))-((other.end.x-other.start.x)*(end.y-start.y));
+		boolean parallel=(denominator==0); // if denominator is zero lines are parallel See http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline2d/ for the derivation of this test
+		if (parallel){
+			// Test the 4 combinations to see if one of the start or end points of one line segment lie on the other
+			boolean overlap=CalculateClosestPoint(other.start).isEqual(other.start);
+			if (!overlap) overlap=CalculateClosestPoint(other.end).isEqual(other.end);
+			if (!overlap) overlap=other.CalculateClosestPoint(start).isEqual(start);
+			if (!overlap) overlap=other.CalculateClosestPoint(end).isEqual(end);
+			return overlap;
+		}
+		else return false;	
+	}
 } // end class LineSegment

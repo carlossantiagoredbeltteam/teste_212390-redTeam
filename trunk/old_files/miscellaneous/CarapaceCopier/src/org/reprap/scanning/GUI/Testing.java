@@ -23,7 +23,7 @@ package org.reprap.scanning.GUI;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 7th December 2010
+ * Last modified by Reece Arnott 17th December 2010
  * 
  * This is test code used to test the success of the combinatorial approach to point matching on different combinations/permutations of found points on a calibration sheet
  *
@@ -48,11 +48,14 @@ package org.reprap.scanning.GUI;
  * 
  * 
  *******************************************************************************/  
+import java.io.File;
+
 import org.reprap.scanning.Calibration.CalibrateImage;
 import org.reprap.scanning.DataStructures.Image;
 import org.reprap.scanning.DataStructures.PixelColour;
 import org.reprap.scanning.FeatureExtraction.PointPairMatch;
 import org.reprap.scanning.Geometry.*;
+
 import javax.swing.JProgressBar;
 
 import Jama.Matrix;
@@ -78,6 +81,52 @@ public class Testing {
 		calibrationcirclecenters=calibrationpoints.clone();
 		count=0;
 		
+	}
+	public Testing(){
+		}
+	
+	public void TemporaryTestMethod(){
+		Point2d[] point=new Point2d[5];
+		point[0]=new Point2d(21.77812500000012,3.276562500000037);
+		point[1]=new Point2d(22.07812500000012,2.9765625000000373);
+		point[2]=new Point2d(25.67812500000013,0.5765625000000378);
+		point[3]=new Point2d(25.97812500000013,0.5765625000000378);
+		point[4]=new Point2d(33.178125000000136,-1.2234374999999622);
+		BoundingPolygon2D poly=new BoundingPolygon2D(point);
+		LineSegment2D[] lines=poly.Get2DLineSegments();
+		
+		int size=1000;
+		PixelColour[][] colour=new PixelColour[size][size];
+		for (int i=0;i<size;i++)
+			for (int j=0;j<size;j++)
+				colour[i][j]=new PixelColour(PixelColour.StandardColours.White);
+		GraphicsFeedback graphics=new GraphicsFeedback(true);
+		graphics.ShowPixelColourArray(colour,size,size);
+		BoundingPolygon2D polygon=poly.clone();
+		// Need to reset the origin and re-scale this before displaying it
+		polygon.ResetOrigin(new Point2d(-20,-20));
+		polygon.scale(10);
+		graphics.OutlinePolygon(polygon,new PixelColour(PixelColour.StandardColours.Blue),0,0);
+		
+		Point2d[] points=polygon.GetOrderedVertices();
+		for (int i=0;i<points.length;i++)
+			graphics.Print(points[i].x,points[i].y,new PixelColour(PixelColour.StandardColours.Red),1,1);
+		for (int i=2;i<=4;i++)
+			graphics.Print(points[i].x,points[i].y,new PixelColour(PixelColour.StandardColours.Green),1,1);
+		graphics.Print(points[3].x,points[3].y,new PixelColour(PixelColour.StandardColours.Navy),1,1);
+		
+		
+		
+		String filename="/home/cshome/r/rarnott/Desktop/images/test.jpg";
+		graphics.SaveImage(filename);
+		
+		boolean selfintersect=poly.isSelfIntersectingPolygon();
+		System.out.println("Self Intersecting test shows "+selfintersect);
+
+		System.out.println("Attempting convert to triangles");
+		poly.ConvertToTrianglesOnZplane(0,true);
+		System.out.println("Finished Attempt");
+			
 	}
 	
 	public void outputCorrectMatches(){
