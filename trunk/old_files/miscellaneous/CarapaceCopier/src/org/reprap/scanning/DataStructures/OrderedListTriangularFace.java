@@ -24,7 +24,7 @@ package org.reprap.scanning.DataStructures;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 2nd July 2010
+* Last modified by Reece Arnott 21st December 2010
 *
 *	This class stores an array of triangluar faces which can be accessed in an ordered way (ordered by a hashvalue) 
 *	A triangular face is 3 vertices a,b,c and potentially 0,1, or 2 other points relating to the tetrahedrons that it is a face for. These are stored as simple indexes to a Point3d array.
@@ -34,17 +34,17 @@ package org.reprap.scanning.DataStructures;
 * 
 * 
 ***********************************************************************************/
-import org.reprap.scanning.Geometry.TriangularFace;
+import org.reprap.scanning.Geometry.TriangularFaceOf3DTetrahedrons;
 import org.reprap.scanning.Geometry.Point3d;
 
 public class OrderedListTriangularFace {
-		private TriangularFace[] Plist; // This is the point list array that is order by the hash value
+		private TriangularFaceOf3DTetrahedrons[] Plist; // This is the point list array that is order by the hash value
 		private int n; // This is the value passed into the constructor as the highest value that can be used as one of the indices which is used in the construction of the hashvalue
 		private long[] insertionorder; // This is just used to keep track of the order in which the elements were inserted so you can extract them in LIFO or FIFO manner.
 		private int nextFIFO; // a pointer to the array index of insertionorder containing the next hashvalue 
 		//Constructor
 		public OrderedListTriangularFace (int high){
-			Plist=new TriangularFace[0];
+			Plist=new TriangularFaceOf3DTetrahedrons[0];
 			n=high;
 			insertionorder=new long[0];
 			nextFIFO=0;
@@ -56,21 +56,12 @@ public class OrderedListTriangularFace {
 			returnvalue.nextFIFO=nextFIFO;
 			return returnvalue;
 		}
-		
-		public void InsertTetrahedronsIfFaceNotExist(OrderedListTriangularFace list){
-			TriangularFace f=list.GetFirstFIFO();
-			while (!f.IsNull()) {
-				InsertIfNotExist(f);
-				f=list.GetNextFIFO();
-			}
-		}
-		
-		// returns true if it inserted the addition
-	public boolean InsertIfNotExist(TriangularFace addition){
+//		 returns true if it inserted the addition
+		public boolean InsertIfNotExist(TriangularFaceOf3DTetrahedrons addition){
 		boolean insert=true;
 			addition.SetHash(n);
 			if (Plist.length==0) {
-				Plist=new TriangularFace[1];
+				Plist=new TriangularFaceOf3DTetrahedrons[1];
 				Plist[0]=addition.clone();
 				insertionorder=new long[1];
 				insertionorder[0]=addition.hashvalue;
@@ -88,7 +79,7 @@ public class OrderedListTriangularFace {
 					else insertpoint=0;
 				} // end else
 				if (insert){
-					TriangularFace[] returnvalue=new TriangularFace[Plist.length+1];
+					TriangularFaceOf3DTetrahedrons[] returnvalue=new TriangularFaceOf3DTetrahedrons[Plist.length+1];
 					for (int i=0;i<returnvalue.length;i++){
 						if (i<insertpoint) returnvalue[i]=Plist[i].clone(); 
 						else if (i>insertpoint)  returnvalue[i]=Plist[i-1].clone();
@@ -104,9 +95,9 @@ public class OrderedListTriangularFace {
 		} // end else
 		return insert;
 	} // end InsertIfNotExist	
-	
+
 	// returns true if it deleted the entry
-	public boolean DeleteIfExist(TriangularFace target){
+	public boolean DeleteIfExist(TriangularFaceOf3DTetrahedrons target){
 		boolean returnvalue=false;
 		if (Plist.length!=0){
 			target.SetHash(n);
@@ -116,10 +107,10 @@ public class OrderedListTriangularFace {
 		} // end if
 		return returnvalue;
 	} // end method
-	
-	public TriangularFace GetFirstFIFO(){
+
+	public TriangularFaceOf3DTetrahedrons GetFirstFIFO(){
 		nextFIFO=0;
-		return GetNextFIFO();
+		return ExtractFIFO();
 	}
 	public void DeleteExtractedFIFOOrder(){
 		if (nextFIFO!=0){
@@ -130,9 +121,10 @@ public class OrderedListTriangularFace {
 		} // end if nextFIFO!=0
 	}
 	
-	public TriangularFace GetNextFIFO(){
-		TriangularFace returnvalue;
-		if (insertionorder.length==0) returnvalue=new TriangularFace();
+	// Gets the next face (in FIFO order) and deletes the face as well
+	public TriangularFaceOf3DTetrahedrons ExtractFIFO(){
+		TriangularFaceOf3DTetrahedrons returnvalue;
+		if (insertionorder.length==0) returnvalue=new TriangularFaceOf3DTetrahedrons();
 		else {
 			int index=-1;
 			while ((index==-1) && (nextFIFO<insertionorder.length)) {
@@ -141,28 +133,10 @@ public class OrderedListTriangularFace {
 			}
 			if ((nextFIFO>insertionorder.length) || (index==-1)){
 				// There are no more valid hashes in the array
-				returnvalue=new TriangularFace();
-			}
-			else returnvalue=Plist[index].clone();
-		} // end else
-		return returnvalue;	
-	}
-	// Same as above except it deletes the face as well
-	public TriangularFace ExtractFIFO(){
-		TriangularFace returnvalue;
-		if (insertionorder.length==0) returnvalue=new TriangularFace();
-		else {
-			int index=-1;
-			while ((index==-1) && (nextFIFO<insertionorder.length)) {
-				index=Exists(insertionorder[nextFIFO]);
-				nextFIFO++;
-			}
-			if ((nextFIFO>insertionorder.length) || (index==-1)){
-				// There are no more valid hashes in the array
-				Plist=new TriangularFace[0];
+				Plist=new TriangularFaceOf3DTetrahedrons[0];
 				insertionorder=new long[0];
 				nextFIFO=0;
-				returnvalue=new TriangularFace();
+				returnvalue=new TriangularFaceOf3DTetrahedrons();
 			}
 			else {
 				returnvalue=Plist[index].clone();
@@ -172,111 +146,19 @@ public class OrderedListTriangularFace {
 		} // end else
 		return returnvalue;	
 	}
-	
-	public void PrintFIFO(){
-		if (insertionorder.length!=0)
-		{
-			int i=0;
-			int index=-1;
-			while (i<insertionorder.length) {
-				index=Exists(insertionorder[i]);
-				if (index!=-1){
-					// There is a valid hash in the array
-					TriangularFace f=Plist[index].clone();
-					System.out.print(i+" "+insertionorder[i]+": ");
-					f.print();
-					System.out.print(" "+TestedTwice(f));
-				} // end if
-				else System.out.print(i+" "+insertionorder[i]+" ");
-				if (nextFIFO==i) System.out.print("  <=====");
-				System.out.println();
-				i++;
-			} // end while
-		} // end if
-	}
-	public void PrintList(){
-		if (Plist.length!=0)
-		{
-			int i=0;
-			while (i<Plist.length) {
-				TriangularFace f=Plist[i].clone();
-				System.out.print(i+": ");
-				f.print();
-				System.out.print(" "+TestedTwice(f));
-				System.out.println();
-				i++;
-			} // end while
-		} // end if
-	}
-	
-	public void PrintInsertionOrder(){
-		if (insertionorder.length!=0)
-		{
-			int i=0;
-			while (i<insertionorder.length) {
-				int index=Exists(insertionorder[i]);
-				System.out.println(i+" "+insertionorder[i]+" "+index);
-				i++;
-			} // end while
-		} // end if
-	}
-	
 	public int getLength(){
 		return Plist.length;
 	}
-	
-	
-	public boolean TestedTwice(TriangularFace P){
-		boolean returnvalue=false;
-		if (Plist.length!=0){
-			P.SetHash(n);
-			int index=Exists(P.hashvalue);
-			if (index!=-1) returnvalue=Plist[index].FaceTestedForMultipleTetrahedrons();
-		}
-		return returnvalue;
-	} 
-	public boolean TestedTwice(int a,int b, int c){
-		TriangularFace temp=new TriangularFace(a,b,c);
-		return TestedTwice(temp);
-	} 
-	
-	// returns true if at least one tetrahedron was inserted
-	public boolean InsertTetrahedronsIfNotExistAndSetTestedTwiceIfExist(TriangularFace addition,Point3d[] array){
-		addition.SetHash(n);
-		boolean returnvalue=InsertIfNotExist(addition);
-		if (!returnvalue) {// i.e. it wasn't inserted because it existed
-			int mergepoint=Find(addition.hashvalue);
-			int count=0;
-			int[] d=new int[2];
-			int d1=Plist[mergepoint].GetFirstTetrahedronPointD();
-			int d2=Plist[mergepoint].GetSecondTetrahedronPointD();
-			// Put the value(s) to add in the d array
-			if (!addition.GetFirstTetrahedronNull()) {d[count]=addition.GetFirstTetrahedronPointD();count++;}
-			if (!addition.GetSecondTetrahedronNull()){d[count]=addition.GetSecondTetrahedronPointD();count++;}
-			// Put as many d value(s) in the TriangularFace as possible
-			if ((count!=0) && (Plist[mergepoint].GetFirstTetrahedronNull())){
-				count--;
-				if (d[count]==d2) {Plist[mergepoint].SetFaceTestedForMultipleTetrahedrons(); count=0;}
-				else {Plist[mergepoint].SetFirstTetrahedronPointD(d[count],array); returnvalue=true;}
-				}
-			if ((count!=0) && (Plist[mergepoint].GetSecondTetrahedronNull())){
-				count--;
-				if (d[count]==d1) {Plist[mergepoint].SetFaceTestedForMultipleTetrahedrons(); count=0;}
-				else {Plist[mergepoint].SetSecondTetrahedronPointD(d[count],array); returnvalue=true;}
-				}
-		} // end if
-	return returnvalue;
-	} // end InsertTetrahedronIfNotExistAndSetTestedTwiceIfExist
 
 	
-	public boolean FaceExists(TriangularFace f){
+	public boolean FaceExists(TriangularFaceOf3DTetrahedrons f){
 		f.SetHash(n);
 		return (Exists(f.hashvalue)!=-1);
 		
 	}
 	
-	public TriangularFace GetTetrahedron(TriangularFace candidate){
-		TriangularFace returnvalue=candidate.clone();
+	public TriangularFaceOf3DTetrahedrons GetTetrahedron(TriangularFaceOf3DTetrahedrons candidate){
+		TriangularFaceOf3DTetrahedrons returnvalue=candidate.clone();
 		candidate.SetHash(n);
 		int index=Find(candidate.hashvalue);
 		if (index!=-1) returnvalue=Plist[index].clone();
@@ -284,7 +166,7 @@ public class OrderedListTriangularFace {
 	}
 	
 	
-	public TriangularFace[] GetFullUnorderedList(){
+	public TriangularFaceOf3DTetrahedrons[] GetFullUnorderedList(){
 		return Plist;
 	}
 	// These are the private methods for this class
@@ -342,12 +224,11 @@ public class OrderedListTriangularFace {
 			} // end if numberofmatches!=0
 		} // end if changeinsertionorderarray
 		// Now delete it from the P array
-		TriangularFace[] returnvalue=new TriangularFace[Plist.length-1];
+		TriangularFaceOf3DTetrahedrons[] returnvalue=new TriangularFaceOf3DTetrahedrons[Plist.length-1];
 		for (int i=0;i<Plist.length;i++){
 			if (index>i) returnvalue[i]=Plist[i].clone();
 			if (index<i) returnvalue[i-1]=Plist[i].clone();
 		}
 		Plist=returnvalue.clone();
 	}
-
 } // end of class

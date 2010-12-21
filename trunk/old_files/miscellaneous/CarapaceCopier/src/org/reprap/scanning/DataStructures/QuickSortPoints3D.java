@@ -42,21 +42,7 @@ public class QuickSortPoints3D {
 		n=new Point3d();
 		pointonplane=new Point3d();
 	}
-	/*
-	public void LoadPlane(Point3d A, Point3d B, Point3d C){
-		// the plane is described by the normal and one of the points
-		// we store the normal normalised to unit length
-		pointonplane=A.clone();
-		// normal=ABxAC
-		n=B.minus(A).crossProduct(C.minus(A));
-		n=n.times(1/Math.sqrt(n.lengthSquared()));
-	}
 	
-	public int[] SortbyAbsoluteDistancefromPlane(int[] subsetofindexes){
-		return Sort(subsetofindexes,'p');
-	}
-	
-*/
 	public int[] Sortby(char coordinate,int[] subsetofindexes){
 		return Sort(subsetofindexes,coordinate);
 	}

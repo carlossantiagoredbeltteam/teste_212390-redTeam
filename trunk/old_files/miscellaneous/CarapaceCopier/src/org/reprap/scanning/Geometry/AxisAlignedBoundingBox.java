@@ -1,7 +1,6 @@
 package org.reprap.scanning.Geometry;
 
 import Jama.Matrix;
-import org.reprap.scanning.DataStructures.TrianglePlusVertexArray;
 import org.reprap.scanning.DataStructures.MatrixManipulations;
 
 /******************************************************************************
@@ -123,82 +122,7 @@ public class AxisAlignedBoundingBox{
 	return returnvalue;
 	}
 	
-	public int[][] GetPointPairIndicesFor3DWireFrameLines(){
-		int[][] returnvalue=new int[12][2];
-		for (int i=0;i<5;i=i+4){ // the upper and lower square
-			returnvalue[i+0][0]=i+0;returnvalue[i+0][1]=i+1;
-			returnvalue[i+1][0]=i+0;returnvalue[i+1][1]=i+3;
-			returnvalue[i+2][0]=i+1;returnvalue[i+2][1]=i+2;
-			returnvalue[i+3][0]=i+3;returnvalue[i+3][1]=i+2;
-			}
-		for (int i=8;i<12;i++) { // the connecting lines between the upper and lower square
-			returnvalue[i][0]=i-8;returnvalue[i][1]=i-4;
-		}
-	return returnvalue;
-	}
-	public int[][] GetPointPairIndicesFor2DWireFrameLines(){
-		int[][] returnvalue=new int[4][2];
-		returnvalue[0][0]=0;returnvalue[0][1]=1;
-		returnvalue[1][0]=0;returnvalue[1][1]=3;
-		returnvalue[2][0]=1;returnvalue[2][1]=2;
-		returnvalue[3][0]=3;returnvalue[3][1]=2;
 		
-	return returnvalue;
-	}
-	
-	public TrianglePlusVertexArray GetTrianglesMakingUpFaces(){
-		Point3d[] corners=GetCornersof3DBoundingBox();
-		TrianglePlusVertexArray returnvalue=new TrianglePlusVertexArray(corners);
-		int[][] quads=GetPointQuadIndicesForBuildingFaces();
-		Point3d center= GetMidpointof3DBoundingBox();
-		for (int i=0;i<6;i++){
-			TriangularFace tri1=new TriangularFace(quads[i][0],quads[i][1],quads[i][2]);
-			TriangularFace tri2=new TriangularFace(quads[i][0],quads[i][2],quads[i][3]);
-			tri1.CalculateNormalAwayFromPoint(corners,center);
-			tri2.CalculateNormalAwayFromPoint(corners,center);
-			returnvalue.AddTriangle(tri1);
-			returnvalue.AddTriangle(tri2);
-		}
-		return returnvalue;
-	}
-	
-	
-	public int[][] GetPointQuadIndicesForBuildingFaces(){
-		int[][] f=new int[6][4];
-		// Bottom face 0,1,2,3
-		f[0][0]=0;
-		f[0][1]=1;
-		f[0][2]=2;
-		f[0][3]=3;
-		// Top face 4,5,6,7
-		f[1][0]=4;
-		f[1][1]=5;
-		f[1][2]=6;
-		f[1][3]=7;
-		// Left face 0,1,4,5
-		f[2][0]=0;
-		f[2][1]=4;
-		f[2][2]=5;
-		f[2][3]=1;
-		// Right face 2,3,6,7
-		f[3][0]=3;
-		f[3][1]=7;
-		f[3][2]=6;
-		f[3][3]=2;
-		// Front face 0,3,4,7
-		f[4][0]=0;
-		f[4][1]=4;
-		f[4][2]=7;
-		f[4][3]=3;
-		// Back face 1,2,5,6
-		f[5][0]=1;
-		f[5][1]=5;
-		f[5][2]=6;
-		f[5][3]=2;
-		
-		return f;
-	}
-	
 	public boolean isEqual(AxisAlignedBoundingBox other){
 		boolean returnvalue=true;
 		if (returnvalue) returnvalue=minx==other.minx;
@@ -209,25 +133,7 @@ public class AxisAlignedBoundingBox{
 		if (returnvalue) returnvalue=maxz==other.maxz;
 		return returnvalue;
 	}
-	
-	public Line3d[] Get3DWireframeLines(){
-		Point3d[] vertices=GetCornersof3DBoundingBox();
-		int[][] pairs=GetPointPairIndicesFor3DWireFrameLines();
-		Line3d[] lines=new Line3d[12];
-		for (int i=0;i<12;i++)
-			lines[i]=new Line3d(vertices[pairs[i][0]],vertices[pairs[i][1]]);
-		return lines;
-	}
-	public LineSegment2D[] Get2DWireframeLines(){
-		Point2d[] vertices=GetCornersof2DBoundingBox();
-		int[][] pairs=GetPointPairIndicesFor2DWireFrameLines();
-		LineSegment2D[] lines=new LineSegment2D[4];
-		for (int i=0;i<4;i++)
-			lines[i]=new LineSegment2D(vertices[pairs[i][0]],vertices[pairs[i][1]]);
-		return lines;
-	}
-	
-	
+
 	public Point2d GetMidpointof2DBoundingBox(){
 		return new Point2d((maxx+minx)/2,(maxy+miny)/2);
 	}
@@ -346,5 +252,7 @@ public class AxisAlignedBoundingBox{
 		} // end if not intersect
 		return intersect;
 	} // end of intersect line method
+	
+	
 }
 

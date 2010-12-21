@@ -201,7 +201,6 @@ public class GraphicsFeedback {
 				Print(newpoint.x,newpoint.y,colour,0,0);
 			}	
 	}
-		
 	
 	public void PrintSurfaceSubVoxels(Voxel rootvoxel, Image givenimage, PixelColour colour){
 		int max=rootvoxel.getSubVoxelArraySize();
@@ -317,6 +316,28 @@ public class GraphicsFeedback {
 		GLimage=newGLimage.clone();
 		return newoffset;
 		} // end method
+	
+public void InvertImage(){
+	byte[] newGLimage=new byte[(imageheight+1)*(imagewidth+1)*numcolours];
+	int oldyindex,newyindex,newindex,oldindex;
+	// 	Read pixels in a row at a time taking care to flip the image at the same time
+	for (int y=0;y<imageheight; y++)
+	{
+		newyindex=(imageheight-y-1)*imagewidth*numcolours;
+		oldyindex=y*imagewidth*numcolours;
+		// if the y coordinate is already stored internally as inverted then don't worry about flipping it for display
+		for (int x=0;x<imagewidth;x++){
+			newindex=newyindex+(x*numcolours);
+			oldindex=oldyindex+(x*numcolours);
+			for (int colours=0;colours<numcolours;colours++) newGLimage[newindex+colours]=GLimage[oldindex+colours];
+		} // end for x
+	} // end for y
+	GLimage=newGLimage.clone();
+
+}
+	
+	
+	
 	
 	public void SaveImage(String filename){
 		savedimagefilename=filename;

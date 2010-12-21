@@ -26,7 +26,7 @@ import org.reprap.scanning.Geometry.Point2d;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 14th May 2010
+ * Last modified by Reece Arnott 21st December 2010
  * 
  ****************************************************************************************/
 
@@ -39,6 +39,11 @@ public class QuickSortPoints2D {
 		for (int i=0;i<pointsarray.length;i++)	pointsarray[i]=array[i].clone();
 	}
 	
+	public int[] Sortby(char coordinate,int[] subsetofindexes){
+		
+		boolean Y=((coordinate==new String("y").charAt(0)) || (coordinate==new String("Y").charAt(0)));
+		return Sort(subsetofindexes,Y);
+	}
 	public int[] SortbyX(int[] subsetofindexes){
 		return Sort(subsetofindexes,false);
 	}
