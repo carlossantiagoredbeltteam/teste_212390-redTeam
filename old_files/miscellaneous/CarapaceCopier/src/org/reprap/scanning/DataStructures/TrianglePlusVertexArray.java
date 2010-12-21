@@ -31,25 +31,25 @@ package org.reprap.scanning.DataStructures;
  * 
  ********************************************************************************/  
 import org.reprap.scanning.Geometry.Point3d;
-import org.reprap.scanning.Geometry.TriangularFaceOf3DTetrahedrons;
+import org.reprap.scanning.Geometry.Triangle3D;
 
 
 public class TrianglePlusVertexArray {
 
 	private Point3d[] vertices;
-	private TriangularFaceOf3DTetrahedrons[] triangles;
+	private Triangle3D[] triangles;
 	
 	
 	// Constructors
 	public TrianglePlusVertexArray(Point3d[] points){
 		vertices=new Point3d[points.length];
 		for (int i=0;i<points.length;i++) vertices[i]=points[i].clone();
-		triangles=new TriangularFaceOf3DTetrahedrons[0];
+		triangles=new Triangle3D[0];
 	}
-	public TrianglePlusVertexArray(Point3d[] points,TriangularFaceOf3DTetrahedrons[] triangle ){
+	public TrianglePlusVertexArray(Point3d[] points,Triangle3D[] triangle ){
 		vertices=new Point3d[points.length];
 		for (int i=0;i<points.length;i++) vertices[i]=points[i].clone();
-		triangles=new TriangularFaceOf3DTetrahedrons[triangle.length];
+		triangles=new Triangle3D[triangle.length];
 		for (int i=0;i<triangles.length;i++) triangles[i]=triangle[i].clone();
 	}
 	public TrianglePlusVertexArray clone(){
@@ -59,16 +59,16 @@ public class TrianglePlusVertexArray {
 	public Point3d[] GetVertexArray(){
 		return vertices;
 	}
-	public TriangularFaceOf3DTetrahedrons[] GetTriangleArray(){
+	public Triangle3D[] GetTriangleArray(){
 		return triangles;
 	}
-	public boolean AddTriangle(TriangularFaceOf3DTetrahedrons add){
+	public boolean AddTriangle(Triangle3D add){
 		boolean returnvalue=true;
 		// Sanity check to make sure the triangle contains valid indices 
 		int[] indices=add.GetFace();
 		for (int i=0;i<indices.length;i++) returnvalue=returnvalue && (indices[i]<vertices.length) && (indices[i]>=0);
 		if (returnvalue){ // add the triangle
-			TriangularFaceOf3DTetrahedrons[] newtriangles=new TriangularFaceOf3DTetrahedrons[triangles.length+1];
+			Triangle3D[] newtriangles=new Triangle3D[triangles.length+1];
 			for (int i=0;i<triangles.length;i++) newtriangles[i]=triangles[i].clone();
 			newtriangles[triangles.length]=add.clone();
 			triangles=newtriangles.clone();
@@ -109,11 +109,11 @@ public class TrianglePlusVertexArray {
 		TrianglePlusVertexArray returnvalue=new TrianglePlusVertexArray(newvertices);
 		
 		// merge the first set of triangles (no change)
-		TriangularFaceOf3DTetrahedrons[] newtriangles=new TriangularFaceOf3DTetrahedrons[triangles.length+other.triangles.length];
+		Triangle3D[] newtriangles=new Triangle3D[triangles.length+other.triangles.length];
 		for (int i=0;i<triangles.length;i++) newtriangles[i]=triangles[i].clone();
 		// Now add the second set of triangles and for each change the indices of the 3 vertices
 		for (int i=0;i<other.triangles.length;i++) {
-			TriangularFaceOf3DTetrahedrons tri=other.triangles[i].clone();
+			Triangle3D tri=other.triangles[i].clone();
 			int[] old=tri.GetFace();
 			tri.ChangeTriangle(old[0]+vertices.length,old[1]+vertices.length,old[2]+vertices.length);
 			tri.SetHash(triangles.length);

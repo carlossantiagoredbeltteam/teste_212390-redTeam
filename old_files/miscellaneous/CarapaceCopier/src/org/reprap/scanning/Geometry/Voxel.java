@@ -356,8 +356,8 @@ boolean end=false;
 								if (!add) add=SubVoxel[neighbourx][neighboury][neighbourz].isOutside();
 								// If applicable convert the four corner vertices into 2 triangles and add to list
 								if (add){
-									TriangularFaceOf3DTetrahedrons tri1=new TriangularFaceOf3DTetrahedrons(quads[0],quads[1],quads[2],vertices);
-									TriangularFaceOf3DTetrahedrons tri2=new TriangularFaceOf3DTetrahedrons(quads[0],quads[2],quads[3],vertices);
+									Triangle3D tri1=new Triangle3D(quads[0],quads[1],quads[2],vertices);
+									Triangle3D tri2=new Triangle3D(quads[0],quads[2],quads[3],vertices);
 									tri1.CalculateNormalAwayFromPoint(vertices,center);
 									tri2.CalculateNormalAwayFromPoint(vertices,center);
 									returnvalue.AddTriangle(tri1);

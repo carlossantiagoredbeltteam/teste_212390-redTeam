@@ -25,79 +25,74 @@ package org.reprap.scanning.Geometry;
 * 
 * Last modified by Reece Arnott 21st December 2010
 *
-*	This class stores a single tetrahedron where the points a,b,c,d are simple indexes to a Point3d array.
+*	This class stores a single triangle where the points a,b,c are simple indexes to a Point2d array.
 * 
 *	
 * 
 ***********************************************************************************/
-public class Tetrahedron {
-	private Triangle3D triangle;
-	private int d;
+public class Triangle2D {
+	private LineSegment2DIndices linesegment;
+	private int c;
 	
 	//Constructor
-	public Tetrahedron(Triangle3D tri, int pointd,Point3d[] pointslist){
-		triangle=tri.clone();
-		triangle.CalculateNormalAwayFromPoint(pointslist,pointslist[pointd]);
-		d=pointd;
+	public Triangle2D(LineSegment2DIndices line, int pointc,Point2d[] pointslist){
+		linesegment=line.clone();
+		linesegment.CalculateNormalAwayFromPoint(pointslist,pointslist[pointc]);
+		c=pointc;
 	}
-	public Tetrahedron(){
-		triangle=new Triangle3D();
-		d=-1;
+	public Triangle2D(){
+		linesegment=new LineSegment2DIndices();
+		c=-1;
 	}
 	
-	public Tetrahedron clone(){
-		Tetrahedron returnvalue=new Tetrahedron();
-		returnvalue.triangle=triangle.clone();
-		returnvalue.d=d;
+	public Triangle2D clone(){
+		Triangle2D returnvalue=new Triangle2D();
+		returnvalue.linesegment=linesegment.clone();
+		returnvalue.c=c;
 		return returnvalue;
 	}
-	public boolean isNull(){return d==-1;}
+	public boolean isNull(){return c==-1;}
 	
-	public Triangle3D[] GetFaces(Point3d[] p){
-			Triangle3D[] returnvalue=new Triangle3D[4];
-			int[] abc=triangle.GetFace();
-			int a=abc[0];
-			int b=abc[1];
-			int c=abc[2];
+	public LineSegment2DIndices[] GetFaces(Point2d[] p){
+		LineSegment2DIndices[] returnvalue=new LineSegment2DIndices[3];
+			int[] ab=linesegment.GetFace();
+			int a=ab[0];
+			int b=ab[1];
 			
-			if (d>=0) { // only do this if there is a tetrahedron
+			if (c>=0) { // only do this if there is a triangle
 				// Based on those returned by C DeWall BuildTetra
-				returnvalue[0]=new Triangle3D(a,b,c,p); returnvalue[0].CalculateNormalAwayFromPoint(p, p[d]);
-				// This returns faces so that a normal calculated from ABxAC for each face will all point in the same direction, either out or in relative to the original tetrahedron
-				returnvalue[1]=new Triangle3D(a,d,c,p);returnvalue[1].CalculateNormalAwayFromPoint(p, p[b]);
-				returnvalue[2]=new Triangle3D(c,d,b,p);returnvalue[2].CalculateNormalAwayFromPoint(p, p[a]);
-				returnvalue[3]=new Triangle3D(b,d,a,p);returnvalue[3].CalculateNormalAwayFromPoint(p, p[c]);
+				returnvalue[0]=new LineSegment2DIndices(a,b,p); returnvalue[0].CalculateNormalAwayFromPoint(p, p[c]);
+				// This returns faces so that a normal calculated for each face will all point out of original triangle
+				returnvalue[1]=new LineSegment2DIndices(a,c,p);returnvalue[1].CalculateNormalAwayFromPoint(p, p[b]);
+				returnvalue[3]=new LineSegment2DIndices(b,c,p);returnvalue[3].CalculateNormalAwayFromPoint(p, p[a]);
 				
 			}
-			else returnvalue=new Triangle3D[0];
+			else returnvalue=new LineSegment2DIndices[0];
 		return returnvalue;
 		}
 	public int[] GetVertices(){
 		// Note that the order of the vertices is such that each vertex returned is the one not used in triangle returned by the GetFaces method for the same array index
-		int[] returnvalue=new int[4];
-		if (d>=0) {
-			int[] abc=triangle.GetFace();
+		int[] returnvalue=new int[3];
+		if (c>=0) {
+			int[] abc=linesegment.GetFace();
 			int a=abc[0];
 			int b=abc[1];
-			int c=abc[2];
-			returnvalue[0]=d;
+			returnvalue[0]=c;
 			returnvalue[1]=b;
 			returnvalue[2]=a;
-			returnvalue[3]=c;
-			
 		}
 		else returnvalue=new int[0];
 		return returnvalue;
 	}
 	
-	public Triangle3D GetTriangle(){
-		return triangle;
+	public LineSegment2DIndices GetLineSegment(){
+		return linesegment;
 	}
 	
 	
 //		 Only used in the DeWall CTC check
-		public boolean isEquivalent(Tetrahedron tetra){
-			int[] othervertices=tetra.GetVertices();
+		public boolean isEquivalent(Triangle2D triangle){
+			int[] othervertices=triangle.GetVertices();
 			int[] thisvertices=GetVertices();
 			boolean returnvalue=true;
 			for (int j=0;j<othervertices.length;j++) if (returnvalue){
@@ -107,6 +102,6 @@ public class Tetrahedron {
 			return returnvalue;
 		}
 		public void print(){
-			System.out.print("d="+d+" ");triangle.print();
+			System.out.print("c="+c+" ");linesegment.print();
 		}
 }

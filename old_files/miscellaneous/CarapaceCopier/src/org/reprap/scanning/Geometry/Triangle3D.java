@@ -36,50 +36,43 @@ package org.reprap.scanning.Geometry;
 import org.reprap.scanning.DataStructures.QuickSortScalarDouble;
 
 
-public class TriangularFaceOf3DTetrahedrons {
+public class Triangle3D {
 	private int a;
 	private int b;
 	private int c;
-	//private int d; // This may contain a negative number which indicates whether the tetrahedron isn't known or if it is known to not exist. 
-	// -1 means Null i.e. that tetrahedron doesn't currently exist
-	public Point3d normal; // If there is a tetrahedron, the normal is oriented in such a way as it is pointing away from the fourth point otherwise it doesn't really matter
+	public Point3d normal; // can be calculated to be specifically pointing away from a point
 	public double normaldota;//Just here so don't have to recalculate each time.
 	public long hashvalue; // This is not set by default. It needs a call to the SetHash method with the maximum index that will be used in a,b, or c.
 	// Constructors
-	public TriangularFaceOf3DTetrahedrons(int pointa, int pointb, int pointc, Point3d[] p){
+	public Triangle3D(int pointa, int pointb, int pointc, Point3d[] p){
 		// Store the face as unsorted points - note that have to sort the points when calculating hashvalue if we do this
 		a=pointa;
 		b=pointb;
 		c=pointc;
-	//	d=-1;
 		CalculateNormalAwayFromPoint(p,p[a]); // pick a random normal direction
-		hashvalue=Long.MIN_VALUE;
 	}
 	
 	// Construct a null face - can be detected using IsNull method
-	public TriangularFaceOf3DTetrahedrons(){
+	public Triangle3D(){
 		a=-1;
 		b=-1;
 		c=-1;
-	//	d=-1;
 		normaldota=0;
 		normal=new Point3d();
-		hashvalue=Long.MIN_VALUE;
 	}
 	
-	public TriangularFaceOf3DTetrahedrons clone(){
-		TriangularFaceOf3DTetrahedrons returnvalue=new TriangularFaceOf3DTetrahedrons();
+	public Triangle3D clone(){
+		Triangle3D returnvalue=new Triangle3D();
 		returnvalue.a=a;
 		returnvalue.b=b;
 		returnvalue.c=c;
-		//returnvalue.d=d;
 		returnvalue.normaldota=normaldota;
 		returnvalue.normal=normal.clone();
 		returnvalue.hashvalue=hashvalue;
 		return returnvalue;
 	}
 	
-	public boolean TriangleEqual(TriangularFaceOf3DTetrahedrons other){
+	public boolean TriangleEqual(Triangle3D other){
 		// This just checks that the  3 vertices of the triangle are the same, but they may not be in the same order etc.
 		int count=0;
 		int i;
@@ -117,14 +110,11 @@ public class TriangularFaceOf3DTetrahedrons {
 	// Mainly used in OrderedListTriangularFace but also used in DeWall3D in a couple of places and in TrianglePlusVertexArray
 	public void SetHash(int n){
 		//Note that due to the storage limitations of long and the way the hash value is calculated this gives a unique hashvalue when n<2^21 (and a,b. and c are all less than n)
-		if (hashvalue==Long.MIN_VALUE){ // only set it if it hasn't already been set
-//			 Quicksort the points
+		//			 Quicksort the points
 			QuickSortScalarDouble qsort=new QuickSortScalarDouble(a,b,c);
 			double[] points=qsort.SortAndReturn();
 			hashvalue=((long)points[0]*n*n)+((long)points[1]*n)+(long)points[2];
-		}
-
-	} // end of method
+		} // end of method
 	
 	public void CalculateNormalAwayFromPoint(Point3d[] p, Point3d other){
 		// The normal to the plane will be ABxAC, we want to have normal.A as well 

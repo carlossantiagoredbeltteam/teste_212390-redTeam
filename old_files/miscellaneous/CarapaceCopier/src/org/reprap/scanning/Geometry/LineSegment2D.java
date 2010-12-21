@@ -24,7 +24,7 @@ package org.reprap.scanning.Geometry;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 17th December 2010
+ * Last modified by Reece Arnott 21st December 2010
  *
  *****************************************************************************/
 
@@ -32,7 +32,6 @@ package org.reprap.scanning.Geometry;
 public class LineSegment2D {
 	public Point2d start;   
 	public Point2d end;
-	
 	//Constructor
 		public LineSegment2D(Point2d x0, Point2d x1){
 		start=x0.clone();
@@ -42,6 +41,7 @@ public class LineSegment2D {
 
 	public LineSegment2D clone(){
 		LineSegment2D returnvalue=new LineSegment2D(start,end);
+		
 		return returnvalue;
 	}
 
@@ -64,7 +64,6 @@ public class LineSegment2D {
 		vector.scale(U);
 		return start.plusEquals(vector);
 	}
-	
 	public double CalculateLengthSquared(){
 		return end.CalculateDistanceSquared(start);
 	}
@@ -100,5 +99,21 @@ public class LineSegment2D {
 			return overlap;
 		}
 		else return false;	
+	}
+	
+//	 This returns the intersection point x and y if there is one, otherwise it returns the start of this line segment 
+	public Point2d IntersectionPointofInfinite2DLines(LineSegment2D other){
+		// We want to find if 2 line segments intersect, exluding if the two line segments are parallel
+		// See http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline2d/ for the derivation of this
+		Point2d returnvalue=start.clone();
+		double denominator=((other.end.y-other.start.y)*(end.x-start.x))-((other.end.x-other.start.x)*(end.y-start.y));
+		if (denominator!=0){		//if the denominator is zero the two lines are parallel
+			double numeratora=((other.end.x-other.start.x)*(start.y-other.start.y))-((other.end.y-other.start.y)*(start.x-other.start.x));
+			double numeratorb=((end.x-start.x)*(start.y-other.start.y))-((end.y-start.y)*(start.x-other.start.x));
+			double ua=numeratora/denominator;
+			//double ub=numeratorb/denominator;
+			returnvalue=GetPointOnLine(ua);
+		}
+		return returnvalue;
 	}
 } // end class LineSegment

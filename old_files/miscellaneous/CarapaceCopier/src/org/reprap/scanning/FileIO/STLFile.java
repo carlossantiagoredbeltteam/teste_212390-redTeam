@@ -43,7 +43,7 @@ public class STLFile {
 		filename=file;
 	}
 	
-	public String WriteASCIIFile(JProgressBar bar, TriangularFaceOf3DTetrahedrons[] surfacetriangles,Point3d[] surfacepoints,String objectname){
+	public String WriteASCIIFile(JProgressBar bar, Triangle3D[] surfacetriangles,Point3d[] surfacepoints,String objectname){
 	  String error="";
 		bar.setMinimum(0);
 	  bar.setMaximum(surfacetriangles.length);
@@ -97,7 +97,7 @@ public class STLFile {
 		return error;
 	}
 	// Write a Binary STL file.
-	public String Write(JProgressBar bar, TriangularFaceOf3DTetrahedrons[] surfacetriangles,Point3d[] surfacepoints,String objectname){
+	public String Write(JProgressBar bar, Triangle3D[] surfacetriangles,Point3d[] surfacepoints,String objectname){
 		  String error="";
 			bar.setMinimum(0);
 		  bar.setMaximum(surfacetriangles.length);

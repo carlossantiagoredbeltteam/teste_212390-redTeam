@@ -35,10 +35,12 @@ package org.reprap.scanning.DataStructures;
 import org.reprap.scanning.Geometry.Point2d;
 import org.reprap.scanning.Geometry.AxisAlignedBoundingBox;
 import org.reprap.scanning.Geometry.Point3d;
+import org.reprap.scanning.Geometry.Triangle3D;
 
 public class Uniform2DGrid{
 	public Uniform2DGridCell[][] Grid;
 	private AxisAlignedBoundingBox boundary; // not used if only one cell
+	private boolean[][] marked; // this is used to flag if the cell is empty or has been tested already
 	private double side; // this defines the size of a cell. Not used if only one cell
 	public int arraysizex,arraysizey; // these store the length of the 2d arrays 
 	// Constructors
@@ -59,6 +61,8 @@ public class Uniform2DGrid{
 			Grid=new Uniform2DGridCell[1][1];
 			Grid[0][0]=new Uniform2DGridCell();
 			Grid[0][0].pointslist=new int[p.length];
+			marked=new boolean[1][1];
+			marked[0][0]=(Grid[0][0].GetLength()==0);
 			for (int i=0;i<p.length;i++) Grid[0][0].pointslist[i]=i;
 			
 		}
@@ -101,10 +105,64 @@ public class Uniform2DGrid{
 					int y=(int)((p[subsetindexes[i]].y-boundary.miny)/side);
 					Grid[x][y].Add(i);
 				}
+			// Create and set the marked array
+			marked=new boolean[arraysizex][arraysizey];
+			resetMarked();
 			}	// end else
 	} // end of constructor
 	
-		
+	public void resetMarked(){
+		for (int i=0;i<arraysizex;i++)
+			for (int j=0;j<arraysizey;j++)
+					marked[i][j]=(Grid[i][j].GetLength()==0);
+	} // end of resetMarked method
+	
+//	 This returns true if the cell should be examined for whether or not it contains points that may be of use in making the triangle to be a tetrahedron
+	public boolean ExaminableCell(int cellx, int celly){
+		return !marked[cellx][celly];
+	}
+	
+	public void CellExamined(int x,int y){
+		marked[x][y]=true;
+	}
+	public int GetFirst(int x,int y){
+		int returnvalue=-1;
+		if ((x>=0) && (x<arraysizex) && (y>=0) && (y<arraysizey)) returnvalue=Grid[x][y].GetFirst();
+		return returnvalue;
+	}
+	public int GetNext(int x,int y){
+		int returnvalue=-1;
+		if ((x>=0) && (x<arraysizex) && (y>=0) && (y<arraysizey)) returnvalue=Grid[x][y].GetNext();
+		return returnvalue;
+	}
+//	 Get the bounding box containing the centre is the given point 
+	public AxisAlignedBoundingBox GetBoundingBox(Point2d centre, double radius){
+		AxisAlignedBoundingBox returnvalue=new AxisAlignedBoundingBox();
+		returnvalue.minz=0;
+		returnvalue.maxz=0;
+		if ((arraysizex==1) && (arraysizey==1)){
+			returnvalue.minx=0;
+			returnvalue.miny=0;
+			returnvalue.maxx=0;
+			returnvalue.maxy=0;
+		}
+		else {// find the indexes of the UG array for the bounding box corners
+		returnvalue.minx=(int)((centre.x-boundary.minx-radius)/side);
+		returnvalue.miny=(int)((centre.y-boundary.miny-radius)/side);
+		returnvalue.maxx=(int)((centre.x-boundary.minx+radius)/side);
+		returnvalue.maxy=(int)((centre.y-boundary.miny+radius)/side);
+		// Make sure everything is in the grid
+		if (returnvalue.minx<0) returnvalue.minx=0;
+		if (returnvalue.miny<0) returnvalue.miny=0;
+		if (returnvalue.minx>(arraysizex-1)) returnvalue.minx=arraysizex-1;
+		if (returnvalue.miny>(arraysizey-1)) returnvalue.miny=arraysizey-1;
+		if (returnvalue.maxx<0) returnvalue.maxx=0;
+		if (returnvalue.maxy<0) returnvalue.maxy=0;
+		if (returnvalue.maxx>(arraysizex-1)) returnvalue.maxx=arraysizex-1;
+		if (returnvalue.maxy>(arraysizey-1)) returnvalue.maxy=arraysizey-1;
+		} // end else
+		return returnvalue;
+	}
 	public int[] GetClosestPoints(Point2d target){
 		// Find the grid cell containing the target point and return the indexes for it 
 		if ((arraysizex==1) && (arraysizey==1)) return Grid[0][0].pointslist;
@@ -146,6 +204,7 @@ public class Uniform2DGrid{
 // This is a nested class. Just used within this class.
 class Uniform2DGridCell{
 	private int[] pointslist;
+	private int nextpointer;
 	
 	public Uniform2DGridCell(){
 		pointslist=new int[0];
@@ -170,6 +229,15 @@ class Uniform2DGridCell{
 			pointslist[0]=add;
 		}
 	} // end of method Add 
+	public int GetFirst(){
+		nextpointer=-1;
+		return GetNext();
+	}
+	public int GetNext(){
+		nextpointer++;
+		if (nextpointer>=pointslist.length) return -1;
+		else return pointslist[nextpointer];
+	}
 } // end of nested class UniformGridCell
 }// end of class UniformGrid
 
