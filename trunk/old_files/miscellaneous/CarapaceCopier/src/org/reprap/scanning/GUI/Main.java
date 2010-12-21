@@ -104,7 +104,7 @@ public class Main extends JFrame {
 	private AxisAlignedBoundingBox volumeofinterest;
     private Point2d[] calibrationcirclecenters;
 	private Point3d[] surfacepoints;
-	private TriangularFaceOf3DTetrahedrons[] surfacetriangles;
+	private Triangle3D[] surfacetriangles;
 	private MainPreferences prefs;
 	private JProgressBar jProgressBar1,jProgressBar2; 
 	private JLabel jLabelTitle,jLabelProgressBar1,jLabelProgressBar2,jLabelOutputLog;
@@ -1590,7 +1590,7 @@ private void FindCalibrationSheetCirclesEtc(){
  	
 	// This sets the initial GUI interface with just Cancel, Previous, and Next buttons
 	private void initComponents() {
-		surfacetriangles=new TriangularFaceOf3DTetrahedrons[0];
+		surfacetriangles=new Triangle3D[0];
 		surfacepoints=new Point3d[0];
 		
 		

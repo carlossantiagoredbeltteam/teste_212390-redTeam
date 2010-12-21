@@ -35,6 +35,7 @@ public class Point2d
 	private final static double tau=Math.PI*2;
 	public double x, y;
 	// constructors
+	public Point2d() {x = 0; y = 0; }
 	public Point2d(double newX,double newY) {x = newX; y = newY; }
 	public Point2d(Matrix M){ x=0;y=0; ApplyTransform(M);}
 	// Operations on internal components

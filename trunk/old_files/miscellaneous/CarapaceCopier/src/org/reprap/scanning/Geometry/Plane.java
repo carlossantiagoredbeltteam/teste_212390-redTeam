@@ -61,7 +61,7 @@ public class Plane {
 		normaldotP=normal.dot(P);
 	}
 	//Construct the plane from a trianglular face
-	public Plane(TriangularFaceOf3DTetrahedrons face, Point3d[] PointsList){
+	public Plane(Triangle3D face, Point3d[] PointsList){
 	// Take point a of the triangle and the calculated normal and use those
 		int[] vertices=face.GetFace();
 		P=PointsList[vertices[0]];

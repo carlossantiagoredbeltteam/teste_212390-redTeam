@@ -174,8 +174,8 @@ public class BoundingPolygon2D {
 			int c=b1+orderedvertices.length;
 			int b2=a+orderedvertices.length;
 			
-			TriangularFaceOf3DTetrahedrons tri1=new TriangularFaceOf3DTetrahedrons(a,b1,c,points);
-			TriangularFaceOf3DTetrahedrons tri2=new TriangularFaceOf3DTetrahedrons(a,b2,c,points);
+			Triangle3D tri1=new Triangle3D(a,b1,c,points);
+			Triangle3D tri2=new Triangle3D(a,b2,c,points);
 			// now we have to orient the normal in the correct manner
 			// If the vertices are ordered in a clockwise direction we want the normal to be pointing to the left of the line segment (as seen when looking from the start to the end)
 			// If they are ordered counter clockwise we want the normal to be pointing to the right, again as seen when looking from the start to the end
@@ -284,7 +284,7 @@ public class BoundingPolygon2D {
 			if (!exit){
 				//System.out.println("Adding "+newa+" "+newb+" "+newc);
 				// We should now be able to add a triangle to the list and take vertex b out of the list
-				TriangularFaceOf3DTetrahedrons newtriangle=new TriangularFaceOf3DTetrahedrons(newa,newb,newc,vertices3d);
+				Triangle3D newtriangle=new Triangle3D(newa,newb,newc,vertices3d);
 				if (normalfacingup) newtriangle.CalculateNormalAwayFromPoint(vertices3d,orderedvertices[newa].ExportAs3DPoint(zvalue-1));
 				else newtriangle.CalculateNormalAwayFromPoint(vertices3d,orderedvertices[newa].ExportAs3DPoint(zvalue+1));
 				triangles.AddTriangle(newtriangle);
@@ -302,7 +302,7 @@ public class BoundingPolygon2D {
 		int a=j;j=1;while (skip[(a+j)%skip.length] && (j<=skip.length))j++;
 		int b=(a+j)%skip.length;j=1;while (skip[(b+j)%skip.length] && (j<=skip.length))j++;
 		int c=(b+j)%skip.length;
-		TriangularFaceOf3DTetrahedrons newtriangle=new TriangularFaceOf3DTetrahedrons(a,b,c,vertices3d);
+		Triangle3D newtriangle=new Triangle3D(a,b,c,vertices3d);
 		if (normalfacingup) newtriangle.CalculateNormalAwayFromPoint(vertices3d,orderedvertices[a].ExportAs3DPoint(zvalue-1));
 		else newtriangle.CalculateNormalAwayFromPoint(vertices3d,orderedvertices[a].ExportAs3DPoint(zvalue+1));
 		triangles.AddTriangle(newtriangle);
