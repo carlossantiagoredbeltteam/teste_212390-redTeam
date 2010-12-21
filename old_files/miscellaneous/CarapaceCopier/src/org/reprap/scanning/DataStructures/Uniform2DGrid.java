@@ -24,7 +24,7 @@ package org.reprap.scanning.DataStructures;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 17th May 2010
+* Last modified by Reece Arnott 21st December 2010
 *
 *	This class takes an array of points and splits the 2d space into a 2d cell structure and stores the indexes for the array in each cell.
 *	 TODO - This class may benefit from using  unconstrained ArrayList rather than fixed length array.
@@ -34,14 +34,25 @@ package org.reprap.scanning.DataStructures;
 
 import org.reprap.scanning.Geometry.Point2d;
 import org.reprap.scanning.Geometry.AxisAlignedBoundingBox;
+import org.reprap.scanning.Geometry.Point3d;
 
 public class Uniform2DGrid{
 	public Uniform2DGridCell[][] Grid;
 	private AxisAlignedBoundingBox boundary; // not used if only one cell
 	private double side; // this defines the size of a cell. Not used if only one cell
 	public int arraysizex,arraysizey; // these store the length of the 2d arrays 
-	// Constructor
+	// Constructors
 	public Uniform2DGrid(Point2d[] p,int m){ // m is the minimum number of cells to divide the space into
+		int[] subsetofindexes=new int[p.length];
+		for (int i=0;i<p.length;i++) subsetofindexes[i]=i;
+		init(p,subsetofindexes,m);
+	}
+
+	public Uniform2DGrid(Point2d[] p,int[] subsetofindexes, int m){ // m is the minimum number of cells to divide the space into
+		init(p,subsetofindexes,m);		
+	}	
+			
+	private void init(Point2d[] p,int[] subsetindexes, int m){	
 		if (m<2){  // don't worry about an accurate grid if there are only a few points
 			arraysizex=1;
 			arraysizey=1;
@@ -54,13 +65,13 @@ public class Uniform2DGrid{
 		else {
 //			 First Find the bounding box
 			boundary=new AxisAlignedBoundingBox();
-			for (int i=0;i<p.length;i++){
-				if (i==0){
-					boundary.minx=p[0].x;
-					boundary.miny=p[0].y;
+			for (int i=0;i<subsetindexes.length;i++){
+					if (i==0){
+					boundary.minx=p[subsetindexes[0]].x;
+					boundary.miny=p[subsetindexes[0]].y;
 					boundary.minz=0;
-					boundary.maxx=p[0].x;
-					boundary.maxy=p[0].y;
+					boundary.maxx=p[subsetindexes[0]].x;
+					boundary.maxy=p[subsetindexes[i]].y;
 					boundary.maxz=0;
 				}
 				else boundary.Expand2DBoundingBox(p[i]);if (p[i].x<boundary.minx) boundary.minx=p[i].x;
@@ -85,14 +96,15 @@ public class Uniform2DGrid{
 				for (int j=0;j<arraysizey;j++)
 						Grid[i][j]=new Uniform2DGridCell();
 			// Now load the points into it
-			for (int i=0;i<p.length;i++){
-				int x=(int)((p[i].x-boundary.minx)/side);
-					int y=(int)((p[i].y-boundary.miny)/side);
+			for (int i=0;i<subsetindexes.length;i++){
+				int x=(int)((p[subsetindexes[i]].x-boundary.minx)/side);
+					int y=(int)((p[subsetindexes[i]].y-boundary.miny)/side);
 					Grid[x][y].Add(i);
 				}
 			}	// end else
 	} // end of constructor
 	
+		
 	public int[] GetClosestPoints(Point2d target){
 		// Find the grid cell containing the target point and return the indexes for it 
 		if ((arraysizex==1) && (arraysizey==1)) return Grid[0][0].pointslist;

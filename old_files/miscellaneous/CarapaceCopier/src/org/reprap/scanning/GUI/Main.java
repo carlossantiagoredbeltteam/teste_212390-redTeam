@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  *
- * Last modified by Reece Arnott 17th December 2010
+ * Last modified by Reece Arnott 20th December 2010
  * 
  * Note that most of the layout commands were initially produced by NetBeans for JDK 6
  * and significantly modified by hand. For future reference if it needs to be done the other way the main things to change are:
@@ -104,7 +104,7 @@ public class Main extends JFrame {
 	private AxisAlignedBoundingBox volumeofinterest;
     private Point2d[] calibrationcirclecenters;
 	private Point3d[] surfacepoints;
-	private TriangularFace[] surfacetriangles;
+	private TriangularFaceOf3DTetrahedrons[] surfacetriangles;
 	private MainPreferences prefs;
 	private JProgressBar jProgressBar1,jProgressBar2; 
 	private JLabel jLabelTitle,jLabelProgressBar1,jLabelProgressBar2,jLabelOutputLog;
@@ -139,8 +139,8 @@ public class Main extends JFrame {
  *  
  */ 
 
-   public static enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration,objectfindingvoxelisation,texturematching,writetofile,end};
-   // public static enum steps {calibrationsheet,test,end};
+   //public static enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration,objectfindingvoxelisation,texturematching,writetofile,end};
+    public static enum steps {calibrationsheet,test,end};
     private final static steps stepsarray[]=steps.values();
     private static steps laststep = steps.valueOf("end");
     private static steps firststep = steps.valueOf("calibrationsheet");
@@ -249,6 +249,7 @@ public class Main extends JFrame {
 				case calibrationsheet : 
 					if ((prefs.SkipStep[currentstep.ordinal()]) && (prefs.calibrationpatterns.getSize()!=0)) setStep(stepsarray[currentstep.ordinal()+1]);
 					else ChooseCalibrationSheet(); break;
+			/*
 				case fileio :
 					if ((prefs.SkipStep[currentstep.ordinal()]) && (prefs.imagefiles.getSize()!=0)) setStep(stepsarray[currentstep.ordinal()+1]);
 					else ChooseImagesAndOutputFile(); break;
@@ -272,8 +273,10 @@ public class Main extends JFrame {
 					OutputSTLFile(); 
 					GraphicsFeedback(); // image feedback if the debug options are set
  					 break;
+ 				//	 */	
+					case test: Test();break;
+ 				
  				case end : end(); break;
-			//	case test: Test();break;
 				}
 			}
 			catch (Exception e) {
@@ -1401,24 +1404,31 @@ private void FindCalibrationSheetCirclesEtc(){
 						//if (!selfintersect){
 						// Test that none of the points are outside the polygon
 						Point2d[] points=boundingpolygon[zindex].GetAllPointsWithinPolygon();
-						//Point2d[] vertices=boundingpolygon[zindex].GetOrderedVertices();
+						Point2d[] vertices=boundingpolygon[zindex].GetOrderedVertices();
 						boolean outside=false;
-						//int numberofvertices=0;
+						int numberofvertices=0;
 						for (int i=0;i<points.length;i++){ 
-						//	boolean vertex=false;
-						//	for (int j=0;j<vertices.length;j++) if (points[i].isEqual(vertices[j])) vertex=true; 
-						//	if (vertex) {numberofvertices++;}
-							//else 
+							boolean vertex=false;
+							for (int j=0;j<vertices.length;j++) if (points[i].isEqual(vertices[j])) vertex=true; 
+							if (vertex) {numberofvertices++;}
+							else 
 							if (boundingpolygon[zindex].PointIsOutside(points[i])) outside=true;
 						}
-						//if (numberofvertices!=vertices.length) {
-						//	System.out.println("Error: Number of vertices in polygon is "+vertices.length+" but number of vertices detected in all points is "+numberofvertices);
-						//	for (int i=0;i<points.length;i++)points[i].print();
-						//	System.out.println();
-						//	for (int i=0;i<vertices.length;i++)vertices[i].print();
-						//	System.out.println();
-						//}
-						if (outside) System.out.println("Error: Point(s) are outside triangulated polygon");
+						if (numberofvertices!=vertices.length) {
+							System.out.println("Error: Number of vertices in polygon is "+vertices.length+" but number of vertices detected in all points is "+numberofvertices);
+							for (int i=0;i<points.length;i++)points[i].print();
+							System.out.println();
+							for (int i=0;i<vertices.length;i++)vertices[i].print();
+							System.out.println();
+						}
+						if (outside) {
+							System.out.println("Error: Point(s) are outside triangulated polygon");
+							for (int i=0;i<points.length;i++){
+							System.out.print("points["+i+"]=new Point2d");
+							points[i].print();
+							System.out.println(";");
+							}
+						}
 					
 						
 						
@@ -1580,7 +1590,7 @@ private void FindCalibrationSheetCirclesEtc(){
  	
 	// This sets the initial GUI interface with just Cancel, Previous, and Next buttons
 	private void initComponents() {
-		surfacetriangles=new TriangularFace[0];
+		surfacetriangles=new TriangularFaceOf3DTetrahedrons[0];
 		surfacepoints=new Point3d[0];
 		
 		

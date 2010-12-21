@@ -34,7 +34,7 @@ package org.reprap.scanning.DataStructures;
 
 import org.reprap.scanning.Geometry.Point3d;
 import org.reprap.scanning.Geometry.AxisAlignedBoundingBox;
-import org.reprap.scanning.Geometry.TriangularFace;
+import org.reprap.scanning.Geometry.TriangularFaceOf3DTetrahedrons;
 
 public class Uniform3DGrid{
 	public UniformGridCell[][][] Grid;
@@ -113,7 +113,7 @@ public class Uniform3DGrid{
 	
 	// This returns true if the cell should be examined for whether or not it contains points that may be of use in making the triangle to be a tetrahedron
 	// i.e. the cell is not marked as already checked or empty, and the cell is not in the inside half space (determined by checking the corner closest to the plane)
-	public boolean ExaminableCell(TriangularFace triangle,int cellx, int celly, int cellz){
+	public boolean ExaminableCell(TriangularFaceOf3DTetrahedrons triangle,int cellx, int celly, int cellz){
 		boolean returnvalue=!marked[cellx][celly][cellz];
 		if ((arraysizex>1) || (arraysizey>1) || (arraysizez>1))
 			if (returnvalue){

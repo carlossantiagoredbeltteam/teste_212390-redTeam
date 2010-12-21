@@ -51,11 +51,9 @@ package org.reprap.scanning.GUI;
 import java.io.File;
 
 import org.reprap.scanning.Calibration.CalibrateImage;
-import org.reprap.scanning.DataStructures.Image;
-import org.reprap.scanning.DataStructures.PixelColour;
 import org.reprap.scanning.FeatureExtraction.PointPairMatch;
 import org.reprap.scanning.Geometry.*;
-
+import org.reprap.scanning.DataStructures.*;
 import javax.swing.JProgressBar;
 
 import Jama.Matrix;
@@ -86,14 +84,19 @@ public class Testing {
 		}
 	
 	public void TemporaryTestMethod(){
-		Point2d[] point=new Point2d[5];
-		point[0]=new Point2d(21.77812500000012,3.276562500000037);
-		point[1]=new Point2d(22.07812500000012,2.9765625000000373);
-		point[2]=new Point2d(25.67812500000013,0.5765625000000378);
-		point[3]=new Point2d(25.97812500000013,0.5765625000000378);
-		point[4]=new Point2d(33.178125000000136,-1.2234374999999622);
-		BoundingPolygon2D poly=new BoundingPolygon2D(point);
-		LineSegment2D[] lines=poly.Get2DLineSegments();
+		Point2d[] points=new Point2d[11];
+		points[0]=new Point2d(34.97812500000012,-2.723437499999962);
+		points[1]=new Point2d(34.67812500000012,-2.723437499999962);
+		points[2]=new Point2d(34.378125000000125,-2.723437499999962);
+		points[3]=new Point2d(34.67812500000012,-2.423437499999962);
+		points[4]=new Point2d(30.77812500000014,-2.1234374999999623);
+		points[5]=new Point2d(23.578125000000124,0.5765625000000378);
+		points[6]=new Point2d(23.278125000000124,0.5765625000000378);
+		points[7]=new Point2d(23.278125000000124,0.8765625000000379);
+		points[8]=new Point2d(23.278125000000124,1.176562500000038);
+		points[9]=new Point2d(22.37812500000012,3.576562500000037);
+		points[10]=new Point2d(21.47812500000012,3.8765625000000368);
+		BoundingPolygon2D poly=new BoundingPolygon2D(points);
 		
 		int size=1000;
 		PixelColour[][] colour=new PixelColour[size][size];
@@ -104,29 +107,77 @@ public class Testing {
 		graphics.ShowPixelColourArray(colour,size,size);
 		BoundingPolygon2D polygon=poly.clone();
 		// Need to reset the origin and re-scale this before displaying it
-		polygon.ResetOrigin(new Point2d(-20,-20));
-		polygon.scale(10);
+		polygon.ResetOrigin(new Point2d(20,-5));
+		polygon.scale(50);
+		Point2d[] point=polygon.GetAllPointsWithinPolygon();
+		LineSegment2D[] lines=polygon.Get2DLineSegments();
+		AxisAlignedBoundingBox aabb=polygon.GetAxisAlignedBoundingBox();
+		for (int j=0;j<point.length;j++) 
+			graphics.PrintPoint(point[j].x,point[j].y,new PixelColour(PixelColour.StandardColours.Red));
+		Point2d[] temp=polygon.GetOrderedVertices();
+		graphics.PrintPoint(temp[0].x,temp[0].y,new PixelColour(PixelColour.StandardColours.Green));
 		graphics.OutlinePolygon(polygon,new PixelColour(PixelColour.StandardColours.Blue),0,0);
+		if (lines.length>0) graphics.PrintLineSegment(lines[0],new PixelColour(PixelColour.StandardColours.Green));
 		
-		Point2d[] points=polygon.GetOrderedVertices();
-		for (int i=0;i<points.length;i++)
-			graphics.Print(points[i].x,points[i].y,new PixelColour(PixelColour.StandardColours.Red),1,1);
-		for (int i=2;i<=4;i++)
-			graphics.Print(points[i].x,points[i].y,new PixelColour(PixelColour.StandardColours.Green),1,1);
-		graphics.Print(points[3].x,points[3].y,new PixelColour(PixelColour.StandardColours.Navy),1,1);
+		graphics.PrintPoint(aabb.minx-1,aabb.miny-1,new PixelColour(PixelColour.StandardColours.Green));
 		
-		
+		graphics.PrintLineSegment(new LineSegment2D(new Point2d(aabb.minx,aabb.miny),new Point2d(aabb.minx,aabb.maxy)),new PixelColour(PixelColour.StandardColours.Purple));
+		graphics.PrintLineSegment(new LineSegment2D(new Point2d(aabb.maxx,aabb.miny),new Point2d(aabb.maxx,aabb.maxy)),new PixelColour(PixelColour.StandardColours.Purple));
+		graphics.PrintLineSegment(new LineSegment2D(new Point2d(aabb.minx,aabb.miny),new Point2d(aabb.maxx,aabb.miny)),new PixelColour(PixelColour.StandardColours.Purple));
+		graphics.PrintLineSegment(new LineSegment2D(new Point2d(aabb.minx,aabb.maxy),new Point2d(aabb.maxx,aabb.maxy)),new PixelColour(PixelColour.StandardColours.Purple));
 		
 		String filename="/home/cshome/r/rarnott/Desktop/images/test.jpg";
+		graphics.InvertImage();
 		graphics.SaveImage(filename);
-		
-		boolean selfintersect=poly.isSelfIntersectingPolygon();
-		System.out.println("Self Intersecting test shows "+selfintersect);
-
-		System.out.println("Attempting convert to triangles");
-		poly.ConvertToTrianglesOnZplane(0,true);
-		System.out.println("Finished Attempt");
+		/*
+		for (int i=0;i<point.length;i++){
+			graphics.ShowPixelColourArray(colour,size,size);
+				
+			Point2d[] newpoints=new Point2d[i+1];
+			for (int j=0;j<newpoints.length;j++) newpoints[j]=point[j].clone();
+			BoundingPolygon2D newpolygon=new BoundingPolygon2D(newpoints);
+			LineSegment2D[] lines=newpolygon.Get2DLineSegments();
 			
+			for (int j=0;j<point.length;j++) 
+				graphics.PrintPoint(point[j].x,point[j].y,new PixelColour(PixelColour.StandardColours.Red));
+			Point2d[] temp=newpolygon.GetOrderedVertices();
+			graphics.PrintPoint(temp[0].x,temp[0].y,new PixelColour(PixelColour.StandardColours.Green));
+			graphics.OutlinePolygon(newpolygon,new PixelColour(PixelColour.StandardColours.Blue),0,0);
+			if (lines.length>0) graphics.PrintLineSegment(lines[0],new PixelColour(PixelColour.StandardColours.Green));
+			String filename="/home/cshome/r/rarnott/Desktop/images/test"+i+".jpg";
+			graphics.SaveImage(filename);
+		}
+		for (int i=0;i<point.length;i++)
+			if (polygon.PointIsOutside(point[i])) System.out.println("Point "+i+" detected as outside");
+		
+		/*
+		graphics.OutlinePolygon(polygon,new PixelColour(PixelColour.StandardColours.Blue),0,0);
+		String filename="/home/cshome/r/rarnott/Desktop/images/test.jpg";
+		graphics.SaveImage(filename);
+		TrianglePlusVertexArray triplusvertices=polygon.ConvertToTrianglesOnZplane(0,true);
+		Point3d[] vertices=triplusvertices.GetVertexArray();
+		TriangularFace[] triangle=triplusvertices.GetTriangleArray();
+		*/
+		/*
+		for (int i=0;i<triangle.length;i++){
+			int[] v=triangle[i].GetFace();
+			Point2d a=new Point2d(vertices[v[0]].x,vertices[v[0]].y);
+			Point2d b=new Point2d(vertices[v[1]].x,vertices[v[1]].y);
+			Point2d c=new Point2d(vertices[v[2]].x,vertices[v[2]].y);
+			LineSegment2D AB=new LineSegment2D(a,b);
+			LineSegment2D AC=new LineSegment2D(a,c);
+			LineSegment2D BC=new LineSegment2D(b,c);
+			graphics.PrintLineSegment(AB,new PixelColour(PixelColour.StandardColours.Red),2,2);
+			graphics.PrintLineSegment(AC,new PixelColour(PixelColour.StandardColours.Red),2,2);
+			graphics.PrintLineSegment(BC,new PixelColour(PixelColour.StandardColours.Red),2,2);
+			String file="/home/cshome/r/rarnott/Desktop/images/test"+i+".jpg";
+			graphics.SaveImage(file);
+			graphics.PrintLineSegment(AB,new PixelColour(PixelColour.StandardColours.Green),2,2);
+			graphics.PrintLineSegment(AC,new PixelColour(PixelColour.StandardColours.Green),2,2);
+			graphics.PrintLineSegment(BC,new PixelColour(PixelColour.StandardColours.Green),2,2);
+		}
+		*/
+		System.out.println("Finished");	
 	}
 	
 	public void outputCorrectMatches(){

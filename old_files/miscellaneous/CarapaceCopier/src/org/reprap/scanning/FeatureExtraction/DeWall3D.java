@@ -64,8 +64,9 @@ import org.reprap.scanning.Geometry.AxisAlignedBoundingBox;
 import org.reprap.scanning.Geometry.Line3d;
 import org.reprap.scanning.Geometry.Plane;
 import org.reprap.scanning.Geometry.Point3d;
-import org.reprap.scanning.Geometry.TriangularFace;
-public class DeWall {
+import org.reprap.scanning.Geometry.TriangularFaceOf3DTetrahedrons;
+import org.reprap.scanning.Geometry.Tetrahedron;
+public class DeWall3D {
 	
 	public enum planeslice {x,y,z};
 	public enum searching {oneradius,tworadii,currentminimumradius,all,exit}; // just for readability in the MakeSimplex method
@@ -85,14 +86,14 @@ public class DeWall {
 	private boolean[] finished;
 	
 	private boolean CyclicTetrahedronCreation=false; // Is there a cyclic tetrahedron creation? Once it is detected the algorithm will cease.
-	private TriangularFace[] Tetrahedrons; // The final list of tetrahedrons returned 
+	private Tetrahedron[] FinalTrianglesEmbeddedInTetrahedrons; // The final list of triangles but they are stored along with the 4th point for the tetrahedronso that can run the CTC check on them
 	
 	private QuickSortPoints3D qsort; // Used to sort the PointsList
 	
 	
 	// Constructor
-	public DeWall(Point3d[] points){
-		Tetrahedrons=new TriangularFace[0];
+	public DeWall3D(Point3d[] points){
+		FinalTrianglesEmbeddedInTetrahedrons=new Tetrahedron[0];
 		PointsList=new Point3d[points.length];
 		count=new int[points.length];
 		finished=new boolean[points.length];
@@ -104,7 +105,7 @@ public class DeWall {
 	}
 	
 	// This method does some setting up and then calls the private DeWall method to carve the space around the points into tetrahedrons 
-	public TriangularFace[] Triangularisation(JProgressBar bar, boolean recursive,String initialplane){
+	public TriangularFaceOf3DTetrahedrons[] Triangularisation(JProgressBar bar, boolean recursive,String initialplane){
 		//  set the progress bar min and max
 		  bar.setMaximum(PointsList.length);
 		  bar.setMinimum(0);
@@ -121,30 +122,21 @@ public class DeWall {
 			dewall(indexarray, new OrderedListTriangularFace(PointsList.length),planeslice.valueOf(initialplane), bar,System.currentTimeMillis(),initialrecursionlevel);
 		bar.setValue(bar.getMaximum());
 		if (print){
-			 System.out.println("Total time:"+(System.currentTimeMillis()-starttime)+"ms  Total Tetrahedrons="+Tetrahedrons.length);
+			 System.out.println("Total time:"+(System.currentTimeMillis()-starttime)+"ms  Total Tetrahedrons="+FinalTrianglesEmbeddedInTetrahedrons.length);
 		 }
 		if (printverbose){
-			for (int i=0;i<Tetrahedrons.length;i++){
+			for (int i=0;i<FinalTrianglesEmbeddedInTetrahedrons.length;i++){
 				System.out.print(i);
-				Tetrahedrons[i].print();
+				FinalTrianglesEmbeddedInTetrahedrons[i].print();
 				System.out.println();
 			} // end for
 		} // end if printverbose
 		
+		// Now convert the tetrahedrons to triangles
+		TriangularFaceOf3DTetrahedrons[] triangles=new TriangularFaceOf3DTetrahedrons[FinalTrianglesEmbeddedInTetrahedrons.length];
+		for (int i=0;i<triangles.length;i++) triangles[i]=FinalTrianglesEmbeddedInTetrahedrons[i].GetTriangle();
 		
-		
-		if ((test) && (!CyclicTetrahedronCreation)){
-			
-			// Tests hopefully ordered quickest first
-			// Currently a selection of random points seem to be carved correctly and pass all the tests.
-			TestPointInclusion(Tetrahedrons);
-			TestEmptyTetrahedrons(Tetrahedrons);
-			TestDelaunayspacing(Tetrahedrons);
-			TestTrianglesMembersOfMax2Tetrahedrons(Tetrahedrons);
-			TestInterpenetrationofTetrahedronFaces(Tetrahedrons);
-			System.out.println("Testing done");
-		}
-		return Tetrahedrons;
+		return triangles;
 	}
 	public boolean IsCyclicTetrahedronCreationError(){
 		return CyclicTetrahedronCreation;
@@ -189,29 +181,31 @@ public class DeWall {
 	//  Wall Construction 
 	if ((AFL.getLength()==0) && (recursionlevel==1)){
 		// Make the first simplex using as one point the closest point to the midpoint split, and as another a point on the other side.
-			TriangularFace t=MakeFirstSimplex(P);
-			if (!t.IsNull()) {
-				t.SetHash(PointsList.length);
-				TriangularFace[] temp=t.GetFaces(PointsList);
+			Tetrahedron tetra=MakeFirstSimplex(P);
+			if (!tetra.isNull()) {
+				TriangularFaceOf3DTetrahedrons[] temp=tetra.GetFaces(PointsList);
 				for (int i=0;i<temp.length;i++) {
 					if (i==0){ // Reverse the first face a and b so a normal calculated from ABxAC is pointing outwards
-						int[] v=temp[i].GetFirstTetrahedron();
-						t=new TriangularFace(v[1],v[0],v[2],v[3],PointsList);
+						int[] v=temp[i].GetFace();
+						TriangularFaceOf3DTetrahedrons t=new TriangularFaceOf3DTetrahedrons(v[1],v[0],v[2],PointsList);
+						int[] oppositevertices=tetra.GetVertices();
+						t.CalculateNormalAwayFromPoint(PointsList,PointsList[oppositevertices[i]]);
+						t.SetHash(PointsList.length);
 						AFL.InsertIfNotExist(t);
 					}
-					AFL.InsertIfNotExist(temp[i]);
+					else AFL.InsertIfNotExist(temp[i]);
 				}
-				Tetrahedrons=new TriangularFace[1];
-				Tetrahedrons[0]=t.clone();
+				FinalTrianglesEmbeddedInTetrahedrons=new Tetrahedron[1];
+				FinalTrianglesEmbeddedInTetrahedrons[0]=tetra.clone();
 				// Increment the counters for each of these four points by 3.
-					int[] indexes=t.GetFirstTetrahedron();
+					int[] indexes=tetra.GetVertices();
 					for (int i=0;i<indexes.length;i++)
 						for (int j=0;j<3;j++) increment(indexes[i]);
 				
 			}
 		}
 		// Split the Active Face List into the correct sub lists
-		TriangularFace f=AFL.GetFirstFIFO();
+		TriangularFaceOf3DTetrahedrons f=AFL.GetFirstFIFO();
 		while (!f.IsNull()){
 			int category=Categorise(f,splitplanecoordinate,currentplaneslice,recursionlevel);
 			switch(category){
@@ -219,7 +213,7 @@ public class DeWall {
 				case 1:AFL1.InsertIfNotExist(f);break;
 				case 2:AFL2.InsertIfNotExist(f);break;
 			}
-		f=AFL.GetNextFIFO();
+		f=AFL.ExtractFIFO();
 		}
 		
 		
@@ -227,26 +221,15 @@ public class DeWall {
 //		 Main loop
 		f=AFLalpha.ExtractFIFO();
 		while (!f.IsNull()){
-			if (printverbose){
-				//System.out.println("AFL1="); AFL1.PrintFIFO();
-				//System.out.println("AFL2=");AFL2.PrintFIFO();
-				System.out.println("AFLalpha=");AFLalpha.PrintFIFO();
-				//System.out.println("sum="); for (int i=0;i<sum.length;i++){sum[i].print();System.out.println();}
-				//UG.Print();
-			}
-			 
-			TriangularFace t=new TriangularFace();
+			
+			Tetrahedron t=new Tetrahedron();
 				t=MakeSimplex(f,UG);
 					// Test to make sure the tetrahedron constructed is a valid one
-					// i.e. that none of the faces are made from triangles that have already been tested for inclusion in two tetrahedrons. 
-					boolean valid=!t.IsNull();
+					boolean valid=!t.isNull();
 					if (valid)
 					{
-						//int[] ind=t.GetFirstTetrahedron();
-						//System.out.println(ind[0]+ind[1]+ind[2]+ind[3]+" "+ind[0]+" "+ind[1]+" "+ind[2]+" "+ind[3]);
-						//System.out.println(ind[0]+" "+ind[1]+" "+ind[2]+" "+ind[3]);
-						Tetrahedrons=Insert(Tetrahedrons,t); // Note that this will mean we end up with a list of TriangularFaces each attached to a single tetrahedron only.
-						TriangularFace[] fdash=t.GetFaces(PointsList);
+						FinalTrianglesEmbeddedInTetrahedrons=Insert(FinalTrianglesEmbeddedInTetrahedrons,t); // Note that this will mean we end up with a list of TriangularFaces each attached to a single tetrahedron only.
+						TriangularFaceOf3DTetrahedrons[] fdash=t.GetFaces(PointsList);
 								for (int i=0;i<fdash.length;i++){
 								if (!fdash[i].TriangleEqual(f)){
 									// Update the correct Active Face list
@@ -272,7 +255,7 @@ public class DeWall {
 				}
 			f=AFLalpha.ExtractFIFO();
 			if (CyclicTetrahedronCreation){
-				f=new TriangularFace(); // exit while loop
+				f=new TriangularFaceOf3DTetrahedrons(); // exit while loop
 			}
 		}//end while
 		
@@ -288,7 +271,7 @@ public class DeWall {
 	// returns 1 if the plane is on one side of the face (to go into AFL1)
 	// returns 2 if the plane is on the other side of the face (to go into AFL2)
 	// If the maximum recursion level has been reached it will also return 0 which essentially turns it into an iterative approach
-	private int Categorise(TriangularFace f,double coordinate,planeslice currentplaneslice,int recursionlevel){
+	private int Categorise(TriangularFaceOf3DTetrahedrons f,double coordinate,planeslice currentplaneslice,int recursionlevel){
 		if (recursionlevel>=maxrecurse) return 0; 
 		else{		
 			int[] indexes=f.GetFace();
@@ -322,13 +305,13 @@ public class DeWall {
 		return returnvalue;
 	}
 	
-	// Manipulation of triangular faces arrays used above for compiling sum TriangularFace array
-	private TriangularFace[] Insert(TriangularFace[] original, TriangularFace addition){
-		addition.SetHash(PointsList.length);
-		TriangularFace[] returnvalue=new TriangularFace[original.length+1];
+	
+	// Adds to a tetrahedron array and also checks for equivalent tetrahedron alreay existing
+	private Tetrahedron[] Insert(Tetrahedron[] original, Tetrahedron addition){
+		Tetrahedron[] returnvalue=new Tetrahedron[original.length+1];
 		for (int i=0;i<original.length;i++){
 			returnvalue[i]=original[i].clone();
-			if (original[i].IncludesFirstTetrahedroninTetrahedron(addition)) CyclicTetrahedronCreation=true;
+			if (original[i].isEquivalent(addition)) CyclicTetrahedronCreation=true;
 		}
 		returnvalue[original.length]=addition.clone();
 		return returnvalue;
@@ -336,7 +319,7 @@ public class DeWall {
 	// Only used by the original algorithm
 	// Delete the face from the list if it exists and add it if it does not
 	// Also increment or decrement the point counters accordingly
-	private OrderedListTriangularFace Update(OrderedListTriangularFace AFL, TriangularFace f){
+	private OrderedListTriangularFace Update(OrderedListTriangularFace AFL, TriangularFaceOf3DTetrahedrons f){
 		boolean deleted=AFL.DeleteIfExist(f);
 		if (!deleted) AFL.InsertIfNotExist(f);
 		int[] indexes=f.GetFace();
@@ -345,16 +328,15 @@ public class DeWall {
 			else increment(indexes[i]);
 		return AFL;
 	}
-
 	// Used to increment and decrement the point counters and set the finished variable
 	private void increment(int i){count[i]++;finished[i]=false;}
 	private void decrement(int i){if (!finished[i]) count[i]--; if (count[i]==0) finished[i]=true;}
 	
 	// Note that this doesn't take account of any points that are to be skipped, it is assumed that it is only called at the start of the procedure when all points are valid.
 	// It is also assumed that the P index array is ordered corectly.
-	private TriangularFace MakeFirstSimplex(int[] P){
+	private Tetrahedron MakeFirstSimplex(int[] P){
 		
-		TriangularFace returnvalue=new TriangularFace();
+		Tetrahedron returnvalue=new Tetrahedron();
 		int midpoint=(int)Math.floor((double)P.length/2);
 		
 		  int a=P[midpoint-1];
@@ -411,8 +393,7 @@ public class DeWall {
 					// Now go through the array and find the fourth point that gives the smallest dd value
 					double currentmindd=Double.MAX_VALUE;
 					int d=-1;
-					returnvalue=new TriangularFace(a,b,c);
-					returnvalue.CalculateNormal(PointsList);
+					TriangularFaceOf3DTetrahedrons triangle=new TriangularFaceOf3DTetrahedrons(a,b,c,PointsList);
 					for(int i=0;i<P.length;i++){
 						boolean valid=((a!=P[i]) && (b!=P[i]) && (c!=P[i]));
 						if (valid){
@@ -431,7 +412,7 @@ public class DeWall {
 								
 								// Check if the centre is on the same side of the plane made by the points A,B,C as point D.
 				            	// If we can assume neither the centre nor the fourth point are on the plane this can be restated as the following boolean test:
-				            	boolean sameside=(returnvalue.InsideHalfspace(PointsList[P[i]])==returnvalue.InsideHalfspace(centre));
+				            	boolean sameside=(triangle.InsideHalfspace(PointsList[P[i]])==triangle.InsideHalfspace(centre));
 				            	double dd=radiussquared;
 				            	if (!sameside) dd=dd*-1;
 				            	if (dd==currentmindd){
@@ -447,20 +428,19 @@ public class DeWall {
 					} // end if !skiptesting
 				} // end for
 				// If there wasn't a 4th point we drop the whole thing
-				if (d==-1) returnvalue=new TriangularFace();
-				else {
+				if (d==-1) returnvalue=new Tetrahedron();
+				else 
 					// Find out whether point d is on the same side of the mid plane between a and b as point b and if it isn't swap point a and b around.
 					// So the normals calculated by ABxAC on all but the first face will point outwards. Note that this means that for the first face to have a normal pointing outwards a and b will have to be swapped around once the face list has been extracted.
-					if (p1.GetHalfspace(PointsList[d])!=p1.GetHalfspace(PointsList[b])) returnvalue=new TriangularFace(b,a,c);
-					returnvalue.SetFirstTetrahedronPointD(d,PointsList);
-				}
+					if (p1.GetHalfspace(PointsList[d])!=p1.GetHalfspace(PointsList[b])) returnvalue=new Tetrahedron(new TriangularFaceOf3DTetrahedrons(b,a,c,PointsList),d,PointsList);
 				} // end if c!=-1
 			} // end if b!=-1
 	return returnvalue;
 	} // end of MakeFirstSimplex method
 
-	private TriangularFace MakeSimplex(TriangularFace f,Uniform3DGrid UG){
-		TriangularFace returnvalue;
+	private Tetrahedron MakeSimplex(TriangularFaceOf3DTetrahedrons f,Uniform3DGrid UG){
+		//TriangularFaceOf3DTetrahedrons returnvalue;
+		Tetrahedron returnvalue;
 		int currentnextpointindex=-1;
 		int[] abc=f.GetFace();
 		decrement(abc[0]);
@@ -605,227 +585,11 @@ public class DeWall {
 			// If there wasn't a 4th point or it is to be ignored we drop the whole thing
 	
 			if ((currentnextpointindex==-1)) 
-					returnvalue=new TriangularFace();
+					returnvalue=new Tetrahedron();
 			else{
-				returnvalue=f.clone();
-				returnvalue.SetFirstTetrahedronPointD(currentnextpointindex,PointsList); //overwrite the old d value
+				returnvalue=new Tetrahedron(f,currentnextpointindex,PointsList);
 			} // end else
 		return returnvalue;
 	}
 	
-	/**********************************************************************************************************************************************
-	 * 
-	 * Here are the test methods. They are only called to test whether the the tetrahedron DeWall space carving is valid, in some cases using 
-	 * different derivations of formulae used above.  
-	 * 
-	 **********************************************************************************************************************************************/
-	
-	
-
-	private void TestInterpenetrationofTetrahedronFaces(TriangularFace[] tetrahedrons){
-		// This is to be called once the points have been turned into tetrahedrons and is just used to test whether the result is valid
-		// which in this case means that no faces are interpenetrating which is tested by checking the halfspaces of the 6 points involved
-		System.out.println("Testing Overlaps and interpenetrations of triangular faces");
-		//System.out.println("An overlap is where 1 triangular edge penetrates the face, and an interpenetration is where two edges penetrates the face");
-		//System.out.println("There is also the case where all 3 edges of one triangle penetrate another triangle i.e. they are both on the same plane and overlap which is tested for as well");
-		for (int i=0;i<tetrahedrons.length;i++){
-			//Note that this assumes that each element in the array of triangular faces only has one tetrahedron attached to it!
-			TriangularFace[] faces=tetrahedrons[i].GetFaces(PointsList);
-			for (int j=0;j<faces.length;j++){
-				// Calculate the plane made from this face
-				int[] vertices=faces[j].GetFace();
-				Plane plane1=new Plane(faces[j],PointsList);
-				// For each tetrahedron 
-				for (int k=0;k<tetrahedrons.length;k++)if (i!=k) {
-						TriangularFace[] faces2=tetrahedrons[k].GetFaces(PointsList);
-						// For each of its faces (that doesn't have any of the 3 current vertices...) create a representative plane
-						for (int l=0;l<faces2.length;l++) if (!((faces2[l].IncludesPoint(vertices[0])) || (faces2[l].IncludesPoint(vertices[1])) || (faces2[l].IncludesPoint(vertices[2])))){
-							int[] vertices2=faces2[l].GetFace();
-							Plane plane2=new Plane(faces2[l],PointsList);
-							// Test whether the planes intersect
-							if (plane1.Intersect(plane2)){
-								boolean[] halfspace=new boolean[3];
-								boolean nopotentialforintersection=true;
-								for (int m=0;m<vertices2.length;m++) halfspace[m]=plane1.GetHalfspace(PointsList[vertices2[m]]);
-								for (int m=1;m<vertices2.length;m++) nopotentialforintersection=nopotentialforintersection && (halfspace[m]==halfspace[0]);
-								if (!nopotentialforintersection){ // there is the posibility of an interpenetration, now do the same test on the vertices of the first plane
-									nopotentialforintersection=true;
-									for (int m=0;m<vertices.length;m++) halfspace[m]=plane2.GetHalfspace(PointsList[vertices[m]]);
-									for (int m=1;m<vertices.length;m++) nopotentialforintersection=nopotentialforintersection && (halfspace[m]==halfspace[0]);
-									if (!nopotentialforintersection){
-										// The two triangles cross each others planes but this doesn't necessarily mean that the two triangles themselves cross.
-										// If they do, one will have an edge that penetrates the triangle of the other so test for this now
-										
-										// Code copied and pasted from old edge penetration tests
-										int interpenetrationcount=0;
-										for (int linesegment=0;linesegment<3;linesegment++){
-											int[] p=new int[2];
-											if (linesegment==0){ p[0]=vertices2[0]; p[1]=vertices2[1];}
-											else if (linesegment==1){ p[0]=vertices2[0]; p[1]=vertices2[2];}
-											else if (linesegment==2){ p[0]=vertices2[1]; p[1]=vertices2[2];}
-											Line3d line=new Line3d(PointsList[p[0]],PointsList[p[1]]);
-											if (faces[j].LineSegmentIntersectTriangularFace(line,PointsList).lengthSquared()!=0) interpenetrationcount++;
-										} // end for linesegment
-										if (interpenetrationcount!=0){
-											if (interpenetrationcount==1)System.out.print("Overlap ");
-											if (interpenetrationcount==2)System.out.print("Interpenetration ");
-											if (interpenetrationcount==3 )System.out.print("3 edge overlap/penetration ");
-											System.out.print("detected between triangle "+j+" ");
-											System.out.print("["+vertices[0]+","+vertices[1]+","+vertices[2]+"]");
-											System.out.print(" of tetrahedron "+i);
-											System.out.print(" and tetrahedron "+k);
-											System.out.print(" triangle "+l+" ");
-											System.out.print("["+vertices2[0]+","+vertices2[1]+","+vertices2[2]+"]");
-											System.out.println();
-										}
-									} // end potential for intersection
-								} // end if potential for intersection
-							} // end if planes intersect
-						} // end if/for l
-					} // end if/for k
-			} // end for j
-		} // end for i
-	}
-	
-	private void TestEmptyTetrahedrons(TriangularFace[] tetrahedrons){
-		// This is to be called once the points have been turned into tetrahedrons and is just used to test whether the result is valid
-		// which in this case means that no points are on the inside halfspace of all the faces of a tetrahedron
-		// Its not efficient but is written so can be easily checked for bugs
-		System.out.println("Testing for points inside tetrahedrons");
-		for (int i=0;i<tetrahedrons.length;i++){
-			// Split the tetrahedron i into 4 faces
-			// Note that this assumes that each element in the array of triangular faces only has one tetrahedron attached to it!
-			// This is a property of the dewall method, not of the data structure itself.
-			TriangularFace[] faces=tetrahedrons[i].GetFaces(PointsList);
-			
-			// Test all points not in the tetrahedron vertices
-			if (faces.length!=0) for (int j=0;j<PointsList.length;j++){
-					if (!tetrahedrons[i].IncludesPointinTetrahedron(j)){
-						boolean insidetetrahedron=true;
-						for (int k=0;k<faces.length;k++) insidetetrahedron=insidetetrahedron && faces[k].InsideHalfspace(PointsList[j]);
-						if (insidetetrahedron) System.out.println("Point "+j+" is inside tetrahedron "+i);
-					}
-				} // end for j
-		} // end for i
-	} // end TestValidity method
-	
-	
-	
-	private void TestDelaunayspacing(TriangularFace[] tetrahedrons){
-//		 This is to be called once the points have been turned into tetrahedrons and is just used to test whether the result is valid
-		// which in this case means that the circumcircle made for each triangle has no other points inside it. 
-		// Its not efficient but is written so can be easily checked for bugs
-
-		System.out.println("Testing Delaunay spacing");
-		
-		for (int i=0;i<tetrahedrons.length;i++){
-			// First break each tetrahedron into its triangles
-			TriangularFace[] faces=tetrahedrons[i].GetFaces(PointsList);
-			// For each triangle, calculate the circumcenter and radius
-			for (int j=0;j<faces.length;j++){
-				// Rearranging equations from http://www.ics.uci.edu/~eppstein/junkyard/circumcenter.html
-				// if numeratorvector=|AC|^2*(ABxAC)xAB+|AB|^2*ACx(ABxAC)
-				// and denominator=2*|ABxAC|^2
-				// the circumcircle radius = |numeratorvector|/denominator
-				// circumcircle center= A+ numeratorvector/denominator
-				int[] faceindex=faces[j].GetFace();
-				Point3d A=PointsList[faceindex[0]].clone();
-				Point3d B=PointsList[faceindex[1]].clone();
-				Point3d C=PointsList[faceindex[2]].clone();
-				Point3d AB=B.minus(A);
-				Point3d AC=C.minus(A);
-				Point3d ABxAC=AB.crossProduct(AC);
-				Point3d numeratorvector=ABxAC.crossProduct(AB).times(AC.lengthSquared()).plus(AC.crossProduct(ABxAC).times(AB.lengthSquared()));
-				double denominator=2*ABxAC.lengthSquared();
-				double radius=Math.sqrt(numeratorvector.lengthSquared())/denominator;
-				Point3d center=A.plus(numeratorvector.times(1/denominator));
-				double radiussquared=radius*radius;
-			// Now go through each point in the point list and make sure it isn't in the circumcircle.
-			for (int k=0;k<PointsList.length;k++){
-			// First, check the distance between and circum-center and the point (if the point isn't in the triangle)
-				if (!faces[j].IncludesPoint(k)) if (PointsList[k].minus(center).lengthSquared()<radiussquared) {
-					// If it is within the radius distance away, check to see if it is in the plane of the triangle
-					// as using floating point, actually just check that it is quite close to plane
-					if (Math.abs(faces[j].normal.dot(PointsList[k])-faces[j].normaldota)<0.00000001){
-					//if (Math.abs(faces[j].normal.dot(PointsList[k])-faces[j].normaldota)==0){
-						System.out.print("Triangle ");
-						System.out.print("["+faceindex[0]+","+faceindex[1]+","+faceindex[2]+"]");
-						System.out.print("of tetrahedron "+i);
-						System.out.print(" not DeLaunay, it contains point "+k+" within the circumcircle");
-						System.out.println();
-					} // end if
-				} // end if
-				} // end for k
-			} // end for j
-		} // end for i
-	} // end test method
-
-	
-	private void TestPointInclusion(TriangularFace[] tetrahedrons){
-		// This is to be called once the points have been turned into tetrahedrons and is just used to test whether the result is valid
-		// which in this case means that all points have been included in at least one tetrahedron. 
-		// Could use boolean but using an int count in case want to expand to output how often a point is used as a vertex etc. 
-		// Its not efficient but is written so can be easily checked for bugs
-		
-		System.out.println("Testing Point Inclusion");
-		int[] PointUsageCount=new int[PointsList.length];
-		for (int i=0;i<PointUsageCount.length;i++) PointUsageCount[i]=0;
-		for (int i=0;i<tetrahedrons.length;i++){
-			int[] index=tetrahedrons[i].GetFirstTetrahedron();
-			for (int j=0;j<index.length;j++) PointUsageCount[index[j]]++;
-			// Just in case there is a second tetrahedron associated with the face.
-			int j=tetrahedrons[i].GetSecondTetrahedronPointD();
-			if (j>=0) PointUsageCount[j]++;
-		}
-		for (int i=0;i<PointUsageCount.length;i++)
-			if (PointUsageCount[i]==0) System.out.println("Point "+i+" not included in any tetrahedron");
-	}
-	
-
-	private void TestTrianglesMembersOfMax2Tetrahedrons(TriangularFace[] tetrahedrons){
-		// This is to be called once the points have been turned into tetrahedrons and is just used to test whether the result is valid
-		// which in this case means that a triangle is part of only 1 or 2 tetrahedrons and if it is a member of two they are on opposite sides of the triangle i.e. halfspaces
-		// It assumes that the tetrahedrons are single with the first d value being the one that is filled in.
-		// Its not efficient but is written so can be easily checked for bugs
-		int[] d=new int[3]; // We only need to keep track of at most 3 d values;
-		int[] tetra=new int[3]; // We only need to keep track of at most 3 index values 
-		System.out.println("Testing Triangular Faces are only part of 1 or 2 tetrahedrons, in different half-spaces.");
-		for (int i=0;i<tetrahedrons.length;i++){
-			// First break each tetrahedron into its faces
-			TriangularFace[] faces=tetrahedrons[i].GetFaces(PointsList);
-			// Go through each tetrahedron and see if it includes all the points of one or more of the faces
-			for (int k=0;k<faces.length;k++){
-				d[0]=faces[k].GetFirstTetrahedronPointD();
-				tetra[0]=i;
-				int count=0;
-				for (int j=0;j<tetrahedrons.length;j++){
-					if (i!=j){
-							if (tetrahedrons[j].IncludesTriangleinTetrahedron(faces[k])){
-								count++;
-								// Find the vertex that isn't the triangle
-								int[] vertices=tetrahedrons[j].GetFirstTetrahedron();
-								int x=0;
-								while (faces[k].IncludesPoint(vertices[x])) x++;
-								d[count]=vertices[x];
-								tetra[count]=j;
-								if (count>1) {
-									System.out.print("Face ");
-									faces[k].print();
-									System.out.println(" of tetrahedron "+tetra[0]+" is joined to point "+d[0]+" and more than 1 other point including "+d[1]+" (tetrahedron "+tetra[1]+") and "+d[2]+" (tetrahedron "+tetra[2]+")");
-											
-									k=faces.length;j=tetrahedrons.length; // skip to end as don't need to test any more
-								} // end if count>1
-							} // end if
-					} // end if i!=j
-				} // end for j
-				if (count==1) // compare the halfspaces
-					if (faces[k].InsideHalfspace(PointsList[d[0]])==faces[k].InsideHalfspace(PointsList[d[1]])) {
-						System.out.print("Face ");
-						faces[k].print();
-						System.out.println(" of tetrahedron "+i+" is joined to form another tetrahedron in the same half-space using point "+d[1]+" (tetrahedron "+tetra[1]+")");
-					}
-				} // end for k
-			} // end for i
-	} // end of method
-
 	} // end of class

@@ -30,19 +30,22 @@ package org.reprap.scanning.Geometry;
  *    
  *    Note that some formulae that traditionally use pi have been replaced to use tau where tau is defined as 2*pi. For an explanation of why this may make things clearer see That Tau Manifesto available at http://tauday.com/
  *    
+ *    Currently the polygon outline may be self intersecting and the triangulation doesn't handle this. It is supposed to handle it by finding intersecting points and recursively subdividing the problem until the sub-polygons are not self-intersecting but this doesn't seem to work. 
+ *    
  *******************************************************************************/
 
 import org.reprap.scanning.DataStructures.TrianglePlusVertexArray;
 public class BoundingPolygon2D {
 	private final static double tau=Math.PI*2;
 	
-	private static enum direction{up,left,down,right}; // clockwise 
-	//private static enum direction{left, up, right, down}; // anti-clockwise
+	//private static enum direction{up,right,down,left}; // ?
+	//private static enum direction{up,left,down,right}; // anti-clockwise 
+	private static enum direction{left, up, right, down}; // clockwise
 	// Note that this assumes a right hand coordinate system i.e. up is in the positive y direction, right is positive x etc.
 	// But this is just for readability
 	
 	private static direction[] directionarray=direction.values();//This is a set of directions to cycle through in order to order the corner array in either clockwise or anti-clockwise direction 
-	private static boolean clockwiseordering=directionarray[0]==direction.up; // The triangulation routine needs to know if the vertices are ordered clockwise or anti-clockwise 
+	private static boolean clockwiseordering=directionarray[0]==direction.left; // The triangulation routine needs to know if the vertices are ordered clockwise or anti-clockwise 
 	
 	private Point2d[] orderedvertices;
 	private Point2d[] allpoints; //TODO currently not used, except for testing purposes delete if not needed.
@@ -128,6 +131,7 @@ public class BoundingPolygon2D {
 		AxisAlignedBoundingBox box=boundingbox.clone();
 		box.Expand2DBoundingBox(point);
 		boolean returnvalue=(!boundingbox.isEqual(box));
+		/*
 		if (!returnvalue){
 			if (orderedvertices.length==0) returnvalue=true;
 			else if (orderedvertices.length==1) returnvalue=!orderedvertices[0].isEqual(point);
@@ -139,7 +143,7 @@ public class BoundingPolygon2D {
 				TrianglePlusVertexArray trianglesplusvertices=ConvertToTrianglesOnZplane(0,true);
 				Line3d line=new Line3d(point.ExportAs3DPoint(-1),point.ExportAs3DPoint(1));
 				Point3d[] vertices=trianglesplusvertices.GetVertexArray();
-				TriangularFace[] triangles=trianglesplusvertices.GetTriangleArray();
+				TriangularFaceOf3DTetrahedrons[] triangles=trianglesplusvertices.GetTriangleArray();
 				boolean inside=false;
 				for (int i=0;i<triangles.length;i++) 
 					if (!inside) inside=triangles[i].LineSegmentIntersectionTriangularFace(line,vertices);
@@ -147,6 +151,7 @@ public class BoundingPolygon2D {
 				
 			} //end else
 		} // end if within bounding box
+		*/
 		return returnvalue;
 	}
 	public TrianglePlusVertexArray ExtrudeTo3DAndConvertToTriangles(double zheight, double minzvalue){
@@ -169,8 +174,8 @@ public class BoundingPolygon2D {
 			int c=b1+orderedvertices.length;
 			int b2=a+orderedvertices.length;
 			
-			TriangularFace tri1=new TriangularFace(a,b1,c);
-			TriangularFace tri2=new TriangularFace(a,b2,c);
+			TriangularFaceOf3DTetrahedrons tri1=new TriangularFaceOf3DTetrahedrons(a,b1,c,points);
+			TriangularFaceOf3DTetrahedrons tri2=new TriangularFaceOf3DTetrahedrons(a,b2,c,points);
 			// now we have to orient the normal in the correct manner
 			// If the vertices are ordered in a clockwise direction we want the normal to be pointing to the left of the line segment (as seen when looking from the start to the end)
 			// If they are ordered counter clockwise we want the normal to be pointing to the right, again as seen when looking from the start to the end
@@ -192,18 +197,18 @@ public class BoundingPolygon2D {
 			TrianglePlusVertexArray triangles=new TrianglePlusVertexArray(new Point3d[0]);
 			if (orderedvertices.length>2){
 			// First test to see if this is a self intersecting polygon, if so split it into two and triangularise them seperately
-			int intersectionlinesegment=GetFirstIntersectingLineSegment();
-			if (intersectionlinesegment!=-1){
+			int[] intersectionlinesegment=GetFirstIntersectingLineSegment();
+			if (intersectionlinesegment[0]!=-1){
 				// Find the intersection point
-				LineSegment2D line1=new LineSegment2D(orderedvertices[0],orderedvertices[orderedvertices.length-1]);
-				LineSegment2D line2=new LineSegment2D(orderedvertices[intersectionlinesegment],orderedvertices[intersectionlinesegment+1]);
+				LineSegment2D line1=new LineSegment2D(orderedvertices[intersectionlinesegment[0]],orderedvertices[(intersectionlinesegment[0]+1)%orderedvertices.length]);
+				LineSegment2D line2=new LineSegment2D(orderedvertices[intersectionlinesegment[1]],orderedvertices[(intersectionlinesegment[1]+1)%orderedvertices.length]);
 				Point2d newvertex=line1.SingleIntersectionPointBetweenStartAndEndExclusive(line2);
 				// Split the points into two arrays and add the new vertex to the end of both
-				Point2d[] vertices1=new Point2d[intersectionlinesegment+2];
-				Point2d[] vertices2=new Point2d[orderedvertices.length-intersectionlinesegment];
+				Point2d[] vertices1=new Point2d[intersectionlinesegment[0]+2];
+				Point2d[] vertices2=new Point2d[orderedvertices.length-intersectionlinesegment[0]];
 				for (int i=0;i<orderedvertices.length;i++){
-					if (i<=intersectionlinesegment) vertices1[i]=orderedvertices[i].clone();
-					else  vertices2[i-intersectionlinesegment-1]=orderedvertices[i].clone();
+					if (i<=intersectionlinesegment[0]) vertices1[i]=orderedvertices[i].clone();
+					else  vertices2[i-intersectionlinesegment[0]-1]=orderedvertices[i].clone();
 				}
 				vertices1[vertices1.length-1]=newvertex.clone();
 				vertices2[vertices2.length-1]=newvertex.clone();
@@ -279,7 +284,7 @@ public class BoundingPolygon2D {
 			if (!exit){
 				//System.out.println("Adding "+newa+" "+newb+" "+newc);
 				// We should now be able to add a triangle to the list and take vertex b out of the list
-				TriangularFace newtriangle=new TriangularFace(newa,newb,newc);
+				TriangularFaceOf3DTetrahedrons newtriangle=new TriangularFaceOf3DTetrahedrons(newa,newb,newc,vertices3d);
 				if (normalfacingup) newtriangle.CalculateNormalAwayFromPoint(vertices3d,orderedvertices[newa].ExportAs3DPoint(zvalue-1));
 				else newtriangle.CalculateNormalAwayFromPoint(vertices3d,orderedvertices[newa].ExportAs3DPoint(zvalue+1));
 				triangles.AddTriangle(newtriangle);
@@ -297,7 +302,7 @@ public class BoundingPolygon2D {
 		int a=j;j=1;while (skip[(a+j)%skip.length] && (j<=skip.length))j++;
 		int b=(a+j)%skip.length;j=1;while (skip[(b+j)%skip.length] && (j<=skip.length))j++;
 		int c=(b+j)%skip.length;
-		TriangularFace newtriangle=new TriangularFace(a,b,c);
+		TriangularFaceOf3DTetrahedrons newtriangle=new TriangularFaceOf3DTetrahedrons(a,b,c,vertices3d);
 		if (normalfacingup) newtriangle.CalculateNormalAwayFromPoint(vertices3d,orderedvertices[a].ExportAs3DPoint(zvalue-1));
 		else newtriangle.CalculateNormalAwayFromPoint(vertices3d,orderedvertices[a].ExportAs3DPoint(zvalue+1));
 		triangles.AddTriangle(newtriangle);
@@ -308,7 +313,7 @@ public class BoundingPolygon2D {
 	}
 	
 	public boolean isSelfIntersectingPolygon(){
-		return (GetFirstIntersectingLineSegment()!=-1);
+		return (GetFirstIntersectingLineSegment()[0]!=-1);
 	}
 	
 	
@@ -319,19 +324,27 @@ public class BoundingPolygon2D {
 	 * 
 	 ***********************************************************************************************************************************************/
 	// If there is an intersecting line segment it gets it's index, otherwise it returns -1
-	private int GetFirstIntersectingLineSegment(){
-		int returnvalue=-1;
+	private int[] GetFirstIntersectingLineSegment(){
+		int[] returnvalue=new int[2];
+		returnvalue[0]=-1;
+		returnvalue[1]=-1;
 		if (orderedvertices.length>2){
 		LineSegment2D[] lines=Get2DLineSegments();
 		// In theory the only line that should intersect others is the last one from the last vertex back to the first
 		// And only when the points are in roughly a straight line (normally only when there are very few of them)
-		LineSegment2D endtostart=lines[lines.length-1].clone();
+		int j=0;
+		while ((returnvalue[1]==-1) && (j<lines.length)){
+		LineSegment2D testing=lines[j].clone();
 		int i=0;
-		while ((i<(lines.length-1)) && (returnvalue==-1)){
-			Point2d intersectionpoint=endtostart.SingleIntersectionPointBetweenStartAndEndExclusive(lines[i]);
-			if (!intersectionpoint.isEqual(endtostart.start))returnvalue=i;
+		while ((i<(lines.length)) && (returnvalue[1]==-1)){
+			if (i!=j){
+				Point2d intersectionpoint=testing.SingleIntersectionPointBetweenStartAndEndExclusive(lines[i]);
+				if (!intersectionpoint.isEqual(testing.start)){returnvalue[0]=j;returnvalue[1]=i;}
+			}
 			i++;
 		} //end while
+		j++;
+		} // end while
 		} // end if
 		return returnvalue;
 		
@@ -344,6 +357,7 @@ public class BoundingPolygon2D {
 	private static Point2d[] FindAndOrderVertices(Point2d vertices[], AxisAlignedBoundingBox bound){
 		direction majordirection = directionarray[0];
 		direction minordirection = directionarray[3];
+		System.out.println("Starting major direction="+majordirection.name()+" minor direction="+minordirection.name());
 		Point2d currentcorner=new Point2d(bound.minx-1,bound.miny-1); 
 		// Assuming the bounding box has been calculated correctly, this will start with the leftmost point and try to find the closest point on its right.
 		int[] vertexindices=new int[vertices.length];
@@ -356,26 +370,22 @@ public class BoundingPolygon2D {
 			double mindistance=0;
 			double distance=0;  
 			boolean first=true;
-			// find the corner in the specified major direction that is furtherest to the minor direction (this may mean that it is the closest in the opposite minor direction)  
+			// find the corner in the specified major (relative) direction that is furtherest to the minor (absolute) direction (this may mean that it is the closest in the opposite minor direction)  
 			for (int i=0; i<vertices.length;i++)
 			{
-				if (!skip[i]){	
+				if (!skip[i]) {	
 				boolean lookat=false;
 					if ((majordirection==direction.right) && (vertices[i].x>currentcorner.x)) lookat=true; 
 					if ((majordirection==direction.left) && (vertices[i].x<currentcorner.x)) lookat=true;
-					if ((majordirection==direction.up) && (vertices[i].y<currentcorner.y)) lookat=true;
-					if ((majordirection==direction.down) && (vertices[i].y>currentcorner.y)) lookat=true;
-					//if ((majordirection==direction.up) && (vertices[i].y>currentcorner.y)) lookat=true; //for inverted y
-					//if ((majordirection==direction.down) && (vertices[i].y<currentcorner.y)) lookat=true; // for inverted y
+				if ((majordirection==direction.up) && (vertices[i].y>currentcorner.y)) lookat=true; //for inverted y
+					if ((majordirection==direction.down) && (vertices[i].y<currentcorner.y)) lookat=true; // for inverted y
 					
 					
 					if (lookat){ // if it is in the direction we are interested in, look at it
-						if (minordirection==direction.right) distance=0-vertices[i].x;
-						if (minordirection==direction.left) distance=vertices[i].x;
-						if (minordirection==direction.down) distance=0-vertices[i].y;
-						if (minordirection==direction.up) distance=vertices[i].y; 
-						//if (minordirection==direction.up) distance=0-vertices[i].y; // for inverted y
-						//if (minordirection==direction.down) distance=vertices[i].y; // for inverted y 
+						if (minordirection==direction.right) distance=bound.maxx-vertices[i].x;
+						if (minordirection==direction.left) distance=vertices[i].x-bound.minx;
+						if (minordirection==direction.down) distance=vertices[i].y-bound.miny;
+						if (minordirection==direction.up) distance=bound.maxy-vertices[i].y; 
 						if ((distance<mindistance) || first) { // if it is closer to the edge in the direction we are interested in (or is the first in this direction) mark it
 							first=false;
 							index=i;
@@ -387,16 +397,19 @@ public class BoundingPolygon2D {
 			if (index==-1) { // if didn't find any vertices in that direction, cycle to the next direction.
 				minordirection=majordirection;
 				majordirection=directionarray[(majordirection.ordinal()+1)%4];
+				System.out.println("No candidates found, cycling to major direction="+majordirection.name()+" minor direction="+minordirection.name());
 			}else { // otherwise add that vertex to the array, skip it next time (unless it is the first vertex) and set this corner to be the current one
 				if (vertexnumber!=0){
 					exit=(index==vertexindices[0]);
 				}
 				if (!exit){
+					System.out.println("Adding vertex "+vertexnumber+" point "+index+" found using directions major direction="+majordirection.name()+" minor direction="+minordirection.name());
 					currentcorner=vertices[index].clone();
 					vertexindices[vertexnumber]= index;
 					skip[index]=(vertexnumber!=0); // we need to keep the first vertex in play so that we can detect when to exit the loop i.e. when we have completed encircling the points and come back to the starting point. 
 					vertexnumber++;
 					exit=(vertexnumber==vertices.length);
+					
 				}
 			} // end else
 		} // end while
