@@ -84,29 +84,33 @@ public class Testing {
 	
 	public void TemporaryTestMethod(){
 		
-			Point2d[] points=new Point2d[1000];
-	
-for (int i=0;i<points.length;i++) {
-			points[i]=new Point2d(Math.random()*1000,Math.random()*1000);
-			
-		}
-	//*/	
-		//Adjust points to be image points
-		Point2d[] imagepoints=new Point2d[points.length];
+		Point2d[] points=new Point2d[10];
+		
+		/*
+		points[0]=new Point2d(88.54451423765386,771.5973217602392);
+		points[1]=new Point2d(656.6396443662753,604.0654772242204);
+		points[2]=new Point2d(375.17334550376046,826.3068089119937);
+		points[3]=new Point2d(887.0381447398563,600.8143797383319);
+		points[4]=new Point2d(54.8944992101199,882.3660233923692);
+		points[5]=new Point2d(243.38956302439075,958.8408105155207);
+		points[6]=new Point2d(506.7671947327678,203.0986636963168);
+		points[7]=new Point2d(354.18849315628944,267.7925268929795);
+		points[8]=new Point2d(523.6011914129683,406.035431835263);
+		points[9]=new Point2d(252.89111269488197,892.7801130061374);
+		*/
+		///*
 		for (int i=0;i<points.length;i++){
-			imagepoints[i]=points[i].clone();
-			//imagepoints[i].minus(new Point2d(-1,-1)); // reset origin
-			//imagepoints[i].scale(50); // scale
-			}
+			points[i]=new Point2d(Math.random()*1000,Math.random()*1000);
+			System.out.print("points["+i+"]=new Point2d");
+			points[i].print();
+			System.out.println(";");
+		}
+		//*/
+	
 		
-		DeWall2D dewall=new DeWall2D(points);
-		Triangle2D[] triangles=dewall.Triangularisation(new JProgressBar(0,1), true,"x");
-		
-		if ((dewall.IsCyclicTriangle2DCreationError()) || (triangles.length==0)) {System.out.println("Error in recursive x start, trying recursive y");triangles=dewall.Triangularisation(new JProgressBar(0,1), true,"y");}
-		if ((dewall.IsCyclicTriangle2DCreationError()) || (triangles.length==0)) {System.out.println("Error in recursive y start, trying sequential x");triangles=dewall.Triangularisation(new JProgressBar(0,1), false,"x");}
-		if ((dewall.IsCyclicTriangle2DCreationError()) || (triangles.length==0)) {System.out.println("Error in sequential x start, trying sequential y");triangles=dewall.Triangularisation(new JProgressBar(0,1), false,"y");}
-		if ((dewall.IsCyclicTriangle2DCreationError()) || (triangles.length==0)) {System.out.println("Pathological points?");}
-		else {
+		BoundingPolygon2D poly=new BoundingPolygon2D();
+		for (int x=0;x<points.length;x++){ 
+			poly.ExpandPolygon(points[x]);
 			int size=1000;
 			PixelColour[][] colour=new PixelColour[size][size];
 			for (int i=0;i<size;i++)
@@ -114,125 +118,41 @@ for (int i=0;i<points.length;i++) {
 				colour[i][j]=new PixelColour(PixelColour.StandardColours.White);
 			GraphicsFeedback graphics=new GraphicsFeedback(true);
 			graphics.ShowPixelColourArray(colour,size,size);
-			for (int i=0;i<triangles.length;i++){
-				LineSegment2D[] lines=triangles[i].GetLineSegmentFaces(imagepoints);
-				for (int j=0;j<lines.length;j++)graphics.PrintLineSegment(lines[j],new PixelColour(PixelColour.StandardColours.Blue));
+			for (int i=0;i<x;i++) {
+				boolean outside=poly.PointIsOutside(points[i]);
+				if (outside) {
+					System.out.println("Something is wrong, point "+i+" was found outside polygon "+x);
+					Point2d[] pts=poly.GetAllPointsWithinPolygon();
+					System.out.println("Total number of points="+pts.length);
+				}
 			}
 			// Points
-			for (int i=0;i<imagepoints.length;i++){
+			for (int i=0;i<points.length;i++){
 				PixelColour col=new PixelColour(PixelColour.StandardColours.Red);
-				graphics.PrintPoint(imagepoints[i].x,imagepoints[i].y,col);
+				graphics.PrintPoint(points[i].x,points[i].y,col);
 			}
-			// Seed triangle
-			for (int i=0;i<1;i++){
-				LineSegment2D[] lines=triangles[i].GetLineSegmentFaces(imagepoints);
-				for (int j=0;j<lines.length;j++)graphics.PrintLineSegment(lines[j],new PixelColour(PixelColour.StandardColours.Red));
-			}
-			String filename="/home/cshome/r/rarnott/Desktop/images/test.jpg";
-			graphics.SaveImage(filename);
-			// Now do the sanity checks
-			boolean fail=TestIntersectionofLineSegments(triangles, points);
-			fail=fail || (TestEmptyTriangles(triangles, points));
-			fail=fail || (TestPointInclusion(triangles, points.length));
-			if (fail) for (int i=0;i<points.length;i++) System.out.println("points["+i+"]=new Point2d("+points[i].x+","+points[i].y+");");
+			Point2d[] point=poly.GetAllPointsWithinPolygon();
 			
-		} // end else
-	//	} // end loop
+			for (int i=0;i<point.length;i++){
+				PixelColour col=new PixelColour(PixelColour.StandardColours.Green);
+				graphics.PrintPoint(point[i].x,point[i].y,col);
+			}
+			
+			LineSegment2D[] lines=poly.GetUnorderedBounding2DLineSegments();
+		AxisAlignedBoundingBox aabb=poly.GetAxisAlignedBoundingBox();
 		
-		
-		/*
-		Point2d[] points=new Point2d[11];
-		points[0]=new Point2d(34.97812500000012,-2.723437499999962);
-		points[1]=new Point2d(34.67812500000012,-2.723437499999962);
-		points[2]=new Point2d(34.378125000000125,-2.723437499999962);
-		points[3]=new Point2d(34.67812500000012,-2.423437499999962);
-		points[4]=new Point2d(30.77812500000014,-2.1234374999999623);
-		points[5]=new Point2d(23.578125000000124,0.5765625000000378);
-		points[6]=new Point2d(23.278125000000124,0.5765625000000378);
-		points[7]=new Point2d(23.278125000000124,0.8765625000000379);
-		points[8]=new Point2d(23.278125000000124,1.176562500000038);
-		points[9]=new Point2d(22.37812500000012,3.576562500000037);
-		points[10]=new Point2d(21.47812500000012,3.8765625000000368);
-		BoundingPolygon2D poly=new BoundingPolygon2D(points);
-		int size=1000;
-		PixelColour[][] colour=new PixelColour[size][size];
-		for (int i=0;i<size;i++)
-			for (int j=0;j<size;j++)
-				colour[i][j]=new PixelColour(PixelColour.StandardColours.White);
-		GraphicsFeedback graphics=new GraphicsFeedback(true);
-		graphics.ShowPixelColourArray(colour,size,size);
-		BoundingPolygon2D polygon=poly.clone();
-		// Need to reset the origin and re-scale this before displaying it
-		polygon.ResetOrigin(new Point2d(20,-5));
-		polygon.scale(50);
-		Point2d[] point=polygon.GetAllPointsWithinPolygon();
-		LineSegment2D[] lines=polygon.Get2DLineSegments();
-		AxisAlignedBoundingBox aabb=polygon.GetAxisAlignedBoundingBox();
-		for (int j=0;j<point.length;j++) 
-			graphics.PrintPoint(point[j].x,point[j].y,new PixelColour(PixelColour.StandardColours.Red));
-		Point2d[] temp=polygon.GetOrderedVertices();
-		graphics.PrintPoint(temp[0].x,temp[0].y,new PixelColour(PixelColour.StandardColours.Green));
-		graphics.OutlinePolygon(polygon,new PixelColour(PixelColour.StandardColours.Blue),0,0);
-		if (lines.length>0) graphics.PrintLineSegment(lines[0],new PixelColour(PixelColour.StandardColours.Green));
-		
-		graphics.PrintPoint(aabb.minx-1,aabb.miny-1,new PixelColour(PixelColour.StandardColours.Green));
+		Point2d[] temp=poly.GetOrderedVertices();
+		for (int i=0;i<temp.length;i++) graphics.PrintPoint(temp[i].x,temp[i].y,new PixelColour(PixelColour.StandardColours.Lime));
+		graphics.OutlinePolygon(poly,new PixelColour(PixelColour.StandardColours.Blue),3,3);
+		for (int i=0;i<lines.length;i++) graphics.PrintLineSegment(lines[i],new PixelColour(PixelColour.StandardColours.Green));
 		
 		graphics.PrintLineSegment(new LineSegment2D(new Point2d(aabb.minx,aabb.miny),new Point2d(aabb.minx,aabb.maxy)),new PixelColour(PixelColour.StandardColours.Purple));
 		graphics.PrintLineSegment(new LineSegment2D(new Point2d(aabb.maxx,aabb.miny),new Point2d(aabb.maxx,aabb.maxy)),new PixelColour(PixelColour.StandardColours.Purple));
 		graphics.PrintLineSegment(new LineSegment2D(new Point2d(aabb.minx,aabb.miny),new Point2d(aabb.maxx,aabb.miny)),new PixelColour(PixelColour.StandardColours.Purple));
 		graphics.PrintLineSegment(new LineSegment2D(new Point2d(aabb.minx,aabb.maxy),new Point2d(aabb.maxx,aabb.maxy)),new PixelColour(PixelColour.StandardColours.Purple));
-		
-		String filename="/home/cshome/r/rarnott/Desktop/images/test.jpg";
-		graphics.InvertImage();
+		String filename="/home/cshome/r/rarnott/Desktop/images/test"+x+".jpg";
 		graphics.SaveImage(filename);
-		/*
-		for (int i=0;i<point.length;i++){
-			graphics.ShowPixelColourArray(colour,size,size);
-				
-			Point2d[] newpoints=new Point2d[i+1];
-			for (int j=0;j<newpoints.length;j++) newpoints[j]=point[j].clone();
-			BoundingPolygon2D newpolygon=new BoundingPolygon2D(newpoints);
-			LineSegment2D[] lines=newpolygon.Get2DLineSegments();
-			
-			for (int j=0;j<point.length;j++) 
-				graphics.PrintPoint(point[j].x,point[j].y,new PixelColour(PixelColour.StandardColours.Red));
-			Point2d[] temp=newpolygon.GetOrderedVertices();
-			graphics.PrintPoint(temp[0].x,temp[0].y,new PixelColour(PixelColour.StandardColours.Green));
-			graphics.OutlinePolygon(newpolygon,new PixelColour(PixelColour.StandardColours.Blue),0,0);
-			if (lines.length>0) graphics.PrintLineSegment(lines[0],new PixelColour(PixelColour.StandardColours.Green));
-			String filename="/home/cshome/r/rarnott/Desktop/images/test"+i+".jpg";
-			graphics.SaveImage(filename);
 		}
-		for (int i=0;i<point.length;i++)
-			if (polygon.PointIsOutside(point[i])) System.out.println("Point "+i+" detected as outside");
-		
-		/*
-		graphics.OutlinePolygon(polygon,new PixelColour(PixelColour.StandardColours.Blue),0,0);
-		String filename="/home/cshome/r/rarnott/Desktop/images/test.jpg";
-		graphics.SaveImage(filename);
-		TrianglePlusVertexArray triplusvertices=polygon.ConvertToTrianglesOnZplane(0,true);
-		Point3d[] vertices=triplusvertices.GetVertexArray();
-		TriangularFace[] triangle=triplusvertices.GetTriangleArray();
-		*/
-		/*
-		for (int i=0;i<triangle.length;i++){
-			int[] v=triangle[i].GetFace();
-			Point2d a=new Point2d(vertices[v[0]].x,vertices[v[0]].y);
-			Point2d b=new Point2d(vertices[v[1]].x,vertices[v[1]].y);
-			Point2d c=new Point2d(vertices[v[2]].x,vertices[v[2]].y);
-			LineSegment2D AB=new LineSegment2D(a,b);
-			LineSegment2D AC=new LineSegment2D(a,c);
-			LineSegment2D BC=new LineSegment2D(b,c);
-			graphics.PrintLineSegment(AB,new PixelColour(PixelColour.StandardColours.Red),2,2);
-			graphics.PrintLineSegment(AC,new PixelColour(PixelColour.StandardColours.Red),2,2);
-			graphics.PrintLineSegment(BC,new PixelColour(PixelColour.StandardColours.Red),2,2);
-			String file="/home/cshome/r/rarnott/Desktop/images/test"+i+".jpg";
-			graphics.SaveImage(file);
-			graphics.PrintLineSegment(AB,new PixelColour(PixelColour.StandardColours.Green),2,2);
-			graphics.PrintLineSegment(AC,new PixelColour(PixelColour.StandardColours.Green),2,2);
-			graphics.PrintLineSegment(BC,new PixelColour(PixelColour.StandardColours.Green),2,2);
-		}
-		*/
 		System.out.println("Finished");	
 	}
 	
@@ -461,13 +381,13 @@ for (int i=0;i<points.length;i++) {
 	private static boolean TestIntersectionofLineSegments(Triangle2D[] triangles, Point2d[] PointsList){
 		boolean fail=false;
 		for (int i=0;i<triangles.length;i++){
-			LineSegment2DIndices[] lines=triangles[i].GetFaces(PointsList);
+			LineSegment2DIndices[] lines=triangles[i].GetLineSegment2DIndices(PointsList);
 			for (int j=0;j<lines.length;j++){
 				LineSegment2D line1=lines[j].ConvertToLineSegment(PointsList);
 				int[] line1indices=lines[j].GetStartAndEndPointIndices();
 				// For each other triangle 
 				for (int k=0;k<triangles.length;k++)if (i!=k) {
-					LineSegment2DIndices[] lines2=triangles[k].GetFaces(PointsList);
+					LineSegment2DIndices[] lines2=triangles[k].GetLineSegment2DIndices(PointsList);
 						
 						// For each of its lines test whether the 2 line segments intersect (aside from the end points) and aside from where one of the points is the start or end of the other line segment (in case of rounding errors
 						for (int l=0;l<lines2.length;l++){

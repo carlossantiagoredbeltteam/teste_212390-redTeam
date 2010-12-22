@@ -107,6 +107,7 @@ public class DeWall2D {
 	
 	// This method does some setting up and then calls the private DeWall method to carve the space around the points into tetrahedrons 
 	public Triangle2D[] Triangularisation(JProgressBar bar, boolean recursive,String initialplane){
+		if (PointsList.length>=3){
 		//  set the progress bar min and max
 		  bar.setMaximum(PointsList.length);
 		  bar.setMinimum(0);
@@ -120,7 +121,7 @@ public class DeWall2D {
 		CyclicTriangle2DCreation=false;
 		int initialrecursionlevel=0;
 		if (!recursive) initialrecursionlevel=maxrecurse;// Call to Sequential version of Dewall by setting the inital recursion level to the maximum 
-			dewall(indexarray, new OrderedListLineSegment2dIndices(PointsList.length),planeslice.valueOf(initialplane), bar,System.currentTimeMillis(),initialrecursionlevel);
+		dewall(indexarray, new OrderedListLineSegment2dIndices(PointsList.length),planeslice.valueOf(initialplane), bar,System.currentTimeMillis(),initialrecursionlevel);
 		bar.setValue(bar.getMaximum());
 		if (print){
 			 System.out.println("Total time:"+(System.currentTimeMillis()-starttime)+"ms  Total Triangle2Ds="+FinalTriangles.length);
@@ -132,8 +133,7 @@ public class DeWall2D {
 				System.out.println();
 			} // end for
 		} // end if printverbose
-		
-		
+		}
 		return FinalTriangles;
 	}
 	public boolean IsCyclicTriangle2DCreationError(){
@@ -192,7 +192,7 @@ public class DeWall2D {
 		// Make the first simplex using as one point the closest point to the midpoint split, and as another a point on the other side.
 			Triangle2D tri=MakeFirstSimplex(P);
 			if (!tri.isNull()) {
-				LineSegment2DIndices[] temp=tri.GetFaces(PointsList);
+				LineSegment2DIndices[] temp=tri.GetLineSegment2DIndices(PointsList);
 				for (int i=0;i<temp.length;i++) {
 					temp[i].SetHash(PointsList.length);
 					//if (i==0){ // Reverse the first line segment normal
@@ -242,7 +242,7 @@ public class DeWall2D {
 					if (valid)
 					{
 						FinalTriangles=Insert(FinalTriangles,t); // Note that this will mean we end up with a list of TriangularFaces each attached to a single tetrahedron only.
-						LineSegment2DIndices[] fdash=t.GetFaces(PointsList);
+						LineSegment2DIndices[] fdash=t.GetLineSegment2DIndices(PointsList);
 						for (int i=0;i<fdash.length;i++){
 								if (!fdash[i].LineSegmentEqual(f)){
 									// Update the correct Active Face list
@@ -326,9 +326,6 @@ public class DeWall2D {
 			returnvalue[i]=original[i].clone();
 			if (original[i].isEquivalent(addition)) {
 				CyclicTriangle2DCreation=true;
-				System.out.print("CTC error adding triangle ");
-				addition.print();
-				System.out.println();
 			}
 		}
 		returnvalue[original.length]=addition.clone();
