@@ -260,17 +260,28 @@ public class BoundingPolygon2D {
 				int next=current;
 				// We have two choices, one will walk around the polygon clockwise, the other clockwise, we want to choose the one that is clockwise.
 				// Find the angle between the points 
-				double angleto0=allpoints[current].GetAngleMeasuredClockwiseFromPositiveX(allpoints[vertexconnections[current][0]]);
-				double angleto1=allpoints[current].GetAngleMeasuredClockwiseFromPositiveX(allpoints[vertexconnections[current][1]]);
-				// The angle 0-current-1 is clockwise if angleto1 is between 0 and 180 degrees greater than angleto0
-				if (angleto0<(tau*0.5)){
-					if (angleto1>angleto0) next=vertexconnections[current][1];
-					else next=vertexconnections[current][0];
-				}
-				else { // may need to do some adjustments as angle is only measure 0-360 degrees
-					if ((angleto1>angleto0) || (angleto1<(angleto0-(tau*0.5)))) next=vertexconnections[current][1];
-					else next=vertexconnections[current][0];	
-				}
+				//double angleto0=allpoints[current].GetAngleMeasuredClockwiseFromPositiveX(allpoints[vertexconnections[current][0]]);
+				//double angleto1=allpoints[current].GetAngleMeasuredClockwiseFromPositiveX(allpoints[vertexconnections[current][1]]);
+				// The angle 0->current->1 is clockwise if angleto1 is between 0 and 180 degrees greater than angleto0
+				//if (angleto0<(tau*0.5)){
+				//	if ((angleto1>angleto0) && (angleto1<(angleto0+(tau*0.5)))) next=vertexconnections[current][1];
+				//	else next=vertexconnections[current][0];
+				//}
+				//else { // may need to do some adjustments as angle is only measure 0-360 degrees
+				//	if ((angleto1>angleto0) || (angleto1<(angleto0-(tau*0.5)))) next=vertexconnections[current][1];
+				//	else next=vertexconnections[current][0];	
+				//}
+				// Alternatively,
+				// Logic taken from http://www.gamedev.net/reference/articles/article425.asp
+				// if the determinant is less than 0 then the points are ordered clockwise
+				Point2d a=allpoints[vertexconnections[current][0]].clone();
+				Point2d b=allpoints[current].clone();
+				Point2d c=allpoints[vertexconnections[current][1]].clone();
+				
+				double determ = ((b.x-a.x)*(c.y-a.y))-((c.x-a.x)*(b.y-a.y));
+				if (determ<0) next=vertexconnections[current][1];
+				else next=vertexconnections[current][0];
+				
 				current=-1;
 				while (current!=first){
 					current=next;
