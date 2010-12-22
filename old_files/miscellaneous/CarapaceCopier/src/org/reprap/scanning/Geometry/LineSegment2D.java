@@ -24,7 +24,7 @@ package org.reprap.scanning.Geometry;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 21st December 2010
+ * Last modified by Reece Arnott 22nd December 2010
  *
  *****************************************************************************/
 
@@ -109,8 +109,8 @@ public class LineSegment2D {
 		double denominator=((other.end.y-other.start.y)*(end.x-start.x))-((other.end.x-other.start.x)*(end.y-start.y));
 		if (denominator!=0){		//if the denominator is zero the two lines are parallel
 			double numeratora=((other.end.x-other.start.x)*(start.y-other.start.y))-((other.end.y-other.start.y)*(start.x-other.start.x));
-			double numeratorb=((end.x-start.x)*(start.y-other.start.y))-((end.y-start.y)*(start.x-other.start.x));
 			double ua=numeratora/denominator;
+			//double numeratorb=((end.x-start.x)*(start.y-other.start.y))-((end.y-start.y)*(start.x-other.start.x));
 			//double ub=numeratorb/denominator;
 			returnvalue=GetPointOnLine(ua);
 		}

@@ -41,14 +41,14 @@ public class QuickSortPoints2D {
 	
 	public int[] Sortby(char coordinate,int[] subsetofindexes){
 		
-		boolean Y=((coordinate==new String("y").charAt(0)) || (coordinate==new String("Y").charAt(0)));
-		return Sort(subsetofindexes,Y);
+		boolean X=((coordinate==new String("x").charAt(0)) || (coordinate==new String("X").charAt(0)));
+		return Sort(subsetofindexes,X);
 	}
 	public int[] SortbyX(int[] subsetofindexes){
-		return Sort(subsetofindexes,false);
+		return Sort(subsetofindexes,true);
 	}
 	public int[] SortbyY(int[] subsetofindexes){
-		return Sort(subsetofindexes,true);
+		return Sort(subsetofindexes,false);
 	}
 	public int[] SortbyX(){
 		indexarray=new int[pointsarray.length];

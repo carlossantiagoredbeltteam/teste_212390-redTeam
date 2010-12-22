@@ -24,7 +24,7 @@ package org.reprap.scanning.DataStructures;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 21st December 2010
+* Last modified by Reece Arnott 22nd December 2010
 *
 *	This class stores an array of line segments which can be accessed in an ordered way (ordered by a hashvalue) 
 *	This was a copy of the OrderedListTriangle3D as at 21st Decemeber with the only changes a search and replace from Triangle3D to LineSegment2DIndices
@@ -155,14 +155,7 @@ public class OrderedListLineSegment2dIndices {
 		
 	}
 	
-	public LineSegment2DIndices GetTetrahedron(LineSegment2DIndices candidate){
-		LineSegment2DIndices returnvalue=candidate.clone();
-		candidate.SetHash(n);
-		int index=Find(candidate.hashvalue);
-		if (index!=-1) returnvalue=list[index].clone();
-		return returnvalue;
-	}
-	
+
 	
 	public LineSegment2DIndices[] GetFullUnorderedList(){
 		return list;
@@ -203,16 +196,18 @@ public class OrderedListLineSegment2dIndices {
 		return returnvalue;
 		
 	}
+	// Note that this doesn't sanity check to see that the index is in range.
 	private void DeleteEntry(int index, boolean changeinsertionorderarray){
 		// First go through the insertionorder array and take out the entry if requested 
 		if (changeinsertionorderarray){
 			int numberofmatches=0;
-			for (int i=0;i<insertionorder.length;i++)if (insertionorder[i]==index) numberofmatches++;
+			long hashtomatch=list[index].hashvalue;
+			for (int i=0;i<insertionorder.length;i++)if (insertionorder[i]==hashtomatch) numberofmatches++;
 			if (numberofmatches!=0){
 				long[] newinsertionarray=new long[insertionorder.length-numberofmatches];
 				int j=0;
 				for (int i=0;i<insertionorder.length;i++){
-					if (insertionorder[i]!=index){
+					if (insertionorder[i]!=hashtomatch){
 						newinsertionarray[j]=insertionorder[i];
 						j++;
 					} // end if
@@ -229,4 +224,26 @@ public class OrderedListLineSegment2dIndices {
 		}
 		list=returnvalue.clone();
 	}
+	
+	public void PrintFIFO(){
+		if (insertionorder.length!=0)
+		{
+			int i=0;
+			int index=-1;
+			while (i<insertionorder.length) {
+				index=Exists(insertionorder[i]);
+				if (index!=-1){
+					// There is a valid hash in the array
+					LineSegment2DIndices f=list[index].clone();
+					System.out.print(i+" "+insertionorder[i]+": ");
+					f.print();
+				} // end if
+				else System.out.print(i+" "+insertionorder[i]+" ");
+				if (nextFIFO==i) System.out.print("  <=====");
+				System.out.println();
+				i++;
+			} // end while
+		} // end if
+	}
+	
 } // end of class

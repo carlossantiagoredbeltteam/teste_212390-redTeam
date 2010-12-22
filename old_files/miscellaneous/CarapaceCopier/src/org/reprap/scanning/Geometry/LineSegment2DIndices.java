@@ -24,7 +24,7 @@ package org.reprap.scanning.Geometry;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 21st December 2010
+* Last modified by Reece Arnott 22nd December 2010
 *
 *	This class stores a 2d line segment face which may be part of 0,1 or 2 triangles.
 *	with the start and end points simple indexes to a Point2d array.
@@ -100,8 +100,8 @@ public class LineSegment2DIndices {
 	}
 		
 	
-	public int[] GetFace(){
-		int[] returnvalue=new int[3];
+	public int[] GetStartAndEndPointIndices(){
+		int[] returnvalue=new int[2];
 		returnvalue[0]=a;
 		returnvalue[1]=b;
 		return returnvalue;
@@ -127,6 +127,13 @@ public class LineSegment2DIndices {
 				normal.scale(-1);
 				normaldota=normal.dot(p[a]);
 			}
+	}
+	
+	public void FlipNormal(Point2d[] p){
+		// flip the normal
+		normal.scale(-1);
+		normaldota=normal.dot(p[a]);
+	
 	}
 	
 	public void print(){

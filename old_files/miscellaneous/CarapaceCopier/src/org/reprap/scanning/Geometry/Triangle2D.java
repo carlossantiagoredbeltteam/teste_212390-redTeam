@@ -23,7 +23,7 @@ package org.reprap.scanning.Geometry;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 21st December 2010
+* Last modified by Reece Arnott 22nd December 2010
 *
 *	This class stores a single triangle where the points a,b,c are simple indexes to a Point2d array.
 * 
@@ -55,7 +55,7 @@ public class Triangle2D {
 	
 	public LineSegment2DIndices[] GetFaces(Point2d[] p){
 		LineSegment2DIndices[] returnvalue=new LineSegment2DIndices[3];
-			int[] ab=linesegment.GetFace();
+			int[] ab=linesegment.GetStartAndEndPointIndices();
 			int a=ab[0];
 			int b=ab[1];
 			
@@ -64,17 +64,24 @@ public class Triangle2D {
 				returnvalue[0]=new LineSegment2DIndices(a,b,p); returnvalue[0].CalculateNormalAwayFromPoint(p, p[c]);
 				// This returns faces so that a normal calculated for each face will all point out of original triangle
 				returnvalue[1]=new LineSegment2DIndices(a,c,p);returnvalue[1].CalculateNormalAwayFromPoint(p, p[b]);
-				returnvalue[3]=new LineSegment2DIndices(b,c,p);returnvalue[3].CalculateNormalAwayFromPoint(p, p[a]);
+				returnvalue[2]=new LineSegment2DIndices(b,c,p);returnvalue[2].CalculateNormalAwayFromPoint(p, p[a]);
 				
 			}
 			else returnvalue=new LineSegment2DIndices[0];
 		return returnvalue;
 		}
+	public LineSegment2D[] GetLineSegmentFaces(Point2d[] p){
+		LineSegment2DIndices[] lines=GetFaces(p);
+		LineSegment2D[] returnvalue=new LineSegment2D[lines.length];
+		for (int i=0;i<lines.length;i++) returnvalue[i]=lines[i].ConvertToLineSegment(p);
+		
+		return returnvalue;
+	}
 	public int[] GetVertices(){
 		// Note that the order of the vertices is such that each vertex returned is the one not used in triangle returned by the GetFaces method for the same array index
 		int[] returnvalue=new int[3];
 		if (c>=0) {
-			int[] abc=linesegment.GetFace();
+			int[] abc=linesegment.GetStartAndEndPointIndices();
 			int a=abc[0];
 			int b=abc[1];
 			returnvalue[0]=c;
@@ -97,7 +104,7 @@ public class Triangle2D {
 			boolean returnvalue=true;
 			for (int j=0;j<othervertices.length;j++) if (returnvalue){
 				int i=othervertices[j];
-				returnvalue=((thisvertices[0]==i) || (thisvertices[1]==i) || (thisvertices[2]==i) || (thisvertices[3]==i));
+				returnvalue=((thisvertices[0]==i) || (thisvertices[1]==i) || (thisvertices[2]==i));
 			}
 			return returnvalue;
 		}
