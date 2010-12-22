@@ -53,7 +53,7 @@ public class Triangle2D {
 	}
 	public boolean isNull(){return c==-1;}
 	
-	public LineSegment2DIndices[] GetFaces(Point2d[] p){
+	public LineSegment2DIndices[] GetLineSegment2DIndices(Point2d[] p){
 		LineSegment2DIndices[] returnvalue=new LineSegment2DIndices[3];
 			int[] ab=linesegment.GetStartAndEndPointIndices();
 			int a=ab[0];
@@ -71,7 +71,7 @@ public class Triangle2D {
 		return returnvalue;
 		}
 	public LineSegment2D[] GetLineSegmentFaces(Point2d[] p){
-		LineSegment2DIndices[] lines=GetFaces(p);
+		LineSegment2DIndices[] lines=GetLineSegment2DIndices(p);
 		LineSegment2D[] returnvalue=new LineSegment2D[lines.length];
 		for (int i=0;i<lines.length;i++) returnvalue[i]=lines[i].ConvertToLineSegment(p);
 		

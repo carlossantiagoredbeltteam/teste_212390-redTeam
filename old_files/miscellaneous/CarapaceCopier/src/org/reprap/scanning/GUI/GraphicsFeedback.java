@@ -146,7 +146,7 @@ public class GraphicsFeedback {
 		} // end for y
 	}
 	public void ShowPixelColourArray(PixelColour[][] map, int w, int h){
-			GLimage=new byte[(h+1)*(w+1)*numcolours];
+		GLimage=new byte[(h+1)*(w+1)*numcolours];
 			imagewidth=w;
 			imageheight=h;
 			int tempindex,index;
@@ -189,7 +189,7 @@ public class GraphicsFeedback {
 	}
 	public void OutlinePolygon(BoundingPolygon2D polygon,PixelColour colour){OutlinePolygon(polygon,colour,2,2);}
 	public void OutlinePolygon(BoundingPolygon2D polygon,PixelColour colour,int w,int h){
-		LineSegment2D[] lines=polygon.Get2DLineSegments();
+		LineSegment2D[] lines=polygon.GetUnorderedBounding2DLineSegments();
 		for (int i=0;i<lines.length;i++) PrintLineSegment(lines[i],colour,w,h);
 	}
 	

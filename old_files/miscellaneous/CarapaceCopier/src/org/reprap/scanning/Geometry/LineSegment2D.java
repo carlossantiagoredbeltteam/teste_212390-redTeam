@@ -58,6 +58,13 @@ public class LineSegment2D {
 		}
 		return returnvalue;
 	}
+	
+	public Line3d ConvertTo3DLine(double zvalue){
+		Point3d start3d=new Point3d(start.x,start.y,zvalue);
+		Point3d end3d=new Point3d(end.x,end.y,zvalue);
+		return new Line3d(start3d,end3d);
+	}
+	
 	public Point2d GetPointOnLine(double U){
 		// The line can be described as start+U(end-start)
 		Point2d vector=end.minusEquals(start);

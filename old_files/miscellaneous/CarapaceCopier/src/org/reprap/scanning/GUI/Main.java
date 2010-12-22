@@ -126,7 +126,7 @@ public class Main extends JFrame {
    //  private final boolean allsameresonsamecamera=false; // TODO - this should eventually be in the GUI as a tickbox and saved as part of the MainPreferences. Note that it also assumes that the image resolutions are the same for the calculation of the principal point etc.  
  //  private final int maxiterations=0;// TODO - this should eventually be added to the GUI and/or as part of the MainPreferences if it is used
 	
-	private boolean print=true; // Just for testing purposes
+	private boolean print=false; // Just for testing purposes
     
     // This defines how many chunks the shared second progress bar is broken up into for the 3 steps it is shared with
 	 private final static int calibrationsheetinterrogationnumberofsteps=1;
@@ -139,8 +139,8 @@ public class Main extends JFrame {
  *  
  */ 
 
-   //public static enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration,objectfindingvoxelisation,texturematching,writetofile,end};
-    public static enum steps {calibrationsheet,test,end};
+   public static enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration,objectfindingvoxelisation,texturematching,writetofile,end};
+   // public static enum steps {calibrationsheet,test,end};
     private final static steps stepsarray[]=steps.values();
     private static steps laststep = steps.valueOf("end");
     private static steps firststep = steps.valueOf("calibrationsheet");
@@ -249,7 +249,6 @@ public class Main extends JFrame {
 				case calibrationsheet : 
 					if ((prefs.SkipStep[currentstep.ordinal()]) && (prefs.calibrationpatterns.getSize()!=0)) setStep(stepsarray[currentstep.ordinal()+1]);
 					else ChooseCalibrationSheet(); break;
-			/*
 				case fileio :
 					if ((prefs.SkipStep[currentstep.ordinal()]) && (prefs.imagefiles.getSize()!=0)) setStep(stepsarray[currentstep.ordinal()+1]);
 					else ChooseImagesAndOutputFile(); break;
@@ -273,8 +272,7 @@ public class Main extends JFrame {
 					OutputSTLFile(); 
 					GraphicsFeedback(); // image feedback if the debug options are set
  					 break;
- 				//	 */	
-					case test: Test();break;
+ 				//	case test: Test();break;
  				
  				case end : end(); break;
 				}
@@ -1371,7 +1369,9 @@ private void FindCalibrationSheetCirclesEtc(){
 												// Set to be skipped to save time if this is not the last sweep
 												skip[xindex][yindex]=false;
 												// Add to the bounding polygon
-												boundingpolygon[zindex].ExpandPolygon(new Point2d(x,y));
+												// Note the random amount added to get around the problem the DeWall triangulation algorithm has with co-circular points
+												Point2d pt=new Point2d(x+(Math.random()*xstep*0.5),y+(Math.random()*ystep*0.5));
+												boundingpolygon[zindex].ExpandPolygon(pt);
 												// 3) reset binary pixel in each contributing image so this pixel is not used in successive runs through the loop if similar enough
 												for (int j=0;j<index;j++){
 													int i=cameras[j];
@@ -1397,42 +1397,7 @@ private void FindCalibrationSheetCirclesEtc(){
 						polygon.scale(1/prefs.AlgorithmSettingSurfacePointTextureResolutionmm);
 						graphics.OutlinePolygon(polygon,new PixelColour(PixelColour.StandardColours.Blue),0,0);
 						String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"SurfaceTextureMatchImageForZ="+String.valueOf(z)+"-"+directionofsweep+".jpg";
-						//graphics.SaveImage(filename);
-						
-						boolean selfintersect=boundingpolygon[zindex].isSelfIntersectingPolygon();
-						System.out.println("Self Intersecting test for "+zindex+" (z="+z+") shows "+selfintersect);
-						//if (!selfintersect){
-						// Test that none of the points are outside the polygon
-						Point2d[] points=boundingpolygon[zindex].GetAllPointsWithinPolygon();
-						Point2d[] vertices=boundingpolygon[zindex].GetOrderedVertices();
-						boolean outside=false;
-						int numberofvertices=0;
-						for (int i=0;i<points.length;i++){ 
-							boolean vertex=false;
-							for (int j=0;j<vertices.length;j++) if (points[i].isEqual(vertices[j])) vertex=true; 
-							if (vertex) {numberofvertices++;}
-							else 
-							if (boundingpolygon[zindex].PointIsOutside(points[i])) outside=true;
-						}
-						if (numberofvertices!=vertices.length) {
-							System.out.println("Error: Number of vertices in polygon is "+vertices.length+" but number of vertices detected in all points is "+numberofvertices);
-							for (int i=0;i<points.length;i++)points[i].print();
-							System.out.println();
-							for (int i=0;i<vertices.length;i++)vertices[i].print();
-							System.out.println();
-						}
-						if (outside) {
-							System.out.println("Error: Point(s) are outside triangulated polygon");
-							for (int i=0;i<points.length;i++){
-							System.out.print("points["+i+"]=new Point2d");
-							points[i].print();
-							System.out.println(";");
-							}
-						}
-					
-						
-						
-					
+						graphics.SaveImage(filename);
 					}
 					if (zdir>0){ // only add triangles on the last sweep upwards.
 						TrianglePlusVertexArray triplusvertex=boundingpolygon[zindex].ExtrudeTo3DAndConvertToTriangles(zstep,z+(zstep/2));
