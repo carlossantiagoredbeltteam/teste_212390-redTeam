@@ -23,7 +23,7 @@ package org.reprap.scanning.GUI;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 17th December 2010
+ * Last modified by Reece Arnott 22nd December 2010
  * 
  * This is test code used to test the success of the combinatorial approach to point matching on different combinations/permutations of found points on a calibration sheet
  *
@@ -48,10 +48,9 @@ package org.reprap.scanning.GUI;
  * 
  * 
  *******************************************************************************/  
-import java.io.File;
 
 import org.reprap.scanning.Calibration.CalibrateImage;
-import org.reprap.scanning.FeatureExtraction.PointPairMatch;
+import org.reprap.scanning.FeatureExtraction.*;
 import org.reprap.scanning.Geometry.*;
 import org.reprap.scanning.DataStructures.*;
 import javax.swing.JProgressBar;
@@ -84,6 +83,64 @@ public class Testing {
 		}
 	
 	public void TemporaryTestMethod(){
+		
+			Point2d[] points=new Point2d[1000];
+	
+for (int i=0;i<points.length;i++) {
+			points[i]=new Point2d(Math.random()*1000,Math.random()*1000);
+			
+		}
+	//*/	
+		//Adjust points to be image points
+		Point2d[] imagepoints=new Point2d[points.length];
+		for (int i=0;i<points.length;i++){
+			imagepoints[i]=points[i].clone();
+			//imagepoints[i].minus(new Point2d(-1,-1)); // reset origin
+			//imagepoints[i].scale(50); // scale
+			}
+		
+		DeWall2D dewall=new DeWall2D(points);
+		Triangle2D[] triangles=dewall.Triangularisation(new JProgressBar(0,1), true,"x");
+		
+		if ((dewall.IsCyclicTriangle2DCreationError()) || (triangles.length==0)) {System.out.println("Error in recursive x start, trying recursive y");triangles=dewall.Triangularisation(new JProgressBar(0,1), true,"y");}
+		if ((dewall.IsCyclicTriangle2DCreationError()) || (triangles.length==0)) {System.out.println("Error in recursive y start, trying sequential x");triangles=dewall.Triangularisation(new JProgressBar(0,1), false,"x");}
+		if ((dewall.IsCyclicTriangle2DCreationError()) || (triangles.length==0)) {System.out.println("Error in sequential x start, trying sequential y");triangles=dewall.Triangularisation(new JProgressBar(0,1), false,"y");}
+		if ((dewall.IsCyclicTriangle2DCreationError()) || (triangles.length==0)) {System.out.println("Pathological points?");}
+		else {
+			int size=1000;
+			PixelColour[][] colour=new PixelColour[size][size];
+			for (int i=0;i<size;i++)
+				for (int j=0;j<size;j++)
+				colour[i][j]=new PixelColour(PixelColour.StandardColours.White);
+			GraphicsFeedback graphics=new GraphicsFeedback(true);
+			graphics.ShowPixelColourArray(colour,size,size);
+			for (int i=0;i<triangles.length;i++){
+				LineSegment2D[] lines=triangles[i].GetLineSegmentFaces(imagepoints);
+				for (int j=0;j<lines.length;j++)graphics.PrintLineSegment(lines[j],new PixelColour(PixelColour.StandardColours.Blue));
+			}
+			// Points
+			for (int i=0;i<imagepoints.length;i++){
+				PixelColour col=new PixelColour(PixelColour.StandardColours.Red);
+				graphics.PrintPoint(imagepoints[i].x,imagepoints[i].y,col);
+			}
+			// Seed triangle
+			for (int i=0;i<1;i++){
+				LineSegment2D[] lines=triangles[i].GetLineSegmentFaces(imagepoints);
+				for (int j=0;j<lines.length;j++)graphics.PrintLineSegment(lines[j],new PixelColour(PixelColour.StandardColours.Red));
+			}
+			String filename="/home/cshome/r/rarnott/Desktop/images/test.jpg";
+			graphics.SaveImage(filename);
+			// Now do the sanity checks
+			boolean fail=TestIntersectionofLineSegments(triangles, points);
+			fail=fail || (TestEmptyTriangles(triangles, points));
+			fail=fail || (TestPointInclusion(triangles, points.length));
+			if (fail) for (int i=0;i<points.length;i++) System.out.println("points["+i+"]=new Point2d("+points[i].x+","+points[i].y+");");
+			
+		} // end else
+	//	} // end loop
+		
+		
+		/*
 		Point2d[] points=new Point2d[11];
 		points[0]=new Point2d(34.97812500000012,-2.723437499999962);
 		points[1]=new Point2d(34.67812500000012,-2.723437499999962);
@@ -97,7 +154,6 @@ public class Testing {
 		points[9]=new Point2d(22.37812500000012,3.576562500000037);
 		points[10]=new Point2d(21.47812500000012,3.8765625000000368);
 		BoundingPolygon2D poly=new BoundingPolygon2D(points);
-		
 		int size=1000;
 		PixelColour[][] colour=new PixelColour[size][size];
 		for (int i=0;i<size;i++)
@@ -402,4 +458,76 @@ public class Testing {
 		Point2d imagepoint=new Point2d(H.times(newpoint));
 		return imagepoint;
 	}
+	private static boolean TestIntersectionofLineSegments(Triangle2D[] triangles, Point2d[] PointsList){
+		boolean fail=false;
+		for (int i=0;i<triangles.length;i++){
+			LineSegment2DIndices[] lines=triangles[i].GetFaces(PointsList);
+			for (int j=0;j<lines.length;j++){
+				LineSegment2D line1=lines[j].ConvertToLineSegment(PointsList);
+				int[] line1indices=lines[j].GetStartAndEndPointIndices();
+				// For each other triangle 
+				for (int k=0;k<triangles.length;k++)if (i!=k) {
+					LineSegment2DIndices[] lines2=triangles[k].GetFaces(PointsList);
+						
+						// For each of its lines test whether the 2 line segments intersect (aside from the end points) and aside from where one of the points is the start or end of the other line segment (in case of rounding errors
+						for (int l=0;l<lines2.length;l++){
+							if (!((lines2[l].IncludesPoint(line1indices[0])) || (lines2[l].IncludesPoint(line1indices[1])))){
+								Point2d intersect=line1.SingleIntersectionPointBetweenStartAndEndExclusive(lines2[l].ConvertToLineSegment(PointsList));
+								if (!intersect.isEqual(line1.start)){
+									fail=true;
+									System.out.println("Intersecting line segments for triangles "+j+" and "+k);
+								} // end if intersection
+							} // end if not include end points
+						}// end for l
+				} // end for k
+			} // end for j
+		} // end for i
+	return fail;	
+	}
+	
+	private static boolean TestEmptyTriangles(Triangle2D[] triangles,Point2d[] PointsList){
+		boolean fail=false;
+		// This is to be called once the points have been turned into triangles and is just used to test whether the result is valid
+		// which in this case means that no points are inside any triangles
+		// Its not efficient but is written so can be easily checked for bugs
+		for (int i=0;i<triangles.length;i++){
+			// Get the vertices of the triangle
+			int[] vertices=triangles[i].GetVertices();
+			Point2d[] vertexpoints=new Point2d[3];
+			for (int j=0;j<3;j++) vertexpoints[j]=PointsList[vertices[j]].clone();
+			Coordinates test=new Coordinates(3);
+			// Test all points not in the triangle vertices
+			for (int j=0;j<PointsList.length;j++){
+					if ((j!=vertices[0]) && (j!=vertices[1]) && (j!=vertices[2])){
+						test.pixel=PointsList[j].clone();
+						test.calculatebary(vertexpoints);
+						if (!test.isOutside()){
+							fail=true;
+							System.out.println("Point "+j+" is inside triangle "+i);
+						}
+					}
+				} // end for j
+		} // end for i
+		return fail;
+	} // end method
+	
+	private static boolean TestPointInclusion(Triangle2D[] triangles, int numberofpoints){
+		// Test all points have been included in at least one triangle 
+		// Could use boolean but using an int count in case want to expand to output how often a point is used as a vertex etc. 
+		// Its not efficient but is written so can be easily checked for bugs
+		
+		boolean fail=false;
+		int[] PointUsageCount=new int[numberofpoints];
+		for (int i=0;i<PointUsageCount.length;i++) PointUsageCount[i]=0;
+		for (int i=0;i<triangles.length;i++){
+			int[] vertices=triangles[i].GetVertices();
+			for (int j=0;j<vertices.length;j++) PointUsageCount[vertices[j]]++;
+		}
+		for (int i=0;i<PointUsageCount.length;i++)
+			if (PointUsageCount[i]==0) {System.out.println("Point "+i+" not included in any tetrahedron"); fail=true;}
+		return fail;
+	} // end of method
+	
+
+	
 }

@@ -25,7 +25,7 @@ package org.reprap.scanning.FeatureExtraction;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 21st December 2010
+* Last modified by Reece Arnott 22nd December 2010
 * 
 * Note that this breaks down if the first simplex made is made from 4 points in a plane or there are 5 points that are co-circular including the initial point so when this is called
 * from the Main class the original simplex seed point is chosen as the midpoint in the array first by ordering the list based on x values, then if that doesn't work, by y and finally z. 
@@ -73,7 +73,6 @@ public class DeWall3D {
 	// These just for testing
 	public static boolean printverbose=false;
 	public static boolean print=false;
-	public static boolean test=false;
 	
 	public int maxrecurse=21; // Once the maximum recursion level is reached the recursion stops and the algorithm reverts to a sequential form by having the Categorise method always returning 0. Given that is assumed a maximum of 2^21 points will be used (due to the way the TriangularFace hashvalue is calculated) it doesn't make sense to set a recursion level greater than 21.  
 	public int minpoints=100; // If the number of points to be processed by DeWall is less than this, recursion stops by having the recursionlevel set to maxrecurse
@@ -175,7 +174,7 @@ public class DeWall3D {
 		} // end for
 		
 	//  Wall Construction 
-	if ((AFL.getLength()==0) && (recursionlevel==1)){
+	if (AFL.getLength()==0){
 		// Make the first simplex using as one point the closest point to the midpoint split, and as another a point on the other side.
 			Tetrahedron tetra=MakeFirstSimplex(P);
 			if (!tetra.isNull()) {

@@ -34,8 +34,6 @@ package org.reprap.scanning.DataStructures;
 
 import org.reprap.scanning.Geometry.Point2d;
 import org.reprap.scanning.Geometry.AxisAlignedBoundingBox;
-import org.reprap.scanning.Geometry.Point3d;
-import org.reprap.scanning.Geometry.Triangle3D;
 
 public class Uniform2DGrid{
 	public Uniform2DGridCell[][] Grid;
@@ -63,7 +61,7 @@ public class Uniform2DGrid{
 			Grid[0][0].pointslist=new int[p.length];
 			marked=new boolean[1][1];
 			marked[0][0]=(Grid[0][0].GetLength()==0);
-			for (int i=0;i<p.length;i++) Grid[0][0].pointslist[i]=i;
+			Grid[0][0].pointslist=subsetindexes.clone();
 			
 		}
 		else {
@@ -75,10 +73,10 @@ public class Uniform2DGrid{
 					boundary.miny=p[subsetindexes[0]].y;
 					boundary.minz=0;
 					boundary.maxx=p[subsetindexes[0]].x;
-					boundary.maxy=p[subsetindexes[i]].y;
+					boundary.maxy=p[subsetindexes[0]].y;
 					boundary.maxz=0;
 				}
-				else boundary.Expand2DBoundingBox(p[i]);if (p[i].x<boundary.minx) boundary.minx=p[i].x;
+				else boundary.Expand2DBoundingBox(p[subsetindexes[i]]);
 					
 			}
 			// Now divide up the space into 2d cells
@@ -103,7 +101,7 @@ public class Uniform2DGrid{
 			for (int i=0;i<subsetindexes.length;i++){
 				int x=(int)((p[subsetindexes[i]].x-boundary.minx)/side);
 					int y=(int)((p[subsetindexes[i]].y-boundary.miny)/side);
-					Grid[x][y].Add(i);
+					Grid[x][y].Add(subsetindexes[i]);
 				}
 			// Create and set the marked array
 			marked=new boolean[arraysizex][arraysizey];

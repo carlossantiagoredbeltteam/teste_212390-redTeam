@@ -25,7 +25,7 @@ package org.reprap.scanning.FeatureExtraction;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 21st December 2010
+* Last modified by Reece Arnott 22nd December 2010
 *
 * This was originally a copy of the DeWall3D class as at 21st Decemeber 2010 and is changed to find 2d line segments and triangles rather than 3d triangles and tetrahedrons
 * 
@@ -64,20 +64,17 @@ import org.reprap.scanning.DataStructures.Uniform2DGrid;
 import org.reprap.scanning.DataStructures.OrderedListLineSegment2dIndices;
 import org.reprap.scanning.Geometry.AxisAlignedBoundingBox;
 import org.reprap.scanning.Geometry.LineSegment2D;
-import org.reprap.scanning.Geometry.Plane;
 import org.reprap.scanning.Geometry.Point2d;
-import org.reprap.scanning.Geometry.Tetrahedron;
 import org.reprap.scanning.Geometry.Triangle2D;
 import org.reprap.scanning.Geometry.LineSegment2DIndices;
-import org.reprap.scanning.Geometry.Triangle3D;
 public class DeWall2D {
 	
 	public enum planeslice {x,y};
 	public enum searching {oneradius,tworadii,currentminimumradius,all,exit}; // just for readability in the MakeSimplex method
 	// These just for testing
+	public static boolean printdebugging=false;
 	public static boolean printverbose=false;
 	public static boolean print=false;
-	public static boolean test=false;
 	
 	public int maxrecurse=21; // Once the maximum recursion level is reached the recursion stops and the algorithm reverts to a sequential form by having the Categorise method always returning 0. Given that is assumed a maximum of 2^21 points will be used (due to the way the TriangularFace hashvalue is calculated) it doesn't make sense to set a recursion level greater than 21.  
 	public int minpoints=100; // If the number of points to be processed by DeWall is less than this, recursion stops by having the recursionlevel set to maxrecurse
@@ -130,7 +127,7 @@ public class DeWall2D {
 		 }
 		if (printverbose){
 			for (int i=0;i<FinalTriangles.length;i++){
-				System.out.print(i);
+				System.out.print(i+" ");
 				FinalTriangles[i].print();
 				System.out.println();
 			} // end for
@@ -153,15 +150,17 @@ public class DeWall2D {
 	private void dewall(int[] P, OrderedListLineSegment2dIndices AFL, planeslice currentplaneslice,JProgressBar bar, long lastprogressupdate,int recursionlevel){
 		recursionlevel++;
 		if (P.length<minpoints) recursionlevel=maxrecurse; 
+		
 		//Initialise the arrays we'll be using to be empty and calculate a splitting plane for the point array P
 		OrderedListLineSegment2dIndices AFLalpha=new OrderedListLineSegment2dIndices(PointsList.length);
 		OrderedListLineSegment2dIndices AFL1=new OrderedListLineSegment2dIndices(PointsList.length);
 		OrderedListLineSegment2dIndices AFL2=new OrderedListLineSegment2dIndices(PointsList.length);
+		
 		// Set up the Uniform Grid
 		Uniform2DGrid UG=new Uniform2DGrid(PointsList, P, (int)(UGScale*P.length));
+		
 		// Sort the list based on the direction of the currentplaneslice 
 		P=qsort.Sortby(currentplaneslice.toString().charAt(0),P);
-			
 		// Partition the point array P into two other point arrays based on the splitting plane
 		// Note that in the case where there is an odd number of elements the right hand array (P2) will be one larger than the left (P1)
 		// Because of the way the rest of this works there shouldn't be only a couple of elements in the array so don't need to test for midpoint-1<0
@@ -178,23 +177,36 @@ public class DeWall2D {
 			if (i<midpoint) P1[i]=P[i];
 			else P2[i-midpoint]=P[i];
 		} // end for
+		if (printdebugging) {System.out.println("Recursion level "+recursionlevel+". Splitting points array of length "+P.length+" into arrays of length "+P1.length+" and "+P2.length);
 		
+		System.out.println("Split plane "+currentplaneslice.toString()+" "+splitplanecoordinate);
+		System.out.println("P1");
+		for (int i=0;i<P1.length;i++) {System.out.print(i+" "+P1[i]+" ");PointsList[P1[i]].print();System.out.println();}
+		System.out.println("P2");
+		for (int i=0;i<P2.length;i++) {System.out.print(i+" "+P2[i]+" ");PointsList[P2[i]].print();System.out.println();}
+		System.out.println("P");
+		for (int i=0;i<P.length;i++) {System.out.print(i+" "+P[i]+" ");PointsList[P[i]].print();System.out.println();}
+		}
 	//  Wall Construction 
-	if ((AFL.getLength()==0) && (recursionlevel==1)){
+	if (AFL.getLength()==0){
 		// Make the first simplex using as one point the closest point to the midpoint split, and as another a point on the other side.
 			Triangle2D tri=MakeFirstSimplex(P);
 			if (!tri.isNull()) {
 				LineSegment2DIndices[] temp=tri.GetFaces(PointsList);
 				for (int i=0;i<temp.length;i++) {
-					if (i==0){ // Reverse the first line segment
-						int[] v=temp[i].GetFace();
-						LineSegment2DIndices t=new LineSegment2DIndices(v[1],v[0],PointsList);
-						int[] oppositevertices=tri.GetVertices();
-						t.CalculateNormalAwayFromPoint(PointsList,PointsList[oppositevertices[i]]);
-						t.SetHash(PointsList.length);
-						AFL.InsertIfNotExist(t);
-					}
-					else AFL.InsertIfNotExist(temp[i]);
+					temp[i].SetHash(PointsList.length);
+					//if (i==0){ // Reverse the first line segment normal
+						//temp[0].FlipNormal(PointsList);
+						//int[] v=temp[0].GetFace();
+						//LineSegment2DIndices t=new LineSegment2DIndices(v[1],v[0],PointsList);
+						//int[] oppositevertices=tri.GetVertices();
+						//t.CalculateNormalAwayFromPoint(PointsList,PointsList[oppositevertices[0]]);
+						//t.SetHash(PointsList.length);
+						//AFL.InsertIfNotExist(t);
+					//	AFL.InsertIfNotExist(temp[0]);
+					//}
+					//else 
+					AFL.InsertIfNotExist(temp[i]);
 				}
 				FinalTriangles=new Triangle2D[1];
 				FinalTriangles[0]=tri.clone();
@@ -205,11 +217,13 @@ public class DeWall2D {
 				
 			}
 		}
+	
 		// Split the Active Face List into the correct sub lists
 		LineSegment2DIndices f=AFL.GetFirstFIFO();
+			
 		while (!f.IsNull()){
-			int category=Categorise(f,splitplanecoordinate,currentplaneslice,recursionlevel);
-			switch(category){
+				int category=Categorise(f,splitplanecoordinate,currentplaneslice,recursionlevel);
+				switch(category){
 				case 0:AFLalpha.InsertIfNotExist(f);break;
 				case 1:AFL1.InsertIfNotExist(f);break;
 				case 2:AFL2.InsertIfNotExist(f);break;
@@ -218,22 +232,22 @@ public class DeWall2D {
 		}
 		
 		
-		
 //		 Main loop
 		f=AFLalpha.ExtractFIFO();
 		while (!f.IsNull()){
-			
 			Triangle2D t=new Triangle2D();
-				t=MakeSimplex(f,UG);
+			t=MakeSimplex(f,UG);
 					// Test to make sure the tetrahedron constructed is a valid one
 					boolean valid=!t.isNull();
 					if (valid)
 					{
 						FinalTriangles=Insert(FinalTriangles,t); // Note that this will mean we end up with a list of TriangularFaces each attached to a single tetrahedron only.
 						LineSegment2DIndices[] fdash=t.GetFaces(PointsList);
-								for (int i=0;i<fdash.length;i++){
+						for (int i=0;i<fdash.length;i++){
 								if (!fdash[i].LineSegmentEqual(f)){
 									// Update the correct Active Face list
+									fdash[i].SetHash(PointsList.length);
+									
 									int category=Categorise(fdash[i],splitplanecoordinate,currentplaneslice,recursionlevel);
 									switch(category){
 										case 0:AFLalpha=Update(AFLalpha,fdash[i]);break;
@@ -244,7 +258,6 @@ public class DeWall2D {
 							} // end for
 							//	 DecimalFormat format = new DecimalFormat("0.000000");
 							//	System.out.println(" "+format.format(splitplanecoordinate));
-						
 					} // end if valid
 			// Once every second update the progress bar and tidy up the lists
 			if ((System.currentTimeMillis()-lastprogressupdate)>1000) {
@@ -254,44 +267,44 @@ public class DeWall2D {
 				bar.setValue(value);
 				lastprogressupdate=System.currentTimeMillis();
 				}
+			if (printdebugging) {
+				System.out.println("AFLalpha "+AFLalpha.getLength());AFLalpha.PrintFIFO();
+				//System.out.println("AFL1 "+AFL1.getLength());//AFL1.PrintFIFO();
+				//System.out.println("AFL2 "+AFL2.getLength());//AFL2.PrintFIFO();
+			}
 			f=AFLalpha.ExtractFIFO();
+			
 			if (CyclicTriangle2DCreation){
+				if (print) System.out.println("CTC error");
 				f=new LineSegment2DIndices(); // exit while loop
 			}
 		}//end while
 		
-		
-//		 recurse and change the orientation of the plane slice
+		// recurse and change the orientation of the plane slice
 		planeslice nextplaneslice=planeslice.values()[(currentplaneslice.ordinal()+1)%planeslice.values().length];
 		// Only recurse if need to i.e. there is at least one face in the Active face list that needs processed and a cyclic tetrahedron creation hasn't been flagged.
 		if ((!CyclicTriangle2DCreation) && (AFL1.getLength()!=0)) dewall(P1,AFL1,nextplaneslice,bar, lastprogressupdate,recursionlevel);
 		if ((!CyclicTriangle2DCreation) && (AFL2.getLength()!=0)) dewall(P2,AFL2,nextplaneslice,bar,lastprogressupdate,recursionlevel);
 	} // end of method dewall (recursive)
 	
-//	 returns 0 if the slice-plane intersects the face and is to go into AFLalpha
-	// returns 1 if the plane is on one side of the face (to go into AFL1)
-	// returns 2 if the plane is on the other side of the face (to go into AFL2)
+//	 returns 0 if the slice-line intersects the line segment and is to go into AFLalpha
+	// returns 1 if the line is on one side of the face (to go into AFL1)
+	// returns 2 if the line is on the other side of the face (to go into AFL2)
 	// If the maximum recursion level has been reached it will also return 0 which essentially turns it into an iterative approach
 	private int Categorise(LineSegment2DIndices f,double coordinate,planeslice currentplaneslice,int recursionlevel){
 		if (recursionlevel>=maxrecurse) return 0; 
 		else{		
-			int[] indexes=f.GetFace();
-			double a,b,c;
-			a=Coordinate(currentplaneslice,indexes[0]);
-			b=Coordinate(currentplaneslice,indexes[1]);
-			c=Coordinate(currentplaneslice,indexes[2]);
-			
-			boolean v1,v2,v3;
-			v1=(a<coordinate);
-			v2=(b<coordinate);
+			int[] indexes=f.GetStartAndEndPointIndices();
+			double start,end;
+			start=Coordinate(currentplaneslice,indexes[0]);
+			end=Coordinate(currentplaneslice,indexes[1]);
+			boolean v1,v2;
+			v1=(start<coordinate);
+			v2=(end<coordinate);
 			if (v1!=v2) return 0;
 			else{
-				v3=(c<coordinate);
-				if (v1!=v3) {return 0;}
-				else {
-					if (v1) return 1;
+				if (v1) return 1;
 					else return 2;
-					}
 			} // end else
 		}
 	} // end Categorise
@@ -311,7 +324,12 @@ public class DeWall2D {
 		Triangle2D[] returnvalue=new Triangle2D[original.length+1];
 		for (int i=0;i<original.length;i++){
 			returnvalue[i]=original[i].clone();
-			if (original[i].isEquivalent(addition)) CyclicTriangle2DCreation=true;
+			if (original[i].isEquivalent(addition)) {
+				CyclicTriangle2DCreation=true;
+				System.out.print("CTC error adding triangle ");
+				addition.print();
+				System.out.println();
+			}
 		}
 		returnvalue[original.length]=addition.clone();
 		return returnvalue;
@@ -322,7 +340,7 @@ public class DeWall2D {
 	private OrderedListLineSegment2dIndices Update(OrderedListLineSegment2dIndices AFL, LineSegment2DIndices f){
 		boolean deleted=AFL.DeleteIfExist(f);
 		if (!deleted) AFL.InsertIfNotExist(f);
-		int[] indexes=f.GetFace();
+		int[] indexes=f.GetStartAndEndPointIndices();
 		for (int i=0;i<indexes.length;i++)
 			if (deleted) decrement(indexes[i]);
 			else increment(indexes[i]);
@@ -336,9 +354,9 @@ public class DeWall2D {
 	// It is also assumed that the P index array is ordered corectly.
 	private Triangle2D MakeFirstSimplex(int[] P){
 		
+		
 		Triangle2D returnvalue=new Triangle2D();
 		int midpoint=(int)Math.floor((double)P.length/2);
-		
 		  int a=P[midpoint-1];
 			int b=-1;
 			double mindistancesquared=Double.MAX_VALUE;
@@ -349,6 +367,7 @@ public class DeWall2D {
 						mindistancesquared=distancesquared;
 				}
 			}
+			
 			if (b!=-1){
 				// Now find the third point from the array that means the circumcircle has the smallest radius
 				
@@ -364,7 +383,7 @@ public class DeWall2D {
 					if ((a!=P[i]) && (b!=P[i])){
 						// Calculate the centre of the circumcircle using this point and from this calculate the radiussquared
 //						Find the bisecting line of the two points we currently have
-						LineSegment2DIndices AC=new LineSegment2DIndices(a,c,PointsList);
+						LineSegment2DIndices AC=new LineSegment2DIndices(a,P[i],PointsList);
 						bisectpoint=AC.GetPointOnLine(PointsList,0.5);
 						LineSegment2D ACbisectline=new LineSegment2D(bisectpoint,bisectpoint.plusEquals(AC.normal));
 						
@@ -389,23 +408,29 @@ public class DeWall2D {
 				} // end for
 				// If there wasn't a 3rd point we drop the whole thing
 				if (c==-1) returnvalue=new Triangle2D();
-				else 
+				else { 
 					// Find out whether point c is on the same side of the mid line between a and b as point b and if it isn't swap point a and b around.
-					// So the normals calculated by ABxAC on all but the first face will point outwards. Note that this means that for the first face to have a normal pointing outwards a and b will have to be swapped around once the face list has been extracted.
-					if (AB.InsideHalfspace(PointsList[c])!=AB.InsideHalfspace(PointsList[b])) returnvalue=new Triangle2D(new LineSegment2DIndices(b,a,PointsList),c,PointsList);
-					else returnvalue=new Triangle2D(new LineSegment2DIndices(a,b,PointsList),c,PointsList);
-				
+					// Point the normal away from c
+					LineSegment2DIndices line=new LineSegment2DIndices(a,b,PointsList);
+					line.SetHash(PointsList.length);
+					if (AB.InsideHalfspace(PointsList[c])!=AB.InsideHalfspace(PointsList[b])){
+						line=new LineSegment2DIndices(b,a,PointsList);
+						line.SetHash(PointsList.length);
+					}
+					returnvalue=new Triangle2D(line,c,PointsList);
+				}
 			} // end if b!=-1
 	return returnvalue;
 	} // end of MakeFirstSimplex method
 
 	private Triangle2D MakeSimplex(LineSegment2DIndices f,Uniform2DGrid UG){
-		//TriangularFaceOf3DTriangle2Ds returnvalue;
 		Triangle2D returnvalue;
 		int currentnextpointindex=-1;
-		int[] ab=f.GetFace();
+		int[] ab=f.GetStartAndEndPointIndices();
 		decrement(ab[0]);
 		decrement(ab[1]);
+		if (printverbose) System.out.println("Attempting Make Simplex with "+ab[0]+" and "+ab[1]);
+		
 		  	// The centre of a circumcircle in 2d can be found as the intersection point of lines that bisect neighbouring edges at right angles
 			
 		  
@@ -428,6 +453,7 @@ public class DeWall2D {
 				UG.resetMarked();
 				while (state!=searching.valueOf("exit")){
 					AxisAlignedBoundingBox box=new AxisAlignedBoundingBox();
+					if (printverbose) System.out.println(state.toString());
 					
 					switch(state) {
 					case oneradius:
@@ -461,13 +487,12 @@ public class DeWall2D {
 						break;
 					}
 					
-					if (printverbose) System.out.println(state.toString());
 					
 				for (int x=(int)box.minx;x<=(int)box.maxx;x++){
 					for (int y=(int)box.miny;y<=(int)box.maxy;y++){
-						for (int z=(int)box.minz;z<=(int)box.maxz;z++){
 							if (UG.ExaminableCell(x,y)){
 								int i=UG.GetFirst(x,y);
+								
 								while (i!=-1){
 									boolean valid=((i!=ab[0]) && (i!=ab[1])); // make sure it isn't one the vertices we already have
 									if (valid) valid=(!f.InsideHalfspace(PointsList[i])); // it is in the correct halfspace
@@ -530,10 +555,9 @@ public class DeWall2D {
 					else state=searching.valueOf("tworadii"); // No candidate was found so expand the search
 					break;
 				}
+				
+				
 			} // end while
-				
-				
-			} // end if p1,p2,p3 intersect
 			// If there wasn't a 4th point or it is to be ignored we drop the whole thing
 	
 			if ((currentnextpointindex==-1)) 

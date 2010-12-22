@@ -24,7 +24,7 @@ package org.reprap.scanning.DataStructures;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 21st December 2010
+* Last modified by Reece Arnott 22nd December 2010
 *
 *	This class stores an array of triangluar faces which can be accessed in an ordered way (ordered by a hashvalue) 
 *	A triangular face is 3 vertices a,b,c. These are stored as simple indexes to a Point3d array.
@@ -32,6 +32,7 @@ package org.reprap.scanning.DataStructures;
 * TODO - This class may benefit from using  unconstrained ArrayList rather than fixed length array.
 * 	
 ***********************************************************************************/
+
 import org.reprap.scanning.Geometry.Triangle3D;
 
 public class OrderedListTriangule3D {
@@ -202,16 +203,18 @@ public class OrderedListTriangule3D {
 		return returnvalue;
 		
 	}
+//	 Note that this doesn't sanity check to see that the index is in range.
 	private void DeleteEntry(int index, boolean changeinsertionorderarray){
 		// First go through the insertionorder array and take out the entry if requested 
 		if (changeinsertionorderarray){
 			int numberofmatches=0;
-			for (int i=0;i<insertionorder.length;i++)if (insertionorder[i]==index) numberofmatches++;
+			long hashtomatch=list[index].hashvalue;
+			for (int i=0;i<insertionorder.length;i++)if (insertionorder[i]==hashtomatch) numberofmatches++;
 			if (numberofmatches!=0){
 				long[] newinsertionarray=new long[insertionorder.length-numberofmatches];
 				int j=0;
 				for (int i=0;i<insertionorder.length;i++){
-					if (insertionorder[i]!=index){
+					if (insertionorder[i]!=hashtomatch){
 						newinsertionarray[j]=insertionorder[i];
 						j++;
 					} // end if

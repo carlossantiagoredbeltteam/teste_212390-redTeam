@@ -66,14 +66,7 @@ public class Uniform3DGrid{
 					boundary.maxy=p[subsetindexes[0]].y;
 					boundary.maxz=p[subsetindexes[0]].z;
 				}
-				else {
-					if (p[subsetindexes[i]].x<boundary.minx) boundary.minx=p[subsetindexes[i]].x;
-					if (p[subsetindexes[i]].y<boundary.miny) boundary.miny=p[subsetindexes[i]].y;
-					if (p[subsetindexes[i]].z<boundary.minz) boundary.minz=p[subsetindexes[i]].z;
-					if (p[subsetindexes[i]].x>boundary.maxx) boundary.maxx=p[subsetindexes[i]].x;
-					if (p[subsetindexes[i]].y>boundary.maxy) boundary.maxy=p[subsetindexes[i]].y;
-					if (p[subsetindexes[i]].z>boundary.maxz) boundary.maxz=p[subsetindexes[i]].z;
-				}
+				else boundary.Expand3DBoundingBox(p[subsetindexes[i]]);
 			}
 			// Now divide up the space into 3d cells
 			double volume=(boundary.maxx-boundary.minx)*(boundary.maxy-boundary.miny)*(boundary.maxz-boundary.minz);
