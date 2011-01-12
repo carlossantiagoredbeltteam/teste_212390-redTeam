@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  *
- * Last modified by Reece Arnott 20th December 2010
+ * Last modified by Reece Arnott 2th January 2011
  * 
  * Note that most of the layout commands were initially produced by NetBeans for JDK 6
  * and significantly modified by hand. For future reference if it needs to be done the other way the main things to change are:
@@ -1247,15 +1247,24 @@ private void FindCalibrationSheetCirclesEtc(){
 	}
  	//This method is an intermediary one for testing purposes
  	// Eventually this will be replaced by a SurfacePatchTextureMatching method that give better output.
+	// Currently this method splits the volume of interest into cubes of a certain size and then scans through them (in all 8 possible combinations of +/- x/y/z directions) looking 
+	// at the nearest pixel a point in the volume back projects to in each valid image (an image is determined to be valid based on the scan direction and where the center of the camera is compared to the point in question.
+	// If the pixels are consistent then the point is labelled as part of the surface not processed in any further sweeps.
+	// Due to the discrete nature of this process the found surface cubes may be spaced so as to have subsequent false positives in other layers so the points are used to produce a series
+	// of layered 2d bounding polygons which are finally strecthed in the z direction and converted to triangles.
+	// In practice this gives a structure similar to the rough voxelised model but with some obvious errors not included. There are still a large number of false positive surface points identified.
+	// It is hoped that the false positive rate will drop as the more points are tested leading to a patch matching (rather than the current point matching) technique.
+	
  	public void SurfacePointTextureMatching(){
-		//TODO set the progress bar and text   
- 		TrianglePlusVertexArray totaltriplusvertex=new TrianglePlusVertexArray(new Point3d[0]);
- 		   int sampleswide=(int)((volumeofinterest.maxx-volumeofinterest.minx)/prefs.AlgorithmSettingSurfacePointTextureResolutionmm);
- 		   int sampleshigh=(int)((volumeofinterest.maxy-volumeofinterest.miny)/prefs.AlgorithmSettingSurfacePointTextureResolutionmm);
- 		   int zsamples=(int)(((volumeofinterest.maxz-volumeofinterest.minz)/prefs.AlgorithmSettingSurfacePointTextureResolutionmm));
- 		   JProgressBar bar=new JProgressBar(0,(zsamples*2)+1);
- 		   bar.setValue(0);
-	 		
+ 		// First find the number of steps to take in each direction
+ 		int sampleswide=(int)((volumeofinterest.maxx-volumeofinterest.minx)/prefs.AlgorithmSettingSurfacePointTextureResolutionmm);
+ 		int sampleshigh=(int)((volumeofinterest.maxy-volumeofinterest.miny)/prefs.AlgorithmSettingSurfacePointTextureResolutionmm);
+ 		int zsamples=(int)(((volumeofinterest.maxz-volumeofinterest.minz)/prefs.AlgorithmSettingSurfacePointTextureResolutionmm));
+ 		JProgressBar bar=new JProgressBar(0,(zsamples*2)+1);
+ 		bar.setValue(0);
+ 		 
+ 		   TrianglePlusVertexArray totaltriplusvertex=new TrianglePlusVertexArray(new Point3d[0]);
+ 	 			
  		   // Increment the second progress bar
  		   try{ 
  				// This is the recommended way of passing GUI information between threads
@@ -1263,6 +1272,7 @@ private void FindCalibrationSheetCirclesEtc(){
  						  public void run(){
  							  // Update progress bar
  							  jProgressBar2.setValue(jProgressBar2.getValue()+1);
+ 							 jLabelProgressBar1.setText("Finding Surface Points");
  							  
  						  }
  					  });
@@ -1280,7 +1290,8 @@ private void FindCalibrationSheetCirclesEtc(){
  		   BoundingPolygon2D[] boundingpolygon=new BoundingPolygon2D[zsamples+1];
  		   for (int i=0;i<=zsamples;i++) boundingpolygon[i]=new BoundingPolygon2D(new Point2d[0]);
 			
- 		   //TODO comment code!
+ 		   //This is 3 series of nested for+while loops in z, then y, then x, that each go through the loop twice, once in the positive, once in the negative directions
+ 		   // leading to each volume being processed in the inner loop (potentially) 2x2x2=8 times. 
  		   for (int zdir=-1;zdir<=1;zdir=zdir+2) {
  			   double z=volumeofinterest.minz;
 				if (zdir==-1) z=volumeofinterest.maxz;
@@ -1312,19 +1323,23 @@ private void FindCalibrationSheetCirclesEtc(){
 					boolean[][] skip=new boolean[sampleswide+1][sampleshigh+1];
 					PixelColour[][] colour=new PixelColour[sampleswide+1][sampleshigh+1]; // currently not used for anything but the debugging images
 					
+					// For each layer set up a 2d boolean array to keep track of which of the volumes has already been identified as a surface one (and skip any further processing)
 					for (int i=0;i<=sampleswide;i++)
 						for (int j=0;j<=sampleshigh;j++){
 							skip[i][j]=true;
 							colour[i][j]=new PixelColour(PixelColour.StandardColours.White);
 						}
+					// 2nd of 3 for+while loops. This one goes through the y values, first forward, then backwards. 
 					for (int ydir=1;ydir>=-1;ydir=ydir-2){
 						double y=volumeofinterest.miny;
 						if (ydir==-1) y=volumeofinterest.maxy;
 						while ((y>=volumeofinterest.miny) && (y<=volumeofinterest.maxy)){	
+							//3rd of 3 for+while loops. This one goes through the x values, first forward, then backwards. 
 							for (int xdir=1;xdir>=-1;xdir=xdir-2){
 								double x=volumeofinterest.minx;
 								if (xdir==-1) x=volumeofinterest.maxx;
 								while ((x>=volumeofinterest.minx) && (x<=volumeofinterest.maxx)){
+									// This is the inner core of the nested loops.
 									//Find if the point is unprocessed in all scenes or not
 									Point3d point=new Point3d(x,y,z);
 									boolean unprocessed=true;
@@ -1334,6 +1349,9 @@ private void FindCalibrationSheetCirclesEtc(){
 										PixelColour[] colours=new PixelColour[images.length];
 										int[] cameras=new int[images.length];
 										int index=0;
+										// This for loop determines which cameras are used in the pixel matching tests later on
+										// TODO maybe abstract this out and put into private static method and test at each level of z and y as well to skip whole scans
+										// if no camera is going to be a valid one.
 										for (int i=0;i<images.length;i++) if (!images[i].skipprocessing){
 											// make the combinations of +/- x,y,z a number between 0 and 7 to make the case statements easier
 											int correctoctant=(int)((xdir==1)?1:0)+((int)((ydir==1)?1:0)*2)+((int)((zdir==1)?1:0)*4);
@@ -1354,7 +1372,7 @@ private void FindCalibrationSheetCirclesEtc(){
 												index++;
 											} // end if camera centre in correct octant
 										} // end for i
-										// 2) find similarity measure and mean colour if in two or more images
+										// 2) find similarity measure and mean colour if can use 2 or more cameras to test this with
 										if (index>1) {
 											PixelColour[] truncatedcolours=new PixelColour[index];
 											for (int i=0;i<index;i++) truncatedcolours[i]=colours[i].clone();
@@ -1369,7 +1387,7 @@ private void FindCalibrationSheetCirclesEtc(){
 												// Set to be skipped to save time if this is not the last sweep
 												skip[xindex][yindex]=false;
 												// Add to the bounding polygon
-												// Note the random amount added to get around the problem the DeWall triangulation algorithm has with co-circular points
+												// Note the random amount added to get around the problem the DeWall triangulation algorithm has with co-circular/regular points
 												Point2d pt=new Point2d(x+(Math.random()*xstep*0.5),y+(Math.random()*ystep*0.5));
 												boundingpolygon[zindex].ExpandPolygon(pt);
 												// 3) reset binary pixel in each contributing image so this pixel is not used in successive runs through the loop if similar enough
@@ -1387,7 +1405,7 @@ private void FindCalibrationSheetCirclesEtc(){
 							y=y+(ydir*ystep);
 						}} // end while and for y
 					if ((prefs.Debug) && (prefs.DebugSurfacePointTextureMatching)){
-						
+						// For each z layer write out a file.
 						GraphicsFeedback graphics=new GraphicsFeedback(true);
 						graphics.ShowPixelColourArray(colour,sampleswide+1,sampleshigh+1);
 						BoundingPolygon2D polygon=new BoundingPolygon2D(new Point2d[0]);
@@ -1399,7 +1417,7 @@ private void FindCalibrationSheetCirclesEtc(){
 						String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"SurfaceTextureMatchImageForZ="+String.valueOf(z)+"-"+directionofsweep+".jpg";
 						graphics.SaveImage(filename);
 					}
-					if (zdir>0){ // only add triangles on the last sweep upwards.
+					if (zdir>0){ // convert the bounding polygon to a 3d volume and convert its surface to triangles to add to the found object but only do so on the last sweep upwards.
 						TrianglePlusVertexArray triplusvertex=boundingpolygon[zindex].ExtrudeTo3DAndConvertToTriangles(zstep,z+(zstep/2));
 						totaltriplusvertex=totaltriplusvertex.MergeAndReturn(triplusvertex);
 						if (print) System.out.println("This layer triangles="+triplusvertex.GetTriangleArrayLength()+" total triangles="+totaltriplusvertex.GetTriangleArrayLength());
@@ -1407,7 +1425,7 @@ private void FindCalibrationSheetCirclesEtc(){
 					
  					z=z+(zdir*zstep);
 				}} // end while and for z
-
+ 		   // Split the triangle array plus vertex array into 2 global arrays 
  		   surfacetriangles=totaltriplusvertex.GetTriangleArray();
  		   surfacepoints=totaltriplusvertex.GetVertexArray();
  		   if (print) System.out.println("triangle length="+surfacetriangles.length);
