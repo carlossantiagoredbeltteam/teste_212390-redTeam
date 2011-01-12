@@ -258,7 +258,7 @@ public class BoundingPolygon2D {
 				orderedpoints[count]=allpoints[current].clone();count++;
 				int previous=current;
 				int next=current;
-				// We have two choices, one will walk around the polygon clockwise, the other clockwise, we want to choose the one that is clockwise.
+				// We have two choices, one will walk around the polygon clockwise, the other anti-clockwise, we want to choose the one that is clockwise.
 				// Find the angle between the points 
 				//double angleto0=allpoints[current].GetAngleMeasuredClockwiseFromPositiveX(allpoints[vertexconnections[current][0]]);
 				//double angleto1=allpoints[current].GetAngleMeasuredClockwiseFromPositiveX(allpoints[vertexconnections[current][1]]);
