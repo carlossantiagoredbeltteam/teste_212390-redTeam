@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  *
- * Last modified by Reece Arnott 2th January 2011
+ * Last modified by Reece Arnott 17th January 2011
  * 
  * Note that most of the layout commands were initially produced by NetBeans for JDK 6
  * and significantly modified by hand. For future reference if it needs to be done the other way the main things to change are:
@@ -140,7 +140,7 @@ public class Main extends JFrame {
  */ 
 
    public static enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration,objectfindingvoxelisation,texturematching,writetofile,end};
-   // public static enum steps {calibrationsheet,test,end};
+   // public static enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration,test,end};
     private final static steps stepsarray[]=steps.values();
     private static steps laststep = steps.valueOf("end");
     private static steps firststep = steps.valueOf("calibrationsheet");
@@ -272,7 +272,7 @@ public class Main extends JFrame {
 					OutputSTLFile(); 
 					GraphicsFeedback(); // image feedback if the debug options are set
  					 break;
- 				//	case test: Test();break;
+ 				//	case test: Test2();break;
  				
  				case end : end(); break;
 				}
@@ -289,7 +289,20 @@ public class Main extends JFrame {
 	 Testing test=new Testing();
 	 test.TemporaryTestMethod();
  }
-	
+
+ public void Test2(){
+	 Point3d a=new Point3d(-(calibrationsheetwidth/2),-(calibrationsheetheight/2),0);
+	 Point3d b=new Point3d(calibrationsheetwidth/2,-calibrationsheetheight/2,0);
+	 Point3d c=new Point3d(-calibrationsheetwidth/2,calibrationsheetheight/2,0);
+	 for (int i=0;i<images.length;i++){
+		 TexturePatch test=new TexturePatch(images[i],a,b,c,200);
+		 String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"testpatch"+Integer.toString(i)+".jpg";
+		 GraphicsFeedback graphics=new GraphicsFeedback(true);
+		 graphics.ShowPixelColourArray(test.ConvertTextureToSquareArrayOfColoursForDisplay(),test.GetSquareGridSize(),test.GetSquareGridSize());
+		 graphics.SaveImage(filename);
+	 }
+ }
+ 
  	
 //  This method redraws the Window for the step in which the calibration pattern is chosen
  	 private void ChooseCalibrationSheet() {
