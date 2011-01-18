@@ -621,7 +621,7 @@ public class Graphics3DFeedback {
 		   double dy=(y-prevMouseY);
 			 // adjust on plane formed using eyepoint as point on plane and eyepoint-lookat as normal rather than the x and y axis  
 		   Plane plane=new Plane(eyepoint,eyepoint.minus(lookat));
-		   Point3d neweyepoint=plane.GetParametricPointOnPlane(up,dx,dy);
+		   Point3d neweyepoint=plane.GetPointOnPlaneFromParametricCoordinates(up,new Point2d(dx,dy));
 		   if (!mouseRButtonDown){
 		    	lookat=lookat.plus(neweyepoint.minus(eyepoint));
 		    }
