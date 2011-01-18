@@ -23,10 +23,14 @@ package org.reprap.scanning.Geometry;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 5th May 2010
+* Last modified by Reece Arnott 18th January 2011
 * 
 * A plane is described by one point on the plane and a normal vector that is at right angles to the plane
 * The normal is stored as a unit vector
+* 
+* There are the standard methods for intersection of planes with other planes and with lines to give a point or line.
+* There are also conversion methods to convert a 3d point on the plane to 2d parametric coordinates and back again 
+* (the origin is the point on the plane and the orientation and scale of one of the coordinate axes is feed in to the methods as the "up" vector)
 * 
 * 
 ************************************************************************************/
@@ -173,6 +177,14 @@ public class Plane {
 		return returnvalue;
 	}
 	
+	// The closest point on the plane will be at the intersection point of the plane and a line made from this point with a vector of the plane normal.
+	public Point3d FindClosestPointOnPlane(Point3d point){
+		Line3d line=new Line3d();
+		line.resetPandV(point, normal);
+		return IntersectionPoint(line);
+	}
+	
+	
 	public boolean GetHalfspace(Point3d p){
 		return (normal.dot(p)<normaldotP);
 	}
@@ -180,8 +192,9 @@ public class Plane {
 	
 	// use the P point as the origin for the 2d coordinate system on the plane and calculate the 3d point that corresponds to the 2d point on the plane.
 	// We also need a vector to use as one of the axes. This is passed in as the up parameter and is used to as a starting point for direction for plane v axis.
-	// Currently only used in Graphics3DFeedback.
-	public Point3d GetParametricPointOnPlane(Point3d up,double u, double v){
+	public Point3d GetPointOnPlaneFromParametricCoordinates(Point3d up,Point2d parametricpoint){
+		double u=parametricpoint.x;
+		double v=parametricpoint.y;
 		Point3d vscalevector,uscalevector;
 		// First find the point on the plane corresponding to the intersection of the line made by point P+up and the normal vector
 		Line3d line=new Line3d();
@@ -199,6 +212,23 @@ public class Plane {
 		point=point.plus(uscalevector.times(u));
 		point=point.plus(vscalevector.times(v));
 		return point;
+	}
+	// This is the opposite conversion from above. Given a 3d point and an up vector (i.e. 1 v unit)  find the u and v coordinates.
+	public Point2d GetParametricCoordinatesFromPointOnPlane(Point3d up,Point3d pointonplane){
+		// Note that the point may not be on the plane so get the closest point that is
+		pointonplane=FindClosestPointOnPlane(pointonplane);
+		
+		// From the up vector define the u and v unit vectors
+		Point3d v=up.clone();
+		Point3d u=v.crossProduct(normal);
+		// Define a new vector going from point P (the parametric coordinate 0,0) to this point and then define that vector in terms of the u and v unit vectors
+		Point3d w=pointonplane.minus(P);
+		// Now solve the equation w=su+tv for s and t
+		// From http://www.softsurfer.com/Archive/algorithm_0104/algorithm_0104.htm#Computing%20Parametric%20Coordinates we get the following
+		double denominator=(u.dot(v)*u.dot(v))-(u.dot(u)*v.dot(v));
+		double s=((u.dot(v)*w.dot(v))-(v.dot(v)*w.dot(u)))/denominator;
+		double t=((u.dot(v)*w.dot(u))-(u.dot(u)*w.dot(v)))/denominator;
+		return new Point2d(s,t);
 	}
 	
 }

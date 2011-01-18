@@ -23,18 +23,22 @@ package org.reprap.scanning.FeatureExtraction;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 17 January 2011
+* Last modified by Reece Arnott 18 January 2011
 *
 *  TODO - should the pixel colours be stored as int and converted when needed?
 *  		
 * 	
-* This samples a triangular patch using barycentric coordinates so the samples will fill the upper left triangle of a square grid.
+* This samples a triangular patch using barycentric coordinates of the points on the plane made by the vertices to give 3d points that are back projected to 2d points in the image
+* These can be displayed to show the samples filling the upper left triangle of a square grid.
+* 
+* Note that if you were to just backproject the vertices to the image and use a naive barycentric coordinate sampling based entirely in the image space  
+* then comparing similarly sampled texture patches from different images may give differing results for the same patch as the barycentric coordinate transform is not the same as a perspective transform, it is just quite close to it.
+* 
+*  Doing the barycentric coordinate transform in 3d world coordinates and then doing a perspective transform on these points preserves the perspective transform and the barycentric coordinates are just used to get a good coverage of samples.
 *
 ****************************************************************************************************************************/
 import org.reprap.scanning.DataStructures.*;
-import org.reprap.scanning.Geometry.Point2d;
-import org.reprap.scanning.Geometry.Point3d;
-import org.reprap.scanning.Geometry.Coordinates;
+import org.reprap.scanning.Geometry.*;
 public class TexturePatch {
 
 	private PixelColour[] sampledtexturecolours; // Note that this is really a set of points in a 2d grid so could be a 2d array but as they form a triangle then half the array would be blank. Instead there is a private method to transform 2d coordinates into the array index 
@@ -48,14 +52,7 @@ public class TexturePatch {
 		sampledtexturecolours=new PixelColour[(int)Math.round((squaresize*(squaresize+1)*0.5))];
 		for (int i=0;i<sampledtexturecolours.length;i++) sampledtexturecolours[i]=new PixelColour(); 
 		
-		// Convert the 3d points to 2d points in the image
-		Point2d[] triangularvertices;
-		triangularvertices=new Point2d[3];
-		triangularvertices[0]=image.getWorldtoImageTransform(a.ConvertPointTo4x1Matrix());
-		triangularvertices[1]=image.getWorldtoImageTransform(b.ConvertPointTo4x1Matrix());
-		triangularvertices[2]=image.getWorldtoImageTransform(c.ConvertPointTo4x1Matrix());
-		
-		init(triangularvertices,image);
+		init(a,b,c,image);
 	}
 	public TexturePatch(int approxnumberofsamples, Image image, Point3d a, Point3d b, Point3d c){
 		// Set up the sampled texture colours array and initialise to blank. Note that the number of sample points will be a little over 1/2 the square of the length of the 2d grid. i.e. 1+2+3+...+n or (n*(n+1))/2
@@ -67,14 +64,7 @@ public class TexturePatch {
 		sampledtexturecolours=new PixelColour[(int)Math.round((squarewidth*(squarewidth+1)*0.5))];
 		for (int i=0;i<sampledtexturecolours.length;i++) sampledtexturecolours[i]=new PixelColour(); 
 		
-		// Convert the 3d points to 2d points in the image
-		Point2d[] triangularvertices;
-		triangularvertices=new Point2d[3];
-		triangularvertices[0]=image.getWorldtoImageTransform(a.ConvertPointTo4x1Matrix());
-		triangularvertices[1]=image.getWorldtoImageTransform(b.ConvertPointTo4x1Matrix());
-		triangularvertices[2]=image.getWorldtoImageTransform(c.ConvertPointTo4x1Matrix());
-		
-		init(triangularvertices,image);
+		init(a,b,c,image);
 	}
 	public TexturePatch(){squarewidth=0;sampledtexturecolours=new PixelColour[0];}
 
@@ -109,8 +99,17 @@ public class TexturePatch {
 	 * 
 	 ************************************************************************************************************************************************/
 	// Called from constructors
-	private void init(Point2d[] triangularvertices, Image image){
-		Coordinates point=new Coordinates(3);
+	private void init(Point3d a,Point3d b,Point3d c, Image image){
+		// Convert the 3d points to 2d parametric points on the plane they make
+		Plane plane=new Plane(a,b,c);
+		Point3d up=b.minus(a);
+		Point2d[] triangularvertices;
+		triangularvertices=new Point2d[3];
+		triangularvertices[0]=plane.GetParametricCoordinatesFromPointOnPlane(up, a);
+		triangularvertices[1]=plane.GetParametricCoordinatesFromPointOnPlane(up, b);
+		triangularvertices[2]=plane.GetParametricCoordinatesFromPointOnPlane(up, c);
+		
+		Coordinates uvpoint=new Coordinates(3);
 		
 		// Collect the samples
 		for (int y=0;y<squarewidth;y++){
@@ -118,18 +117,26 @@ public class TexturePatch {
 			  // calculate the barycentric coordinates for this point
 				// The order of these doesn't matter as long as it is consistent so make it so that when displaying the 2d grid point 0 is upper left, point 1 is upper right, point 2 is lower left (increasing the x or y barycentric coordinates give a point closer to b or c respectively)
 				// This just makes it relatively easy to test by simply giving a triangle with similar orientation. There is no inherent reason for choosing one orientation over another though.  
-				point.barycoordinates[1]=(double)x/(double)squarewidth;
-				point.barycoordinates[2]=(double)y/(double)squarewidth;
-				point.barycoordinates[0]=1-point.barycoordinates[1]-point.barycoordinates[2];
-				// Now retrieve the colour of this point and insert it into the array
-				point.CalculatePixelCoordinate(triangularvertices);
-				sampledtexturecolours[ConvertToArrayCoordinates(x,y,squarewidth)]=image.InterpolatePixelColour(point.pixel);
+				uvpoint.barycoordinates[1]=(double)x/(double)squarewidth;
+				uvpoint.barycoordinates[2]=(double)y/(double)squarewidth;
+				uvpoint.barycoordinates[0]=1-uvpoint.barycoordinates[1]-uvpoint.barycoordinates[2];
+				// Now convert this point back to a 3d point, backproject it to the image and retrieve the colour of this point and insert it into the array
+				uvpoint.CalculatePixelCoordinate(triangularvertices);
+				Point3d worldpoint=plane.GetPointOnPlaneFromParametricCoordinates(up, uvpoint.pixel);
+				Point2d imagepoint=image.getWorldtoImageTransform(worldpoint.ConvertPointTo4x1Matrix());
+				sampledtexturecolours[ConvertToArrayCoordinates(x,y,squarewidth)]=image.InterpolatePixelColour(imagepoint);
 				// Note that the ConvertToArrayCoordinates currently does the same as incrementing index would do within this loop but the calculation is farmed out so
 				// can change the calculation if need be and still have set and get calls going to the same index within the 1d array.
 			} // end for x
 		} // end for y
 	}
 
+	
+	public static double FindSimilarityMeasure(TexturePatch[] patches){
+		
+		return 0;
+	}
+	
 	
 	private static int ConvertToArrayCoordinates(int x, int y, int maxx){
 		// Note this doesn't take into account if (x,y) is outside the upper (left) triangle of the 2d grid. Checks for this need to be made before calling this 

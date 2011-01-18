@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  *
- * Last modified by Reece Arnott 17th January 2011
+ * Last modified by Reece Arnott 18th January 2011
  * 
  * Note that most of the layout commands were initially produced by NetBeans for JDK 6
  * and significantly modified by hand. For future reference if it needs to be done the other way the main things to change are:
@@ -263,6 +263,7 @@ public class Main extends JFrame {
 					// There is an if statement in this step that reads values from: a properties file and two image files per original image file if it is an automatic step
 					// Note that the end is an unconditional call to this method with an incremented step
 					// i.e. automatically go onto the next step
+			///*
 				case objectfindingvoxelisation : 
 					FindCoarseVoxelisedObject(); break; // this is another of the big ones
 					// Note that the end is a call to this method with an incremented step if the next step is set to Automatic
@@ -272,6 +273,7 @@ public class Main extends JFrame {
 					OutputSTLFile(); 
 					GraphicsFeedback(); // image feedback if the debug options are set
  					 break;
+ 				//*/
  				//	case test: Test2();break;
  				
  				case end : end(); break;
@@ -295,7 +297,7 @@ public class Main extends JFrame {
 	 Point3d b=new Point3d(calibrationsheetwidth/2,-calibrationsheetheight/2,0);
 	 Point3d c=new Point3d(-calibrationsheetwidth/2,calibrationsheetheight/2,0);
 	 for (int i=0;i<images.length;i++){
-		 TexturePatch test=new TexturePatch(images[i],a,b,c,200);
+		 TexturePatch test=new TexturePatch(images[i],a,b,c,800);
 		 String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"testpatch"+Integer.toString(i)+".jpg";
 		 GraphicsFeedback graphics=new GraphicsFeedback(true);
 		 graphics.ShowPixelColourArray(test.ConvertTextureToSquareArrayOfColoursForDisplay(),test.GetSquareGridSize(),test.GetSquareGridSize());
