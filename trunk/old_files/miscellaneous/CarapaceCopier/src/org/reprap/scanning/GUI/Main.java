@@ -139,8 +139,8 @@ public class Main extends JFrame {
  *  
  */ 
 
-   public static enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration,objectfindingvoxelisation,texturematching,writetofile,end};
-   // public static enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration,test,end};
+   //public static enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration,objectfindingvoxelisation,texturematching,writetofile,end};
+    public static enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration,test,end};
     private final static steps stepsarray[]=steps.values();
     private static steps laststep = steps.valueOf("end");
     private static steps firststep = steps.valueOf("calibrationsheet");
@@ -263,7 +263,7 @@ public class Main extends JFrame {
 					// There is an if statement in this step that reads values from: a properties file and two image files per original image file if it is an automatic step
 					// Note that the end is an unconditional call to this method with an incremented step
 					// i.e. automatically go onto the next step
-			///*
+			/*
 				case objectfindingvoxelisation : 
 					FindCoarseVoxelisedObject(); break; // this is another of the big ones
 					// Note that the end is a call to this method with an incremented step if the next step is set to Automatic
@@ -274,7 +274,7 @@ public class Main extends JFrame {
 					GraphicsFeedback(); // image feedback if the debug options are set
  					 break;
  				//*/
- 				//	case test: Test2();break;
+ 					case test: Test2();break;
  				
  				case end : end(); break;
 				}
@@ -293,16 +293,30 @@ public class Main extends JFrame {
  }
 
  public void Test2(){
-	 Point3d a=new Point3d(-(calibrationsheetwidth/2),-(calibrationsheetheight/2),0);
-	 Point3d b=new Point3d(calibrationsheetwidth/2,-calibrationsheetheight/2,0);
-	 Point3d c=new Point3d(-calibrationsheetwidth/2,calibrationsheetheight/2,0);
+	 //Point3d a=new Point3d(-(calibrationsheetwidth/2),-(calibrationsheetheight/2),0);
+	 //Point3d b=new Point3d(calibrationsheetwidth/2,-calibrationsheetheight/2,0);
+	 //Point3d c=new Point3d(-calibrationsheetwidth/2,calibrationsheetheight/2,0);
+	 Point3d a=new Point3d(calibrationsheetwidth/2,calibrationsheetheight/2,0);
+	 Point3d b=new Point3d(-calibrationsheetwidth/2,calibrationsheetheight/2,0);
+	 Point3d c=new Point3d(calibrationsheetwidth/2,-calibrationsheetheight/2,0);
+	 Point3d uppoint=new Point3d(a.x,a.y,1);
+	 
+	 
+	 int size=800;
+	 // Note that if set threshold to Double.MAX_VALUE then all pixels will be shown, otherwise pixels with a similarity value over the threshold will be shown as red
+	 String texturespatchimilarityfilename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"similaritypatch0.jpg";
+	 double averagevariance=TexturePatch.FindSimilarityMeasure(images, a, b, c, size, uppoint,texturespatchimilarityfilename, prefs.AlgorithmSettingSurfacePointTextureVarianceThreshold);
+	//TexturePatch.FindSimilarityMeasure(images, a, b, c, size,uppoint,texturespatchimilarityfilename,Double.MAX_VALUE);
+	 //TexturePatch.FindSimilarityMeasure(images, a, b, c, size,uppoint,null, prefs.AlgorithmSettingSurfacePointTextureVarianceThreshold);
+	 System.out.println(averagevariance);
 	 for (int i=0;i<images.length;i++){
-		 TexturePatch test=new TexturePatch(images[i],a,b,c,800);
+		 TexturePatch test=new TexturePatch(images[i],a,b,c,size);
 		 String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"testpatch"+Integer.toString(i)+".jpg";
 		 GraphicsFeedback graphics=new GraphicsFeedback(true);
 		 graphics.ShowPixelColourArray(test.ConvertTextureToSquareArrayOfColoursForDisplay(),test.GetSquareGridSize(),test.GetSquareGridSize());
 		 graphics.SaveImage(filename);
 	 }
+	
  }
  
  	
@@ -2120,8 +2134,8 @@ private void FindCalibrationSheetCirclesEtc(){
 	bar.setValue(bar.getMinimum());
 		  while (bar.getValue()<bar.getMaximum()){
 //			This matches circle centers in the calibration sheet with ellipse centers found in the image
-			 bar=circles.MatchCircles(calibrationcirclecenters);
-			 // bar=circles.OldMatchCircles(calibrationcirclecenters);
+			// bar=circles.MatchCircles(calibrationcirclecenters);
+			  bar=circles.OldMatchCircles(calibrationcirclecenters);
 			  final JProgressBar temp=bar; 
 			  try{ 
 			// This is the recommended way of passing GUI information between threads

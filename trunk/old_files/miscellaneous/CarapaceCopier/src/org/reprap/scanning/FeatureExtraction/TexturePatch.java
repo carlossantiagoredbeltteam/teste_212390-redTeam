@@ -23,7 +23,7 @@ package org.reprap.scanning.FeatureExtraction;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 18 January 2011
+* Last modified by Reece Arnott 19th January 2011
 *
 *  TODO - should the pixel colours be stored as int and converted when needed?
 *  		
@@ -39,6 +39,7 @@ package org.reprap.scanning.FeatureExtraction;
 ****************************************************************************************************************************/
 import org.reprap.scanning.DataStructures.*;
 import org.reprap.scanning.Geometry.*;
+import org.reprap.scanning.GUI.GraphicsFeedback;
 public class TexturePatch {
 
 	private PixelColour[] sampledtexturecolours; // Note that this is really a set of points in a 2d grid so could be a 2d array but as they form a triangle then half the array would be blank. Instead there is a private method to transform 2d coordinates into the array index 
@@ -49,10 +50,10 @@ public class TexturePatch {
 	public TexturePatch(Image image, Point3d a, Point3d b, Point3d c, int squaresize){
 		// Set up the sampled texture colours array and initialise to blank. Note that the number of sample points will be a little over 1/2 the square of the length of the 2d grid. i.e. 1+2+3+...+n or (n*(n+1))/2
 		squarewidth=squaresize;
-		sampledtexturecolours=new PixelColour[(int)Math.round((squaresize*(squaresize+1)*0.5))];
-		for (int i=0;i<sampledtexturecolours.length;i++) sampledtexturecolours[i]=new PixelColour(); 
-		
-		init(a,b,c,image);
+		Point3d[] samplepoints=Get3dSamplePoints(a,b,c,squarewidth);
+		sampledtexturecolours=new PixelColour[samplepoints.length];
+		for (int i=0;i<sampledtexturecolours.length;i++) sampledtexturecolours[i]=image.InterpolatePixelColour(image.getWorldtoImageTransform(samplepoints[i].ConvertPointTo4x1Matrix()));
+
 	}
 	public TexturePatch(int approxnumberofsamples, Image image, Point3d a, Point3d b, Point3d c){
 		// Set up the sampled texture colours array and initialise to blank. Note that the number of sample points will be a little over 1/2 the square of the length of the 2d grid. i.e. 1+2+3+...+n or (n*(n+1))/2
@@ -61,10 +62,9 @@ public class TexturePatch {
 		// so n=-1+/- sqrt(1+8s))/2, as we are only interested in the positive root and need to round to the nearest integer, this gives us
 		squarewidth=(int)Math.round((Math.sqrt(1+(approxnumberofsamples*8))-1)*0.5);
 		// Note that due to needing this to be a whole number the requested number of samples may not be quite what we end up with.
-		sampledtexturecolours=new PixelColour[(int)Math.round((squarewidth*(squarewidth+1)*0.5))];
-		for (int i=0;i<sampledtexturecolours.length;i++) sampledtexturecolours[i]=new PixelColour(); 
-		
-		init(a,b,c,image);
+		Point3d[] samplepoints=Get3dSamplePoints(a,b,c,squarewidth);
+		sampledtexturecolours=new PixelColour[samplepoints.length];
+		for (int i=0;i<sampledtexturecolours.length;i++) sampledtexturecolours[i]=image.InterpolatePixelColour(image.getWorldtoImageTransform(samplepoints[i].ConvertPointTo4x1Matrix()));
 	}
 	public TexturePatch(){squarewidth=0;sampledtexturecolours=new PixelColour[0];}
 
@@ -81,15 +81,59 @@ public class TexturePatch {
 	
 	// For display purposes the samples will be in the upper half triangle of the square with the lower half being black
 	public PixelColour[][] ConvertTextureToSquareArrayOfColoursForDisplay(){
-		PixelColour[][] returnvalue=new PixelColour[squarewidth][squarewidth];
-		for (int x=0;x<squarewidth;x++)
-			for (int y=0;y<squarewidth;y++)
-				if ((squarewidth-x)>y) returnvalue[x][y]=sampledtexturecolours[ConvertToArrayCoordinates(x,y,squarewidth)].clone();
-				else returnvalue[x][y]=new PixelColour();
-		return returnvalue;
+		return ConvertTextureToSquareArrayOfColoursForDisplay(sampledtexturecolours,squarewidth);
 	}
-
 	
+	public static double FindSimilarityMeasure(Image[] images, Point3d a, Point3d b, Point3d c, int squaresize, Point3d pointabovetriangleplane, String displayfilename, double temppointsimilaritythreshold){
+		double variancesum=0;
+		// First filter out those images that do not have a camera centre above the plane defined by the triangle
+		boolean[] skip=new boolean[images.length];
+		int count=0;
+		Plane plane=new Plane(a,b,c);
+		for (int i=0;i<images.length;i++){
+			Point3d C=new Point3d(MatrixManipulations.GetRightNullSpace(images[i].getWorldtoImageTransformMatrix()));
+			skip[i]=plane.GetHalfspace(pointabovetriangleplane)!=plane.GetHalfspace(C);
+			if (!skip[i]) count++;
+			}
+		if (count>1) {
+			TexturePatch[] patch=new TexturePatch[count];
+			count=0;
+			// First get the 3d sample points
+			Point3d[] samplepoints=Get3dSamplePoints(a,b,c,squaresize);
+			// Now, for each image that we are not skipping use these sample points to create a patch
+			for (int i=0;i<images.length;i++) if (!skip[i]){
+				System.out.print(".");
+				patch[count]=new TexturePatch();
+				patch[count].squarewidth=squaresize;
+				patch[count].sampledtexturecolours=new PixelColour[samplepoints.length];
+				for (int j=0;j<patch[count].sampledtexturecolours.length;j++) patch[count].sampledtexturecolours[j]=images[i].InterpolatePixelColour(images[i].getWorldtoImageTransform(samplepoints[j].ConvertPointTo4x1Matrix()));
+				count++;
+				} // end for/if !skip
+			System.out.println();
+			// For display purposes create a pixel colour of the same size as the sampled patches
+			PixelColour[] display=new PixelColour[patch[0].sampledtexturecolours.length];
+			// Now do a point similarity measure for each one and set the colour for the display patch
+			for (int index=0;index<display.length;index++){
+				PixelColour[] colours=new PixelColour[patch.length];
+				for (int i=0;i<patch.length;i++) colours[i]=patch[i].sampledtexturecolours[index].clone();
+				PixelColour newcolour=new PixelColour();
+				double[] variance=newcolour.SetPixelToMeanColourAndReturnVariance(colours); // This gives variance for R,G,B, greyscale, and RGB in length 5 array
+				// 	if similar enough store the colour but currently not used for anything but displaying debug images
+				if (variance[4]<temppointsimilaritythreshold)  display[index]=newcolour.clone();
+				else display[index]=new PixelColour(PixelColour.StandardColours.Red);
+				variancesum=variancesum+variance[4];
+			} // end for
+		
+		// Now save the display image if filename is not null
+		if (displayfilename!=null){
+			GraphicsFeedback graphics=new GraphicsFeedback(true);
+			graphics.ShowPixelColourArray(ConvertTextureToSquareArrayOfColoursForDisplay(display, squaresize), squaresize,squaresize);
+			graphics.SaveImage(displayfilename);
+		}
+		return variancesum/samplepoints.length;
+		} // end if count>1
+		else return Double.MAX_VALUE;
+	}
 	
 	
 	
@@ -98,9 +142,11 @@ public class TexturePatch {
 	 * Private methods from here on down
 	 * 
 	 ************************************************************************************************************************************************/
-	// Called from constructors
-	private void init(Point3d a,Point3d b,Point3d c, Image image){
-		// Convert the 3d points to 2d parametric points on the plane they make
+	
+
+	private static Point3d[] Get3dSamplePoints(Point3d a, Point3d b, Point3d c, int squarewidth){
+		Point3d[] returnvalue=new Point3d[(int)(squarewidth*(squarewidth+1)*0.5)];
+		//		 Convert the 3d points to 2d parametric points on the plane they make
 		Plane plane=new Plane(a,b,c);
 		Point3d up=b.minus(a);
 		Point2d[] triangularvertices;
@@ -120,22 +166,27 @@ public class TexturePatch {
 				uvpoint.barycoordinates[1]=(double)x/(double)squarewidth;
 				uvpoint.barycoordinates[2]=(double)y/(double)squarewidth;
 				uvpoint.barycoordinates[0]=1-uvpoint.barycoordinates[1]-uvpoint.barycoordinates[2];
-				// Now convert this point back to a 3d point, backproject it to the image and retrieve the colour of this point and insert it into the array
+				// Now convert this point back to a 3d point and insert it into the array
 				uvpoint.CalculatePixelCoordinate(triangularvertices);
-				Point3d worldpoint=plane.GetPointOnPlaneFromParametricCoordinates(up, uvpoint.pixel);
-				Point2d imagepoint=image.getWorldtoImageTransform(worldpoint.ConvertPointTo4x1Matrix());
-				sampledtexturecolours[ConvertToArrayCoordinates(x,y,squarewidth)]=image.InterpolatePixelColour(imagepoint);
+				returnvalue[ConvertToArrayCoordinates(x,y,squarewidth)]=plane.GetPointOnPlaneFromParametricCoordinates(up, uvpoint.pixel);;
 				// Note that the ConvertToArrayCoordinates currently does the same as incrementing index would do within this loop but the calculation is farmed out so
 				// can change the calculation if need be and still have set and get calls going to the same index within the 1d array.
 			} // end for x
 		} // end for y
+		return returnvalue;
 	}
-
 	
-	public static double FindSimilarityMeasure(TexturePatch[] patches){
-		
-		return 0;
+	private static PixelColour[][] ConvertTextureToSquareArrayOfColoursForDisplay(PixelColour[] texturecolours,int width){
+		PixelColour[][] returnvalue=new PixelColour[width][width];
+		for (int x=0;x<width;x++)
+			for (int y=0;y<width;y++)
+				if ((width-x)>y) returnvalue[x][y]=texturecolours[ConvertToArrayCoordinates(x,y,width)].clone();
+				else returnvalue[x][y]=new PixelColour();
+		return returnvalue;
 	}
+	
+	
+	
 	
 	
 	private static int ConvertToArrayCoordinates(int x, int y, int maxx){
