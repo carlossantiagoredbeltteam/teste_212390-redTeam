@@ -935,9 +935,8 @@ private void FindCalibrationSheetCirclesEtc(){
 								 Point2d[] ellipsecenters=FindEllipses(j);
 
 	    					 if (Continue(j,ellipsecenters)){
-//Sub-Step 2    						  
-	      					PointPairMatch circles=MatchCircles(j,ellipsecenters);
-	      					
+//Sub-Step 2    			
+	    					PointPairMatch circles=MatchCircles(j,ellipsecenters);
 	      					if (prefs.Debug) {
 	      						if (prefs.DebugCalibrationSheetBarycentricEstimate){
 	      						// Write out a file that is the dimensions of the calibration sheet with the colours corresponding to the colours in the image
@@ -2129,13 +2128,13 @@ private void FindCalibrationSheetCirclesEtc(){
 			  }
 		  });
 	PointPairMatch circles=new PointPairMatch(ellipsecenters);
-	  
 	JProgressBar bar=new JProgressBar(0,1);
 	bar.setValue(bar.getMinimum());
 		  while (bar.getValue()<bar.getMaximum()){
 //			This matches circle centers in the calibration sheet with ellipse centers found in the image
 			// bar=circles.MatchCircles(calibrationcirclecenters);
 			  bar=circles.OldMatchCircles(calibrationcirclecenters);
+			 // bar=circles.NewMatchCircles(calibrationcirclecenters);
 			  final JProgressBar temp=bar; 
 			  try{ 
 			// This is the recommended way of passing GUI information between threads
@@ -2152,6 +2151,7 @@ private void FindCalibrationSheetCirclesEtc(){
 				  System.out.println("Exception in updating the progress bar"+e.getMessage());
 	         }
 	  } // end while
+		 			 
 	  // display output
 		  final String text4="Number of Matched Point Pairs in image "+(i+1)+"="+circles.getNumberofPointPairs()+"\n";
 		  EventQueue.invokeLater(new Runnable(){
@@ -2728,7 +2728,7 @@ public class Point3dArray {
 		 // We need to use the assumption that the principal point is at the origin so start by setting the imagecenter to be the origin
 			 Point2d imagecenter=new Point2d(images[n].width/2,images[n].height/2);
 			images[n].originofimagecoordinates=imagecenter.clone();
-			camera=new CalibrateCamera(images[n]);
+			camera=new CalibrateCamera(images[n],maxbundleadjustmentiterations);
 		 Matrix K=camera.getCameraMatrix();
 		 double errorcode=K.get(2,2);
 		if (errorcode==1) distortion=CalculateIndividualCameraCalibration(n,K,maxbundleadjustmentiterations);
@@ -2765,7 +2765,7 @@ public class Point3dArray {
 				 // reset the coordinate origin to the internal representation with the origin at the image center (or the actual principal point if the above adjustment is uncommented 
 				 newpointpairs[j].pointtwo.minus(images[i].originofimagecoordinates);
 			}
-			CalibrateImage calibration=new CalibrateImage(newpointpairs);
+			CalibrateImage calibration=new CalibrateImage(newpointpairs,prefs.AlgorithmSettingMaxBundleAdjustmentNumberOfIterations);
 			calibration.CalculateTranslationandRotation(cameramatrix);
 			calibration.setZscalefactor(images[i].originofimagecoordinates,cameramatrix);
 			

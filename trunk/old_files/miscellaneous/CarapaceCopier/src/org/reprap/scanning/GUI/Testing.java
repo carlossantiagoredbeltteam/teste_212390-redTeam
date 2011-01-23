@@ -238,7 +238,7 @@ public class Testing {
 			
 			// Create planar homography
 			PointPair2D[] pp=circles.getMatchedPoints();
-			CalibrateImage calibrate=new CalibrateImage(pp);
+			CalibrateImage calibrate=new CalibrateImage(pp,100);
 			Matrix H=calibrate.getHomography();
 			
 			String prefix=""+(System.currentTimeMillis()-starttime)+" "+n+" ";

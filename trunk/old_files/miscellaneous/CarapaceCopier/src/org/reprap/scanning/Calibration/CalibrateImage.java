@@ -23,7 +23,7 @@ package org.reprap.scanning.Calibration;
  * 
  * Reece Arnott	reece.arnott@gmail.com
  * 
- * Last modified by Reece Arnott 13th December 2010
+ * Last modified by Reece Arnott 22nd January 2010
  * 
  *   	
  *   
@@ -43,12 +43,12 @@ public class CalibrateImage {
  private Matrix Homography=new Matrix(3,3);
  private double zscalefactor; // used to change the scale of the world z axis (defined to be the same as - or the average of- the x and y axes which are based on the pixels of the calibration sheet) to the arbitrary z scale used by the Camera, rotation and translation matrices derived by Zhangs method
  private boolean setRotationAndTranslation;
- 
+ private int bundleadjustmentmaxlooping;
  boolean print=false; // only for testing purposes
  boolean printDLT=false; // only for testing purposes
  
  // Constructor
-public CalibrateImage(PointPair2D[] pp){	 
+public CalibrateImage(PointPair2D[] pp,int homgraphyadjustmentlooping){	 
 	 matchedpoints=new PointPair2D[pp.length];
 	 for (int i=0;i<pp.length;i++) {
 		 matchedpoints[i]=pp[i].clone();
@@ -57,11 +57,13 @@ public CalibrateImage(PointPair2D[] pp){
 	 setHomographyusingAllPoints();
 	 setRotationAndTranslation=false;
 	 zscalefactor=1;
+	 bundleadjustmentmaxlooping=homgraphyadjustmentlooping;
  }
  public CalibrateImage(){	 
 	 matchedpoints=new PointPair2D[0];
 	setRotationAndTranslation=false;
 	 zscalefactor=1;
+	 bundleadjustmentmaxlooping=100;
  }
  // clone method
  public CalibrateImage clone(){
@@ -73,6 +75,7 @@ public CalibrateImage(PointPair2D[] pp){
 	 returnvalue.translation=translation.copy();
 	 returnvalue.setRotationAndTranslation=setRotationAndTranslation;
 	 returnvalue.zscalefactor=zscalefactor;
+	 returnvalue.bundleadjustmentmaxlooping=bundleadjustmentmaxlooping;
 	 return returnvalue;
  }
  
@@ -86,9 +89,12 @@ public CalibrateImage(PointPair2D[] pp){
 		}
 		Matrix H=setHomography(PointsInImageOne, PointsInImageTwo);
 		// Now do Bundle adjustment on this estimated homography to get a closer match
-		CalibrationBundleAdjustment adjust=new CalibrationBundleAdjustment();
-		adjust.BundleAdjustment(100, PointsInImageOne, PointsInImageTwo,H);
-		Homography=H.copy();
+		if (bundleadjustmentmaxlooping>0){
+			CalibrationBundleAdjustment adjust=new CalibrationBundleAdjustment();
+			adjust.BundleAdjustment(bundleadjustmentmaxlooping, PointsInImageOne, PointsInImageTwo,H);
+			Homography=H.copy();
+		}
+		else Homography=H.copy();
  }
 // This uses the RANSAC algorithm to calculate a homography based on a subset of the matched points and returns the number of inliers for this homography
 public int setHomograhyusingRANSAC(double tsquared){ // t is the transfer error distance threshold to determine inliers and outliers 
@@ -203,13 +209,16 @@ public int setHomograhyusingRANSAC(double tsquared){ // t is the transfer error 
 			//H.print(10,20);		
 		}
 		//Now do Bundle adjustment on this estimated homography to get a closer match
-		CalibrationBundleAdjustment adjust=new CalibrationBundleAdjustment();
-		adjust.BundleAdjustment(100, PointsInImageOne, PointsInImageTwo,H);
+		if (bundleadjustmentmaxlooping>0){
+			CalibrationBundleAdjustment adjust=new CalibrationBundleAdjustment();
+			adjust.BundleAdjustment(bundleadjustmentmaxlooping, PointsInImageOne, PointsInImageTwo,H);
+			Homography=H.copy();
+		}
+		else Homography=H.copy();
 		//if (print) {
 		//	System.out.println("Adjusted homography");
 		//	H.print(10,20);		
 		//}
-		Homography=H.copy();
 	}
 	else maxinliers=0;
 	return maxinliers;
