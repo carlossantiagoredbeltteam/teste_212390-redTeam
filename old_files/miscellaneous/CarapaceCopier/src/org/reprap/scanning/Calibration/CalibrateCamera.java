@@ -42,7 +42,7 @@ public class CalibrateCamera {
 	 private boolean print=false; //just for testing purposes
 	
 	 //constructor
-	 public CalibrateCamera(Image[] images, boolean[] use){
+	 public CalibrateCamera(Image[] images, boolean[] use, int maxbundleadjustment){
 		int count=0;
 		for (int j=0;j<use.length;j++) if (use[j]) count++;
 		imagecalibrationarray=new CalibrateImage[count];
@@ -56,13 +56,13 @@ public class CalibrateCamera {
 					 // set the coordinate origin to the center of the image
 						pointpair[j].pointtwo.minus(images[i].originofimagecoordinates);
 					 } // end for j
-				imagecalibrationarray[count]=new CalibrateImage(pointpair);
+				imagecalibrationarray[count]=new CalibrateImage(pointpair, maxbundleadjustment);
 				count++;
 			}
 		}
 		warnings="";
 	}
-	 public CalibrateCamera(Image image){
+	 public CalibrateCamera(Image image, int maxbundleadjustment){
 			imagecalibrationarray=new CalibrateImage[1];
 			 // Use the original point matches - note that the second points are the image coordinate ones
 			 PointPair2D[] pointpair=new PointPair2D[image.matchingpoints.length];
@@ -71,7 +71,7 @@ public class CalibrateCamera {
 				 // set the coordinate origin to the center of the image
 					pointpair[j].pointtwo.minus(image.originofimagecoordinates);
 				 } // end for j
-			imagecalibrationarray[0]=new CalibrateImage(pointpair);
+			imagecalibrationarray[0]=new CalibrateImage(pointpair, maxbundleadjustment);
 			warnings="";
 		}
 //	 This is just used in the CalculateCameraMatrix method to make the code tidier
