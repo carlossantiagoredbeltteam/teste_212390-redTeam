@@ -23,7 +23,7 @@ package org.reprap.scanning.FeatureExtraction;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 19th January 2011
+* Last modified by Reece Arnott 24th January 2011
 *
 *  TODO - should the pixel colours be stored as int and converted when needed?
 *  		
@@ -43,7 +43,6 @@ import org.reprap.scanning.GUI.GraphicsFeedback;
 public class TexturePatch {
 
 	private PixelColour[] sampledtexturecolours; // Note that this is really a set of points in a 2d grid so could be a 2d array but as they form a triangle then half the array would be blank. Instead there is a private method to transform 2d coordinates into the array index 
-	//private Point2d[] triangularvertices; // These are 3 points used as the anchor points with everything being transformed to and from barycentric coordinates relative to them. Currently not used outside of constructor
 	private int squarewidth; // Set by constructor
 	
 	// Constructors
@@ -84,9 +83,45 @@ public class TexturePatch {
 		return ConvertTextureToSquareArrayOfColoursForDisplay(sampledtexturecolours,squarewidth);
 	}
 	
-	public static double FindSimilarityMeasure(Image[] images, Point3d a, Point3d b, Point3d c, int squaresize, Point3d pointabovetriangleplane, String displayfilename, double temppointsimilaritythreshold){
+	public static double FindSimilarityMeasure(Image[] images, Point3d a, Point3d b, Point3d c, int squaresize, Point3d pointabovetriangleplane){
 		double variancesum=0;
 		// First filter out those images that do not have a camera centre above the plane defined by the triangle
+		boolean[] skip=new boolean[images.length];
+		int count=0;
+		Plane plane=new Plane(a,b,c);
+		for (int i=0;i<images.length;i++){
+			Point3d C=new Point3d(MatrixManipulations.GetRightNullSpace(images[i].getWorldtoImageTransformMatrix()));
+			skip[i]=plane.GetHalfspace(pointabovetriangleplane)!=plane.GetHalfspace(C);
+			if (!skip[i]) count++;
+			}
+		if (count>1) {
+			TexturePatch[] patch=new TexturePatch[count];
+			count=0;
+			// First get the 3d sample points
+			Point3d[] samplepoints=Get3dSamplePoints(a,b,c,squaresize);
+			// Now, for each image that we are not skipping use these sample points to create a patch
+			for (int i=0;i<images.length;i++) if (!skip[i]){
+				patch[count]=new TexturePatch();
+				patch[count].squarewidth=squaresize;
+				patch[count].sampledtexturecolours=new PixelColour[samplepoints.length];
+				for (int j=0;j<patch[count].sampledtexturecolours.length;j++) patch[count].sampledtexturecolours[j]=images[i].InterpolatePixelColour(images[i].getWorldtoImageTransform(samplepoints[j].ConvertPointTo4x1Matrix()));
+				count++;
+				} // end for/if !skip
+			// Now do a point similarity measure for each one and set the colour for the display patch
+			for (int index=0;index<patch[0].sampledtexturecolours.length;index++){
+				PixelColour[] colours=new PixelColour[patch.length];
+				for (int i=0;i<patch.length;i++) colours[i]=patch[i].sampledtexturecolours[index].clone();
+				double[] variance=new PixelColour().SetPixelToMeanColourAndReturnVariance(colours); // This gives variance for R,G,B, greyscale, and RGB in length 5 array
+				variancesum=variancesum+variance[4];
+			} // end for
+		return variancesum/samplepoints.length;
+		} // end if count>1
+		else return Double.MAX_VALUE;
+	}
+	
+	public static double SaveSimilarityPatch(Image[] images, Point3d a, Point3d b, Point3d c, int squaresize, Point3d pointabovetriangleplane, String displayfilename, double temppointsimilaritythreshold){
+		// First filter out those images that do not have a camera centre above the plane defined by the triangle
+		double variancesum=0;
 		boolean[] skip=new boolean[images.length];
 		int count=0;
 		Plane plane=new Plane(a,b,c);
@@ -122,6 +157,7 @@ public class TexturePatch {
 				if (variance[4]<temppointsimilaritythreshold)  display[index]=newcolour.clone();
 				else display[index]=new PixelColour(PixelColour.StandardColours.Red);
 				variancesum=variancesum+variance[4];
+				
 			} // end for
 		
 		// Now save the display image if filename is not null
@@ -134,8 +170,6 @@ public class TexturePatch {
 		} // end if count>1
 		else return Double.MAX_VALUE;
 	}
-	
-	
 	
 	/************************************************************************************************************************************************
 	 * 

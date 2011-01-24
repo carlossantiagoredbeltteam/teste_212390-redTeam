@@ -299,24 +299,45 @@ public class Main extends JFrame {
 	 Point3d a=new Point3d(calibrationsheetwidth/2,calibrationsheetheight/2,0);
 	 Point3d b=new Point3d(-calibrationsheetwidth/2,calibrationsheetheight/2,0);
 	 Point3d c=new Point3d(calibrationsheetwidth/2,-calibrationsheetheight/2,0);
-	 Point3d uppoint=new Point3d(a.x,a.y,1);
+	 Point3d upvector=new Point3d(0,0,1);
+	 Point3d uppoint=a.plus(upvector);
 	 
+	 double minvarianceangle=0;
+	 double step=0;
+	 double minvariance=Double.MAX_VALUE;
+	 long starttime=System.currentTimeMillis();
 	 
-	 int size=800;
-	 // Note that if set threshold to Double.MAX_VALUE then all pixels will be shown, otherwise pixels with a similarity value over the threshold will be shown as red
-	 String texturespatchimilarityfilename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"similaritypatch0.jpg";
-	 double averagevariance=TexturePatch.FindSimilarityMeasure(images, a, b, c, size, uppoint,texturespatchimilarityfilename, prefs.AlgorithmSettingSurfacePointTextureVarianceThreshold);
-	//TexturePatch.FindSimilarityMeasure(images, a, b, c, size,uppoint,texturespatchimilarityfilename,Double.MAX_VALUE);
-	 //TexturePatch.FindSimilarityMeasure(images, a, b, c, size,uppoint,null, prefs.AlgorithmSettingSurfacePointTextureVarianceThreshold);
-	 System.out.println(averagevariance);
-	 for (int i=0;i<images.length;i++){
-		 TexturePatch test=new TexturePatch(images[i],a,b,c,size);
-		 String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"testpatch"+Integer.toString(i)+".jpg";
-		 GraphicsFeedback graphics=new GraphicsFeedback(true);
-		 graphics.ShowPixelColourArray(test.ConvertTextureToSquareArrayOfColoursForDisplay(),test.GetSquareGridSize(),test.GetSquareGridSize());
-		 graphics.SaveImage(filename);
-	 }
-	
+	 int numberofsubdivisions=3;
+	 int numberofdivsionspergap=8;
+	 double minangle=((double)-90/(double)360)*tau;
+	 double maxangle=((double)90/(double)360)*tau;
+	 int size=40;
+	 
+	 for (int loop=0;loop<numberofsubdivisions;loop++){
+		 step=(maxangle-minangle)/numberofdivsionspergap;
+		 
+	 for (double angle=minangle;angle<=maxangle;angle=angle+step){
+		 Point3d rotatedpoint=MatrixManipulations.RotatePointCaroundLineAB(angle,a,b,c);
+		 Point3d rotateduppoint=MatrixManipulations.RotatePointCaroundLineAB(angle,a,b,uppoint);
+		// Note that if set threshold to Double.MAX_VALUE then all pixels will be shown, otherwise pixels with a similarity value over the threshold will be shown as red
+		 //String texturespatchimilarityfilename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"similaritypatch"+i+".jpg";
+		 double averagevariance=TexturePatch.FindSimilarityMeasure(images, a, b, rotatedpoint, size, rotateduppoint);
+		 if (averagevariance<minvariance){ minvariance=averagevariance;minvarianceangle=angle;}
+	 } // end for angle
+	 	minangle=minvarianceangle-(step/2);
+	 	maxangle=minvarianceangle+(step/2);
+	 	size=size/2;
+	 } // end for loop
+	 
+	 System.out.println(((minvarianceangle/tau)*360)+" degrees +/-"+((step/tau)*360)*0.5+" "+minvariance);
+	 System.out.println("Time: "+(System.currentTimeMillis()-starttime)+"ms");
+	 double angle=minvarianceangle;
+	 size=800;
+	 Point3d rotatedpoint=MatrixManipulations.RotatePointCaroundLineAB(angle,a,b,c);
+	 Point3d rotateduppoint=MatrixManipulations.RotatePointCaroundLineAB(angle,a,b,uppoint);
+	 String texturespatchimilarityfilename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"similaritypatch.jpg";
+	 double value=TexturePatch.SaveSimilarityPatch(images, a, b, rotatedpoint, size, rotateduppoint,texturespatchimilarityfilename, prefs.AlgorithmSettingSurfacePointTextureVarianceThreshold);
+		System.out.println(value);
  }
  
  	
@@ -2132,9 +2153,19 @@ private void FindCalibrationSheetCirclesEtc(){
 	bar.setValue(bar.getMinimum());
 		  while (bar.getValue()<bar.getMaximum()){
 //			This matches circle centers in the calibration sheet with ellipse centers found in the image
-			// bar=circles.MatchCircles(calibrationcirclecenters);
+			// There are currently 3 ways of doing this.
+			  // The OldMatchCircles is a combinatorial approach (m^3n^3 or approx n^6), matching every 3 combinations of points in the image with every permutation of 3 of points in the calibration sheet and 
+			  // scoring based on distance to the nearest valid point by matching the rest of the points in the image with points in the calibration sheet using barycentric coordinate transforms 
 			  bar=circles.OldMatchCircles(calibrationcirclecenters);
-			 // bar=circles.NewMatchCircles(calibrationcirclecenters);
+				 // The MatchCircles is similar to the OldMatchCircles except the 3 points in the image to macth are chosen as those that give a triangle with the largest area - works less good at low angles
+			  	// m^3+n^3 or approx n^3
+			  // bar=circles.MatchCircles(calibrationcirclecenters);
+			  // The NewMatchCircles chooses 4 points in the image that form a quadralateral (or possibly triangle if one point is inside the triangle) with the largest area and matches them
+			  // with every permutation of 4 points in the calibration sheet. For each permutation a homography is created and 
+			  // the scoring is based on distance to the nearest valid point by matching the rest of the points in the image with points in the calibration sheet using this planar homography transform.
+			  // Which 4 points to choose from the image as the starting points is irrelevent if there are no false positives. If there are likely to be false positives this largest area is unlikely to be a good choice. 
+			  // m^4+n^4 or approx n^4
+			  // bar=circles.NewMatchCircles(calibrationcirclecenters);
 			  final JProgressBar temp=bar; 
 			  try{ 
 			// This is the recommended way of passing GUI information between threads
