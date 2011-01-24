@@ -155,8 +155,8 @@ boolean skip;
 						totalerrordistancesquared=totalerrordistancesquared+mindistancesquared;
 						circlefound[nextcircleindex]=true;
 						ellipsefound[nextellipseindex]=true;
+						index++;
 					}
-					index++;
 					breakout=((index>=foundcentroids.length)  || (totalerrordistancesquared>smallesterror));
 				} // end while !breakout
 				// If this configuration is better than the last one we have, use it instead
@@ -301,14 +301,14 @@ private void SetPointPairsUsingHomography(Point2d[] circlearray){
 							totalerrordistancesquared=totalerrordistancesquared+mindistancesquared;
 							circlefound[nextcircleindex]=true;
 							ellipsefound[nextellipseindex]=true;
+							index++;
 						}
-						index++;
 						breakout=((index>=foundcentroids.length)  || (totalerrordistancesquared>smallesterror));
 					} // end while !breakout
 					// If this configuration is better than the last one we have, use it instead
 					if ((totalerrordistancesquared<smallesterror) && (index>=foundpointpairs.length)){
 						// Now we need to add in the error from the original 4 anchor points
-						for (int i=0;i<3;i++){
+						for (int i=0;i<4;i++){
 							PointPair2D potentialpointpair=new PointPair2D();
 							potentialpointpair.pointone=foundcentroids[i].pointone.clone();
 							potentialpointpair.pointtwo=potentialpointpair.pointone.clone();
