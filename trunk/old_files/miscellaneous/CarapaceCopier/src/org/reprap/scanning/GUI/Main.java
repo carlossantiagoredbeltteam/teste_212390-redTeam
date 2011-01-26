@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  *
- * Last modified by Reece Arnott 18th January 2011
+ * Last modified by Reece Arnott 25th January 2011
  * 
  * Note that most of the layout commands were initially produced by NetBeans for JDK 6
  * and significantly modified by hand. For future reference if it needs to be done the other way the main things to change are:
@@ -293,52 +293,74 @@ public class Main extends JFrame {
  }
 
  public void Test2(){
-	 //Point3d a=new Point3d(-(calibrationsheetwidth/2),-(calibrationsheetheight/2),0);
-	 //Point3d b=new Point3d(calibrationsheetwidth/2,-calibrationsheetheight/2,0);
-	 //Point3d c=new Point3d(-calibrationsheetwidth/2,calibrationsheetheight/2,0);
-	 Point3d a=new Point3d(calibrationsheetwidth/2,calibrationsheetheight/2,0);
-	 Point3d b=new Point3d(-calibrationsheetwidth/2,calibrationsheetheight/2,0);
-	 Point3d c=new Point3d(calibrationsheetwidth/2,-calibrationsheetheight/2,0);
-	 Point3d upvector=new Point3d(0,0,1);
-	 Point3d uppoint=a.plus(upvector);
+	 // Create an equalateral triangle starting at top of calibration sheet
 	 
-	 double minvarianceangle=0;
-	 double step=0;
-	 double minvariance=Double.MAX_VALUE;
-	 long starttime=System.currentTimeMillis();
+	// Point2d a2d=new Point2d(-(calibrationsheetwidth/2),-(calibrationsheetheight/2));
+	// Point2d a2d=new Point2d(0,0);
+ Point2d a2d=new Point2d(calibrationsheetwidth/2,calibrationsheetheight/2);
+
+	 double initialangle=Math.PI;
+	 double length=20;
+	 Point2d b2d=a2d.GetOtherPoint(initialangle,length);
+	 Point2d c2d=a2d.GetOtherPoint(initialangle+(((double)60/(double)360)*tau),length);
+	 
+	 Point3d a=new Point3d(a2d.x,a2d.y,0);
+	 Point3d b=new Point3d(b2d.x,b2d.y,0);
+	 Point3d c=new Point3d(c2d.x,c2d.y,0);
+	  
+	 Point3d upvector=new Point3d(0,0,1);
 	 
 	 int numberofsubdivisions=3;
-	 int numberofdivsionspergap=8;
-	 double minangle=((double)-90/(double)360)*tau;
-	 double maxangle=((double)90/(double)360)*tau;
-	 int size=40;
+	 int numberofranges=8;
+	 int squaresize=10;
+	 double minimumsimilarityrange=1000;
+	 double mindistancesquaredbetweenvertices=4;
+	 volumeofinterest.minx=(-calibrationsheetwidth/2);
+	 volumeofinterest.miny=(-calibrationsheetheight/2);
+	 volumeofinterest.minz=-1;
+	 volumeofinterest.maxx=(calibrationsheetwidth/2);
+	 volumeofinterest.maxy=(calibrationsheetheight/2);
+	 volumeofinterest.maxz=(calibrationsheetwidth/2);
 	 
-	 for (int loop=0;loop<numberofsubdivisions;loop++){
-		 step=(maxangle-minangle)/numberofdivsionspergap;
+	 Point3d[] vertices=new Point3d[3];
+	 vertices[0]=a.clone();
+	 vertices[1]=b.clone();
+	 vertices[2]=c.clone();
+	 
+	 Triangle3D[] tri=new Triangle3D[1];
+	 tri[0]=new Triangle3D(0,1,2,vertices,upvector);
+	 
+	 TrianglePlusVertexArray tripatches=new TrianglePlusVertexArray(vertices,tri);
+	 int i=0;
+	 int max=100;
+	 while ((i<max) && (i<tripatches.GetTriangleArrayLength())){
+		 tripatches.ExpandTexturePatch(i, volumeofinterest,numberofranges,numberofsubdivisions,images,squaresize,minimumsimilarityrange,mindistancesquaredbetweenvertices);
+		 System.out.println(i+" "+tripatches.GetTriangleArrayLength()+" "+tripatches.GetVertexArrayLength());
+		 i++;
 		 
-	 for (double angle=minangle;angle<=maxangle;angle=angle+step){
-		 Point3d rotatedpoint=MatrixManipulations.RotatePointCaroundLineAB(angle,a,b,c);
-		 Point3d rotateduppoint=MatrixManipulations.RotatePointCaroundLineAB(angle,a,b,uppoint);
-		// Note that if set threshold to Double.MAX_VALUE then all pixels will be shown, otherwise pixels with a similarity value over the threshold will be shown as red
-		 //String texturespatchimilarityfilename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"similaritypatch"+i+".jpg";
-		 double averagevariance=TexturePatch.FindSimilarityMeasure(images, a, b, rotatedpoint, size, rotateduppoint);
-		 if (averagevariance<minvariance){ minvariance=averagevariance;minvarianceangle=angle;}
-	 } // end for angle
-	 	minangle=minvarianceangle-(step/2);
-	 	maxangle=minvarianceangle+(step/2);
-	 	size=size/2;
-	 } // end for loop
+	 }
+	  
+	 tri=tripatches.GetTriangleArray();
+	 vertices=tripatches.GetVertexArray();
+	 max=tri.length;
+	 String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"test.jpg";
+	 PixelColour colour=new PixelColour(PixelColour.StandardColours.Blue);
+	 GraphicsFeedback graphics=new GraphicsFeedback(true);
+	 graphics.ShowImage(images[0]);
+	 for (i=0;i<max;i++){
+		// if (i>=(tri.length-1)) colour=new PixelColour(PixelColour.StandardColours.Red);
+		 int[] v=tri[i].GetFace();
+		 Line3d ab=new Line3d(vertices[v[0]],vertices[v[1]]);
+		 Line3d bc=new Line3d(vertices[v[1]],vertices[v[2]]);
+		 Line3d ac=new Line3d(vertices[v[0]],vertices[v[2]]);
+		 graphics.PrintLineSegment(ab, colour,images[0]);
+		 graphics.PrintLineSegment(bc, colour,images[0]);
+		 graphics.PrintLineSegment(ac, colour,images[0]);
+		 
+	 }
+	 graphics.SaveImage(filename);
 	 
-	 System.out.println(((minvarianceangle/tau)*360)+" degrees +/-"+((step/tau)*360)*0.5+" "+minvariance);
-	 System.out.println("Time: "+(System.currentTimeMillis()-starttime)+"ms");
-	 double angle=minvarianceangle;
-	 size=800;
-	 Point3d rotatedpoint=MatrixManipulations.RotatePointCaroundLineAB(angle,a,b,c);
-	 Point3d rotateduppoint=MatrixManipulations.RotatePointCaroundLineAB(angle,a,b,uppoint);
-	 String texturespatchimilarityfilename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"similaritypatch.jpg";
-	 double value=TexturePatch.SaveSimilarityPatch(images, a, b, rotatedpoint, size, rotateduppoint,texturespatchimilarityfilename, prefs.AlgorithmSettingSurfacePointTextureVarianceThreshold);
-		System.out.println(value);
- }
+}
  
  	
 //  This method redraws the Window for the step in which the calibration pattern is chosen
