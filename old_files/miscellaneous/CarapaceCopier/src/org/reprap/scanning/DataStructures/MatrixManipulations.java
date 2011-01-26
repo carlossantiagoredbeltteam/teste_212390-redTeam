@@ -173,7 +173,7 @@ public class MatrixManipulations {
 		normalisedvector=normalisedvector.times(1/Math.sqrt(normalisedvector.lengthSquared()));
 		matrix.set(0,0,rcos + (normalisedvector.x*normalisedvector.x*(1-rcos)));
 		matrix.set(1,0,(normalisedvector.z * rsin) + (normalisedvector.y*normalisedvector.x*(1-rcos)));
-		matrix.set(1,0,(-normalisedvector.y * rsin) + (normalisedvector.z*normalisedvector.x*(1-rcos)));
+		matrix.set(2,0,(-normalisedvector.y * rsin) + (normalisedvector.z*normalisedvector.x*(1-rcos)));
 		matrix.set(0,1,(-normalisedvector.z * rsin) + (normalisedvector.x*normalisedvector.y*(1-rcos)));
 		matrix.set(1,1,rcos + (normalisedvector.y*normalisedvector.y*(1-rcos)));
 		matrix.set(2,1,(normalisedvector.x * rsin) + (normalisedvector.z*normalisedvector.y*(1-rcos)));
@@ -188,9 +188,7 @@ public class MatrixManipulations {
 		Point3d ab=b.minus(a);
 		Point3d ac=c.minus(a);
 		Matrix R=Calculate3x3RotationMatrixFor3DVectorUsingQuarternions(angle,ab);
-		Point3d returnvalue=new Point3d(R.times(ac.ConvertPointTo3x1Matrix()));
-		returnvalue=returnvalue.plus(a);
-		return returnvalue;
+		return new Point3d(R.times(ac.ConvertPointTo3x1Matrix())).plus(a);
 	}
 	
 	public Matrix[] CalculateImageRectificationHomographies(AxisAlignedBoundingBox image1, AxisAlignedBoundingBox image2){

@@ -202,6 +202,9 @@ public class GraphicsFeedback {
 			}	
 	}
 	
+	public void PrintLineSegment(Line3d line,PixelColour colour, Image image){ PrintLineSegment(new LineSegment2D(image.getWorldtoImageTransform(line.P.ConvertPointTo4x1Matrix()),image.getWorldtoImageTransform(line.GetPointonLine(1).ConvertPointTo4x1Matrix())),colour);}
+	
+	
 	public void PrintSurfaceSubVoxels(Voxel rootvoxel, Image givenimage, PixelColour colour){
 		int max=rootvoxel.getSubVoxelArraySize();
 		for (int i=0;i<max;i++){

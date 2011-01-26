@@ -23,7 +23,7 @@ package org.reprap.scanning.FeatureExtraction;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 24th January 2011
+* Last modified by Reece Arnott 25th January 2011
 *
 *  TODO - should the pixel colours be stored as int and converted when needed?
 *  		
@@ -40,6 +40,8 @@ package org.reprap.scanning.FeatureExtraction;
 import org.reprap.scanning.DataStructures.*;
 import org.reprap.scanning.Geometry.*;
 import org.reprap.scanning.GUI.GraphicsFeedback;
+
+import Jama.Matrix;
 public class TexturePatch {
 
 	private PixelColour[] sampledtexturecolours; // Note that this is really a set of points in a 2d grid so could be a 2d array but as they form a triangle then half the array would be blank. Instead there is a private method to transform 2d coordinates into the array index 
@@ -54,6 +56,8 @@ public class TexturePatch {
 		for (int i=0;i<sampledtexturecolours.length;i++) sampledtexturecolours[i]=image.InterpolatePixelColour(image.getWorldtoImageTransform(samplepoints[i].ConvertPointTo4x1Matrix()));
 
 	}
+	//TODO delete when know it is not needed
+	/*
 	public TexturePatch(int approxnumberofsamples, Image image, Point3d a, Point3d b, Point3d c){
 		// Set up the sampled texture colours array and initialise to blank. Note that the number of sample points will be a little over 1/2 the square of the length of the 2d grid. i.e. 1+2+3+...+n or (n*(n+1))/2
 		// using the quadratic formula we can work out n as we can rearrange n(n+1)/2=s to be
@@ -65,6 +69,8 @@ public class TexturePatch {
 		sampledtexturecolours=new PixelColour[samplepoints.length];
 		for (int i=0;i<sampledtexturecolours.length;i++) sampledtexturecolours[i]=image.InterpolatePixelColour(image.getWorldtoImageTransform(samplepoints[i].ConvertPointTo4x1Matrix()));
 	}
+	*/
+	
 	public TexturePatch(){squarewidth=0;sampledtexturecolours=new PixelColour[0];}
 
 	// Clone method
@@ -83,7 +89,7 @@ public class TexturePatch {
 		return ConvertTextureToSquareArrayOfColoursForDisplay(sampledtexturecolours,squarewidth);
 	}
 	
-	public static double FindSimilarityMeasure(Image[] images, Point3d a, Point3d b, Point3d c, int squaresize, Point3d pointabovetriangleplane){
+	public static double FindSimilarityMeasure(Image[] images, Point3d a, Point3d b, Point3d c, int squaresize, Point3d upvector){
 		double variancesum=0;
 		// First filter out those images that do not have a camera centre above the plane defined by the triangle
 		boolean[] skip=new boolean[images.length];
@@ -91,7 +97,7 @@ public class TexturePatch {
 		Plane plane=new Plane(a,b,c);
 		for (int i=0;i<images.length;i++){
 			Point3d C=new Point3d(MatrixManipulations.GetRightNullSpace(images[i].getWorldtoImageTransformMatrix()));
-			skip[i]=plane.GetHalfspace(pointabovetriangleplane)!=plane.GetHalfspace(C);
+			skip[i]=plane.GetHalfspace(upvector.plus(a))!=plane.GetHalfspace(C);
 			if (!skip[i]) count++;
 			}
 		if (count>1) {
@@ -119,7 +125,13 @@ public class TexturePatch {
 		else return Double.MAX_VALUE;
 	}
 	
-	public static double SaveSimilarityPatch(Image[] images, Point3d a, Point3d b, Point3d c, int squaresize, Point3d pointabovetriangleplane, String displayfilename, double temppointsimilaritythreshold){
+	
+	
+	
+	
+	
+	
+	public static double SaveSimilarityPatch(Image[] images, Point3d a, Point3d b, Point3d c, int squaresize, Point3d upvector, String displayfilename, double temppointsimilaritythreshold){
 		// First filter out those images that do not have a camera centre above the plane defined by the triangle
 		double variancesum=0;
 		boolean[] skip=new boolean[images.length];
@@ -127,7 +139,7 @@ public class TexturePatch {
 		Plane plane=new Plane(a,b,c);
 		for (int i=0;i<images.length;i++){
 			Point3d C=new Point3d(MatrixManipulations.GetRightNullSpace(images[i].getWorldtoImageTransformMatrix()));
-			skip[i]=plane.GetHalfspace(pointabovetriangleplane)!=plane.GetHalfspace(C);
+			skip[i]=plane.GetHalfspace(upvector.plus(a))!=plane.GetHalfspace(C);
 			if (!skip[i]) count++;
 			}
 		if (count>1) {
@@ -137,14 +149,12 @@ public class TexturePatch {
 			Point3d[] samplepoints=Get3dSamplePoints(a,b,c,squaresize);
 			// Now, for each image that we are not skipping use these sample points to create a patch
 			for (int i=0;i<images.length;i++) if (!skip[i]){
-				System.out.print(".");
 				patch[count]=new TexturePatch();
 				patch[count].squarewidth=squaresize;
 				patch[count].sampledtexturecolours=new PixelColour[samplepoints.length];
 				for (int j=0;j<patch[count].sampledtexturecolours.length;j++) patch[count].sampledtexturecolours[j]=images[i].InterpolatePixelColour(images[i].getWorldtoImageTransform(samplepoints[j].ConvertPointTo4x1Matrix()));
 				count++;
 				} // end for/if !skip
-			System.out.println();
 			// For display purposes create a pixel colour of the same size as the sampled patches
 			PixelColour[] display=new PixelColour[patch[0].sampledtexturecolours.length];
 			// Now do a point similarity measure for each one and set the colour for the display patch

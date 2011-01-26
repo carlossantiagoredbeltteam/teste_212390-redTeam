@@ -24,7 +24,7 @@ package org.reprap.scanning.Geometry;
 * 
 * Reece Arnott	reece.arnott@gmail.com
 * 
-* Last modified by Reece Arnott 21st December 2010
+* Last modified by Reece Arnott 26th January 2011
 *
 *	This class stores a triangluar face which may be part of 0,1 or 2 tetrahedrons.
 *	A triangular face is 3 vertices a,b,c and potentially 0,1, or 2 other points relating 
@@ -51,7 +51,15 @@ public class Triangle3D {
 		c=pointc;
 		CalculateNormalAwayFromPoint(p,p[a]); // pick a random normal direction
 	}
-	
+	public Triangle3D(int pointa, int pointb, int pointc, Point3d[] p, Point3d normalvector){
+		// Store the face as unsorted points - note that have to sort the points when calculating hashvalue if we do this
+		a=pointa;
+		b=pointb;
+		c=pointc;
+		normal=normalvector.clone();
+		normal=normalvector.times(Math.sqrt(normalvector.lengthSquared()));
+		normaldota=normal.dot(p[a]);
+	}
 	// Construct a null face - can be detected using IsNull method
 	public Triangle3D(){
 		a=-1;
@@ -70,6 +78,16 @@ public class Triangle3D {
 		returnvalue.normal=normal.clone();
 		returnvalue.hashvalue=hashvalue;
 		return returnvalue;
+	}
+//	TODO delete when not needed
+	
+	public double getArea(Point3d[] P){
+		// Using Herons formula A=sqrt(p(p-a)(p-b)(p-c)) where a,b,c are the lengths of the sides of the triangle and p is half the perimeter i.e. (a+b+c)/2
+		double ab=Math.sqrt(P[b].minus(P[a]).lengthSquared());
+		double bc=Math.sqrt(P[c].minus(P[b]).lengthSquared());
+		double ac=Math.sqrt(P[c].minus(P[a]).lengthSquared());
+		double p=(ab+ac+bc)/2;
+		return (Math.sqrt(p*(p-ac)*(p-bc)*(p-ac)));
 	}
 	
 	public boolean TriangleEqual(Triangle3D other){
