@@ -155,7 +155,7 @@ public class TrianglePlusVertexArray {
 		
 		// There are a maximum of 2 new patches we can get from this patch, as it is assumed that the point on the otherside of the line ab has already been found.
 		// Note that we will not expand in a direction if it means going outside the bounding box or if it is a circular triangle creation. 
-		// TODO The latter is determined simply by seeing if there is any other triangle that contains both points a and c or b and c respectively
+		// The latter is determined simply by seeing if there is any other triangle that contains both points a and c or b and c respectively
 		
 		int[] points=triangles[current].GetFace();
 		// Just for additional readability
@@ -182,16 +182,35 @@ public class TrianglePlusVertexArray {
 				
 				// Find if the specified point is close to a point we already have and snap to it if that is the case
 				int i=0;
-				boolean exit=false;
-				while ((i<vertices.length) && (!exit)){
-					if (newcandnormal[0].CalculateDistanceSquared(vertices[i])<mindistancesquaredbetweenvertices) {newcindex=i; exit=true;}
+				boolean snappedto=false;
+				while ((i<vertices.length) && (!snappedto)){
+					if (newcandnormal[0].CalculateDistanceSquared(vertices[i])<mindistancesquaredbetweenvertices) {
+						newcindex=i; 
+						snappedto=true;
+					}
 					i++;
 				}
 			
-				// Find if the point is inside the bounding box, if so, add the triangle
+				// Find if the point is inside the bounding box, and doesn't interpenetrate any other pre-existing triangles, if so, add the triangle
 				if (aabb.PointInside3DBoundingBox(newcandnormal[0])) {
-					if (newcindex==vertices.length) AddVertex(newcandnormal[0]);
-					AddTriangle(new Triangle3D(newa,newb,newcindex,vertices,newcandnormal[1]));
+					Point3d[] oldpointsarray=new Point3d[0];
+					if (!snappedto) {oldpointsarray=vertices.clone();AddVertex(newcandnormal[0]);}
+					Triangle3D tri=new Triangle3D(newa,newb,newcindex,vertices,newcandnormal[1]);
+					boolean interpenetration=Interpenetration(tri,current);
+					//for (i=0;i<vertices.length;i++){System.out.print(i+" ");vertices[i].Print();System.out.println();}
+					if (!interpenetration){
+						if (snappedto) //we will need to recalculate the normal. 
+							//As long as the snapping to a previously existing index did not change the angle by more than 90 degrees
+							//(given that the snapping is supposed to be a small portion just to get around rounding errors this shouldn't be a problem) 
+							//we can easily calculate the new normal with the question of which side of the triangle is up 
+							//solved by having it be the same side as with the previous normal
+							tri.CalculateNormalAwayFromPoint(vertices,vertices[newcindex].minus(newcandnormal[1]));
+						AddTriangle(tri);
+					}
+					else {
+						 if (!snappedto) vertices=oldpointsarray.clone(); // reset the vertex array if need be
+					}
+					 
 				} // end if within boundingbox
 			} // end if skip
 		} // end for loop
@@ -214,53 +233,59 @@ public class TrianglePlusVertexArray {
 			 rotatedpoint=rotatedpoint.plus(newa);
 			 Point3d rotatedupvector=new Point3d(R.times(normal.ConvertPointTo3x1Matrix()));	
 		 	 double averagevariance=TexturePatch.FindSimilarityMeasure(images, newa, newb, rotatedpoint, squaresize, rotatedupvector);
-		 if (averagevariance<minvariance){
-			 minvariance=averagevariance;
-			 minvarianceangle=angle;
-			 returnvalue[0]=rotatedpoint.clone();
-			 returnvalue[1]=new Point3d(R.times(normal.ConvertPointTo3x1Matrix()));	
-		 }
-		 else if (averagevariance>maxvariance) maxvariance=averagevariance;
+		 	if (averagevariance!=Double.MAX_VALUE) // if the value returned is Double.MAX_VALUE then this means this angle is invalid as there are not at least 2 cameras above a patch at this angle (it could be this is the correct angle but the object is self-occluding so we cannot tell) 
+		 	 if (averagevariance<minvariance){
+		 		 minvariance=averagevariance;
+		 		 minvarianceangle=angle;
+		 		 returnvalue[0]=rotatedpoint.clone();
+		 		 returnvalue[1]=rotatedupvector.clone();	
+		 	 }
+		 	 else if ((averagevariance>maxvariance) || (maxvariance==Double.MAX_VALUE)) maxvariance=averagevariance;
 	 } // end for angle
 	 	minangle=minvarianceangle-(step/2);
 	 	maxangle=minvarianceangle+(step/2);
 	 } // end for loop
-		// If there is not enough variation to be able to tell, just leave it at zero degrees.
-		if ((maxvariance-minvariance)<minimumrange){
+		// If there is not enough variation to be able to tell, just leave it at zero degrees. i.e. continue expanding the plane in this direction
+		if ((maxvariance-minvariance)<=minimumrange){
 			returnvalue[0]=newczero.clone();
 			returnvalue[1]=normal.clone();
 		}
+		else System.out.println((maxvariance-minvariance));
 	return returnvalue;
 	}
-	//TODO uncomment and get working
-	/*
-	public boolean Interpenetration(TriangularTexturePatch[] others, int skip){
+	
+
+	// Note this only tests the interpenetration of edges ac and bc
+	private boolean Interpenetration(Triangle3D tri, int skip){
 		boolean interpenetration=false;
-		Line3d[] perimeter=new Line3d[3];
-		perimeter[0]=new Line3d(a,b);
-		perimeter[1]=new Line3d(b,c);
-		perimeter[2]=new Line3d(c,a);
-		
+		int[] vertex=tri.GetFace();
+		Line3d[] perimeter=new Line3d[2];
+		perimeter[0]=new Line3d(vertices[vertex[0]],vertices[vertex[2]]);
+		perimeter[1]=new Line3d(vertices[vertex[1]],vertices[vertex[2]]);
 		int k=0;
-		while ((k<others.length) && (!interpenetration))if (k!=skip){
-			Plane plane=new Plane(others[k].a,others[k].b,others[k].c);
+		while ((k<triangles.length) && (!interpenetration))if (k!=skip){
+			Plane plane=new Plane(triangles[k],vertices);
 			//Test for penetration of each edge, first with the plane, then with the triangle
-			for (int linesegment=0;linesegment<3;linesegment++) if (!interpenetration){
+			for (int linesegment=0;linesegment<2;linesegment++) if (!interpenetration){
+				int[] v=triangles[k].GetFace();
+				// First before anything else, test to see if one of the points in the line segment is one of the vertices of the triangle we're about to test
+				if ((!triangles[k].IncludesPoint(vertex[2])) && (!triangles[k].IncludesPoint(vertex[linesegment])))
+				{
 				// Test to see if the line segment intersects the plane which it will unless it is the 
 				// special case that the line segment and plane are parallel in which case we need to do more testing
-				boolean parallel=plane.Intersect(perimeter[linesegment]);
-				// If it is parallel are the points close enough to be considered part of the plane and if they are are they within the triangle
+				boolean parallel=!plane.Intersect(perimeter[linesegment]);
+				// If it is parallel are the points close enough to be considered part of the plane and if they are are they within the triangle?
 				if (parallel) { // these are the special cases
 					Point3d point=plane.FindClosestPointOnPlane(perimeter[linesegment].P);
 					if (perimeter[linesegment].P.ApproxEqual(point)){
 						// Test to see if either end of the line segment are within the triangle, using barycentric coordinates after transferring to 2d barycentric coordinates
 						// if neither end is, does the line segment intersect with the other line segments
-						Point3d up=others[k].b.minus(others[k].a);
+						Point3d up=vertices[v[1]].minus(vertices[v[0]]);
 						Point2d[] triangularvertices;
 						triangularvertices=new Point2d[3];
-						triangularvertices[0]=plane.GetParametricCoordinatesFromPointOnPlane(up, others[k].a);
-						triangularvertices[1]=plane.GetParametricCoordinatesFromPointOnPlane(up, others[k].b);
-						triangularvertices[2]=plane.GetParametricCoordinatesFromPointOnPlane(up, others[k].c);
+						triangularvertices[0]=plane.GetParametricCoordinatesFromPointOnPlane(up, vertices[v[0]]);
+						triangularvertices[1]=plane.GetParametricCoordinatesFromPointOnPlane(up, vertices[v[1]]);
+						triangularvertices[2]=plane.GetParametricCoordinatesFromPointOnPlane(up, vertices[v[2]]);
 						Point2d point1=plane.GetParametricCoordinatesFromPointOnPlane(up, point);
 						Coordinates test=new Coordinates(3);
 						test.pixel=point1.clone();
@@ -273,37 +298,37 @@ public class TrianglePlusVertexArray {
 							if (test.isOutside()) {
 								// Both ends of the line segment are outside the triangle but does the line segment itself intersect the perimeter of the triangle
 								LineSegment2D line=new LineSegment2D(point1,point2);
-								interpenetration=point1.isEqual(line.SingleIntersectionPointBetweenStartAndEndExclusive(new LineSegment2D(triangularvertices[0],triangularvertices[1])));
-								if (!interpenetration) interpenetration=point1.isEqual(line.SingleIntersectionPointBetweenStartAndEndExclusive(new LineSegment2D(triangularvertices[1],triangularvertices[2])));
-								if (!interpenetration) interpenetration=point1.isEqual(line.SingleIntersectionPointBetweenStartAndEndExclusive(new LineSegment2D(triangularvertices[2],triangularvertices[0])));
-								if (interpenetration) System.out.println("Interpenetration detected: The triangle and line segment are parallel, on the same plane with line segment "+linesegment+" crossing the triangle");
-							} else {interpenetration=true; System.out.println("Interpenetration detected: The triangle and line segment are parallel, on the same plane with the end of line segment "+linesegment+" inside the triangle"+k);}
-						} else {interpenetration=true;System.out.println("Interpenetration detected: The triangle and line segment are parallel, on the same plane with the start of line segment "+linesegment+" inside the triangle"+k);}
+								interpenetration=!point1.isEqual(line.SingleIntersectionPointBetweenStartAndEndExclusive(new LineSegment2D(triangularvertices[0],triangularvertices[1])));
+								if (!interpenetration) interpenetration=!point1.isEqual(line.SingleIntersectionPointBetweenStartAndEndExclusive(new LineSegment2D(triangularvertices[1],triangularvertices[2])));
+								if (!interpenetration) interpenetration=!point1.isEqual(line.SingleIntersectionPointBetweenStartAndEndExclusive(new LineSegment2D(triangularvertices[2],triangularvertices[0])));
+								if (interpenetration) System.out.println("Interpenetration detected: The triangle and line segment are parallel, on the same plane with line segment "+vertex[linesegment]+"-"+vertex[2]+" crossing the triangle"+k+" vertices ("+v[0]+","+v[1]+","+v[2]+")");
+							} else {interpenetration=true; System.out.println("Interpenetration detected: The triangle and line segment are parallel, on the same plane with the end of line segment "+vertex[linesegment]+"-"+vertex[2]+" inside the triangle"+k+" vertices ("+v[0]+","+v[1]+","+v[2]+")");}
+						} else {interpenetration=true;System.out.println("Interpenetration detected: The triangle and line segment are parallel, on the same plane with the start of line segment "+vertex[linesegment]+"-"+vertex[2]+" inside the triangle"+k+" vertices ("+v[0]+","+v[1]+","+v[2]+")");}
 					} // end if on the plane
 				} // end if parallel
-				else if (plane.IntersectLineSegment(perimeter[linesegment])){ // this is the general case
+				else if (plane.IntersectLineSegment(perimeter[linesegment])){ // this is the general case. Note now we just want to see if the line segment intersects the plane
 					Point3d intersectionpoint=plane.IntersectionPoint(perimeter[linesegment]);
 					// Now use barycentric coordinates after transforming to 2d parameteric coordinates to see if the point is in the triangle
-					Point3d up=others[k].b.minus(others[k].a);
+					Point3d up=vertices[v[1]].minus(vertices[v[0]]);
 					Point2d[] triangularvertices;
 					triangularvertices=new Point2d[3];
-					triangularvertices[0]=plane.GetParametricCoordinatesFromPointOnPlane(up, others[k].a);
-					triangularvertices[1]=plane.GetParametricCoordinatesFromPointOnPlane(up, others[k].b);
-					triangularvertices[2]=plane.GetParametricCoordinatesFromPointOnPlane(up, others[k].c);
+					triangularvertices[0]=plane.GetParametricCoordinatesFromPointOnPlane(up, vertices[v[0]]);
+					triangularvertices[1]=plane.GetParametricCoordinatesFromPointOnPlane(up, vertices[v[1]]);
+					triangularvertices[2]=plane.GetParametricCoordinatesFromPointOnPlane(up, vertices[v[2]]);
 					Point2d point=plane.GetParametricCoordinatesFromPointOnPlane(up, intersectionpoint);
 					Coordinates test=new Coordinates(3);
 					test.pixel=point.clone();
 					test.calculatebary(triangularvertices);
 					interpenetration=(!test.isOutside()); 
-					if (interpenetration) System.out.println("Interpenetration detected: The triangle and line segment are not parallel, but the line segment "+linesegment+" intersects the plane made by the triangle at a point inside the triangle "+k);
+					if (interpenetration) System.out.println("Interpenetration detected: The triangle and line segment are not parallel, but the line segment "+vertex[linesegment]+"-"+vertex[2]+"  intersects the plane made by the triangle at a point inside the triangle"+k+" vertices ("+v[0]+","+v[1]+","+v[2]+")");
 				} // end else if
+				} // end if line segment ends not include one of points of triangle
 				} // end for linesegments
 			k++;
 				} // end if/while loop
 			else k++;
 		return interpenetration;
 	}
-	*/
 	
 	
 }
