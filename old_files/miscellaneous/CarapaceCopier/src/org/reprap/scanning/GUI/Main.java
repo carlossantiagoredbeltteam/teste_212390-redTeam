@@ -22,7 +22,7 @@
  * 
  * Reece Arnott	reece.arnott@gmail.com
  *
- * Last modified by Reece Arnott 25th January 2011
+ * Last modified by Reece Arnott 28th January 2011
  * 
  * Note that most of the layout commands were initially produced by NetBeans for JDK 6
  * and significantly modified by hand. For future reference if it needs to be done the other way the main things to change are:
@@ -140,7 +140,7 @@ public class Main extends JFrame {
  */ 
 
    //public static enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration,objectfindingvoxelisation,texturematching,writetofile,end};
-    public static enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration,test,end};
+    public static enum steps {calibrationsheet, fileio, calibrationsheetinterrogation,calibration,objectfindingvoxelisation,test,writetofile,end};
     private final static steps stepsarray[]=steps.values();
     private static steps laststep = steps.valueOf("end");
     private static steps firststep = steps.valueOf("calibrationsheet");
@@ -263,18 +263,17 @@ public class Main extends JFrame {
 					// There is an if statement in this step that reads values from: a properties file and two image files per original image file if it is an automatic step
 					// Note that the end is an unconditional call to this method with an incremented step
 					// i.e. automatically go onto the next step
-			/*
 				case objectfindingvoxelisation : 
 					FindCoarseVoxelisedObject(); break; // this is another of the big ones
 					// Note that the end is a call to this method with an incremented step if the next step is set to Automatic
 					// i.e. exit without the user pressing the exit button
-				case texturematching :SurfacePointTextureMatching();break;
+				//case texturematching :SurfacePointTextureMatching();break;
+				case test: Test2();break;
+	 				
 				case writetofile:
 					OutputSTLFile(); 
 					GraphicsFeedback(); // image feedback if the debug options are set
  					 break;
- 				//*/
- 					case test: Test2();break;
  				
  				case end : end(); break;
 				}
@@ -291,16 +290,31 @@ public class Main extends JFrame {
 	 Testing test=new Testing();
 	 test.TemporaryTestMethod();
  }
-
+//TODO make into a "real" method rather than just using it for testing
  public void Test2(){
 	 // Create an equalateral triangle starting at top of calibration sheet
 	 
-	// Point2d a2d=new Point2d(-(calibrationsheetwidth/2),-(calibrationsheetheight/2));
+	 //Point2d a2d=new Point2d(-(calibrationsheetwidth/2),-(calibrationsheetheight/2));
 	// Point2d a2d=new Point2d(0,0);
- Point2d a2d=new Point2d(calibrationsheetwidth/2,calibrationsheetheight/2);
-
-	 double initialangle=Math.PI;
-	 double length=20;
+ Point2d a2d=new Point2d(volumeofinterest.minx,volumeofinterest.miny);
+ 	    // Increment the second progress bar
+ try{ 
+		// This is the recommended way of passing GUI information between threads
+			  EventQueue.invokeLater(new Runnable(){
+				  public void run(){
+					  // Update progress bar
+					  jProgressBar2.setValue(jProgressBar2.getValue()+1);
+					 jLabelProgressBar1.setText("Estimating Surface Triangles");
+					  
+				  }
+			  });
+		  }
+		  catch (Exception e) { 
+			  System.out.println("Exception in updating the progress bar"+e.getMessage());
+      } 
+	 double initialangle=0;
+	 double length=10;
+	 double mindistancebetweenvertices=length/4;
 	 Point2d b2d=a2d.GetOtherPoint(initialangle,length);
 	 Point2d c2d=a2d.GetOtherPoint(initialangle+(((double)60/(double)360)*tau),length);
 	 
@@ -310,49 +324,80 @@ public class Main extends JFrame {
 	  
 	 Point3d upvector=new Point3d(0,0,1);
 	 
+	 //volumeofinterest.minx=(-calibrationsheetwidth/2);
+	 //volumeofinterest.miny=(-calibrationsheetheight/2);
+	 //volumeofinterest.minz=-1;
+	 //volumeofinterest.maxx=(calibrationsheetwidth/2);
+	 //volumeofinterest.maxy=(calibrationsheetheight/2);
+	 //volumeofinterest.maxz=(calibrationsheetwidth/2);
+	 
+	 
+	 // Standard "test every degree from -89.5 to 89.5 inclusive in steps of 1 degree"
+	 //int numberofsubdivisions=1;
+	 //int numberofranges=180;
+	 // subdivide search space recursively to a certain accuracy.
 	 int numberofsubdivisions=3;
 	 int numberofranges=8;
 	 int squaresize=10;
-	 double minimumsimilarityrange=1000;
-	 double mindistancesquaredbetweenvertices=4;
-	 volumeofinterest.minx=(-calibrationsheetwidth/2);
-	 volumeofinterest.miny=(-calibrationsheetheight/2);
-	 volumeofinterest.minz=-1;
-	 volumeofinterest.maxx=(calibrationsheetwidth/2);
-	 volumeofinterest.maxy=(calibrationsheetheight/2);
-	 volumeofinterest.maxz=(calibrationsheetwidth/2);
+	 double minimumsimilarityrange=1000; // between 0 and 255*255*3=195075
+	 int max=1000;
+	 JProgressBar bar=new JProgressBar(0,max);
+		bar.setValue(0);
+
+	
+	 surfacepoints=new Point3d[3];
+	 surfacepoints[0]=a.clone();
+	 surfacepoints[1]=b.clone();
+	 surfacepoints[2]=c.clone();
 	 
-	 Point3d[] vertices=new Point3d[3];
-	 vertices[0]=a.clone();
-	 vertices[1]=b.clone();
-	 vertices[2]=c.clone();
+	 surfacetriangles=new Triangle3D[1];
+	 surfacetriangles[0]=new Triangle3D(0,1,2,surfacepoints,upvector);
 	 
-	 Triangle3D[] tri=new Triangle3D[1];
-	 tri[0]=new Triangle3D(0,1,2,vertices,upvector);
-	 
-	 TrianglePlusVertexArray tripatches=new TrianglePlusVertexArray(vertices,tri);
+	 TrianglePlusVertexArray tripatches=new TrianglePlusVertexArray(surfacepoints,surfacetriangles);
 	 int i=0;
-	 int max=100;
+	 double mindistancesquaredbetweenvertices=mindistancebetweenvertices*mindistancebetweenvertices;
 	 while ((i<max) && (i<tripatches.GetTriangleArrayLength())){
 		 tripatches.ExpandTexturePatch(i, volumeofinterest,numberofranges,numberofsubdivisions,images,squaresize,minimumsimilarityrange,mindistancesquaredbetweenvertices);
-		 System.out.println(i+" "+tripatches.GetTriangleArrayLength()+" "+tripatches.GetVertexArrayLength());
+		 System.out.print((double)((int)(((double)i/(double)tripatches.GetTriangleArrayLength())*10000))/100+"%");
+		 System.out.println("    "+i+" "+tripatches.GetTriangleArrayLength()+" "+tripatches.GetVertexArrayLength());
 		 i++;
+		 if (i==tripatches.GetTriangleArrayLength()) i=max;
+		 bar.setValue(i);
+	 	final JProgressBar temp=bar;
+	 	 //final String text="Estimating Surface Triangles. Found "+i+" out of a maximum of "+max;
+ 		  try{ 
+ 				// This is the recommended way of passing GUI information between threads
+ 					  EventQueue.invokeLater(new Runnable(){
+ 						  public void run(){
+ 							  // Update progress bar
+ 							jProgressBar1.setMinimum(temp.getMinimum());
+ 							  jProgressBar1.setMaximum(temp.getMaximum());
+ 							  jProgressBar1.setValue(temp.getValue());
+ 			//				  jLabelProgressBar1.setText(text);
+ 						  }
+ 					  });
+ 				  }
+ 				  catch (Exception e) { 
+ 					  System.out.println("Exception in updating the progress bar"+e.getMessage());
+ 		         } 
+		 
 		 
 	 }
-	  
-	 tri=tripatches.GetTriangleArray();
-	 vertices=tripatches.GetVertexArray();
-	 max=tri.length;
+	 // Split the patches into the triangles array and the vertices array 
+	 surfacepoints=tripatches.GetVertexArray();
+	 surfacetriangles=tripatches.GetTriangleArray();
+		
+	max=surfacetriangles.length;
 	 String filename=prefs.DebugSaveOutputImagesFolder+File.separatorChar+"test.jpg";
 	 PixelColour colour=new PixelColour(PixelColour.StandardColours.Blue);
 	 GraphicsFeedback graphics=new GraphicsFeedback(true);
 	 graphics.ShowImage(images[0]);
 	 for (i=0;i<max;i++){
 		// if (i>=(tri.length-1)) colour=new PixelColour(PixelColour.StandardColours.Red);
-		 int[] v=tri[i].GetFace();
-		 Line3d ab=new Line3d(vertices[v[0]],vertices[v[1]]);
-		 Line3d bc=new Line3d(vertices[v[1]],vertices[v[2]]);
-		 Line3d ac=new Line3d(vertices[v[0]],vertices[v[2]]);
+		 int[] v=surfacetriangles[i].GetFace();
+		 Line3d ab=new Line3d(surfacepoints[v[0]],surfacepoints[v[1]]);
+		 Line3d bc=new Line3d(surfacepoints[v[1]],surfacepoints[v[2]]);
+		 Line3d ac=new Line3d(surfacepoints[v[0]],surfacepoints[v[2]]);
 		 graphics.PrintLineSegment(ab, colour,images[0]);
 		 graphics.PrintLineSegment(bc, colour,images[0]);
 		 graphics.PrintLineSegment(ac, colour,images[0]);
@@ -360,6 +405,17 @@ public class Main extends JFrame {
 	 }
 	 graphics.SaveImage(filename);
 	 
+	 final String text="Object bounding volume surface estimated using "+surfacetriangles.length+" triangles.\n";
+	  // display output
+	  EventQueue.invokeLater(new Runnable(){
+		  public void run(){
+			  jTextAreaOutput.setText(jTextAreaOutput.getText()+text);
+			}
+	  });
+	 
+	 
+//	 Automatically go onto the next step
+	   setStep(stepsarray[currentstep.ordinal()+1]);
 }
  
  	

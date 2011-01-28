@@ -80,7 +80,7 @@ public class Triangle3D {
 		return returnvalue;
 	}
 //	TODO delete when not needed
-	
+	/*
 	public double getArea(Point3d[] P){
 		// Using Herons formula A=sqrt(p(p-a)(p-b)(p-c)) where a,b,c are the lengths of the sides of the triangle and p is half the perimeter i.e. (a+b+c)/2
 		double ab=Math.sqrt(P[b].minus(P[a]).lengthSquared());
@@ -89,7 +89,22 @@ public class Triangle3D {
 		double p=(ab+ac+bc)/2;
 		return (Math.sqrt(p*(p-ac)*(p-bc)*(p-ac)));
 	}
-	
+	public Point3d GetPointA(Point3d[] P){
+		Point3d returnvalue=new Point3d();
+		if ((a>=0) && (a<P.length)) returnvalue=P[a].clone();
+		return returnvalue;
+	}
+	public Point3d GetPointB(Point3d[] P){
+		Point3d returnvalue=new Point3d();
+		if ((b>=0) && (b<P.length)) returnvalue=P[b].clone();
+		return returnvalue;
+	}
+	public Point3d GetPointC(Point3d[] P){
+		Point3d returnvalue=new Point3d();
+		if ((c>=0) && (c<P.length)) returnvalue=P[c].clone();
+		return returnvalue;
+	}
+	*/
 	public boolean TriangleEqual(Triangle3D other){
 		// This just checks that the  3 vertices of the triangle are the same, but they may not be in the same order etc.
 		int count=0;
