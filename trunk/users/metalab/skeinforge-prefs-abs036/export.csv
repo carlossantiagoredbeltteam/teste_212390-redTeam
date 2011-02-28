@@ -1,7 +1,0 @@
-Format is tab separated preferences.
-Also Send Output To:	
-Delete M110 Gcode Line	False
-Do Not Change Output	True
-gcode_only	False
-gcode_small	False
-Open File to be Exported	

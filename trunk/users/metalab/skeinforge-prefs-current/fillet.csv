@@ -1,8 +1,0 @@
-Format is tab separated preferences.
-Activate Fillet	True
-Arc Point	False
-Arc Radius	False
-Arc Segment	False
-Bevel	True
-Fillet Radius Over Half Extrusion Width (ratio):	0.7
-Open File to be Filleted	/Users/kintel/code/metalab/checkout/reprap/users/metalab/models/cylinder.gts
