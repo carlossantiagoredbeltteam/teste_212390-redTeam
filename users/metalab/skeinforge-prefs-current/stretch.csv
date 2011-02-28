@@ -1,6 +1,0 @@
-Format is tab separated preferences.
-Activate Stretch	True
-Open File to be Stretched	
-Stretch From Distance Over Extrusion Width (ratio):	2.0
-Maximum Stretch Over Extrusion Width (ratio):	0.1
-Perimeter Maximum Stretch Over Extrusion Width (ratio):	0.2
