@@ -1,8 +1,8 @@
 #include <ctype.h>
 #include <stdio.h>
+#include "WProgram.h"
 #include <HardwareSerial.h>
 #include <avr/pgmspace.h>
-#include "WProgram.h"
 #include "vectors.h"
 #include "features.h"
 #include "configuration.h"
