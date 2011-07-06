@@ -3,7 +3,7 @@
 
 // NO RS485/EXTRUDER CONTROLLER SUPPORT
 // PLEASE VERIFY PIN ASSIGNMENTS FOR YOUR CONFIGURATION!!!!!!!
-#define MOTHERBOARD 3 // ATMEGA168 = 0, SANGUINO = 1, MOTHERBOARD = 2, MEGA/RAMPS = 3, ATMEGA328 = 4, Gen6 = 5, Sanguinololu = 6
+#define MOTHERBOARD 6 // ATMEGA168 = 0, SANGUINO = 1, MOTHERBOARD = 2, MEGA/RAMPS = 3, ATMEGA328 = 4, Gen6 = 5, Sanguinololu = 6
 
 //Comment out to disable SD support
 //#define SDSUPPORT 1
@@ -70,8 +70,8 @@ float min_constant_speed_units = 2; // the minimum units of an accelerated move 
 //Calibration variables
 float x_steps_per_unit = 80;
 float y_steps_per_unit = 80;
-float z_steps_per_unit = 6667.184;
-float e_steps_per_unit = 48;
+float z_steps_per_unit = 2560;
+float e_steps_per_unit = 30;
 
 #ifdef REPRAP_ACC
 float f_steps_per_unit = 1;
@@ -100,17 +100,16 @@ const bool DISABLE_E = false;
 
 const bool INVERT_X_DIR = false;
 const bool INVERT_Y_DIR = false;
-const bool INVERT_Z_DIR = true;
+const bool INVERT_Z_DIR = false;
 const bool INVERT_E_DIR = false;
 
 //Thermistor settings:
 //Uncomment for 10k thermistor
-#include "BedThermistorTable_10k.h"
+#include "BedThermistorTable_10k_EPCOS_B57550G103J.h"
 
 //Thermistor settings:
 //Uncomment for 100k thermistor
-#include "ThermistorTable_100k.h"
-//#include "BedThermistorTable_100k.h"
+#include "ThermistorTable_100k_EPCOS_B57540G0104J.h"
 
 //Uncomment for 200k thermistor
 //#include "ThermistorTable_200k.h"
